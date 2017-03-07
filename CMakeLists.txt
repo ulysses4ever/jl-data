@@ -1,0 +1,25 @@
+project(ele-pipeline)
+cmake_minimum_required(VERSION 2.8)
+
+find_package(Threads)
+
+#add_definitions(-std=c++11 -m64 -O2)
+add_definitions(-std=c++11 -m64 -g)
+
+
+file(GLOB_RECURSE SRC_LIST "src/*.h" "src/*.cpp" "../notes.mkd" "../data/datasets.mkd" "../SourcererCC/clone-detector/sourcerer-cc.properties")
+
+#aux_source_directory(. SRC_LIST)
+
+
+include_directories(${CMAKE_SOURCE_DIR})
+
+
+
+
+
+file(GLOB_RECURSE DOWNLOADER_SRC "downloader/*.h" "downloader/*.cpp" "include/*.h" "include/*.cpp" "settings.csv" "hashes/*.cpp" "hashes/*.h")
+
+add_executable(downloader ${DOWNLOADER_SRC})
+target_link_libraries(downloader ${CMAKE_THREAD_LIBS_INIT})
+

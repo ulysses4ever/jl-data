@@ -1,0 +1,115 @@
+#include "include/utils.h"
+#include "include/exec.h"
+
+#include "git.h"
+
+
+#include <iostream>
+
+bool Git::Clone(std::string const & url, std::string const & into) {
+    std::string cmd = STR("git clone " << url << " " << into);
+    std::string out = execAndCapture(cmd, "");
+    return (out.find("fatal:") == std::string::npos);
+}
+
+/** Returns list of all branches in the given repository.
+ */
+std::unordered_set<std::string> Git::GetBranches(std::string const & repoUrl) {
+    std::string cmd = "git branch -r";
+    std::string branches = execAndCapture(cmd, repoUrl);
+    // now analyze the result for the branch names
+    std::unordered_set<std::string> result;
+    std::size_t i = 0;
+    while (i < branches.size()) {
+        // skip leading whitespace
+        while (branches[i] == ' ')
+            ++i;
+        // now everything till ' ' or '\n' is branch name
+        std::size_t start = i + 7;
+        while (branches[i] != ' ' and branches[i] != '\n')
+            ++i;
+        if (branches[i] == '\n') {
+            // now everything up to i is the branch
+            result.insert(branches.substr(start, i - start));
+            ++i;
+        } else {
+            // skip extra info about the branch
+            while (branches[i++] != '\n') { }
+        }
+    }
+    return result;
+}
+
+
+std::string Git::GetCurrentBranch(std::string const & repoUrl) {
+    std::string cmd = "git rev-parse --abbrev-ref HEAD";
+    std::string result;
+    if (execAndCapture(cmd,repoUrl, result))
+        return result.substr(0, result.size() - 1); // ignore the new line at the end of the output
+    else
+        throw std::ios_base::failure(STR("Unable to get current branch in " << repoUrl));
+}
+
+bool Git::SetBranch(std::string const & repoUrl, std::string const branch) {
+    std::string cmd = STR("git checkout " << branch);
+    std::string output; // silenc the console output of git
+    return execAndCapture(cmd, repoUrl, output);
+}
+
+std::vector<Git::FileInfo> Git::GetFileInfo(std::string const & repoUrl) {
+    std::string cmd = STR("git log --format=\"format:%at\" --name-only --diff-filter=A");
+    std::string files = execAndCapture(cmd, repoUrl);
+    // now analyze the files and their dates
+    std::vector<FileInfo> result;
+    std::stringstream ss(files);
+    int date = 0;
+    while (not ss.eof()) {
+        std::string tmp;
+        std::getline(ss, tmp, '\n');
+        if (tmp.empty()) {
+            date = 0;
+        } else if (date == 0) {
+            date = std::stoi(tmp);
+        } else {
+            result.push_back(FileInfo(tmp, date));
+        }
+    }
+    return result;
+}
+
+// todo only works when the file exists
+std::vector<Git::FileHistory> Git::GetFileHistory(std::string const & repoUrl, FileInfo const & file) {
+    std::string cmd = STR("git log --format=\"format:%at %H\" --follow --name-only -- " << file.filename);
+    //std::string cmd = STR("git log --format=\"format:%at %H\" " << filename);
+    std::string history = execAndCapture(cmd, repoUrl);
+    std::vector<FileHistory> result;
+    std::size_t i = 0;
+    while (i < history.size()) {
+        int date = 0;
+        while (history[i] != ' ')
+            date = date * 10 + (history[i++] - '0');
+        //std::cout << "date " << date << std::endl;
+        std::size_t start = ++i; // the space
+        while (i < history.size() and history[i] != '\n')
+            ++i;
+        //std::cout << "start: " << start << ", end: " << i << ", : " << history.substr(start, i - start) << std::endl;
+        std::string hash = history.substr(start, i - start);
+        start = ++i; // \n
+        while (i < history.size() and history[i] != '\n')
+            ++i;
+        result.push_back(FileHistory(history.substr(start, i - start), date, hash));
+        // skip newlines
+        while (history[i] == '\n')
+            ++i; 
+    }
+    return result;
+}
+
+bool Git::GetFileRevision(std::string const & repoUrl, const FileHistory & file, std::string & into) {
+    std::string cmd = STR("git show " << file.hash << ":" << file.filename);
+    return execAndCapture(cmd, repoUrl, into);
+}
+
+
+
+//git log --format="format:%at %H"  --follow CMakeLists.txt
