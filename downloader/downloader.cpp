@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <unordered_map>
+#include <cassert>
 
 #include "include/csv.h"
 #include "include/filesystem.h"
@@ -164,12 +165,30 @@ public:
         return contentId_;
     }
 
+    long parentId() const {
+        return parentId_;
+    }
+
+    long & parentId() {
+        return parentId_;
+    }
+
     bool operator == (FileSnapshot const & other) const {
         return commit_ == other.commit_ and relPath_ == other.relPath_;
     }
 
+    void writeTo(std::ostream & s) const {
+        s << id_ << ","
+          << escape(relPath_) << ","
+          << commit_ << ","
+          << time_ << ","
+          << contentId_ << ","
+          << parentId_ << std::endl;
+    }
+
 private:
     long id_;
+    long parentId_;
     std::string commit_;
     std::string relPath_;
     long contentId_;
@@ -191,17 +210,78 @@ namespace std {
 
 /** Branch Snapshot
 
-  While FileSnapshots provide information about all possible versions of files, the branch snapshot is used to determine which files were part of which branch at given time.
-
-  For each branch visited, the downloader lists the file snapshot ids for the files present in that branch.
-
-  Branch snapshots are stored in `branch_` prefixed files,
+  When the project is downloaded, a branch snapshot contains the file snapshot ids for all relevant files present in the branch at the given commit. This can be used to reconstruct which file snapshots are present in the branch at the given time.
 
  */
 class BranchSnapshot {
 public:
 
+
+
+    /** Adds given file to the branch snapshot.
+     */
+    void addFile(long snapshotId) {
+        files_.push_back(snapshotId);
+    }
+
+    std::string const & name() const {
+        return name_;
+    }
+
+    std::string const & commit() const {
+        return commit_;
+    }
+
+    int date() const {
+        return date_;
+    }
+
+    /** Writes the branch snapshot into the project folder.
+     */
+    void writeTo(std::ostream & s) const {
+        s << escape(name_) << ","
+          << commit_ << ","
+          << date_;
+        for (long f: files_)
+            s << "," << f;
+        s << std::endl;
+    }
+
+    BranchSnapshot(Git::BranchInfo const & b):
+        name_(b.name),
+        commit_(b.commit),
+        date_(b.date) {
+    }
+
+    bool operator == (BranchSnapshot const & other) const {
+        return name_ == other.name_ and commit_ == other.commit_;
+    }
+
+private:
+    // branch name
+    std::string name_;
+    // commit hash at which the branch has been sampled
+    std::string commit_;
+    // creation time of the commit at which the snapshot has been taken
+    int date_;
+    // file snapshot id's that are part of the branch
+    std::vector<long> files_;
 };
+
+namespace std {
+
+    template<>
+    struct hash<::BranchSnapshot> {
+
+        std::size_t operator()(::BranchSnapshot const & b) const {
+            return std::hash<std::string>{}(b.commit());
+        }
+
+    };
+
+}
+
+
 
 
 
@@ -285,6 +365,11 @@ private:
 
 
 
+        // store file snapshots
+        writeProjectStatistics(task);
+
+
+
 
 
         // all work is done, delete the project
@@ -334,34 +419,52 @@ private:
 
      */
     void processFiles(Project & p, std::string const & branchName) {
+        // get the branch snapshot
+        BranchSnapshot branch(Git::GetBranchInfo(p.localPath()));
+        // for incremental downloads, if we have already seen the branch at given commit, there is no need to parse further
+        if (branches_.find(branch) != branches_.end())
+            return;
         // get all files reported in the branch
         for (Git::FileInfo const & file : Git::GetFileInfo(p.localPath())) {
             bool denied;
             if (filePattern_.check(file.filename, denied)) {
-                // TODO if the file exists, add it to the branch information
-                //if (isFile(STR(p.localPath() << "/" << file.filename)))
-                //    throw "NOT IMPLEMENTED";
                 // get the file history and create the snapshots where missing
-                // TODO reverse!!!!!
-                for (Git::FileHistory const & fh : Git::GetFileHistory(p.localPath(), file)) {
-                    FileSnapshot fs(fh);
-                    // if the file snapshot does not yet exist, we must add it, get the contents and add the contents to the
-                    if (files_.find(fs) == files_.end()) {
-                        // get the source
+                std::vector<Git::FileHistory> fh = Git::GetFileHistory(p.localPath(), file);
+                // this is the previous revision id, -1 means no previous revision exists
+                long lastId = -1;
+                // iterate from last to first
+                for (auto i = fh.rbegin(), e = fh.rend(); i != e; ++i) {
+                    FileSnapshot fs(*i);
+                    auto si = files_.find(fs);
+                    if (si == files_.end()) {
                         std::string text;
-                        if (Git::GetFileRevision(p.localPath(), fh, text)) {
+                        if (Git::GetFileRevision(p.localPath(), *i, text)) {
                             // assign the snapshot id
                             fs.id() = files_.size();
+                            fs.parentId() = lastId;
                             fs.contentId() = getContentId(text);
                             // add the file snapshot to current project's snapshots
                             files_.insert(fs);
+                            lastId = fs.id();
+                        } else {
+                            // if the file can't be obtained, it has been deleted. therefore set lastId to -1
+                            lastId = -1;
                         }
+                    } else {
+                        lastId = si->id();
                     }
                 }
+                // if the file exists, add it to the branch information
+                if (isFile(STR(p.localPath() << "/" << file.filename))) {
+                    assert(lastId != -1 and "Deleted file should not be in branch.");
+                    branch.addFile(lastId);
+                }
             } else if (denied) {
+                // if the file has been denied... ouch
                 p.hasDeniedFiles() = true;
             }
         }
+        branches_.insert(branch);
     }
 
     long getContentId(std::string const & text) {
@@ -386,9 +489,23 @@ private:
             // TODO compress the directory contents
             std::cout << "done target dir " << targetDir << std::endl;
         }
+        return id;
     }
 
-
+    void writeProjectStatistics(Project & p) {
+        std::string path = STR(ProjectsPath() << Settings::IdToPath(p.id()) << "/project_" << p.id());
+        createPathIfMissing(path);
+        // create file snapshots
+        std::ofstream fs(STR(path << "/files.csv"));
+        for (auto const & s : files_)
+            s.writeTo(fs);
+        fs.close();
+        // write branches
+        std::ofstream bs(STR(path << "/branches.csv"));
+        for (auto const & s : branches_)
+            s.writeTo(bs);
+        bs.close();
+    }
 
     /** Just deletes the local path associated with the project.
      */
@@ -427,6 +544,10 @@ private:
     /** File snapshots in the current project.
      */
     std::unordered_set<FileSnapshot> files_;
+
+    /** Branches captured in the current project.
+     */
+    std::unordered_set<BranchSnapshot> branches_;
 
 
     /** Contains a map of all file hashes seen so far and their ids.

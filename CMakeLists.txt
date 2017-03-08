@@ -17,9 +17,15 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 
 
+file(GLOB_RECURSE CLEANER_SRC "cleaner/*.h" "cleaner/*.cpp" "include/*.h" "include/*.cpp" "settings.csv" "hashes/*.cpp" "hashes/*.h")
+
+add_executable(cleaner ${CLEANER_SRC})
+target_link_libraries(cleaner ${CMAKE_THREAD_LIBS_INIT})
 
 file(GLOB_RECURSE DOWNLOADER_SRC "downloader/*.h" "downloader/*.cpp" "include/*.h" "include/*.cpp" "settings.csv" "hashes/*.cpp" "hashes/*.h")
 
 add_executable(downloader ${DOWNLOADER_SRC})
 target_link_libraries(downloader ${CMAKE_THREAD_LIBS_INIT})
+
+
 

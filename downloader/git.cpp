@@ -14,9 +14,9 @@ bool Git::Clone(std::string const & url, std::string const & into) {
 
 /** Returns list of all branches in the given repository.
  */
-std::unordered_set<std::string> Git::GetBranches(std::string const & repoUrl) {
+std::unordered_set<std::string> Git::GetBranches(std::string const & repoPath) {
     std::string cmd = "git branch -r";
-    std::string branches = execAndCapture(cmd, repoUrl);
+    std::string branches = execAndCapture(cmd, repoPath);
     // now analyze the result for the branch names
     std::unordered_set<std::string> result;
     std::size_t i = 0;
@@ -41,24 +41,45 @@ std::unordered_set<std::string> Git::GetBranches(std::string const & repoUrl) {
 }
 
 
-std::string Git::GetCurrentBranch(std::string const & repoUrl) {
+std::string Git::GetCurrentBranch(std::string const & repoPath) {
     std::string cmd = "git rev-parse --abbrev-ref HEAD";
     std::string result;
-    if (execAndCapture(cmd,repoUrl, result))
+    if (execAndCapture(cmd,repoPath, result))
         return result.substr(0, result.size() - 1); // ignore the new line at the end of the output
     else
-        throw std::ios_base::failure(STR("Unable to get current branch in " << repoUrl));
+        throw std::ios_base::failure(STR("Unable to get current branch in " << repoPath));
 }
 
-bool Git::SetBranch(std::string const & repoUrl, std::string const branch) {
+std::string Git::GetLatestCommit(std::string const & repoPath) {
+    std::string cmd = "git rev-parse HEAD";
+    std::string result;
+    if (execAndCapture(cmd,repoPath, result))
+        return result.substr(0, result.size() - 1); // ignore the new line at the end of the output
+    else
+        throw std::ios_base::failure(STR("Unable to get latest commit in " << repoPath));
+}
+
+bool Git::SetBranch(std::string const & repoPath, std::string const branch) {
     std::string cmd = STR("git checkout " << branch);
     std::string output; // silenc the console output of git
-    return execAndCapture(cmd, repoUrl, output);
+    return execAndCapture(cmd, repoPath, output);
 }
 
-std::vector<Git::FileInfo> Git::GetFileInfo(std::string const & repoUrl) {
+Git::BranchInfo Git::GetBranchInfo(std::string const & repoPath) {
+    std::string name = GetCurrentBranch(repoPath);
+    std::string commit = GetLatestCommit(repoPath);
+    std::string cmd = STR("git show -s --format=%at " << commit);
+    std::string result;
+    if (execAndCapture(cmd,repoPath, result))
+        return BranchInfo(name, commit, std::stoi(result));
+    else
+        throw std::ios_base::failure(STR("Unable to get current branch info " << repoPath));
+}
+
+
+std::vector<Git::FileInfo> Git::GetFileInfo(std::string const & repoPath) {
     std::string cmd = STR("git log --format=\"format:%at\" --name-only --diff-filter=A");
-    std::string files = execAndCapture(cmd, repoUrl);
+    std::string files = execAndCapture(cmd, repoPath);
     // now analyze the files and their dates
     std::vector<FileInfo> result;
     std::stringstream ss(files);
@@ -78,10 +99,10 @@ std::vector<Git::FileInfo> Git::GetFileInfo(std::string const & repoUrl) {
 }
 
 // todo only works when the file exists
-std::vector<Git::FileHistory> Git::GetFileHistory(std::string const & repoUrl, FileInfo const & file) {
+std::vector<Git::FileHistory> Git::GetFileHistory(std::string const & repoPath, FileInfo const & file) {
     std::string cmd = STR("git log --format=\"format:%at %H\" --follow --name-only -- " << file.filename);
     //std::string cmd = STR("git log --format=\"format:%at %H\" " << filename);
-    std::string history = execAndCapture(cmd, repoUrl);
+    std::string history = execAndCapture(cmd, repoPath);
     std::vector<FileHistory> result;
     std::size_t i = 0;
     while (i < history.size()) {
@@ -105,9 +126,9 @@ std::vector<Git::FileHistory> Git::GetFileHistory(std::string const & repoUrl, F
     return result;
 }
 
-bool Git::GetFileRevision(std::string const & repoUrl, const FileHistory & file, std::string & into) {
+bool Git::GetFileRevision(std::string const & repoPath, const FileHistory & file, std::string & into) {
     std::string cmd = STR("git show " << file.hash << ":" << file.filename);
-    return execAndCapture(cmd, repoUrl, into);
+    return execAndCapture(cmd, repoPath, into);
 }
 
 
