@@ -89,6 +89,11 @@ public:
         return hasDeniedFiles_;
     }
 
+    void writeTo(std::ostream & s) {
+        s << id_ << ","
+          << escape(gitUrl_) << ","
+          << (hasDeniedFiles_ ? 1 : 0) << std::endl;
+    }
 
 private:
     friend std::ostream & operator << (std::ostream & s, Project const & task) {
@@ -362,16 +367,8 @@ private:
         download(task);
         // process all branches
         processAllBranches(task);
-
-
-
         // store file snapshots
         writeProjectStatistics(task);
-
-
-
-
-
         // all work is done, delete the project
         deleteProject(task);
     }
@@ -456,7 +453,8 @@ private:
                 }
                 // if the file exists, add it to the branch information
                 if (isFile(STR(p.localPath() << "/" << file.filename))) {
-                    assert(lastId != -1 and "Deleted file should not be in branch.");
+                    if (lastId == -1)
+                        assert(lastId != -1 and "Deleted file should not be in branch.");
                     branch.addFile(lastId);
                 }
             } else if (denied) {
@@ -505,6 +503,8 @@ private:
         for (auto const & s : branches_)
             s.writeTo(bs);
         bs.close();
+        // write the project to the projects list
+        p.writeTo(projects_);
     }
 
     /** Just deletes the local path associated with the project.
@@ -557,12 +557,18 @@ private:
     /** File patterns to accept, or deny.
      */
     static PatternList filePattern_;
+
+    /** File to which the analyzed projects are stored.
+     */
+    static std::ofstream projects_;
 };
 
 
 std::unordered_map<Hash, long> Downloader::fileHashes_;
 
 PatternList Downloader::filePattern_;
+
+std::ofstream Downloader::projects_;
 
 
 
@@ -585,7 +591,8 @@ int main(int argc, char * argv[]) {
     Downloader::Initialize(PatternList::JavaScript());
     Downloader::Spawn(1);
     Downloader::Run();
-    Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
+    //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
+    Downloader::FeedProjectsFrom("/data/ele/projects.csv");
     Downloader::Wait();
     std::cout << "haha" << std::endl;
     /*

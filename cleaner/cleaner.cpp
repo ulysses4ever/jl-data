@@ -50,8 +50,8 @@ private:
         return row[5];
     }
 
-    static std::string const & Url(std::vector<std::string> const & row) {
-        return row[1];
+    static std::string Url(std::vector<std::string> const & row) {
+        return STR("http://github.com/" << row[1].substr(29) <<  ".git");
     }
 
     long load(std::string const & input) {
