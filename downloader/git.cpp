@@ -7,7 +7,7 @@
 #include <iostream>
 
 bool Git::Clone(std::string const & url, std::string const & into) {
-    std::string cmd = STR("git clone " << url << " " << into);
+    std::string cmd = STR("GIT_TERMINAL_PROMPT=0 git clone " << url << " " << into);
     std::string out = execAndCapture(cmd, "");
     return (out.find("fatal:") == std::string::npos);
 }
