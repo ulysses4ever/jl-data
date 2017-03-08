@@ -368,7 +368,7 @@ public:
         unsigned line = 0;
         for (auto x : p) {
             // TODO only do first 100 projects
-            if (line > 50)
+            if (line > 10000)
                 break;
             ++line;
             if (x.size() == 1) {
@@ -536,7 +536,8 @@ private:
         Hash h = Hash::Calculate(text);
         long id;
         {
-            // TODO lock this
+            // lock on the file contents
+            std::lock_guard<std::mutex> g(contentsGuard_);
             auto i = fileHashes_.find(h);
             if (i != fileHashes_.end())
                 return i->second;
@@ -551,7 +552,6 @@ private:
         out.close();
         if (Settings::ClosesPathDir(id)) {
             // TODO compress the directory contents
-            std::cout << "done target dir " << targetDir << std::endl;
         }
         return id;
     }
@@ -570,7 +570,7 @@ private:
             s.writeTo(bs);
         bs.close();
         // add the task to projects
-        // TODO this must be mutexed
+        std::lock_guard<std::mutex> g(projectsGuard_);
         projects_.insert(p);
     }
 
@@ -628,6 +628,9 @@ private:
     /** File to which the analyzed projects are stored.
      */
     static std::unordered_set<Project> projects_;
+
+    static std::mutex projectsGuard_;
+    static std::mutex contentsGuard_;
 };
 
 
@@ -637,6 +640,9 @@ PatternList Downloader::filePattern_;
 
 std::unordered_set<Project> Downloader::projects_;
 
+
+std::mutex Downloader::projectsGuard_;
+std::mutex Downloader::contentsGuard_;
 
 
 
@@ -656,13 +662,13 @@ int main(int argc, char * argv[]) {
 
     Settings::OutputPath = "/data/ele";
     Downloader::Initialize(PatternList::JavaScript());
-    Downloader::Spawn(1);
+    Downloader::Spawn(8);
     Downloader::Run();
     //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
     Downloader::FeedProjectsFrom("/data/ele/projects.csv");
     Downloader::Wait();
     Downloader::Finalize();
-    std::cout << "haha" << std::endl;
+    std::cout << "DONE" << std::endl;
     /*
 
     Downloader::Spawn(10);

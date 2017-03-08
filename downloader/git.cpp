@@ -60,7 +60,7 @@ std::string Git::GetLatestCommit(std::string const & repoPath) {
 }
 
 bool Git::SetBranch(std::string const & repoPath, std::string const branch) {
-    std::string cmd = STR("git checkout " << branch);
+    std::string cmd = STR("git checkout \"" << branch << "\"");
     std::string output; // silenc the console output of git
     return execAndCapture(cmd, repoPath, output);
 }

@@ -22,4 +22,5 @@ Hash Hash::Calculate(std::string const & from) {
     md5.add(from.c_str(), from.size());
     Hash result;
     md5.getHash(reinterpret_cast<unsigned char*>(& result));
+    return result;
 }
