@@ -106,6 +106,13 @@ public:
             cvStatus_.wait(g);
     }
 
+    static unsigned long CompletedTasks() {
+        return completedTasks_;
+    }
+
+    static unsigned long ErrorTasks() {
+        return errorTasks_;
+    }
 
 
 protected:

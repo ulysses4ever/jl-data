@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <ctime>
 
 /** Shorthand for converting different types to string as long as they support the std::ostream << operator.
  */
@@ -53,3 +54,8 @@ inline std::string escape(std::string const & from, bool quote = true) {
         result += "\"";
     return result;
 }
+
+inline int timestamp() {
+    return std::time(nullptr);
+}
+

@@ -89,6 +89,10 @@ public:
         return hasDeniedFiles_;
     }
 
+    bool operator == (Project const & other) const {
+        return gitUrl_ == other.gitUrl_;
+    }
+
     void writeTo(std::ostream & s) {
         s << id_ << ","
           << escape(gitUrl_) << ","
@@ -115,11 +119,25 @@ private:
 
     /** True if there were some files that are explicitly denied.
      */
-    bool hasDeniedFiles_;
+    bool hasDeniedFiles_ = false;
 
 
     static std::atomic<long> idIndex_;
 };
+
+namespace std {
+
+    template<>
+    struct hash<::Project> {
+
+        std::size_t operator()(::Project const & p) const {
+            return std::hash<std::string>{}(p.gitUrl());
+        }
+
+    };
+
+}
+
 
 
 /**  File Snapshots.
@@ -331,6 +349,16 @@ public:
         createPathIfMissing(FilesPath());
     }
 
+    static void Finalize() {
+        WriteProjects();
+        // output the file contents mapping
+        WriteContentsMapping();
+        // output the statistics
+        WriteStatistics();
+    }
+
+
+
     /** Reads the given file, and schedules each project in it for the download.
 
       The file should contain a git url per line.
@@ -339,6 +367,9 @@ public:
         CSVParser p(filename);
         unsigned line = 0;
         for (auto x : p) {
+            // TODO only do first 100 projects
+            if (line > 50)
+                break;
             ++line;
             if (x.size() == 1) {
                 Schedule(Project(x[0]));
@@ -356,12 +387,47 @@ public:
     }
 
 private:
+
+    static void WriteProjects() {
+        std::ofstream f(STR(StatsPath() << "/projects.csv"));
+        for (auto p : projects_)
+            p.writeTo(f);
+    }
+
+    static void WriteContentsMapping() {
+        std::ofstream f(STR(StatsPath() << "/contents.csv"));
+        for (auto i : fileHashes_)
+            f << i.first << "," << i.second << std::endl;
+    }
+
+
+    /** Writes statistics about the run.
+
+      - date of the run
+      - # of projects (tasks) analyzed
+      - # of project stored
+      - # of projects which failed to download
+      - # number of unique file contents analyzed
+
+     */
+    static void WriteStatistics() {
+        std::ofstream f(STR(StatsPath() << "/runs.csv"));
+        f << timestamp() << ","
+          << CompletedTasks() << ","
+          << projects_.size() << ","
+          << ErrorTasks() << ","
+          << fileHashes_.size() << std::endl;
+    }
+
     /** For each project, the dowloader does the following:
 
       - attempt to clone the project, if this fails, the project's url is reported to the failed files
 
      */
     void run(Project & task) override {
+        files_.clear();
+        branches_.clear();
+
         Log(STR("Processing task " << task));
         // clone the project
         download(task);
@@ -423,7 +489,7 @@ private:
             return;
         // get all files reported in the branch
         for (Git::FileInfo const & file : Git::GetFileInfo(p.localPath())) {
-            bool denied;
+            bool denied = false;
             if (filePattern_.check(file.filename, denied)) {
                 // get the file history and create the snapshots where missing
                 std::vector<Git::FileHistory> fh = Git::GetFileHistory(p.localPath(), file);
@@ -503,8 +569,9 @@ private:
         for (auto const & s : branches_)
             s.writeTo(bs);
         bs.close();
-        // write the project to the projects list
-        p.writeTo(projects_);
+        // add the task to projects
+        // TODO this must be mutexed
+        projects_.insert(p);
     }
 
     /** Just deletes the local path associated with the project.
@@ -560,7 +627,7 @@ private:
 
     /** File to which the analyzed projects are stored.
      */
-    static std::ofstream projects_;
+    static std::unordered_set<Project> projects_;
 };
 
 
@@ -568,7 +635,7 @@ std::unordered_map<Hash, long> Downloader::fileHashes_;
 
 PatternList Downloader::filePattern_;
 
-std::ofstream Downloader::projects_;
+std::unordered_set<Project> Downloader::projects_;
 
 
 
@@ -594,6 +661,7 @@ int main(int argc, char * argv[]) {
     //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
     Downloader::FeedProjectsFrom("/data/ele/projects.csv");
     Downloader::Wait();
+    Downloader::Finalize();
     std::cout << "haha" << std::endl;
     /*
 

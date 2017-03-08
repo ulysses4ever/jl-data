@@ -2,4 +2,4 @@
 
 std::string Settings::OutputPath;
 
-int Settings::MaxFilesPerDirectory = 10;
+int Settings::MaxFilesPerDirectory = 1000;
