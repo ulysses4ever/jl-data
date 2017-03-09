@@ -98,7 +98,8 @@ long Cleaner::Limit = -1;
 
  */
 int main(int argc, char* argv[]) {
-    Cleaner::FilterLanguage("JavaScript");
+    Cleaner::FilterLanguage("Julia");
+//    Cleaner::FilterLanguage("JavaScript");
     Cleaner::Clean("/data/ghtorrent/projects.csv", "/data/ele/projects.csv");
     return EXIT_SUCCESS;
 }

@@ -20,6 +20,11 @@ public:
         return js;
     }
 
+    static PatternList Julia() {
+	PatternList jl; 
+        jl.allowSuffix(".jl");
+    }
+
     /** Returns true if the given filename should be analyzed, false if not.
 
       First the denied exact names, prefixes, suffixes and contains are checked. If the filename does not violate these, then the allowed items are checked and if at least one matches, true is returned.
