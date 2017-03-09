@@ -66,6 +66,13 @@ public:
         return gitUrl_;
     }
 
+    /** Returns the project url to be used when querying github API.
+     */
+    std::string apiUrl() const {
+        std::string result = gitUrl_.substr(18, gitUrl_.size() - 22); // remove gh http and .git
+        return STR("https://api.github.com/repos/" << result);
+    }
+
     /** Default constructor required by the worker framework.
      */
     Project():
@@ -332,7 +339,6 @@ public:
 
         // for now, just make sure the directories exist
         createPathIfMissing(Settings::OutputPath);
-        createPathIfMissing(TempPath());
         createPathIfMissing(StatsPath());
         createPathIfMissing(ProjectsPath());
         createPathIfMissing(FilesPath());
@@ -359,12 +365,15 @@ public:
      */
     static void FeedProjectsFrom(std::string const & filename) {
         CSVParser p(filename);
-        unsigned line = 0;
+        long line = -1;
         for (auto x : p) {
-            // TODO only do first 100 projects
-            if (line > 10000)
-                break;
             ++line;
+            // skip the initial projects if requested
+            if (line < Debug_FirstProjectOffset)
+                continue;
+            // and only do the given number of them if required
+            if (Debug_MaxProjects > -1 and line > Debug_FirstProjectOffset + Debug_MaxProjects)
+                break;
             if (x.size() == 1) {
                 Schedule(Project(x[0]));
                 continue;
@@ -379,6 +388,36 @@ public:
             Error(STR(filename << ", line " << line << ": Invalid format of the project url input, skipping."));
         }
     }
+
+    /** If true, once an output directory contains its maximal number of files, the files will be compressed to an archive.
+
+      Initial findings show this reduces the output size tenfold.
+     */
+    static bool CompressFileContents;
+
+    /** If true, once a github repository analysis is finished, the repository will be removed from disk.
+
+      TODO when projects are kept, we want to store them hierarchically.
+     */
+    static bool DeleteClonedProjects;
+
+    /** When true, if a project seems to be already cloned in the destination directory,
+
+      Note that this should only be useful in debug mode.
+     */
+    static bool Debug_ReuseClonedProjects;
+
+    /** Maximal number of projects to be fetched.
+
+       All projects are fetched if -1.
+     */
+    static long Debug_MaxProjects;
+
+    /** Number of projects to skip when fetching.
+
+      If 0, no projects are skipped.
+     */
+    static long Debug_FirstProjectOffset;
 
 private:
 
@@ -396,8 +435,8 @@ private:
 
 	static void WriteFailedProjects() {
 		std::ofstream f(STR(StatsPath() << "/failedProjects.csv"));
-		for (auto i : failedProjects_)
-			f << i << std::endl;
+        for (auto i : failedProjects_)
+            f << i.gitUrl() << "," << i.id();
 	}
 
 
@@ -435,29 +474,39 @@ private:
         processAllBranches(task);
         // store file snapshots
         writeProjectStatistics(task);
+        // load the metadata
+        downloadMetadata(task);
         // all work is done, delete the project
         deleteProject(task);
     }
 
+
+
     void download(Project & p) {
-		localPath_ = STR(TempPath() << "/" << p.id());
+        localPath_ = STR(ProjectsPath() << Settings::IdToPath(p.id()) << "/project_" << p.id());
+        createPathIfMissing(localPath_);
+        localRepo_ = STR(localPath_ << "/repo");
         // if by chance the dir already exists (from last execution, remove it so that we can clone into)
-        if (isDirectory(localPath_))
-            deletePath(localPath_);
-        if (not Git::Clone(p.gitUrl(), localPath_)) {
+        if (isDirectory(localRepo_)) {
+            // unless we are reusing cloned projects
+            if (Debug_ReuseClonedProjects)
+                return;
+            deletePath(localRepo_);
+        }
+        if (not Git::Clone(p.gitUrl(), localRepo_)) {
 			// the project can't be downloaded, output it to the failed list
 			{
 				std::lock_guard<std::mutex> g(projectsGuard_);
-				failedProjects_.push_back(p.gitUrl());
+                failedProjects_.insert(p);
 			}
             throw std::runtime_error(STR("Unable to download project " << p.gitUrl()));
         }
-        Log(STR(p << " successfully cloned to local path " << localPath_));
+        Log(STR(p << " successfully cloned to local path " << localRepo_));
     }
 
     void processAllBranches(Project & p) {
-        std::unordered_set<std::string> branches = Git::GetBranches(localPath_);
-        std::string current = Git::GetCurrentBranch(localPath_);
+        std::unordered_set<std::string> branches = Git::GetBranches(localRepo_);
+        std::string current = Git::GetCurrentBranch(localRepo_);
         while (true) {
             branches.erase(current); // remove current branch
             Log(STR("Analyzing branch " << current));
@@ -471,7 +520,7 @@ private:
                 current = * branches.begin();
                 branches.erase(branches.begin());
                 // and checkout
-                if (not Git::SetBranch(localPath_, current)) {
+                if (not Git::SetBranch(localRepo_, current)) {
                     Error(STR("Unable to checkout branch " << current));
                     continue;
                 }
@@ -485,16 +534,16 @@ private:
      */
     void processFiles(Project & p, std::string const & branchName) {
         // get the branch snapshot
-        BranchSnapshot branch(Git::GetBranchInfo(localPath_));
+        BranchSnapshot branch(Git::GetBranchInfo(localRepo_));
         // for incremental downloads, if we have already seen the branch at given commit, there is no need to parse further
         if (branches_.find(branch) != branches_.end())
             return;
         // get all files reported in the branch
-        for (Git::FileInfo const & file : Git::GetFileInfo(localPath_)) {
+        for (Git::FileInfo const & file : Git::GetFileInfo(localRepo_)) {
             bool denied = false;
             if (filePattern_.check(file.filename, denied)) {
                 // get the file history and create the snapshots where missing
-                std::vector<Git::FileHistory> fh = Git::GetFileHistory(localPath_, file);
+                std::vector<Git::FileHistory> fh = Git::GetFileHistory(localRepo_, file);
                 // this is the previous revision id, -1 means no previous revision exists
                 long lastId = -1;
                 // iterate from last to first
@@ -503,7 +552,7 @@ private:
                     auto si = files_.find(fs);
                     if (si == files_.end()) {
                         std::string text;
-                        if (Git::GetFileRevision(localPath_, *i, text)) {
+                        if (Git::GetFileRevision(localRepo_, *i, text)) {
                             // assign the snapshot id
                             fs.id() = files_.size();
                             fs.parentId() = lastId;
@@ -520,12 +569,12 @@ private:
                     }
                 }
                 // if the file exists, add it to the branch information
-                if (isFile(STR(localPath_ << "/" << file.filename))) {
+                if (isFile(STR(localRepo_ << "/" << file.filename))) {
                     if (lastId == -1) {
                         Error(STR("PROJECT: " << p.id()));
                         Error(STR("BRANCH:  " << branchName));
                         Error(STR("FILE:    " << file.filename));
-                        assert(lastId != -1 and "Deleted file should not be in branch.");
+                        throw std::ios_base::failure(STR("Deleted file should not be in branch"));
                     }
                     branch.addFile(lastId);
                 }
@@ -556,22 +605,24 @@ private:
         std::ofstream out(STR(targetDir << "/" << id << ".raw"));
         out << text;
         out.close();
-        if (Settings::ClosesPathDir(id)) {
-            // TODO compress the directory contents
+        if (CompressFileContents and Settings::ClosesPathDir(id)) {
+            bool ok = true;
+            ok = exec("tar cfJ files.tar.xz *.raw", targetDir);
+            ok = exec("rm -f *.raw", targetDir);
+            if (not ok)
+                throw std::ios_base::failure(STR("Unable to compress files in " << targetDir));
         }
         return id;
     }
 
     void writeProjectStatistics(Project & p) {
-        std::string path = STR(ProjectsPath() << Settings::IdToPath(p.id()) << "/project_" << p.id());
-        createPathIfMissing(path);
         // create file snapshots
-        std::ofstream fs(STR(path << "/files.csv"));
+        std::ofstream fs(STR(localPath_ << "/files.csv"));
         for (auto const & s : files_)
             s.writeTo(fs);
         fs.close();
         // write branches
-        std::ofstream bs(STR(path << "/branches.csv"));
+        std::ofstream bs(STR(localPath_ << "/branches.csv"));
         for (auto const & s : branches_)
             s.writeTo(bs);
         bs.close();
@@ -580,19 +631,36 @@ private:
         projects_.insert(p);
     }
 
-    /** Just deletes the local path associated with the project.
-     */
-    void deleteProject(Project & p) {
-        deletePath(localPath_);
-        Log(STR(localPath_ << " deleted."));
+    void downloadMetadata(Project & p) {
+        // if there are no API tokens imported, do not download the metadata
+        if (apiTokens_.empty())
+            return;
+        // get the API index and rotate it
+        size_t tokenIndex;
+        {
+            std::lock_guard<std::mutex> g(apiTokensGuard_);
+            tokenIndex = currentApiToken_++;
+            if (currentApiToken_ == apiTokens_.size())
+                currentApiToken_ = 0;
+        }
+        // construct the url and the request
+        std::string req = STR("curl -i -s " << p.apiUrl() << " -H \"Authorization: token " << apiTokens_[tokenIndex] << "\"");
+        req = execAndCapture(req, localPath_);
+        // TODO analyze the results somehow to be a bit more robust
+
+        // store the raw json data
+        std::ofstream m(STR(localPath_ << "/metadata.json"));
+        m << req;
     }
 
 
-
-
-
-    static std::string TempPath() {
-        return Settings::OutputPath + "/temp";
+    /** Just deletes the local path associated with the project.
+     */
+    void deleteProject(Project & p) {
+        if (DeleteClonedProjects) {
+            deletePath(localRepo_);
+            Log(STR(localRepo_ << " deleted."));
+        }
     }
 
     static std::string StatsPath() {
@@ -615,6 +683,7 @@ private:
 	/** Contains the local path where the current project is stored. 
 	 */
 	std::string localPath_;
+    std::string localRepo_;
 
     /** File snapshots in the current project.
      */
@@ -639,11 +708,50 @@ private:
 
 	/** Vector which contains a list of failed projects so that they can be reattempted in the future. 
 	 */
-	static std::vector<std::string> failedProjects_;
+    static std::unordered_set<Project> failedProjects_;
+
+    /** List of API tokens which the metadata downloader rotates to circumvent the single token rate limitation.
+     */
+public:
+    static std::vector<std::string> apiTokens_;
+
+private:
+
+    /** Current API token to be used.
+     */
+    static int currentApiToken_;
 
     static std::mutex projectsGuard_;
     static std::mutex contentsGuard_;
+    static std::mutex apiTokensGuard_;
 };
+
+
+bool Downloader::CompressFileContents = true;
+
+bool Downloader::DeleteClonedProjects = true;
+
+bool Downloader::Debug_ReuseClonedProjects = false;
+
+long Downloader::Debug_MaxProjects = 1000;
+
+long Downloader::Debug_FirstProjectOffset = 0;
+
+
+
+
+std::vector<std::string> Downloader::apiTokens_;
+int Downloader::currentApiToken_ = 0;
+
+std::mutex Downloader::apiTokensGuard_;
+
+
+
+
+
+
+
+
 
 
 std::unordered_map<Hash, long> Downloader::fileHashes_;
@@ -651,11 +759,18 @@ std::unordered_map<Hash, long> Downloader::fileHashes_;
 PatternList Downloader::filePattern_;
 
 std::unordered_set<Project> Downloader::projects_;
-std::vector<std::string> Downloader::failedProjects_;
+std::unordered_set<Project> Downloader::failedProjects_;
 
 
 std::mutex Downloader::projectsGuard_;
 std::mutex Downloader::contentsGuard_;
+
+
+
+
+
+
+
 
 
 
@@ -668,22 +783,29 @@ std::atomic<long> Project::idIndex_(0);
 
 
 
+
+
 /** Things to do:
 
   - settings in one file that is part of the target zone
   - single executable with arguments
   - incremental
   - metadata - for metadata we need either a different downloader, or more authentication tokens
-  - compressing files
+  - compressing files (DONE)
 
  */
 
 
 
 
+
+
+
 int main(int argc, char * argv[]) {
-
-
+    CSVParser p("/data/ele/apitokens.csv");
+    for (auto row : p) {
+        Downloader::apiTokens_.push_back(row[0]);
+    }
     Settings::OutputPath = "/data/ele";
 	//Settings::OutputPath = "/home/peta/ele";
     Downloader::Initialize(PatternList::JavaScript());
