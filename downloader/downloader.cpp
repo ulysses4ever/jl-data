@@ -521,8 +521,12 @@ private:
                 }
                 // if the file exists, add it to the branch information
                 if (isFile(STR(localPath_ << "/" << file.filename))) {
-                    if (lastId == -1)
+                    if (lastId == -1) {
+                        Error(STR("PROJECT: " << p.id()));
+                        Error(STR("BRANCH:  " << branchName));
+                        Error(STR("FILE:    " << file.filename));
                         assert(lastId != -1 and "Deleted file should not be in branch.");
+                    }
                     branch.addFile(lastId);
                 }
             } else if (denied) {
@@ -658,6 +662,24 @@ std::mutex Downloader::contentsGuard_;
 
 
 std::atomic<long> Project::idIndex_(0);
+
+
+
+
+
+
+/** Things to do:
+
+  - settings in one file that is part of the target zone
+  - single executable with arguments
+  - incremental
+  - metadata - for metadata we need either a different downloader, or more authentication tokens
+  - compressing files
+
+ */
+
+
+
 
 int main(int argc, char * argv[]) {
 
