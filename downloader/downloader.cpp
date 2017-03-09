@@ -342,8 +342,13 @@ public:
         WriteProjects();
         // output the file contents mapping
         WriteContentsMapping();
+
+		// Write the list of failed projects
+		WriteFailedProjects();
+
         // output the statistics
         WriteStatistics();
+
     }
 
 
@@ -389,6 +394,12 @@ private:
             f << i.first << "," << i.second << std::endl;
     }
 
+	static void WriteFailedProjects() {
+		std::ofstream f(STR(StatsPath() << "/failedProjects.csv"));
+		for (auto i : failedProjects_)
+			f << i << std::endl;
+	}
+
 
     /** Writes statistics about the run.
 
@@ -430,13 +441,15 @@ private:
 
     void download(Project & p) {
 		localPath_ = STR(TempPath() << "/" << p.id());
-		return;
         // if by chance the dir already exists (from last execution, remove it so that we can clone into)
         if (isDirectory(localPath_))
             deletePath(localPath_);
         if (not Git::Clone(p.gitUrl(), localPath_)) {
-            // the project can't be downloaded, output it to the failed list
-            // TODO
+			// the project can't be downloaded, output it to the failed list
+			{
+				std::lock_guard<std::mutex> g(projectsGuard_);
+				failedProjects_.push_back(p.gitUrl());
+			}
             throw std::runtime_error(STR("Unable to download project " << p.gitUrl()));
         }
         Log(STR(p << " successfully cloned to local path " << localPath_));
@@ -620,6 +633,10 @@ private:
      */
     static std::unordered_set<Project> projects_;
 
+	/** Vector which contains a list of failed projects so that they can be reattempted in the future. 
+	 */
+	static std::vector<std::string> failedProjects_;
+
     static std::mutex projectsGuard_;
     static std::mutex contentsGuard_;
 };
@@ -630,6 +647,7 @@ std::unordered_map<Hash, long> Downloader::fileHashes_;
 PatternList Downloader::filePattern_;
 
 std::unordered_set<Project> Downloader::projects_;
+std::vector<std::string> Downloader::failedProjects_;
 
 
 std::mutex Downloader::projectsGuard_;
@@ -641,21 +659,17 @@ std::mutex Downloader::contentsGuard_;
 
 std::atomic<long> Project::idIndex_(0);
 
-
-
-
-
 int main(int argc, char * argv[]) {
 
 
-    //Settings::OutputPath = "/data/ele";
-	Settings::OutputPath = "/home/peta/ele";
+    Settings::OutputPath = "/data/ele";
+	//Settings::OutputPath = "/home/peta/ele";
     Downloader::Initialize(PatternList::JavaScript());
     Downloader::Spawn(8);
     Downloader::Run();
     //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
-    //Downloader::FeedProjectsFrom("/data/ele/projects.csv");
-	Downloader::FeedProjectsFrom("/home/peta/ele/projects.csv");
+    Downloader::FeedProjectsFrom("/data/ele/projects.csv");
+	//Downloader::FeedProjectsFrom("/home/peta/ele/projects.csv");
     Downloader::Wait();
     Downloader::Finalize();
     std::cout << "DONE" << std::endl;
