@@ -66,15 +66,6 @@ public:
         return gitUrl_;
     }
 
-    std::string const & localPath() const {
-        return localPath_;
-    }
-
-    void setLocalPath(std::string const & path) {
-        localPath_ = path;
-    }
-
-
     /** Default constructor required by the worker framework.
      */
     Project():
@@ -114,8 +105,6 @@ private:
     /** Git url from which the repo can be cloned.
      */
     std::string gitUrl_;
-
-    std::string localPath_;
 
     /** True if there were some files that are explicitly denied.
      */
@@ -439,23 +428,23 @@ private:
         deleteProject(task);
     }
 
-
     void download(Project & p) {
-        p.setLocalPath(STR(TempPath() << "/" << p.id()));
+		localPath_ = STR(TempPath() << "/" << p.id());
+		return;
         // if by chance the dir already exists (from last execution, remove it so that we can clone into)
-        if (isDirectory(p.localPath()))
-            deletePath(p.localPath());
-        if (not Git::Clone(p.gitUrl(), p.localPath())) {
+        if (isDirectory(localPath_))
+            deletePath(localPath_);
+        if (not Git::Clone(p.gitUrl(), localPath_)) {
             // the project can't be downloaded, output it to the failed list
             // TODO
             throw std::runtime_error(STR("Unable to download project " << p.gitUrl()));
         }
-        Log(STR(p << " successfully cloned to local path " << p.localPath()));
+        Log(STR(p << " successfully cloned to local path " << localPath_));
     }
 
     void processAllBranches(Project & p) {
-        std::unordered_set<std::string> branches = Git::GetBranches(p.localPath());
-        std::string current = Git::GetCurrentBranch(p.localPath());
+        std::unordered_set<std::string> branches = Git::GetBranches(localPath_);
+        std::string current = Git::GetCurrentBranch(localPath_);
         while (true) {
             branches.erase(current); // remove current branch
             Log(STR("Analyzing branch " << current));
@@ -469,7 +458,7 @@ private:
                 current = * branches.begin();
                 branches.erase(branches.begin());
                 // and checkout
-                if (not Git::SetBranch(p.localPath(), current)) {
+                if (not Git::SetBranch(localPath_, current)) {
                     Error(STR("Unable to checkout branch " << current));
                     continue;
                 }
@@ -483,16 +472,16 @@ private:
      */
     void processFiles(Project & p, std::string const & branchName) {
         // get the branch snapshot
-        BranchSnapshot branch(Git::GetBranchInfo(p.localPath()));
+        BranchSnapshot branch(Git::GetBranchInfo(localPath_));
         // for incremental downloads, if we have already seen the branch at given commit, there is no need to parse further
         if (branches_.find(branch) != branches_.end())
             return;
         // get all files reported in the branch
-        for (Git::FileInfo const & file : Git::GetFileInfo(p.localPath())) {
+        for (Git::FileInfo const & file : Git::GetFileInfo(localPath_)) {
             bool denied = false;
             if (filePattern_.check(file.filename, denied)) {
                 // get the file history and create the snapshots where missing
-                std::vector<Git::FileHistory> fh = Git::GetFileHistory(p.localPath(), file);
+                std::vector<Git::FileHistory> fh = Git::GetFileHistory(localPath_, file);
                 // this is the previous revision id, -1 means no previous revision exists
                 long lastId = -1;
                 // iterate from last to first
@@ -501,7 +490,7 @@ private:
                     auto si = files_.find(fs);
                     if (si == files_.end()) {
                         std::string text;
-                        if (Git::GetFileRevision(p.localPath(), *i, text)) {
+                        if (Git::GetFileRevision(localPath_, *i, text)) {
                             // assign the snapshot id
                             fs.id() = files_.size();
                             fs.parentId() = lastId;
@@ -518,7 +507,7 @@ private:
                     }
                 }
                 // if the file exists, add it to the branch information
-                if (isFile(STR(p.localPath() << "/" << file.filename))) {
+                if (isFile(STR(localPath_ << "/" << file.filename))) {
                     if (lastId == -1)
                         assert(lastId != -1 and "Deleted file should not be in branch.");
                     branch.addFile(lastId);
@@ -577,8 +566,8 @@ private:
     /** Just deletes the local path associated with the project.
      */
     void deleteProject(Project & p) {
-        deletePath(p.localPath());
-        Log(STR(p.localPath() << " deleted."));
+        deletePath(localPath_);
+        Log(STR(localPath_ << " deleted."));
     }
 
 
@@ -606,7 +595,9 @@ private:
 
 
 
-
+	/** Contains the local path where the current project is stored. 
+	 */
+	std::string localPath_;
 
     /** File snapshots in the current project.
      */
@@ -654,18 +645,17 @@ std::atomic<long> Project::idIndex_(0);
 
 
 
-
-
-
 int main(int argc, char * argv[]) {
 
 
-    Settings::OutputPath = "/data/ele";
+    //Settings::OutputPath = "/data/ele";
+	Settings::OutputPath = "/home/peta/ele";
     Downloader::Initialize(PatternList::JavaScript());
     Downloader::Spawn(8);
     Downloader::Run();
     //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
-    Downloader::FeedProjectsFrom("/data/ele/projects.csv");
+    //Downloader::FeedProjectsFrom("/data/ele/projects.csv");
+	Downloader::FeedProjectsFrom("/home/peta/ele/projects.csv");
     Downloader::Wait();
     Downloader::Finalize();
     std::cout << "DONE" << std::endl;

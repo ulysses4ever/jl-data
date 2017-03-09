@@ -100,7 +100,7 @@ std::vector<Git::FileInfo> Git::GetFileInfo(std::string const & repoPath) {
 
 // todo only works when the file exists
 std::vector<Git::FileHistory> Git::GetFileHistory(std::string const & repoPath, FileInfo const & file) {
-    std::string cmd = STR("git log --format=\"format:%at %H\" --follow --name-only -- \"" << file.filename << "\"");
+    std::string cmd = STR("git log --format=\"format:%at %H\" -- \"" << file.filename << "\"");
     //std::string cmd = STR("git log --format=\"format:%at %H\" " << filename);
     std::string history = execAndCapture(cmd, repoPath);
     std::vector<FileHistory> result;
@@ -115,13 +115,8 @@ std::vector<Git::FileHistory> Git::GetFileHistory(std::string const & repoPath, 
             ++i;
         //std::cout << "start: " << start << ", end: " << i << ", : " << history.substr(start, i - start) << std::endl;
         std::string hash = history.substr(start, i - start);
-        start = ++i; // \n
-        while (i < history.size() and history[i] != '\n')
-            ++i;
-        result.push_back(FileHistory(history.substr(start, i - start), date, hash));
-        // skip newlines
-        while (history[i] == '\n')
-            ++i; 
+		++i; // \n
+        result.push_back(FileHistory(file.filename, date, hash));
     }
     return result;
 }
@@ -130,7 +125,3 @@ bool Git::GetFileRevision(std::string const & repoPath, const FileHistory & file
     std::string cmd = STR("git show " << file.hash << ":" << "\"" << file.filename << "\"");
     return execAndCapture(cmd, repoPath, into);
 }
-
-
-
-//git log --format="format:%at %H"  --follow CMakeLists.txt

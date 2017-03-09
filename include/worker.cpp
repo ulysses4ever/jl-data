@@ -40,5 +40,5 @@ void Error(std::string what) {
 }
 
 void Log(std::string what) {
-    //Write(what);
+    Write(what);
 }
