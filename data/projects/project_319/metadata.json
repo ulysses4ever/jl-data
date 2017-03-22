@@ -1,0 +1,23 @@
+HTTP/1.1 401 Unauthorized
+Server: GitHub.com
+Date: Sat, 11 Mar 2017 00:35:41 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 93
+Status: 401 Unauthorized
+X-GitHub-Media-Type: github.v3; format=json
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 54
+X-RateLimit-Reset: 1489196061
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+X-GitHub-Request-Id: E2DE:0712:7268F29:893058A:58C3465D
+
+{
+  "message": "Bad credentials",
+  "documentation_url": "https://developer.github.com/v3"
+}

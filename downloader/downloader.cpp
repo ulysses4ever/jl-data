@@ -802,13 +802,17 @@ std::atomic<long> Project::idIndex_(0);
 
 
 int main(int argc, char * argv[]) {
+std::cout << "starting main method";
 //    CSVParser p("/data/ele/apitokens.csv");
-    CSVParser p("~/jl-proj/ght-pipeline/data/apitokens.csv");
+//    CSVParser p("~/jl-proj/ght-pipeline/data/apitokens.csv");
+    CSVParser p("/afs/athena.mit.edu/user/g/l/glnpease/jl-proj/ght-pipeline/data/apitokens.csv");
+    
     for (auto row : p) {
         Downloader::apiTokens_.push_back(row[0]);
     }
+std::cout << "done with opening api tokens";
 //    Settings::OutputPath = "/data/ele";
-    Settings::OutputPath = "~/jl-proj/ght-pipeline/data";
+    Settings::OutputPath = "/afs/athena.mit.edu/user/g/l/glnpease/jl-proj/ght-pipeline/data";
 	//Settings::OutputPath = "/home/peta/ele";
 //    Downloader::Initialize(PatternList::JavaScript());
     Downloader::Initialize(PatternList::Julia()); //TODO what is this? 
@@ -816,7 +820,7 @@ int main(int argc, char * argv[]) {
     Downloader::Run();
     //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
 //    Downloader::FeedProjectsFrom("/data/ele/projects.csv");
-    Downloader::FeedProjectsFrom("~/jl-proj/ght-pipeline/data/projects-julia.csv");
+    Downloader::FeedProjectsFrom("/afs/athena.mit.edu/user/g/l/glnpease/jl-proj/ght-pipeline/data/projects-julia.csv");
 	//Downloader::FeedProjectsFrom("/home/peta/ele/projects.csv");
     Downloader::Wait();
     Downloader::Finalize();

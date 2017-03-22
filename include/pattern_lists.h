@@ -23,6 +23,7 @@ public:
     static PatternList Julia() {
 	PatternList jl; 
         jl.allowSuffix(".jl");
+	return jl;
     }
 
     /** Returns true if the given filename should be analyzed, false if not.
