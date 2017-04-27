@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:17:18 GMT
+Date: Thu, 27 Apr 2017 17:59:45 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5157
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3248
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2ad6d6149cb9c160038eb6c1ae8c747a"
+Last-Modified: Fri, 13 May 2016 04:33:59 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D230:0712:7239861:88F857A:58C3420E
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: EED8:6637:13310BE:18C5ACE:59023191
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 58697756,
+  "name": "krauth",
+  "full_name": "davidamaro/krauth",
+  "owner": {
+    "login": "davidamaro",
+    "id": 4453955,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/4453955?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/davidamaro",
+    "html_url": "https://github.com/davidamaro",
+    "followers_url": "https://api.github.com/users/davidamaro/followers",
+    "following_url": "https://api.github.com/users/davidamaro/following{/other_user}",
+    "gists_url": "https://api.github.com/users/davidamaro/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/davidamaro/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/davidamaro/subscriptions",
+    "organizations_url": "https://api.github.com/users/davidamaro/orgs",
+    "repos_url": "https://api.github.com/users/davidamaro/repos",
+    "events_url": "https://api.github.com/users/davidamaro/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/davidamaro/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/davidamaro/krauth",
+  "description": "Todos los pseudocódigos del libro de Krauth en Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/davidamaro/krauth",
+  "forks_url": "https://api.github.com/repos/davidamaro/krauth/forks",
+  "keys_url": "https://api.github.com/repos/davidamaro/krauth/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/davidamaro/krauth/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/davidamaro/krauth/teams",
+  "hooks_url": "https://api.github.com/repos/davidamaro/krauth/hooks",
+  "issue_events_url": "https://api.github.com/repos/davidamaro/krauth/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/davidamaro/krauth/events",
+  "assignees_url": "https://api.github.com/repos/davidamaro/krauth/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/davidamaro/krauth/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/davidamaro/krauth/tags",
+  "blobs_url": "https://api.github.com/repos/davidamaro/krauth/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/davidamaro/krauth/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/davidamaro/krauth/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/davidamaro/krauth/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/davidamaro/krauth/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/davidamaro/krauth/languages",
+  "stargazers_url": "https://api.github.com/repos/davidamaro/krauth/stargazers",
+  "contributors_url": "https://api.github.com/repos/davidamaro/krauth/contributors",
+  "subscribers_url": "https://api.github.com/repos/davidamaro/krauth/subscribers",
+  "subscription_url": "https://api.github.com/repos/davidamaro/krauth/subscription",
+  "commits_url": "https://api.github.com/repos/davidamaro/krauth/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/davidamaro/krauth/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/davidamaro/krauth/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/davidamaro/krauth/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/davidamaro/krauth/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/davidamaro/krauth/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/davidamaro/krauth/merges",
+  "archive_url": "https://api.github.com/repos/davidamaro/krauth/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/davidamaro/krauth/downloads",
+  "issues_url": "https://api.github.com/repos/davidamaro/krauth/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/davidamaro/krauth/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/davidamaro/krauth/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/davidamaro/krauth/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/davidamaro/krauth/labels{/name}",
+  "releases_url": "https://api.github.com/repos/davidamaro/krauth/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/davidamaro/krauth/deployments",
+  "created_at": "2016-05-13T03:55:10Z",
+  "updated_at": "2016-05-13T04:33:59Z",
+  "pushed_at": "2016-06-13T02:57:12Z",
+  "git_url": "git://github.com/davidamaro/krauth.git",
+  "ssh_url": "git@github.com:davidamaro/krauth.git",
+  "clone_url": "https://github.com/davidamaro/krauth.git",
+  "svn_url": "https://github.com/davidamaro/krauth",
+  "homepage": null,
+  "size": 2,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

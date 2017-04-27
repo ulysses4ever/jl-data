@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:27:23 GMT
+Date: Thu, 27 Apr 2017 17:58:56 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6500
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3483
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b66ca6885bdec6bd7d37e8d6fb24cd15"
+Last-Modified: Sat, 07 Jan 2017 11:54:18 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 11
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CCEA:0710:4C89427:5B9115B:58C3365B
+Vary: Accept-Encoding
+X-Served-By: 4537b68c46a1b65b106078b0a2578ee2
+X-GitHub-Request-Id: 249E:6631:861B14:AD36C9:59023160
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 66783597,
+  "name": "Deconvolution.jl",
+  "full_name": "JuliaDSP/Deconvolution.jl",
+  "owner": {
+    "login": "JuliaDSP",
+    "id": 6054300,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6054300?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaDSP",
+    "html_url": "https://github.com/JuliaDSP",
+    "followers_url": "https://api.github.com/users/JuliaDSP/followers",
+    "following_url": "https://api.github.com/users/JuliaDSP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaDSP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaDSP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaDSP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaDSP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaDSP/repos",
+    "events_url": "https://api.github.com/users/JuliaDSP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaDSP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaDSP/Deconvolution.jl",
+  "description": "A Julia package for deconvolution of digital signals",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl",
+  "forks_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaDSP/Deconvolution.jl/deployments",
+  "created_at": "2016-08-28T18:18:13Z",
+  "updated_at": "2017-01-07T11:54:18Z",
+  "pushed_at": "2016-12-17T17:54:15Z",
+  "git_url": "git://github.com/JuliaDSP/Deconvolution.jl.git",
+  "ssh_url": "git@github.com:JuliaDSP/Deconvolution.jl.git",
+  "clone_url": "https://github.com/JuliaDSP/Deconvolution.jl.git",
+  "svn_url": "https://github.com/JuliaDSP/Deconvolution.jl",
+  "homepage": "",
+  "size": 657,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaDSP",
+    "id": 6054300,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6054300?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaDSP",
+    "html_url": "https://github.com/JuliaDSP",
+    "followers_url": "https://api.github.com/users/JuliaDSP/followers",
+    "following_url": "https://api.github.com/users/JuliaDSP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaDSP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaDSP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaDSP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaDSP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaDSP/repos",
+    "events_url": "https://api.github.com/users/JuliaDSP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaDSP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 2,
+  "subscribers_count": 2
 }

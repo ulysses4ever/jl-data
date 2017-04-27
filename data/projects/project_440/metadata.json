@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:57:51 GMT
+Date: Thu, 27 Apr 2017 18:00:13 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4975
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3131
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "163e9281286f676c0454544f2cdcf07d"
+Last-Modified: Thu, 22 Dec 2016 14:20:06 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D7D3:070F:2C21B77:34A8CEF:58C3599F
+Vary: Accept-Encoding
+X-Served-By: 4537b68c46a1b65b106078b0a2578ee2
+X-GitHub-Request-Id: BC19:6634:134399E:18E699E:590231AD
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55632771,
+  "name": "NCon.jl",
+  "full_name": "mhauru/NCon.jl",
+  "owner": {
+    "login": "mhauru",
+    "id": 5229876,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/5229876?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mhauru",
+    "html_url": "https://github.com/mhauru",
+    "followers_url": "https://api.github.com/users/mhauru/followers",
+    "following_url": "https://api.github.com/users/mhauru/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mhauru/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mhauru/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mhauru/subscriptions",
+    "organizations_url": "https://api.github.com/users/mhauru/orgs",
+    "repos_url": "https://api.github.com/users/mhauru/repos",
+    "events_url": "https://api.github.com/users/mhauru/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mhauru/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mhauru/NCon.jl",
+  "description": "Tensor network contraction function for Julia.",
+  "fork": false,
+  "url": "https://api.github.com/repos/mhauru/NCon.jl",
+  "forks_url": "https://api.github.com/repos/mhauru/NCon.jl/forks",
+  "keys_url": "https://api.github.com/repos/mhauru/NCon.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mhauru/NCon.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mhauru/NCon.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mhauru/NCon.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mhauru/NCon.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mhauru/NCon.jl/events",
+  "assignees_url": "https://api.github.com/repos/mhauru/NCon.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mhauru/NCon.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mhauru/NCon.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mhauru/NCon.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mhauru/NCon.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mhauru/NCon.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mhauru/NCon.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mhauru/NCon.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mhauru/NCon.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mhauru/NCon.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mhauru/NCon.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mhauru/NCon.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mhauru/NCon.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mhauru/NCon.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mhauru/NCon.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mhauru/NCon.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mhauru/NCon.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mhauru/NCon.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mhauru/NCon.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mhauru/NCon.jl/merges",
+  "archive_url": "https://api.github.com/repos/mhauru/NCon.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mhauru/NCon.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mhauru/NCon.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mhauru/NCon.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mhauru/NCon.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mhauru/NCon.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mhauru/NCon.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mhauru/NCon.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mhauru/NCon.jl/deployments",
+  "created_at": "2016-04-06T18:57:06Z",
+  "updated_at": "2016-12-22T14:20:06Z",
+  "pushed_at": "2016-08-25T18:30:37Z",
+  "git_url": "git://github.com/mhauru/NCon.jl.git",
+  "ssh_url": "git@github.com:mhauru/NCon.jl.git",
+  "clone_url": "https://github.com/mhauru/NCon.jl.git",
+  "svn_url": "https://github.com/mhauru/NCon.jl",
+  "homepage": null,
+  "size": 17,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 2
 }

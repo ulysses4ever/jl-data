@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:49 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5247
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2738
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "425fe10e5f94767f857b78ececa716ee"
+Last-Modified: Tue, 31 May 2016 09:55:55 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 7f48e2f7761567e923121f17538d7a6d
+X-GitHub-Request-Id: A90D:6633:DD86BA:11ED513:5902320D
+
+{
+  "id": 60077585,
+  "name": "Bandits",
+  "full_name": "RemyDegenne/Bandits",
+  "owner": {
+    "login": "RemyDegenne",
+    "id": 4094732,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/4094732?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/RemyDegenne",
+    "html_url": "https://github.com/RemyDegenne",
+    "followers_url": "https://api.github.com/users/RemyDegenne/followers",
+    "following_url": "https://api.github.com/users/RemyDegenne/following{/other_user}",
+    "gists_url": "https://api.github.com/users/RemyDegenne/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/RemyDegenne/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/RemyDegenne/subscriptions",
+    "organizations_url": "https://api.github.com/users/RemyDegenne/orgs",
+    "repos_url": "https://api.github.com/users/RemyDegenne/repos",
+    "events_url": "https://api.github.com/users/RemyDegenne/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/RemyDegenne/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/RemyDegenne/Bandits",
+  "description": "Julia implementation of multi-armed bandits",
+  "fork": false,
+  "url": "https://api.github.com/repos/RemyDegenne/Bandits",
+  "forks_url": "https://api.github.com/repos/RemyDegenne/Bandits/forks",
+  "keys_url": "https://api.github.com/repos/RemyDegenne/Bandits/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/RemyDegenne/Bandits/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/RemyDegenne/Bandits/teams",
+  "hooks_url": "https://api.github.com/repos/RemyDegenne/Bandits/hooks",
+  "issue_events_url": "https://api.github.com/repos/RemyDegenne/Bandits/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/RemyDegenne/Bandits/events",
+  "assignees_url": "https://api.github.com/repos/RemyDegenne/Bandits/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/RemyDegenne/Bandits/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/RemyDegenne/Bandits/tags",
+  "blobs_url": "https://api.github.com/repos/RemyDegenne/Bandits/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/RemyDegenne/Bandits/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/RemyDegenne/Bandits/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/RemyDegenne/Bandits/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/RemyDegenne/Bandits/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/RemyDegenne/Bandits/languages",
+  "stargazers_url": "https://api.github.com/repos/RemyDegenne/Bandits/stargazers",
+  "contributors_url": "https://api.github.com/repos/RemyDegenne/Bandits/contributors",
+  "subscribers_url": "https://api.github.com/repos/RemyDegenne/Bandits/subscribers",
+  "subscription_url": "https://api.github.com/repos/RemyDegenne/Bandits/subscription",
+  "commits_url": "https://api.github.com/repos/RemyDegenne/Bandits/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/RemyDegenne/Bandits/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/RemyDegenne/Bandits/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/RemyDegenne/Bandits/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/RemyDegenne/Bandits/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/RemyDegenne/Bandits/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/RemyDegenne/Bandits/merges",
+  "archive_url": "https://api.github.com/repos/RemyDegenne/Bandits/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/RemyDegenne/Bandits/downloads",
+  "issues_url": "https://api.github.com/repos/RemyDegenne/Bandits/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/RemyDegenne/Bandits/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/RemyDegenne/Bandits/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/RemyDegenne/Bandits/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/RemyDegenne/Bandits/labels{/name}",
+  "releases_url": "https://api.github.com/repos/RemyDegenne/Bandits/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/RemyDegenne/Bandits/deployments",
+  "created_at": "2016-05-31T09:48:10Z",
+  "updated_at": "2016-05-31T09:55:55Z",
+  "pushed_at": "2016-06-01T14:00:33Z",
+  "git_url": "git://github.com/RemyDegenne/Bandits.git",
+  "ssh_url": "git@github.com:RemyDegenne/Bandits.git",
+  "clone_url": "https://github.com/RemyDegenne/Bandits.git",
+  "svn_url": "https://github.com/RemyDegenne/Bandits",
+  "homepage": null,
+  "size": 35,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

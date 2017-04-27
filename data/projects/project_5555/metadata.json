@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:50:38 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5565
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4920
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "419b5416770ae619fe946f5c18913b54"
+Last-Modified: Fri, 31 Mar 2017 03:04:32 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: ef96c2e493b28ffea49b891b085ed2dd
+X-GitHub-Request-Id: 3BB9:6637:13CB731:198C543:59023D7E
+
+{
+  "id": 34028073,
+  "name": "EmpiricalRisks.jl",
+  "full_name": "lindahua/EmpiricalRisks.jl",
+  "owner": {
+    "login": "lindahua",
+    "id": 1900250,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1900250?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lindahua",
+    "html_url": "https://github.com/lindahua",
+    "followers_url": "https://api.github.com/users/lindahua/followers",
+    "following_url": "https://api.github.com/users/lindahua/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lindahua/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lindahua/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lindahua/subscriptions",
+    "organizations_url": "https://api.github.com/users/lindahua/orgs",
+    "repos_url": "https://api.github.com/users/lindahua/repos",
+    "events_url": "https://api.github.com/users/lindahua/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lindahua/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/lindahua/EmpiricalRisks.jl",
+  "description": "Julia implementation of predictors and loss functions for empirical risk minimization",
+  "fork": false,
+  "url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl",
+  "forks_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/forks",
+  "keys_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/teams",
+  "hooks_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/events",
+  "assignees_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/tags",
+  "blobs_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/subscription",
+  "commits_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/merges",
+  "archive_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/downloads",
+  "issues_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/lindahua/EmpiricalRisks.jl/deployments",
+  "created_at": "2015-04-16T01:39:02Z",
+  "updated_at": "2017-03-31T03:04:32Z",
+  "pushed_at": "2017-01-24T07:24:47Z",
+  "git_url": "git://github.com/lindahua/EmpiricalRisks.jl.git",
+  "ssh_url": "git@github.com:lindahua/EmpiricalRisks.jl.git",
+  "clone_url": "https://github.com/lindahua/EmpiricalRisks.jl.git",
+  "svn_url": "https://github.com/lindahua/EmpiricalRisks.jl",
+  "homepage": "",
+  "size": 79,
+  "stargazers_count": 14,
+  "watchers_count": 14,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 6,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 6,
+  "open_issues": 4,
+  "watchers": 14,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 6,
+  "subscribers_count": 5
+}

@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:44:06 GMT
+Date: Thu, 27 Apr 2017 18:00:07 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5205
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3154
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4d76b55f96cc331c948aa00c61203145"
+Last-Modified: Tue, 12 Apr 2016 01:19:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 22
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E6B3:070F:2C164CC:349ADAC:58C35666
+Vary: Accept-Encoding
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: CF17:6633:DD4477:11E7FAD:590231A7
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 56020231,
+  "name": "eve.jl",
+  "full_name": "barcharcraz/eve.jl",
+  "owner": {
+    "login": "barcharcraz",
+    "id": 1304509,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/1304509?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/barcharcraz",
+    "html_url": "https://github.com/barcharcraz",
+    "followers_url": "https://api.github.com/users/barcharcraz/followers",
+    "following_url": "https://api.github.com/users/barcharcraz/following{/other_user}",
+    "gists_url": "https://api.github.com/users/barcharcraz/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/barcharcraz/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/barcharcraz/subscriptions",
+    "organizations_url": "https://api.github.com/users/barcharcraz/orgs",
+    "repos_url": "https://api.github.com/users/barcharcraz/repos",
+    "events_url": "https://api.github.com/users/barcharcraz/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/barcharcraz/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/barcharcraz/eve.jl",
+  "description": "Julia library for interacting with Eve Online",
+  "fork": false,
+  "url": "https://api.github.com/repos/barcharcraz/eve.jl",
+  "forks_url": "https://api.github.com/repos/barcharcraz/eve.jl/forks",
+  "keys_url": "https://api.github.com/repos/barcharcraz/eve.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/barcharcraz/eve.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/barcharcraz/eve.jl/teams",
+  "hooks_url": "https://api.github.com/repos/barcharcraz/eve.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/barcharcraz/eve.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/barcharcraz/eve.jl/events",
+  "assignees_url": "https://api.github.com/repos/barcharcraz/eve.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/barcharcraz/eve.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/barcharcraz/eve.jl/tags",
+  "blobs_url": "https://api.github.com/repos/barcharcraz/eve.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/barcharcraz/eve.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/barcharcraz/eve.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/barcharcraz/eve.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/barcharcraz/eve.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/barcharcraz/eve.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/barcharcraz/eve.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/barcharcraz/eve.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/barcharcraz/eve.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/barcharcraz/eve.jl/subscription",
+  "commits_url": "https://api.github.com/repos/barcharcraz/eve.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/barcharcraz/eve.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/barcharcraz/eve.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/barcharcraz/eve.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/barcharcraz/eve.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/barcharcraz/eve.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/barcharcraz/eve.jl/merges",
+  "archive_url": "https://api.github.com/repos/barcharcraz/eve.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/barcharcraz/eve.jl/downloads",
+  "issues_url": "https://api.github.com/repos/barcharcraz/eve.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/barcharcraz/eve.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/barcharcraz/eve.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/barcharcraz/eve.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/barcharcraz/eve.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/barcharcraz/eve.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/barcharcraz/eve.jl/deployments",
+  "created_at": "2016-04-12T01:19:34Z",
+  "updated_at": "2016-04-12T01:19:44Z",
+  "pushed_at": "2016-05-07T03:02:30Z",
+  "git_url": "git://github.com/barcharcraz/eve.jl.git",
+  "ssh_url": "git@github.com:barcharcraz/eve.jl.git",
+  "clone_url": "https://github.com/barcharcraz/eve.jl.git",
+  "svn_url": "https://github.com/barcharcraz/eve.jl",
+  "homepage": null,
+  "size": 20,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

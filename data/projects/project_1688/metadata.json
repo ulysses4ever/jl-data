@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:16 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5316
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1981
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "f47e486768f54521fe4d51e39a42d029"
+Last-Modified: Fri, 28 Oct 2016 10:10:05 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 7f48e2f7761567e923121f17538d7a6d
+X-GitHub-Request-Id: F532:6637:13442D2:18DE553:59023318
+
+{
+  "id": 29478756,
+  "name": "BARON.jl",
+  "full_name": "joehuchette/BARON.jl",
+  "owner": {
+    "login": "joehuchette",
+    "id": 1373010,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1373010?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/joehuchette",
+    "html_url": "https://github.com/joehuchette",
+    "followers_url": "https://api.github.com/users/joehuchette/followers",
+    "following_url": "https://api.github.com/users/joehuchette/following{/other_user}",
+    "gists_url": "https://api.github.com/users/joehuchette/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/joehuchette/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/joehuchette/subscriptions",
+    "organizations_url": "https://api.github.com/users/joehuchette/orgs",
+    "repos_url": "https://api.github.com/users/joehuchette/repos",
+    "events_url": "https://api.github.com/users/joehuchette/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/joehuchette/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/joehuchette/BARON.jl",
+  "description": "Julia wrapper for the BARON mixed-integer nonlinear programming solver",
+  "fork": false,
+  "url": "https://api.github.com/repos/joehuchette/BARON.jl",
+  "forks_url": "https://api.github.com/repos/joehuchette/BARON.jl/forks",
+  "keys_url": "https://api.github.com/repos/joehuchette/BARON.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/joehuchette/BARON.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/joehuchette/BARON.jl/teams",
+  "hooks_url": "https://api.github.com/repos/joehuchette/BARON.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/joehuchette/BARON.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/joehuchette/BARON.jl/events",
+  "assignees_url": "https://api.github.com/repos/joehuchette/BARON.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/joehuchette/BARON.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/joehuchette/BARON.jl/tags",
+  "blobs_url": "https://api.github.com/repos/joehuchette/BARON.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/joehuchette/BARON.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/joehuchette/BARON.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/joehuchette/BARON.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/joehuchette/BARON.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/joehuchette/BARON.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/joehuchette/BARON.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/joehuchette/BARON.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/joehuchette/BARON.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/joehuchette/BARON.jl/subscription",
+  "commits_url": "https://api.github.com/repos/joehuchette/BARON.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/joehuchette/BARON.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/joehuchette/BARON.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/joehuchette/BARON.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/joehuchette/BARON.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/joehuchette/BARON.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/joehuchette/BARON.jl/merges",
+  "archive_url": "https://api.github.com/repos/joehuchette/BARON.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/joehuchette/BARON.jl/downloads",
+  "issues_url": "https://api.github.com/repos/joehuchette/BARON.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/joehuchette/BARON.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/joehuchette/BARON.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/joehuchette/BARON.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/joehuchette/BARON.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/joehuchette/BARON.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/joehuchette/BARON.jl/deployments",
+  "created_at": "2015-01-19T16:02:11Z",
+  "updated_at": "2016-10-28T10:10:05Z",
+  "pushed_at": "2016-12-16T14:17:52Z",
+  "git_url": "git://github.com/joehuchette/BARON.jl.git",
+  "ssh_url": "git@github.com:joehuchette/BARON.jl.git",
+  "clone_url": "https://github.com/joehuchette/BARON.jl.git",
+  "svn_url": "https://github.com/joehuchette/BARON.jl",
+  "homepage": "",
+  "size": 17,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 2,
+  "open_issues": 2,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 1
+}

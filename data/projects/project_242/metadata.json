@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:48:43 GMT
+Date: Thu, 27 Apr 2017 17:59:34 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5191
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3311
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "fdf566a3f951bfebb0247983b5370650"
+Last-Modified: Fri, 10 Jun 2016 18:32:46 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E009:0712:71F047B:88A11AB:58C33B5B
+Vary: Accept-Encoding
+X-Served-By: a51acaae89a7607fd7ee967627be18e4
+X-GitHub-Request-Id: 32B3:6634:1341DCC:18E4476:59023186
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 60864594,
+  "name": "BayesTree.jl",
+  "full_name": "mathcg/BayesTree.jl",
+  "owner": {
+    "login": "mathcg",
+    "id": 19145161,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/19145161?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mathcg",
+    "html_url": "https://github.com/mathcg",
+    "followers_url": "https://api.github.com/users/mathcg/followers",
+    "following_url": "https://api.github.com/users/mathcg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mathcg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mathcg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mathcg/subscriptions",
+    "organizations_url": "https://api.github.com/users/mathcg/orgs",
+    "repos_url": "https://api.github.com/users/mathcg/repos",
+    "events_url": "https://api.github.com/users/mathcg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mathcg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mathcg/BayesTree.jl",
+  "description": "Code For bayes additive regression trees",
+  "fork": false,
+  "url": "https://api.github.com/repos/mathcg/BayesTree.jl",
+  "forks_url": "https://api.github.com/repos/mathcg/BayesTree.jl/forks",
+  "keys_url": "https://api.github.com/repos/mathcg/BayesTree.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mathcg/BayesTree.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mathcg/BayesTree.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mathcg/BayesTree.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mathcg/BayesTree.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mathcg/BayesTree.jl/events",
+  "assignees_url": "https://api.github.com/repos/mathcg/BayesTree.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mathcg/BayesTree.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mathcg/BayesTree.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mathcg/BayesTree.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mathcg/BayesTree.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mathcg/BayesTree.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mathcg/BayesTree.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mathcg/BayesTree.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mathcg/BayesTree.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mathcg/BayesTree.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mathcg/BayesTree.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mathcg/BayesTree.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mathcg/BayesTree.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mathcg/BayesTree.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mathcg/BayesTree.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mathcg/BayesTree.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mathcg/BayesTree.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mathcg/BayesTree.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mathcg/BayesTree.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mathcg/BayesTree.jl/merges",
+  "archive_url": "https://api.github.com/repos/mathcg/BayesTree.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mathcg/BayesTree.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mathcg/BayesTree.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mathcg/BayesTree.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mathcg/BayesTree.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mathcg/BayesTree.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mathcg/BayesTree.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mathcg/BayesTree.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mathcg/BayesTree.jl/deployments",
+  "created_at": "2016-06-10T17:14:48Z",
+  "updated_at": "2016-06-10T18:32:46Z",
+  "pushed_at": "2016-06-12T05:46:32Z",
+  "git_url": "git://github.com/mathcg/BayesTree.jl.git",
+  "ssh_url": "git@github.com:mathcg/BayesTree.jl.git",
+  "clone_url": "https://github.com/mathcg/BayesTree.jl.git",
+  "svn_url": "https://github.com/mathcg/BayesTree.jl",
+  "homepage": null,
+  "size": 39,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

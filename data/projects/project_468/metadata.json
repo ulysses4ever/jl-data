@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 02:01:00 GMT
+Date: Thu, 27 Apr 2017 18:00:23 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4994
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3107
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "657cf36f41513fbe6f67ff21e169cb6a"
+Last-Modified: Tue, 22 Mar 2016 23:41:55 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E81A:0712:733E0BD:8A30828:58C35A5C
+Vary: Accept-Encoding
+X-Served-By: 2d7a5e35115884240089368322196939
+X-GitHub-Request-Id: 4287:6637:1332DB1:18C812B:590231B7
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 54516295,
+  "name": "SPH.jl",
+  "full_name": "eschnett/SPH.jl",
+  "owner": {
+    "login": "eschnett",
+    "id": 213514,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/213514?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/eschnett",
+    "html_url": "https://github.com/eschnett",
+    "followers_url": "https://api.github.com/users/eschnett/followers",
+    "following_url": "https://api.github.com/users/eschnett/following{/other_user}",
+    "gists_url": "https://api.github.com/users/eschnett/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/eschnett/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/eschnett/subscriptions",
+    "organizations_url": "https://api.github.com/users/eschnett/orgs",
+    "repos_url": "https://api.github.com/users/eschnett/repos",
+    "events_url": "https://api.github.com/users/eschnett/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/eschnett/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/eschnett/SPH.jl",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/eschnett/SPH.jl",
+  "forks_url": "https://api.github.com/repos/eschnett/SPH.jl/forks",
+  "keys_url": "https://api.github.com/repos/eschnett/SPH.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/eschnett/SPH.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/eschnett/SPH.jl/teams",
+  "hooks_url": "https://api.github.com/repos/eschnett/SPH.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/eschnett/SPH.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/eschnett/SPH.jl/events",
+  "assignees_url": "https://api.github.com/repos/eschnett/SPH.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/eschnett/SPH.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/eschnett/SPH.jl/tags",
+  "blobs_url": "https://api.github.com/repos/eschnett/SPH.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/eschnett/SPH.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/eschnett/SPH.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/eschnett/SPH.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/eschnett/SPH.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/eschnett/SPH.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/eschnett/SPH.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/eschnett/SPH.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/eschnett/SPH.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/eschnett/SPH.jl/subscription",
+  "commits_url": "https://api.github.com/repos/eschnett/SPH.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/eschnett/SPH.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/eschnett/SPH.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/eschnett/SPH.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/eschnett/SPH.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/eschnett/SPH.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/eschnett/SPH.jl/merges",
+  "archive_url": "https://api.github.com/repos/eschnett/SPH.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/eschnett/SPH.jl/downloads",
+  "issues_url": "https://api.github.com/repos/eschnett/SPH.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/eschnett/SPH.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/eschnett/SPH.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/eschnett/SPH.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/eschnett/SPH.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/eschnett/SPH.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/eschnett/SPH.jl/deployments",
+  "created_at": "2016-03-22T23:39:08Z",
+  "updated_at": "2016-03-22T23:41:55Z",
+  "pushed_at": "2016-07-13T02:09:33Z",
+  "git_url": "git://github.com/eschnett/SPH.jl.git",
+  "ssh_url": "git@github.com:eschnett/SPH.jl.git",
+  "clone_url": "https://github.com/eschnett/SPH.jl.git",
+  "svn_url": "https://github.com/eschnett/SPH.jl",
+  "homepage": null,
+  "size": 8,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

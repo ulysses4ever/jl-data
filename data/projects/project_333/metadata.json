@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:22:13 GMT
+Date: Thu, 27 Apr 2017 17:59:51 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5275
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3228
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "0ee8ed50f771eb64b5c5fecafa8a9286"
+Last-Modified: Wed, 22 Feb 2017 04:38:34 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 42
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E4ED:0711:71318D5:87DC771:58C35145
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 3C1C:6631:863171:AD5384:59023197
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 58211970,
+  "name": "TALib.jl",
+  "full_name": "femtotrader/TALib.jl",
+  "owner": {
+    "login": "femtotrader",
+    "id": 5049737,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/5049737?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/femtotrader",
+    "html_url": "https://github.com/femtotrader",
+    "followers_url": "https://api.github.com/users/femtotrader/followers",
+    "following_url": "https://api.github.com/users/femtotrader/following{/other_user}",
+    "gists_url": "https://api.github.com/users/femtotrader/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/femtotrader/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/femtotrader/subscriptions",
+    "organizations_url": "https://api.github.com/users/femtotrader/orgs",
+    "repos_url": "https://api.github.com/users/femtotrader/repos",
+    "events_url": "https://api.github.com/users/femtotrader/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/femtotrader/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/femtotrader/TALib.jl",
+  "description": "A Julia wrapper for TA-Lib",
+  "fork": false,
+  "url": "https://api.github.com/repos/femtotrader/TALib.jl",
+  "forks_url": "https://api.github.com/repos/femtotrader/TALib.jl/forks",
+  "keys_url": "https://api.github.com/repos/femtotrader/TALib.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/femtotrader/TALib.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/femtotrader/TALib.jl/teams",
+  "hooks_url": "https://api.github.com/repos/femtotrader/TALib.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/femtotrader/TALib.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/femtotrader/TALib.jl/events",
+  "assignees_url": "https://api.github.com/repos/femtotrader/TALib.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/femtotrader/TALib.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/femtotrader/TALib.jl/tags",
+  "blobs_url": "https://api.github.com/repos/femtotrader/TALib.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/femtotrader/TALib.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/femtotrader/TALib.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/femtotrader/TALib.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/femtotrader/TALib.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/femtotrader/TALib.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/femtotrader/TALib.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/femtotrader/TALib.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/femtotrader/TALib.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/femtotrader/TALib.jl/subscription",
+  "commits_url": "https://api.github.com/repos/femtotrader/TALib.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/femtotrader/TALib.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/femtotrader/TALib.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/femtotrader/TALib.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/femtotrader/TALib.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/femtotrader/TALib.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/femtotrader/TALib.jl/merges",
+  "archive_url": "https://api.github.com/repos/femtotrader/TALib.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/femtotrader/TALib.jl/downloads",
+  "issues_url": "https://api.github.com/repos/femtotrader/TALib.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/femtotrader/TALib.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/femtotrader/TALib.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/femtotrader/TALib.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/femtotrader/TALib.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/femtotrader/TALib.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/femtotrader/TALib.jl/deployments",
+  "created_at": "2016-05-06T14:14:02Z",
+  "updated_at": "2017-02-22T04:38:34Z",
+  "pushed_at": "2016-10-16T16:24:31Z",
+  "git_url": "git://github.com/femtotrader/TALib.jl.git",
+  "ssh_url": "git@github.com:femtotrader/TALib.jl.git",
+  "clone_url": "https://github.com/femtotrader/TALib.jl.git",
+  "svn_url": "https://github.com/femtotrader/TALib.jl",
+  "homepage": "",
+  "size": 557,
+  "stargazers_count": 7,
+  "watchers_count": 7,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 11,
+  "forks": 1,
+  "open_issues": 11,
+  "watchers": 7,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 3
 }

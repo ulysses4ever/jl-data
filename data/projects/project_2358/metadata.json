@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:10:54 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4827
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1337
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b77df46453853dbc8aa95d4276c70f6a"
+Last-Modified: Thu, 20 Nov 2014 11:58:06 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 3895:6634:13618B5:190D407:5902342E
+
+{
+  "id": 20107540,
+  "name": "ecog",
+  "full_name": "shashi/ecog",
+  "owner": {
+    "login": "shashi",
+    "id": 25916,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/25916?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/shashi",
+    "html_url": "https://github.com/shashi",
+    "followers_url": "https://api.github.com/users/shashi/followers",
+    "following_url": "https://api.github.com/users/shashi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/shashi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/shashi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/shashi/subscriptions",
+    "organizations_url": "https://api.github.com/users/shashi/orgs",
+    "repos_url": "https://api.github.com/users/shashi/repos",
+    "events_url": "https://api.github.com/users/shashi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/shashi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/shashi/ecog",
+  "description": "Code for the Brain Topography paper",
+  "fork": false,
+  "url": "https://api.github.com/repos/shashi/ecog",
+  "forks_url": "https://api.github.com/repos/shashi/ecog/forks",
+  "keys_url": "https://api.github.com/repos/shashi/ecog/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/shashi/ecog/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/shashi/ecog/teams",
+  "hooks_url": "https://api.github.com/repos/shashi/ecog/hooks",
+  "issue_events_url": "https://api.github.com/repos/shashi/ecog/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/shashi/ecog/events",
+  "assignees_url": "https://api.github.com/repos/shashi/ecog/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/shashi/ecog/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/shashi/ecog/tags",
+  "blobs_url": "https://api.github.com/repos/shashi/ecog/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/shashi/ecog/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/shashi/ecog/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/shashi/ecog/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/shashi/ecog/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/shashi/ecog/languages",
+  "stargazers_url": "https://api.github.com/repos/shashi/ecog/stargazers",
+  "contributors_url": "https://api.github.com/repos/shashi/ecog/contributors",
+  "subscribers_url": "https://api.github.com/repos/shashi/ecog/subscribers",
+  "subscription_url": "https://api.github.com/repos/shashi/ecog/subscription",
+  "commits_url": "https://api.github.com/repos/shashi/ecog/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/shashi/ecog/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/shashi/ecog/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/shashi/ecog/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/shashi/ecog/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/shashi/ecog/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/shashi/ecog/merges",
+  "archive_url": "https://api.github.com/repos/shashi/ecog/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/shashi/ecog/downloads",
+  "issues_url": "https://api.github.com/repos/shashi/ecog/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/shashi/ecog/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/shashi/ecog/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/shashi/ecog/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/shashi/ecog/labels{/name}",
+  "releases_url": "https://api.github.com/repos/shashi/ecog/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/shashi/ecog/deployments",
+  "created_at": "2014-05-23T17:08:41Z",
+  "updated_at": "2014-11-20T11:58:06Z",
+  "pushed_at": "2014-07-02T11:56:23Z",
+  "git_url": "git://github.com/shashi/ecog.git",
+  "ssh_url": "git@github.com:shashi/ecog.git",
+  "clone_url": "https://github.com/shashi/ecog.git",
+  "svn_url": "https://github.com/shashi/ecog",
+  "homepage": "",
+  "size": 184,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

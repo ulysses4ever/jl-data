@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:51 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5529
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1528
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "fcf6a5dc8bb06613a8be8e567af67450"
+Last-Modified: Mon, 07 Sep 2015 03:42:32 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 15bc4ab707db6d6b474783868c7cc828
+X-GitHub-Request-Id: A679:6637:134BB7B:18E7F69:590233B2
+
+{
+  "id": 32411265,
+  "name": "Orthotopes.jl",
+  "full_name": "KristofferC/Orthotopes.jl",
+  "owner": {
+    "login": "KristofferC",
+    "id": 1282691,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1282691?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/KristofferC",
+    "html_url": "https://github.com/KristofferC",
+    "followers_url": "https://api.github.com/users/KristofferC/followers",
+    "following_url": "https://api.github.com/users/KristofferC/following{/other_user}",
+    "gists_url": "https://api.github.com/users/KristofferC/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/KristofferC/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/KristofferC/subscriptions",
+    "organizations_url": "https://api.github.com/users/KristofferC/orgs",
+    "repos_url": "https://api.github.com/users/KristofferC/repos",
+    "events_url": "https://api.github.com/users/KristofferC/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/KristofferC/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/KristofferC/Orthotopes.jl",
+  "description": "A Julia package for creating n-dimensional \"bounding boxes\"",
+  "fork": false,
+  "url": "https://api.github.com/repos/KristofferC/Orthotopes.jl",
+  "forks_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/forks",
+  "keys_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/teams",
+  "hooks_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/events",
+  "assignees_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/tags",
+  "blobs_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/subscription",
+  "commits_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/merges",
+  "archive_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/downloads",
+  "issues_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/KristofferC/Orthotopes.jl/deployments",
+  "created_at": "2015-03-17T18:09:37Z",
+  "updated_at": "2015-09-07T03:42:32Z",
+  "pushed_at": "2015-04-30T22:18:47Z",
+  "git_url": "git://github.com/KristofferC/Orthotopes.jl.git",
+  "ssh_url": "git@github.com:KristofferC/Orthotopes.jl.git",
+  "clone_url": "https://github.com/KristofferC/Orthotopes.jl.git",
+  "svn_url": "https://github.com/KristofferC/Orthotopes.jl",
+  "homepage": "",
+  "size": 121,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": false,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:54:32 GMT
+Date: Thu, 27 Apr 2017 17:59:37 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5006
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3298
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7cd7c5a698d82f3a1d9a199e248d8933"
+Last-Modified: Mon, 13 Jun 2016 00:28:46 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E07C:0711:703DC11:86BEF38:58C33CB8
+Vary: Accept-Encoding
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 1D3F:6634:1341FD2:18E4715:59023189
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 48989883,
+  "name": "euler",
+  "full_name": "nhejazi/euler",
+  "owner": {
+    "login": "nhejazi",
+    "id": 8527276,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8527276?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nhejazi",
+    "html_url": "https://github.com/nhejazi",
+    "followers_url": "https://api.github.com/users/nhejazi/followers",
+    "following_url": "https://api.github.com/users/nhejazi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nhejazi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nhejazi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nhejazi/subscriptions",
+    "organizations_url": "https://api.github.com/users/nhejazi/orgs",
+    "repos_url": "https://api.github.com/users/nhejazi/repos",
+    "events_url": "https://api.github.com/users/nhejazi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nhejazi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/nhejazi/euler",
+  "description": ":question: my solutions to the mathematics/programming challenges of Project Euler",
+  "fork": false,
+  "url": "https://api.github.com/repos/nhejazi/euler",
+  "forks_url": "https://api.github.com/repos/nhejazi/euler/forks",
+  "keys_url": "https://api.github.com/repos/nhejazi/euler/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/nhejazi/euler/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/nhejazi/euler/teams",
+  "hooks_url": "https://api.github.com/repos/nhejazi/euler/hooks",
+  "issue_events_url": "https://api.github.com/repos/nhejazi/euler/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/nhejazi/euler/events",
+  "assignees_url": "https://api.github.com/repos/nhejazi/euler/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/nhejazi/euler/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/nhejazi/euler/tags",
+  "blobs_url": "https://api.github.com/repos/nhejazi/euler/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/nhejazi/euler/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/nhejazi/euler/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/nhejazi/euler/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/nhejazi/euler/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/nhejazi/euler/languages",
+  "stargazers_url": "https://api.github.com/repos/nhejazi/euler/stargazers",
+  "contributors_url": "https://api.github.com/repos/nhejazi/euler/contributors",
+  "subscribers_url": "https://api.github.com/repos/nhejazi/euler/subscribers",
+  "subscription_url": "https://api.github.com/repos/nhejazi/euler/subscription",
+  "commits_url": "https://api.github.com/repos/nhejazi/euler/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/nhejazi/euler/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/nhejazi/euler/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/nhejazi/euler/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/nhejazi/euler/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/nhejazi/euler/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/nhejazi/euler/merges",
+  "archive_url": "https://api.github.com/repos/nhejazi/euler/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/nhejazi/euler/downloads",
+  "issues_url": "https://api.github.com/repos/nhejazi/euler/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/nhejazi/euler/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/nhejazi/euler/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/nhejazi/euler/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/nhejazi/euler/labels{/name}",
+  "releases_url": "https://api.github.com/repos/nhejazi/euler/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/nhejazi/euler/deployments",
+  "created_at": "2016-01-04T10:21:10Z",
+  "updated_at": "2016-06-13T00:28:46Z",
+  "pushed_at": "2016-06-03T03:50:36Z",
+  "git_url": "git://github.com/nhejazi/euler.git",
+  "ssh_url": "git@github.com:nhejazi/euler.git",
+  "clone_url": "https://github.com/nhejazi/euler.git",
+  "svn_url": "https://github.com/nhejazi/euler",
+  "homepage": "https://projecteuler.net/about",
+  "size": 18,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

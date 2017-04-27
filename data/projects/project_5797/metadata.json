@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:54:21 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5031
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4696
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "871b11e59c0281976f97d8eb46d2f011"
+Last-Modified: Fri, 31 Mar 2017 18:08:15 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: d256f86292c6dde5d09d15d926ec67a3
+X-GitHub-Request-Id: B640:6633:E4D05C:1283D7D:59023E5D
+
+{
+  "id": 42298310,
+  "name": "KSVM.jl",
+  "full_name": "Evizero/KSVM.jl",
+  "owner": {
+    "login": "Evizero",
+    "id": 10854026,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/10854026?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Evizero",
+    "html_url": "https://github.com/Evizero",
+    "followers_url": "https://api.github.com/users/Evizero/followers",
+    "following_url": "https://api.github.com/users/Evizero/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Evizero/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Evizero/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Evizero/subscriptions",
+    "organizations_url": "https://api.github.com/users/Evizero/orgs",
+    "repos_url": "https://api.github.com/users/Evizero/repos",
+    "events_url": "https://api.github.com/users/Evizero/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Evizero/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/Evizero/KSVM.jl",
+  "description": "Support Vector Machines (SVM) in pure Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/Evizero/KSVM.jl",
+  "forks_url": "https://api.github.com/repos/Evizero/KSVM.jl/forks",
+  "keys_url": "https://api.github.com/repos/Evizero/KSVM.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/Evizero/KSVM.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/Evizero/KSVM.jl/teams",
+  "hooks_url": "https://api.github.com/repos/Evizero/KSVM.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/Evizero/KSVM.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/Evizero/KSVM.jl/events",
+  "assignees_url": "https://api.github.com/repos/Evizero/KSVM.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/Evizero/KSVM.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/Evizero/KSVM.jl/tags",
+  "blobs_url": "https://api.github.com/repos/Evizero/KSVM.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/Evizero/KSVM.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/Evizero/KSVM.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/Evizero/KSVM.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/Evizero/KSVM.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/Evizero/KSVM.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/Evizero/KSVM.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/Evizero/KSVM.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/Evizero/KSVM.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/Evizero/KSVM.jl/subscription",
+  "commits_url": "https://api.github.com/repos/Evizero/KSVM.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/Evizero/KSVM.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/Evizero/KSVM.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/Evizero/KSVM.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/Evizero/KSVM.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/Evizero/KSVM.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/Evizero/KSVM.jl/merges",
+  "archive_url": "https://api.github.com/repos/Evizero/KSVM.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/Evizero/KSVM.jl/downloads",
+  "issues_url": "https://api.github.com/repos/Evizero/KSVM.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/Evizero/KSVM.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/Evizero/KSVM.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/Evizero/KSVM.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/Evizero/KSVM.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/Evizero/KSVM.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/Evizero/KSVM.jl/deployments",
+  "created_at": "2015-09-11T08:58:36Z",
+  "updated_at": "2017-03-31T18:08:15Z",
+  "pushed_at": "2016-05-13T15:59:18Z",
+  "git_url": "git://github.com/Evizero/KSVM.jl.git",
+  "ssh_url": "git@github.com:Evizero/KSVM.jl.git",
+  "clone_url": "https://github.com/Evizero/KSVM.jl.git",
+  "svn_url": "https://github.com/Evizero/KSVM.jl",
+  "homepage": "",
+  "size": 448,
+  "stargazers_count": 20,
+  "watchers_count": 20,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 20,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 6
+}

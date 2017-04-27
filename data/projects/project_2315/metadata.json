@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:10:21 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4989
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1381
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "1f67e0f268646af38fb8de37784facf7"
+Last-Modified: Mon, 30 Jan 2017 18:16:57 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 593010132f82159af0ded24b4932e109
+X-GitHub-Request-Id: 512B:6634:13600BB:190B4B4:5902340D
+
+{
+  "id": 44876572,
+  "name": "JSom",
+  "full_name": "agrimaldi/JSom",
+  "owner": {
+    "login": "agrimaldi",
+    "id": 151401,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/151401?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/agrimaldi",
+    "html_url": "https://github.com/agrimaldi",
+    "followers_url": "https://api.github.com/users/agrimaldi/followers",
+    "following_url": "https://api.github.com/users/agrimaldi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/agrimaldi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/agrimaldi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/agrimaldi/subscriptions",
+    "organizations_url": "https://api.github.com/users/agrimaldi/orgs",
+    "repos_url": "https://api.github.com/users/agrimaldi/repos",
+    "events_url": "https://api.github.com/users/agrimaldi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/agrimaldi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/agrimaldi/JSom",
+  "description": "Self Organizing Maps in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/agrimaldi/JSom",
+  "forks_url": "https://api.github.com/repos/agrimaldi/JSom/forks",
+  "keys_url": "https://api.github.com/repos/agrimaldi/JSom/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/agrimaldi/JSom/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/agrimaldi/JSom/teams",
+  "hooks_url": "https://api.github.com/repos/agrimaldi/JSom/hooks",
+  "issue_events_url": "https://api.github.com/repos/agrimaldi/JSom/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/agrimaldi/JSom/events",
+  "assignees_url": "https://api.github.com/repos/agrimaldi/JSom/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/agrimaldi/JSom/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/agrimaldi/JSom/tags",
+  "blobs_url": "https://api.github.com/repos/agrimaldi/JSom/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/agrimaldi/JSom/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/agrimaldi/JSom/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/agrimaldi/JSom/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/agrimaldi/JSom/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/agrimaldi/JSom/languages",
+  "stargazers_url": "https://api.github.com/repos/agrimaldi/JSom/stargazers",
+  "contributors_url": "https://api.github.com/repos/agrimaldi/JSom/contributors",
+  "subscribers_url": "https://api.github.com/repos/agrimaldi/JSom/subscribers",
+  "subscription_url": "https://api.github.com/repos/agrimaldi/JSom/subscription",
+  "commits_url": "https://api.github.com/repos/agrimaldi/JSom/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/agrimaldi/JSom/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/agrimaldi/JSom/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/agrimaldi/JSom/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/agrimaldi/JSom/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/agrimaldi/JSom/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/agrimaldi/JSom/merges",
+  "archive_url": "https://api.github.com/repos/agrimaldi/JSom/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/agrimaldi/JSom/downloads",
+  "issues_url": "https://api.github.com/repos/agrimaldi/JSom/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/agrimaldi/JSom/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/agrimaldi/JSom/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/agrimaldi/JSom/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/agrimaldi/JSom/labels{/name}",
+  "releases_url": "https://api.github.com/repos/agrimaldi/JSom/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/agrimaldi/JSom/deployments",
+  "created_at": "2015-10-24T17:23:03Z",
+  "updated_at": "2017-01-30T18:16:57Z",
+  "pushed_at": "2017-01-30T18:16:55Z",
+  "git_url": "git://github.com/agrimaldi/JSom.git",
+  "ssh_url": "git@github.com:agrimaldi/JSom.git",
+  "clone_url": "https://github.com/agrimaldi/JSom.git",
+  "svn_url": "https://github.com/agrimaldi/JSom",
+  "homepage": null,
+  "size": 33,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 7,
+  "forks": 0,
+  "open_issues": 7,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

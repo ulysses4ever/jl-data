@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:31:38 GMT
+Date: Thu, 27 Apr 2017 17:59:10 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4924
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3415
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "d9dc41530e1fa1f3a6c8c1c36a2e6834"
+Last-Modified: Fri, 06 Jan 2017 08:10:55 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CDEB:0711:6FFB5ED:867171D:58C3375A
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 3523:6637:132F885:18C3B25:5902316E
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 65010290,
+  "name": "learngit",
+  "full_name": "mixml/learngit",
+  "owner": {
+    "login": "mixml",
+    "id": 16316668,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/16316668?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mixml",
+    "html_url": "https://github.com/mixml",
+    "followers_url": "https://api.github.com/users/mixml/followers",
+    "following_url": "https://api.github.com/users/mixml/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mixml/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mixml/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mixml/subscriptions",
+    "organizations_url": "https://api.github.com/users/mixml/orgs",
+    "repos_url": "https://api.github.com/users/mixml/repos",
+    "events_url": "https://api.github.com/users/mixml/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mixml/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mixml/learngit",
+  "description": "learngit",
+  "fork": false,
+  "url": "https://api.github.com/repos/mixml/learngit",
+  "forks_url": "https://api.github.com/repos/mixml/learngit/forks",
+  "keys_url": "https://api.github.com/repos/mixml/learngit/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mixml/learngit/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mixml/learngit/teams",
+  "hooks_url": "https://api.github.com/repos/mixml/learngit/hooks",
+  "issue_events_url": "https://api.github.com/repos/mixml/learngit/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mixml/learngit/events",
+  "assignees_url": "https://api.github.com/repos/mixml/learngit/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mixml/learngit/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mixml/learngit/tags",
+  "blobs_url": "https://api.github.com/repos/mixml/learngit/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mixml/learngit/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mixml/learngit/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mixml/learngit/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mixml/learngit/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mixml/learngit/languages",
+  "stargazers_url": "https://api.github.com/repos/mixml/learngit/stargazers",
+  "contributors_url": "https://api.github.com/repos/mixml/learngit/contributors",
+  "subscribers_url": "https://api.github.com/repos/mixml/learngit/subscribers",
+  "subscription_url": "https://api.github.com/repos/mixml/learngit/subscription",
+  "commits_url": "https://api.github.com/repos/mixml/learngit/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mixml/learngit/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mixml/learngit/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mixml/learngit/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mixml/learngit/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mixml/learngit/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mixml/learngit/merges",
+  "archive_url": "https://api.github.com/repos/mixml/learngit/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mixml/learngit/downloads",
+  "issues_url": "https://api.github.com/repos/mixml/learngit/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mixml/learngit/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mixml/learngit/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mixml/learngit/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mixml/learngit/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mixml/learngit/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mixml/learngit/deployments",
+  "created_at": "2016-08-05T10:23:18Z",
+  "updated_at": "2017-01-06T08:10:55Z",
+  "pushed_at": "2017-01-06T08:13:33Z",
+  "git_url": "git://github.com/mixml/learngit.git",
+  "ssh_url": "git@github.com:mixml/learngit.git",
+  "clone_url": "https://github.com/mixml/learngit.git",
+  "svn_url": "https://github.com/mixml/learngit",
+  "homepage": null,
+  "size": 8,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": null,
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

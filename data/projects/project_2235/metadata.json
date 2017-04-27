@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:09:36 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4900
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1455
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "ded4d0339738a1e068bfeb2c1642322d"
+Last-Modified: Mon, 27 Mar 2017 01:14:14 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 3e3b9690823fb031da84658eb58aa83b
+X-GitHub-Request-Id: C698:6637:134E299:18EB0C6:590233E0
+
+{
+  "id": 10722107,
+  "name": "BDF.jl",
+  "full_name": "sam81/BDF.jl",
+  "owner": {
+    "login": "sam81",
+    "id": 2574659,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/2574659?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sam81",
+    "html_url": "https://github.com/sam81",
+    "followers_url": "https://api.github.com/users/sam81/followers",
+    "following_url": "https://api.github.com/users/sam81/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sam81/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sam81/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sam81/subscriptions",
+    "organizations_url": "https://api.github.com/users/sam81/orgs",
+    "repos_url": "https://api.github.com/users/sam81/repos",
+    "events_url": "https://api.github.com/users/sam81/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sam81/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/sam81/BDF.jl",
+  "description": "Module to read Biosemi BDF files with the Julia programming language",
+  "fork": false,
+  "url": "https://api.github.com/repos/sam81/BDF.jl",
+  "forks_url": "https://api.github.com/repos/sam81/BDF.jl/forks",
+  "keys_url": "https://api.github.com/repos/sam81/BDF.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/sam81/BDF.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/sam81/BDF.jl/teams",
+  "hooks_url": "https://api.github.com/repos/sam81/BDF.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/sam81/BDF.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/sam81/BDF.jl/events",
+  "assignees_url": "https://api.github.com/repos/sam81/BDF.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/sam81/BDF.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/sam81/BDF.jl/tags",
+  "blobs_url": "https://api.github.com/repos/sam81/BDF.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/sam81/BDF.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/sam81/BDF.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/sam81/BDF.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/sam81/BDF.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/sam81/BDF.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/sam81/BDF.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/sam81/BDF.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/sam81/BDF.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/sam81/BDF.jl/subscription",
+  "commits_url": "https://api.github.com/repos/sam81/BDF.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/sam81/BDF.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/sam81/BDF.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/sam81/BDF.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/sam81/BDF.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/sam81/BDF.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/sam81/BDF.jl/merges",
+  "archive_url": "https://api.github.com/repos/sam81/BDF.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/sam81/BDF.jl/downloads",
+  "issues_url": "https://api.github.com/repos/sam81/BDF.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/sam81/BDF.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/sam81/BDF.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/sam81/BDF.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/sam81/BDF.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/sam81/BDF.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/sam81/BDF.jl/deployments",
+  "created_at": "2013-06-16T15:53:13Z",
+  "updated_at": "2017-03-27T01:14:14Z",
+  "pushed_at": "2017-03-27T01:58:21Z",
+  "git_url": "git://github.com/sam81/BDF.jl.git",
+  "ssh_url": "git@github.com:sam81/BDF.jl.git",
+  "clone_url": "https://github.com/sam81/BDF.jl.git",
+  "svn_url": "https://github.com/sam81/BDF.jl",
+  "homepage": null,
+  "size": 2185,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 4,
+  "mirror_url": null,
+  "open_issues_count": 5,
+  "forks": 4,
+  "open_issues": 5,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 4,
+  "subscribers_count": 2
+}

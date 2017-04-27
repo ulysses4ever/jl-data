@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:32:05 GMT
+Date: Thu, 27 Apr 2017 17:59:13 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5584
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3401
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "ba36c665951ec2cd2faff1aec116cdc7"
+Last-Modified: Fri, 29 Jul 2016 21:08:25 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CE1E:0710:4C93C60:5B9D8FC:58C33775
+Vary: Accept-Encoding
+X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
+X-GitHub-Request-Id: 8512:6634:1341080:18E3324:59023171
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 64510323,
+  "name": "juliajulia",
+  "full_name": "righthandabacus/juliajulia",
+  "owner": {
+    "login": "righthandabacus",
+    "id": 12358258,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/12358258?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/righthandabacus",
+    "html_url": "https://github.com/righthandabacus",
+    "followers_url": "https://api.github.com/users/righthandabacus/followers",
+    "following_url": "https://api.github.com/users/righthandabacus/following{/other_user}",
+    "gists_url": "https://api.github.com/users/righthandabacus/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/righthandabacus/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/righthandabacus/subscriptions",
+    "organizations_url": "https://api.github.com/users/righthandabacus/orgs",
+    "repos_url": "https://api.github.com/users/righthandabacus/repos",
+    "events_url": "https://api.github.com/users/righthandabacus/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/righthandabacus/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/righthandabacus/juliajulia",
+  "description": "Use Julia to plot Julia set",
+  "fork": false,
+  "url": "https://api.github.com/repos/righthandabacus/juliajulia",
+  "forks_url": "https://api.github.com/repos/righthandabacus/juliajulia/forks",
+  "keys_url": "https://api.github.com/repos/righthandabacus/juliajulia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/righthandabacus/juliajulia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/righthandabacus/juliajulia/teams",
+  "hooks_url": "https://api.github.com/repos/righthandabacus/juliajulia/hooks",
+  "issue_events_url": "https://api.github.com/repos/righthandabacus/juliajulia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/righthandabacus/juliajulia/events",
+  "assignees_url": "https://api.github.com/repos/righthandabacus/juliajulia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/righthandabacus/juliajulia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/righthandabacus/juliajulia/tags",
+  "blobs_url": "https://api.github.com/repos/righthandabacus/juliajulia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/righthandabacus/juliajulia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/righthandabacus/juliajulia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/righthandabacus/juliajulia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/righthandabacus/juliajulia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/righthandabacus/juliajulia/languages",
+  "stargazers_url": "https://api.github.com/repos/righthandabacus/juliajulia/stargazers",
+  "contributors_url": "https://api.github.com/repos/righthandabacus/juliajulia/contributors",
+  "subscribers_url": "https://api.github.com/repos/righthandabacus/juliajulia/subscribers",
+  "subscription_url": "https://api.github.com/repos/righthandabacus/juliajulia/subscription",
+  "commits_url": "https://api.github.com/repos/righthandabacus/juliajulia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/righthandabacus/juliajulia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/righthandabacus/juliajulia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/righthandabacus/juliajulia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/righthandabacus/juliajulia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/righthandabacus/juliajulia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/righthandabacus/juliajulia/merges",
+  "archive_url": "https://api.github.com/repos/righthandabacus/juliajulia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/righthandabacus/juliajulia/downloads",
+  "issues_url": "https://api.github.com/repos/righthandabacus/juliajulia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/righthandabacus/juliajulia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/righthandabacus/juliajulia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/righthandabacus/juliajulia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/righthandabacus/juliajulia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/righthandabacus/juliajulia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/righthandabacus/juliajulia/deployments",
+  "created_at": "2016-07-29T21:02:56Z",
+  "updated_at": "2016-07-29T21:08:25Z",
+  "pushed_at": "2016-07-29T22:06:36Z",
+  "git_url": "git://github.com/righthandabacus/juliajulia.git",
+  "ssh_url": "git@github.com:righthandabacus/juliajulia.git",
+  "clone_url": "https://github.com/righthandabacus/juliajulia.git",
+  "svn_url": "https://github.com/righthandabacus/juliajulia",
+  "homepage": null,
+  "size": 4,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

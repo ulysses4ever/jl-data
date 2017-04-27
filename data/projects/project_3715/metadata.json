@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:26:30 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5119
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 37
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "afc82aaaaf1b04ab590f11224ada20d4"
+Last-Modified: Sat, 31 May 2014 10:46:46 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
+X-GitHub-Request-Id: D5EF:6631:88D626:B0B794:590237D6
+
+{
+  "id": 19873838,
+  "name": "gol-julia",
+  "full_name": "kamicut/gol-julia",
+  "owner": {
+    "login": "kamicut",
+    "id": 719357,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/719357?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kamicut",
+    "html_url": "https://github.com/kamicut",
+    "followers_url": "https://api.github.com/users/kamicut/followers",
+    "following_url": "https://api.github.com/users/kamicut/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kamicut/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kamicut/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kamicut/subscriptions",
+    "organizations_url": "https://api.github.com/users/kamicut/orgs",
+    "repos_url": "https://api.github.com/users/kamicut/repos",
+    "events_url": "https://api.github.com/users/kamicut/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kamicut/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/kamicut/gol-julia",
+  "description": "A simple implementation of game of life in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/kamicut/gol-julia",
+  "forks_url": "https://api.github.com/repos/kamicut/gol-julia/forks",
+  "keys_url": "https://api.github.com/repos/kamicut/gol-julia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/kamicut/gol-julia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/kamicut/gol-julia/teams",
+  "hooks_url": "https://api.github.com/repos/kamicut/gol-julia/hooks",
+  "issue_events_url": "https://api.github.com/repos/kamicut/gol-julia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/kamicut/gol-julia/events",
+  "assignees_url": "https://api.github.com/repos/kamicut/gol-julia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/kamicut/gol-julia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/kamicut/gol-julia/tags",
+  "blobs_url": "https://api.github.com/repos/kamicut/gol-julia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/kamicut/gol-julia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/kamicut/gol-julia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/kamicut/gol-julia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/kamicut/gol-julia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/kamicut/gol-julia/languages",
+  "stargazers_url": "https://api.github.com/repos/kamicut/gol-julia/stargazers",
+  "contributors_url": "https://api.github.com/repos/kamicut/gol-julia/contributors",
+  "subscribers_url": "https://api.github.com/repos/kamicut/gol-julia/subscribers",
+  "subscription_url": "https://api.github.com/repos/kamicut/gol-julia/subscription",
+  "commits_url": "https://api.github.com/repos/kamicut/gol-julia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/kamicut/gol-julia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/kamicut/gol-julia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/kamicut/gol-julia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/kamicut/gol-julia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/kamicut/gol-julia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/kamicut/gol-julia/merges",
+  "archive_url": "https://api.github.com/repos/kamicut/gol-julia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/kamicut/gol-julia/downloads",
+  "issues_url": "https://api.github.com/repos/kamicut/gol-julia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/kamicut/gol-julia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/kamicut/gol-julia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/kamicut/gol-julia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/kamicut/gol-julia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/kamicut/gol-julia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/kamicut/gol-julia/deployments",
+  "created_at": "2014-05-16T23:42:09Z",
+  "updated_at": "2014-05-31T10:46:46Z",
+  "pushed_at": "2014-05-17T11:40:18Z",
+  "git_url": "git://github.com/kamicut/gol-julia.git",
+  "ssh_url": "git@github.com:kamicut/gol-julia.git",
+  "clone_url": "https://github.com/kamicut/gol-julia.git",
+  "svn_url": "https://github.com/kamicut/gol-julia",
+  "homepage": null,
+  "size": 136,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 1,
+  "open_issues": 2,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

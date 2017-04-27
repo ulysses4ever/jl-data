@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:02:52 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5322
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2600
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a0f8b7ff54b43c3354956e01190ad329"
+Last-Modified: Sat, 26 Mar 2016 21:52:05 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: a30e6f9aa7cf5731b87dfb3b9992202d
+X-GitHub-Request-Id: C262:6637:1339D0E:18D131D:5902324C
+
+{
+  "id": 45998087,
+  "name": "GUITestRunner.jl",
+  "full_name": "meoke/GUITestRunner.jl",
+  "owner": {
+    "login": "meoke",
+    "id": 10836798,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/10836798?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/meoke",
+    "html_url": "https://github.com/meoke",
+    "followers_url": "https://api.github.com/users/meoke/followers",
+    "following_url": "https://api.github.com/users/meoke/following{/other_user}",
+    "gists_url": "https://api.github.com/users/meoke/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/meoke/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/meoke/subscriptions",
+    "organizations_url": "https://api.github.com/users/meoke/orgs",
+    "repos_url": "https://api.github.com/users/meoke/repos",
+    "events_url": "https://api.github.com/users/meoke/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/meoke/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/meoke/GUITestRunner.jl",
+  "description": "A graphical interface for Julia package TestRunner.",
+  "fork": false,
+  "url": "https://api.github.com/repos/meoke/GUITestRunner.jl",
+  "forks_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/forks",
+  "keys_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/teams",
+  "hooks_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/events",
+  "assignees_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/tags",
+  "blobs_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/subscription",
+  "commits_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/merges",
+  "archive_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/downloads",
+  "issues_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/meoke/GUITestRunner.jl/deployments",
+  "created_at": "2015-11-11T17:31:40Z",
+  "updated_at": "2016-03-26T21:52:05Z",
+  "pushed_at": "2016-03-27T21:28:12Z",
+  "git_url": "git://github.com/meoke/GUITestRunner.jl.git",
+  "ssh_url": "git@github.com:meoke/GUITestRunner.jl.git",
+  "clone_url": "https://github.com/meoke/GUITestRunner.jl.git",
+  "svn_url": "https://github.com/meoke/GUITestRunner.jl",
+  "homepage": "",
+  "size": 107,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 4
+}

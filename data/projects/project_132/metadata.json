@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:31:52 GMT
+Date: Thu, 27 Apr 2017 17:59:11 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5041
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3411
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4a410bed3e1c219230f94e184d0e941e"
+Last-Modified: Wed, 03 Aug 2016 12:08:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DDD4:0710:4C92F8F:5B9C9A6:58C33768
+Vary: Accept-Encoding
+X-Served-By: 5aeb3f30c9e3ef6ef7bcbcddfd9a68f7
+X-GitHub-Request-Id: 677F:6637:132F90D:18C3BE0:5902316F
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 4121386,
+  "name": "atomist",
+  "full_name": "SamChill/atomist",
+  "owner": {
+    "login": "SamChill",
+    "id": 1629780,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1629780?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/SamChill",
+    "html_url": "https://github.com/SamChill",
+    "followers_url": "https://api.github.com/users/SamChill/followers",
+    "following_url": "https://api.github.com/users/SamChill/following{/other_user}",
+    "gists_url": "https://api.github.com/users/SamChill/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/SamChill/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/SamChill/subscriptions",
+    "organizations_url": "https://api.github.com/users/SamChill/orgs",
+    "repos_url": "https://api.github.com/users/SamChill/repos",
+    "events_url": "https://api.github.com/users/SamChill/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/SamChill/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/SamChill/atomist",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/SamChill/atomist",
+  "forks_url": "https://api.github.com/repos/SamChill/atomist/forks",
+  "keys_url": "https://api.github.com/repos/SamChill/atomist/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/SamChill/atomist/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/SamChill/atomist/teams",
+  "hooks_url": "https://api.github.com/repos/SamChill/atomist/hooks",
+  "issue_events_url": "https://api.github.com/repos/SamChill/atomist/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/SamChill/atomist/events",
+  "assignees_url": "https://api.github.com/repos/SamChill/atomist/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/SamChill/atomist/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/SamChill/atomist/tags",
+  "blobs_url": "https://api.github.com/repos/SamChill/atomist/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/SamChill/atomist/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/SamChill/atomist/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/SamChill/atomist/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/SamChill/atomist/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/SamChill/atomist/languages",
+  "stargazers_url": "https://api.github.com/repos/SamChill/atomist/stargazers",
+  "contributors_url": "https://api.github.com/repos/SamChill/atomist/contributors",
+  "subscribers_url": "https://api.github.com/repos/SamChill/atomist/subscribers",
+  "subscription_url": "https://api.github.com/repos/SamChill/atomist/subscription",
+  "commits_url": "https://api.github.com/repos/SamChill/atomist/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/SamChill/atomist/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/SamChill/atomist/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/SamChill/atomist/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/SamChill/atomist/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/SamChill/atomist/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/SamChill/atomist/merges",
+  "archive_url": "https://api.github.com/repos/SamChill/atomist/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/SamChill/atomist/downloads",
+  "issues_url": "https://api.github.com/repos/SamChill/atomist/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/SamChill/atomist/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/SamChill/atomist/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/SamChill/atomist/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/SamChill/atomist/labels{/name}",
+  "releases_url": "https://api.github.com/repos/SamChill/atomist/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/SamChill/atomist/deployments",
+  "created_at": "2012-04-24T05:26:40Z",
+  "updated_at": "2016-08-03T12:08:58Z",
+  "pushed_at": "2012-04-27T02:44:00Z",
+  "git_url": "git://github.com/SamChill/atomist.git",
+  "ssh_url": "git@github.com:SamChill/atomist.git",
+  "clone_url": "https://github.com/SamChill/atomist.git",
+  "svn_url": "https://github.com/SamChill/atomist",
+  "homepage": null,
+  "size": 112,
+  "stargazers_count": 3,
+  "watchers_count": 3,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 3,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

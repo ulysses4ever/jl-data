@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:46 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5854
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2750
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7c9284fd2d5330c02a2cfe6b4640921c"
+Last-Modified: Sun, 13 Dec 2015 06:46:35 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 0F9E:6634:1348294:18EC78A:59023209
+
+{
+  "id": 47909086,
+  "name": "mdp-reinforcement-learning",
+  "full_name": "ange3/mdp-reinforcement-learning",
+  "owner": {
+    "login": "ange3",
+    "id": 3327438,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/3327438?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ange3",
+    "html_url": "https://github.com/ange3",
+    "followers_url": "https://api.github.com/users/ange3/followers",
+    "following_url": "https://api.github.com/users/ange3/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ange3/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ange3/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ange3/subscriptions",
+    "organizations_url": "https://api.github.com/users/ange3/orgs",
+    "repos_url": "https://api.github.com/users/ange3/repos",
+    "events_url": "https://api.github.com/users/ange3/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ange3/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ange3/mdp-reinforcement-learning",
+  "description": "Implementing RL algorithms (Value Iteration and Q-Learning) on 3 Markov Decision Process data sets. Goal is to create a best policy for each MDP.",
+  "fork": false,
+  "url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning",
+  "forks_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/forks",
+  "keys_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/teams",
+  "hooks_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/hooks",
+  "issue_events_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/events",
+  "assignees_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/tags",
+  "blobs_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/languages",
+  "stargazers_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/stargazers",
+  "contributors_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/contributors",
+  "subscribers_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/subscribers",
+  "subscription_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/subscription",
+  "commits_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/merges",
+  "archive_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/downloads",
+  "issues_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ange3/mdp-reinforcement-learning/deployments",
+  "created_at": "2015-12-13T06:44:01Z",
+  "updated_at": "2015-12-13T06:46:35Z",
+  "pushed_at": "2015-12-13T07:10:45Z",
+  "git_url": "git://github.com/ange3/mdp-reinforcement-learning.git",
+  "ssh_url": "git@github.com:ange3/mdp-reinforcement-learning.git",
+  "clone_url": "https://github.com/ange3/mdp-reinforcement-learning.git",
+  "svn_url": "https://github.com/ange3/mdp-reinforcement-learning",
+  "homepage": "",
+  "size": 714,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

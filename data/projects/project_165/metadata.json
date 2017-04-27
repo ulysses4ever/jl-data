@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:33:21 GMT
+Date: Thu, 27 Apr 2017 17:59:18 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5868
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3377
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "183c1f7d5f249b9c4e8f592f043771db"
+Last-Modified: Fri, 29 Jul 2016 13:59:28 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DE46:0711:6FFEF1E:86757AB:58C337C1
+Vary: Accept-Encoding
+X-Served-By: 46808ddc41c302090177e58148908b23
+X-GitHub-Request-Id: 6CE6:6637:132FD74:18C419F:59023176
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 64484536,
+  "name": "Bugs.jl",
+  "full_name": "MiNaO/Bugs.jl",
+  "owner": {
+    "login": "MiNaO",
+    "id": 16795535,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16795535?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MiNaO",
+    "html_url": "https://github.com/MiNaO",
+    "followers_url": "https://api.github.com/users/MiNaO/followers",
+    "following_url": "https://api.github.com/users/MiNaO/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MiNaO/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MiNaO/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MiNaO/subscriptions",
+    "organizations_url": "https://api.github.com/users/MiNaO/orgs",
+    "repos_url": "https://api.github.com/users/MiNaO/repos",
+    "events_url": "https://api.github.com/users/MiNaO/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MiNaO/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/MiNaO/Bugs.jl",
+  "description": "Bugs in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/MiNaO/Bugs.jl",
+  "forks_url": "https://api.github.com/repos/MiNaO/Bugs.jl/forks",
+  "keys_url": "https://api.github.com/repos/MiNaO/Bugs.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/MiNaO/Bugs.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/MiNaO/Bugs.jl/teams",
+  "hooks_url": "https://api.github.com/repos/MiNaO/Bugs.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/MiNaO/Bugs.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/MiNaO/Bugs.jl/events",
+  "assignees_url": "https://api.github.com/repos/MiNaO/Bugs.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/MiNaO/Bugs.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/MiNaO/Bugs.jl/tags",
+  "blobs_url": "https://api.github.com/repos/MiNaO/Bugs.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/MiNaO/Bugs.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/MiNaO/Bugs.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/MiNaO/Bugs.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/MiNaO/Bugs.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/MiNaO/Bugs.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/MiNaO/Bugs.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/MiNaO/Bugs.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/MiNaO/Bugs.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/MiNaO/Bugs.jl/subscription",
+  "commits_url": "https://api.github.com/repos/MiNaO/Bugs.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/MiNaO/Bugs.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/MiNaO/Bugs.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/MiNaO/Bugs.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/MiNaO/Bugs.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/MiNaO/Bugs.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/MiNaO/Bugs.jl/merges",
+  "archive_url": "https://api.github.com/repos/MiNaO/Bugs.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/MiNaO/Bugs.jl/downloads",
+  "issues_url": "https://api.github.com/repos/MiNaO/Bugs.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/MiNaO/Bugs.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/MiNaO/Bugs.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/MiNaO/Bugs.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/MiNaO/Bugs.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/MiNaO/Bugs.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/MiNaO/Bugs.jl/deployments",
+  "created_at": "2016-07-29T13:56:38Z",
+  "updated_at": "2016-07-29T13:59:28Z",
+  "pushed_at": "2016-07-29T13:59:28Z",
+  "git_url": "git://github.com/MiNaO/Bugs.jl.git",
+  "ssh_url": "git@github.com:MiNaO/Bugs.jl.git",
+  "clone_url": "https://github.com/MiNaO/Bugs.jl.git",
+  "svn_url": "https://github.com/MiNaO/Bugs.jl",
+  "homepage": null,
+  "size": 1,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "MiNaO",
+    "id": 16795535,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16795535?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/MiNaO",
+    "html_url": "https://github.com/MiNaO",
+    "followers_url": "https://api.github.com/users/MiNaO/followers",
+    "following_url": "https://api.github.com/users/MiNaO/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MiNaO/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MiNaO/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MiNaO/subscriptions",
+    "organizations_url": "https://api.github.com/users/MiNaO/orgs",
+    "repos_url": "https://api.github.com/users/MiNaO/repos",
+    "events_url": "https://api.github.com/users/MiNaO/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MiNaO/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

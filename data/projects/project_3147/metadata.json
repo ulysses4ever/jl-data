@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:19:36 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5203
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 577
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "1f3198a1e41aaaa6a768f9057744d92c"
+Last-Modified: Sat, 10 May 2014 17:53:08 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 52437fedc85beec8da3449496900fb9a
+X-GitHub-Request-Id: 640C:6637:136BBA4:191151D:59023638
+
+{
+  "id": 12140623,
+  "name": "GPTopics",
+  "full_name": "mjwillson/GPTopics",
+  "owner": {
+    "login": "mjwillson",
+    "id": 4502,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/4502?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mjwillson",
+    "html_url": "https://github.com/mjwillson",
+    "followers_url": "https://api.github.com/users/mjwillson/followers",
+    "following_url": "https://api.github.com/users/mjwillson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mjwillson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mjwillson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mjwillson/subscriptions",
+    "organizations_url": "https://api.github.com/users/mjwillson/orgs",
+    "repos_url": "https://api.github.com/users/mjwillson/repos",
+    "events_url": "https://api.github.com/users/mjwillson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mjwillson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mjwillson/GPTopics",
+  "description": "Playing around with variants on Gaussian Process topic models in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/mjwillson/GPTopics",
+  "forks_url": "https://api.github.com/repos/mjwillson/GPTopics/forks",
+  "keys_url": "https://api.github.com/repos/mjwillson/GPTopics/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mjwillson/GPTopics/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mjwillson/GPTopics/teams",
+  "hooks_url": "https://api.github.com/repos/mjwillson/GPTopics/hooks",
+  "issue_events_url": "https://api.github.com/repos/mjwillson/GPTopics/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mjwillson/GPTopics/events",
+  "assignees_url": "https://api.github.com/repos/mjwillson/GPTopics/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mjwillson/GPTopics/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mjwillson/GPTopics/tags",
+  "blobs_url": "https://api.github.com/repos/mjwillson/GPTopics/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mjwillson/GPTopics/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mjwillson/GPTopics/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mjwillson/GPTopics/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mjwillson/GPTopics/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mjwillson/GPTopics/languages",
+  "stargazers_url": "https://api.github.com/repos/mjwillson/GPTopics/stargazers",
+  "contributors_url": "https://api.github.com/repos/mjwillson/GPTopics/contributors",
+  "subscribers_url": "https://api.github.com/repos/mjwillson/GPTopics/subscribers",
+  "subscription_url": "https://api.github.com/repos/mjwillson/GPTopics/subscription",
+  "commits_url": "https://api.github.com/repos/mjwillson/GPTopics/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mjwillson/GPTopics/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mjwillson/GPTopics/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mjwillson/GPTopics/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mjwillson/GPTopics/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mjwillson/GPTopics/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mjwillson/GPTopics/merges",
+  "archive_url": "https://api.github.com/repos/mjwillson/GPTopics/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mjwillson/GPTopics/downloads",
+  "issues_url": "https://api.github.com/repos/mjwillson/GPTopics/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mjwillson/GPTopics/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mjwillson/GPTopics/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mjwillson/GPTopics/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mjwillson/GPTopics/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mjwillson/GPTopics/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mjwillson/GPTopics/deployments",
+  "created_at": "2013-08-15T18:26:42Z",
+  "updated_at": "2014-05-10T17:53:08Z",
+  "pushed_at": "2013-09-26T18:41:15Z",
+  "git_url": "git://github.com/mjwillson/GPTopics.git",
+  "ssh_url": "git@github.com:mjwillson/GPTopics.git",
+  "clone_url": "https://github.com/mjwillson/GPTopics.git",
+  "svn_url": "https://github.com/mjwillson/GPTopics",
+  "homepage": null,
+  "size": 120,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

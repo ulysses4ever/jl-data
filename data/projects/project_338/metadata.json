@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:22:59 GMT
+Date: Thu, 27 Apr 2017 17:59:52 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5557
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3224
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "04b5e49795340eae5312584543350442"
+Last-Modified: Thu, 11 Aug 2016 19:31:23 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 37
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E508:0711:7132FE8:87DE32F:58C35173
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 2225:6637:1331574:18C614D:59023198
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 65496056,
+  "name": "ParticlePlot.jl",
+  "full_name": "baggepinnen/ParticlePlot.jl",
+  "owner": {
+    "login": "baggepinnen",
+    "id": 3797491,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/3797491?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/baggepinnen",
+    "html_url": "https://github.com/baggepinnen",
+    "followers_url": "https://api.github.com/users/baggepinnen/followers",
+    "following_url": "https://api.github.com/users/baggepinnen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/baggepinnen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/baggepinnen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/baggepinnen/subscriptions",
+    "organizations_url": "https://api.github.com/users/baggepinnen/orgs",
+    "repos_url": "https://api.github.com/users/baggepinnen/repos",
+    "events_url": "https://api.github.com/users/baggepinnen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/baggepinnen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/baggepinnen/ParticlePlot.jl",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl",
+  "forks_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/forks",
+  "keys_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/teams",
+  "hooks_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/events",
+  "assignees_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/tags",
+  "blobs_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/subscription",
+  "commits_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/merges",
+  "archive_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/downloads",
+  "issues_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/baggepinnen/ParticlePlot.jl/deployments",
+  "created_at": "2016-08-11T19:31:02Z",
+  "updated_at": "2016-08-11T19:31:23Z",
+  "pushed_at": "2016-08-11T19:34:04Z",
+  "git_url": "git://github.com/baggepinnen/ParticlePlot.jl.git",
+  "ssh_url": "git@github.com:baggepinnen/ParticlePlot.jl.git",
+  "clone_url": "https://github.com/baggepinnen/ParticlePlot.jl.git",
+  "svn_url": "https://github.com/baggepinnen/ParticlePlot.jl",
+  "homepage": null,
+  "size": 6,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

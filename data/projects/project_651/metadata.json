@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:02 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5214
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2947
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "539b4cd2eafbbd8ee207fff70c99149a"
+Last-Modified: Tue, 26 Jan 2016 16:25:12 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: 4EAE:6637:1334BFC:18CA951:590231DE
+
+{
+  "id": 50438964,
+  "name": "GenS.jl",
+  "full_name": "WilCrofter/GenS.jl",
+  "owner": {
+    "login": "WilCrofter",
+    "id": 2634813,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/2634813?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/WilCrofter",
+    "html_url": "https://github.com/WilCrofter",
+    "followers_url": "https://api.github.com/users/WilCrofter/followers",
+    "following_url": "https://api.github.com/users/WilCrofter/following{/other_user}",
+    "gists_url": "https://api.github.com/users/WilCrofter/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/WilCrofter/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/WilCrofter/subscriptions",
+    "organizations_url": "https://api.github.com/users/WilCrofter/orgs",
+    "repos_url": "https://api.github.com/users/WilCrofter/repos",
+    "events_url": "https://api.github.com/users/WilCrofter/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/WilCrofter/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/WilCrofter/GenS.jl",
+  "description": "A Julia package to generate the nonzero entries of a system matrix.",
+  "fork": false,
+  "url": "https://api.github.com/repos/WilCrofter/GenS.jl",
+  "forks_url": "https://api.github.com/repos/WilCrofter/GenS.jl/forks",
+  "keys_url": "https://api.github.com/repos/WilCrofter/GenS.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/WilCrofter/GenS.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/WilCrofter/GenS.jl/teams",
+  "hooks_url": "https://api.github.com/repos/WilCrofter/GenS.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/WilCrofter/GenS.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/WilCrofter/GenS.jl/events",
+  "assignees_url": "https://api.github.com/repos/WilCrofter/GenS.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/WilCrofter/GenS.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/WilCrofter/GenS.jl/tags",
+  "blobs_url": "https://api.github.com/repos/WilCrofter/GenS.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/WilCrofter/GenS.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/WilCrofter/GenS.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/WilCrofter/GenS.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/WilCrofter/GenS.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/WilCrofter/GenS.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/WilCrofter/GenS.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/WilCrofter/GenS.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/WilCrofter/GenS.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/WilCrofter/GenS.jl/subscription",
+  "commits_url": "https://api.github.com/repos/WilCrofter/GenS.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/WilCrofter/GenS.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/WilCrofter/GenS.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/WilCrofter/GenS.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/WilCrofter/GenS.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/WilCrofter/GenS.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/WilCrofter/GenS.jl/merges",
+  "archive_url": "https://api.github.com/repos/WilCrofter/GenS.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/WilCrofter/GenS.jl/downloads",
+  "issues_url": "https://api.github.com/repos/WilCrofter/GenS.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/WilCrofter/GenS.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/WilCrofter/GenS.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/WilCrofter/GenS.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/WilCrofter/GenS.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/WilCrofter/GenS.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/WilCrofter/GenS.jl/deployments",
+  "created_at": "2016-01-26T15:43:38Z",
+  "updated_at": "2016-01-26T16:25:12Z",
+  "pushed_at": "2016-02-02T02:46:46Z",
+  "git_url": "git://github.com/WilCrofter/GenS.jl.git",
+  "ssh_url": "git@github.com:WilCrofter/GenS.jl.git",
+  "clone_url": "https://github.com/WilCrofter/GenS.jl.git",
+  "svn_url": "https://github.com/WilCrofter/GenS.jl",
+  "homepage": "",
+  "size": 24,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 1,
+  "open_issues": 2,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 3
+}

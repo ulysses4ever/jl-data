@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:33:31 GMT
+Date: Thu, 27 Apr 2017 17:59:19 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5622
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3372
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "0c84ab147377b8f704e631345cc9e895"
+Last-Modified: Tue, 19 Jul 2016 02:33:47 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DE53:0712:71C63D4:886F081:58C337CB
+Vary: Accept-Encoding
+X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
+X-GitHub-Request-Id: E8A5:6633:DD2B14:11E5E0D:59023177
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 63384764,
+  "name": "AlgebraicTraits.jl",
+  "full_name": "TotalVerb/AlgebraicTraits.jl",
+  "owner": {
+    "login": "TotalVerb",
+    "id": 12903942,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/12903942?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/TotalVerb",
+    "html_url": "https://github.com/TotalVerb",
+    "followers_url": "https://api.github.com/users/TotalVerb/followers",
+    "following_url": "https://api.github.com/users/TotalVerb/following{/other_user}",
+    "gists_url": "https://api.github.com/users/TotalVerb/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/TotalVerb/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/TotalVerb/subscriptions",
+    "organizations_url": "https://api.github.com/users/TotalVerb/orgs",
+    "repos_url": "https://api.github.com/users/TotalVerb/repos",
+    "events_url": "https://api.github.com/users/TotalVerb/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/TotalVerb/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/TotalVerb/AlgebraicTraits.jl",
+  "description": "Traits from an abstract algebra perspective",
+  "fork": false,
+  "url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl",
+  "forks_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/forks",
+  "keys_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/teams",
+  "hooks_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/events",
+  "assignees_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/tags",
+  "blobs_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/subscription",
+  "commits_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/merges",
+  "archive_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/downloads",
+  "issues_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/TotalVerb/AlgebraicTraits.jl/deployments",
+  "created_at": "2016-07-15T02:25:49Z",
+  "updated_at": "2016-07-19T02:33:47Z",
+  "pushed_at": "2016-07-15T02:26:27Z",
+  "git_url": "git://github.com/TotalVerb/AlgebraicTraits.jl.git",
+  "ssh_url": "git@github.com:TotalVerb/AlgebraicTraits.jl.git",
+  "clone_url": "https://github.com/TotalVerb/AlgebraicTraits.jl.git",
+  "svn_url": "https://github.com/TotalVerb/AlgebraicTraits.jl",
+  "homepage": null,
+  "size": 5,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

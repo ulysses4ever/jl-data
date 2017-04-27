@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:25:05 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5056
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 129
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "db02518427e07e11092ed4a2251e7d1e"
+Last-Modified: Sat, 18 Mar 2017 06:47:53 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 9371:6637:137D28E:1927CC7:59023780
+
+{
+  "id": 23519907,
+  "name": "LibBSON.jl",
+  "full_name": "pzion/LibBSON.jl",
+  "owner": {
+    "login": "pzion",
+    "id": 48849,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/48849?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pzion",
+    "html_url": "https://github.com/pzion",
+    "followers_url": "https://api.github.com/users/pzion/followers",
+    "following_url": "https://api.github.com/users/pzion/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pzion/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pzion/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pzion/subscriptions",
+    "organizations_url": "https://api.github.com/users/pzion/orgs",
+    "repos_url": "https://api.github.com/users/pzion/repos",
+    "events_url": "https://api.github.com/users/pzion/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pzion/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/pzion/LibBSON.jl",
+  "description": "libbson bindings for the Julia programming language",
+  "fork": false,
+  "url": "https://api.github.com/repos/pzion/LibBSON.jl",
+  "forks_url": "https://api.github.com/repos/pzion/LibBSON.jl/forks",
+  "keys_url": "https://api.github.com/repos/pzion/LibBSON.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/pzion/LibBSON.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/pzion/LibBSON.jl/teams",
+  "hooks_url": "https://api.github.com/repos/pzion/LibBSON.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/pzion/LibBSON.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/pzion/LibBSON.jl/events",
+  "assignees_url": "https://api.github.com/repos/pzion/LibBSON.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/pzion/LibBSON.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/pzion/LibBSON.jl/tags",
+  "blobs_url": "https://api.github.com/repos/pzion/LibBSON.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/pzion/LibBSON.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/pzion/LibBSON.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/pzion/LibBSON.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/pzion/LibBSON.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/pzion/LibBSON.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/pzion/LibBSON.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/pzion/LibBSON.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/pzion/LibBSON.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/pzion/LibBSON.jl/subscription",
+  "commits_url": "https://api.github.com/repos/pzion/LibBSON.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/pzion/LibBSON.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/pzion/LibBSON.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/pzion/LibBSON.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/pzion/LibBSON.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/pzion/LibBSON.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/pzion/LibBSON.jl/merges",
+  "archive_url": "https://api.github.com/repos/pzion/LibBSON.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/pzion/LibBSON.jl/downloads",
+  "issues_url": "https://api.github.com/repos/pzion/LibBSON.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/pzion/LibBSON.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/pzion/LibBSON.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/pzion/LibBSON.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/pzion/LibBSON.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/pzion/LibBSON.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/pzion/LibBSON.jl/deployments",
+  "created_at": "2014-08-31T18:16:38Z",
+  "updated_at": "2017-03-18T06:47:53Z",
+  "pushed_at": "2017-04-06T17:44:58Z",
+  "git_url": "git://github.com/pzion/LibBSON.jl.git",
+  "ssh_url": "git@github.com:pzion/LibBSON.jl.git",
+  "clone_url": "https://github.com/pzion/LibBSON.jl.git",
+  "svn_url": "https://github.com/pzion/LibBSON.jl",
+  "homepage": null,
+  "size": 88,
+  "stargazers_count": 3,
+  "watchers_count": 3,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 14,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 14,
+  "open_issues": 1,
+  "watchers": 3,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 14,
+  "subscribers_count": 4
+}

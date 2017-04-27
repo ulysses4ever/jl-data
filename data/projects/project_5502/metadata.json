@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:49:42 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5164
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4970
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4adcf63bdfc45b67b0381aae58b5447f"
+Last-Modified: Tue, 13 Sep 2016 15:38:54 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 626ed3a9050b8faa02ef5f3c540b508d
+X-GitHub-Request-Id: 452A:6631:8B127A:B3970A:59023D46
+
+{
+  "id": 39547851,
+  "name": "Slackbot.jl",
+  "full_name": "jiahao/Slackbot.jl",
+  "owner": {
+    "login": "jiahao",
+    "id": 1732,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1732?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jiahao",
+    "html_url": "https://github.com/jiahao",
+    "followers_url": "https://api.github.com/users/jiahao/followers",
+    "following_url": "https://api.github.com/users/jiahao/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jiahao/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jiahao/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jiahao/subscriptions",
+    "organizations_url": "https://api.github.com/users/jiahao/orgs",
+    "repos_url": "https://api.github.com/users/jiahao/repos",
+    "events_url": "https://api.github.com/users/jiahao/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jiahao/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jiahao/Slackbot.jl",
+  "description": "A Julia REPL that interacts with Slack.com's webhook integration",
+  "fork": false,
+  "url": "https://api.github.com/repos/jiahao/Slackbot.jl",
+  "forks_url": "https://api.github.com/repos/jiahao/Slackbot.jl/forks",
+  "keys_url": "https://api.github.com/repos/jiahao/Slackbot.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jiahao/Slackbot.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jiahao/Slackbot.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jiahao/Slackbot.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jiahao/Slackbot.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jiahao/Slackbot.jl/events",
+  "assignees_url": "https://api.github.com/repos/jiahao/Slackbot.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jiahao/Slackbot.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jiahao/Slackbot.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jiahao/Slackbot.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jiahao/Slackbot.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jiahao/Slackbot.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jiahao/Slackbot.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jiahao/Slackbot.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jiahao/Slackbot.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jiahao/Slackbot.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jiahao/Slackbot.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jiahao/Slackbot.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jiahao/Slackbot.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jiahao/Slackbot.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jiahao/Slackbot.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jiahao/Slackbot.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jiahao/Slackbot.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jiahao/Slackbot.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jiahao/Slackbot.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jiahao/Slackbot.jl/merges",
+  "archive_url": "https://api.github.com/repos/jiahao/Slackbot.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jiahao/Slackbot.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jiahao/Slackbot.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jiahao/Slackbot.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jiahao/Slackbot.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jiahao/Slackbot.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jiahao/Slackbot.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jiahao/Slackbot.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jiahao/Slackbot.jl/deployments",
+  "created_at": "2015-07-23T05:38:06Z",
+  "updated_at": "2016-09-13T15:38:54Z",
+  "pushed_at": "2015-09-06T18:02:38Z",
+  "git_url": "git://github.com/jiahao/Slackbot.jl.git",
+  "ssh_url": "git@github.com:jiahao/Slackbot.jl.git",
+  "clone_url": "https://github.com/jiahao/Slackbot.jl.git",
+  "svn_url": "https://github.com/jiahao/Slackbot.jl",
+  "homepage": null,
+  "size": 148,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 3,
+  "open_issues": 0,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 1
+}

@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:35:56 GMT
+Date: Thu, 27 Apr 2017 17:59:47 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5533
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3237
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "754f65b145b38e269c9bf87956eed3cd"
+Last-Modified: Mon, 27 Mar 2017 08:50:27 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 53
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D30F:0710:4D0523D:5C22164:58C3466C
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: AFD2:6634:13427F2:18E5195:59023193
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 58387097,
+  "name": "BlockArrays.jl",
+  "full_name": "KristofferC/BlockArrays.jl",
+  "owner": {
+    "login": "KristofferC",
+    "id": 1282691,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1282691?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/KristofferC",
+    "html_url": "https://github.com/KristofferC",
+    "followers_url": "https://api.github.com/users/KristofferC/followers",
+    "following_url": "https://api.github.com/users/KristofferC/following{/other_user}",
+    "gists_url": "https://api.github.com/users/KristofferC/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/KristofferC/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/KristofferC/subscriptions",
+    "organizations_url": "https://api.github.com/users/KristofferC/orgs",
+    "repos_url": "https://api.github.com/users/KristofferC/repos",
+    "events_url": "https://api.github.com/users/KristofferC/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/KristofferC/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/KristofferC/BlockArrays.jl",
+  "description": "BlockArrays for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/KristofferC/BlockArrays.jl",
+  "forks_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/forks",
+  "keys_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/teams",
+  "hooks_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/events",
+  "assignees_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/tags",
+  "blobs_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/subscription",
+  "commits_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/merges",
+  "archive_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/downloads",
+  "issues_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/KristofferC/BlockArrays.jl/deployments",
+  "created_at": "2016-05-09T15:23:31Z",
+  "updated_at": "2017-03-27T08:50:27Z",
+  "pushed_at": "2017-04-12T11:09:06Z",
+  "git_url": "git://github.com/KristofferC/BlockArrays.jl.git",
+  "ssh_url": "git@github.com:KristofferC/BlockArrays.jl.git",
+  "clone_url": "https://github.com/KristofferC/BlockArrays.jl.git",
+  "svn_url": "https://github.com/KristofferC/BlockArrays.jl",
+  "homepage": null,
+  "size": 112,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 2,
+  "open_issues": 2,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 1
 }

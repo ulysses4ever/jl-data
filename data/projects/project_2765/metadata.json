@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:14:55 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4960
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 939
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "75f30910b0132ed8e5500993badb48d1"
+Last-Modified: Wed, 22 Jul 2015 17:31:26 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: A762:6634:136C535:191B640:5902351F
+
+{
+  "id": 31237553,
+  "name": "mccons",
+  "full_name": "qczhang/mccons",
+  "owner": {
+    "login": "qczhang",
+    "id": 10397974,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/10397974?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/qczhang",
+    "html_url": "https://github.com/qczhang",
+    "followers_url": "https://api.github.com/users/qczhang/followers",
+    "following_url": "https://api.github.com/users/qczhang/following{/other_user}",
+    "gists_url": "https://api.github.com/users/qczhang/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/qczhang/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/qczhang/subscriptions",
+    "organizations_url": "https://api.github.com/users/qczhang/orgs",
+    "repos_url": "https://api.github.com/users/qczhang/repos",
+    "events_url": "https://api.github.com/users/qczhang/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/qczhang/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/qczhang/mccons",
+  "description": "similarity search",
+  "fork": false,
+  "url": "https://api.github.com/repos/qczhang/mccons",
+  "forks_url": "https://api.github.com/repos/qczhang/mccons/forks",
+  "keys_url": "https://api.github.com/repos/qczhang/mccons/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/qczhang/mccons/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/qczhang/mccons/teams",
+  "hooks_url": "https://api.github.com/repos/qczhang/mccons/hooks",
+  "issue_events_url": "https://api.github.com/repos/qczhang/mccons/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/qczhang/mccons/events",
+  "assignees_url": "https://api.github.com/repos/qczhang/mccons/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/qczhang/mccons/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/qczhang/mccons/tags",
+  "blobs_url": "https://api.github.com/repos/qczhang/mccons/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/qczhang/mccons/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/qczhang/mccons/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/qczhang/mccons/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/qczhang/mccons/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/qczhang/mccons/languages",
+  "stargazers_url": "https://api.github.com/repos/qczhang/mccons/stargazers",
+  "contributors_url": "https://api.github.com/repos/qczhang/mccons/contributors",
+  "subscribers_url": "https://api.github.com/repos/qczhang/mccons/subscribers",
+  "subscription_url": "https://api.github.com/repos/qczhang/mccons/subscription",
+  "commits_url": "https://api.github.com/repos/qczhang/mccons/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/qczhang/mccons/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/qczhang/mccons/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/qczhang/mccons/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/qczhang/mccons/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/qczhang/mccons/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/qczhang/mccons/merges",
+  "archive_url": "https://api.github.com/repos/qczhang/mccons/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/qczhang/mccons/downloads",
+  "issues_url": "https://api.github.com/repos/qczhang/mccons/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/qczhang/mccons/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/qczhang/mccons/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/qczhang/mccons/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/qczhang/mccons/labels{/name}",
+  "releases_url": "https://api.github.com/repos/qczhang/mccons/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/qczhang/mccons/deployments",
+  "created_at": "2015-02-24T00:24:37Z",
+  "updated_at": "2015-07-22T17:31:26Z",
+  "pushed_at": "2014-06-30T18:19:37Z",
+  "git_url": "git://github.com/qczhang/mccons.git",
+  "ssh_url": "git@github.com:qczhang/mccons.git",
+  "clone_url": "https://github.com/qczhang/mccons.git",
+  "svn_url": "https://github.com/qczhang/mccons",
+  "homepage": "",
+  "size": 1245,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": false,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:07:49 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4946
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1696
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "f0c9cb4188f80a0acb1a8ae1743f3ac2"
+Last-Modified: Wed, 01 Mar 2017 23:41:29 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: D91C:6633:DE5BB5:11FE46C:59023375
+
+{
+  "id": 4690534,
+  "name": "MCMC.jl",
+  "full_name": "doobwa/MCMC.jl",
+  "owner": {
+    "login": "doobwa",
+    "id": 79467,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/79467?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/doobwa",
+    "html_url": "https://github.com/doobwa",
+    "followers_url": "https://api.github.com/users/doobwa/followers",
+    "following_url": "https://api.github.com/users/doobwa/following{/other_user}",
+    "gists_url": "https://api.github.com/users/doobwa/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/doobwa/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/doobwa/subscriptions",
+    "organizations_url": "https://api.github.com/users/doobwa/orgs",
+    "repos_url": "https://api.github.com/users/doobwa/repos",
+    "events_url": "https://api.github.com/users/doobwa/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/doobwa/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/doobwa/MCMC.jl",
+  "description": "MCMC tools for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/doobwa/MCMC.jl",
+  "forks_url": "https://api.github.com/repos/doobwa/MCMC.jl/forks",
+  "keys_url": "https://api.github.com/repos/doobwa/MCMC.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/doobwa/MCMC.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/doobwa/MCMC.jl/teams",
+  "hooks_url": "https://api.github.com/repos/doobwa/MCMC.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/doobwa/MCMC.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/doobwa/MCMC.jl/events",
+  "assignees_url": "https://api.github.com/repos/doobwa/MCMC.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/doobwa/MCMC.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/doobwa/MCMC.jl/tags",
+  "blobs_url": "https://api.github.com/repos/doobwa/MCMC.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/doobwa/MCMC.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/doobwa/MCMC.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/doobwa/MCMC.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/doobwa/MCMC.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/doobwa/MCMC.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/doobwa/MCMC.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/doobwa/MCMC.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/doobwa/MCMC.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/doobwa/MCMC.jl/subscription",
+  "commits_url": "https://api.github.com/repos/doobwa/MCMC.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/doobwa/MCMC.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/doobwa/MCMC.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/doobwa/MCMC.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/doobwa/MCMC.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/doobwa/MCMC.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/doobwa/MCMC.jl/merges",
+  "archive_url": "https://api.github.com/repos/doobwa/MCMC.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/doobwa/MCMC.jl/downloads",
+  "issues_url": "https://api.github.com/repos/doobwa/MCMC.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/doobwa/MCMC.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/doobwa/MCMC.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/doobwa/MCMC.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/doobwa/MCMC.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/doobwa/MCMC.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/doobwa/MCMC.jl/deployments",
+  "created_at": "2012-06-17T08:28:09Z",
+  "updated_at": "2017-03-01T23:41:29Z",
+  "pushed_at": "2013-04-16T22:36:01Z",
+  "git_url": "git://github.com/doobwa/MCMC.jl.git",
+  "ssh_url": "git@github.com:doobwa/MCMC.jl.git",
+  "clone_url": "https://github.com/doobwa/MCMC.jl.git",
+  "svn_url": "https://github.com/doobwa/MCMC.jl",
+  "homepage": "",
+  "size": 390,
+  "stargazers_count": 20,
+  "watchers_count": 20,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 7,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 7,
+  "open_issues": 4,
+  "watchers": 20,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 7,
+  "subscribers_count": 7
+}

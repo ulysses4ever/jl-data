@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:13:28 GMT
+Date: Thu, 27 Apr 2017 17:59:42 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5151
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3269
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "19c47765cc32e2616d6d5a393cba409f"
+Last-Modified: Thu, 03 Nov 2016 13:15:46 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D1D1:0712:7230907:88ED83E:58C34128
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: E31E:6633:DD371A:11E6D81:5902318E
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 52272345,
+  "name": "IUWT.jl",
+  "full_name": "andferrari/IUWT.jl",
+  "owner": {
+    "login": "andferrari",
+    "id": 8927904,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8927904?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/andferrari",
+    "html_url": "https://github.com/andferrari",
+    "followers_url": "https://api.github.com/users/andferrari/followers",
+    "following_url": "https://api.github.com/users/andferrari/following{/other_user}",
+    "gists_url": "https://api.github.com/users/andferrari/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/andferrari/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/andferrari/subscriptions",
+    "organizations_url": "https://api.github.com/users/andferrari/orgs",
+    "repos_url": "https://api.github.com/users/andferrari/repos",
+    "events_url": "https://api.github.com/users/andferrari/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/andferrari/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/andferrari/IUWT.jl",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/andferrari/IUWT.jl",
+  "forks_url": "https://api.github.com/repos/andferrari/IUWT.jl/forks",
+  "keys_url": "https://api.github.com/repos/andferrari/IUWT.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/andferrari/IUWT.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/andferrari/IUWT.jl/teams",
+  "hooks_url": "https://api.github.com/repos/andferrari/IUWT.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/andferrari/IUWT.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/andferrari/IUWT.jl/events",
+  "assignees_url": "https://api.github.com/repos/andferrari/IUWT.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/andferrari/IUWT.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/andferrari/IUWT.jl/tags",
+  "blobs_url": "https://api.github.com/repos/andferrari/IUWT.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/andferrari/IUWT.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/andferrari/IUWT.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/andferrari/IUWT.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/andferrari/IUWT.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/andferrari/IUWT.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/andferrari/IUWT.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/andferrari/IUWT.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/andferrari/IUWT.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/andferrari/IUWT.jl/subscription",
+  "commits_url": "https://api.github.com/repos/andferrari/IUWT.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/andferrari/IUWT.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/andferrari/IUWT.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/andferrari/IUWT.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/andferrari/IUWT.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/andferrari/IUWT.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/andferrari/IUWT.jl/merges",
+  "archive_url": "https://api.github.com/repos/andferrari/IUWT.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/andferrari/IUWT.jl/downloads",
+  "issues_url": "https://api.github.com/repos/andferrari/IUWT.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/andferrari/IUWT.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/andferrari/IUWT.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/andferrari/IUWT.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/andferrari/IUWT.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/andferrari/IUWT.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/andferrari/IUWT.jl/deployments",
+  "created_at": "2016-02-22T12:36:04Z",
+  "updated_at": "2016-11-03T13:15:46Z",
+  "pushed_at": "2016-11-03T17:32:57Z",
+  "git_url": "git://github.com/andferrari/IUWT.jl.git",
+  "ssh_url": "git@github.com:andferrari/IUWT.jl.git",
+  "clone_url": "https://github.com/andferrari/IUWT.jl.git",
+  "svn_url": "https://github.com/andferrari/IUWT.jl",
+  "homepage": null,
+  "size": 13,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 2
 }

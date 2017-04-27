@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:29:05 GMT
+Date: Thu, 27 Apr 2017 18:00:34 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5608
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3064
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "48239dbf1268cb61e3bcae501f554abf"
+Last-Modified: Mon, 13 Feb 2017 09:39:52 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 6
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E5A0:0711:7141C18:87EFA62:58C352E1
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: A453:6633:DD5602:11E96BE:590231C2
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 53767031,
+  "name": "machine_learning",
+  "full_name": "ekinakyurek/machine_learning",
+  "owner": {
+    "login": "ekinakyurek",
+    "id": 15363057,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/15363057?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ekinakyurek",
+    "html_url": "https://github.com/ekinakyurek",
+    "followers_url": "https://api.github.com/users/ekinakyurek/followers",
+    "following_url": "https://api.github.com/users/ekinakyurek/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ekinakyurek/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ekinakyurek/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ekinakyurek/subscriptions",
+    "organizations_url": "https://api.github.com/users/ekinakyurek/orgs",
+    "repos_url": "https://api.github.com/users/ekinakyurek/repos",
+    "events_url": "https://api.github.com/users/ekinakyurek/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ekinakyurek/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ekinakyurek/machine_learning",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/ekinakyurek/machine_learning",
+  "forks_url": "https://api.github.com/repos/ekinakyurek/machine_learning/forks",
+  "keys_url": "https://api.github.com/repos/ekinakyurek/machine_learning/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ekinakyurek/machine_learning/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ekinakyurek/machine_learning/teams",
+  "hooks_url": "https://api.github.com/repos/ekinakyurek/machine_learning/hooks",
+  "issue_events_url": "https://api.github.com/repos/ekinakyurek/machine_learning/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ekinakyurek/machine_learning/events",
+  "assignees_url": "https://api.github.com/repos/ekinakyurek/machine_learning/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ekinakyurek/machine_learning/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ekinakyurek/machine_learning/tags",
+  "blobs_url": "https://api.github.com/repos/ekinakyurek/machine_learning/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ekinakyurek/machine_learning/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ekinakyurek/machine_learning/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ekinakyurek/machine_learning/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ekinakyurek/machine_learning/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ekinakyurek/machine_learning/languages",
+  "stargazers_url": "https://api.github.com/repos/ekinakyurek/machine_learning/stargazers",
+  "contributors_url": "https://api.github.com/repos/ekinakyurek/machine_learning/contributors",
+  "subscribers_url": "https://api.github.com/repos/ekinakyurek/machine_learning/subscribers",
+  "subscription_url": "https://api.github.com/repos/ekinakyurek/machine_learning/subscription",
+  "commits_url": "https://api.github.com/repos/ekinakyurek/machine_learning/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ekinakyurek/machine_learning/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ekinakyurek/machine_learning/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ekinakyurek/machine_learning/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ekinakyurek/machine_learning/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ekinakyurek/machine_learning/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ekinakyurek/machine_learning/merges",
+  "archive_url": "https://api.github.com/repos/ekinakyurek/machine_learning/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ekinakyurek/machine_learning/downloads",
+  "issues_url": "https://api.github.com/repos/ekinakyurek/machine_learning/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ekinakyurek/machine_learning/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ekinakyurek/machine_learning/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ekinakyurek/machine_learning/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ekinakyurek/machine_learning/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ekinakyurek/machine_learning/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ekinakyurek/machine_learning/deployments",
+  "created_at": "2016-03-13T04:15:31Z",
+  "updated_at": "2017-02-13T09:39:52Z",
+  "pushed_at": "2017-02-13T09:39:49Z",
+  "git_url": "git://github.com/ekinakyurek/machine_learning.git",
+  "ssh_url": "git@github.com:ekinakyurek/machine_learning.git",
+  "clone_url": "https://github.com/ekinakyurek/machine_learning.git",
+  "svn_url": "https://github.com/ekinakyurek/machine_learning",
+  "homepage": null,
+  "size": 151158,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

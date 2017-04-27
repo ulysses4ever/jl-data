@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 02:01:21 GMT
+Date: Thu, 27 Apr 2017 18:00:25 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5123
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3101
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "668300ca0c17cdaa4ba67f4654dc5a37"
+Last-Modified: Fri, 28 Oct 2016 18:08:55 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D85A:0712:733F247:8A31D96:58C35A71
+Vary: Accept-Encoding
+X-Served-By: 02ea60dfed58b2a09106fafd6ca0c108
+X-GitHub-Request-Id: B2B6:6634:1344383:18E7674:590231B9
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 38879769,
+  "name": "Hafta.jl",
+  "full_name": "mortenpi/Hafta.jl",
+  "owner": {
+    "login": "mortenpi",
+    "id": 147757,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/147757?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mortenpi",
+    "html_url": "https://github.com/mortenpi",
+    "followers_url": "https://api.github.com/users/mortenpi/followers",
+    "following_url": "https://api.github.com/users/mortenpi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mortenpi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mortenpi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mortenpi/subscriptions",
+    "organizations_url": "https://api.github.com/users/mortenpi/orgs",
+    "repos_url": "https://api.github.com/users/mortenpi/repos",
+    "events_url": "https://api.github.com/users/mortenpi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mortenpi/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mortenpi/Hafta.jl",
+  "description": "Hartree-Fock and others for quantum systems",
+  "fork": false,
+  "url": "https://api.github.com/repos/mortenpi/Hafta.jl",
+  "forks_url": "https://api.github.com/repos/mortenpi/Hafta.jl/forks",
+  "keys_url": "https://api.github.com/repos/mortenpi/Hafta.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mortenpi/Hafta.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mortenpi/Hafta.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mortenpi/Hafta.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mortenpi/Hafta.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mortenpi/Hafta.jl/events",
+  "assignees_url": "https://api.github.com/repos/mortenpi/Hafta.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mortenpi/Hafta.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mortenpi/Hafta.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mortenpi/Hafta.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mortenpi/Hafta.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mortenpi/Hafta.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mortenpi/Hafta.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mortenpi/Hafta.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mortenpi/Hafta.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mortenpi/Hafta.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mortenpi/Hafta.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mortenpi/Hafta.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mortenpi/Hafta.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mortenpi/Hafta.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mortenpi/Hafta.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mortenpi/Hafta.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mortenpi/Hafta.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mortenpi/Hafta.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mortenpi/Hafta.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mortenpi/Hafta.jl/merges",
+  "archive_url": "https://api.github.com/repos/mortenpi/Hafta.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mortenpi/Hafta.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mortenpi/Hafta.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mortenpi/Hafta.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mortenpi/Hafta.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mortenpi/Hafta.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mortenpi/Hafta.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mortenpi/Hafta.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mortenpi/Hafta.jl/deployments",
+  "created_at": "2015-07-10T12:42:31Z",
+  "updated_at": "2016-10-28T18:08:55Z",
+  "pushed_at": "2016-12-07T13:40:28Z",
+  "git_url": "git://github.com/mortenpi/Hafta.jl.git",
+  "ssh_url": "git@github.com:mortenpi/Hafta.jl.git",
+  "clone_url": "https://github.com/mortenpi/Hafta.jl.git",
+  "svn_url": "https://github.com/mortenpi/Hafta.jl",
+  "homepage": "",
+  "size": 101,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": false,
+  "has_pages": true,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

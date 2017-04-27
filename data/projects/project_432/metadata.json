@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:56:40 GMT
+Date: Thu, 27 Apr 2017 18:00:18 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5093
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3117
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "29e6acecc5d6577af16a14f17f8b1944"
+Last-Modified: Fri, 14 Apr 2017 10:40:51 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 6
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E776:0712:73338CD:8A23CB2:58C35958
+Vary: Accept-Encoding
+X-Served-By: d256f86292c6dde5d09d15d926ec67a3
+X-GitHub-Request-Id: 603E:6633:DD4BD0:11E8979:590231B2
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55794437,
+  "name": "Caesar.jl",
+  "full_name": "dehann/Caesar.jl",
+  "owner": {
+    "login": "dehann",
+    "id": 6412556,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6412556?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dehann",
+    "html_url": "https://github.com/dehann",
+    "followers_url": "https://api.github.com/users/dehann/followers",
+    "following_url": "https://api.github.com/users/dehann/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dehann/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dehann/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dehann/subscriptions",
+    "organizations_url": "https://api.github.com/users/dehann/orgs",
+    "repos_url": "https://api.github.com/users/dehann/repos",
+    "events_url": "https://api.github.com/users/dehann/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dehann/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dehann/Caesar.jl",
+  "description": "Robot toolkit: Towards non-parametric and parametric navigation solutions",
+  "fork": false,
+  "url": "https://api.github.com/repos/dehann/Caesar.jl",
+  "forks_url": "https://api.github.com/repos/dehann/Caesar.jl/forks",
+  "keys_url": "https://api.github.com/repos/dehann/Caesar.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dehann/Caesar.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dehann/Caesar.jl/teams",
+  "hooks_url": "https://api.github.com/repos/dehann/Caesar.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/dehann/Caesar.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dehann/Caesar.jl/events",
+  "assignees_url": "https://api.github.com/repos/dehann/Caesar.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dehann/Caesar.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dehann/Caesar.jl/tags",
+  "blobs_url": "https://api.github.com/repos/dehann/Caesar.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dehann/Caesar.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dehann/Caesar.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dehann/Caesar.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dehann/Caesar.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dehann/Caesar.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/dehann/Caesar.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/dehann/Caesar.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/dehann/Caesar.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/dehann/Caesar.jl/subscription",
+  "commits_url": "https://api.github.com/repos/dehann/Caesar.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dehann/Caesar.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dehann/Caesar.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dehann/Caesar.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dehann/Caesar.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dehann/Caesar.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dehann/Caesar.jl/merges",
+  "archive_url": "https://api.github.com/repos/dehann/Caesar.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dehann/Caesar.jl/downloads",
+  "issues_url": "https://api.github.com/repos/dehann/Caesar.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dehann/Caesar.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dehann/Caesar.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dehann/Caesar.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dehann/Caesar.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dehann/Caesar.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dehann/Caesar.jl/deployments",
+  "created_at": "2016-04-08T16:40:09Z",
+  "updated_at": "2017-04-14T10:40:51Z",
+  "pushed_at": "2017-04-25T00:44:47Z",
+  "git_url": "git://github.com/dehann/Caesar.jl.git",
+  "ssh_url": "git@github.com:dehann/Caesar.jl.git",
+  "clone_url": "https://github.com/dehann/Caesar.jl.git",
+  "svn_url": "https://github.com/dehann/Caesar.jl",
+  "homepage": null,
+  "size": 13118,
+  "stargazers_count": 5,
+  "watchers_count": 5,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 6,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 6,
+  "open_issues": 4,
+  "watchers": 5,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 6,
+  "subscribers_count": 6
 }

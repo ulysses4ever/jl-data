@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:27:43 GMT
+Date: Thu, 27 Apr 2017 17:58:57 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6172
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3477
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a66fa9564a4e9922a0a46d536e6a6344"
+Last-Modified: Tue, 25 Apr 2017 15:06:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 5
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CCFE:0710:4C89CDB:5B91B78:58C3366F
+Vary: Accept-Encoding
+X-Served-By: 5aeb3f30c9e3ef6ef7bcbcddfd9a68f7
+X-GitHub-Request-Id: 3F80:6637:132EEC0:18C2E88:59023161
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 6788337,
+  "name": "PyPlot.jl",
+  "full_name": "JuliaPy/PyPlot.jl",
+  "owner": {
+    "login": "JuliaPy",
+    "id": 22030672,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/22030672?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPy",
+    "html_url": "https://github.com/JuliaPy",
+    "followers_url": "https://api.github.com/users/JuliaPy/followers",
+    "following_url": "https://api.github.com/users/JuliaPy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPy/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPy/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPy/repos",
+    "events_url": "https://api.github.com/users/JuliaPy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPy/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaPy/PyPlot.jl",
+  "description": "Plotting for Julia based on matplotlib.pyplot",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaPy/PyPlot.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPy/PyPlot.jl/deployments",
+  "created_at": "2012-11-21T01:42:21Z",
+  "updated_at": "2017-04-25T15:06:58Z",
+  "pushed_at": "2017-02-10T21:28:25Z",
+  "git_url": "git://github.com/JuliaPy/PyPlot.jl.git",
+  "ssh_url": "git@github.com:JuliaPy/PyPlot.jl.git",
+  "clone_url": "https://github.com/JuliaPy/PyPlot.jl.git",
+  "svn_url": "https://github.com/JuliaPy/PyPlot.jl",
+  "homepage": "https://github.com/stevengj/PyPlot.jl",
+  "size": 3043,
+  "stargazers_count": 151,
+  "watchers_count": 151,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": false,
+  "has_pages": false,
+  "forks_count": 51,
+  "mirror_url": null,
+  "open_issues_count": 42,
+  "forks": 51,
+  "open_issues": 42,
+  "watchers": 151,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaPy",
+    "id": 22030672,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/22030672?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPy",
+    "html_url": "https://github.com/JuliaPy",
+    "followers_url": "https://api.github.com/users/JuliaPy/followers",
+    "following_url": "https://api.github.com/users/JuliaPy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPy/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPy/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPy/repos",
+    "events_url": "https://api.github.com/users/JuliaPy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPy/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 51,
+  "subscribers_count": 10
 }

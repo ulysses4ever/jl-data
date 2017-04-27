@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:26:35 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5001
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 28
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "8e8c21b9772ccaecab73650ce3f070b9"
+Last-Modified: Thu, 27 Apr 2017 10:22:18 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: C443:6633:E0EB44:1233846:590237DB
+
+{
+  "id": 31508715,
+  "name": "AdaGram.jl",
+  "full_name": "sbos/AdaGram.jl",
+  "owner": {
+    "login": "sbos",
+    "id": 120461,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/120461?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sbos",
+    "html_url": "https://github.com/sbos",
+    "followers_url": "https://api.github.com/users/sbos/followers",
+    "following_url": "https://api.github.com/users/sbos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sbos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sbos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sbos/subscriptions",
+    "organizations_url": "https://api.github.com/users/sbos/orgs",
+    "repos_url": "https://api.github.com/users/sbos/repos",
+    "events_url": "https://api.github.com/users/sbos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sbos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/sbos/AdaGram.jl",
+  "description": "Adaptive Skip-gram implementation in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/sbos/AdaGram.jl",
+  "forks_url": "https://api.github.com/repos/sbos/AdaGram.jl/forks",
+  "keys_url": "https://api.github.com/repos/sbos/AdaGram.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/sbos/AdaGram.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/sbos/AdaGram.jl/teams",
+  "hooks_url": "https://api.github.com/repos/sbos/AdaGram.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/sbos/AdaGram.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/sbos/AdaGram.jl/events",
+  "assignees_url": "https://api.github.com/repos/sbos/AdaGram.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/sbos/AdaGram.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/sbos/AdaGram.jl/tags",
+  "blobs_url": "https://api.github.com/repos/sbos/AdaGram.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/sbos/AdaGram.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/sbos/AdaGram.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/sbos/AdaGram.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/sbos/AdaGram.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/sbos/AdaGram.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/sbos/AdaGram.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/sbos/AdaGram.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/sbos/AdaGram.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/sbos/AdaGram.jl/subscription",
+  "commits_url": "https://api.github.com/repos/sbos/AdaGram.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/sbos/AdaGram.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/sbos/AdaGram.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/sbos/AdaGram.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/sbos/AdaGram.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/sbos/AdaGram.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/sbos/AdaGram.jl/merges",
+  "archive_url": "https://api.github.com/repos/sbos/AdaGram.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/sbos/AdaGram.jl/downloads",
+  "issues_url": "https://api.github.com/repos/sbos/AdaGram.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/sbos/AdaGram.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/sbos/AdaGram.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/sbos/AdaGram.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/sbos/AdaGram.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/sbos/AdaGram.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/sbos/AdaGram.jl/deployments",
+  "created_at": "2015-03-01T19:58:59Z",
+  "updated_at": "2017-04-27T10:22:18Z",
+  "pushed_at": "2016-12-02T20:47:51Z",
+  "git_url": "git://github.com/sbos/AdaGram.jl.git",
+  "ssh_url": "git@github.com:sbos/AdaGram.jl.git",
+  "clone_url": "https://github.com/sbos/AdaGram.jl.git",
+  "svn_url": "https://github.com/sbos/AdaGram.jl",
+  "homepage": null,
+  "size": 10369,
+  "stargazers_count": 76,
+  "watchers_count": 76,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 20,
+  "mirror_url": null,
+  "open_issues_count": 8,
+  "forks": 20,
+  "open_issues": 8,
+  "watchers": 76,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 20,
+  "subscribers_count": 15
+}

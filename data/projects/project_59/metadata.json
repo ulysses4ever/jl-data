@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:27:43 GMT
+Date: Thu, 27 Apr 2017 17:58:57 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5573
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3480
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "00759e814a624c962777faea8356e724"
+Last-Modified: Tue, 06 Sep 2016 03:57:48 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 6
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DCD2:0712:71B7AB2:885DE4D:58C3366F
+Vary: Accept-Encoding
+X-Served-By: e183f7c661b1bbc2c987b3c4dc7b04e0
+X-GitHub-Request-Id: 32F8:6634:13405C9:18E24CB:59023161
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 67362347,
+  "name": "RvSpectraKitLearn.jl",
+  "full_name": "eford/RvSpectraKitLearn.jl",
+  "owner": {
+    "login": "eford",
+    "id": 1323714,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1323714?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/eford",
+    "html_url": "https://github.com/eford",
+    "followers_url": "https://api.github.com/users/eford/followers",
+    "following_url": "https://api.github.com/users/eford/following{/other_user}",
+    "gists_url": "https://api.github.com/users/eford/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/eford/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/eford/subscriptions",
+    "organizations_url": "https://api.github.com/users/eford/orgs",
+    "repos_url": "https://api.github.com/users/eford/repos",
+    "events_url": "https://api.github.com/users/eford/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/eford/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/eford/RvSpectraKitLearn.jl",
+  "description": "Tools for Machince Learning to Anayzle Ensembles of Spectra with Goal of Measuring Doppler Shifts in Presence of Stellar Activity",
+  "fork": false,
+  "url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl",
+  "forks_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/forks",
+  "keys_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/teams",
+  "hooks_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/events",
+  "assignees_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/tags",
+  "blobs_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/subscription",
+  "commits_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/merges",
+  "archive_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/downloads",
+  "issues_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/eford/RvSpectraKitLearn.jl/deployments",
+  "created_at": "2016-09-04T18:46:54Z",
+  "updated_at": "2016-09-06T03:57:48Z",
+  "pushed_at": "2016-09-20T13:46:09Z",
+  "git_url": "git://github.com/eford/RvSpectraKitLearn.jl.git",
+  "ssh_url": "git@github.com:eford/RvSpectraKitLearn.jl.git",
+  "clone_url": "https://github.com/eford/RvSpectraKitLearn.jl.git",
+  "svn_url": "https://github.com/eford/RvSpectraKitLearn.jl",
+  "homepage": "",
+  "size": 33,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

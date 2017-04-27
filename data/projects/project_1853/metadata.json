@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:07:07 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4882
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1822
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "d6c9366930554c85f2021c52271e49ec"
+Last-Modified: Sun, 29 Mar 2015 20:23:04 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 8269:6637:1346AD5:18E1850:5902334B
+
+{
+  "id": 28406484,
+  "name": "FsBert",
+  "full_name": "et4te/FsBert",
+  "owner": {
+    "login": "et4te",
+    "id": 138829,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/138829?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/et4te",
+    "html_url": "https://github.com/et4te",
+    "followers_url": "https://api.github.com/users/et4te/followers",
+    "following_url": "https://api.github.com/users/et4te/following{/other_user}",
+    "gists_url": "https://api.github.com/users/et4te/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/et4te/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/et4te/subscriptions",
+    "organizations_url": "https://api.github.com/users/et4te/orgs",
+    "repos_url": "https://api.github.com/users/et4te/repos",
+    "events_url": "https://api.github.com/users/et4te/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/et4te/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/et4te/FsBert",
+  "description": "Julia binary Erlang term encoding / decoding library.",
+  "fork": false,
+  "url": "https://api.github.com/repos/et4te/FsBert",
+  "forks_url": "https://api.github.com/repos/et4te/FsBert/forks",
+  "keys_url": "https://api.github.com/repos/et4te/FsBert/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/et4te/FsBert/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/et4te/FsBert/teams",
+  "hooks_url": "https://api.github.com/repos/et4te/FsBert/hooks",
+  "issue_events_url": "https://api.github.com/repos/et4te/FsBert/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/et4te/FsBert/events",
+  "assignees_url": "https://api.github.com/repos/et4te/FsBert/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/et4te/FsBert/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/et4te/FsBert/tags",
+  "blobs_url": "https://api.github.com/repos/et4te/FsBert/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/et4te/FsBert/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/et4te/FsBert/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/et4te/FsBert/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/et4te/FsBert/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/et4te/FsBert/languages",
+  "stargazers_url": "https://api.github.com/repos/et4te/FsBert/stargazers",
+  "contributors_url": "https://api.github.com/repos/et4te/FsBert/contributors",
+  "subscribers_url": "https://api.github.com/repos/et4te/FsBert/subscribers",
+  "subscription_url": "https://api.github.com/repos/et4te/FsBert/subscription",
+  "commits_url": "https://api.github.com/repos/et4te/FsBert/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/et4te/FsBert/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/et4te/FsBert/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/et4te/FsBert/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/et4te/FsBert/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/et4te/FsBert/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/et4te/FsBert/merges",
+  "archive_url": "https://api.github.com/repos/et4te/FsBert/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/et4te/FsBert/downloads",
+  "issues_url": "https://api.github.com/repos/et4te/FsBert/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/et4te/FsBert/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/et4te/FsBert/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/et4te/FsBert/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/et4te/FsBert/labels{/name}",
+  "releases_url": "https://api.github.com/repos/et4te/FsBert/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/et4te/FsBert/deployments",
+  "created_at": "2014-12-23T15:59:43Z",
+  "updated_at": "2015-03-29T20:23:04Z",
+  "pushed_at": "2014-12-23T17:58:16Z",
+  "git_url": "git://github.com/et4te/FsBert.git",
+  "ssh_url": "git@github.com:et4te/FsBert.git",
+  "clone_url": "https://github.com/et4te/FsBert.git",
+  "svn_url": "https://github.com/et4te/FsBert",
+  "homepage": null,
+  "size": 156,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 1
+}

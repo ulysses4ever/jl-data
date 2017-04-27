@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:05 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5107
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2016
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "0cbab7424b3a5c017b56c8a0cc14c748"
+Last-Modified: Tue, 28 Feb 2017 17:13:28 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: edf23fdc48375d9066b698b8d98062e9
+X-GitHub-Request-Id: 078E:6637:13439FA:18DD9F3:5902330D
+
+{
+  "id": 7305513,
+  "name": "Layout.jl",
+  "full_name": "timholy/Layout.jl",
+  "owner": {
+    "login": "timholy",
+    "id": 1525481,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1525481?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/timholy",
+    "html_url": "https://github.com/timholy",
+    "followers_url": "https://api.github.com/users/timholy/followers",
+    "following_url": "https://api.github.com/users/timholy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/timholy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/timholy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/timholy/subscriptions",
+    "organizations_url": "https://api.github.com/users/timholy/orgs",
+    "repos_url": "https://api.github.com/users/timholy/repos",
+    "events_url": "https://api.github.com/users/timholy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/timholy/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/timholy/Layout.jl",
+  "description": "Graphics layout management for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/timholy/Layout.jl",
+  "forks_url": "https://api.github.com/repos/timholy/Layout.jl/forks",
+  "keys_url": "https://api.github.com/repos/timholy/Layout.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/timholy/Layout.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/timholy/Layout.jl/teams",
+  "hooks_url": "https://api.github.com/repos/timholy/Layout.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/timholy/Layout.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/timholy/Layout.jl/events",
+  "assignees_url": "https://api.github.com/repos/timholy/Layout.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/timholy/Layout.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/timholy/Layout.jl/tags",
+  "blobs_url": "https://api.github.com/repos/timholy/Layout.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/timholy/Layout.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/timholy/Layout.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/timholy/Layout.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/timholy/Layout.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/timholy/Layout.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/timholy/Layout.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/timholy/Layout.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/timholy/Layout.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/timholy/Layout.jl/subscription",
+  "commits_url": "https://api.github.com/repos/timholy/Layout.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/timholy/Layout.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/timholy/Layout.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/timholy/Layout.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/timholy/Layout.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/timholy/Layout.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/timholy/Layout.jl/merges",
+  "archive_url": "https://api.github.com/repos/timholy/Layout.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/timholy/Layout.jl/downloads",
+  "issues_url": "https://api.github.com/repos/timholy/Layout.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/timholy/Layout.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/timholy/Layout.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/timholy/Layout.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/timholy/Layout.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/timholy/Layout.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/timholy/Layout.jl/deployments",
+  "created_at": "2012-12-24T10:20:20Z",
+  "updated_at": "2017-02-28T17:13:28Z",
+  "pushed_at": "2016-03-10T18:34:26Z",
+  "git_url": "git://github.com/timholy/Layout.jl.git",
+  "ssh_url": "git@github.com:timholy/Layout.jl.git",
+  "clone_url": "https://github.com/timholy/Layout.jl.git",
+  "svn_url": "https://github.com/timholy/Layout.jl",
+  "homepage": null,
+  "size": 16,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

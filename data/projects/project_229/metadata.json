@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:45:32 GMT
+Date: Thu, 27 Apr 2017 17:59:33 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6237
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3313
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "8863774ad5ac220b1a8b244599cbee71"
+Last-Modified: Fri, 21 Apr 2017 00:32:22 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CFBC:0711:702332D:869FE4C:58C33A9C
+Vary: Accept-Encoding
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: 6641:6634:1341D40:18E43C3:59023185
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 40322111,
+  "name": "Mimi.jl",
+  "full_name": "anthofflab/Mimi.jl",
+  "owner": {
+    "login": "anthofflab",
+    "id": 14098068,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/14098068?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/anthofflab",
+    "html_url": "https://github.com/anthofflab",
+    "followers_url": "https://api.github.com/users/anthofflab/followers",
+    "following_url": "https://api.github.com/users/anthofflab/following{/other_user}",
+    "gists_url": "https://api.github.com/users/anthofflab/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/anthofflab/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/anthofflab/subscriptions",
+    "organizations_url": "https://api.github.com/users/anthofflab/orgs",
+    "repos_url": "https://api.github.com/users/anthofflab/repos",
+    "events_url": "https://api.github.com/users/anthofflab/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/anthofflab/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/anthofflab/Mimi.jl",
+  "description": "Integrated Assessment Modeling Framework",
+  "fork": false,
+  "url": "https://api.github.com/repos/anthofflab/Mimi.jl",
+  "forks_url": "https://api.github.com/repos/anthofflab/Mimi.jl/forks",
+  "keys_url": "https://api.github.com/repos/anthofflab/Mimi.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/anthofflab/Mimi.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/anthofflab/Mimi.jl/teams",
+  "hooks_url": "https://api.github.com/repos/anthofflab/Mimi.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/anthofflab/Mimi.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/anthofflab/Mimi.jl/events",
+  "assignees_url": "https://api.github.com/repos/anthofflab/Mimi.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/anthofflab/Mimi.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/anthofflab/Mimi.jl/tags",
+  "blobs_url": "https://api.github.com/repos/anthofflab/Mimi.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/anthofflab/Mimi.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/anthofflab/Mimi.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/anthofflab/Mimi.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/anthofflab/Mimi.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/anthofflab/Mimi.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/anthofflab/Mimi.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/anthofflab/Mimi.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/anthofflab/Mimi.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/anthofflab/Mimi.jl/subscription",
+  "commits_url": "https://api.github.com/repos/anthofflab/Mimi.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/anthofflab/Mimi.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/anthofflab/Mimi.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/anthofflab/Mimi.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/anthofflab/Mimi.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/anthofflab/Mimi.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/anthofflab/Mimi.jl/merges",
+  "archive_url": "https://api.github.com/repos/anthofflab/Mimi.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/anthofflab/Mimi.jl/downloads",
+  "issues_url": "https://api.github.com/repos/anthofflab/Mimi.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/anthofflab/Mimi.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/anthofflab/Mimi.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/anthofflab/Mimi.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/anthofflab/Mimi.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/anthofflab/Mimi.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/anthofflab/Mimi.jl/deployments",
+  "created_at": "2015-08-06T19:02:48Z",
+  "updated_at": "2017-04-21T00:32:22Z",
+  "pushed_at": "2017-04-22T17:23:00Z",
+  "git_url": "git://github.com/anthofflab/Mimi.jl.git",
+  "ssh_url": "git@github.com:anthofflab/Mimi.jl.git",
+  "clone_url": "https://github.com/anthofflab/Mimi.jl.git",
+  "svn_url": "https://github.com/anthofflab/Mimi.jl",
+  "homepage": null,
+  "size": 472,
+  "stargazers_count": 6,
+  "watchers_count": 6,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": false,
+  "has_pages": true,
+  "forks_count": 11,
+  "mirror_url": null,
+  "open_issues_count": 31,
+  "forks": 11,
+  "open_issues": 31,
+  "watchers": 6,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "anthofflab",
+    "id": 14098068,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/14098068?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/anthofflab",
+    "html_url": "https://github.com/anthofflab",
+    "followers_url": "https://api.github.com/users/anthofflab/followers",
+    "following_url": "https://api.github.com/users/anthofflab/following{/other_user}",
+    "gists_url": "https://api.github.com/users/anthofflab/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/anthofflab/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/anthofflab/subscriptions",
+    "organizations_url": "https://api.github.com/users/anthofflab/orgs",
+    "repos_url": "https://api.github.com/users/anthofflab/repos",
+    "events_url": "https://api.github.com/users/anthofflab/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/anthofflab/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 11,
+  "subscribers_count": 2
 }

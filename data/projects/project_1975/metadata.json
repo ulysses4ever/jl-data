@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:07:43 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5046
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1712
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "0b03f6614d90c5f5120b26f0098ef349"
+Last-Modified: Tue, 05 Nov 2013 19:43:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 075bb2f6b7031ca3c0e69edb17939fae
+X-GitHub-Request-Id: 51FA:6633:DE57BD:11FDF94:5902336F
+
+{
+  "id": 14151870,
+  "name": "Curry.jl",
+  "full_name": "remusao/Curry.jl",
+  "owner": {
+    "login": "remusao",
+    "id": 1299873,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1299873?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/remusao",
+    "html_url": "https://github.com/remusao",
+    "followers_url": "https://api.github.com/users/remusao/followers",
+    "following_url": "https://api.github.com/users/remusao/following{/other_user}",
+    "gists_url": "https://api.github.com/users/remusao/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/remusao/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/remusao/subscriptions",
+    "organizations_url": "https://api.github.com/users/remusao/orgs",
+    "repos_url": "https://api.github.com/users/remusao/repos",
+    "events_url": "https://api.github.com/users/remusao/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/remusao/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/remusao/Curry.jl",
+  "description": "Currying in julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/remusao/Curry.jl",
+  "forks_url": "https://api.github.com/repos/remusao/Curry.jl/forks",
+  "keys_url": "https://api.github.com/repos/remusao/Curry.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/remusao/Curry.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/remusao/Curry.jl/teams",
+  "hooks_url": "https://api.github.com/repos/remusao/Curry.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/remusao/Curry.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/remusao/Curry.jl/events",
+  "assignees_url": "https://api.github.com/repos/remusao/Curry.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/remusao/Curry.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/remusao/Curry.jl/tags",
+  "blobs_url": "https://api.github.com/repos/remusao/Curry.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/remusao/Curry.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/remusao/Curry.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/remusao/Curry.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/remusao/Curry.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/remusao/Curry.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/remusao/Curry.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/remusao/Curry.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/remusao/Curry.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/remusao/Curry.jl/subscription",
+  "commits_url": "https://api.github.com/repos/remusao/Curry.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/remusao/Curry.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/remusao/Curry.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/remusao/Curry.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/remusao/Curry.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/remusao/Curry.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/remusao/Curry.jl/merges",
+  "archive_url": "https://api.github.com/repos/remusao/Curry.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/remusao/Curry.jl/downloads",
+  "issues_url": "https://api.github.com/repos/remusao/Curry.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/remusao/Curry.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/remusao/Curry.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/remusao/Curry.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/remusao/Curry.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/remusao/Curry.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/remusao/Curry.jl/deployments",
+  "created_at": "2013-11-05T19:39:50Z",
+  "updated_at": "2013-11-05T19:43:44Z",
+  "pushed_at": "2013-11-05T19:43:44Z",
+  "git_url": "git://github.com/remusao/Curry.jl.git",
+  "ssh_url": "git@github.com:remusao/Curry.jl.git",
+  "clone_url": "https://github.com/remusao/Curry.jl.git",
+  "svn_url": "https://github.com/remusao/Curry.jl",
+  "homepage": null,
+  "size": 104,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

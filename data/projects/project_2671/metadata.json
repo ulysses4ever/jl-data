@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:47 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5015
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1027
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "e024653aad4c73556482efef6aa8f9fc"
+Last-Modified: Fri, 07 Apr 2017 20:44:56 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 07ff1c8a09e44b62e277fae50a1b1dc4
+X-GitHub-Request-Id: 788F:6633:DF2C8A:120F321:590234DB
+
+{
+  "id": 10877203,
+  "name": "Judo.jl",
+  "full_name": "dcjones/Judo.jl",
+  "owner": {
+    "login": "dcjones",
+    "id": 210361,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/210361?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dcjones",
+    "html_url": "https://github.com/dcjones",
+    "followers_url": "https://api.github.com/users/dcjones/followers",
+    "following_url": "https://api.github.com/users/dcjones/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dcjones/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dcjones/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dcjones/subscriptions",
+    "organizations_url": "https://api.github.com/users/dcjones/orgs",
+    "repos_url": "https://api.github.com/users/dcjones/repos",
+    "events_url": "https://api.github.com/users/dcjones/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dcjones/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dcjones/Judo.jl",
+  "description": "A Julia document generator",
+  "fork": false,
+  "url": "https://api.github.com/repos/dcjones/Judo.jl",
+  "forks_url": "https://api.github.com/repos/dcjones/Judo.jl/forks",
+  "keys_url": "https://api.github.com/repos/dcjones/Judo.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dcjones/Judo.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dcjones/Judo.jl/teams",
+  "hooks_url": "https://api.github.com/repos/dcjones/Judo.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/dcjones/Judo.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dcjones/Judo.jl/events",
+  "assignees_url": "https://api.github.com/repos/dcjones/Judo.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dcjones/Judo.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dcjones/Judo.jl/tags",
+  "blobs_url": "https://api.github.com/repos/dcjones/Judo.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dcjones/Judo.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dcjones/Judo.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dcjones/Judo.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dcjones/Judo.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dcjones/Judo.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/dcjones/Judo.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/dcjones/Judo.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/dcjones/Judo.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/dcjones/Judo.jl/subscription",
+  "commits_url": "https://api.github.com/repos/dcjones/Judo.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dcjones/Judo.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dcjones/Judo.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dcjones/Judo.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dcjones/Judo.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dcjones/Judo.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dcjones/Judo.jl/merges",
+  "archive_url": "https://api.github.com/repos/dcjones/Judo.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dcjones/Judo.jl/downloads",
+  "issues_url": "https://api.github.com/repos/dcjones/Judo.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dcjones/Judo.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dcjones/Judo.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dcjones/Judo.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dcjones/Judo.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dcjones/Judo.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dcjones/Judo.jl/deployments",
+  "created_at": "2013-06-23T03:29:57Z",
+  "updated_at": "2017-04-07T20:44:56Z",
+  "pushed_at": "2016-01-29T16:12:27Z",
+  "git_url": "git://github.com/dcjones/Judo.jl.git",
+  "ssh_url": "git@github.com:dcjones/Judo.jl.git",
+  "clone_url": "https://github.com/dcjones/Judo.jl.git",
+  "svn_url": "https://github.com/dcjones/Judo.jl",
+  "homepage": "",
+  "size": 404,
+  "stargazers_count": 57,
+  "watchers_count": 57,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 11,
+  "mirror_url": null,
+  "open_issues_count": 14,
+  "forks": 11,
+  "open_issues": 14,
+  "watchers": 57,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 11,
+  "subscribers_count": 6
+}

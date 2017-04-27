@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:29:37 GMT
+Date: Thu, 27 Apr 2017 17:59:08 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5391
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3426
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b2d4ce907b1ad5f61d2d8040cd7d44cf"
+Last-Modified: Mon, 22 Aug 2016 13:16:07 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DD46:0711:6FF625E:866B648:58C336E1
+Vary: Accept-Encoding
+X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
+X-GitHub-Request-Id: 6F61:6634:1340DE6:18E2F96:5902316C
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 65044174,
+  "name": "Classifiers.jl",
+  "full_name": "facundoq/Classifiers.jl",
+  "owner": {
+    "login": "facundoq",
+    "id": 1576711,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1576711?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/facundoq",
+    "html_url": "https://github.com/facundoq",
+    "followers_url": "https://api.github.com/users/facundoq/followers",
+    "following_url": "https://api.github.com/users/facundoq/following{/other_user}",
+    "gists_url": "https://api.github.com/users/facundoq/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/facundoq/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/facundoq/subscriptions",
+    "organizations_url": "https://api.github.com/users/facundoq/orgs",
+    "repos_url": "https://api.github.com/users/facundoq/repos",
+    "events_url": "https://api.github.com/users/facundoq/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/facundoq/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/facundoq/Classifiers.jl",
+  "description": "Implementation of some classifiers in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/facundoq/Classifiers.jl",
+  "forks_url": "https://api.github.com/repos/facundoq/Classifiers.jl/forks",
+  "keys_url": "https://api.github.com/repos/facundoq/Classifiers.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/facundoq/Classifiers.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/facundoq/Classifiers.jl/teams",
+  "hooks_url": "https://api.github.com/repos/facundoq/Classifiers.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/facundoq/Classifiers.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/facundoq/Classifiers.jl/events",
+  "assignees_url": "https://api.github.com/repos/facundoq/Classifiers.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/facundoq/Classifiers.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/facundoq/Classifiers.jl/tags",
+  "blobs_url": "https://api.github.com/repos/facundoq/Classifiers.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/facundoq/Classifiers.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/facundoq/Classifiers.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/facundoq/Classifiers.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/facundoq/Classifiers.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/facundoq/Classifiers.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/facundoq/Classifiers.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/facundoq/Classifiers.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/facundoq/Classifiers.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/facundoq/Classifiers.jl/subscription",
+  "commits_url": "https://api.github.com/repos/facundoq/Classifiers.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/facundoq/Classifiers.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/facundoq/Classifiers.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/facundoq/Classifiers.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/facundoq/Classifiers.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/facundoq/Classifiers.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/facundoq/Classifiers.jl/merges",
+  "archive_url": "https://api.github.com/repos/facundoq/Classifiers.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/facundoq/Classifiers.jl/downloads",
+  "issues_url": "https://api.github.com/repos/facundoq/Classifiers.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/facundoq/Classifiers.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/facundoq/Classifiers.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/facundoq/Classifiers.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/facundoq/Classifiers.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/facundoq/Classifiers.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/facundoq/Classifiers.jl/deployments",
+  "created_at": "2016-08-05T19:34:13Z",
+  "updated_at": "2016-08-22T13:16:07Z",
+  "pushed_at": "2016-10-11T12:59:18Z",
+  "git_url": "git://github.com/facundoq/Classifiers.jl.git",
+  "ssh_url": "git@github.com:facundoq/Classifiers.jl.git",
+  "clone_url": "https://github.com/facundoq/Classifiers.jl.git",
+  "svn_url": "https://github.com/facundoq/Classifiers.jl",
+  "homepage": "",
+  "size": 24607,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

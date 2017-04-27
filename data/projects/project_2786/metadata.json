@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:15:25 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5264
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 918
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "20ab17a2c50fbdbfa941a167ee58566c"
+Last-Modified: Thu, 06 Feb 2014 06:16:02 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: FA2F:6637:135FCBA:1901BCB:5902353D
+
+{
+  "id": 14721485,
+  "name": "Series.jl",
+  "full_name": "milktrader/Series.jl",
+  "owner": {
+    "login": "milktrader",
+    "id": 324836,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/324836?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/milktrader",
+    "html_url": "https://github.com/milktrader",
+    "followers_url": "https://api.github.com/users/milktrader/followers",
+    "following_url": "https://api.github.com/users/milktrader/following{/other_user}",
+    "gists_url": "https://api.github.com/users/milktrader/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/milktrader/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/milktrader/subscriptions",
+    "organizations_url": "https://api.github.com/users/milktrader/orgs",
+    "repos_url": "https://api.github.com/users/milktrader/repos",
+    "events_url": "https://api.github.com/users/milktrader/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/milktrader/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/milktrader/Series.jl",
+  "description": "Series data structure in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/milktrader/Series.jl",
+  "forks_url": "https://api.github.com/repos/milktrader/Series.jl/forks",
+  "keys_url": "https://api.github.com/repos/milktrader/Series.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/milktrader/Series.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/milktrader/Series.jl/teams",
+  "hooks_url": "https://api.github.com/repos/milktrader/Series.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/milktrader/Series.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/milktrader/Series.jl/events",
+  "assignees_url": "https://api.github.com/repos/milktrader/Series.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/milktrader/Series.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/milktrader/Series.jl/tags",
+  "blobs_url": "https://api.github.com/repos/milktrader/Series.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/milktrader/Series.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/milktrader/Series.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/milktrader/Series.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/milktrader/Series.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/milktrader/Series.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/milktrader/Series.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/milktrader/Series.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/milktrader/Series.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/milktrader/Series.jl/subscription",
+  "commits_url": "https://api.github.com/repos/milktrader/Series.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/milktrader/Series.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/milktrader/Series.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/milktrader/Series.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/milktrader/Series.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/milktrader/Series.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/milktrader/Series.jl/merges",
+  "archive_url": "https://api.github.com/repos/milktrader/Series.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/milktrader/Series.jl/downloads",
+  "issues_url": "https://api.github.com/repos/milktrader/Series.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/milktrader/Series.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/milktrader/Series.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/milktrader/Series.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/milktrader/Series.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/milktrader/Series.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/milktrader/Series.jl/deployments",
+  "created_at": "2013-11-26T15:58:25Z",
+  "updated_at": "2014-02-06T06:16:02Z",
+  "pushed_at": "2014-02-06T06:16:02Z",
+  "git_url": "git://github.com/milktrader/Series.jl.git",
+  "ssh_url": "git@github.com:milktrader/Series.jl.git",
+  "clone_url": "https://github.com/milktrader/Series.jl.git",
+  "svn_url": "https://github.com/milktrader/Series.jl",
+  "homepage": "",
+  "size": 888,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 3
+}

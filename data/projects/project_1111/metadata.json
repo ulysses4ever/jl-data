@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:03:18 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6274
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2526
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "e46dbafb647901ac4ef90ec7e5f20632"
+Last-Modified: Sat, 18 Feb 2017 18:37:17 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 8F6A:6634:134C2EB:18F1B04:59023266
+
+{
+  "id": 48670110,
+  "name": "HTSLIB.jl",
+  "full_name": "OpenGene/HTSLIB.jl",
+  "owner": {
+    "login": "OpenGene",
+    "id": 16162853,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/16162853?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/OpenGene",
+    "html_url": "https://github.com/OpenGene",
+    "followers_url": "https://api.github.com/users/OpenGene/followers",
+    "following_url": "https://api.github.com/users/OpenGene/following{/other_user}",
+    "gists_url": "https://api.github.com/users/OpenGene/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/OpenGene/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/OpenGene/subscriptions",
+    "organizations_url": "https://api.github.com/users/OpenGene/orgs",
+    "repos_url": "https://api.github.com/users/OpenGene/repos",
+    "events_url": "https://api.github.com/users/OpenGene/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/OpenGene/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/OpenGene/HTSLIB.jl",
+  "description": "HTSLIB.jl is a julia wrapper of htslib for accessing common high-throughput sequencing data file formats such as BAM/SAM files",
+  "fork": false,
+  "url": "https://api.github.com/repos/OpenGene/HTSLIB.jl",
+  "forks_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/forks",
+  "keys_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/teams",
+  "hooks_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/events",
+  "assignees_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/tags",
+  "blobs_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/subscription",
+  "commits_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/merges",
+  "archive_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/downloads",
+  "issues_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/OpenGene/HTSLIB.jl/deployments",
+  "created_at": "2015-12-28T02:42:48Z",
+  "updated_at": "2017-02-18T18:37:17Z",
+  "pushed_at": "2016-04-29T06:37:57Z",
+  "git_url": "git://github.com/OpenGene/HTSLIB.jl.git",
+  "ssh_url": "git@github.com:OpenGene/HTSLIB.jl.git",
+  "clone_url": "https://github.com/OpenGene/HTSLIB.jl.git",
+  "svn_url": "https://github.com/OpenGene/HTSLIB.jl",
+  "homepage": "",
+  "size": 3820,
+  "stargazers_count": 16,
+  "watchers_count": 16,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 3,
+  "open_issues": 4,
+  "watchers": 16,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "OpenGene",
+    "id": 16162853,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/16162853?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/OpenGene",
+    "html_url": "https://github.com/OpenGene",
+    "followers_url": "https://api.github.com/users/OpenGene/followers",
+    "following_url": "https://api.github.com/users/OpenGene/following{/other_user}",
+    "gists_url": "https://api.github.com/users/OpenGene/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/OpenGene/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/OpenGene/subscriptions",
+    "organizations_url": "https://api.github.com/users/OpenGene/orgs",
+    "repos_url": "https://api.github.com/users/OpenGene/repos",
+    "events_url": "https://api.github.com/users/OpenGene/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/OpenGene/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 3,
+  "subscribers_count": 3
+}

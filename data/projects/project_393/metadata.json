@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:42:22 GMT
+Date: Thu, 27 Apr 2017 18:00:05 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5115
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3161
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "afc36173ec295e2f2da064d3d4142690"
+Last-Modified: Fri, 15 Apr 2016 10:40:33 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 37
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E673:0711:7161E9E:8815EF5:58C355FD
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: 1B7E:6634:1343391:18E61A0:590231A5
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 45709530,
+  "name": "KCores.jl",
+  "full_name": "johnybx/KCores.jl",
+  "owner": {
+    "login": "johnybx",
+    "id": 15018762,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/15018762?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/johnybx",
+    "html_url": "https://github.com/johnybx",
+    "followers_url": "https://api.github.com/users/johnybx/followers",
+    "following_url": "https://api.github.com/users/johnybx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/johnybx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/johnybx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/johnybx/subscriptions",
+    "organizations_url": "https://api.github.com/users/johnybx/orgs",
+    "repos_url": "https://api.github.com/users/johnybx/repos",
+    "events_url": "https://api.github.com/users/johnybx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/johnybx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/johnybx/KCores.jl",
+  "description": "A Julia package for k core decomposition.",
+  "fork": false,
+  "url": "https://api.github.com/repos/johnybx/KCores.jl",
+  "forks_url": "https://api.github.com/repos/johnybx/KCores.jl/forks",
+  "keys_url": "https://api.github.com/repos/johnybx/KCores.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/johnybx/KCores.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/johnybx/KCores.jl/teams",
+  "hooks_url": "https://api.github.com/repos/johnybx/KCores.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/johnybx/KCores.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/johnybx/KCores.jl/events",
+  "assignees_url": "https://api.github.com/repos/johnybx/KCores.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/johnybx/KCores.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/johnybx/KCores.jl/tags",
+  "blobs_url": "https://api.github.com/repos/johnybx/KCores.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/johnybx/KCores.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/johnybx/KCores.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/johnybx/KCores.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/johnybx/KCores.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/johnybx/KCores.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/johnybx/KCores.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/johnybx/KCores.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/johnybx/KCores.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/johnybx/KCores.jl/subscription",
+  "commits_url": "https://api.github.com/repos/johnybx/KCores.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/johnybx/KCores.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/johnybx/KCores.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/johnybx/KCores.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/johnybx/KCores.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/johnybx/KCores.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/johnybx/KCores.jl/merges",
+  "archive_url": "https://api.github.com/repos/johnybx/KCores.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/johnybx/KCores.jl/downloads",
+  "issues_url": "https://api.github.com/repos/johnybx/KCores.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/johnybx/KCores.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/johnybx/KCores.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/johnybx/KCores.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/johnybx/KCores.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/johnybx/KCores.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/johnybx/KCores.jl/deployments",
+  "created_at": "2015-11-06T21:45:27Z",
+  "updated_at": "2016-04-15T10:40:33Z",
+  "pushed_at": "2016-04-15T21:33:34Z",
+  "git_url": "git://github.com/johnybx/KCores.jl.git",
+  "ssh_url": "git@github.com:johnybx/KCores.jl.git",
+  "clone_url": "https://github.com/johnybx/KCores.jl.git",
+  "svn_url": "https://github.com/johnybx/KCores.jl",
+  "homepage": "",
+  "size": 6056,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

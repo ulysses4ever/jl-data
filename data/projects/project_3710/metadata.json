@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:26:31 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4961
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 34
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2455b757e3775cab759d9f2f3b3955fc"
+Last-Modified: Wed, 19 Apr 2017 03:40:02 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 7A58:6637:1381C30:192DA34:590237D7
+
+{
+  "id": 14488993,
+  "name": "TSne.jl",
+  "full_name": "lejon/TSne.jl",
+  "owner": {
+    "login": "lejon",
+    "id": 4058675,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/4058675?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lejon",
+    "html_url": "https://github.com/lejon",
+    "followers_url": "https://api.github.com/users/lejon/followers",
+    "following_url": "https://api.github.com/users/lejon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lejon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lejon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lejon/subscriptions",
+    "organizations_url": "https://api.github.com/users/lejon/orgs",
+    "repos_url": "https://api.github.com/users/lejon/repos",
+    "events_url": "https://api.github.com/users/lejon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lejon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/lejon/TSne.jl",
+  "description": "Julia port of L.J.P. van der Maaten and G.E. Hintons T-SNE visualisation technique.",
+  "fork": false,
+  "url": "https://api.github.com/repos/lejon/TSne.jl",
+  "forks_url": "https://api.github.com/repos/lejon/TSne.jl/forks",
+  "keys_url": "https://api.github.com/repos/lejon/TSne.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/lejon/TSne.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/lejon/TSne.jl/teams",
+  "hooks_url": "https://api.github.com/repos/lejon/TSne.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/lejon/TSne.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/lejon/TSne.jl/events",
+  "assignees_url": "https://api.github.com/repos/lejon/TSne.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/lejon/TSne.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/lejon/TSne.jl/tags",
+  "blobs_url": "https://api.github.com/repos/lejon/TSne.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/lejon/TSne.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/lejon/TSne.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/lejon/TSne.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/lejon/TSne.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/lejon/TSne.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/lejon/TSne.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/lejon/TSne.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/lejon/TSne.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/lejon/TSne.jl/subscription",
+  "commits_url": "https://api.github.com/repos/lejon/TSne.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/lejon/TSne.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/lejon/TSne.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/lejon/TSne.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/lejon/TSne.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/lejon/TSne.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/lejon/TSne.jl/merges",
+  "archive_url": "https://api.github.com/repos/lejon/TSne.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/lejon/TSne.jl/downloads",
+  "issues_url": "https://api.github.com/repos/lejon/TSne.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/lejon/TSne.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/lejon/TSne.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/lejon/TSne.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/lejon/TSne.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/lejon/TSne.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/lejon/TSne.jl/deployments",
+  "created_at": "2013-11-18T10:13:33Z",
+  "updated_at": "2017-04-19T03:40:02Z",
+  "pushed_at": "2017-04-24T05:21:39Z",
+  "git_url": "git://github.com/lejon/TSne.jl.git",
+  "ssh_url": "git@github.com:lejon/TSne.jl.git",
+  "clone_url": "https://github.com/lejon/TSne.jl.git",
+  "svn_url": "https://github.com/lejon/TSne.jl",
+  "homepage": null,
+  "size": 579,
+  "stargazers_count": 46,
+  "watchers_count": 46,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 9,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 9,
+  "open_issues": 3,
+  "watchers": 46,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 9,
+  "subscribers_count": 3
+}

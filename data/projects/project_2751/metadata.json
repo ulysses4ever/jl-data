@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:14:47 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5511
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 951
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "0c688bd4248fab8c2aeea10f8e640cdc"
+Last-Modified: Wed, 07 Sep 2016 14:48:25 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 075bb2f6b7031ca3c0e69edb17939fae
+X-GitHub-Request-Id: 3F4D:6637:135DCB7:18FF2E3:59023517
+
+{
+  "id": 67616074,
+  "name": "JuGRN-Generator",
+  "full_name": "varnerlab/JuGRN-Generator",
+  "owner": {
+    "login": "varnerlab",
+    "id": 14302599,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/14302599?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/varnerlab",
+    "html_url": "https://github.com/varnerlab",
+    "followers_url": "https://api.github.com/users/varnerlab/followers",
+    "following_url": "https://api.github.com/users/varnerlab/following{/other_user}",
+    "gists_url": "https://api.github.com/users/varnerlab/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/varnerlab/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/varnerlab/subscriptions",
+    "organizations_url": "https://api.github.com/users/varnerlab/orgs",
+    "repos_url": "https://api.github.com/users/varnerlab/repos",
+    "events_url": "https://api.github.com/users/varnerlab/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/varnerlab/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/varnerlab/JuGRN-Generator",
+  "description": "Code generator for GRN models in the Julia programming language",
+  "fork": false,
+  "url": "https://api.github.com/repos/varnerlab/JuGRN-Generator",
+  "forks_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/forks",
+  "keys_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/teams",
+  "hooks_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/hooks",
+  "issue_events_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/events",
+  "assignees_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/tags",
+  "blobs_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/languages",
+  "stargazers_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/stargazers",
+  "contributors_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/contributors",
+  "subscribers_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/subscribers",
+  "subscription_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/subscription",
+  "commits_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/merges",
+  "archive_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/downloads",
+  "issues_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/labels{/name}",
+  "releases_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/varnerlab/JuGRN-Generator/deployments",
+  "created_at": "2016-09-07T14:46:01Z",
+  "updated_at": "2016-09-07T14:48:25Z",
+  "pushed_at": "2017-03-02T18:06:01Z",
+  "git_url": "git://github.com/varnerlab/JuGRN-Generator.git",
+  "ssh_url": "git@github.com:varnerlab/JuGRN-Generator.git",
+  "clone_url": "https://github.com/varnerlab/JuGRN-Generator.git",
+  "svn_url": "https://github.com/varnerlab/JuGRN-Generator",
+  "homepage": null,
+  "size": 66,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

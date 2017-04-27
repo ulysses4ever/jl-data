@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:18:00 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5095
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 707
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "ca2d075c81bc4f517fc47cf912236f62"
+Last-Modified: Sun, 20 Mar 2016 13:19:47 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 18B0:6633:DFB4A8:121A517:590235D7
+
+{
+  "id": 3795496,
+  "name": "jobshop",
+  "full_name": "stefan-k/jobshop",
+  "owner": {
+    "login": "stefan-k",
+    "id": 553169,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/553169?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/stefan-k",
+    "html_url": "https://github.com/stefan-k",
+    "followers_url": "https://api.github.com/users/stefan-k/followers",
+    "following_url": "https://api.github.com/users/stefan-k/following{/other_user}",
+    "gists_url": "https://api.github.com/users/stefan-k/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/stefan-k/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/stefan-k/subscriptions",
+    "organizations_url": "https://api.github.com/users/stefan-k/orgs",
+    "repos_url": "https://api.github.com/users/stefan-k/repos",
+    "events_url": "https://api.github.com/users/stefan-k/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/stefan-k/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/stefan-k/jobshop",
+  "description": "Jobshop problem solved with evolutionary strategies in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/stefan-k/jobshop",
+  "forks_url": "https://api.github.com/repos/stefan-k/jobshop/forks",
+  "keys_url": "https://api.github.com/repos/stefan-k/jobshop/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/stefan-k/jobshop/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/stefan-k/jobshop/teams",
+  "hooks_url": "https://api.github.com/repos/stefan-k/jobshop/hooks",
+  "issue_events_url": "https://api.github.com/repos/stefan-k/jobshop/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/stefan-k/jobshop/events",
+  "assignees_url": "https://api.github.com/repos/stefan-k/jobshop/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/stefan-k/jobshop/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/stefan-k/jobshop/tags",
+  "blobs_url": "https://api.github.com/repos/stefan-k/jobshop/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/stefan-k/jobshop/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/stefan-k/jobshop/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/stefan-k/jobshop/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/stefan-k/jobshop/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/stefan-k/jobshop/languages",
+  "stargazers_url": "https://api.github.com/repos/stefan-k/jobshop/stargazers",
+  "contributors_url": "https://api.github.com/repos/stefan-k/jobshop/contributors",
+  "subscribers_url": "https://api.github.com/repos/stefan-k/jobshop/subscribers",
+  "subscription_url": "https://api.github.com/repos/stefan-k/jobshop/subscription",
+  "commits_url": "https://api.github.com/repos/stefan-k/jobshop/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/stefan-k/jobshop/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/stefan-k/jobshop/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/stefan-k/jobshop/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/stefan-k/jobshop/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/stefan-k/jobshop/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/stefan-k/jobshop/merges",
+  "archive_url": "https://api.github.com/repos/stefan-k/jobshop/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/stefan-k/jobshop/downloads",
+  "issues_url": "https://api.github.com/repos/stefan-k/jobshop/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/stefan-k/jobshop/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/stefan-k/jobshop/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/stefan-k/jobshop/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/stefan-k/jobshop/labels{/name}",
+  "releases_url": "https://api.github.com/repos/stefan-k/jobshop/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/stefan-k/jobshop/deployments",
+  "created_at": "2012-03-22T07:50:20Z",
+  "updated_at": "2016-03-20T13:19:47Z",
+  "pushed_at": "2012-06-25T20:15:23Z",
+  "git_url": "git://github.com/stefan-k/jobshop.git",
+  "ssh_url": "git@github.com:stefan-k/jobshop.git",
+  "clone_url": "https://github.com/stefan-k/jobshop.git",
+  "svn_url": "https://github.com/stefan-k/jobshop",
+  "homepage": "",
+  "size": 916,
+  "stargazers_count": 3,
+  "watchers_count": 3,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 3,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 2
+}

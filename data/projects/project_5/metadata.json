@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:25:46 GMT
+Date: Thu, 27 Apr 2017 17:58:51 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5065
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3529
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "809db97240ae3aac515b561c52e84c77"
+Last-Modified: Fri, 30 Sep 2016 01:48:08 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 54
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CC5A:0710:4C86BF2:5B8E236:58C335FA
+Vary: Accept-Encoding
+X-Served-By: 593010132f82159af0ded24b4932e109
+X-GitHub-Request-Id: 5E5B:6637:132E9D0:18C2810:5902315A
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 69622651,
+  "name": "ALU_CPU",
+  "full_name": "jimmyz27/ALU_CPU",
+  "owner": {
+    "login": "jimmyz27",
+    "id": 14306139,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14306139?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jimmyz27",
+    "html_url": "https://github.com/jimmyz27",
+    "followers_url": "https://api.github.com/users/jimmyz27/followers",
+    "following_url": "https://api.github.com/users/jimmyz27/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jimmyz27/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jimmyz27/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jimmyz27/subscriptions",
+    "organizations_url": "https://api.github.com/users/jimmyz27/orgs",
+    "repos_url": "https://api.github.com/users/jimmyz27/repos",
+    "events_url": "https://api.github.com/users/jimmyz27/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jimmyz27/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jimmyz27/ALU_CPU",
+  "description": "project for SFU CMPT-276",
+  "fork": false,
+  "url": "https://api.github.com/repos/jimmyz27/ALU_CPU",
+  "forks_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/forks",
+  "keys_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/teams",
+  "hooks_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/hooks",
+  "issue_events_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/events",
+  "assignees_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/tags",
+  "blobs_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/languages",
+  "stargazers_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/stargazers",
+  "contributors_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/contributors",
+  "subscribers_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/subscribers",
+  "subscription_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/subscription",
+  "commits_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/merges",
+  "archive_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/downloads",
+  "issues_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jimmyz27/ALU_CPU/deployments",
+  "created_at": "2016-09-30T01:34:55Z",
+  "updated_at": "2016-09-30T01:48:08Z",
+  "pushed_at": "2016-10-06T22:04:25Z",
+  "git_url": "git://github.com/jimmyz27/ALU_CPU.git",
+  "ssh_url": "git@github.com:jimmyz27/ALU_CPU.git",
+  "clone_url": "https://github.com/jimmyz27/ALU_CPU.git",
+  "svn_url": "https://github.com/jimmyz27/ALU_CPU",
+  "homepage": null,
+  "size": 29,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

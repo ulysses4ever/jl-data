@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:23:46 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5342
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 222
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2a25c561a9837b2250987b9cb60725da"
+Last-Modified: Sun, 01 Jun 2014 23:56:28 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 3e3b9690823fb031da84658eb58aa83b
+X-GitHub-Request-Id: 3622:6637:1378F6E:1922752:59023732
+
+{
+  "id": 19956326,
+  "name": "uJSON.jl",
+  "full_name": "samuelcolvin/uJSON.jl",
+  "owner": {
+    "login": "samuelcolvin",
+    "id": 4039449,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/4039449?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/samuelcolvin",
+    "html_url": "https://github.com/samuelcolvin",
+    "followers_url": "https://api.github.com/users/samuelcolvin/followers",
+    "following_url": "https://api.github.com/users/samuelcolvin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/samuelcolvin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/samuelcolvin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/samuelcolvin/subscriptions",
+    "organizations_url": "https://api.github.com/users/samuelcolvin/orgs",
+    "repos_url": "https://api.github.com/users/samuelcolvin/repos",
+    "events_url": "https://api.github.com/users/samuelcolvin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/samuelcolvin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/samuelcolvin/uJSON.jl",
+  "description": "JSON library for Julia using ultraJSON",
+  "fork": false,
+  "url": "https://api.github.com/repos/samuelcolvin/uJSON.jl",
+  "forks_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/forks",
+  "keys_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/teams",
+  "hooks_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/events",
+  "assignees_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/tags",
+  "blobs_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/subscription",
+  "commits_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/merges",
+  "archive_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/downloads",
+  "issues_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/samuelcolvin/uJSON.jl/deployments",
+  "created_at": "2014-05-19T20:20:05Z",
+  "updated_at": "2014-06-01T23:56:28Z",
+  "pushed_at": "2014-06-01T23:56:28Z",
+  "git_url": "git://github.com/samuelcolvin/uJSON.jl.git",
+  "ssh_url": "git@github.com:samuelcolvin/uJSON.jl.git",
+  "clone_url": "https://github.com/samuelcolvin/uJSON.jl.git",
+  "svn_url": "https://github.com/samuelcolvin/uJSON.jl",
+  "homepage": null,
+  "size": 340,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:20:58 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6320
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 428
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4789e7a4722063e57ad043c988b5082b"
+Last-Modified: Tue, 25 Apr 2017 06:24:38 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: C884:6633:E0175A:1222809:5902368A
+
+{
+  "id": 17029918,
+  "name": "Formatting.jl",
+  "full_name": "JuliaIO/Formatting.jl",
+  "owner": {
+    "login": "JuliaIO",
+    "id": 11489324,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/11489324?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaIO",
+    "html_url": "https://github.com/JuliaIO",
+    "followers_url": "https://api.github.com/users/JuliaIO/followers",
+    "following_url": "https://api.github.com/users/JuliaIO/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaIO/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaIO/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaIO/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaIO/orgs",
+    "repos_url": "https://api.github.com/users/JuliaIO/repos",
+    "events_url": "https://api.github.com/users/JuliaIO/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaIO/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaIO/Formatting.jl",
+  "description": "A Julia package to provide Python-like formatting support",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaIO/Formatting.jl",
+  "forks_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaIO/Formatting.jl/deployments",
+  "created_at": "2014-02-20T17:58:13Z",
+  "updated_at": "2017-04-25T06:24:38Z",
+  "pushed_at": "2017-04-25T23:40:50Z",
+  "git_url": "git://github.com/JuliaIO/Formatting.jl.git",
+  "ssh_url": "git@github.com:JuliaIO/Formatting.jl.git",
+  "clone_url": "https://github.com/JuliaIO/Formatting.jl.git",
+  "svn_url": "https://github.com/JuliaIO/Formatting.jl",
+  "homepage": null,
+  "size": 48,
+  "stargazers_count": 32,
+  "watchers_count": 32,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 14,
+  "mirror_url": null,
+  "open_issues_count": 11,
+  "forks": 14,
+  "open_issues": 11,
+  "watchers": 32,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaIO",
+    "id": 11489324,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/11489324?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaIO",
+    "html_url": "https://github.com/JuliaIO",
+    "followers_url": "https://api.github.com/users/JuliaIO/followers",
+    "following_url": "https://api.github.com/users/JuliaIO/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaIO/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaIO/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaIO/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaIO/orgs",
+    "repos_url": "https://api.github.com/users/JuliaIO/repos",
+    "events_url": "https://api.github.com/users/JuliaIO/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaIO/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 14,
+  "subscribers_count": 28
+}

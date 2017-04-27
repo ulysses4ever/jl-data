@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:21:08 GMT
+Date: Thu, 27 Apr 2017 17:59:50 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6447
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3230
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7a1a7845afbb6d0a106c901c8ec7e46d"
+Last-Modified: Mon, 09 May 2016 16:56:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 47
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E4D6:0711:712F14D:87D97B4:58C35104
+Vary: Accept-Encoding
+X-Served-By: ef96c2e493b28ffea49b891b085ed2dd
+X-GitHub-Request-Id: 8BD2:6637:1331437:18C5FA3:59023196
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 58391783,
+  "name": "Term_paper_computational_econ",
+  "full_name": "ThomasBourany/Term_paper_computational_econ",
+  "owner": {
+    "login": "ThomasBourany",
+    "id": 16957939,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/16957939?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ThomasBourany",
+    "html_url": "https://github.com/ThomasBourany",
+    "followers_url": "https://api.github.com/users/ThomasBourany/followers",
+    "following_url": "https://api.github.com/users/ThomasBourany/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ThomasBourany/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ThomasBourany/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ThomasBourany/subscriptions",
+    "organizations_url": "https://api.github.com/users/ThomasBourany/orgs",
+    "repos_url": "https://api.github.com/users/ThomasBourany/repos",
+    "events_url": "https://api.github.com/users/ThomasBourany/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ThomasBourany/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ThomasBourany/Term_paper_computational_econ",
+  "description": "Term paper for the course of computational economics. I implement a simple growth model with exogenous fiscal policy, with a method called \"shooting algorithm\"",
+  "fork": false,
+  "url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ",
+  "forks_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/forks",
+  "keys_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/teams",
+  "hooks_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/hooks",
+  "issue_events_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/events",
+  "assignees_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/tags",
+  "blobs_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/languages",
+  "stargazers_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/stargazers",
+  "contributors_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/contributors",
+  "subscribers_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/subscribers",
+  "subscription_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/subscription",
+  "commits_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/merges",
+  "archive_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/downloads",
+  "issues_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ThomasBourany/Term_paper_computational_econ/deployments",
+  "created_at": "2016-05-09T16:31:32Z",
+  "updated_at": "2016-05-09T16:56:58Z",
+  "pushed_at": "2016-05-11T12:08:10Z",
+  "git_url": "git://github.com/ThomasBourany/Term_paper_computational_econ.git",
+  "ssh_url": "git@github.com:ThomasBourany/Term_paper_computational_econ.git",
+  "clone_url": "https://github.com/ThomasBourany/Term_paper_computational_econ.git",
+  "svn_url": "https://github.com/ThomasBourany/Term_paper_computational_econ",
+  "homepage": null,
+  "size": 3015,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

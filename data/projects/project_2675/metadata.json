@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:48 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5335
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1025
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "bb756b164b74752c1460c1d337e6ff9a"
+Last-Modified: Sat, 22 Aug 2015 18:38:01 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 07ff1c8a09e44b62e277fae50a1b1dc4
+X-GitHub-Request-Id: FFC2:6634:13699B4:1917CB3:590234DB
+
+{
+  "id": 12785398,
+  "name": "XClipboard.jl",
+  "full_name": "kmsquire/XClipboard.jl",
+  "owner": {
+    "login": "kmsquire",
+    "id": 223250,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/223250?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kmsquire",
+    "html_url": "https://github.com/kmsquire",
+    "followers_url": "https://api.github.com/users/kmsquire/followers",
+    "following_url": "https://api.github.com/users/kmsquire/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kmsquire/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kmsquire/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kmsquire/subscriptions",
+    "organizations_url": "https://api.github.com/users/kmsquire/orgs",
+    "repos_url": "https://api.github.com/users/kmsquire/repos",
+    "events_url": "https://api.github.com/users/kmsquire/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kmsquire/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/kmsquire/XClipboard.jl",
+  "description": "xlib clipboard bindings for julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/kmsquire/XClipboard.jl",
+  "forks_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/forks",
+  "keys_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/teams",
+  "hooks_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/events",
+  "assignees_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/tags",
+  "blobs_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/subscription",
+  "commits_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/merges",
+  "archive_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/downloads",
+  "issues_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/kmsquire/XClipboard.jl/deployments",
+  "created_at": "2013-09-12T14:11:27Z",
+  "updated_at": "2015-08-22T18:38:01Z",
+  "pushed_at": "2015-08-09T10:51:06Z",
+  "git_url": "git://github.com/kmsquire/XClipboard.jl.git",
+  "ssh_url": "git@github.com:kmsquire/XClipboard.jl.git",
+  "clone_url": "https://github.com/kmsquire/XClipboard.jl.git",
+  "svn_url": "https://github.com/kmsquire/XClipboard.jl",
+  "homepage": null,
+  "size": 201,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 1,
+  "open_issues": 3,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

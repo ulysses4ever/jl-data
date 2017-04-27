@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:25:31 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5087
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 115
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a7bf7c59f9cd4a6688025ce6156c4da4"
+Last-Modified: Wed, 18 May 2016 00:33:35 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 15bc4ab707db6d6b474783868c7cc828
+X-GitHub-Request-Id: 95D9:6637:137E913:1929939:5902379B
+
+{
+  "id": 13538014,
+  "name": "BGZF.jl",
+  "full_name": "kmsquire/BGZF.jl",
+  "owner": {
+    "login": "kmsquire",
+    "id": 223250,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/223250?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kmsquire",
+    "html_url": "https://github.com/kmsquire",
+    "followers_url": "https://api.github.com/users/kmsquire/followers",
+    "following_url": "https://api.github.com/users/kmsquire/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kmsquire/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kmsquire/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kmsquire/subscriptions",
+    "organizations_url": "https://api.github.com/users/kmsquire/orgs",
+    "repos_url": "https://api.github.com/users/kmsquire/repos",
+    "events_url": "https://api.github.com/users/kmsquire/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kmsquire/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/kmsquire/BGZF.jl",
+  "description": "Julia package to read/write BGZF compressed files",
+  "fork": false,
+  "url": "https://api.github.com/repos/kmsquire/BGZF.jl",
+  "forks_url": "https://api.github.com/repos/kmsquire/BGZF.jl/forks",
+  "keys_url": "https://api.github.com/repos/kmsquire/BGZF.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/kmsquire/BGZF.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/kmsquire/BGZF.jl/teams",
+  "hooks_url": "https://api.github.com/repos/kmsquire/BGZF.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/kmsquire/BGZF.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/kmsquire/BGZF.jl/events",
+  "assignees_url": "https://api.github.com/repos/kmsquire/BGZF.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/kmsquire/BGZF.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/kmsquire/BGZF.jl/tags",
+  "blobs_url": "https://api.github.com/repos/kmsquire/BGZF.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/kmsquire/BGZF.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/kmsquire/BGZF.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/kmsquire/BGZF.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/kmsquire/BGZF.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/kmsquire/BGZF.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/kmsquire/BGZF.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/kmsquire/BGZF.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/kmsquire/BGZF.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/kmsquire/BGZF.jl/subscription",
+  "commits_url": "https://api.github.com/repos/kmsquire/BGZF.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/kmsquire/BGZF.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/kmsquire/BGZF.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/kmsquire/BGZF.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/kmsquire/BGZF.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/kmsquire/BGZF.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/kmsquire/BGZF.jl/merges",
+  "archive_url": "https://api.github.com/repos/kmsquire/BGZF.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/kmsquire/BGZF.jl/downloads",
+  "issues_url": "https://api.github.com/repos/kmsquire/BGZF.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/kmsquire/BGZF.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/kmsquire/BGZF.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/kmsquire/BGZF.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/kmsquire/BGZF.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/kmsquire/BGZF.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/kmsquire/BGZF.jl/deployments",
+  "created_at": "2013-10-13T11:20:51Z",
+  "updated_at": "2016-05-18T00:33:35Z",
+  "pushed_at": "2013-10-14T02:13:33Z",
+  "git_url": "git://github.com/kmsquire/BGZF.jl.git",
+  "ssh_url": "git@github.com:kmsquire/BGZF.jl.git",
+  "clone_url": "https://github.com/kmsquire/BGZF.jl.git",
+  "svn_url": "https://github.com/kmsquire/BGZF.jl",
+  "homepage": null,
+  "size": 104,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

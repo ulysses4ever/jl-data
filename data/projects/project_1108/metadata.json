@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:03:16 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6346
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2531
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "c49bc78733d143a847cf1bb318149826"
+Last-Modified: Sun, 04 Dec 2016 14:17:15 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: bd82876e9bf04990f289ba22f246ee9b
+X-GitHub-Request-Id: 3D81:6633:DDBD43:11F19B7:59023264
+
+{
+  "id": 38220135,
+  "name": "SARSOP.jl",
+  "full_name": "JuliaPOMDP/SARSOP.jl",
+  "owner": {
+    "login": "JuliaPOMDP",
+    "id": 16347008,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16347008?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPOMDP",
+    "html_url": "https://github.com/JuliaPOMDP",
+    "followers_url": "https://api.github.com/users/JuliaPOMDP/followers",
+    "following_url": "https://api.github.com/users/JuliaPOMDP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPOMDP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPOMDP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPOMDP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPOMDP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPOMDP/repos",
+    "events_url": "https://api.github.com/users/JuliaPOMDP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPOMDP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaPOMDP/SARSOP.jl",
+  "description": "Julia package that wraps the SARSOP software for solving POMDPs/MDPs",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPOMDP/SARSOP.jl/deployments",
+  "created_at": "2015-06-29T00:48:32Z",
+  "updated_at": "2016-12-04T14:17:15Z",
+  "pushed_at": "2016-12-21T19:57:41Z",
+  "git_url": "git://github.com/JuliaPOMDP/SARSOP.jl.git",
+  "ssh_url": "git@github.com:JuliaPOMDP/SARSOP.jl.git",
+  "clone_url": "https://github.com/JuliaPOMDP/SARSOP.jl.git",
+  "svn_url": "https://github.com/JuliaPOMDP/SARSOP.jl",
+  "homepage": "",
+  "size": 431,
+  "stargazers_count": 5,
+  "watchers_count": 5,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 5,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaPOMDP",
+    "id": 16347008,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16347008?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPOMDP",
+    "html_url": "https://github.com/JuliaPOMDP",
+    "followers_url": "https://api.github.com/users/JuliaPOMDP/followers",
+    "following_url": "https://api.github.com/users/JuliaPOMDP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPOMDP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPOMDP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPOMDP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPOMDP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPOMDP/repos",
+    "events_url": "https://api.github.com/users/JuliaPOMDP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPOMDP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 22
+}

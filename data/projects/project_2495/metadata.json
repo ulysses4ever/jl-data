@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:12:17 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6054
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1191
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "dc1a29b1906c523734684cba79494e23"
+Last-Modified: Mon, 13 Apr 2015 02:36:34 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: 5127:6634:13654F4:19123D2:59023481
+
+{
+  "id": 28106877,
+  "name": "mpc_lp_julia",
+  "full_name": "copl/mpc_lp_julia",
+  "owner": {
+    "login": "copl",
+    "id": 9603077,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/9603077?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/copl",
+    "html_url": "https://github.com/copl",
+    "followers_url": "https://api.github.com/users/copl/followers",
+    "following_url": "https://api.github.com/users/copl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/copl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/copl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/copl/subscriptions",
+    "organizations_url": "https://api.github.com/users/copl/orgs",
+    "repos_url": "https://api.github.com/users/copl/repos",
+    "events_url": "https://api.github.com/users/copl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/copl/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/copl/mpc_lp_julia",
+  "description": "Example Mehrotra Predictor corrector in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/copl/mpc_lp_julia",
+  "forks_url": "https://api.github.com/repos/copl/mpc_lp_julia/forks",
+  "keys_url": "https://api.github.com/repos/copl/mpc_lp_julia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/copl/mpc_lp_julia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/copl/mpc_lp_julia/teams",
+  "hooks_url": "https://api.github.com/repos/copl/mpc_lp_julia/hooks",
+  "issue_events_url": "https://api.github.com/repos/copl/mpc_lp_julia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/copl/mpc_lp_julia/events",
+  "assignees_url": "https://api.github.com/repos/copl/mpc_lp_julia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/copl/mpc_lp_julia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/copl/mpc_lp_julia/tags",
+  "blobs_url": "https://api.github.com/repos/copl/mpc_lp_julia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/copl/mpc_lp_julia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/copl/mpc_lp_julia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/copl/mpc_lp_julia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/copl/mpc_lp_julia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/copl/mpc_lp_julia/languages",
+  "stargazers_url": "https://api.github.com/repos/copl/mpc_lp_julia/stargazers",
+  "contributors_url": "https://api.github.com/repos/copl/mpc_lp_julia/contributors",
+  "subscribers_url": "https://api.github.com/repos/copl/mpc_lp_julia/subscribers",
+  "subscription_url": "https://api.github.com/repos/copl/mpc_lp_julia/subscription",
+  "commits_url": "https://api.github.com/repos/copl/mpc_lp_julia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/copl/mpc_lp_julia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/copl/mpc_lp_julia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/copl/mpc_lp_julia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/copl/mpc_lp_julia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/copl/mpc_lp_julia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/copl/mpc_lp_julia/merges",
+  "archive_url": "https://api.github.com/repos/copl/mpc_lp_julia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/copl/mpc_lp_julia/downloads",
+  "issues_url": "https://api.github.com/repos/copl/mpc_lp_julia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/copl/mpc_lp_julia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/copl/mpc_lp_julia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/copl/mpc_lp_julia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/copl/mpc_lp_julia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/copl/mpc_lp_julia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/copl/mpc_lp_julia/deployments",
+  "created_at": "2014-12-16T21:11:55Z",
+  "updated_at": "2015-04-13T02:36:34Z",
+  "pushed_at": "2015-08-20T17:46:48Z",
+  "git_url": "git://github.com/copl/mpc_lp_julia.git",
+  "ssh_url": "git@github.com:copl/mpc_lp_julia.git",
+  "clone_url": "https://github.com/copl/mpc_lp_julia.git",
+  "svn_url": "https://github.com/copl/mpc_lp_julia",
+  "homepage": null,
+  "size": 7858,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 24,
+  "forks": 0,
+  "open_issues": 24,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "copl",
+    "id": 9603077,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/9603077?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/copl",
+    "html_url": "https://github.com/copl",
+    "followers_url": "https://api.github.com/users/copl/followers",
+    "following_url": "https://api.github.com/users/copl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/copl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/copl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/copl/subscriptions",
+    "organizations_url": "https://api.github.com/users/copl/orgs",
+    "repos_url": "https://api.github.com/users/copl/repos",
+    "events_url": "https://api.github.com/users/copl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/copl/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 5
+}

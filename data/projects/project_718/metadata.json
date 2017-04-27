@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:11 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5632
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2887
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "63328ccff579d5ea1e10249c9d54363b"
+Last-Modified: Sun, 23 Apr 2017 05:50:02 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 72C7:6631:865775:AD8556:590231E7
+
+{
+  "id": 49215812,
+  "name": "StringUtils.jl",
+  "full_name": "ScottPJones/StringUtils.jl",
+  "owner": {
+    "login": "ScottPJones",
+    "id": 11798751,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/11798751?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ScottPJones",
+    "html_url": "https://github.com/ScottPJones",
+    "followers_url": "https://api.github.com/users/ScottPJones/followers",
+    "following_url": "https://api.github.com/users/ScottPJones/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ScottPJones/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ScottPJones/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ScottPJones/subscriptions",
+    "organizations_url": "https://api.github.com/users/ScottPJones/orgs",
+    "repos_url": "https://api.github.com/users/ScottPJones/repos",
+    "events_url": "https://api.github.com/users/ScottPJones/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ScottPJones/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ScottPJones/StringUtils.jl",
+  "description": "String utilities for Julia, Swift-like interpolation/quoting, better performing versions of string functions, etc.",
+  "fork": false,
+  "url": "https://api.github.com/repos/ScottPJones/StringUtils.jl",
+  "forks_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/forks",
+  "keys_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/teams",
+  "hooks_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/events",
+  "assignees_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/tags",
+  "blobs_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/subscription",
+  "commits_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/merges",
+  "archive_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/downloads",
+  "issues_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ScottPJones/StringUtils.jl/deployments",
+  "created_at": "2016-01-07T16:22:49Z",
+  "updated_at": "2017-04-23T05:50:02Z",
+  "pushed_at": "2017-01-25T23:24:03Z",
+  "git_url": "git://github.com/ScottPJones/StringUtils.jl.git",
+  "ssh_url": "git@github.com:ScottPJones/StringUtils.jl.git",
+  "clone_url": "https://github.com/ScottPJones/StringUtils.jl.git",
+  "svn_url": "https://github.com/ScottPJones/StringUtils.jl",
+  "homepage": null,
+  "size": 715,
+  "stargazers_count": 17,
+  "watchers_count": 17,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 3,
+  "open_issues": 0,
+  "watchers": 17,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 2
+}

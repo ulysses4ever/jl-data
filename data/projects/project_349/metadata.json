@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:24:55 GMT
+Date: Thu, 27 Apr 2017 17:59:55 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5216
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3212
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "fcd789bea2e4f28b873fb7bb834ec2e5"
+Last-Modified: Tue, 28 Feb 2017 13:35:00 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 26
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E53A:0712:72E592B:89C51D0:58C351E7
+Vary: Accept-Encoding
+X-Served-By: 1e9204dbc0447a6f39c3b3c44d87b3f8
+X-GitHub-Request-Id: 89B5:6631:8632E7:AD5565:5902319B
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 57433998,
+  "name": "Ogg.jl",
+  "full_name": "staticfloat/Ogg.jl",
+  "owner": {
+    "login": "staticfloat",
+    "id": 130920,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/130920?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/staticfloat",
+    "html_url": "https://github.com/staticfloat",
+    "followers_url": "https://api.github.com/users/staticfloat/followers",
+    "following_url": "https://api.github.com/users/staticfloat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/staticfloat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/staticfloat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/staticfloat/subscriptions",
+    "organizations_url": "https://api.github.com/users/staticfloat/orgs",
+    "repos_url": "https://api.github.com/users/staticfloat/repos",
+    "events_url": "https://api.github.com/users/staticfloat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/staticfloat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/staticfloat/Ogg.jl",
+  "description": "Julia package to interface with Ogg containers and streams",
+  "fork": false,
+  "url": "https://api.github.com/repos/staticfloat/Ogg.jl",
+  "forks_url": "https://api.github.com/repos/staticfloat/Ogg.jl/forks",
+  "keys_url": "https://api.github.com/repos/staticfloat/Ogg.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/staticfloat/Ogg.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/staticfloat/Ogg.jl/teams",
+  "hooks_url": "https://api.github.com/repos/staticfloat/Ogg.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/staticfloat/Ogg.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/staticfloat/Ogg.jl/events",
+  "assignees_url": "https://api.github.com/repos/staticfloat/Ogg.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/staticfloat/Ogg.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/staticfloat/Ogg.jl/tags",
+  "blobs_url": "https://api.github.com/repos/staticfloat/Ogg.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/staticfloat/Ogg.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/staticfloat/Ogg.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/staticfloat/Ogg.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/staticfloat/Ogg.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/staticfloat/Ogg.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/staticfloat/Ogg.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/staticfloat/Ogg.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/staticfloat/Ogg.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/staticfloat/Ogg.jl/subscription",
+  "commits_url": "https://api.github.com/repos/staticfloat/Ogg.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/staticfloat/Ogg.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/staticfloat/Ogg.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/staticfloat/Ogg.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/staticfloat/Ogg.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/staticfloat/Ogg.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/staticfloat/Ogg.jl/merges",
+  "archive_url": "https://api.github.com/repos/staticfloat/Ogg.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/staticfloat/Ogg.jl/downloads",
+  "issues_url": "https://api.github.com/repos/staticfloat/Ogg.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/staticfloat/Ogg.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/staticfloat/Ogg.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/staticfloat/Ogg.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/staticfloat/Ogg.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/staticfloat/Ogg.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/staticfloat/Ogg.jl/deployments",
+  "created_at": "2016-04-30T08:40:28Z",
+  "updated_at": "2017-02-28T13:35:00Z",
+  "pushed_at": "2016-11-28T22:07:47Z",
+  "git_url": "git://github.com/staticfloat/Ogg.jl.git",
+  "ssh_url": "git@github.com:staticfloat/Ogg.jl.git",
+  "clone_url": "https://github.com/staticfloat/Ogg.jl.git",
+  "svn_url": "https://github.com/staticfloat/Ogg.jl",
+  "homepage": null,
+  "size": 17,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

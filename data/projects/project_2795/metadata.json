@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:15:33 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5632
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 900
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "5f47c9e2cd702ba52f00dbf485546cdf"
+Last-Modified: Fri, 19 Feb 2016 04:33:27 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: 3F31:6631:87C3BC:AF56ED:59023545
+
+{
+  "id": 52051194,
+  "name": "cpab-diffeo-julia",
+  "full_name": "angel8yu/cpab-diffeo-julia",
+  "owner": {
+    "login": "angel8yu",
+    "id": 5693558,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/5693558?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/angel8yu",
+    "html_url": "https://github.com/angel8yu",
+    "followers_url": "https://api.github.com/users/angel8yu/followers",
+    "following_url": "https://api.github.com/users/angel8yu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/angel8yu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/angel8yu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/angel8yu/subscriptions",
+    "organizations_url": "https://api.github.com/users/angel8yu/orgs",
+    "repos_url": "https://api.github.com/users/angel8yu/repos",
+    "events_url": "https://api.github.com/users/angel8yu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/angel8yu/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/angel8yu/cpab-diffeo-julia",
+  "description": "A Julia implementation of CPAB transformations based on [Freifeld et al., ICCV '15] (http://people.csail.mit.edu/freifeld/papers/freifeld_ICCV_2015.pdf)",
+  "fork": false,
+  "url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia",
+  "forks_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/forks",
+  "keys_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/teams",
+  "hooks_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/hooks",
+  "issue_events_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/events",
+  "assignees_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/tags",
+  "blobs_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/languages",
+  "stargazers_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/stargazers",
+  "contributors_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/contributors",
+  "subscribers_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/subscribers",
+  "subscription_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/subscription",
+  "commits_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/merges",
+  "archive_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/downloads",
+  "issues_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/angel8yu/cpab-diffeo-julia/deployments",
+  "created_at": "2016-02-19T01:07:19Z",
+  "updated_at": "2016-02-19T04:33:27Z",
+  "pushed_at": "2016-03-24T18:16:55Z",
+  "git_url": "git://github.com/angel8yu/cpab-diffeo-julia.git",
+  "ssh_url": "git@github.com:angel8yu/cpab-diffeo-julia.git",
+  "clone_url": "https://github.com/angel8yu/cpab-diffeo-julia.git",
+  "svn_url": "https://github.com/angel8yu/cpab-diffeo-julia",
+  "homepage": "",
+  "size": 19034,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 2
+}

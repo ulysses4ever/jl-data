@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:56:04 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6727
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4619
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "5ff9e76c763c6a7169a8181c201981ce"
+Last-Modified: Wed, 29 Mar 2017 05:30:56 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 732E:6634:13E3BB8:19B586D:59023EC4
+
+{
+  "id": 36465936,
+  "name": "ArrayFire.jl",
+  "full_name": "JuliaComputing/ArrayFire.jl",
+  "owner": {
+    "login": "JuliaComputing",
+    "id": 10258468,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/10258468?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaComputing",
+    "html_url": "https://github.com/JuliaComputing",
+    "followers_url": "https://api.github.com/users/JuliaComputing/followers",
+    "following_url": "https://api.github.com/users/JuliaComputing/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaComputing/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaComputing/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaComputing/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaComputing/orgs",
+    "repos_url": "https://api.github.com/users/JuliaComputing/repos",
+    "events_url": "https://api.github.com/users/JuliaComputing/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaComputing/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaComputing/ArrayFire.jl",
+  "description": "Julia wrapper for the ArrayFire library",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl",
+  "forks_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaComputing/ArrayFire.jl/deployments",
+  "created_at": "2015-05-28T21:01:58Z",
+  "updated_at": "2017-03-29T05:30:56Z",
+  "pushed_at": "2017-04-25T17:03:47Z",
+  "git_url": "git://github.com/JuliaComputing/ArrayFire.jl.git",
+  "ssh_url": "git@github.com:JuliaComputing/ArrayFire.jl.git",
+  "clone_url": "https://github.com/JuliaComputing/ArrayFire.jl.git",
+  "svn_url": "https://github.com/JuliaComputing/ArrayFire.jl",
+  "homepage": "",
+  "size": 233,
+  "stargazers_count": 77,
+  "watchers_count": 77,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": false,
+  "has_pages": false,
+  "forks_count": 22,
+  "mirror_url": null,
+  "open_issues_count": 28,
+  "forks": 22,
+  "open_issues": 28,
+  "watchers": 77,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaComputing",
+    "id": 10258468,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/10258468?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaComputing",
+    "html_url": "https://github.com/JuliaComputing",
+    "followers_url": "https://api.github.com/users/JuliaComputing/followers",
+    "following_url": "https://api.github.com/users/JuliaComputing/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaComputing/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaComputing/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaComputing/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaComputing/orgs",
+    "repos_url": "https://api.github.com/users/JuliaComputing/repos",
+    "events_url": "https://api.github.com/users/JuliaComputing/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaComputing/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 22,
+  "subscribers_count": 20
+}

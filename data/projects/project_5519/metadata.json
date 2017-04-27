@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:49:55 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5098
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4953
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "c745263807b5fd1bff1df262f9139022"
+Last-Modified: Fri, 24 Mar 2017 15:16:26 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 795A:6637:13C9355:198979E:59023D53
+
+{
+  "id": 39214384,
+  "name": "BSR.jl",
+  "full_name": "jakesnell/BSR.jl",
+  "owner": {
+    "login": "jakesnell",
+    "id": 825173,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/825173?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jakesnell",
+    "html_url": "https://github.com/jakesnell",
+    "followers_url": "https://api.github.com/users/jakesnell/followers",
+    "following_url": "https://api.github.com/users/jakesnell/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jakesnell/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jakesnell/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jakesnell/subscriptions",
+    "organizations_url": "https://api.github.com/users/jakesnell/orgs",
+    "repos_url": "https://api.github.com/users/jakesnell/repos",
+    "events_url": "https://api.github.com/users/jakesnell/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jakesnell/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jakesnell/BSR.jl",
+  "description": "Julia wrapper for Berkeley Segmentation Resources",
+  "fork": false,
+  "url": "https://api.github.com/repos/jakesnell/BSR.jl",
+  "forks_url": "https://api.github.com/repos/jakesnell/BSR.jl/forks",
+  "keys_url": "https://api.github.com/repos/jakesnell/BSR.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jakesnell/BSR.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jakesnell/BSR.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jakesnell/BSR.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jakesnell/BSR.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jakesnell/BSR.jl/events",
+  "assignees_url": "https://api.github.com/repos/jakesnell/BSR.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jakesnell/BSR.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jakesnell/BSR.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jakesnell/BSR.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jakesnell/BSR.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jakesnell/BSR.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jakesnell/BSR.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jakesnell/BSR.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jakesnell/BSR.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jakesnell/BSR.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jakesnell/BSR.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jakesnell/BSR.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jakesnell/BSR.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jakesnell/BSR.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jakesnell/BSR.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jakesnell/BSR.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jakesnell/BSR.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jakesnell/BSR.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jakesnell/BSR.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jakesnell/BSR.jl/merges",
+  "archive_url": "https://api.github.com/repos/jakesnell/BSR.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jakesnell/BSR.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jakesnell/BSR.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jakesnell/BSR.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jakesnell/BSR.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jakesnell/BSR.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jakesnell/BSR.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jakesnell/BSR.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jakesnell/BSR.jl/deployments",
+  "created_at": "2015-07-16T18:48:43Z",
+  "updated_at": "2017-03-24T15:16:26Z",
+  "pushed_at": "2015-07-28T23:16:14Z",
+  "git_url": "git://github.com/jakesnell/BSR.jl.git",
+  "ssh_url": "git@github.com:jakesnell/BSR.jl.git",
+  "clone_url": "https://github.com/jakesnell/BSR.jl.git",
+  "svn_url": "https://github.com/jakesnell/BSR.jl",
+  "homepage": null,
+  "size": 132,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 2
+}

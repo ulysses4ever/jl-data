@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:24 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5169
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1963
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b1444298829120de58e22fee0b8cae22"
+Last-Modified: Thu, 12 Dec 2013 14:57:41 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: ADB8:6634:1355068:18FD096:59023320
+
+{
+  "id": 5734400,
+  "name": "julia-svm",
+  "full_name": "ianfiske/julia-svm",
+  "owner": {
+    "login": "ianfiske",
+    "id": 135570,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/135570?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ianfiske",
+    "html_url": "https://github.com/ianfiske",
+    "followers_url": "https://api.github.com/users/ianfiske/followers",
+    "following_url": "https://api.github.com/users/ianfiske/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ianfiske/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ianfiske/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ianfiske/subscriptions",
+    "organizations_url": "https://api.github.com/users/ianfiske/orgs",
+    "repos_url": "https://api.github.com/users/ianfiske/repos",
+    "events_url": "https://api.github.com/users/ianfiske/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ianfiske/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ianfiske/julia-svm",
+  "description": "Julia bindings to libsvm backed by JuliaData",
+  "fork": false,
+  "url": "https://api.github.com/repos/ianfiske/julia-svm",
+  "forks_url": "https://api.github.com/repos/ianfiske/julia-svm/forks",
+  "keys_url": "https://api.github.com/repos/ianfiske/julia-svm/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ianfiske/julia-svm/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ianfiske/julia-svm/teams",
+  "hooks_url": "https://api.github.com/repos/ianfiske/julia-svm/hooks",
+  "issue_events_url": "https://api.github.com/repos/ianfiske/julia-svm/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ianfiske/julia-svm/events",
+  "assignees_url": "https://api.github.com/repos/ianfiske/julia-svm/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ianfiske/julia-svm/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ianfiske/julia-svm/tags",
+  "blobs_url": "https://api.github.com/repos/ianfiske/julia-svm/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ianfiske/julia-svm/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ianfiske/julia-svm/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ianfiske/julia-svm/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ianfiske/julia-svm/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ianfiske/julia-svm/languages",
+  "stargazers_url": "https://api.github.com/repos/ianfiske/julia-svm/stargazers",
+  "contributors_url": "https://api.github.com/repos/ianfiske/julia-svm/contributors",
+  "subscribers_url": "https://api.github.com/repos/ianfiske/julia-svm/subscribers",
+  "subscription_url": "https://api.github.com/repos/ianfiske/julia-svm/subscription",
+  "commits_url": "https://api.github.com/repos/ianfiske/julia-svm/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ianfiske/julia-svm/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ianfiske/julia-svm/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ianfiske/julia-svm/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ianfiske/julia-svm/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ianfiske/julia-svm/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ianfiske/julia-svm/merges",
+  "archive_url": "https://api.github.com/repos/ianfiske/julia-svm/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ianfiske/julia-svm/downloads",
+  "issues_url": "https://api.github.com/repos/ianfiske/julia-svm/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ianfiske/julia-svm/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ianfiske/julia-svm/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ianfiske/julia-svm/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ianfiske/julia-svm/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ianfiske/julia-svm/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ianfiske/julia-svm/deployments",
+  "created_at": "2012-09-09T02:51:51Z",
+  "updated_at": "2013-12-12T14:57:41Z",
+  "pushed_at": "2012-09-11T02:18:27Z",
+  "git_url": "git://github.com/ianfiske/julia-svm.git",
+  "ssh_url": "git@github.com:ianfiske/julia-svm.git",
+  "clone_url": "https://github.com/ianfiske/julia-svm.git",
+  "svn_url": "https://github.com/ianfiske/julia-svm",
+  "homepage": null,
+  "size": 120,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 0
+}

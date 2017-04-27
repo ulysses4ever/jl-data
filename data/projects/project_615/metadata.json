@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:00:56 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5304
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2982
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "e9a51c31e7d2a534154854a0e3b01a58"
+Last-Modified: Fri, 05 Feb 2016 03:08:28 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 9e60649f02cd840ee8baa9960690f79f
+X-GitHub-Request-Id: 58F3:6634:1345E39:18E98E6:590231D8
+
+{
+  "id": 51122757,
+  "name": "juliasandbox",
+  "full_name": "jpellman/juliasandbox",
+  "owner": {
+    "login": "jpellman",
+    "id": 5000591,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/5000591?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jpellman",
+    "html_url": "https://github.com/jpellman",
+    "followers_url": "https://api.github.com/users/jpellman/followers",
+    "following_url": "https://api.github.com/users/jpellman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jpellman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jpellman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jpellman/subscriptions",
+    "organizations_url": "https://api.github.com/users/jpellman/orgs",
+    "repos_url": "https://api.github.com/users/jpellman/repos",
+    "events_url": "https://api.github.com/users/jpellman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jpellman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jpellman/juliasandbox",
+  "description": "A sandbox where I will play around with Julia.",
+  "fork": false,
+  "url": "https://api.github.com/repos/jpellman/juliasandbox",
+  "forks_url": "https://api.github.com/repos/jpellman/juliasandbox/forks",
+  "keys_url": "https://api.github.com/repos/jpellman/juliasandbox/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jpellman/juliasandbox/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jpellman/juliasandbox/teams",
+  "hooks_url": "https://api.github.com/repos/jpellman/juliasandbox/hooks",
+  "issue_events_url": "https://api.github.com/repos/jpellman/juliasandbox/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jpellman/juliasandbox/events",
+  "assignees_url": "https://api.github.com/repos/jpellman/juliasandbox/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jpellman/juliasandbox/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jpellman/juliasandbox/tags",
+  "blobs_url": "https://api.github.com/repos/jpellman/juliasandbox/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jpellman/juliasandbox/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jpellman/juliasandbox/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jpellman/juliasandbox/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jpellman/juliasandbox/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jpellman/juliasandbox/languages",
+  "stargazers_url": "https://api.github.com/repos/jpellman/juliasandbox/stargazers",
+  "contributors_url": "https://api.github.com/repos/jpellman/juliasandbox/contributors",
+  "subscribers_url": "https://api.github.com/repos/jpellman/juliasandbox/subscribers",
+  "subscription_url": "https://api.github.com/repos/jpellman/juliasandbox/subscription",
+  "commits_url": "https://api.github.com/repos/jpellman/juliasandbox/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jpellman/juliasandbox/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jpellman/juliasandbox/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jpellman/juliasandbox/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jpellman/juliasandbox/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jpellman/juliasandbox/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jpellman/juliasandbox/merges",
+  "archive_url": "https://api.github.com/repos/jpellman/juliasandbox/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jpellman/juliasandbox/downloads",
+  "issues_url": "https://api.github.com/repos/jpellman/juliasandbox/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jpellman/juliasandbox/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jpellman/juliasandbox/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jpellman/juliasandbox/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jpellman/juliasandbox/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jpellman/juliasandbox/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jpellman/juliasandbox/deployments",
+  "created_at": "2016-02-05T03:07:55Z",
+  "updated_at": "2016-02-05T03:08:28Z",
+  "pushed_at": "2016-02-17T02:36:14Z",
+  "git_url": "git://github.com/jpellman/juliasandbox.git",
+  "ssh_url": "git@github.com:jpellman/juliasandbox.git",
+  "clone_url": "https://github.com/jpellman/juliasandbox.git",
+  "svn_url": "https://github.com/jpellman/juliasandbox",
+  "homepage": null,
+  "size": 2,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

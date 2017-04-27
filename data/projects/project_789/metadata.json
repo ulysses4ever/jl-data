@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:27 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4995
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2825
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "f5dd959781b2a5957daad965f8f402e4"
+Last-Modified: Wed, 27 Jul 2016 07:16:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 15bc4ab707db6d6b474783868c7cc828
+X-GitHub-Request-Id: 3F4C:6634:13475C4:18EB6CF:590231F7
+
+{
+  "id": 48720349,
+  "name": "HTM.jl",
+  "full_name": "iizukak/HTM.jl",
+  "owner": {
+    "login": "iizukak",
+    "id": 478824,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/478824?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/iizukak",
+    "html_url": "https://github.com/iizukak",
+    "followers_url": "https://api.github.com/users/iizukak/followers",
+    "following_url": "https://api.github.com/users/iizukak/following{/other_user}",
+    "gists_url": "https://api.github.com/users/iizukak/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/iizukak/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/iizukak/subscriptions",
+    "organizations_url": "https://api.github.com/users/iizukak/orgs",
+    "repos_url": "https://api.github.com/users/iizukak/repos",
+    "events_url": "https://api.github.com/users/iizukak/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/iizukak/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/iizukak/HTM.jl",
+  "description": "Hierarchical Temporal Memory (HTM) implementation in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/iizukak/HTM.jl",
+  "forks_url": "https://api.github.com/repos/iizukak/HTM.jl/forks",
+  "keys_url": "https://api.github.com/repos/iizukak/HTM.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/iizukak/HTM.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/iizukak/HTM.jl/teams",
+  "hooks_url": "https://api.github.com/repos/iizukak/HTM.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/iizukak/HTM.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/iizukak/HTM.jl/events",
+  "assignees_url": "https://api.github.com/repos/iizukak/HTM.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/iizukak/HTM.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/iizukak/HTM.jl/tags",
+  "blobs_url": "https://api.github.com/repos/iizukak/HTM.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/iizukak/HTM.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/iizukak/HTM.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/iizukak/HTM.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/iizukak/HTM.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/iizukak/HTM.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/iizukak/HTM.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/iizukak/HTM.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/iizukak/HTM.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/iizukak/HTM.jl/subscription",
+  "commits_url": "https://api.github.com/repos/iizukak/HTM.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/iizukak/HTM.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/iizukak/HTM.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/iizukak/HTM.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/iizukak/HTM.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/iizukak/HTM.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/iizukak/HTM.jl/merges",
+  "archive_url": "https://api.github.com/repos/iizukak/HTM.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/iizukak/HTM.jl/downloads",
+  "issues_url": "https://api.github.com/repos/iizukak/HTM.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/iizukak/HTM.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/iizukak/HTM.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/iizukak/HTM.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/iizukak/HTM.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/iizukak/HTM.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/iizukak/HTM.jl/deployments",
+  "created_at": "2015-12-29T01:21:16Z",
+  "updated_at": "2016-07-27T07:16:44Z",
+  "pushed_at": "2016-01-04T23:46:14Z",
+  "git_url": "git://github.com/iizukak/HTM.jl.git",
+  "ssh_url": "git@github.com:iizukak/HTM.jl.git",
+  "clone_url": "https://github.com/iizukak/HTM.jl.git",
+  "svn_url": "https://github.com/iizukak/HTM.jl",
+  "homepage": null,
+  "size": 7,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 0
+}

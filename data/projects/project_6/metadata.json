@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:25:47 GMT
+Date: Thu, 27 Apr 2017 17:58:52 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5599
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3519
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "55209adbbb54dfdae41c7ed8a655f9e6"
+Last-Modified: Fri, 17 Mar 2017 19:37:42 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 52
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CC5C:0711:6FEB4F8:865EBF8:58C335FB
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 196C:6634:13401E3:18E1FAF:5902315B
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 69614332,
+  "name": "Synaptor",
+  "full_name": "nicholasturner1/Synaptor",
+  "owner": {
+    "login": "nicholasturner1",
+    "id": 1390187,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1390187?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/nicholasturner1",
+    "html_url": "https://github.com/nicholasturner1",
+    "followers_url": "https://api.github.com/users/nicholasturner1/followers",
+    "following_url": "https://api.github.com/users/nicholasturner1/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nicholasturner1/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nicholasturner1/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nicholasturner1/subscriptions",
+    "organizations_url": "https://api.github.com/users/nicholasturner1/orgs",
+    "repos_url": "https://api.github.com/users/nicholasturner1/repos",
+    "events_url": "https://api.github.com/users/nicholasturner1/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nicholasturner1/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/nicholasturner1/Synaptor",
+  "description": "Package & Toolbox for processing voxelwise Convolutional Network output designed to predict synapses within electron microscopy data",
+  "fork": false,
+  "url": "https://api.github.com/repos/nicholasturner1/Synaptor",
+  "forks_url": "https://api.github.com/repos/nicholasturner1/Synaptor/forks",
+  "keys_url": "https://api.github.com/repos/nicholasturner1/Synaptor/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/nicholasturner1/Synaptor/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/nicholasturner1/Synaptor/teams",
+  "hooks_url": "https://api.github.com/repos/nicholasturner1/Synaptor/hooks",
+  "issue_events_url": "https://api.github.com/repos/nicholasturner1/Synaptor/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/nicholasturner1/Synaptor/events",
+  "assignees_url": "https://api.github.com/repos/nicholasturner1/Synaptor/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/nicholasturner1/Synaptor/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/nicholasturner1/Synaptor/tags",
+  "blobs_url": "https://api.github.com/repos/nicholasturner1/Synaptor/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/nicholasturner1/Synaptor/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/nicholasturner1/Synaptor/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/nicholasturner1/Synaptor/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/nicholasturner1/Synaptor/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/nicholasturner1/Synaptor/languages",
+  "stargazers_url": "https://api.github.com/repos/nicholasturner1/Synaptor/stargazers",
+  "contributors_url": "https://api.github.com/repos/nicholasturner1/Synaptor/contributors",
+  "subscribers_url": "https://api.github.com/repos/nicholasturner1/Synaptor/subscribers",
+  "subscription_url": "https://api.github.com/repos/nicholasturner1/Synaptor/subscription",
+  "commits_url": "https://api.github.com/repos/nicholasturner1/Synaptor/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/nicholasturner1/Synaptor/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/nicholasturner1/Synaptor/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/nicholasturner1/Synaptor/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/nicholasturner1/Synaptor/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/nicholasturner1/Synaptor/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/nicholasturner1/Synaptor/merges",
+  "archive_url": "https://api.github.com/repos/nicholasturner1/Synaptor/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/nicholasturner1/Synaptor/downloads",
+  "issues_url": "https://api.github.com/repos/nicholasturner1/Synaptor/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/nicholasturner1/Synaptor/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/nicholasturner1/Synaptor/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/nicholasturner1/Synaptor/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/nicholasturner1/Synaptor/labels{/name}",
+  "releases_url": "https://api.github.com/repos/nicholasturner1/Synaptor/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/nicholasturner1/Synaptor/deployments",
+  "created_at": "2016-09-29T22:55:43Z",
+  "updated_at": "2017-03-17T19:37:42Z",
+  "pushed_at": "2017-04-26T02:50:34Z",
+  "git_url": "git://github.com/nicholasturner1/Synaptor.git",
+  "ssh_url": "git@github.com:nicholasturner1/Synaptor.git",
+  "clone_url": "https://github.com/nicholasturner1/Synaptor.git",
+  "svn_url": "https://github.com/nicholasturner1/Synaptor",
+  "homepage": "",
+  "size": 209,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

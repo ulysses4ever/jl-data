@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:27:25 GMT
+Date: Thu, 27 Apr 2017 17:59:58 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5277
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3196
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b7fca5e504ea9ca3ca3cf65442fe29bf"
+Last-Modified: Tue, 28 Mar 2017 23:57:17 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 12
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D5AC:0711:713DA7A:87EAC7A:58C3527D
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: 166B:6631:8633AA:AD5668:5902319D
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 57098835,
+  "name": "PATHSolver.jl",
+  "full_name": "chkwon/PATHSolver.jl",
+  "owner": {
+    "login": "chkwon",
+    "id": 7596204,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/7596204?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chkwon",
+    "html_url": "https://github.com/chkwon",
+    "followers_url": "https://api.github.com/users/chkwon/followers",
+    "following_url": "https://api.github.com/users/chkwon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chkwon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chkwon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chkwon/subscriptions",
+    "organizations_url": "https://api.github.com/users/chkwon/orgs",
+    "repos_url": "https://api.github.com/users/chkwon/repos",
+    "events_url": "https://api.github.com/users/chkwon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chkwon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/chkwon/PATHSolver.jl",
+  "description": "provide a Julia wrapper for the PATH Solver for solving mixed complementarity problems",
+  "fork": false,
+  "url": "https://api.github.com/repos/chkwon/PATHSolver.jl",
+  "forks_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/forks",
+  "keys_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/teams",
+  "hooks_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/events",
+  "assignees_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/tags",
+  "blobs_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/subscription",
+  "commits_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/merges",
+  "archive_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/downloads",
+  "issues_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/chkwon/PATHSolver.jl/deployments",
+  "created_at": "2016-04-26T04:52:50Z",
+  "updated_at": "2017-03-28T23:57:17Z",
+  "pushed_at": "2017-02-18T02:30:43Z",
+  "git_url": "git://github.com/chkwon/PATHSolver.jl.git",
+  "ssh_url": "git@github.com:chkwon/PATHSolver.jl.git",
+  "clone_url": "https://github.com/chkwon/PATHSolver.jl.git",
+  "svn_url": "https://github.com/chkwon/PATHSolver.jl",
+  "homepage": "",
+  "size": 46,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 3,
+  "open_issues": 2,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 1
 }

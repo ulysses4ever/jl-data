@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:19:21 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5832
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 599
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "cf11879be8736cc52808d8da3600e56b"
+Last-Modified: Mon, 09 Dec 2013 10:53:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: F72E:6634:1378A03:192B535:59023629
+
+{
+  "id": 14442895,
+  "name": "ApproximateBayes.jl",
+  "full_name": "robertfeldt/ApproximateBayes.jl",
+  "owner": {
+    "login": "robertfeldt",
+    "id": 3980,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/3980?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/robertfeldt",
+    "html_url": "https://github.com/robertfeldt",
+    "followers_url": "https://api.github.com/users/robertfeldt/followers",
+    "following_url": "https://api.github.com/users/robertfeldt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/robertfeldt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/robertfeldt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/robertfeldt/subscriptions",
+    "organizations_url": "https://api.github.com/users/robertfeldt/orgs",
+    "repos_url": "https://api.github.com/users/robertfeldt/repos",
+    "events_url": "https://api.github.com/users/robertfeldt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/robertfeldt/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/robertfeldt/ApproximateBayes.jl",
+  "description": "Likelihood-free bayesian inference based on model simulation à la Approximate Bayesian Computation (ABC)",
+  "fork": false,
+  "url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl",
+  "forks_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/forks",
+  "keys_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/teams",
+  "hooks_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/events",
+  "assignees_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/tags",
+  "blobs_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/subscription",
+  "commits_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/merges",
+  "archive_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/downloads",
+  "issues_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/robertfeldt/ApproximateBayes.jl/deployments",
+  "created_at": "2013-11-16T06:27:06Z",
+  "updated_at": "2013-12-09T10:53:58Z",
+  "pushed_at": "2013-12-09T10:53:54Z",
+  "git_url": "git://github.com/robertfeldt/ApproximateBayes.jl.git",
+  "ssh_url": "git@github.com:robertfeldt/ApproximateBayes.jl.git",
+  "clone_url": "https://github.com/robertfeldt/ApproximateBayes.jl.git",
+  "svn_url": "https://github.com/robertfeldt/ApproximateBayes.jl",
+  "homepage": null,
+  "size": 120,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

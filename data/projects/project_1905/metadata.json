@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:07:21 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5381
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1777
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4224aa5180a11323f39a8312edea6f52"
+Last-Modified: Fri, 31 Jul 2015 08:52:50 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 3757:6634:1357D00:1900969:59023359
+
+{
+  "id": 21387390,
+  "name": "NAG.jl",
+  "full_name": "StefanKarpinski/NAG.jl",
+  "owner": {
+    "login": "StefanKarpinski",
+    "id": 153596,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/153596?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/StefanKarpinski",
+    "html_url": "https://github.com/StefanKarpinski",
+    "followers_url": "https://api.github.com/users/StefanKarpinski/followers",
+    "following_url": "https://api.github.com/users/StefanKarpinski/following{/other_user}",
+    "gists_url": "https://api.github.com/users/StefanKarpinski/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/StefanKarpinski/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/StefanKarpinski/subscriptions",
+    "organizations_url": "https://api.github.com/users/StefanKarpinski/orgs",
+    "repos_url": "https://api.github.com/users/StefanKarpinski/repos",
+    "events_url": "https://api.github.com/users/StefanKarpinski/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/StefanKarpinski/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/StefanKarpinski/NAG.jl",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/StefanKarpinski/NAG.jl",
+  "forks_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/forks",
+  "keys_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/teams",
+  "hooks_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/events",
+  "assignees_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/tags",
+  "blobs_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/subscription",
+  "commits_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/merges",
+  "archive_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/downloads",
+  "issues_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/StefanKarpinski/NAG.jl/deployments",
+  "created_at": "2014-07-01T12:49:28Z",
+  "updated_at": "2015-07-31T08:52:50Z",
+  "pushed_at": "2014-12-11T18:38:35Z",
+  "git_url": "git://github.com/StefanKarpinski/NAG.jl.git",
+  "ssh_url": "git@github.com:StefanKarpinski/NAG.jl.git",
+  "clone_url": "https://github.com/StefanKarpinski/NAG.jl.git",
+  "svn_url": "https://github.com/StefanKarpinski/NAG.jl",
+  "homepage": null,
+  "size": 168,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 3,
+  "open_issues": 1,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 3
+}

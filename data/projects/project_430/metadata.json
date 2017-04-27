@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:55:21 GMT
+Date: Thu, 27 Apr 2017 18:00:10 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5606
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3140
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "c23884646a2bcaa64488bbd4e633306e"
+Last-Modified: Tue, 29 Nov 2016 02:04:03 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 8
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D790:0711:7185B36:8843648:58C35909
+Vary: Accept-Encoding
+X-Served-By: 626ed3a9050b8faa02ef5f3c540b508d
+X-GitHub-Request-Id: 5984:6637:13322E8:18C7346:590231AA
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55810212,
+  "name": "ApproxEffectiveMass",
+  "full_name": "jarvist/ApproxEffectiveMass",
+  "owner": {
+    "login": "jarvist",
+    "id": 82852,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/82852?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jarvist",
+    "html_url": "https://github.com/jarvist",
+    "followers_url": "https://api.github.com/users/jarvist/followers",
+    "following_url": "https://api.github.com/users/jarvist/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jarvist/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jarvist/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jarvist/subscriptions",
+    "organizations_url": "https://api.github.com/users/jarvist/orgs",
+    "repos_url": "https://api.github.com/users/jarvist/repos",
+    "events_url": "https://api.github.com/users/jarvist/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jarvist/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jarvist/ApproxEffectiveMass",
+  "description": "Effective mass from a (VASP?) bandstructure calculation via ApproxFun fitting to the bands, a WIP.",
+  "fork": false,
+  "url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass",
+  "forks_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/forks",
+  "keys_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/teams",
+  "hooks_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/hooks",
+  "issue_events_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/events",
+  "assignees_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/tags",
+  "blobs_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/languages",
+  "stargazers_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/stargazers",
+  "contributors_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/contributors",
+  "subscribers_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/subscribers",
+  "subscription_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/subscription",
+  "commits_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/merges",
+  "archive_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/downloads",
+  "issues_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jarvist/ApproxEffectiveMass/deployments",
+  "created_at": "2016-04-08T21:17:16Z",
+  "updated_at": "2016-11-29T02:04:03Z",
+  "pushed_at": "2016-04-13T21:37:20Z",
+  "git_url": "git://github.com/jarvist/ApproxEffectiveMass.git",
+  "ssh_url": "git@github.com:jarvist/ApproxEffectiveMass.git",
+  "clone_url": "https://github.com/jarvist/ApproxEffectiveMass.git",
+  "svn_url": "https://github.com/jarvist/ApproxEffectiveMass",
+  "homepage": null,
+  "size": 38,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 3
 }

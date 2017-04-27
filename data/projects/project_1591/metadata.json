@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:05:52 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6251
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2075
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "74ec728ce4f57b22c96db30f8c7836b4"
+Last-Modified: Thu, 27 Apr 2017 15:32:13 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: 9A64:6634:135379D:18FB0C2:59023300
+
+{
+  "id": 19463347,
+  "name": "Coverage.jl",
+  "full_name": "JuliaCI/Coverage.jl",
+  "owner": {
+    "login": "JuliaCI",
+    "id": 9957604,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/9957604?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaCI",
+    "html_url": "https://github.com/JuliaCI",
+    "followers_url": "https://api.github.com/users/JuliaCI/followers",
+    "following_url": "https://api.github.com/users/JuliaCI/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaCI/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaCI/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaCI/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaCI/orgs",
+    "repos_url": "https://api.github.com/users/JuliaCI/repos",
+    "events_url": "https://api.github.com/users/JuliaCI/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaCI/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaCI/Coverage.jl",
+  "description": "Take Julia code coverage and memory allocation results, do useful things with them",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaCI/Coverage.jl",
+  "forks_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaCI/Coverage.jl/deployments",
+  "created_at": "2014-05-05T16:53:13Z",
+  "updated_at": "2017-04-27T15:32:13Z",
+  "pushed_at": "2017-04-24T22:39:49Z",
+  "git_url": "git://github.com/JuliaCI/Coverage.jl.git",
+  "ssh_url": "git@github.com:JuliaCI/Coverage.jl.git",
+  "clone_url": "https://github.com/JuliaCI/Coverage.jl.git",
+  "svn_url": "https://github.com/JuliaCI/Coverage.jl",
+  "homepage": "",
+  "size": 163,
+  "stargazers_count": 37,
+  "watchers_count": 37,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 40,
+  "mirror_url": null,
+  "open_issues_count": 11,
+  "forks": 40,
+  "open_issues": 11,
+  "watchers": 37,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaCI",
+    "id": 9957604,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/9957604?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaCI",
+    "html_url": "https://github.com/JuliaCI",
+    "followers_url": "https://api.github.com/users/JuliaCI/followers",
+    "following_url": "https://api.github.com/users/JuliaCI/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaCI/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaCI/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaCI/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaCI/orgs",
+    "repos_url": "https://api.github.com/users/JuliaCI/repos",
+    "events_url": "https://api.github.com/users/JuliaCI/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaCI/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 40,
+  "subscribers_count": 7
+}

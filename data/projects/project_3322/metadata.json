@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:21:07 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5578
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 407
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "09b472cd749438a04ba5d84559f3b960"
+Last-Modified: Fri, 27 May 2016 14:50:35 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 7701:6633:E01E21:12230EB:59023693
+
+{
+  "id": 11436730,
+  "name": "blog-example.jl",
+  "full_name": "astrieanna/blog-example.jl",
+  "owner": {
+    "login": "astrieanna",
+    "id": 1205394,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1205394?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/astrieanna",
+    "html_url": "https://github.com/astrieanna",
+    "followers_url": "https://api.github.com/users/astrieanna/followers",
+    "following_url": "https://api.github.com/users/astrieanna/following{/other_user}",
+    "gists_url": "https://api.github.com/users/astrieanna/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/astrieanna/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/astrieanna/subscriptions",
+    "organizations_url": "https://api.github.com/users/astrieanna/orgs",
+    "repos_url": "https://api.github.com/users/astrieanna/repos",
+    "events_url": "https://api.github.com/users/astrieanna/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/astrieanna/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/astrieanna/blog-example.jl",
+  "description": "A Example Blog app in Julia using HttpServer, Calendar, SQLite, and Mustache",
+  "fork": false,
+  "url": "https://api.github.com/repos/astrieanna/blog-example.jl",
+  "forks_url": "https://api.github.com/repos/astrieanna/blog-example.jl/forks",
+  "keys_url": "https://api.github.com/repos/astrieanna/blog-example.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/astrieanna/blog-example.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/astrieanna/blog-example.jl/teams",
+  "hooks_url": "https://api.github.com/repos/astrieanna/blog-example.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/astrieanna/blog-example.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/astrieanna/blog-example.jl/events",
+  "assignees_url": "https://api.github.com/repos/astrieanna/blog-example.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/astrieanna/blog-example.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/astrieanna/blog-example.jl/tags",
+  "blobs_url": "https://api.github.com/repos/astrieanna/blog-example.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/astrieanna/blog-example.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/astrieanna/blog-example.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/astrieanna/blog-example.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/astrieanna/blog-example.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/astrieanna/blog-example.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/astrieanna/blog-example.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/astrieanna/blog-example.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/astrieanna/blog-example.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/astrieanna/blog-example.jl/subscription",
+  "commits_url": "https://api.github.com/repos/astrieanna/blog-example.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/astrieanna/blog-example.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/astrieanna/blog-example.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/astrieanna/blog-example.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/astrieanna/blog-example.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/astrieanna/blog-example.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/astrieanna/blog-example.jl/merges",
+  "archive_url": "https://api.github.com/repos/astrieanna/blog-example.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/astrieanna/blog-example.jl/downloads",
+  "issues_url": "https://api.github.com/repos/astrieanna/blog-example.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/astrieanna/blog-example.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/astrieanna/blog-example.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/astrieanna/blog-example.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/astrieanna/blog-example.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/astrieanna/blog-example.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/astrieanna/blog-example.jl/deployments",
+  "created_at": "2013-07-16T00:13:21Z",
+  "updated_at": "2016-05-27T14:50:35Z",
+  "pushed_at": "2013-07-16T16:50:51Z",
+  "git_url": "git://github.com/astrieanna/blog-example.jl.git",
+  "ssh_url": "git@github.com:astrieanna/blog-example.jl.git",
+  "clone_url": "https://github.com/astrieanna/blog-example.jl.git",
+  "svn_url": "https://github.com/astrieanna/blog-example.jl",
+  "homepage": null,
+  "size": 288,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 0
+}

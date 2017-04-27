@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:30:28 GMT
+Date: Thu, 27 Apr 2017 17:59:06 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5277
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3433
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "ea4e5fa0ad2a5432d12c6699b1c6f45b"
+Last-Modified: Thu, 27 Oct 2016 20:04:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CDAD:0712:71BF1C4:8866B2C:58C33714
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: AD92:6631:861FC4:AD3CD5:5902316A
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 65575336,
+  "name": "NeuroIO.jl",
+  "full_name": "simonster/NeuroIO.jl",
+  "owner": {
+    "login": "simonster",
+    "id": 470884,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/470884?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/simonster",
+    "html_url": "https://github.com/simonster",
+    "followers_url": "https://api.github.com/users/simonster/followers",
+    "following_url": "https://api.github.com/users/simonster/following{/other_user}",
+    "gists_url": "https://api.github.com/users/simonster/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/simonster/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/simonster/subscriptions",
+    "organizations_url": "https://api.github.com/users/simonster/orgs",
+    "repos_url": "https://api.github.com/users/simonster/repos",
+    "events_url": "https://api.github.com/users/simonster/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/simonster/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/simonster/NeuroIO.jl",
+  "description": "Read and write common electrophysiology data formats",
+  "fork": false,
+  "url": "https://api.github.com/repos/simonster/NeuroIO.jl",
+  "forks_url": "https://api.github.com/repos/simonster/NeuroIO.jl/forks",
+  "keys_url": "https://api.github.com/repos/simonster/NeuroIO.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/simonster/NeuroIO.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/simonster/NeuroIO.jl/teams",
+  "hooks_url": "https://api.github.com/repos/simonster/NeuroIO.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/simonster/NeuroIO.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/simonster/NeuroIO.jl/events",
+  "assignees_url": "https://api.github.com/repos/simonster/NeuroIO.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/simonster/NeuroIO.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/simonster/NeuroIO.jl/tags",
+  "blobs_url": "https://api.github.com/repos/simonster/NeuroIO.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/simonster/NeuroIO.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/simonster/NeuroIO.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/simonster/NeuroIO.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/simonster/NeuroIO.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/simonster/NeuroIO.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/simonster/NeuroIO.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/simonster/NeuroIO.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/simonster/NeuroIO.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/simonster/NeuroIO.jl/subscription",
+  "commits_url": "https://api.github.com/repos/simonster/NeuroIO.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/simonster/NeuroIO.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/simonster/NeuroIO.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/simonster/NeuroIO.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/simonster/NeuroIO.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/simonster/NeuroIO.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/simonster/NeuroIO.jl/merges",
+  "archive_url": "https://api.github.com/repos/simonster/NeuroIO.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/simonster/NeuroIO.jl/downloads",
+  "issues_url": "https://api.github.com/repos/simonster/NeuroIO.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/simonster/NeuroIO.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/simonster/NeuroIO.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/simonster/NeuroIO.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/simonster/NeuroIO.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/simonster/NeuroIO.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/simonster/NeuroIO.jl/deployments",
+  "created_at": "2016-08-12T18:29:53Z",
+  "updated_at": "2016-10-27T20:04:44Z",
+  "pushed_at": "2016-10-27T21:38:59Z",
+  "git_url": "git://github.com/simonster/NeuroIO.jl.git",
+  "ssh_url": "git@github.com:simonster/NeuroIO.jl.git",
+  "clone_url": "https://github.com/simonster/NeuroIO.jl.git",
+  "svn_url": "https://github.com/simonster/NeuroIO.jl",
+  "homepage": null,
+  "size": 150,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 2
 }

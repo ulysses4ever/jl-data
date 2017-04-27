@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:12:51 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5886
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1128
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "77775ef760b487e3d6af7c8404fe81a0"
+Last-Modified: Sat, 06 Dec 2014 19:22:30 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: BDCC:6637:1357BD5:18F77EE:590234A3
+
+{
+  "id": 11713422,
+  "name": "RandomProcesses.jl",
+  "full_name": "johnmyleswhite/RandomProcesses.jl",
+  "owner": {
+    "login": "johnmyleswhite",
+    "id": 22064,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/22064?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/johnmyleswhite",
+    "html_url": "https://github.com/johnmyleswhite",
+    "followers_url": "https://api.github.com/users/johnmyleswhite/followers",
+    "following_url": "https://api.github.com/users/johnmyleswhite/following{/other_user}",
+    "gists_url": "https://api.github.com/users/johnmyleswhite/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/johnmyleswhite/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/johnmyleswhite/subscriptions",
+    "organizations_url": "https://api.github.com/users/johnmyleswhite/orgs",
+    "repos_url": "https://api.github.com/users/johnmyleswhite/repos",
+    "events_url": "https://api.github.com/users/johnmyleswhite/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/johnmyleswhite/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/johnmyleswhite/RandomProcesses.jl",
+  "description": "Random processes (CRP, CRT) in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl",
+  "forks_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/forks",
+  "keys_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/teams",
+  "hooks_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/events",
+  "assignees_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/tags",
+  "blobs_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/subscription",
+  "commits_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/merges",
+  "archive_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/downloads",
+  "issues_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/johnmyleswhite/RandomProcesses.jl/deployments",
+  "created_at": "2013-07-28T01:18:05Z",
+  "updated_at": "2014-12-06T19:22:30Z",
+  "pushed_at": "2014-12-06T19:22:29Z",
+  "git_url": "git://github.com/johnmyleswhite/RandomProcesses.jl.git",
+  "ssh_url": "git@github.com:johnmyleswhite/RandomProcesses.jl.git",
+  "clone_url": "https://github.com/johnmyleswhite/RandomProcesses.jl.git",
+  "svn_url": "https://github.com/johnmyleswhite/RandomProcesses.jl",
+  "homepage": null,
+  "size": 128,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

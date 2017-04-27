@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:54:46 GMT
+Date: Thu, 27 Apr 2017 17:59:37 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5596
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3295
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "d65c7bd30d70a1b7ad538d7ae70ad0f3"
+Last-Modified: Thu, 02 Jun 2016 17:56:25 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E084:0711:703E5C8:86BFAB6:58C33CC6
+Vary: Accept-Encoding
+X-Served-By: 5aeb3f30c9e3ef6ef7bcbcddfd9a68f7
+X-GitHub-Request-Id: 9692:6634:134202C:18E478D:59023189
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 60217231,
+  "name": "BewleyModel",
+  "full_name": "pierremabille/BewleyModel",
+  "owner": {
+    "login": "pierremabille",
+    "id": 16960486,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/16960486?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pierremabille",
+    "html_url": "https://github.com/pierremabille",
+    "followers_url": "https://api.github.com/users/pierremabille/followers",
+    "following_url": "https://api.github.com/users/pierremabille/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pierremabille/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pierremabille/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pierremabille/subscriptions",
+    "organizations_url": "https://api.github.com/users/pierremabille/orgs",
+    "repos_url": "https://api.github.com/users/pierremabille/repos",
+    "events_url": "https://api.github.com/users/pierremabille/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pierremabille/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/pierremabille/BewleyModel",
+  "description": "Solving Bewley models in Julia: steady state computations, calibration, transitional dynamics.",
+  "fork": false,
+  "url": "https://api.github.com/repos/pierremabille/BewleyModel",
+  "forks_url": "https://api.github.com/repos/pierremabille/BewleyModel/forks",
+  "keys_url": "https://api.github.com/repos/pierremabille/BewleyModel/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/pierremabille/BewleyModel/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/pierremabille/BewleyModel/teams",
+  "hooks_url": "https://api.github.com/repos/pierremabille/BewleyModel/hooks",
+  "issue_events_url": "https://api.github.com/repos/pierremabille/BewleyModel/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/pierremabille/BewleyModel/events",
+  "assignees_url": "https://api.github.com/repos/pierremabille/BewleyModel/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/pierremabille/BewleyModel/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/pierremabille/BewleyModel/tags",
+  "blobs_url": "https://api.github.com/repos/pierremabille/BewleyModel/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/pierremabille/BewleyModel/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/pierremabille/BewleyModel/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/pierremabille/BewleyModel/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/pierremabille/BewleyModel/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/pierremabille/BewleyModel/languages",
+  "stargazers_url": "https://api.github.com/repos/pierremabille/BewleyModel/stargazers",
+  "contributors_url": "https://api.github.com/repos/pierremabille/BewleyModel/contributors",
+  "subscribers_url": "https://api.github.com/repos/pierremabille/BewleyModel/subscribers",
+  "subscription_url": "https://api.github.com/repos/pierremabille/BewleyModel/subscription",
+  "commits_url": "https://api.github.com/repos/pierremabille/BewleyModel/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/pierremabille/BewleyModel/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/pierremabille/BewleyModel/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/pierremabille/BewleyModel/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/pierremabille/BewleyModel/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/pierremabille/BewleyModel/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/pierremabille/BewleyModel/merges",
+  "archive_url": "https://api.github.com/repos/pierremabille/BewleyModel/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/pierremabille/BewleyModel/downloads",
+  "issues_url": "https://api.github.com/repos/pierremabille/BewleyModel/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/pierremabille/BewleyModel/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/pierremabille/BewleyModel/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/pierremabille/BewleyModel/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/pierremabille/BewleyModel/labels{/name}",
+  "releases_url": "https://api.github.com/repos/pierremabille/BewleyModel/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/pierremabille/BewleyModel/deployments",
+  "created_at": "2016-06-01T23:21:42Z",
+  "updated_at": "2016-06-02T17:56:25Z",
+  "pushed_at": "2016-06-03T13:19:53Z",
+  "git_url": "git://github.com/pierremabille/BewleyModel.git",
+  "ssh_url": "git@github.com:pierremabille/BewleyModel.git",
+  "clone_url": "https://github.com/pierremabille/BewleyModel.git",
+  "svn_url": "https://github.com/pierremabille/BewleyModel",
+  "homepage": "",
+  "size": 770,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Jupyter Notebook",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

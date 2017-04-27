@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:32 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5509
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1055
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "ac81d996bf80b42fa9ddfe3dd0ac1e54"
+Last-Modified: Mon, 16 Mar 2015 08:29:20 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 318e55760cf7cdb40e61175a4d36cd32
+X-GitHub-Request-Id: E85C:6637:135A03F:18FA56B:590234CC
+
+{
+  "id": 24228514,
+  "name": "Symbolize.jl",
+  "full_name": "waldyrious/Symbolize.jl",
+  "owner": {
+    "login": "waldyrious",
+    "id": 478237,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/478237?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/waldyrious",
+    "html_url": "https://github.com/waldyrious",
+    "followers_url": "https://api.github.com/users/waldyrious/followers",
+    "following_url": "https://api.github.com/users/waldyrious/following{/other_user}",
+    "gists_url": "https://api.github.com/users/waldyrious/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/waldyrious/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/waldyrious/subscriptions",
+    "organizations_url": "https://api.github.com/users/waldyrious/orgs",
+    "repos_url": "https://api.github.com/users/waldyrious/repos",
+    "events_url": "https://api.github.com/users/waldyrious/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/waldyrious/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/waldyrious/Symbolize.jl",
+  "description": "a Julia package to perform numeric-to-symbolic inference (aka \"reverse calculation\"), i.e., convert a number to a closed-form representation.",
+  "fork": false,
+  "url": "https://api.github.com/repos/waldyrious/Symbolize.jl",
+  "forks_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/forks",
+  "keys_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/teams",
+  "hooks_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/events",
+  "assignees_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/tags",
+  "blobs_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/subscription",
+  "commits_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/merges",
+  "archive_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/downloads",
+  "issues_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/waldyrious/Symbolize.jl/deployments",
+  "created_at": "2014-09-19T12:10:35Z",
+  "updated_at": "2015-03-16T08:29:20Z",
+  "pushed_at": "2015-03-16T08:29:17Z",
+  "git_url": "git://github.com/waldyrious/Symbolize.jl.git",
+  "ssh_url": "git@github.com:waldyrious/Symbolize.jl.git",
+  "clone_url": "https://github.com/waldyrious/Symbolize.jl.git",
+  "svn_url": "https://github.com/waldyrious/Symbolize.jl",
+  "homepage": "",
+  "size": 164,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

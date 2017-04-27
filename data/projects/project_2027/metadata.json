@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:04 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5252
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1662
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "1e4eb1a1831f582850953e821a94e179"
+Last-Modified: Mon, 08 Feb 2016 18:49:40 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 7f48e2f7761567e923121f17538d7a6d
+X-GitHub-Request-Id: 470A:6631:870EDF:AE6DAB:59023383
+
+{
+  "id": 22546529,
+  "name": "Misc.jl",
+  "full_name": "scheinerman/Misc.jl",
+  "owner": {
+    "login": "scheinerman",
+    "id": 7482062,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/7482062?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/scheinerman",
+    "html_url": "https://github.com/scheinerman",
+    "followers_url": "https://api.github.com/users/scheinerman/followers",
+    "following_url": "https://api.github.com/users/scheinerman/following{/other_user}",
+    "gists_url": "https://api.github.com/users/scheinerman/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/scheinerman/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/scheinerman/subscriptions",
+    "organizations_url": "https://api.github.com/users/scheinerman/orgs",
+    "repos_url": "https://api.github.com/users/scheinerman/repos",
+    "events_url": "https://api.github.com/users/scheinerman/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/scheinerman/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/scheinerman/Misc.jl",
+  "description": "Uncategorized, but hopefully useful, Julia code.",
+  "fork": false,
+  "url": "https://api.github.com/repos/scheinerman/Misc.jl",
+  "forks_url": "https://api.github.com/repos/scheinerman/Misc.jl/forks",
+  "keys_url": "https://api.github.com/repos/scheinerman/Misc.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/scheinerman/Misc.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/scheinerman/Misc.jl/teams",
+  "hooks_url": "https://api.github.com/repos/scheinerman/Misc.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/scheinerman/Misc.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/scheinerman/Misc.jl/events",
+  "assignees_url": "https://api.github.com/repos/scheinerman/Misc.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/scheinerman/Misc.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/scheinerman/Misc.jl/tags",
+  "blobs_url": "https://api.github.com/repos/scheinerman/Misc.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/scheinerman/Misc.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/scheinerman/Misc.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/scheinerman/Misc.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/scheinerman/Misc.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/scheinerman/Misc.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/scheinerman/Misc.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/scheinerman/Misc.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/scheinerman/Misc.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/scheinerman/Misc.jl/subscription",
+  "commits_url": "https://api.github.com/repos/scheinerman/Misc.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/scheinerman/Misc.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/scheinerman/Misc.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/scheinerman/Misc.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/scheinerman/Misc.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/scheinerman/Misc.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/scheinerman/Misc.jl/merges",
+  "archive_url": "https://api.github.com/repos/scheinerman/Misc.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/scheinerman/Misc.jl/downloads",
+  "issues_url": "https://api.github.com/repos/scheinerman/Misc.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/scheinerman/Misc.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/scheinerman/Misc.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/scheinerman/Misc.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/scheinerman/Misc.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/scheinerman/Misc.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/scheinerman/Misc.jl/deployments",
+  "created_at": "2014-08-02T13:21:46Z",
+  "updated_at": "2016-02-08T18:49:40Z",
+  "pushed_at": "2016-09-03T15:04:27Z",
+  "git_url": "git://github.com/scheinerman/Misc.jl.git",
+  "ssh_url": "git@github.com:scheinerman/Misc.jl.git",
+  "clone_url": "https://github.com/scheinerman/Misc.jl.git",
+  "svn_url": "https://github.com/scheinerman/Misc.jl",
+  "homepage": null,
+  "size": 40,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

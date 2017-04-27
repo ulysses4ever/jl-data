@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:33 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6152
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1594
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "bef355c892aea709bf7f007e41f63ad7"
+Last-Modified: Wed, 26 Apr 2017 18:36:32 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 15bc4ab707db6d6b474783868c7cc828
+X-GitHub-Request-Id: 7D7B:6631:871AC9:AE7CA5:590233A1
+
+{
+  "id": 14762054,
+  "name": "DSP.jl",
+  "full_name": "JuliaDSP/DSP.jl",
+  "owner": {
+    "login": "JuliaDSP",
+    "id": 6054300,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6054300?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaDSP",
+    "html_url": "https://github.com/JuliaDSP",
+    "followers_url": "https://api.github.com/users/JuliaDSP/followers",
+    "following_url": "https://api.github.com/users/JuliaDSP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaDSP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaDSP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaDSP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaDSP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaDSP/repos",
+    "events_url": "https://api.github.com/users/JuliaDSP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaDSP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaDSP/DSP.jl",
+  "description": "Filter design, periodograms, window functions, and other digital signal processing functionality",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaDSP/DSP.jl",
+  "forks_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaDSP/DSP.jl/deployments",
+  "created_at": "2013-11-27T23:35:58Z",
+  "updated_at": "2017-04-26T18:36:32Z",
+  "pushed_at": "2017-04-11T16:09:27Z",
+  "git_url": "git://github.com/JuliaDSP/DSP.jl.git",
+  "ssh_url": "git@github.com:JuliaDSP/DSP.jl.git",
+  "clone_url": "https://github.com/JuliaDSP/DSP.jl.git",
+  "svn_url": "https://github.com/JuliaDSP/DSP.jl",
+  "homepage": "http://dspjl.readthedocs.org/en/latest/",
+  "size": 873,
+  "stargazers_count": 67,
+  "watchers_count": 67,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 28,
+  "mirror_url": null,
+  "open_issues_count": 36,
+  "forks": 28,
+  "open_issues": 36,
+  "watchers": 67,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaDSP",
+    "id": 6054300,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6054300?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaDSP",
+    "html_url": "https://github.com/JuliaDSP",
+    "followers_url": "https://api.github.com/users/JuliaDSP/followers",
+    "following_url": "https://api.github.com/users/JuliaDSP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaDSP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaDSP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaDSP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaDSP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaDSP/repos",
+    "events_url": "https://api.github.com/users/JuliaDSP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaDSP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 28,
+  "subscribers_count": 24
+}

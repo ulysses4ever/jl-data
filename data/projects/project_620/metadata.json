@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:00:57 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5069
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2976
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "9a7b12298734060241c6a8e32bb00f12"
+Last-Modified: Tue, 25 Apr 2017 20:15:11 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: AD9B:6634:1345FA3:18E9A8C:590231D9
+
+{
+  "id": 51027384,
+  "name": "Mayday.jl",
+  "full_name": "rdeits/Mayday.jl",
+  "owner": {
+    "login": "rdeits",
+    "id": 591886,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/591886?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rdeits",
+    "html_url": "https://github.com/rdeits",
+    "followers_url": "https://api.github.com/users/rdeits/followers",
+    "following_url": "https://api.github.com/users/rdeits/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rdeits/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rdeits/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rdeits/subscriptions",
+    "organizations_url": "https://api.github.com/users/rdeits/orgs",
+    "repos_url": "https://api.github.com/users/rdeits/repos",
+    "events_url": "https://api.github.com/users/rdeits/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rdeits/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/rdeits/Mayday.jl",
+  "description": "Sums-of-Squares optimization in Julia, powered by JuMP",
+  "fork": false,
+  "url": "https://api.github.com/repos/rdeits/Mayday.jl",
+  "forks_url": "https://api.github.com/repos/rdeits/Mayday.jl/forks",
+  "keys_url": "https://api.github.com/repos/rdeits/Mayday.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/rdeits/Mayday.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/rdeits/Mayday.jl/teams",
+  "hooks_url": "https://api.github.com/repos/rdeits/Mayday.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/rdeits/Mayday.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/rdeits/Mayday.jl/events",
+  "assignees_url": "https://api.github.com/repos/rdeits/Mayday.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/rdeits/Mayday.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/rdeits/Mayday.jl/tags",
+  "blobs_url": "https://api.github.com/repos/rdeits/Mayday.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/rdeits/Mayday.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/rdeits/Mayday.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/rdeits/Mayday.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/rdeits/Mayday.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/rdeits/Mayday.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/rdeits/Mayday.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/rdeits/Mayday.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/rdeits/Mayday.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/rdeits/Mayday.jl/subscription",
+  "commits_url": "https://api.github.com/repos/rdeits/Mayday.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/rdeits/Mayday.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/rdeits/Mayday.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/rdeits/Mayday.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/rdeits/Mayday.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/rdeits/Mayday.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/rdeits/Mayday.jl/merges",
+  "archive_url": "https://api.github.com/repos/rdeits/Mayday.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/rdeits/Mayday.jl/downloads",
+  "issues_url": "https://api.github.com/repos/rdeits/Mayday.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/rdeits/Mayday.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/rdeits/Mayday.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/rdeits/Mayday.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/rdeits/Mayday.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/rdeits/Mayday.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/rdeits/Mayday.jl/deployments",
+  "created_at": "2016-02-03T20:12:52Z",
+  "updated_at": "2017-04-25T20:15:11Z",
+  "pushed_at": "2017-03-08T05:45:08Z",
+  "git_url": "git://github.com/rdeits/Mayday.jl.git",
+  "ssh_url": "git@github.com:rdeits/Mayday.jl.git",
+  "clone_url": "https://github.com/rdeits/Mayday.jl.git",
+  "svn_url": "https://github.com/rdeits/Mayday.jl",
+  "homepage": null,
+  "size": 29,
+  "stargazers_count": 6,
+  "watchers_count": 6,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 6,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 2
+}

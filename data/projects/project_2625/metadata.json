@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:25 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6205
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1075
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "961b89c5a0526bd47a4ad3fc53c287a4"
+Last-Modified: Tue, 21 Feb 2017 07:48:09 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 626ed3a9050b8faa02ef5f3c540b508d
+X-GitHub-Request-Id: 17FB:6633:DF1FB3:120E273:590234C4
+
+{
+  "id": 61346964,
+  "name": "ParallelDataTransfer.jl",
+  "full_name": "ChrisRackauckas/ParallelDataTransfer.jl",
+  "owner": {
+    "login": "ChrisRackauckas",
+    "id": 1814174,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1814174?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ChrisRackauckas",
+    "html_url": "https://github.com/ChrisRackauckas",
+    "followers_url": "https://api.github.com/users/ChrisRackauckas/followers",
+    "following_url": "https://api.github.com/users/ChrisRackauckas/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ChrisRackauckas/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ChrisRackauckas/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ChrisRackauckas/subscriptions",
+    "organizations_url": "https://api.github.com/users/ChrisRackauckas/orgs",
+    "repos_url": "https://api.github.com/users/ChrisRackauckas/repos",
+    "events_url": "https://api.github.com/users/ChrisRackauckas/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ChrisRackauckas/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ChrisRackauckas/ParallelDataTransfer.jl",
+  "description": "A bunch of helper functions for transferring data between worker processes",
+  "fork": false,
+  "url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl",
+  "forks_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/forks",
+  "keys_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/teams",
+  "hooks_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/events",
+  "assignees_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/tags",
+  "blobs_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/subscription",
+  "commits_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/merges",
+  "archive_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/downloads",
+  "issues_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ChrisRackauckas/ParallelDataTransfer.jl/deployments",
+  "created_at": "2016-06-17T05:07:41Z",
+  "updated_at": "2017-02-21T07:48:09Z",
+  "pushed_at": "2017-04-03T12:03:58Z",
+  "git_url": "git://github.com/ChrisRackauckas/ParallelDataTransfer.jl.git",
+  "ssh_url": "git@github.com:ChrisRackauckas/ParallelDataTransfer.jl.git",
+  "clone_url": "https://github.com/ChrisRackauckas/ParallelDataTransfer.jl.git",
+  "svn_url": "https://github.com/ChrisRackauckas/ParallelDataTransfer.jl",
+  "homepage": null,
+  "size": 25,
+  "stargazers_count": 31,
+  "watchers_count": 31,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 2,
+  "open_issues": 2,
+  "watchers": 31,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 4
+}

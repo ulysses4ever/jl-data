@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:59:18 GMT
+Date: Thu, 27 Apr 2017 18:00:19 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6732
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3115
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "df914ac7be1733e8cc96b28cdc6fc893"
+Last-Modified: Wed, 26 Apr 2017 18:35:31 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E7D6:0712:7339FF2:8A2B7D8:58C359F6
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 1B4C:6634:1343F20:18E70C0:590231B3
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 42071676,
+  "name": "SampledSignals.jl",
+  "full_name": "JuliaAudio/SampledSignals.jl",
+  "owner": {
+    "login": "JuliaAudio",
+    "id": 15641401,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/15641401?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaAudio",
+    "html_url": "https://github.com/JuliaAudio",
+    "followers_url": "https://api.github.com/users/JuliaAudio/followers",
+    "following_url": "https://api.github.com/users/JuliaAudio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaAudio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaAudio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaAudio/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaAudio/orgs",
+    "repos_url": "https://api.github.com/users/JuliaAudio/repos",
+    "events_url": "https://api.github.com/users/JuliaAudio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaAudio/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaAudio/SampledSignals.jl",
+  "description": "Core types for regularly-sampled multichannel signals like Audio, RADAR and Software-Defined Radio",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl",
+  "forks_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaAudio/SampledSignals.jl/deployments",
+  "created_at": "2015-09-07T19:52:28Z",
+  "updated_at": "2017-04-26T18:35:31Z",
+  "pushed_at": "2016-12-28T22:42:06Z",
+  "git_url": "git://github.com/JuliaAudio/SampledSignals.jl.git",
+  "ssh_url": "git@github.com:JuliaAudio/SampledSignals.jl.git",
+  "clone_url": "https://github.com/JuliaAudio/SampledSignals.jl.git",
+  "svn_url": "https://github.com/JuliaAudio/SampledSignals.jl",
+  "homepage": "",
+  "size": 224,
+  "stargazers_count": 12,
+  "watchers_count": 12,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 12,
+  "forks": 3,
+  "open_issues": 12,
+  "watchers": 12,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaAudio",
+    "id": 15641401,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/15641401?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaAudio",
+    "html_url": "https://github.com/JuliaAudio",
+    "followers_url": "https://api.github.com/users/JuliaAudio/followers",
+    "following_url": "https://api.github.com/users/JuliaAudio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaAudio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaAudio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaAudio/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaAudio/orgs",
+    "repos_url": "https://api.github.com/users/JuliaAudio/repos",
+    "events_url": "https://api.github.com/users/JuliaAudio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaAudio/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 3,
+  "subscribers_count": 5
 }

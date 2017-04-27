@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:03:37 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5589
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2427
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b83b6778542992a2287e8a77d92a22f6"
+Last-Modified: Wed, 14 Oct 2015 14:19:26 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 07ff1c8a09e44b62e277fae50a1b1dc4
+X-GitHub-Request-Id: 68ED:6637:133C2BE:18D4288:59023279
+
+{
+  "id": 44252501,
+  "name": "SimpleHttpIO.jl",
+  "full_name": "moisespsena/SimpleHttpIO.jl",
+  "owner": {
+    "login": "moisespsena",
+    "id": 350884,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/350884?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/moisespsena",
+    "html_url": "https://github.com/moisespsena",
+    "followers_url": "https://api.github.com/users/moisespsena/followers",
+    "following_url": "https://api.github.com/users/moisespsena/following{/other_user}",
+    "gists_url": "https://api.github.com/users/moisespsena/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/moisespsena/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/moisespsena/subscriptions",
+    "organizations_url": "https://api.github.com/users/moisespsena/orgs",
+    "repos_url": "https://api.github.com/users/moisespsena/repos",
+    "events_url": "https://api.github.com/users/moisespsena/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/moisespsena/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/moisespsena/SimpleHttpIO.jl",
+  "description": "The Julia HTTP IO Stream utilities",
+  "fork": false,
+  "url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl",
+  "forks_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/forks",
+  "keys_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/teams",
+  "hooks_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/events",
+  "assignees_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/tags",
+  "blobs_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/subscription",
+  "commits_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/merges",
+  "archive_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/downloads",
+  "issues_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/moisespsena/SimpleHttpIO.jl/deployments",
+  "created_at": "2015-10-14T14:18:53Z",
+  "updated_at": "2015-10-14T14:19:26Z",
+  "pushed_at": "2015-10-22T16:40:04Z",
+  "git_url": "git://github.com/moisespsena/SimpleHttpIO.jl.git",
+  "ssh_url": "git@github.com:moisespsena/SimpleHttpIO.jl.git",
+  "clone_url": "https://github.com/moisespsena/SimpleHttpIO.jl.git",
+  "svn_url": "https://github.com/moisespsena/SimpleHttpIO.jl",
+  "homepage": null,
+  "size": 144,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

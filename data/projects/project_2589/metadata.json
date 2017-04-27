@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5671
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1106
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7d15a589089bf6a376751a4a39712563"
+Last-Modified: Thu, 30 Mar 2017 05:07:47 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 0e17b94a265a427d9cafe798ceea7c02
+X-GitHub-Request-Id: 62A0:6634:1367757:1915029:590234AD
+
+{
+  "id": 46641717,
+  "name": "DeepNeuralClassifier",
+  "full_name": "jostmey/DeepNeuralClassifier",
+  "owner": {
+    "login": "jostmey",
+    "id": 1855108,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1855108?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jostmey",
+    "html_url": "https://github.com/jostmey",
+    "followers_url": "https://api.github.com/users/jostmey/followers",
+    "following_url": "https://api.github.com/users/jostmey/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jostmey/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jostmey/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jostmey/subscriptions",
+    "organizations_url": "https://api.github.com/users/jostmey/orgs",
+    "repos_url": "https://api.github.com/users/jostmey/repos",
+    "events_url": "https://api.github.com/users/jostmey/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jostmey/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jostmey/DeepNeuralClassifier",
+  "description": "Deep neural network using rectified linear units to classify hand written symbols from the MNIST dataset.",
+  "fork": false,
+  "url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier",
+  "forks_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/forks",
+  "keys_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/teams",
+  "hooks_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/hooks",
+  "issue_events_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/events",
+  "assignees_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/tags",
+  "blobs_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/languages",
+  "stargazers_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/stargazers",
+  "contributors_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/contributors",
+  "subscribers_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/subscribers",
+  "subscription_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/subscription",
+  "commits_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/merges",
+  "archive_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/downloads",
+  "issues_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jostmey/DeepNeuralClassifier/deployments",
+  "created_at": "2015-11-22T01:33:51Z",
+  "updated_at": "2017-03-30T05:07:47Z",
+  "pushed_at": "2016-02-29T15:27:50Z",
+  "git_url": "git://github.com/jostmey/DeepNeuralClassifier.git",
+  "ssh_url": "git@github.com:jostmey/DeepNeuralClassifier.git",
+  "clone_url": "https://github.com/jostmey/DeepNeuralClassifier.git",
+  "svn_url": "https://github.com/jostmey/DeepNeuralClassifier",
+  "homepage": "",
+  "size": 8302,
+  "stargazers_count": 232,
+  "watchers_count": 232,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 24,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 24,
+  "open_issues": 0,
+  "watchers": 232,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 24,
+  "subscribers_count": 10
+}

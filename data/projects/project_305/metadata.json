@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:17:14 GMT
+Date: Thu, 27 Apr 2017 17:59:45 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5276
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3246
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "77531e7f7076f28d94d040c60e044596"
+Last-Modified: Wed, 18 May 2016 03:09:06 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E202:0710:4CE564D:5BFD2B1:58C3420A
+Vary: Accept-Encoding
+X-Served-By: 52189b7290fad804d77890ef34a1eeae
+X-GitHub-Request-Id: E3AB:6637:13310CD:18C5AF8:59023191
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 58723339,
+  "name": "CSCI6189",
+  "full_name": "zengjichuan/CSCI6189",
+  "owner": {
+    "login": "zengjichuan",
+    "id": 7911254,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/7911254?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zengjichuan",
+    "html_url": "https://github.com/zengjichuan",
+    "followers_url": "https://api.github.com/users/zengjichuan/followers",
+    "following_url": "https://api.github.com/users/zengjichuan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zengjichuan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zengjichuan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zengjichuan/subscriptions",
+    "organizations_url": "https://api.github.com/users/zengjichuan/orgs",
+    "repos_url": "https://api.github.com/users/zengjichuan/repos",
+    "events_url": "https://api.github.com/users/zengjichuan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zengjichuan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/zengjichuan/CSCI6189",
+  "description": "CSCI6189 Project",
+  "fork": false,
+  "url": "https://api.github.com/repos/zengjichuan/CSCI6189",
+  "forks_url": "https://api.github.com/repos/zengjichuan/CSCI6189/forks",
+  "keys_url": "https://api.github.com/repos/zengjichuan/CSCI6189/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/zengjichuan/CSCI6189/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/zengjichuan/CSCI6189/teams",
+  "hooks_url": "https://api.github.com/repos/zengjichuan/CSCI6189/hooks",
+  "issue_events_url": "https://api.github.com/repos/zengjichuan/CSCI6189/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/zengjichuan/CSCI6189/events",
+  "assignees_url": "https://api.github.com/repos/zengjichuan/CSCI6189/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/zengjichuan/CSCI6189/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/zengjichuan/CSCI6189/tags",
+  "blobs_url": "https://api.github.com/repos/zengjichuan/CSCI6189/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/zengjichuan/CSCI6189/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/zengjichuan/CSCI6189/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/zengjichuan/CSCI6189/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/zengjichuan/CSCI6189/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/zengjichuan/CSCI6189/languages",
+  "stargazers_url": "https://api.github.com/repos/zengjichuan/CSCI6189/stargazers",
+  "contributors_url": "https://api.github.com/repos/zengjichuan/CSCI6189/contributors",
+  "subscribers_url": "https://api.github.com/repos/zengjichuan/CSCI6189/subscribers",
+  "subscription_url": "https://api.github.com/repos/zengjichuan/CSCI6189/subscription",
+  "commits_url": "https://api.github.com/repos/zengjichuan/CSCI6189/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/zengjichuan/CSCI6189/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/zengjichuan/CSCI6189/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/zengjichuan/CSCI6189/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/zengjichuan/CSCI6189/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/zengjichuan/CSCI6189/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/zengjichuan/CSCI6189/merges",
+  "archive_url": "https://api.github.com/repos/zengjichuan/CSCI6189/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/zengjichuan/CSCI6189/downloads",
+  "issues_url": "https://api.github.com/repos/zengjichuan/CSCI6189/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/zengjichuan/CSCI6189/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/zengjichuan/CSCI6189/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/zengjichuan/CSCI6189/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/zengjichuan/CSCI6189/labels{/name}",
+  "releases_url": "https://api.github.com/repos/zengjichuan/CSCI6189/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/zengjichuan/CSCI6189/deployments",
+  "created_at": "2016-05-13T09:26:00Z",
+  "updated_at": "2016-05-18T03:09:06Z",
+  "pushed_at": "2016-05-19T20:06:00Z",
+  "git_url": "git://github.com/zengjichuan/CSCI6189.git",
+  "ssh_url": "git@github.com:zengjichuan/CSCI6189.git",
+  "clone_url": "https://github.com/zengjichuan/CSCI6189.git",
+  "svn_url": "https://github.com/zengjichuan/CSCI6189",
+  "homepage": null,
+  "size": 450,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Jupyter Notebook",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

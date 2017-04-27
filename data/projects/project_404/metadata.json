@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:43:00 GMT
+Date: Thu, 27 Apr 2017 18:00:06 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4893
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3156
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7178d2e88f483688119e6a7c67a4df85"
+Last-Modified: Mon, 24 Apr 2017 15:49:01 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 29
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D6B8:0712:7312C17:89FAB58:58C35624
+Vary: Accept-Encoding
+X-Served-By: 3e3b9690823fb031da84658eb58aa83b
+X-GitHub-Request-Id: E335:6634:1343487:18E62EA:590231A6
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 36258059,
+  "name": "Spark.jl",
+  "full_name": "dfdx/Spark.jl",
+  "owner": {
+    "login": "dfdx",
+    "id": 428171,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/428171?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dfdx",
+    "html_url": "https://github.com/dfdx",
+    "followers_url": "https://api.github.com/users/dfdx/followers",
+    "following_url": "https://api.github.com/users/dfdx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dfdx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dfdx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dfdx/subscriptions",
+    "organizations_url": "https://api.github.com/users/dfdx/orgs",
+    "repos_url": "https://api.github.com/users/dfdx/repos",
+    "events_url": "https://api.github.com/users/dfdx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dfdx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dfdx/Spark.jl",
+  "description": "Julia binding for Apache Spark",
+  "fork": false,
+  "url": "https://api.github.com/repos/dfdx/Spark.jl",
+  "forks_url": "https://api.github.com/repos/dfdx/Spark.jl/forks",
+  "keys_url": "https://api.github.com/repos/dfdx/Spark.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dfdx/Spark.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dfdx/Spark.jl/teams",
+  "hooks_url": "https://api.github.com/repos/dfdx/Spark.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/dfdx/Spark.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dfdx/Spark.jl/events",
+  "assignees_url": "https://api.github.com/repos/dfdx/Spark.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dfdx/Spark.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dfdx/Spark.jl/tags",
+  "blobs_url": "https://api.github.com/repos/dfdx/Spark.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dfdx/Spark.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dfdx/Spark.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dfdx/Spark.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dfdx/Spark.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dfdx/Spark.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/dfdx/Spark.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/dfdx/Spark.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/dfdx/Spark.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/dfdx/Spark.jl/subscription",
+  "commits_url": "https://api.github.com/repos/dfdx/Spark.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dfdx/Spark.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dfdx/Spark.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dfdx/Spark.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dfdx/Spark.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dfdx/Spark.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dfdx/Spark.jl/merges",
+  "archive_url": "https://api.github.com/repos/dfdx/Spark.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dfdx/Spark.jl/downloads",
+  "issues_url": "https://api.github.com/repos/dfdx/Spark.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dfdx/Spark.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dfdx/Spark.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dfdx/Spark.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dfdx/Spark.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dfdx/Spark.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dfdx/Spark.jl/deployments",
+  "created_at": "2015-05-25T22:33:25Z",
+  "updated_at": "2017-04-24T15:49:01Z",
+  "pushed_at": "2017-04-25T23:01:48Z",
+  "git_url": "git://github.com/dfdx/Spark.jl.git",
+  "ssh_url": "git@github.com:dfdx/Spark.jl.git",
+  "clone_url": "https://github.com/dfdx/Spark.jl.git",
+  "svn_url": "https://github.com/dfdx/Spark.jl",
+  "homepage": "",
+  "size": 147,
+  "stargazers_count": 30,
+  "watchers_count": 30,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 7,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 7,
+  "open_issues": 3,
+  "watchers": 30,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 7,
+  "subscribers_count": 9
 }

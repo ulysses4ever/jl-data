@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:27 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4810
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1067
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "d4302ffbb114230e60e428c8f77fdd5c"
+Last-Modified: Thu, 16 Mar 2017 15:07:23 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 5634:6631:879705:AF1C45:590234C7
+
+{
+  "id": 63225480,
+  "name": "IPC.jl",
+  "full_name": "emmt/IPC.jl",
+  "owner": {
+    "login": "emmt",
+    "id": 708675,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/708675?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/emmt",
+    "html_url": "https://github.com/emmt",
+    "followers_url": "https://api.github.com/users/emmt/followers",
+    "following_url": "https://api.github.com/users/emmt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/emmt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/emmt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/emmt/subscriptions",
+    "organizations_url": "https://api.github.com/users/emmt/orgs",
+    "repos_url": "https://api.github.com/users/emmt/repos",
+    "events_url": "https://api.github.com/users/emmt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/emmt/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/emmt/IPC.jl",
+  "description": "Inter-Process Communication for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/emmt/IPC.jl",
+  "forks_url": "https://api.github.com/repos/emmt/IPC.jl/forks",
+  "keys_url": "https://api.github.com/repos/emmt/IPC.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/emmt/IPC.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/emmt/IPC.jl/teams",
+  "hooks_url": "https://api.github.com/repos/emmt/IPC.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/emmt/IPC.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/emmt/IPC.jl/events",
+  "assignees_url": "https://api.github.com/repos/emmt/IPC.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/emmt/IPC.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/emmt/IPC.jl/tags",
+  "blobs_url": "https://api.github.com/repos/emmt/IPC.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/emmt/IPC.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/emmt/IPC.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/emmt/IPC.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/emmt/IPC.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/emmt/IPC.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/emmt/IPC.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/emmt/IPC.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/emmt/IPC.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/emmt/IPC.jl/subscription",
+  "commits_url": "https://api.github.com/repos/emmt/IPC.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/emmt/IPC.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/emmt/IPC.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/emmt/IPC.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/emmt/IPC.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/emmt/IPC.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/emmt/IPC.jl/merges",
+  "archive_url": "https://api.github.com/repos/emmt/IPC.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/emmt/IPC.jl/downloads",
+  "issues_url": "https://api.github.com/repos/emmt/IPC.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/emmt/IPC.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/emmt/IPC.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/emmt/IPC.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/emmt/IPC.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/emmt/IPC.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/emmt/IPC.jl/deployments",
+  "created_at": "2016-07-13T07:43:19Z",
+  "updated_at": "2017-03-16T15:07:23Z",
+  "pushed_at": "2017-03-16T15:07:21Z",
+  "git_url": "git://github.com/emmt/IPC.jl.git",
+  "ssh_url": "git@github.com:emmt/IPC.jl.git",
+  "clone_url": "https://github.com/emmt/IPC.jl.git",
+  "svn_url": "https://github.com/emmt/IPC.jl",
+  "homepage": null,
+  "size": 12,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

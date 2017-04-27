@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:38 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5442
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2771
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "80891109337341a37880d891e87b255f"
+Last-Modified: Sun, 20 Dec 2015 06:24:49 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 9A63:6631:8663D4:AD95F3:59023202
+
+{
+  "id": 48309150,
+  "name": "FloatFloat.jl",
+  "full_name": "J-Sarnoff/FloatFloat.jl",
+  "owner": {
+    "login": "J-Sarnoff",
+    "id": 13563390,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/13563390?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/J-Sarnoff",
+    "html_url": "https://github.com/J-Sarnoff",
+    "followers_url": "https://api.github.com/users/J-Sarnoff/followers",
+    "following_url": "https://api.github.com/users/J-Sarnoff/following{/other_user}",
+    "gists_url": "https://api.github.com/users/J-Sarnoff/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/J-Sarnoff/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/J-Sarnoff/subscriptions",
+    "organizations_url": "https://api.github.com/users/J-Sarnoff/orgs",
+    "repos_url": "https://api.github.com/users/J-Sarnoff/repos",
+    "events_url": "https://api.github.com/users/J-Sarnoff/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/J-Sarnoff/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/J-Sarnoff/FloatFloat.jl",
+  "description": "floating point arithmetic with extended precision significands and faithful rounding",
+  "fork": false,
+  "url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl",
+  "forks_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/forks",
+  "keys_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/teams",
+  "hooks_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/events",
+  "assignees_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/tags",
+  "blobs_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/subscription",
+  "commits_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/merges",
+  "archive_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/downloads",
+  "issues_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/J-Sarnoff/FloatFloat.jl/deployments",
+  "created_at": "2015-12-20T05:57:44Z",
+  "updated_at": "2015-12-20T06:24:49Z",
+  "pushed_at": "2015-12-29T02:21:20Z",
+  "git_url": "git://github.com/J-Sarnoff/FloatFloat.jl.git",
+  "ssh_url": "git@github.com:J-Sarnoff/FloatFloat.jl.git",
+  "clone_url": "https://github.com/J-Sarnoff/FloatFloat.jl.git",
+  "svn_url": "https://github.com/J-Sarnoff/FloatFloat.jl",
+  "homepage": "",
+  "size": 86,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

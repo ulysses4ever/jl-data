@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:12 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5929
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1638
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "3b08341f51f95abdb3e87200fd05e20b"
+Last-Modified: Fri, 24 Mar 2017 15:32:12 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: 71FA:6637:1349D1F:18E58B7:5902338C
+
+{
+  "id": 48516554,
+  "name": "RestrictedBoltzmannMachine",
+  "full_name": "jostmey/RestrictedBoltzmannMachine",
+  "owner": {
+    "login": "jostmey",
+    "id": 1855108,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1855108?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jostmey",
+    "html_url": "https://github.com/jostmey",
+    "followers_url": "https://api.github.com/users/jostmey/followers",
+    "following_url": "https://api.github.com/users/jostmey/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jostmey/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jostmey/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jostmey/subscriptions",
+    "organizations_url": "https://api.github.com/users/jostmey/orgs",
+    "repos_url": "https://api.github.com/users/jostmey/repos",
+    "events_url": "https://api.github.com/users/jostmey/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jostmey/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jostmey/RestrictedBoltzmannMachine",
+  "description": "Neural network trained as a generative model on the MNIST dataset using Persistent Contrastive Divergence.",
+  "fork": false,
+  "url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine",
+  "forks_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/forks",
+  "keys_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/teams",
+  "hooks_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/hooks",
+  "issue_events_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/events",
+  "assignees_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/tags",
+  "blobs_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/languages",
+  "stargazers_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/stargazers",
+  "contributors_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/contributors",
+  "subscribers_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/subscribers",
+  "subscription_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/subscription",
+  "commits_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/merges",
+  "archive_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/downloads",
+  "issues_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/deployments",
+  "created_at": "2015-12-24T00:17:19Z",
+  "updated_at": "2017-03-24T15:32:12Z",
+  "pushed_at": "2017-03-15T17:39:00Z",
+  "git_url": "git://github.com/jostmey/RestrictedBoltzmannMachine.git",
+  "ssh_url": "git@github.com:jostmey/RestrictedBoltzmannMachine.git",
+  "clone_url": "https://github.com/jostmey/RestrictedBoltzmannMachine.git",
+  "svn_url": "https://github.com/jostmey/RestrictedBoltzmannMachine",
+  "homepage": "",
+  "size": 3691,
+  "stargazers_count": 33,
+  "watchers_count": 33,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 8,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 8,
+  "open_issues": 0,
+  "watchers": 33,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 8,
+  "subscribers_count": 4
+}

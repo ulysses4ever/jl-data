@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:00:34 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6808
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3063
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "cbdda47c715778f8b9a70d7fdcb31f3a"
+Last-Modified: Mon, 24 Apr 2017 18:07:59 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 52437fedc85beec8da3449496900fb9a
+X-GitHub-Request-Id: 4413:6633:DD5607:11E96CA:590231C2
+
+{
+  "id": 29503786,
+  "name": "ControlSystems.jl",
+  "full_name": "JuliaControl/ControlSystems.jl",
+  "owner": {
+    "login": "JuliaControl",
+    "id": 10605979,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/10605979?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaControl",
+    "html_url": "https://github.com/JuliaControl",
+    "followers_url": "https://api.github.com/users/JuliaControl/followers",
+    "following_url": "https://api.github.com/users/JuliaControl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaControl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaControl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaControl/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaControl/orgs",
+    "repos_url": "https://api.github.com/users/JuliaControl/repos",
+    "events_url": "https://api.github.com/users/JuliaControl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaControl/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaControl/ControlSystems.jl",
+  "description": "A Control Systems Toolbox for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl",
+  "forks_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaControl/ControlSystems.jl/deployments",
+  "created_at": "2015-01-20T00:30:32Z",
+  "updated_at": "2017-04-24T18:07:59Z",
+  "pushed_at": "2017-03-27T13:01:26Z",
+  "git_url": "git://github.com/JuliaControl/ControlSystems.jl.git",
+  "ssh_url": "git@github.com:JuliaControl/ControlSystems.jl.git",
+  "clone_url": "https://github.com/JuliaControl/ControlSystems.jl.git",
+  "svn_url": "https://github.com/JuliaControl/ControlSystems.jl",
+  "homepage": "",
+  "size": 1873,
+  "stargazers_count": 54,
+  "watchers_count": 54,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 12,
+  "mirror_url": null,
+  "open_issues_count": 36,
+  "forks": 12,
+  "open_issues": 36,
+  "watchers": 54,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaControl",
+    "id": 10605979,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/10605979?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaControl",
+    "html_url": "https://github.com/JuliaControl",
+    "followers_url": "https://api.github.com/users/JuliaControl/followers",
+    "following_url": "https://api.github.com/users/JuliaControl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaControl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaControl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaControl/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaControl/orgs",
+    "repos_url": "https://api.github.com/users/JuliaControl/repos",
+    "events_url": "https://api.github.com/users/JuliaControl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaControl/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 12,
+  "subscribers_count": 14
+}

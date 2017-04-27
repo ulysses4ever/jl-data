@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:38:06 GMT
+Date: Thu, 27 Apr 2017 17:59:21 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5392
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3360
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a820a7f5aece33ff465be52403179eb3"
+Last-Modified: Mon, 11 Jul 2016 22:03:21 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DEBB:0711:700CEEB:8685C16:58C338DE
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: D8E4:6637:132FFFD:18C44D8:59023179
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 63105375,
+  "name": "Sketch.jl",
+  "full_name": "daniel-perry/Sketch.jl",
+  "owner": {
+    "login": "daniel-perry",
+    "id": 1464194,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1464194?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/daniel-perry",
+    "html_url": "https://github.com/daniel-perry",
+    "followers_url": "https://api.github.com/users/daniel-perry/followers",
+    "following_url": "https://api.github.com/users/daniel-perry/following{/other_user}",
+    "gists_url": "https://api.github.com/users/daniel-perry/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/daniel-perry/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/daniel-perry/subscriptions",
+    "organizations_url": "https://api.github.com/users/daniel-perry/orgs",
+    "repos_url": "https://api.github.com/users/daniel-perry/repos",
+    "events_url": "https://api.github.com/users/daniel-perry/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/daniel-perry/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/daniel-perry/Sketch.jl",
+  "description": "implementation of various sketching algorithms",
+  "fork": false,
+  "url": "https://api.github.com/repos/daniel-perry/Sketch.jl",
+  "forks_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/forks",
+  "keys_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/teams",
+  "hooks_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/events",
+  "assignees_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/tags",
+  "blobs_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/subscription",
+  "commits_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/merges",
+  "archive_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/downloads",
+  "issues_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/daniel-perry/Sketch.jl/deployments",
+  "created_at": "2016-07-11T22:02:57Z",
+  "updated_at": "2016-07-11T22:03:21Z",
+  "pushed_at": "2016-07-12T16:26:18Z",
+  "git_url": "git://github.com/daniel-perry/Sketch.jl.git",
+  "ssh_url": "git@github.com:daniel-perry/Sketch.jl.git",
+  "clone_url": "https://github.com/daniel-perry/Sketch.jl.git",
+  "svn_url": "https://github.com/daniel-perry/Sketch.jl",
+  "homepage": null,
+  "size": 7,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

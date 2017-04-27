@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:13:34 GMT
+Date: Thu, 27 Apr 2017 17:59:43 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5685
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3265
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "370d3252549010a37f6c81e991af67a5"
+Last-Modified: Sat, 15 Oct 2016 06:57:24 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E1AB:0712:7230C51:88EDC36:58C3412E
+Vary: Accept-Encoding
+X-Served-By: 9e60649f02cd840ee8baa9960690f79f
+X-GitHub-Request-Id: 9565:6633:DD3788:11E6E12:5902318F
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 59482547,
+  "name": "Delegate.jl",
+  "full_name": "Jeffrey-Sarnoff/Delegate.jl",
+  "owner": {
+    "login": "Jeffrey-Sarnoff",
+    "id": 17810853,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/17810853?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Jeffrey-Sarnoff",
+    "html_url": "https://github.com/Jeffrey-Sarnoff",
+    "followers_url": "https://api.github.com/users/Jeffrey-Sarnoff/followers",
+    "following_url": "https://api.github.com/users/Jeffrey-Sarnoff/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Jeffrey-Sarnoff/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Jeffrey-Sarnoff/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Jeffrey-Sarnoff/subscriptions",
+    "organizations_url": "https://api.github.com/users/Jeffrey-Sarnoff/orgs",
+    "repos_url": "https://api.github.com/users/Jeffrey-Sarnoff/repos",
+    "events_url": "https://api.github.com/users/Jeffrey-Sarnoff/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Jeffrey-Sarnoff/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/Jeffrey-Sarnoff/Delegate.jl",
+  "description": "Delegate functions into type fields or over type vars, with plain or iso-typed result",
+  "fork": false,
+  "url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl",
+  "forks_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/forks",
+  "keys_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/teams",
+  "hooks_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/events",
+  "assignees_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/tags",
+  "blobs_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/subscription",
+  "commits_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/merges",
+  "archive_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/downloads",
+  "issues_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/Jeffrey-Sarnoff/Delegate.jl/deployments",
+  "created_at": "2016-05-23T12:53:27Z",
+  "updated_at": "2016-10-15T06:57:24Z",
+  "pushed_at": "2016-07-23T15:29:23Z",
+  "git_url": "git://github.com/Jeffrey-Sarnoff/Delegate.jl.git",
+  "ssh_url": "git@github.com:Jeffrey-Sarnoff/Delegate.jl.git",
+  "clone_url": "https://github.com/Jeffrey-Sarnoff/Delegate.jl.git",
+  "svn_url": "https://github.com/Jeffrey-Sarnoff/Delegate.jl",
+  "homepage": "",
+  "size": 60,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 4
 }

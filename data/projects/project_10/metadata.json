@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:25:54 GMT
+Date: Thu, 27 Apr 2017 17:58:52 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5500
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3515
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "51c0d1d41184d4491b9c86a4546c227c"
+Last-Modified: Thu, 29 Sep 2016 16:35:18 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 50
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CC6A:070F:2BB07F9:3422CE6:58C33602
+Vary: Accept-Encoding
+X-Served-By: e183f7c661b1bbc2c987b3c4dc7b04e0
+X-GitHub-Request-Id: 99CA:6631:8619C1:AD350A:5902315C
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 69586009,
+  "name": "EmpiricalCDFs.jl",
+  "full_name": "jlapeyre/EmpiricalCDFs.jl",
+  "owner": {
+    "login": "jlapeyre",
+    "id": 1969884,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1969884?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jlapeyre",
+    "html_url": "https://github.com/jlapeyre",
+    "followers_url": "https://api.github.com/users/jlapeyre/followers",
+    "following_url": "https://api.github.com/users/jlapeyre/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jlapeyre/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jlapeyre/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jlapeyre/subscriptions",
+    "organizations_url": "https://api.github.com/users/jlapeyre/orgs",
+    "repos_url": "https://api.github.com/users/jlapeyre/repos",
+    "events_url": "https://api.github.com/users/jlapeyre/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jlapeyre/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jlapeyre/EmpiricalCDFs.jl",
+  "description": "Create and print an empirical cummulative distribution function",
+  "fork": false,
+  "url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl",
+  "forks_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/forks",
+  "keys_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/events",
+  "assignees_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/merges",
+  "archive_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jlapeyre/EmpiricalCDFs.jl/deployments",
+  "created_at": "2016-09-29T16:25:41Z",
+  "updated_at": "2016-09-29T16:35:18Z",
+  "pushed_at": "2017-04-26T13:57:14Z",
+  "git_url": "git://github.com/jlapeyre/EmpiricalCDFs.jl.git",
+  "ssh_url": "git@github.com:jlapeyre/EmpiricalCDFs.jl.git",
+  "clone_url": "https://github.com/jlapeyre/EmpiricalCDFs.jl.git",
+  "svn_url": "https://github.com/jlapeyre/EmpiricalCDFs.jl",
+  "homepage": null,
+  "size": 6307,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

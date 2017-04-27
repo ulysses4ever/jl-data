@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 02:00:08 GMT
+Date: Thu, 27 Apr 2017 18:00:20 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5150
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3114
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "cabc46923176bb6c7c861108db89f35c"
+Last-Modified: Thu, 26 Jan 2017 07:29:33 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D81F:0712:733BC1A:8A2DB0B:58C35A28
+Vary: Accept-Encoding
+X-Served-By: d0b3c2c33a23690498aa8e70a435a259
+X-GitHub-Request-Id: 6B60:6633:DD4CA3:11E8A83:590231B3
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55119351,
+  "name": "jpor_codes",
+  "full_name": "chkwon/jpor_codes",
+  "owner": {
+    "login": "chkwon",
+    "id": 7596204,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/7596204?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/chkwon",
+    "html_url": "https://github.com/chkwon",
+    "followers_url": "https://api.github.com/users/chkwon/followers",
+    "following_url": "https://api.github.com/users/chkwon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chkwon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chkwon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chkwon/subscriptions",
+    "organizations_url": "https://api.github.com/users/chkwon/orgs",
+    "repos_url": "https://api.github.com/users/chkwon/repos",
+    "events_url": "https://api.github.com/users/chkwon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chkwon/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/chkwon/jpor_codes",
+  "description": "Codes for the book \"Julia Programming for Operations Research\"",
+  "fork": false,
+  "url": "https://api.github.com/repos/chkwon/jpor_codes",
+  "forks_url": "https://api.github.com/repos/chkwon/jpor_codes/forks",
+  "keys_url": "https://api.github.com/repos/chkwon/jpor_codes/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/chkwon/jpor_codes/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/chkwon/jpor_codes/teams",
+  "hooks_url": "https://api.github.com/repos/chkwon/jpor_codes/hooks",
+  "issue_events_url": "https://api.github.com/repos/chkwon/jpor_codes/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/chkwon/jpor_codes/events",
+  "assignees_url": "https://api.github.com/repos/chkwon/jpor_codes/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/chkwon/jpor_codes/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/chkwon/jpor_codes/tags",
+  "blobs_url": "https://api.github.com/repos/chkwon/jpor_codes/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/chkwon/jpor_codes/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/chkwon/jpor_codes/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/chkwon/jpor_codes/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/chkwon/jpor_codes/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/chkwon/jpor_codes/languages",
+  "stargazers_url": "https://api.github.com/repos/chkwon/jpor_codes/stargazers",
+  "contributors_url": "https://api.github.com/repos/chkwon/jpor_codes/contributors",
+  "subscribers_url": "https://api.github.com/repos/chkwon/jpor_codes/subscribers",
+  "subscription_url": "https://api.github.com/repos/chkwon/jpor_codes/subscription",
+  "commits_url": "https://api.github.com/repos/chkwon/jpor_codes/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/chkwon/jpor_codes/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/chkwon/jpor_codes/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/chkwon/jpor_codes/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/chkwon/jpor_codes/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/chkwon/jpor_codes/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/chkwon/jpor_codes/merges",
+  "archive_url": "https://api.github.com/repos/chkwon/jpor_codes/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/chkwon/jpor_codes/downloads",
+  "issues_url": "https://api.github.com/repos/chkwon/jpor_codes/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/chkwon/jpor_codes/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/chkwon/jpor_codes/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/chkwon/jpor_codes/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/chkwon/jpor_codes/labels{/name}",
+  "releases_url": "https://api.github.com/repos/chkwon/jpor_codes/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/chkwon/jpor_codes/deployments",
+  "created_at": "2016-03-31T04:05:56Z",
+  "updated_at": "2017-01-26T07:29:33Z",
+  "pushed_at": "2016-11-25T18:12:34Z",
+  "git_url": "git://github.com/chkwon/jpor_codes.git",
+  "ssh_url": "git@github.com:chkwon/jpor_codes.git",
+  "clone_url": "https://github.com/chkwon/jpor_codes.git",
+  "svn_url": "https://github.com/chkwon/jpor_codes",
+  "homepage": "www.chkwon.net/julia",
+  "size": 290,
+  "stargazers_count": 21,
+  "watchers_count": 21,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 10,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 10,
+  "open_issues": 0,
+  "watchers": 21,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 10,
+  "subscribers_count": 4
 }

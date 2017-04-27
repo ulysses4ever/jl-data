@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:02:50 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5419
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2618
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "60dc7d2047ca50c4ce4114686a038767"
+Last-Modified: Tue, 15 Nov 2016 01:52:04 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: edf23fdc48375d9066b698b8d98062e9
+X-GitHub-Request-Id: 67F4:6634:134AD15:18EFF31:5902324A
+
+{
+  "id": 46384417,
+  "name": "SimplePlot.jl",
+  "full_name": "slundberg/SimplePlot.jl",
+  "owner": {
+    "login": "slundberg",
+    "id": 3740613,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/3740613?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/slundberg",
+    "html_url": "https://github.com/slundberg",
+    "followers_url": "https://api.github.com/users/slundberg/followers",
+    "following_url": "https://api.github.com/users/slundberg/following{/other_user}",
+    "gists_url": "https://api.github.com/users/slundberg/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/slundberg/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/slundberg/subscriptions",
+    "organizations_url": "https://api.github.com/users/slundberg/orgs",
+    "repos_url": "https://api.github.com/users/slundberg/repos",
+    "events_url": "https://api.github.com/users/slundberg/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/slundberg/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/slundberg/SimplePlot.jl",
+  "description": "A collection of clean plotting methods for easy Julia figures.",
+  "fork": false,
+  "url": "https://api.github.com/repos/slundberg/SimplePlot.jl",
+  "forks_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/forks",
+  "keys_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/teams",
+  "hooks_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/events",
+  "assignees_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/tags",
+  "blobs_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/subscription",
+  "commits_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/merges",
+  "archive_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/downloads",
+  "issues_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/slundberg/SimplePlot.jl/deployments",
+  "created_at": "2015-11-18T00:26:38Z",
+  "updated_at": "2016-11-15T01:52:04Z",
+  "pushed_at": "2016-12-11T18:16:35Z",
+  "git_url": "git://github.com/slundberg/SimplePlot.jl.git",
+  "ssh_url": "git@github.com:slundberg/SimplePlot.jl.git",
+  "clone_url": "https://github.com/slundberg/SimplePlot.jl.git",
+  "svn_url": "https://github.com/slundberg/SimplePlot.jl",
+  "homepage": "",
+  "size": 101,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

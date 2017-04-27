@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:17:29 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5379
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 745
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "91645ee81419126bdbce6389e4459276"
+Last-Modified: Wed, 31 Dec 2014 11:40:42 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: c6c65e5196703428e7641f7d1e9bc353
+X-GitHub-Request-Id: 0FBA:6631:87F02F:AF9023:590235B9
+
+{
+  "id": 28398950,
+  "name": "PikeLexer",
+  "full_name": "ordovician/PikeLexer",
+  "owner": {
+    "login": "ordovician",
+    "id": 72194,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/72194?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ordovician",
+    "html_url": "https://github.com/ordovician",
+    "followers_url": "https://api.github.com/users/ordovician/followers",
+    "following_url": "https://api.github.com/users/ordovician/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ordovician/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ordovician/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ordovician/subscriptions",
+    "organizations_url": "https://api.github.com/users/ordovician/orgs",
+    "repos_url": "https://api.github.com/users/ordovician/repos",
+    "events_url": "https://api.github.com/users/ordovician/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ordovician/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ordovician/PikeLexer",
+  "description": "Experimenting with building a lexer in Julia based on the ideas presented by Rob Pike on how the lexer in the Go template engine was implemented.",
+  "fork": false,
+  "url": "https://api.github.com/repos/ordovician/PikeLexer",
+  "forks_url": "https://api.github.com/repos/ordovician/PikeLexer/forks",
+  "keys_url": "https://api.github.com/repos/ordovician/PikeLexer/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ordovician/PikeLexer/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ordovician/PikeLexer/teams",
+  "hooks_url": "https://api.github.com/repos/ordovician/PikeLexer/hooks",
+  "issue_events_url": "https://api.github.com/repos/ordovician/PikeLexer/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ordovician/PikeLexer/events",
+  "assignees_url": "https://api.github.com/repos/ordovician/PikeLexer/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ordovician/PikeLexer/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ordovician/PikeLexer/tags",
+  "blobs_url": "https://api.github.com/repos/ordovician/PikeLexer/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ordovician/PikeLexer/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ordovician/PikeLexer/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ordovician/PikeLexer/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ordovician/PikeLexer/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ordovician/PikeLexer/languages",
+  "stargazers_url": "https://api.github.com/repos/ordovician/PikeLexer/stargazers",
+  "contributors_url": "https://api.github.com/repos/ordovician/PikeLexer/contributors",
+  "subscribers_url": "https://api.github.com/repos/ordovician/PikeLexer/subscribers",
+  "subscription_url": "https://api.github.com/repos/ordovician/PikeLexer/subscription",
+  "commits_url": "https://api.github.com/repos/ordovician/PikeLexer/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ordovician/PikeLexer/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ordovician/PikeLexer/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ordovician/PikeLexer/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ordovician/PikeLexer/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ordovician/PikeLexer/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ordovician/PikeLexer/merges",
+  "archive_url": "https://api.github.com/repos/ordovician/PikeLexer/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ordovician/PikeLexer/downloads",
+  "issues_url": "https://api.github.com/repos/ordovician/PikeLexer/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ordovician/PikeLexer/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ordovician/PikeLexer/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ordovician/PikeLexer/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ordovician/PikeLexer/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ordovician/PikeLexer/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ordovician/PikeLexer/deployments",
+  "created_at": "2014-12-23T13:17:18Z",
+  "updated_at": "2014-12-31T11:40:42Z",
+  "pushed_at": "2014-12-31T11:40:42Z",
+  "git_url": "git://github.com/ordovician/PikeLexer.git",
+  "ssh_url": "git@github.com:ordovician/PikeLexer.git",
+  "clone_url": "https://github.com/ordovician/PikeLexer.git",
+  "svn_url": "https://github.com/ordovician/PikeLexer",
+  "homepage": null,
+  "size": 148,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

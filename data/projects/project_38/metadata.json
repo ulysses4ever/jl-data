@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:26:49 GMT
+Date: Thu, 27 Apr 2017 17:58:54 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5441
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3497
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "bd761b608cce2db69dad7dd3bdf91f7c"
+Last-Modified: Tue, 11 Oct 2016 00:32:41 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 26
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DC8E:0712:71B541F:885B0AD:58C33639
+Vary: Accept-Encoding
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: 3850:6637:132EC30:18C2B49:5902315E
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 68615733,
+  "name": "TensorNetworks.jl",
+  "full_name": "mhauru/TensorNetworks.jl",
+  "owner": {
+    "login": "mhauru",
+    "id": 5229876,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/5229876?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mhauru",
+    "html_url": "https://github.com/mhauru",
+    "followers_url": "https://api.github.com/users/mhauru/followers",
+    "following_url": "https://api.github.com/users/mhauru/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mhauru/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mhauru/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mhauru/subscriptions",
+    "organizations_url": "https://api.github.com/users/mhauru/orgs",
+    "repos_url": "https://api.github.com/users/mhauru/repos",
+    "events_url": "https://api.github.com/users/mhauru/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mhauru/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mhauru/TensorNetworks.jl",
+  "description": "Network level tools for implementing tensor network algorithms in Julia.",
+  "fork": false,
+  "url": "https://api.github.com/repos/mhauru/TensorNetworks.jl",
+  "forks_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/forks",
+  "keys_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/events",
+  "assignees_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/merges",
+  "archive_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mhauru/TensorNetworks.jl/deployments",
+  "created_at": "2016-09-19T14:49:47Z",
+  "updated_at": "2016-10-11T00:32:41Z",
+  "pushed_at": "2016-09-19T20:13:11Z",
+  "git_url": "git://github.com/mhauru/TensorNetworks.jl.git",
+  "ssh_url": "git@github.com:mhauru/TensorNetworks.jl.git",
+  "clone_url": "https://github.com/mhauru/TensorNetworks.jl.git",
+  "svn_url": "https://github.com/mhauru/TensorNetworks.jl",
+  "homepage": null,
+  "size": 25,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

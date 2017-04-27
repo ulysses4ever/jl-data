@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:02:08 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5072
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2689
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "6dc7e92ab40dac51c5867be4a6d6ab86"
+Last-Modified: Fri, 27 Nov 2015 13:48:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: 62B9:6637:1337C5E:18CE88A:5902321F
+
+{
+  "id": 46959916,
+  "name": "Nanoflann.jl",
+  "full_name": "c42f/Nanoflann.jl",
+  "owner": {
+    "login": "c42f",
+    "id": 601473,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/601473?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/c42f",
+    "html_url": "https://github.com/c42f",
+    "followers_url": "https://api.github.com/users/c42f/followers",
+    "following_url": "https://api.github.com/users/c42f/following{/other_user}",
+    "gists_url": "https://api.github.com/users/c42f/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/c42f/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/c42f/subscriptions",
+    "organizations_url": "https://api.github.com/users/c42f/orgs",
+    "repos_url": "https://api.github.com/users/c42f/repos",
+    "events_url": "https://api.github.com/users/c42f/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/c42f/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/c42f/Nanoflann.jl",
+  "description": "Simple wrapper around nanoflann.hpp",
+  "fork": false,
+  "url": "https://api.github.com/repos/c42f/Nanoflann.jl",
+  "forks_url": "https://api.github.com/repos/c42f/Nanoflann.jl/forks",
+  "keys_url": "https://api.github.com/repos/c42f/Nanoflann.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/c42f/Nanoflann.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/c42f/Nanoflann.jl/teams",
+  "hooks_url": "https://api.github.com/repos/c42f/Nanoflann.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/c42f/Nanoflann.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/c42f/Nanoflann.jl/events",
+  "assignees_url": "https://api.github.com/repos/c42f/Nanoflann.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/c42f/Nanoflann.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/c42f/Nanoflann.jl/tags",
+  "blobs_url": "https://api.github.com/repos/c42f/Nanoflann.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/c42f/Nanoflann.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/c42f/Nanoflann.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/c42f/Nanoflann.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/c42f/Nanoflann.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/c42f/Nanoflann.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/c42f/Nanoflann.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/c42f/Nanoflann.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/c42f/Nanoflann.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/c42f/Nanoflann.jl/subscription",
+  "commits_url": "https://api.github.com/repos/c42f/Nanoflann.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/c42f/Nanoflann.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/c42f/Nanoflann.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/c42f/Nanoflann.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/c42f/Nanoflann.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/c42f/Nanoflann.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/c42f/Nanoflann.jl/merges",
+  "archive_url": "https://api.github.com/repos/c42f/Nanoflann.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/c42f/Nanoflann.jl/downloads",
+  "issues_url": "https://api.github.com/repos/c42f/Nanoflann.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/c42f/Nanoflann.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/c42f/Nanoflann.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/c42f/Nanoflann.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/c42f/Nanoflann.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/c42f/Nanoflann.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/c42f/Nanoflann.jl/deployments",
+  "created_at": "2015-11-27T04:38:29Z",
+  "updated_at": "2015-11-27T13:48:58Z",
+  "pushed_at": "2015-11-28T00:44:35Z",
+  "git_url": "git://github.com/c42f/Nanoflann.jl.git",
+  "ssh_url": "git@github.com:c42f/Nanoflann.jl.git",
+  "clone_url": "https://github.com/c42f/Nanoflann.jl.git",
+  "svn_url": "https://github.com/c42f/Nanoflann.jl",
+  "homepage": null,
+  "size": 10,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

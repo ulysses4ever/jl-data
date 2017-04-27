@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:57:02 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6485
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4576
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "350b55c8a6347e6768c6bc3031b16b3e"
+Last-Modified: Thu, 30 Mar 2017 08:39:02 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 9000e9eef7bb1e89f22030c676da140e
+X-GitHub-Request-Id: 2341:6631:8BB4A3:B46772:59023EFD
+
+{
+  "id": 43172261,
+  "name": "LibSndFile.jl",
+  "full_name": "JuliaAudio/LibSndFile.jl",
+  "owner": {
+    "login": "JuliaAudio",
+    "id": 15641401,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/15641401?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaAudio",
+    "html_url": "https://github.com/JuliaAudio",
+    "followers_url": "https://api.github.com/users/JuliaAudio/followers",
+    "following_url": "https://api.github.com/users/JuliaAudio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaAudio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaAudio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaAudio/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaAudio/orgs",
+    "repos_url": "https://api.github.com/users/JuliaAudio/repos",
+    "events_url": "https://api.github.com/users/JuliaAudio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaAudio/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaAudio/LibSndFile.jl",
+  "description": "Julia Interface to libsndfile",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl",
+  "forks_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaAudio/LibSndFile.jl/deployments",
+  "created_at": "2015-09-25T19:51:36Z",
+  "updated_at": "2017-03-30T08:39:02Z",
+  "pushed_at": "2017-02-02T05:49:58Z",
+  "git_url": "git://github.com/JuliaAudio/LibSndFile.jl.git",
+  "ssh_url": "git@github.com:JuliaAudio/LibSndFile.jl.git",
+  "clone_url": "https://github.com/JuliaAudio/LibSndFile.jl.git",
+  "svn_url": "https://github.com/JuliaAudio/LibSndFile.jl",
+  "homepage": null,
+  "size": 530,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 5,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 5,
+  "open_issues": 2,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaAudio",
+    "id": 15641401,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/15641401?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaAudio",
+    "html_url": "https://github.com/JuliaAudio",
+    "followers_url": "https://api.github.com/users/JuliaAudio/followers",
+    "following_url": "https://api.github.com/users/JuliaAudio/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaAudio/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaAudio/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaAudio/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaAudio/orgs",
+    "repos_url": "https://api.github.com/users/JuliaAudio/repos",
+    "events_url": "https://api.github.com/users/JuliaAudio/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaAudio/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 5,
+  "subscribers_count": 2
+}

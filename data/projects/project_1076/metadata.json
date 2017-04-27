@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:02:59 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5405
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2565
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7af1d9114e5853cc8309a41b8471b8ea"
+Last-Modified: Tue, 07 Mar 2017 19:20:03 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 0e17b94a265a427d9cafe798ceea7c02
+X-GitHub-Request-Id: 47E6:6637:133A253:18D19DE:59023253
+
+{
+  "id": 45520078,
+  "name": "BlsData.jl",
+  "full_name": "micahjsmith/BlsData.jl",
+  "owner": {
+    "login": "micahjsmith",
+    "id": 5473606,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/5473606?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/micahjsmith",
+    "html_url": "https://github.com/micahjsmith",
+    "followers_url": "https://api.github.com/users/micahjsmith/followers",
+    "following_url": "https://api.github.com/users/micahjsmith/following{/other_user}",
+    "gists_url": "https://api.github.com/users/micahjsmith/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/micahjsmith/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/micahjsmith/subscriptions",
+    "organizations_url": "https://api.github.com/users/micahjsmith/orgs",
+    "repos_url": "https://api.github.com/users/micahjsmith/repos",
+    "events_url": "https://api.github.com/users/micahjsmith/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/micahjsmith/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/micahjsmith/BlsData.jl",
+  "description": "Pull data from the Bureau of Labor Statistics (BLS) directly into Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/micahjsmith/BlsData.jl",
+  "forks_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/forks",
+  "keys_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/teams",
+  "hooks_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/events",
+  "assignees_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/tags",
+  "blobs_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/subscription",
+  "commits_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/merges",
+  "archive_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/downloads",
+  "issues_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/micahjsmith/BlsData.jl/deployments",
+  "created_at": "2015-11-04T06:35:08Z",
+  "updated_at": "2017-03-07T19:20:03Z",
+  "pushed_at": "2015-11-29T18:00:53Z",
+  "git_url": "git://github.com/micahjsmith/BlsData.jl.git",
+  "ssh_url": "git@github.com:micahjsmith/BlsData.jl.git",
+  "clone_url": "https://github.com/micahjsmith/BlsData.jl.git",
+  "svn_url": "https://github.com/micahjsmith/BlsData.jl",
+  "homepage": "",
+  "size": 22,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 3,
+  "open_issues": 0,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 1
+}

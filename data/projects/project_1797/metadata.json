@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:46 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5230
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1875
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2ea8e8b0e7fec2701eaa8cd6d7e6ee9b"
+Last-Modified: Wed, 15 Oct 2014 06:23:26 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: a30e6f9aa7cf5731b87dfb3b9992202d
+X-GitHub-Request-Id: F5A5:6633:DE3405:11FB303:59023335
+
+{
+  "id": 25188028,
+  "name": "nanstats",
+  "full_name": "dataRonin/nanstats",
+  "owner": {
+    "login": "dataRonin",
+    "id": 6188545,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/6188545?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dataRonin",
+    "html_url": "https://github.com/dataRonin",
+    "followers_url": "https://api.github.com/users/dataRonin/followers",
+    "following_url": "https://api.github.com/users/dataRonin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dataRonin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dataRonin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dataRonin/subscriptions",
+    "organizations_url": "https://api.github.com/users/dataRonin/orgs",
+    "repos_url": "https://api.github.com/users/dataRonin/repos",
+    "events_url": "https://api.github.com/users/dataRonin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dataRonin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dataRonin/nanstats",
+  "description": "A quick little mod for doing basic stats on vectors which contain nans, just like in Matlab",
+  "fork": false,
+  "url": "https://api.github.com/repos/dataRonin/nanstats",
+  "forks_url": "https://api.github.com/repos/dataRonin/nanstats/forks",
+  "keys_url": "https://api.github.com/repos/dataRonin/nanstats/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dataRonin/nanstats/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dataRonin/nanstats/teams",
+  "hooks_url": "https://api.github.com/repos/dataRonin/nanstats/hooks",
+  "issue_events_url": "https://api.github.com/repos/dataRonin/nanstats/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dataRonin/nanstats/events",
+  "assignees_url": "https://api.github.com/repos/dataRonin/nanstats/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dataRonin/nanstats/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dataRonin/nanstats/tags",
+  "blobs_url": "https://api.github.com/repos/dataRonin/nanstats/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dataRonin/nanstats/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dataRonin/nanstats/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dataRonin/nanstats/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dataRonin/nanstats/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dataRonin/nanstats/languages",
+  "stargazers_url": "https://api.github.com/repos/dataRonin/nanstats/stargazers",
+  "contributors_url": "https://api.github.com/repos/dataRonin/nanstats/contributors",
+  "subscribers_url": "https://api.github.com/repos/dataRonin/nanstats/subscribers",
+  "subscription_url": "https://api.github.com/repos/dataRonin/nanstats/subscription",
+  "commits_url": "https://api.github.com/repos/dataRonin/nanstats/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dataRonin/nanstats/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dataRonin/nanstats/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dataRonin/nanstats/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dataRonin/nanstats/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dataRonin/nanstats/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dataRonin/nanstats/merges",
+  "archive_url": "https://api.github.com/repos/dataRonin/nanstats/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dataRonin/nanstats/downloads",
+  "issues_url": "https://api.github.com/repos/dataRonin/nanstats/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dataRonin/nanstats/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dataRonin/nanstats/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dataRonin/nanstats/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dataRonin/nanstats/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dataRonin/nanstats/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dataRonin/nanstats/deployments",
+  "created_at": "2014-10-14T03:04:35Z",
+  "updated_at": "2014-10-15T06:23:26Z",
+  "pushed_at": "2014-10-14T03:33:08Z",
+  "git_url": "git://github.com/dataRonin/nanstats.git",
+  "ssh_url": "git@github.com:dataRonin/nanstats.git",
+  "clone_url": "https://github.com/dataRonin/nanstats.git",
+  "svn_url": "https://github.com/dataRonin/nanstats",
+  "homepage": null,
+  "size": 128,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

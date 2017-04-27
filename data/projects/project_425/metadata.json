@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:54:43 GMT
+Date: Thu, 27 Apr 2017 18:00:11 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5389
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3135
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "045f6f4ef9b512f32fc9999a99422c90"
+Last-Modified: Tue, 20 Sep 2016 04:56:10 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 13
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E74D:0710:4D81696:5CB6BE6:58C358E3
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 7CC7:6637:13323A9:18C744E:590231AB
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55822742,
+  "name": "RethinkDB.jl",
+  "full_name": "mrcsparker/RethinkDB.jl",
+  "owner": {
+    "login": "mrcsparker",
+    "id": 29571,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/29571?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mrcsparker",
+    "html_url": "https://github.com/mrcsparker",
+    "followers_url": "https://api.github.com/users/mrcsparker/followers",
+    "following_url": "https://api.github.com/users/mrcsparker/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mrcsparker/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mrcsparker/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mrcsparker/subscriptions",
+    "organizations_url": "https://api.github.com/users/mrcsparker/orgs",
+    "repos_url": "https://api.github.com/users/mrcsparker/repos",
+    "events_url": "https://api.github.com/users/mrcsparker/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mrcsparker/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mrcsparker/RethinkDB.jl",
+  "description": "Julia RethinkDB bindings",
+  "fork": false,
+  "url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl",
+  "forks_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/forks",
+  "keys_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/events",
+  "assignees_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/merges",
+  "archive_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mrcsparker/RethinkDB.jl/deployments",
+  "created_at": "2016-04-09T02:51:15Z",
+  "updated_at": "2016-09-20T04:56:10Z",
+  "pushed_at": "2016-04-12T23:35:01Z",
+  "git_url": "git://github.com/mrcsparker/RethinkDB.jl.git",
+  "ssh_url": "git@github.com:mrcsparker/RethinkDB.jl.git",
+  "clone_url": "https://github.com/mrcsparker/RethinkDB.jl.git",
+  "svn_url": "https://github.com/mrcsparker/RethinkDB.jl",
+  "homepage": null,
+  "size": 63,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

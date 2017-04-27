@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:13:20 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6870
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1087
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "db4cf4f7287a37bc3e8e9d125314833f"
+Last-Modified: Tue, 29 Nov 2016 18:55:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: edf23fdc48375d9066b698b8d98062e9
+X-GitHub-Request-Id: CD3A:6637:1359579:18F97B7:590234BF
+
+{
+  "id": 30219159,
+  "name": "PDESolver.jl",
+  "full_name": "OptimalDesignLab/PDESolver.jl",
+  "owner": {
+    "login": "OptimalDesignLab",
+    "id": 7097175,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/7097175?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/OptimalDesignLab",
+    "html_url": "https://github.com/OptimalDesignLab",
+    "followers_url": "https://api.github.com/users/OptimalDesignLab/followers",
+    "following_url": "https://api.github.com/users/OptimalDesignLab/following{/other_user}",
+    "gists_url": "https://api.github.com/users/OptimalDesignLab/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/OptimalDesignLab/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/OptimalDesignLab/subscriptions",
+    "organizations_url": "https://api.github.com/users/OptimalDesignLab/orgs",
+    "repos_url": "https://api.github.com/users/OptimalDesignLab/repos",
+    "events_url": "https://api.github.com/users/OptimalDesignLab/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/OptimalDesignLab/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/OptimalDesignLab/PDESolver.jl",
+  "description": "A Julia-based solver for partial-differential equations.",
+  "fork": false,
+  "url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl",
+  "forks_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/forks",
+  "keys_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/teams",
+  "hooks_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/events",
+  "assignees_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/tags",
+  "blobs_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/subscription",
+  "commits_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/merges",
+  "archive_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/downloads",
+  "issues_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/OptimalDesignLab/PDESolver.jl/deployments",
+  "created_at": "2015-02-03T01:49:51Z",
+  "updated_at": "2016-11-29T18:55:58Z",
+  "pushed_at": "2017-04-27T00:47:20Z",
+  "git_url": "git://github.com/OptimalDesignLab/PDESolver.jl.git",
+  "ssh_url": "git@github.com:OptimalDesignLab/PDESolver.jl.git",
+  "clone_url": "https://github.com/OptimalDesignLab/PDESolver.jl.git",
+  "svn_url": "https://github.com/OptimalDesignLab/PDESolver.jl",
+  "homepage": null,
+  "size": 17958,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 46,
+  "forks": 0,
+  "open_issues": 46,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "OptimalDesignLab",
+    "id": 7097175,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/7097175?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/OptimalDesignLab",
+    "html_url": "https://github.com/OptimalDesignLab",
+    "followers_url": "https://api.github.com/users/OptimalDesignLab/followers",
+    "following_url": "https://api.github.com/users/OptimalDesignLab/following{/other_user}",
+    "gists_url": "https://api.github.com/users/OptimalDesignLab/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/OptimalDesignLab/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/OptimalDesignLab/subscriptions",
+    "organizations_url": "https://api.github.com/users/OptimalDesignLab/orgs",
+    "repos_url": "https://api.github.com/users/OptimalDesignLab/repos",
+    "events_url": "https://api.github.com/users/OptimalDesignLab/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/OptimalDesignLab/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 2
+}

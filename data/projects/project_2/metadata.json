@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:25:46 GMT
+Date: Thu, 27 Apr 2017 17:58:51 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6375
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3525
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2e1513026dcee3aeb078d4952b4c65f2"
+Last-Modified: Tue, 08 Nov 2016 11:28:17 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 55
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DC2C:0710:4C86BD6:5B8E210:58C335FA
+Vary: Accept-Encoding
+X-Served-By: 8166eb1845e56d99ba68a6b1065016c1
+X-GitHub-Request-Id: 48BD:6634:134016D:18E1F20:5902315B
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 69663935,
+  "name": "WAHVectors.jl",
+  "full_name": "BioJulia/WAHVectors.jl",
+  "owner": {
+    "login": "BioJulia",
+    "id": 6486271,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6486271?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BioJulia",
+    "html_url": "https://github.com/BioJulia",
+    "followers_url": "https://api.github.com/users/BioJulia/followers",
+    "following_url": "https://api.github.com/users/BioJulia/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BioJulia/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BioJulia/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BioJulia/subscriptions",
+    "organizations_url": "https://api.github.com/users/BioJulia/orgs",
+    "repos_url": "https://api.github.com/users/BioJulia/repos",
+    "events_url": "https://api.github.com/users/BioJulia/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BioJulia/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/BioJulia/WAHVectors.jl",
+  "description": "Compress bit vectors using the Word Aligned Hybrid method.",
+  "fork": false,
+  "url": "https://api.github.com/repos/BioJulia/WAHVectors.jl",
+  "forks_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/forks",
+  "keys_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/teams",
+  "hooks_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/events",
+  "assignees_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/tags",
+  "blobs_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/subscription",
+  "commits_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/merges",
+  "archive_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/downloads",
+  "issues_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/BioJulia/WAHVectors.jl/deployments",
+  "created_at": "2016-09-30T12:13:31Z",
+  "updated_at": "2016-11-08T11:28:17Z",
+  "pushed_at": "2016-11-21T19:08:45Z",
+  "git_url": "git://github.com/BioJulia/WAHVectors.jl.git",
+  "ssh_url": "git@github.com:BioJulia/WAHVectors.jl.git",
+  "clone_url": "https://github.com/BioJulia/WAHVectors.jl.git",
+  "svn_url": "https://github.com/BioJulia/WAHVectors.jl",
+  "homepage": null,
+  "size": 526,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "BioJulia",
+    "id": 6486271,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6486271?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BioJulia",
+    "html_url": "https://github.com/BioJulia",
+    "followers_url": "https://api.github.com/users/BioJulia/followers",
+    "following_url": "https://api.github.com/users/BioJulia/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BioJulia/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BioJulia/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BioJulia/subscriptions",
+    "organizations_url": "https://api.github.com/users/BioJulia/orgs",
+    "repos_url": "https://api.github.com/users/BioJulia/repos",
+    "events_url": "https://api.github.com/users/BioJulia/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BioJulia/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 2,
+  "subscribers_count": 4
 }

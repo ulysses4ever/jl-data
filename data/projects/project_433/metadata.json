@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:56:51 GMT
+Date: Thu, 27 Apr 2017 18:00:11 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5007
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3137
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4a99d22b54e9d5c46b15836a6f020290"
+Last-Modified: Fri, 08 Apr 2016 09:42:04 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 5
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D7A8:0712:73342BF:8A248CF:58C35963
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: BF7F:6637:133238E:18C7429:590231AB
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55762172,
+  "name": "SnFFT",
+  "full_name": "jboillat/SnFFT",
+  "owner": {
+    "login": "jboillat",
+    "id": 18345063,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/18345063?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jboillat",
+    "html_url": "https://github.com/jboillat",
+    "followers_url": "https://api.github.com/users/jboillat/followers",
+    "following_url": "https://api.github.com/users/jboillat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jboillat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jboillat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jboillat/subscriptions",
+    "organizations_url": "https://api.github.com/users/jboillat/orgs",
+    "repos_url": "https://api.github.com/users/jboillat/repos",
+    "events_url": "https://api.github.com/users/jboillat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jboillat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jboillat/SnFFT",
+  "description": "FFT on the Symmetric group with values in a finite field",
+  "fork": false,
+  "url": "https://api.github.com/repos/jboillat/SnFFT",
+  "forks_url": "https://api.github.com/repos/jboillat/SnFFT/forks",
+  "keys_url": "https://api.github.com/repos/jboillat/SnFFT/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jboillat/SnFFT/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jboillat/SnFFT/teams",
+  "hooks_url": "https://api.github.com/repos/jboillat/SnFFT/hooks",
+  "issue_events_url": "https://api.github.com/repos/jboillat/SnFFT/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jboillat/SnFFT/events",
+  "assignees_url": "https://api.github.com/repos/jboillat/SnFFT/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jboillat/SnFFT/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jboillat/SnFFT/tags",
+  "blobs_url": "https://api.github.com/repos/jboillat/SnFFT/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jboillat/SnFFT/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jboillat/SnFFT/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jboillat/SnFFT/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jboillat/SnFFT/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jboillat/SnFFT/languages",
+  "stargazers_url": "https://api.github.com/repos/jboillat/SnFFT/stargazers",
+  "contributors_url": "https://api.github.com/repos/jboillat/SnFFT/contributors",
+  "subscribers_url": "https://api.github.com/repos/jboillat/SnFFT/subscribers",
+  "subscription_url": "https://api.github.com/repos/jboillat/SnFFT/subscription",
+  "commits_url": "https://api.github.com/repos/jboillat/SnFFT/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jboillat/SnFFT/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jboillat/SnFFT/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jboillat/SnFFT/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jboillat/SnFFT/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jboillat/SnFFT/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jboillat/SnFFT/merges",
+  "archive_url": "https://api.github.com/repos/jboillat/SnFFT/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jboillat/SnFFT/downloads",
+  "issues_url": "https://api.github.com/repos/jboillat/SnFFT/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jboillat/SnFFT/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jboillat/SnFFT/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jboillat/SnFFT/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jboillat/SnFFT/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jboillat/SnFFT/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jboillat/SnFFT/deployments",
+  "created_at": "2016-04-08T08:13:27Z",
+  "updated_at": "2016-04-08T09:42:04Z",
+  "pushed_at": "2016-04-08T15:27:00Z",
+  "git_url": "git://github.com/jboillat/SnFFT.git",
+  "ssh_url": "git@github.com:jboillat/SnFFT.git",
+  "clone_url": "https://github.com/jboillat/SnFFT.git",
+  "svn_url": "https://github.com/jboillat/SnFFT",
+  "homepage": "",
+  "size": 24,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

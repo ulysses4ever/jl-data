@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:49:48 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5019
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4960
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "67903d3d16ba55f0a8a5f83c0505c116"
+Last-Modified: Mon, 29 Aug 2016 02:32:59 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: a30e6f9aa7cf5731b87dfb3b9992202d
+X-GitHub-Request-Id: 876D:6634:13D1774:199E292:59023D4C
+
+{
+  "id": 48349806,
+  "name": "D4.jl",
+  "full_name": "khwilson/D4.jl",
+  "owner": {
+    "login": "khwilson",
+    "id": 1527442,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1527442?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/khwilson",
+    "html_url": "https://github.com/khwilson",
+    "followers_url": "https://api.github.com/users/khwilson/followers",
+    "following_url": "https://api.github.com/users/khwilson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/khwilson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/khwilson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/khwilson/subscriptions",
+    "organizations_url": "https://api.github.com/users/khwilson/orgs",
+    "repos_url": "https://api.github.com/users/khwilson/repos",
+    "events_url": "https://api.github.com/users/khwilson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/khwilson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/khwilson/D4.jl",
+  "description": "An implementation of Cohen/Diaz y Diaz/Olivier's D4 count",
+  "fork": false,
+  "url": "https://api.github.com/repos/khwilson/D4.jl",
+  "forks_url": "https://api.github.com/repos/khwilson/D4.jl/forks",
+  "keys_url": "https://api.github.com/repos/khwilson/D4.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/khwilson/D4.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/khwilson/D4.jl/teams",
+  "hooks_url": "https://api.github.com/repos/khwilson/D4.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/khwilson/D4.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/khwilson/D4.jl/events",
+  "assignees_url": "https://api.github.com/repos/khwilson/D4.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/khwilson/D4.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/khwilson/D4.jl/tags",
+  "blobs_url": "https://api.github.com/repos/khwilson/D4.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/khwilson/D4.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/khwilson/D4.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/khwilson/D4.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/khwilson/D4.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/khwilson/D4.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/khwilson/D4.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/khwilson/D4.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/khwilson/D4.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/khwilson/D4.jl/subscription",
+  "commits_url": "https://api.github.com/repos/khwilson/D4.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/khwilson/D4.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/khwilson/D4.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/khwilson/D4.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/khwilson/D4.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/khwilson/D4.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/khwilson/D4.jl/merges",
+  "archive_url": "https://api.github.com/repos/khwilson/D4.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/khwilson/D4.jl/downloads",
+  "issues_url": "https://api.github.com/repos/khwilson/D4.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/khwilson/D4.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/khwilson/D4.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/khwilson/D4.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/khwilson/D4.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/khwilson/D4.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/khwilson/D4.jl/deployments",
+  "created_at": "2015-12-21T04:01:45Z",
+  "updated_at": "2016-08-29T02:32:59Z",
+  "pushed_at": "2016-08-29T02:32:58Z",
+  "git_url": "git://github.com/khwilson/D4.jl.git",
+  "ssh_url": "git@github.com:khwilson/D4.jl.git",
+  "clone_url": "https://github.com/khwilson/D4.jl.git",
+  "svn_url": "https://github.com/khwilson/D4.jl",
+  "homepage": null,
+  "size": 27,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Jupyter Notebook",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

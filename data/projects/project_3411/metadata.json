@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:22:15 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5088
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 321
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "baebaf0a4e67e0e68c4a8e740f889f88"
+Last-Modified: Thu, 10 Mar 2016 17:02:19 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: e14705a23c085afeff5e104b1fc3922a
+X-GitHub-Request-Id: 8A06:6633:E04974:1226945:590236D7
+
+{
+  "id": 14605352,
+  "name": "StateSpace",
+  "full_name": "carljv/StateSpace",
+  "owner": {
+    "login": "carljv",
+    "id": 1170842,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1170842?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/carljv",
+    "html_url": "https://github.com/carljv",
+    "followers_url": "https://api.github.com/users/carljv/followers",
+    "following_url": "https://api.github.com/users/carljv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/carljv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/carljv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/carljv/subscriptions",
+    "organizations_url": "https://api.github.com/users/carljv/orgs",
+    "repos_url": "https://api.github.com/users/carljv/repos",
+    "events_url": "https://api.github.com/users/carljv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/carljv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/carljv/StateSpace",
+  "description": "StateSpace models in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/carljv/StateSpace",
+  "forks_url": "https://api.github.com/repos/carljv/StateSpace/forks",
+  "keys_url": "https://api.github.com/repos/carljv/StateSpace/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/carljv/StateSpace/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/carljv/StateSpace/teams",
+  "hooks_url": "https://api.github.com/repos/carljv/StateSpace/hooks",
+  "issue_events_url": "https://api.github.com/repos/carljv/StateSpace/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/carljv/StateSpace/events",
+  "assignees_url": "https://api.github.com/repos/carljv/StateSpace/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/carljv/StateSpace/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/carljv/StateSpace/tags",
+  "blobs_url": "https://api.github.com/repos/carljv/StateSpace/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/carljv/StateSpace/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/carljv/StateSpace/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/carljv/StateSpace/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/carljv/StateSpace/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/carljv/StateSpace/languages",
+  "stargazers_url": "https://api.github.com/repos/carljv/StateSpace/stargazers",
+  "contributors_url": "https://api.github.com/repos/carljv/StateSpace/contributors",
+  "subscribers_url": "https://api.github.com/repos/carljv/StateSpace/subscribers",
+  "subscription_url": "https://api.github.com/repos/carljv/StateSpace/subscription",
+  "commits_url": "https://api.github.com/repos/carljv/StateSpace/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/carljv/StateSpace/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/carljv/StateSpace/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/carljv/StateSpace/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/carljv/StateSpace/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/carljv/StateSpace/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/carljv/StateSpace/merges",
+  "archive_url": "https://api.github.com/repos/carljv/StateSpace/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/carljv/StateSpace/downloads",
+  "issues_url": "https://api.github.com/repos/carljv/StateSpace/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/carljv/StateSpace/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/carljv/StateSpace/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/carljv/StateSpace/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/carljv/StateSpace/labels{/name}",
+  "releases_url": "https://api.github.com/repos/carljv/StateSpace/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/carljv/StateSpace/deployments",
+  "created_at": "2013-11-22T01:16:42Z",
+  "updated_at": "2016-03-10T17:02:19Z",
+  "pushed_at": "2013-11-22T17:18:42Z",
+  "git_url": "git://github.com/carljv/StateSpace.git",
+  "ssh_url": "git@github.com:carljv/StateSpace.git",
+  "clone_url": "https://github.com/carljv/StateSpace.git",
+  "svn_url": "https://github.com/carljv/StateSpace",
+  "homepage": null,
+  "size": 120,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:28:12 GMT
+Date: Thu, 27 Apr 2017 17:58:59 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6057
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3471
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b24470002dabbbc745c319be9a9c8142"
+Last-Modified: Tue, 30 Aug 2016 23:36:50 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DCEE:0710:4C8A836:5B92900:58C3368C
+Vary: Accept-Encoding
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: A220:6637:132EFC5:18C2FD0:59023163
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 66985464,
+  "name": "decisiontreerandomforestfisher",
+  "full_name": "xukai92/decisiontreerandomforestfisher",
+  "owner": {
+    "login": "xukai92",
+    "id": 5985769,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/5985769?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/xukai92",
+    "html_url": "https://github.com/xukai92",
+    "followers_url": "https://api.github.com/users/xukai92/followers",
+    "following_url": "https://api.github.com/users/xukai92/following{/other_user}",
+    "gists_url": "https://api.github.com/users/xukai92/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/xukai92/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/xukai92/subscriptions",
+    "organizations_url": "https://api.github.com/users/xukai92/orgs",
+    "repos_url": "https://api.github.com/users/xukai92/repos",
+    "events_url": "https://api.github.com/users/xukai92/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/xukai92/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/xukai92/decisiontreerandomforestfisher",
+  "description": "Learn decision tree and random forest using the Fisher dataset",
+  "fork": false,
+  "url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher",
+  "forks_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/forks",
+  "keys_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/teams",
+  "hooks_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/hooks",
+  "issue_events_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/events",
+  "assignees_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/tags",
+  "blobs_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/languages",
+  "stargazers_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/stargazers",
+  "contributors_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/contributors",
+  "subscribers_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/subscribers",
+  "subscription_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/subscription",
+  "commits_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/merges",
+  "archive_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/downloads",
+  "issues_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/labels{/name}",
+  "releases_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/xukai92/decisiontreerandomforestfisher/deployments",
+  "created_at": "2016-08-30T23:36:39Z",
+  "updated_at": "2016-08-30T23:36:50Z",
+  "pushed_at": "2016-08-31T14:43:25Z",
+  "git_url": "git://github.com/xukai92/decisiontreerandomforestfisher.git",
+  "ssh_url": "git@github.com:xukai92/decisiontreerandomforestfisher.git",
+  "clone_url": "https://github.com/xukai92/decisiontreerandomforestfisher.git",
+  "svn_url": "https://github.com/xukai92/decisiontreerandomforestfisher",
+  "homepage": null,
+  "size": 4,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

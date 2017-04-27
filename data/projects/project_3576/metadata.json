@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:24:18 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5023
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 171
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "bfffbf51d2407818bde4cf57e2040acd"
+Last-Modified: Thu, 07 Apr 2016 16:28:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
+X-GitHub-Request-Id: 27C1:6631:88988C:B069C2:59023752
+
+{
+  "id": 10163212,
+  "name": "Sam.jl",
+  "full_name": "kmsquire/Sam.jl",
+  "owner": {
+    "login": "kmsquire",
+    "id": 223250,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/223250?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kmsquire",
+    "html_url": "https://github.com/kmsquire",
+    "followers_url": "https://api.github.com/users/kmsquire/followers",
+    "following_url": "https://api.github.com/users/kmsquire/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kmsquire/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kmsquire/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kmsquire/subscriptions",
+    "organizations_url": "https://api.github.com/users/kmsquire/orgs",
+    "repos_url": "https://api.github.com/users/kmsquire/repos",
+    "events_url": "https://api.github.com/users/kmsquire/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kmsquire/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/kmsquire/Sam.jl",
+  "description": "Sam/Bam file support for julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/kmsquire/Sam.jl",
+  "forks_url": "https://api.github.com/repos/kmsquire/Sam.jl/forks",
+  "keys_url": "https://api.github.com/repos/kmsquire/Sam.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/kmsquire/Sam.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/kmsquire/Sam.jl/teams",
+  "hooks_url": "https://api.github.com/repos/kmsquire/Sam.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/kmsquire/Sam.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/kmsquire/Sam.jl/events",
+  "assignees_url": "https://api.github.com/repos/kmsquire/Sam.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/kmsquire/Sam.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/kmsquire/Sam.jl/tags",
+  "blobs_url": "https://api.github.com/repos/kmsquire/Sam.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/kmsquire/Sam.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/kmsquire/Sam.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/kmsquire/Sam.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/kmsquire/Sam.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/kmsquire/Sam.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/kmsquire/Sam.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/kmsquire/Sam.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/kmsquire/Sam.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/kmsquire/Sam.jl/subscription",
+  "commits_url": "https://api.github.com/repos/kmsquire/Sam.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/kmsquire/Sam.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/kmsquire/Sam.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/kmsquire/Sam.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/kmsquire/Sam.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/kmsquire/Sam.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/kmsquire/Sam.jl/merges",
+  "archive_url": "https://api.github.com/repos/kmsquire/Sam.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/kmsquire/Sam.jl/downloads",
+  "issues_url": "https://api.github.com/repos/kmsquire/Sam.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/kmsquire/Sam.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/kmsquire/Sam.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/kmsquire/Sam.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/kmsquire/Sam.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/kmsquire/Sam.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/kmsquire/Sam.jl/deployments",
+  "created_at": "2013-05-20T00:16:11Z",
+  "updated_at": "2016-04-07T16:28:44Z",
+  "pushed_at": "2016-04-07T16:28:43Z",
+  "git_url": "git://github.com/kmsquire/Sam.jl.git",
+  "ssh_url": "git@github.com:kmsquire/Sam.jl.git",
+  "clone_url": "https://github.com/kmsquire/Sam.jl.git",
+  "svn_url": "https://github.com/kmsquire/Sam.jl",
+  "homepage": null,
+  "size": 19,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 4
+}

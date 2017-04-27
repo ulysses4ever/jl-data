@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:54:37 GMT
+Date: Thu, 27 Apr 2017 17:59:37 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5039
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3297
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "383b541a1f967eafc2d40af5fb4a0242"
+Last-Modified: Thu, 02 Jun 2016 16:39:15 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D0AA:0710:4CBE637:5BCF9DE:58C33CBD
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 84F2:6633:DD3428:11E69DF:59023189
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 60280556,
+  "name": "lattice",
+  "full_name": "balents/lattice",
+  "owner": {
+    "login": "balents",
+    "id": 13522035,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/13522035?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/balents",
+    "html_url": "https://github.com/balents",
+    "followers_url": "https://api.github.com/users/balents/followers",
+    "following_url": "https://api.github.com/users/balents/following{/other_user}",
+    "gists_url": "https://api.github.com/users/balents/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/balents/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/balents/subscriptions",
+    "organizations_url": "https://api.github.com/users/balents/orgs",
+    "repos_url": "https://api.github.com/users/balents/repos",
+    "events_url": "https://api.github.com/users/balents/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/balents/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/balents/lattice",
+  "description": "type and method to store lattices for condensed matter",
+  "fork": false,
+  "url": "https://api.github.com/repos/balents/lattice",
+  "forks_url": "https://api.github.com/repos/balents/lattice/forks",
+  "keys_url": "https://api.github.com/repos/balents/lattice/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/balents/lattice/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/balents/lattice/teams",
+  "hooks_url": "https://api.github.com/repos/balents/lattice/hooks",
+  "issue_events_url": "https://api.github.com/repos/balents/lattice/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/balents/lattice/events",
+  "assignees_url": "https://api.github.com/repos/balents/lattice/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/balents/lattice/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/balents/lattice/tags",
+  "blobs_url": "https://api.github.com/repos/balents/lattice/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/balents/lattice/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/balents/lattice/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/balents/lattice/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/balents/lattice/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/balents/lattice/languages",
+  "stargazers_url": "https://api.github.com/repos/balents/lattice/stargazers",
+  "contributors_url": "https://api.github.com/repos/balents/lattice/contributors",
+  "subscribers_url": "https://api.github.com/repos/balents/lattice/subscribers",
+  "subscription_url": "https://api.github.com/repos/balents/lattice/subscription",
+  "commits_url": "https://api.github.com/repos/balents/lattice/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/balents/lattice/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/balents/lattice/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/balents/lattice/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/balents/lattice/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/balents/lattice/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/balents/lattice/merges",
+  "archive_url": "https://api.github.com/repos/balents/lattice/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/balents/lattice/downloads",
+  "issues_url": "https://api.github.com/repos/balents/lattice/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/balents/lattice/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/balents/lattice/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/balents/lattice/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/balents/lattice/labels{/name}",
+  "releases_url": "https://api.github.com/repos/balents/lattice/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/balents/lattice/deployments",
+  "created_at": "2016-06-02T16:38:20Z",
+  "updated_at": "2016-06-02T16:39:15Z",
+  "pushed_at": "2016-06-02T16:39:14Z",
+  "git_url": "git://github.com/balents/lattice.git",
+  "ssh_url": "git@github.com:balents/lattice.git",
+  "clone_url": "https://github.com/balents/lattice.git",
+  "svn_url": "https://github.com/balents/lattice",
+  "homepage": null,
+  "size": 3,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

@@ -1,13 +1,16 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 301 Moved Permanently
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 02:01:40 GMT
+Date: Thu, 27 Apr 2017 18:00:26 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 168
+Status: 301 Moved Permanently
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3095
+X-RateLimit-Reset: 1493318926
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo_deployment, write:repo_hook
+Location: https://api.github.com/repositories/50229682
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +18,12 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E83D:0710:4D8B029:5CC246C:58C35A83
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 939F:6634:134445B:18E7786:590231BA
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "message": "Moved Permanently",
+  "url": "https://api.github.com/repositories/50229682",
+  "documentation_url": "https://developer.github.com/v3/#http-redirects"
 }

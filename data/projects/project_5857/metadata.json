@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:55:39 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5728
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4640
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "daf3f3302cbdf9ea020c98c5e2b9094c"
+Last-Modified: Thu, 26 Jan 2017 02:58:13 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 9e60649f02cd840ee8baa9960690f79f
+X-GitHub-Request-Id: D05F:6631:8B9A71:B4459D:59023EAB
+
+{
+  "id": 42469108,
+  "name": "ConicNonlinearBridge.jl",
+  "full_name": "mlubin/ConicNonlinearBridge.jl",
+  "owner": {
+    "login": "mlubin",
+    "id": 1733683,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1733683?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mlubin",
+    "html_url": "https://github.com/mlubin",
+    "followers_url": "https://api.github.com/users/mlubin/followers",
+    "following_url": "https://api.github.com/users/mlubin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mlubin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mlubin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mlubin/subscriptions",
+    "organizations_url": "https://api.github.com/users/mlubin/orgs",
+    "repos_url": "https://api.github.com/users/mlubin/repos",
+    "events_url": "https://api.github.com/users/mlubin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mlubin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mlubin/ConicNonlinearBridge.jl",
+  "description": "MathProgBase wrapper to solve conic optimization problems with derivative-based nonlinear solvers",
+  "fork": false,
+  "url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl",
+  "forks_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/forks",
+  "keys_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/events",
+  "assignees_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/merges",
+  "archive_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mlubin/ConicNonlinearBridge.jl/deployments",
+  "created_at": "2015-09-14T18:37:24Z",
+  "updated_at": "2017-01-26T02:58:13Z",
+  "pushed_at": "2017-03-24T04:11:01Z",
+  "git_url": "git://github.com/mlubin/ConicNonlinearBridge.jl.git",
+  "ssh_url": "git@github.com:mlubin/ConicNonlinearBridge.jl.git",
+  "clone_url": "https://github.com/mlubin/ConicNonlinearBridge.jl.git",
+  "svn_url": "https://github.com/mlubin/ConicNonlinearBridge.jl",
+  "homepage": "",
+  "size": 31,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 2,
+  "open_issues": 1,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 2
+}

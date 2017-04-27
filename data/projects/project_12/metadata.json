@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:25:57 GMT
+Date: Thu, 27 Apr 2017 17:58:51 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 7211
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3523
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "79b12203a87097dd8b185bc96901f584"
+Last-Modified: Thu, 29 Sep 2016 14:34:40 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 48
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CC6C:070F:2BB086A:3422D7B:58C33605
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: A87C:6631:86195A:AD3485:5902315B
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 69576022,
+  "name": "InteractiveControlPlots.jl",
+  "full_name": "JuliaControl/InteractiveControlPlots.jl",
+  "owner": {
+    "login": "JuliaControl",
+    "id": 10605979,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/10605979?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaControl",
+    "html_url": "https://github.com/JuliaControl",
+    "followers_url": "https://api.github.com/users/JuliaControl/followers",
+    "following_url": "https://api.github.com/users/JuliaControl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaControl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaControl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaControl/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaControl/orgs",
+    "repos_url": "https://api.github.com/users/JuliaControl/repos",
+    "events_url": "https://api.github.com/users/JuliaControl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaControl/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaControl/InteractiveControlPlots.jl",
+  "description": "Collection of interactive examples of control plots",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl",
+  "forks_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaControl/InteractiveControlPlots.jl/deployments",
+  "created_at": "2016-09-29T14:33:38Z",
+  "updated_at": "2016-09-29T14:34:40Z",
+  "pushed_at": "2016-09-29T14:34:39Z",
+  "git_url": "git://github.com/JuliaControl/InteractiveControlPlots.jl.git",
+  "ssh_url": "git@github.com:JuliaControl/InteractiveControlPlots.jl.git",
+  "clone_url": "https://github.com/JuliaControl/InteractiveControlPlots.jl.git",
+  "svn_url": "https://github.com/JuliaControl/InteractiveControlPlots.jl",
+  "homepage": null,
+  "size": 6,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaControl",
+    "id": 10605979,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/10605979?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaControl",
+    "html_url": "https://github.com/JuliaControl",
+    "followers_url": "https://api.github.com/users/JuliaControl/followers",
+    "following_url": "https://api.github.com/users/JuliaControl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaControl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaControl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaControl/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaControl/orgs",
+    "repos_url": "https://api.github.com/users/JuliaControl/repos",
+    "events_url": "https://api.github.com/users/JuliaControl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaControl/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

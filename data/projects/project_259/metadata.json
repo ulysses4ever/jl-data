@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:10:55 GMT
+Date: Thu, 27 Apr 2017 17:59:37 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5615
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3294
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "20989e14487ff20b8d5f83f3954cfba8"
+Last-Modified: Tue, 31 May 2016 19:42:26 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D16C:0712:7229D24:88E5818:58C3408F
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 9DDE:6634:1342031:18E4792:59023189
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 60117794,
+  "name": "PortfolioMonitor",
+  "full_name": "WilCrofter/PortfolioMonitor",
+  "owner": {
+    "login": "WilCrofter",
+    "id": 2634813,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/2634813?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/WilCrofter",
+    "html_url": "https://github.com/WilCrofter",
+    "followers_url": "https://api.github.com/users/WilCrofter/followers",
+    "following_url": "https://api.github.com/users/WilCrofter/following{/other_user}",
+    "gists_url": "https://api.github.com/users/WilCrofter/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/WilCrofter/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/WilCrofter/subscriptions",
+    "organizations_url": "https://api.github.com/users/WilCrofter/orgs",
+    "repos_url": "https://api.github.com/users/WilCrofter/repos",
+    "events_url": "https://api.github.com/users/WilCrofter/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/WilCrofter/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/WilCrofter/PortfolioMonitor",
+  "description": "Port of custom R functionality to Julia with possible API extensions.",
+  "fork": false,
+  "url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor",
+  "forks_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/forks",
+  "keys_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/teams",
+  "hooks_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/hooks",
+  "issue_events_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/events",
+  "assignees_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/tags",
+  "blobs_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/languages",
+  "stargazers_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/stargazers",
+  "contributors_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/contributors",
+  "subscribers_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/subscribers",
+  "subscription_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/subscription",
+  "commits_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/merges",
+  "archive_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/downloads",
+  "issues_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/labels{/name}",
+  "releases_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/WilCrofter/PortfolioMonitor/deployments",
+  "created_at": "2016-05-31T19:34:09Z",
+  "updated_at": "2016-05-31T19:42:26Z",
+  "pushed_at": "2016-06-04T18:08:04Z",
+  "git_url": "git://github.com/WilCrofter/PortfolioMonitor.git",
+  "ssh_url": "git@github.com:WilCrofter/PortfolioMonitor.git",
+  "clone_url": "https://github.com/WilCrofter/PortfolioMonitor.git",
+  "svn_url": "https://github.com/WilCrofter/PortfolioMonitor",
+  "homepage": null,
+  "size": 11,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": false,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 0,
+  "open_issues": 3,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 3
 }

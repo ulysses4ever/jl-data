@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:20:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5165
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 529
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "6c844a4c32f6ce3f333d40097b23abb0"
+Last-Modified: Sun, 27 Mar 2016 12:58:01 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: 6FB8:6637:136CDF0:1912D94:59023650
+
+{
+  "id": 15647688,
+  "name": "C45.jl",
+  "full_name": "smitty1110/C45.jl",
+  "owner": {
+    "login": "smitty1110",
+    "id": 6321784,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6321784?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/smitty1110",
+    "html_url": "https://github.com/smitty1110",
+    "followers_url": "https://api.github.com/users/smitty1110/followers",
+    "following_url": "https://api.github.com/users/smitty1110/following{/other_user}",
+    "gists_url": "https://api.github.com/users/smitty1110/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/smitty1110/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/smitty1110/subscriptions",
+    "organizations_url": "https://api.github.com/users/smitty1110/orgs",
+    "repos_url": "https://api.github.com/users/smitty1110/repos",
+    "events_url": "https://api.github.com/users/smitty1110/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/smitty1110/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/smitty1110/C45.jl",
+  "description": "A Julia implementation of the C4.5 decision tree algorithm.",
+  "fork": false,
+  "url": "https://api.github.com/repos/smitty1110/C45.jl",
+  "forks_url": "https://api.github.com/repos/smitty1110/C45.jl/forks",
+  "keys_url": "https://api.github.com/repos/smitty1110/C45.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/smitty1110/C45.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/smitty1110/C45.jl/teams",
+  "hooks_url": "https://api.github.com/repos/smitty1110/C45.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/smitty1110/C45.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/smitty1110/C45.jl/events",
+  "assignees_url": "https://api.github.com/repos/smitty1110/C45.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/smitty1110/C45.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/smitty1110/C45.jl/tags",
+  "blobs_url": "https://api.github.com/repos/smitty1110/C45.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/smitty1110/C45.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/smitty1110/C45.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/smitty1110/C45.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/smitty1110/C45.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/smitty1110/C45.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/smitty1110/C45.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/smitty1110/C45.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/smitty1110/C45.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/smitty1110/C45.jl/subscription",
+  "commits_url": "https://api.github.com/repos/smitty1110/C45.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/smitty1110/C45.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/smitty1110/C45.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/smitty1110/C45.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/smitty1110/C45.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/smitty1110/C45.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/smitty1110/C45.jl/merges",
+  "archive_url": "https://api.github.com/repos/smitty1110/C45.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/smitty1110/C45.jl/downloads",
+  "issues_url": "https://api.github.com/repos/smitty1110/C45.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/smitty1110/C45.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/smitty1110/C45.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/smitty1110/C45.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/smitty1110/C45.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/smitty1110/C45.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/smitty1110/C45.jl/deployments",
+  "created_at": "2014-01-05T08:02:46Z",
+  "updated_at": "2016-03-27T12:58:01Z",
+  "pushed_at": "2014-01-12T02:37:26Z",
+  "git_url": "git://github.com/smitty1110/C45.jl.git",
+  "ssh_url": "git@github.com:smitty1110/C45.jl.git",
+  "clone_url": "https://github.com/smitty1110/C45.jl.git",
+  "svn_url": "https://github.com/smitty1110/C45.jl",
+  "homepage": null,
+  "size": 160,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

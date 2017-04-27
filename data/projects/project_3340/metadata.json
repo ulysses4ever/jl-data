@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:21:17 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5908
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 387
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "ccb240d5bc9f34a87755826f0b0af02a"
+Last-Modified: Fri, 20 Nov 2015 04:46:43 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 0676:6631:8847F2:B002FC:5902369D
+
+{
+  "id": 46538366,
+  "name": "MagneticFieldSources.jl",
+  "full_name": "haymeister/MagneticFieldSources.jl",
+  "owner": {
+    "login": "haymeister",
+    "id": 3585726,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/3585726?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/haymeister",
+    "html_url": "https://github.com/haymeister",
+    "followers_url": "https://api.github.com/users/haymeister/followers",
+    "following_url": "https://api.github.com/users/haymeister/following{/other_user}",
+    "gists_url": "https://api.github.com/users/haymeister/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/haymeister/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/haymeister/subscriptions",
+    "organizations_url": "https://api.github.com/users/haymeister/orgs",
+    "repos_url": "https://api.github.com/users/haymeister/repos",
+    "events_url": "https://api.github.com/users/haymeister/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/haymeister/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/haymeister/MagneticFieldSources.jl",
+  "description": "A Julia module for modeling basic magnetic field sources",
+  "fork": false,
+  "url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl",
+  "forks_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/forks",
+  "keys_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/teams",
+  "hooks_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/events",
+  "assignees_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/tags",
+  "blobs_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/subscription",
+  "commits_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/merges",
+  "archive_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/downloads",
+  "issues_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/haymeister/MagneticFieldSources.jl/deployments",
+  "created_at": "2015-11-20T04:05:06Z",
+  "updated_at": "2015-11-20T04:46:43Z",
+  "pushed_at": "2015-12-03T04:46:27Z",
+  "git_url": "git://github.com/haymeister/MagneticFieldSources.jl.git",
+  "ssh_url": "git@github.com:haymeister/MagneticFieldSources.jl.git",
+  "clone_url": "https://github.com/haymeister/MagneticFieldSources.jl.git",
+  "svn_url": "https://github.com/haymeister/MagneticFieldSources.jl",
+  "homepage": null,
+  "size": 6,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

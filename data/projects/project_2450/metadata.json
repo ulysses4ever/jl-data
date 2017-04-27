@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:11:39 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4779
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1244
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a0cc08c2d467ed4ef9606da977694abc"
+Last-Modified: Sat, 09 Apr 2016 12:55:29 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 7011:6633:DEE0A6:120916B:5902345B
+
+{
+  "id": 5962921,
+  "name": "jolo",
+  "full_name": "albop/jolo",
+  "owner": {
+    "login": "albop",
+    "id": 276777,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/276777?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/albop",
+    "html_url": "https://github.com/albop",
+    "followers_url": "https://api.github.com/users/albop/followers",
+    "following_url": "https://api.github.com/users/albop/following{/other_user}",
+    "gists_url": "https://api.github.com/users/albop/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/albop/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/albop/subscriptions",
+    "organizations_url": "https://api.github.com/users/albop/orgs",
+    "repos_url": "https://api.github.com/users/albop/repos",
+    "events_url": "https://api.github.com/users/albop/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/albop/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/albop/jolo",
+  "description": "Experimental Julia tools for dsge models",
+  "fork": false,
+  "url": "https://api.github.com/repos/albop/jolo",
+  "forks_url": "https://api.github.com/repos/albop/jolo/forks",
+  "keys_url": "https://api.github.com/repos/albop/jolo/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/albop/jolo/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/albop/jolo/teams",
+  "hooks_url": "https://api.github.com/repos/albop/jolo/hooks",
+  "issue_events_url": "https://api.github.com/repos/albop/jolo/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/albop/jolo/events",
+  "assignees_url": "https://api.github.com/repos/albop/jolo/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/albop/jolo/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/albop/jolo/tags",
+  "blobs_url": "https://api.github.com/repos/albop/jolo/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/albop/jolo/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/albop/jolo/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/albop/jolo/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/albop/jolo/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/albop/jolo/languages",
+  "stargazers_url": "https://api.github.com/repos/albop/jolo/stargazers",
+  "contributors_url": "https://api.github.com/repos/albop/jolo/contributors",
+  "subscribers_url": "https://api.github.com/repos/albop/jolo/subscribers",
+  "subscription_url": "https://api.github.com/repos/albop/jolo/subscription",
+  "commits_url": "https://api.github.com/repos/albop/jolo/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/albop/jolo/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/albop/jolo/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/albop/jolo/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/albop/jolo/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/albop/jolo/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/albop/jolo/merges",
+  "archive_url": "https://api.github.com/repos/albop/jolo/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/albop/jolo/downloads",
+  "issues_url": "https://api.github.com/repos/albop/jolo/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/albop/jolo/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/albop/jolo/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/albop/jolo/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/albop/jolo/labels{/name}",
+  "releases_url": "https://api.github.com/repos/albop/jolo/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/albop/jolo/deployments",
+  "created_at": "2012-09-26T08:23:44Z",
+  "updated_at": "2016-04-09T12:55:29Z",
+  "pushed_at": "2013-09-09T10:15:33Z",
+  "git_url": "git://github.com/albop/jolo.git",
+  "ssh_url": "git@github.com:albop/jolo.git",
+  "clone_url": "https://github.com/albop/jolo.git",
+  "svn_url": "https://github.com/albop/jolo",
+  "homepage": null,
+  "size": 96,
+  "stargazers_count": 3,
+  "watchers_count": 3,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 3,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 1
+}

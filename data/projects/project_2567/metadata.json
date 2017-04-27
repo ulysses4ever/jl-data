@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:12:50 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5129
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1130
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "e2144888f35a3cf5a6a25b115d47f10a"
+Last-Modified: Sat, 01 Oct 2016 14:01:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 76D9:6637:1357AF5:18F76DF:590234A2
+
+{
+  "id": 12405922,
+  "name": "JuliaCMAES",
+  "full_name": "Staross/JuliaCMAES",
+  "owner": {
+    "login": "Staross",
+    "id": 2781392,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/2781392?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Staross",
+    "html_url": "https://github.com/Staross",
+    "followers_url": "https://api.github.com/users/Staross/followers",
+    "following_url": "https://api.github.com/users/Staross/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Staross/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Staross/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Staross/subscriptions",
+    "organizations_url": "https://api.github.com/users/Staross/orgs",
+    "repos_url": "https://api.github.com/users/Staross/repos",
+    "events_url": "https://api.github.com/users/Staross/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Staross/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/Staross/JuliaCMAES",
+  "description": "CMAES for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/Staross/JuliaCMAES",
+  "forks_url": "https://api.github.com/repos/Staross/JuliaCMAES/forks",
+  "keys_url": "https://api.github.com/repos/Staross/JuliaCMAES/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/Staross/JuliaCMAES/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/Staross/JuliaCMAES/teams",
+  "hooks_url": "https://api.github.com/repos/Staross/JuliaCMAES/hooks",
+  "issue_events_url": "https://api.github.com/repos/Staross/JuliaCMAES/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/Staross/JuliaCMAES/events",
+  "assignees_url": "https://api.github.com/repos/Staross/JuliaCMAES/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/Staross/JuliaCMAES/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/Staross/JuliaCMAES/tags",
+  "blobs_url": "https://api.github.com/repos/Staross/JuliaCMAES/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/Staross/JuliaCMAES/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/Staross/JuliaCMAES/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/Staross/JuliaCMAES/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/Staross/JuliaCMAES/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/Staross/JuliaCMAES/languages",
+  "stargazers_url": "https://api.github.com/repos/Staross/JuliaCMAES/stargazers",
+  "contributors_url": "https://api.github.com/repos/Staross/JuliaCMAES/contributors",
+  "subscribers_url": "https://api.github.com/repos/Staross/JuliaCMAES/subscribers",
+  "subscription_url": "https://api.github.com/repos/Staross/JuliaCMAES/subscription",
+  "commits_url": "https://api.github.com/repos/Staross/JuliaCMAES/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/Staross/JuliaCMAES/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/Staross/JuliaCMAES/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/Staross/JuliaCMAES/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/Staross/JuliaCMAES/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/Staross/JuliaCMAES/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/Staross/JuliaCMAES/merges",
+  "archive_url": "https://api.github.com/repos/Staross/JuliaCMAES/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/Staross/JuliaCMAES/downloads",
+  "issues_url": "https://api.github.com/repos/Staross/JuliaCMAES/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/Staross/JuliaCMAES/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/Staross/JuliaCMAES/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/Staross/JuliaCMAES/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/Staross/JuliaCMAES/labels{/name}",
+  "releases_url": "https://api.github.com/repos/Staross/JuliaCMAES/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/Staross/JuliaCMAES/deployments",
+  "created_at": "2013-08-27T12:52:29Z",
+  "updated_at": "2016-10-01T14:01:44Z",
+  "pushed_at": "2016-10-03T13:37:42Z",
+  "git_url": "git://github.com/Staross/JuliaCMAES.git",
+  "ssh_url": "git@github.com:Staross/JuliaCMAES.git",
+  "clone_url": "https://github.com/Staross/JuliaCMAES.git",
+  "svn_url": "https://github.com/Staross/JuliaCMAES",
+  "homepage": "",
+  "size": 13,
+  "stargazers_count": 5,
+  "watchers_count": 5,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 2,
+  "open_issues": 1,
+  "watchers": 5,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 2
+}

@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:03 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6429
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2027
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "588cc419e471b2310011da7e25c7a573"
+Last-Modified: Fri, 21 Apr 2017 09:15:57 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 7D29:6631:86DC17:AE2DDC:5902330B
+
+{
+  "id": 51617057,
+  "name": "MLDataUtils.jl",
+  "full_name": "JuliaML/MLDataUtils.jl",
+  "owner": {
+    "login": "JuliaML",
+    "id": 15799035,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/15799035?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaML",
+    "html_url": "https://github.com/JuliaML",
+    "followers_url": "https://api.github.com/users/JuliaML/followers",
+    "following_url": "https://api.github.com/users/JuliaML/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaML/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaML/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaML/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaML/orgs",
+    "repos_url": "https://api.github.com/users/JuliaML/repos",
+    "events_url": "https://api.github.com/users/JuliaML/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaML/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaML/MLDataUtils.jl",
+  "description": " Utility package for generating, loading, splitting, and processing Machine Learning datasets",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl",
+  "forks_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaML/MLDataUtils.jl/deployments",
+  "created_at": "2016-02-12T21:17:27Z",
+  "updated_at": "2017-04-21T09:15:57Z",
+  "pushed_at": "2017-04-27T08:49:53Z",
+  "git_url": "git://github.com/JuliaML/MLDataUtils.jl.git",
+  "ssh_url": "git@github.com:JuliaML/MLDataUtils.jl.git",
+  "clone_url": "https://github.com/JuliaML/MLDataUtils.jl.git",
+  "svn_url": "https://github.com/JuliaML/MLDataUtils.jl",
+  "homepage": "http://mldatautilsjl.readthedocs.io/",
+  "size": 406,
+  "stargazers_count": 14,
+  "watchers_count": 14,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 9,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 9,
+  "open_issues": 4,
+  "watchers": 14,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaML",
+    "id": 15799035,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/15799035?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaML",
+    "html_url": "https://github.com/JuliaML",
+    "followers_url": "https://api.github.com/users/JuliaML/followers",
+    "following_url": "https://api.github.com/users/JuliaML/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaML/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaML/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaML/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaML/orgs",
+    "repos_url": "https://api.github.com/users/JuliaML/repos",
+    "events_url": "https://api.github.com/users/JuliaML/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaML/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 9,
+  "subscribers_count": 8
+}

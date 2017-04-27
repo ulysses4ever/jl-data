@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:53 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5139
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1520
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "37f442db1ba9bc61f5de81692eb89e0b"
+Last-Modified: Sat, 18 Feb 2017 23:12:50 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 13d09b732ebe76f892093130dc088652
+X-GitHub-Request-Id: A419:6634:135C2AD:19062CB:590233B5
+
+{
+  "id": 27005518,
+  "name": "NaNMath.jl",
+  "full_name": "mlubin/NaNMath.jl",
+  "owner": {
+    "login": "mlubin",
+    "id": 1733683,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1733683?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/mlubin",
+    "html_url": "https://github.com/mlubin",
+    "followers_url": "https://api.github.com/users/mlubin/followers",
+    "following_url": "https://api.github.com/users/mlubin/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mlubin/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mlubin/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mlubin/subscriptions",
+    "organizations_url": "https://api.github.com/users/mlubin/orgs",
+    "repos_url": "https://api.github.com/users/mlubin/repos",
+    "events_url": "https://api.github.com/users/mlubin/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mlubin/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/mlubin/NaNMath.jl",
+  "description": "Julia math built-ins which return NaN and accumulator functions which ignore NaN",
+  "fork": false,
+  "url": "https://api.github.com/repos/mlubin/NaNMath.jl",
+  "forks_url": "https://api.github.com/repos/mlubin/NaNMath.jl/forks",
+  "keys_url": "https://api.github.com/repos/mlubin/NaNMath.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mlubin/NaNMath.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mlubin/NaNMath.jl/teams",
+  "hooks_url": "https://api.github.com/repos/mlubin/NaNMath.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/mlubin/NaNMath.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mlubin/NaNMath.jl/events",
+  "assignees_url": "https://api.github.com/repos/mlubin/NaNMath.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mlubin/NaNMath.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mlubin/NaNMath.jl/tags",
+  "blobs_url": "https://api.github.com/repos/mlubin/NaNMath.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mlubin/NaNMath.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mlubin/NaNMath.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mlubin/NaNMath.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mlubin/NaNMath.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mlubin/NaNMath.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/mlubin/NaNMath.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/mlubin/NaNMath.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/mlubin/NaNMath.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/mlubin/NaNMath.jl/subscription",
+  "commits_url": "https://api.github.com/repos/mlubin/NaNMath.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mlubin/NaNMath.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mlubin/NaNMath.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mlubin/NaNMath.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mlubin/NaNMath.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mlubin/NaNMath.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mlubin/NaNMath.jl/merges",
+  "archive_url": "https://api.github.com/repos/mlubin/NaNMath.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mlubin/NaNMath.jl/downloads",
+  "issues_url": "https://api.github.com/repos/mlubin/NaNMath.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mlubin/NaNMath.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mlubin/NaNMath.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mlubin/NaNMath.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mlubin/NaNMath.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mlubin/NaNMath.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mlubin/NaNMath.jl/deployments",
+  "created_at": "2014-11-22T16:56:17Z",
+  "updated_at": "2017-02-18T23:12:50Z",
+  "pushed_at": "2017-03-24T22:54:24Z",
+  "git_url": "git://github.com/mlubin/NaNMath.jl.git",
+  "ssh_url": "git@github.com:mlubin/NaNMath.jl.git",
+  "clone_url": "https://github.com/mlubin/NaNMath.jl.git",
+  "svn_url": "https://github.com/mlubin/NaNMath.jl",
+  "homepage": "",
+  "size": 18,
+  "stargazers_count": 3,
+  "watchers_count": 3,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 8,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 8,
+  "open_issues": 0,
+  "watchers": 3,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 8,
+  "subscribers_count": 2
+}

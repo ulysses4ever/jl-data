@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:19:14 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5050
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 614
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "6301227057939d3cf7c7f3337fad0957"
+Last-Modified: Sun, 17 Apr 2016 20:45:39 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 3417:6637:136AB76:190FFDB:59023622
+
+{
+  "id": 56457551,
+  "name": "Babi.jl",
+  "full_name": "thomlake/Babi.jl",
+  "owner": {
+    "login": "thomlake",
+    "id": 404526,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/404526?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/thomlake",
+    "html_url": "https://github.com/thomlake",
+    "followers_url": "https://api.github.com/users/thomlake/followers",
+    "following_url": "https://api.github.com/users/thomlake/following{/other_user}",
+    "gists_url": "https://api.github.com/users/thomlake/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/thomlake/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/thomlake/subscriptions",
+    "organizations_url": "https://api.github.com/users/thomlake/orgs",
+    "repos_url": "https://api.github.com/users/thomlake/repos",
+    "events_url": "https://api.github.com/users/thomlake/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/thomlake/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/thomlake/Babi.jl",
+  "description": "bAbI utilities",
+  "fork": false,
+  "url": "https://api.github.com/repos/thomlake/Babi.jl",
+  "forks_url": "https://api.github.com/repos/thomlake/Babi.jl/forks",
+  "keys_url": "https://api.github.com/repos/thomlake/Babi.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/thomlake/Babi.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/thomlake/Babi.jl/teams",
+  "hooks_url": "https://api.github.com/repos/thomlake/Babi.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/thomlake/Babi.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/thomlake/Babi.jl/events",
+  "assignees_url": "https://api.github.com/repos/thomlake/Babi.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/thomlake/Babi.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/thomlake/Babi.jl/tags",
+  "blobs_url": "https://api.github.com/repos/thomlake/Babi.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/thomlake/Babi.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/thomlake/Babi.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/thomlake/Babi.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/thomlake/Babi.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/thomlake/Babi.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/thomlake/Babi.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/thomlake/Babi.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/thomlake/Babi.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/thomlake/Babi.jl/subscription",
+  "commits_url": "https://api.github.com/repos/thomlake/Babi.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/thomlake/Babi.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/thomlake/Babi.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/thomlake/Babi.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/thomlake/Babi.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/thomlake/Babi.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/thomlake/Babi.jl/merges",
+  "archive_url": "https://api.github.com/repos/thomlake/Babi.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/thomlake/Babi.jl/downloads",
+  "issues_url": "https://api.github.com/repos/thomlake/Babi.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/thomlake/Babi.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/thomlake/Babi.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/thomlake/Babi.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/thomlake/Babi.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/thomlake/Babi.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/thomlake/Babi.jl/deployments",
+  "created_at": "2016-04-17T20:43:43Z",
+  "updated_at": "2016-04-17T20:45:39Z",
+  "pushed_at": "2016-05-29T17:09:45Z",
+  "git_url": "git://github.com/thomlake/Babi.jl.git",
+  "ssh_url": "git@github.com:thomlake/Babi.jl.git",
+  "clone_url": "https://github.com/thomlake/Babi.jl.git",
+  "svn_url": "https://github.com/thomlake/Babi.jl",
+  "homepage": "",
+  "size": 512,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

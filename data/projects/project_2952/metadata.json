@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:17:22 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5577
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 758
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "c1e55d29edb7c5e449cb366a12f50cac"
+Last-Modified: Sat, 15 Apr 2017 12:50:13 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 46F3:6637:136599A:1909400:590235B2
+
+{
+  "id": 7292020,
+  "name": "Calculus.jl",
+  "full_name": "johnmyleswhite/Calculus.jl",
+  "owner": {
+    "login": "johnmyleswhite",
+    "id": 22064,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/22064?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/johnmyleswhite",
+    "html_url": "https://github.com/johnmyleswhite",
+    "followers_url": "https://api.github.com/users/johnmyleswhite/followers",
+    "following_url": "https://api.github.com/users/johnmyleswhite/following{/other_user}",
+    "gists_url": "https://api.github.com/users/johnmyleswhite/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/johnmyleswhite/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/johnmyleswhite/subscriptions",
+    "organizations_url": "https://api.github.com/users/johnmyleswhite/orgs",
+    "repos_url": "https://api.github.com/users/johnmyleswhite/repos",
+    "events_url": "https://api.github.com/users/johnmyleswhite/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/johnmyleswhite/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/johnmyleswhite/Calculus.jl",
+  "description": "Calculus functions in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl",
+  "forks_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/forks",
+  "keys_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/teams",
+  "hooks_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/events",
+  "assignees_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/tags",
+  "blobs_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/subscription",
+  "commits_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/merges",
+  "archive_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/downloads",
+  "issues_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/johnmyleswhite/Calculus.jl/deployments",
+  "created_at": "2012-12-23T05:10:19Z",
+  "updated_at": "2017-04-15T12:50:13Z",
+  "pushed_at": "2017-04-27T16:13:57Z",
+  "git_url": "git://github.com/johnmyleswhite/Calculus.jl.git",
+  "ssh_url": "git@github.com:johnmyleswhite/Calculus.jl.git",
+  "clone_url": "https://github.com/johnmyleswhite/Calculus.jl.git",
+  "svn_url": "https://github.com/johnmyleswhite/Calculus.jl",
+  "homepage": null,
+  "size": 137,
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 46,
+  "mirror_url": null,
+  "open_issues_count": 21,
+  "forks": 46,
+  "open_issues": 21,
+  "watchers": 80,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 46,
+  "subscribers_count": 15
+}

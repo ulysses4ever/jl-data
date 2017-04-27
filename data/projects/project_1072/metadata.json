@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:02:58 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5360
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2568
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "d6038945d675bc0fe2c2d4b390883988"
+Last-Modified: Wed, 04 Nov 2015 13:29:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: a7f8a126c9ed3f1c4715a34c0ddc7290
+X-GitHub-Request-Id: 9E9E:6631:868AB5:ADC6A4:59023252
+
+{
+  "id": 45540711,
+  "name": "DigitSets.jl",
+  "full_name": "jwmerrill/DigitSets.jl",
+  "owner": {
+    "login": "jwmerrill",
+    "id": 48409,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/48409?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jwmerrill",
+    "html_url": "https://github.com/jwmerrill",
+    "followers_url": "https://api.github.com/users/jwmerrill/followers",
+    "following_url": "https://api.github.com/users/jwmerrill/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jwmerrill/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jwmerrill/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jwmerrill/subscriptions",
+    "organizations_url": "https://api.github.com/users/jwmerrill/orgs",
+    "repos_url": "https://api.github.com/users/jwmerrill/repos",
+    "events_url": "https://api.github.com/users/jwmerrill/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jwmerrill/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jwmerrill/DigitSets.jl",
+  "description": "Represent a set of digits with an immutable bitmask",
+  "fork": false,
+  "url": "https://api.github.com/repos/jwmerrill/DigitSets.jl",
+  "forks_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/forks",
+  "keys_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/events",
+  "assignees_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/merges",
+  "archive_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jwmerrill/DigitSets.jl/deployments",
+  "created_at": "2015-11-04T13:29:37Z",
+  "updated_at": "2015-11-04T13:29:44Z",
+  "pushed_at": "2015-11-16T17:58:31Z",
+  "git_url": "git://github.com/jwmerrill/DigitSets.jl.git",
+  "ssh_url": "git@github.com:jwmerrill/DigitSets.jl.git",
+  "clone_url": "https://github.com/jwmerrill/DigitSets.jl.git",
+  "svn_url": "https://github.com/jwmerrill/DigitSets.jl",
+  "homepage": null,
+  "size": 6,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

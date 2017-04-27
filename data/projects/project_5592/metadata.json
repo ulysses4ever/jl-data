@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:51:21 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5491
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4884
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "9ef41d8785786e9032d78d0a7959358b"
+Last-Modified: Sun, 05 Jun 2016 09:02:29 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 46808ddc41c302090177e58148908b23
+X-GitHub-Request-Id: 5084:6633:E469F8:127BA2D:59023DA9
+
+{
+  "id": 47076210,
+  "name": "SimpleStructs.jl",
+  "full_name": "pluskid/SimpleStructs.jl",
+  "owner": {
+    "login": "pluskid",
+    "id": 3542,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/3542?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/pluskid",
+    "html_url": "https://github.com/pluskid",
+    "followers_url": "https://api.github.com/users/pluskid/followers",
+    "following_url": "https://api.github.com/users/pluskid/following{/other_user}",
+    "gists_url": "https://api.github.com/users/pluskid/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/pluskid/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/pluskid/subscriptions",
+    "organizations_url": "https://api.github.com/users/pluskid/orgs",
+    "repos_url": "https://api.github.com/users/pluskid/repos",
+    "events_url": "https://api.github.com/users/pluskid/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/pluskid/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/pluskid/SimpleStructs.jl",
+  "description": "Easy to use struct definition with defaults and value constraints, as well as auto-defined user-friendly constructors",
+  "fork": false,
+  "url": "https://api.github.com/repos/pluskid/SimpleStructs.jl",
+  "forks_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/forks",
+  "keys_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/teams",
+  "hooks_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/events",
+  "assignees_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/tags",
+  "blobs_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/subscription",
+  "commits_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/merges",
+  "archive_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/downloads",
+  "issues_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/pluskid/SimpleStructs.jl/deployments",
+  "created_at": "2015-11-29T19:06:59Z",
+  "updated_at": "2016-06-05T09:02:29Z",
+  "pushed_at": "2015-12-18T15:32:43Z",
+  "git_url": "git://github.com/pluskid/SimpleStructs.jl.git",
+  "ssh_url": "git@github.com:pluskid/SimpleStructs.jl.git",
+  "clone_url": "https://github.com/pluskid/SimpleStructs.jl.git",
+  "svn_url": "https://github.com/pluskid/SimpleStructs.jl",
+  "homepage": null,
+  "size": 16,
+  "stargazers_count": 6,
+  "watchers_count": 6,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 6,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 4
+}

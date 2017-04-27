@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:27 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5457
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1950
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "564d4ccc8bf4b6d4b9905da613b65c50"
+Last-Modified: Fri, 31 Oct 2014 15:41:36 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: d0b3c2c33a23690498aa8e70a435a259
+X-GitHub-Request-Id: 0A39:6633:DE2B4A:11FA746:59023323
+
+{
+  "id": 26022112,
+  "name": "julia_algs",
+  "full_name": "jakobjaderbo/julia_algs",
+  "owner": {
+    "login": "jakobjaderbo",
+    "id": 8696321,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/8696321?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jakobjaderbo",
+    "html_url": "https://github.com/jakobjaderbo",
+    "followers_url": "https://api.github.com/users/jakobjaderbo/followers",
+    "following_url": "https://api.github.com/users/jakobjaderbo/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jakobjaderbo/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jakobjaderbo/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jakobjaderbo/subscriptions",
+    "organizations_url": "https://api.github.com/users/jakobjaderbo/orgs",
+    "repos_url": "https://api.github.com/users/jakobjaderbo/repos",
+    "events_url": "https://api.github.com/users/jakobjaderbo/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jakobjaderbo/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jakobjaderbo/julia_algs",
+  "description": "Implementations of a few algorithms for data analysis with julia.",
+  "fork": false,
+  "url": "https://api.github.com/repos/jakobjaderbo/julia_algs",
+  "forks_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/forks",
+  "keys_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/teams",
+  "hooks_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/hooks",
+  "issue_events_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/events",
+  "assignees_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/tags",
+  "blobs_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/languages",
+  "stargazers_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/stargazers",
+  "contributors_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/contributors",
+  "subscribers_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/subscribers",
+  "subscription_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/subscription",
+  "commits_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/merges",
+  "archive_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/downloads",
+  "issues_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jakobjaderbo/julia_algs/deployments",
+  "created_at": "2014-10-31T15:41:27Z",
+  "updated_at": "2014-10-31T15:41:36Z",
+  "pushed_at": "2014-11-04T14:28:50Z",
+  "git_url": "git://github.com/jakobjaderbo/julia_algs.git",
+  "ssh_url": "git@github.com:jakobjaderbo/julia_algs.git",
+  "clone_url": "https://github.com/jakobjaderbo/julia_algs.git",
+  "svn_url": "https://github.com/jakobjaderbo/julia_algs",
+  "homepage": null,
+  "size": 128,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 0,
+  "open_issues": 4,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

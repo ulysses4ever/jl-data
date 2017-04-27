@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:30:30 GMT
+Date: Thu, 27 Apr 2017 17:59:08 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6985
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3427
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "658f2f38b4de5a3fd376d4d9a6302e89"
+Last-Modified: Wed, 17 Aug 2016 20:04:07 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DD85:0712:71BF2AD:8866C4B:58C33716
+Vary: Accept-Encoding
+X-Served-By: ef96c2e493b28ffea49b891b085ed2dd
+X-GitHub-Request-Id: A85A:6634:1340DE8:18E2F98:5902316C
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 65934032,
+  "name": "SemanticLabelingAlgorithm",
+  "full_name": "usc-isi-i2/SemanticLabelingAlgorithm",
+  "owner": {
+    "login": "usc-isi-i2",
+    "id": 1073160,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/1073160?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/usc-isi-i2",
+    "html_url": "https://github.com/usc-isi-i2",
+    "followers_url": "https://api.github.com/users/usc-isi-i2/followers",
+    "following_url": "https://api.github.com/users/usc-isi-i2/following{/other_user}",
+    "gists_url": "https://api.github.com/users/usc-isi-i2/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/usc-isi-i2/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/usc-isi-i2/subscriptions",
+    "organizations_url": "https://api.github.com/users/usc-isi-i2/orgs",
+    "repos_url": "https://api.github.com/users/usc-isi-i2/repos",
+    "events_url": "https://api.github.com/users/usc-isi-i2/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/usc-isi-i2/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/usc-isi-i2/SemanticLabelingAlgorithm",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm",
+  "forks_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/forks",
+  "keys_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/teams",
+  "hooks_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/hooks",
+  "issue_events_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/events",
+  "assignees_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/tags",
+  "blobs_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/languages",
+  "stargazers_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/stargazers",
+  "contributors_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/contributors",
+  "subscribers_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/subscribers",
+  "subscription_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/subscription",
+  "commits_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/merges",
+  "archive_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/downloads",
+  "issues_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/labels{/name}",
+  "releases_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/usc-isi-i2/SemanticLabelingAlgorithm/deployments",
+  "created_at": "2016-08-17T18:57:04Z",
+  "updated_at": "2016-08-17T20:04:07Z",
+  "pushed_at": "2016-08-17T22:55:08Z",
+  "git_url": "git://github.com/usc-isi-i2/SemanticLabelingAlgorithm.git",
+  "ssh_url": "git@github.com:usc-isi-i2/SemanticLabelingAlgorithm.git",
+  "clone_url": "https://github.com/usc-isi-i2/SemanticLabelingAlgorithm.git",
+  "svn_url": "https://github.com/usc-isi-i2/SemanticLabelingAlgorithm",
+  "homepage": null,
+  "size": 18893,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "usc-isi-i2",
+    "id": 1073160,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/1073160?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/usc-isi-i2",
+    "html_url": "https://github.com/usc-isi-i2",
+    "followers_url": "https://api.github.com/users/usc-isi-i2/followers",
+    "following_url": "https://api.github.com/users/usc-isi-i2/following{/other_user}",
+    "gists_url": "https://api.github.com/users/usc-isi-i2/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/usc-isi-i2/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/usc-isi-i2/subscriptions",
+    "organizations_url": "https://api.github.com/users/usc-isi-i2/orgs",
+    "repos_url": "https://api.github.com/users/usc-isi-i2/repos",
+    "events_url": "https://api.github.com/users/usc-isi-i2/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/usc-isi-i2/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 10
 }

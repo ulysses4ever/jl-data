@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:03:33 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5532
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2449
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "397c462a1d631f1491f58beb06486a83"
+Last-Modified: Sun, 13 Dec 2015 16:30:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 7f48e2f7761567e923121f17538d7a6d
+X-GitHub-Request-Id: 1E53:6631:869B2C:ADDB7F:59023275
+
+{
+  "id": 44421645,
+  "name": "MiscData.jl",
+  "full_name": "jamesfolberth/MiscData.jl",
+  "owner": {
+    "login": "jamesfolberth",
+    "id": 3261080,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/3261080?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jamesfolberth",
+    "html_url": "https://github.com/jamesfolberth",
+    "followers_url": "https://api.github.com/users/jamesfolberth/followers",
+    "following_url": "https://api.github.com/users/jamesfolberth/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jamesfolberth/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jamesfolberth/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jamesfolberth/subscriptions",
+    "organizations_url": "https://api.github.com/users/jamesfolberth/orgs",
+    "repos_url": "https://api.github.com/users/jamesfolberth/repos",
+    "events_url": "https://api.github.com/users/jamesfolberth/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jamesfolberth/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jamesfolberth/MiscData.jl",
+  "description": "Julia wrappers for miscellaneous datasets",
+  "fork": false,
+  "url": "https://api.github.com/repos/jamesfolberth/MiscData.jl",
+  "forks_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/forks",
+  "keys_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/events",
+  "assignees_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/merges",
+  "archive_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jamesfolberth/MiscData.jl/deployments",
+  "created_at": "2015-10-17T02:57:27Z",
+  "updated_at": "2015-12-13T16:30:58Z",
+  "pushed_at": "2015-11-02T19:37:17Z",
+  "git_url": "git://github.com/jamesfolberth/MiscData.jl.git",
+  "ssh_url": "git@github.com:jamesfolberth/MiscData.jl.git",
+  "clone_url": "https://github.com/jamesfolberth/MiscData.jl.git",
+  "svn_url": "https://github.com/jamesfolberth/MiscData.jl",
+  "homepage": null,
+  "size": 148,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

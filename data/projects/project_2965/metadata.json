@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:17:28 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5022
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 748
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "56b05d37574cd45936adb489b7fbbb4c"
+Last-Modified: Wed, 19 Apr 2017 01:45:16 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: ACB4:6633:DFA459:1218F83:590235B8
+
+{
+  "id": 6986835,
+  "name": "Rif.jl",
+  "full_name": "lgautier/Rif.jl",
+  "owner": {
+    "login": "lgautier",
+    "id": 650866,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/650866?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lgautier",
+    "html_url": "https://github.com/lgautier",
+    "followers_url": "https://api.github.com/users/lgautier/followers",
+    "following_url": "https://api.github.com/users/lgautier/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lgautier/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lgautier/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lgautier/subscriptions",
+    "organizations_url": "https://api.github.com/users/lgautier/orgs",
+    "repos_url": "https://api.github.com/users/lgautier/repos",
+    "events_url": "https://api.github.com/users/lgautier/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lgautier/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/lgautier/Rif.jl",
+  "description": "Julia-to-R interface",
+  "fork": false,
+  "url": "https://api.github.com/repos/lgautier/Rif.jl",
+  "forks_url": "https://api.github.com/repos/lgautier/Rif.jl/forks",
+  "keys_url": "https://api.github.com/repos/lgautier/Rif.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/lgautier/Rif.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/lgautier/Rif.jl/teams",
+  "hooks_url": "https://api.github.com/repos/lgautier/Rif.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/lgautier/Rif.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/lgautier/Rif.jl/events",
+  "assignees_url": "https://api.github.com/repos/lgautier/Rif.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/lgautier/Rif.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/lgautier/Rif.jl/tags",
+  "blobs_url": "https://api.github.com/repos/lgautier/Rif.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/lgautier/Rif.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/lgautier/Rif.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/lgautier/Rif.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/lgautier/Rif.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/lgautier/Rif.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/lgautier/Rif.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/lgautier/Rif.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/lgautier/Rif.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/lgautier/Rif.jl/subscription",
+  "commits_url": "https://api.github.com/repos/lgautier/Rif.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/lgautier/Rif.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/lgautier/Rif.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/lgautier/Rif.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/lgautier/Rif.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/lgautier/Rif.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/lgautier/Rif.jl/merges",
+  "archive_url": "https://api.github.com/repos/lgautier/Rif.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/lgautier/Rif.jl/downloads",
+  "issues_url": "https://api.github.com/repos/lgautier/Rif.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/lgautier/Rif.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/lgautier/Rif.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/lgautier/Rif.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/lgautier/Rif.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/lgautier/Rif.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/lgautier/Rif.jl/deployments",
+  "created_at": "2012-12-03T17:56:48Z",
+  "updated_at": "2017-04-19T01:45:16Z",
+  "pushed_at": "2016-08-20T19:50:11Z",
+  "git_url": "git://github.com/lgautier/Rif.jl.git",
+  "ssh_url": "git@github.com:lgautier/Rif.jl.git",
+  "clone_url": "https://github.com/lgautier/Rif.jl.git",
+  "svn_url": "https://github.com/lgautier/Rif.jl",
+  "homepage": null,
+  "size": 177,
+  "stargazers_count": 52,
+  "watchers_count": 52,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 20,
+  "mirror_url": null,
+  "open_issues_count": 10,
+  "forks": 20,
+  "open_issues": 10,
+  "watchers": 52,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 20,
+  "subscribers_count": 13
+}

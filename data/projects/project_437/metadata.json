@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:57:27 GMT
+Date: Thu, 27 Apr 2017 18:00:12 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5760
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3132
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "e6548d1476e7861d94b717d91863cd49"
+Last-Modified: Wed, 16 Nov 2016 04:42:03 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 2
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E793:0710:4D84E72:5CBAE92:58C35987
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: A013:6637:1332494:18C7570:590231AC
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55694865,
+  "name": "KernelDensityEstimate.jl",
+  "full_name": "dehann/KernelDensityEstimate.jl",
+  "owner": {
+    "login": "dehann",
+    "id": 6412556,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6412556?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dehann",
+    "html_url": "https://github.com/dehann",
+    "followers_url": "https://api.github.com/users/dehann/followers",
+    "following_url": "https://api.github.com/users/dehann/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dehann/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dehann/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dehann/subscriptions",
+    "organizations_url": "https://api.github.com/users/dehann/orgs",
+    "repos_url": "https://api.github.com/users/dehann/repos",
+    "events_url": "https://api.github.com/users/dehann/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dehann/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dehann/KernelDensityEstimate.jl",
+  "description": "Kernel Density Estimate with product approximation using multiscale Gibbs sampling",
+  "fork": false,
+  "url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl",
+  "forks_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/forks",
+  "keys_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/teams",
+  "hooks_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/events",
+  "assignees_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/tags",
+  "blobs_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/subscription",
+  "commits_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/merges",
+  "archive_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/downloads",
+  "issues_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dehann/KernelDensityEstimate.jl/deployments",
+  "created_at": "2016-04-07T13:00:34Z",
+  "updated_at": "2016-11-16T04:42:03Z",
+  "pushed_at": "2017-04-03T04:50:24Z",
+  "git_url": "git://github.com/dehann/KernelDensityEstimate.jl.git",
+  "ssh_url": "git@github.com:dehann/KernelDensityEstimate.jl.git",
+  "clone_url": "https://github.com/dehann/KernelDensityEstimate.jl.git",
+  "svn_url": "https://github.com/dehann/KernelDensityEstimate.jl",
+  "homepage": null,
+  "size": 415,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 6,
+  "forks": 2,
+  "open_issues": 6,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 1
 }

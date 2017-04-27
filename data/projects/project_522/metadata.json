@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:00:35 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6325
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3058
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7a2a37ab939354b2f05acc20131573ab"
+Last-Modified: Tue, 25 Apr 2017 16:56:53 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: A1F5:6633:DD566C:11E9750:590231C3
+
+{
+  "id": 23092530,
+  "name": "VLFeat.jl",
+  "full_name": "IHPSystems/VLFeat.jl",
+  "owner": {
+    "login": "IHPSystems",
+    "id": 4903214,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/4903214?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/IHPSystems",
+    "html_url": "https://github.com/IHPSystems",
+    "followers_url": "https://api.github.com/users/IHPSystems/followers",
+    "following_url": "https://api.github.com/users/IHPSystems/following{/other_user}",
+    "gists_url": "https://api.github.com/users/IHPSystems/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/IHPSystems/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/IHPSystems/subscriptions",
+    "organizations_url": "https://api.github.com/users/IHPSystems/orgs",
+    "repos_url": "https://api.github.com/users/IHPSystems/repos",
+    "events_url": "https://api.github.com/users/IHPSystems/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/IHPSystems/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/IHPSystems/VLFeat.jl",
+  "description": "Julia wrapper for the VLFeat computer vision library",
+  "fork": false,
+  "url": "https://api.github.com/repos/IHPSystems/VLFeat.jl",
+  "forks_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/forks",
+  "keys_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/teams",
+  "hooks_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/events",
+  "assignees_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/tags",
+  "blobs_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/subscription",
+  "commits_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/merges",
+  "archive_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/downloads",
+  "issues_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/IHPSystems/VLFeat.jl/deployments",
+  "created_at": "2014-08-19T01:30:45Z",
+  "updated_at": "2017-04-25T16:56:53Z",
+  "pushed_at": "2016-09-25T12:28:16Z",
+  "git_url": "git://github.com/IHPSystems/VLFeat.jl.git",
+  "ssh_url": "git@github.com:IHPSystems/VLFeat.jl.git",
+  "clone_url": "https://github.com/IHPSystems/VLFeat.jl.git",
+  "svn_url": "https://github.com/IHPSystems/VLFeat.jl",
+  "homepage": "",
+  "size": 68,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "IHPSystems",
+    "id": 4903214,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/4903214?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/IHPSystems",
+    "html_url": "https://github.com/IHPSystems",
+    "followers_url": "https://api.github.com/users/IHPSystems/followers",
+    "following_url": "https://api.github.com/users/IHPSystems/following{/other_user}",
+    "gists_url": "https://api.github.com/users/IHPSystems/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/IHPSystems/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/IHPSystems/subscriptions",
+    "organizations_url": "https://api.github.com/users/IHPSystems/orgs",
+    "repos_url": "https://api.github.com/users/IHPSystems/repos",
+    "events_url": "https://api.github.com/users/IHPSystems/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/IHPSystems/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 1,
+  "subscribers_count": 5
+}

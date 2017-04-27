@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:15 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6157
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1634
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "6f95eb5244292d5e0369d6dba3307898"
+Last-Modified: Wed, 05 Apr 2017 15:44:24 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 1e9204dbc0447a6f39c3b3c44d87b3f8
+X-GitHub-Request-Id: DAAE:6633:DE6BFA:11FF8E8:5902338F
+
+{
+  "id": 13529107,
+  "name": "CPLEX.jl",
+  "full_name": "JuliaOpt/CPLEX.jl",
+  "owner": {
+    "login": "JuliaOpt",
+    "id": 5667382,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/5667382?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaOpt",
+    "html_url": "https://github.com/JuliaOpt",
+    "followers_url": "https://api.github.com/users/JuliaOpt/followers",
+    "following_url": "https://api.github.com/users/JuliaOpt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaOpt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaOpt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaOpt/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaOpt/orgs",
+    "repos_url": "https://api.github.com/users/JuliaOpt/repos",
+    "events_url": "https://api.github.com/users/JuliaOpt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaOpt/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaOpt/CPLEX.jl",
+  "description": "Julia interface for the CPLEX optimization software",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl",
+  "forks_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaOpt/CPLEX.jl/deployments",
+  "created_at": "2013-10-12T21:13:03Z",
+  "updated_at": "2017-04-05T15:44:24Z",
+  "pushed_at": "2017-04-24T20:25:47Z",
+  "git_url": "git://github.com/JuliaOpt/CPLEX.jl.git",
+  "ssh_url": "git@github.com:JuliaOpt/CPLEX.jl.git",
+  "clone_url": "https://github.com/JuliaOpt/CPLEX.jl.git",
+  "svn_url": "https://github.com/JuliaOpt/CPLEX.jl",
+  "homepage": null,
+  "size": 359,
+  "stargazers_count": 14,
+  "watchers_count": 14,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 25,
+  "mirror_url": null,
+  "open_issues_count": 15,
+  "forks": 25,
+  "open_issues": 15,
+  "watchers": 14,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaOpt",
+    "id": 5667382,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/5667382?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaOpt",
+    "html_url": "https://github.com/JuliaOpt",
+    "followers_url": "https://api.github.com/users/JuliaOpt/followers",
+    "following_url": "https://api.github.com/users/JuliaOpt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaOpt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaOpt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaOpt/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaOpt/orgs",
+    "repos_url": "https://api.github.com/users/JuliaOpt/repos",
+    "events_url": "https://api.github.com/users/JuliaOpt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaOpt/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 25,
+  "subscribers_count": 9
+}

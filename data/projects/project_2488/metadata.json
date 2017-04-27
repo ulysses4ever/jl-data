@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:12:10 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4873
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1205
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "051a8eb5e805597d2ba3c1292103c827"
+Last-Modified: Sun, 13 Apr 2014 13:04:56 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: 466A:6631:87760A:AEF270:5902347A
+
+{
+  "id": 15661107,
+  "name": "GI.jl",
+  "full_name": "bfredl/GI.jl",
+  "owner": {
+    "login": "bfredl",
+    "id": 1363104,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1363104?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/bfredl",
+    "html_url": "https://github.com/bfredl",
+    "followers_url": "https://api.github.com/users/bfredl/followers",
+    "following_url": "https://api.github.com/users/bfredl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/bfredl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/bfredl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/bfredl/subscriptions",
+    "organizations_url": "https://api.github.com/users/bfredl/orgs",
+    "repos_url": "https://api.github.com/users/bfredl/repos",
+    "events_url": "https://api.github.com/users/bfredl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/bfredl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/bfredl/GI.jl",
+  "description": "GObject-introspection for julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/bfredl/GI.jl",
+  "forks_url": "https://api.github.com/repos/bfredl/GI.jl/forks",
+  "keys_url": "https://api.github.com/repos/bfredl/GI.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/bfredl/GI.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/bfredl/GI.jl/teams",
+  "hooks_url": "https://api.github.com/repos/bfredl/GI.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/bfredl/GI.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/bfredl/GI.jl/events",
+  "assignees_url": "https://api.github.com/repos/bfredl/GI.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/bfredl/GI.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/bfredl/GI.jl/tags",
+  "blobs_url": "https://api.github.com/repos/bfredl/GI.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/bfredl/GI.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/bfredl/GI.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/bfredl/GI.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/bfredl/GI.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/bfredl/GI.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/bfredl/GI.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/bfredl/GI.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/bfredl/GI.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/bfredl/GI.jl/subscription",
+  "commits_url": "https://api.github.com/repos/bfredl/GI.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/bfredl/GI.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/bfredl/GI.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/bfredl/GI.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/bfredl/GI.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/bfredl/GI.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/bfredl/GI.jl/merges",
+  "archive_url": "https://api.github.com/repos/bfredl/GI.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/bfredl/GI.jl/downloads",
+  "issues_url": "https://api.github.com/repos/bfredl/GI.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/bfredl/GI.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/bfredl/GI.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/bfredl/GI.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/bfredl/GI.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/bfredl/GI.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/bfredl/GI.jl/deployments",
+  "created_at": "2014-01-05T23:49:37Z",
+  "updated_at": "2014-04-13T13:04:56Z",
+  "pushed_at": "2014-04-13T13:04:55Z",
+  "git_url": "git://github.com/bfredl/GI.jl.git",
+  "ssh_url": "git@github.com:bfredl/GI.jl.git",
+  "clone_url": "https://github.com/bfredl/GI.jl.git",
+  "svn_url": "https://github.com/bfredl/GI.jl",
+  "homepage": null,
+  "size": 328,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

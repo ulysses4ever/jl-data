@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:52:02 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5436
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4842
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "f9d5823072a4b1c272215d3f8c186b8b"
+Last-Modified: Sat, 25 Mar 2017 01:54:30 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 084D:6634:13D7DE0:19A665E:59023DD2
+
+{
+  "id": 20580947,
+  "name": "Socrata.jl",
+  "full_name": "drewgendreau/Socrata.jl",
+  "owner": {
+    "login": "drewgendreau",
+    "id": 5003237,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/5003237?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/drewgendreau",
+    "html_url": "https://github.com/drewgendreau",
+    "followers_url": "https://api.github.com/users/drewgendreau/followers",
+    "following_url": "https://api.github.com/users/drewgendreau/following{/other_user}",
+    "gists_url": "https://api.github.com/users/drewgendreau/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/drewgendreau/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/drewgendreau/subscriptions",
+    "organizations_url": "https://api.github.com/users/drewgendreau/orgs",
+    "repos_url": "https://api.github.com/users/drewgendreau/repos",
+    "events_url": "https://api.github.com/users/drewgendreau/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/drewgendreau/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/drewgendreau/Socrata.jl",
+  "description": "Julia API for accessing Socrata open data sets",
+  "fork": false,
+  "url": "https://api.github.com/repos/drewgendreau/Socrata.jl",
+  "forks_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/forks",
+  "keys_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/teams",
+  "hooks_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/events",
+  "assignees_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/tags",
+  "blobs_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/subscription",
+  "commits_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/merges",
+  "archive_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/downloads",
+  "issues_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/drewgendreau/Socrata.jl/deployments",
+  "created_at": "2014-06-06T23:20:16Z",
+  "updated_at": "2017-03-25T01:54:30Z",
+  "pushed_at": "2014-07-25T15:05:24Z",
+  "git_url": "git://github.com/drewgendreau/Socrata.jl.git",
+  "ssh_url": "git@github.com:drewgendreau/Socrata.jl.git",
+  "clone_url": "https://github.com/drewgendreau/Socrata.jl.git",
+  "svn_url": "https://github.com/drewgendreau/Socrata.jl",
+  "homepage": "",
+  "size": 224,
+  "stargazers_count": 9,
+  "watchers_count": 9,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 9,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 2
+}

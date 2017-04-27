@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:26:51 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5198
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 8
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "330e119bdb5b7794dd530a6018ee46fb"
+Last-Modified: Fri, 03 Feb 2017 14:36:59 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 092F:6634:138F32A:19485E6:590237EB
+
+{
+  "id": 17297768,
+  "name": "SCIP.jl",
+  "full_name": "ryanjoneil/SCIP.jl",
+  "owner": {
+    "login": "ryanjoneil",
+    "id": 6748953,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6748953?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ryanjoneil",
+    "html_url": "https://github.com/ryanjoneil",
+    "followers_url": "https://api.github.com/users/ryanjoneil/followers",
+    "following_url": "https://api.github.com/users/ryanjoneil/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ryanjoneil/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ryanjoneil/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ryanjoneil/subscriptions",
+    "organizations_url": "https://api.github.com/users/ryanjoneil/orgs",
+    "repos_url": "https://api.github.com/users/ryanjoneil/repos",
+    "events_url": "https://api.github.com/users/ryanjoneil/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ryanjoneil/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ryanjoneil/SCIP.jl",
+  "description": "(deprecated) Julia interface to the SCIP solver",
+  "fork": false,
+  "url": "https://api.github.com/repos/ryanjoneil/SCIP.jl",
+  "forks_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/forks",
+  "keys_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/teams",
+  "hooks_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/events",
+  "assignees_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/tags",
+  "blobs_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/subscription",
+  "commits_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/merges",
+  "archive_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/downloads",
+  "issues_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ryanjoneil/SCIP.jl/deployments",
+  "created_at": "2014-02-28T19:52:52Z",
+  "updated_at": "2017-02-03T14:36:59Z",
+  "pushed_at": "2015-12-17T19:57:22Z",
+  "git_url": "git://github.com/ryanjoneil/SCIP.jl.git",
+  "ssh_url": "git@github.com:ryanjoneil/SCIP.jl.git",
+  "clone_url": "https://github.com/ryanjoneil/SCIP.jl.git",
+  "svn_url": "https://github.com/ryanjoneil/SCIP.jl",
+  "homepage": "",
+  "size": 5263,
+  "stargazers_count": 5,
+  "watchers_count": 5,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 14,
+  "forks": 3,
+  "open_issues": 14,
+  "watchers": 5,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 8
+}

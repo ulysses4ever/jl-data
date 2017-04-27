@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:34:30 GMT
+Date: Thu, 27 Apr 2017 17:59:49 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5427
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3233
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "9e1e32f33759a1a05d09dc20905f1c85"
+Last-Modified: Mon, 09 May 2016 20:29:24 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 57
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D2F9:0711:70B2A5C:874685D:58C34616
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 2D83:6637:1331359:18C5E6F:59023195
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 56797271,
+  "name": "piriform",
+  "full_name": "aubreythompson/piriform",
+  "owner": {
+    "login": "aubreythompson",
+    "id": 1236618,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1236618?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/aubreythompson",
+    "html_url": "https://github.com/aubreythompson",
+    "followers_url": "https://api.github.com/users/aubreythompson/followers",
+    "following_url": "https://api.github.com/users/aubreythompson/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aubreythompson/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aubreythompson/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aubreythompson/subscriptions",
+    "organizations_url": "https://api.github.com/users/aubreythompson/orgs",
+    "repos_url": "https://api.github.com/users/aubreythompson/repos",
+    "events_url": "https://api.github.com/users/aubreythompson/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aubreythompson/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/aubreythompson/piriform",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/aubreythompson/piriform",
+  "forks_url": "https://api.github.com/repos/aubreythompson/piriform/forks",
+  "keys_url": "https://api.github.com/repos/aubreythompson/piriform/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/aubreythompson/piriform/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/aubreythompson/piriform/teams",
+  "hooks_url": "https://api.github.com/repos/aubreythompson/piriform/hooks",
+  "issue_events_url": "https://api.github.com/repos/aubreythompson/piriform/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/aubreythompson/piriform/events",
+  "assignees_url": "https://api.github.com/repos/aubreythompson/piriform/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/aubreythompson/piriform/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/aubreythompson/piriform/tags",
+  "blobs_url": "https://api.github.com/repos/aubreythompson/piriform/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/aubreythompson/piriform/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/aubreythompson/piriform/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/aubreythompson/piriform/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/aubreythompson/piriform/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/aubreythompson/piriform/languages",
+  "stargazers_url": "https://api.github.com/repos/aubreythompson/piriform/stargazers",
+  "contributors_url": "https://api.github.com/repos/aubreythompson/piriform/contributors",
+  "subscribers_url": "https://api.github.com/repos/aubreythompson/piriform/subscribers",
+  "subscription_url": "https://api.github.com/repos/aubreythompson/piriform/subscription",
+  "commits_url": "https://api.github.com/repos/aubreythompson/piriform/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/aubreythompson/piriform/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/aubreythompson/piriform/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/aubreythompson/piriform/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/aubreythompson/piriform/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/aubreythompson/piriform/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/aubreythompson/piriform/merges",
+  "archive_url": "https://api.github.com/repos/aubreythompson/piriform/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/aubreythompson/piriform/downloads",
+  "issues_url": "https://api.github.com/repos/aubreythompson/piriform/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/aubreythompson/piriform/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/aubreythompson/piriform/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/aubreythompson/piriform/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/aubreythompson/piriform/labels{/name}",
+  "releases_url": "https://api.github.com/repos/aubreythompson/piriform/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/aubreythompson/piriform/deployments",
+  "created_at": "2016-04-21T18:38:04Z",
+  "updated_at": "2016-05-09T20:29:24Z",
+  "pushed_at": "2016-09-17T21:32:44Z",
+  "git_url": "git://github.com/aubreythompson/piriform.git",
+  "ssh_url": "git@github.com:aubreythompson/piriform.git",
+  "clone_url": "https://github.com/aubreythompson/piriform.git",
+  "svn_url": "https://github.com/aubreythompson/piriform",
+  "homepage": null,
+  "size": 16121,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "sompolinsky-net",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

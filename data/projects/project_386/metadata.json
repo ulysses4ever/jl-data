@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:41:44 GMT
+Date: Thu, 27 Apr 2017 18:00:01 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5570
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3176
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "88952983af0883e6e4f7948ac9a914cd"
+Last-Modified: Sat, 16 Apr 2016 19:44:19 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 46
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D67C:0712:730FF56:89F750E:58C355D8
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: 2974:6634:134306C:18E5D54:590231A0
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 56402236,
+  "name": "julia-grass-wrapper",
+  "full_name": "krejcmat/julia-grass-wrapper",
+  "owner": {
+    "login": "krejcmat",
+    "id": 8127566,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/8127566?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/krejcmat",
+    "html_url": "https://github.com/krejcmat",
+    "followers_url": "https://api.github.com/users/krejcmat/followers",
+    "following_url": "https://api.github.com/users/krejcmat/following{/other_user}",
+    "gists_url": "https://api.github.com/users/krejcmat/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/krejcmat/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/krejcmat/subscriptions",
+    "organizations_url": "https://api.github.com/users/krejcmat/orgs",
+    "repos_url": "https://api.github.com/users/krejcmat/repos",
+    "events_url": "https://api.github.com/users/krejcmat/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/krejcmat/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/krejcmat/julia-grass-wrapper",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper",
+  "forks_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/forks",
+  "keys_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/teams",
+  "hooks_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/hooks",
+  "issue_events_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/events",
+  "assignees_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/tags",
+  "blobs_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/languages",
+  "stargazers_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/stargazers",
+  "contributors_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/contributors",
+  "subscribers_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/subscribers",
+  "subscription_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/subscription",
+  "commits_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/merges",
+  "archive_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/downloads",
+  "issues_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/labels{/name}",
+  "releases_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/krejcmat/julia-grass-wrapper/deployments",
+  "created_at": "2016-04-16T19:37:17Z",
+  "updated_at": "2016-04-16T19:44:19Z",
+  "pushed_at": "2016-04-16T19:46:31Z",
+  "git_url": "git://github.com/krejcmat/julia-grass-wrapper.git",
+  "ssh_url": "git@github.com:krejcmat/julia-grass-wrapper.git",
+  "clone_url": "https://github.com/krejcmat/julia-grass-wrapper.git",
+  "svn_url": "https://github.com/krejcmat/julia-grass-wrapper",
+  "homepage": null,
+  "size": 103,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

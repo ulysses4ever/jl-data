@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:05:44 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5393
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2101
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "379468b2fa41a3644da5409b1f209b63"
+Last-Modified: Sun, 03 Apr 2016 16:00:23 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 2c18a09f3ac5e4dd1e004af7c5a94769
+X-GitHub-Request-Id: 9FC0:6631:86D353:AE22D2:590232F8
+
+{
+  "id": 28281072,
+  "name": "DeepConvert.jl",
+  "full_name": "jlapeyre/DeepConvert.jl",
+  "owner": {
+    "login": "jlapeyre",
+    "id": 1969884,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1969884?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jlapeyre",
+    "html_url": "https://github.com/jlapeyre",
+    "followers_url": "https://api.github.com/users/jlapeyre/followers",
+    "following_url": "https://api.github.com/users/jlapeyre/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jlapeyre/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jlapeyre/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jlapeyre/subscriptions",
+    "organizations_url": "https://api.github.com/users/jlapeyre/orgs",
+    "repos_url": "https://api.github.com/users/jlapeyre/repos",
+    "events_url": "https://api.github.com/users/jlapeyre/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jlapeyre/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jlapeyre/DeepConvert.jl",
+  "description": "Convenient literal expressions for large numbers",
+  "fork": false,
+  "url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl",
+  "forks_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/forks",
+  "keys_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/events",
+  "assignees_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/merges",
+  "archive_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jlapeyre/DeepConvert.jl/deployments",
+  "created_at": "2014-12-20T22:28:20Z",
+  "updated_at": "2016-04-03T16:00:23Z",
+  "pushed_at": "2016-04-03T16:00:21Z",
+  "git_url": "git://github.com/jlapeyre/DeepConvert.jl.git",
+  "ssh_url": "git@github.com:jlapeyre/DeepConvert.jl.git",
+  "clone_url": "https://github.com/jlapeyre/DeepConvert.jl.git",
+  "svn_url": "https://github.com/jlapeyre/DeepConvert.jl",
+  "homepage": "",
+  "size": 18,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 2
+}

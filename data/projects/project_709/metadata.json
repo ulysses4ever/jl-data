@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:01:08 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5128
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2896
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7aa188d5f7be86f269c026fc3cdfcf44"
+Last-Modified: Sat, 03 Dec 2016 11:53:10 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: d0b3c2c33a23690498aa8e70a435a259
+X-GitHub-Request-Id: 163D:6634:13468A7:18EA5F9:590231E4
+
+{
+  "id": 49372347,
+  "name": "LispREPL.jl",
+  "full_name": "swadey/LispREPL.jl",
+  "owner": {
+    "login": "swadey",
+    "id": 1401817,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1401817?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/swadey",
+    "html_url": "https://github.com/swadey",
+    "followers_url": "https://api.github.com/users/swadey/followers",
+    "following_url": "https://api.github.com/users/swadey/following{/other_user}",
+    "gists_url": "https://api.github.com/users/swadey/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/swadey/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/swadey/subscriptions",
+    "organizations_url": "https://api.github.com/users/swadey/orgs",
+    "repos_url": "https://api.github.com/users/swadey/repos",
+    "events_url": "https://api.github.com/users/swadey/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/swadey/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/swadey/LispREPL.jl",
+  "description": "REPL for LispSyntax.jl",
+  "fork": false,
+  "url": "https://api.github.com/repos/swadey/LispREPL.jl",
+  "forks_url": "https://api.github.com/repos/swadey/LispREPL.jl/forks",
+  "keys_url": "https://api.github.com/repos/swadey/LispREPL.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/swadey/LispREPL.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/swadey/LispREPL.jl/teams",
+  "hooks_url": "https://api.github.com/repos/swadey/LispREPL.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/swadey/LispREPL.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/swadey/LispREPL.jl/events",
+  "assignees_url": "https://api.github.com/repos/swadey/LispREPL.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/swadey/LispREPL.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/swadey/LispREPL.jl/tags",
+  "blobs_url": "https://api.github.com/repos/swadey/LispREPL.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/swadey/LispREPL.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/swadey/LispREPL.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/swadey/LispREPL.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/swadey/LispREPL.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/swadey/LispREPL.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/swadey/LispREPL.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/swadey/LispREPL.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/swadey/LispREPL.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/swadey/LispREPL.jl/subscription",
+  "commits_url": "https://api.github.com/repos/swadey/LispREPL.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/swadey/LispREPL.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/swadey/LispREPL.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/swadey/LispREPL.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/swadey/LispREPL.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/swadey/LispREPL.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/swadey/LispREPL.jl/merges",
+  "archive_url": "https://api.github.com/repos/swadey/LispREPL.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/swadey/LispREPL.jl/downloads",
+  "issues_url": "https://api.github.com/repos/swadey/LispREPL.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/swadey/LispREPL.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/swadey/LispREPL.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/swadey/LispREPL.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/swadey/LispREPL.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/swadey/LispREPL.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/swadey/LispREPL.jl/deployments",
+  "created_at": "2016-01-10T15:21:47Z",
+  "updated_at": "2016-12-03T11:53:10Z",
+  "pushed_at": "2016-01-14T02:09:36Z",
+  "git_url": "git://github.com/swadey/LispREPL.jl.git",
+  "ssh_url": "git@github.com:swadey/LispREPL.jl.git",
+  "clone_url": "https://github.com/swadey/LispREPL.jl.git",
+  "svn_url": "https://github.com/swadey/LispREPL.jl",
+  "homepage": "",
+  "size": 10,
+  "stargazers_count": 10,
+  "watchers_count": 10,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 3,
+  "open_issues": 3,
+  "watchers": 10,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 5
+}

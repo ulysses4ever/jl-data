@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:11:42 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6368
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1238
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "91b4e5c41db8c5cff73fca3d940472cb"
+Last-Modified: Wed, 21 Sep 2016 15:52:57 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: 275B:6634:13639A1:1910032:5902345E
+
+{
+  "id": 11216425,
+  "name": "HTTPClient.jl",
+  "full_name": "JuliaWeb/HTTPClient.jl",
+  "owner": {
+    "login": "JuliaWeb",
+    "id": 8564604,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8564604?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaWeb",
+    "html_url": "https://github.com/JuliaWeb",
+    "followers_url": "https://api.github.com/users/JuliaWeb/followers",
+    "following_url": "https://api.github.com/users/JuliaWeb/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaWeb/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaWeb/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaWeb/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaWeb/orgs",
+    "repos_url": "https://api.github.com/users/JuliaWeb/repos",
+    "events_url": "https://api.github.com/users/JuliaWeb/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaWeb/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaWeb/HTTPClient.jl",
+  "description": "HTTP client functionality (based on LibCURL.jl)",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl",
+  "forks_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaWeb/HTTPClient.jl/deployments",
+  "created_at": "2013-07-06T09:57:54Z",
+  "updated_at": "2016-09-21T15:52:57Z",
+  "pushed_at": "2016-08-31T11:28:40Z",
+  "git_url": "git://github.com/JuliaWeb/HTTPClient.jl.git",
+  "ssh_url": "git@github.com:JuliaWeb/HTTPClient.jl.git",
+  "clone_url": "https://github.com/JuliaWeb/HTTPClient.jl.git",
+  "svn_url": "https://github.com/JuliaWeb/HTTPClient.jl",
+  "homepage": "",
+  "size": 54,
+  "stargazers_count": 16,
+  "watchers_count": 16,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 14,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 14,
+  "open_issues": 3,
+  "watchers": 16,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaWeb",
+    "id": 8564604,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8564604?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaWeb",
+    "html_url": "https://github.com/JuliaWeb",
+    "followers_url": "https://api.github.com/users/JuliaWeb/followers",
+    "following_url": "https://api.github.com/users/JuliaWeb/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaWeb/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaWeb/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaWeb/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaWeb/orgs",
+    "repos_url": "https://api.github.com/users/JuliaWeb/repos",
+    "events_url": "https://api.github.com/users/JuliaWeb/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaWeb/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 14,
+  "subscribers_count": 9
+}

@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:19:47 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5339
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 544
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "b33c57bda17781e4c8a3f5972d937013"
+Last-Modified: Sat, 05 Nov 2016 22:35:14 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 5B45:6631:881F67:AFCE2A:59023643
+
+{
+  "id": 40056554,
+  "name": "DiceSimulator",
+  "full_name": "HHammond/DiceSimulator",
+  "owner": {
+    "login": "HHammond",
+    "id": 3064019,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/3064019?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/HHammond",
+    "html_url": "https://github.com/HHammond",
+    "followers_url": "https://api.github.com/users/HHammond/followers",
+    "following_url": "https://api.github.com/users/HHammond/following{/other_user}",
+    "gists_url": "https://api.github.com/users/HHammond/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/HHammond/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/HHammond/subscriptions",
+    "organizations_url": "https://api.github.com/users/HHammond/orgs",
+    "repos_url": "https://api.github.com/users/HHammond/repos",
+    "events_url": "https://api.github.com/users/HHammond/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/HHammond/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/HHammond/DiceSimulator",
+  "description": "Dice Game simulator in Julia and C.",
+  "fork": false,
+  "url": "https://api.github.com/repos/HHammond/DiceSimulator",
+  "forks_url": "https://api.github.com/repos/HHammond/DiceSimulator/forks",
+  "keys_url": "https://api.github.com/repos/HHammond/DiceSimulator/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/HHammond/DiceSimulator/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/HHammond/DiceSimulator/teams",
+  "hooks_url": "https://api.github.com/repos/HHammond/DiceSimulator/hooks",
+  "issue_events_url": "https://api.github.com/repos/HHammond/DiceSimulator/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/HHammond/DiceSimulator/events",
+  "assignees_url": "https://api.github.com/repos/HHammond/DiceSimulator/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/HHammond/DiceSimulator/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/HHammond/DiceSimulator/tags",
+  "blobs_url": "https://api.github.com/repos/HHammond/DiceSimulator/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/HHammond/DiceSimulator/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/HHammond/DiceSimulator/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/HHammond/DiceSimulator/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/HHammond/DiceSimulator/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/HHammond/DiceSimulator/languages",
+  "stargazers_url": "https://api.github.com/repos/HHammond/DiceSimulator/stargazers",
+  "contributors_url": "https://api.github.com/repos/HHammond/DiceSimulator/contributors",
+  "subscribers_url": "https://api.github.com/repos/HHammond/DiceSimulator/subscribers",
+  "subscription_url": "https://api.github.com/repos/HHammond/DiceSimulator/subscription",
+  "commits_url": "https://api.github.com/repos/HHammond/DiceSimulator/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/HHammond/DiceSimulator/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/HHammond/DiceSimulator/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/HHammond/DiceSimulator/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/HHammond/DiceSimulator/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/HHammond/DiceSimulator/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/HHammond/DiceSimulator/merges",
+  "archive_url": "https://api.github.com/repos/HHammond/DiceSimulator/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/HHammond/DiceSimulator/downloads",
+  "issues_url": "https://api.github.com/repos/HHammond/DiceSimulator/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/HHammond/DiceSimulator/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/HHammond/DiceSimulator/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/HHammond/DiceSimulator/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/HHammond/DiceSimulator/labels{/name}",
+  "releases_url": "https://api.github.com/repos/HHammond/DiceSimulator/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/HHammond/DiceSimulator/deployments",
+  "created_at": "2015-08-01T18:44:07Z",
+  "updated_at": "2016-11-05T22:35:14Z",
+  "pushed_at": "2015-08-01T21:02:37Z",
+  "git_url": "git://github.com/HHammond/DiceSimulator.git",
+  "ssh_url": "git@github.com:HHammond/DiceSimulator.git",
+  "clone_url": "https://github.com/HHammond/DiceSimulator.git",
+  "svn_url": "https://github.com/HHammond/DiceSimulator",
+  "homepage": null,
+  "size": 136,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 0
+}

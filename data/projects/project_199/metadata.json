@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:39:34 GMT
+Date: Thu, 27 Apr 2017 17:59:24 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5767
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3351
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "d7ebcc114cacc1c2a42773ef30d6914c"
+Last-Modified: Mon, 04 Jul 2016 19:27:24 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CF12:0711:7011A0B:868B39C:58C33936
+Vary: Accept-Encoding
+X-Served-By: 3e3b9690823fb031da84658eb58aa83b
+X-GitHub-Request-Id: E7CE:6637:13301F9:18C4761:5902317C
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 62583705,
+  "name": "mlp-regression-mocha",
+  "full_name": "diegoacuna/mlp-regression-mocha",
+  "owner": {
+    "login": "diegoacuna",
+    "id": 740012,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/740012?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/diegoacuna",
+    "html_url": "https://github.com/diegoacuna",
+    "followers_url": "https://api.github.com/users/diegoacuna/followers",
+    "following_url": "https://api.github.com/users/diegoacuna/following{/other_user}",
+    "gists_url": "https://api.github.com/users/diegoacuna/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/diegoacuna/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/diegoacuna/subscriptions",
+    "organizations_url": "https://api.github.com/users/diegoacuna/orgs",
+    "repos_url": "https://api.github.com/users/diegoacuna/repos",
+    "events_url": "https://api.github.com/users/diegoacuna/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/diegoacuna/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/diegoacuna/mlp-regression-mocha",
+  "description": "Multi-Layer Perceptron for regression using Mocha",
+  "fork": false,
+  "url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha",
+  "forks_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/forks",
+  "keys_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/teams",
+  "hooks_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/hooks",
+  "issue_events_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/events",
+  "assignees_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/tags",
+  "blobs_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/languages",
+  "stargazers_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/stargazers",
+  "contributors_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/contributors",
+  "subscribers_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/subscribers",
+  "subscription_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/subscription",
+  "commits_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/merges",
+  "archive_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/downloads",
+  "issues_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/labels{/name}",
+  "releases_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/diegoacuna/mlp-regression-mocha/deployments",
+  "created_at": "2016-07-04T19:26:22Z",
+  "updated_at": "2016-07-04T19:27:24Z",
+  "pushed_at": "2016-07-04T19:27:23Z",
+  "git_url": "git://github.com/diegoacuna/mlp-regression-mocha.git",
+  "ssh_url": "git@github.com:diegoacuna/mlp-regression-mocha.git",
+  "clone_url": "https://github.com/diegoacuna/mlp-regression-mocha.git",
+  "svn_url": "https://github.com/diegoacuna/mlp-regression-mocha",
+  "homepage": null,
+  "size": 2,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

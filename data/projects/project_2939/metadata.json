@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:17:09 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4784
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 775
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "9e2435a902ba3a10d8a73bf78adb24e9"
+Last-Modified: Tue, 25 Mar 2014 08:40:01 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: c6c65e5196703428e7641f7d1e9bc353
+X-GitHub-Request-Id: 65EB:6637:1364FC8:190872C:590235A5
+
+{
+  "id": 6470319,
+  "name": "jga",
+  "full_name": "tmeits/jga",
+  "owner": {
+    "login": "tmeits",
+    "id": 56503,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/56503?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tmeits",
+    "html_url": "https://github.com/tmeits",
+    "followers_url": "https://api.github.com/users/tmeits/followers",
+    "following_url": "https://api.github.com/users/tmeits/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tmeits/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tmeits/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tmeits/subscriptions",
+    "organizations_url": "https://api.github.com/users/tmeits/orgs",
+    "repos_url": "https://api.github.com/users/tmeits/repos",
+    "events_url": "https://api.github.com/users/tmeits/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tmeits/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/tmeits/jga",
+  "description": "A Simple Julia Lang Genetic Algorithm",
+  "fork": false,
+  "url": "https://api.github.com/repos/tmeits/jga",
+  "forks_url": "https://api.github.com/repos/tmeits/jga/forks",
+  "keys_url": "https://api.github.com/repos/tmeits/jga/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/tmeits/jga/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/tmeits/jga/teams",
+  "hooks_url": "https://api.github.com/repos/tmeits/jga/hooks",
+  "issue_events_url": "https://api.github.com/repos/tmeits/jga/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/tmeits/jga/events",
+  "assignees_url": "https://api.github.com/repos/tmeits/jga/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/tmeits/jga/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/tmeits/jga/tags",
+  "blobs_url": "https://api.github.com/repos/tmeits/jga/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/tmeits/jga/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/tmeits/jga/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/tmeits/jga/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/tmeits/jga/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/tmeits/jga/languages",
+  "stargazers_url": "https://api.github.com/repos/tmeits/jga/stargazers",
+  "contributors_url": "https://api.github.com/repos/tmeits/jga/contributors",
+  "subscribers_url": "https://api.github.com/repos/tmeits/jga/subscribers",
+  "subscription_url": "https://api.github.com/repos/tmeits/jga/subscription",
+  "commits_url": "https://api.github.com/repos/tmeits/jga/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/tmeits/jga/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/tmeits/jga/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/tmeits/jga/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/tmeits/jga/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/tmeits/jga/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/tmeits/jga/merges",
+  "archive_url": "https://api.github.com/repos/tmeits/jga/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/tmeits/jga/downloads",
+  "issues_url": "https://api.github.com/repos/tmeits/jga/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/tmeits/jga/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/tmeits/jga/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/tmeits/jga/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/tmeits/jga/labels{/name}",
+  "releases_url": "https://api.github.com/repos/tmeits/jga/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/tmeits/jga/deployments",
+  "created_at": "2012-10-31T07:28:31Z",
+  "updated_at": "2014-03-25T08:40:01Z",
+  "pushed_at": "2014-03-25T08:40:00Z",
+  "git_url": "git://github.com/tmeits/jga.git",
+  "ssh_url": "git@github.com:tmeits/jga.git",
+  "clone_url": "https://github.com/tmeits/jga.git",
+  "svn_url": "https://github.com/tmeits/jga",
+  "homepage": "",
+  "size": 164,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

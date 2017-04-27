@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:27:18 GMT
+Date: Thu, 27 Apr 2017 17:58:56 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4999
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3487
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "29d2e185e5cbb74d57ac46f9bb59d153"
+Last-Modified: Mon, 19 Sep 2016 17:06:28 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 15
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: CCDD:0712:71B6978:885C9EA:58C33656
+Vary: Accept-Encoding
+X-Served-By: 15bc4ab707db6d6b474783868c7cc828
+X-GitHub-Request-Id: 666B:6634:13404D0:18E238A:59023160
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 67722620,
+  "name": "DS3001",
+  "full_name": "vakobzar/DS3001",
+  "owner": {
+    "login": "vakobzar",
+    "id": 21690943,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/21690943?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vakobzar",
+    "html_url": "https://github.com/vakobzar",
+    "followers_url": "https://api.github.com/users/vakobzar/followers",
+    "following_url": "https://api.github.com/users/vakobzar/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vakobzar/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vakobzar/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vakobzar/subscriptions",
+    "organizations_url": "https://api.github.com/users/vakobzar/orgs",
+    "repos_url": "https://api.github.com/users/vakobzar/repos",
+    "events_url": "https://api.github.com/users/vakobzar/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vakobzar/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/vakobzar/DS3001",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/vakobzar/DS3001",
+  "forks_url": "https://api.github.com/repos/vakobzar/DS3001/forks",
+  "keys_url": "https://api.github.com/repos/vakobzar/DS3001/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/vakobzar/DS3001/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/vakobzar/DS3001/teams",
+  "hooks_url": "https://api.github.com/repos/vakobzar/DS3001/hooks",
+  "issue_events_url": "https://api.github.com/repos/vakobzar/DS3001/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/vakobzar/DS3001/events",
+  "assignees_url": "https://api.github.com/repos/vakobzar/DS3001/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/vakobzar/DS3001/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/vakobzar/DS3001/tags",
+  "blobs_url": "https://api.github.com/repos/vakobzar/DS3001/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/vakobzar/DS3001/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/vakobzar/DS3001/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/vakobzar/DS3001/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/vakobzar/DS3001/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/vakobzar/DS3001/languages",
+  "stargazers_url": "https://api.github.com/repos/vakobzar/DS3001/stargazers",
+  "contributors_url": "https://api.github.com/repos/vakobzar/DS3001/contributors",
+  "subscribers_url": "https://api.github.com/repos/vakobzar/DS3001/subscribers",
+  "subscription_url": "https://api.github.com/repos/vakobzar/DS3001/subscription",
+  "commits_url": "https://api.github.com/repos/vakobzar/DS3001/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/vakobzar/DS3001/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/vakobzar/DS3001/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/vakobzar/DS3001/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/vakobzar/DS3001/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/vakobzar/DS3001/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/vakobzar/DS3001/merges",
+  "archive_url": "https://api.github.com/repos/vakobzar/DS3001/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/vakobzar/DS3001/downloads",
+  "issues_url": "https://api.github.com/repos/vakobzar/DS3001/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/vakobzar/DS3001/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/vakobzar/DS3001/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/vakobzar/DS3001/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/vakobzar/DS3001/labels{/name}",
+  "releases_url": "https://api.github.com/repos/vakobzar/DS3001/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/vakobzar/DS3001/deployments",
+  "created_at": "2016-09-08T16:53:12Z",
+  "updated_at": "2016-09-19T17:06:28Z",
+  "pushed_at": "2016-10-05T22:51:01Z",
+  "git_url": "git://github.com/vakobzar/DS3001.git",
+  "ssh_url": "git@github.com:vakobzar/DS3001.git",
+  "clone_url": "https://github.com/vakobzar/DS3001.git",
+  "svn_url": "https://github.com/vakobzar/DS3001",
+  "homepage": null,
+  "size": 41,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 9,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 9,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 9,
+  "subscribers_count": 0
 }

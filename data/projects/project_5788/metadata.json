@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:54:16 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5088
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4701
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "13ce7473fcb3e3fdb1fb00190ed995de"
+Last-Modified: Mon, 07 Sep 2015 05:36:26 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 8400:6631:8B7B56:B41DFE:59023E58
+
+{
+  "id": 42032211,
+  "name": "pac.jl",
+  "full_name": "haroldsoh/pac.jl",
+  "owner": {
+    "login": "haroldsoh",
+    "id": 5593099,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/5593099?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/haroldsoh",
+    "html_url": "https://github.com/haroldsoh",
+    "followers_url": "https://api.github.com/users/haroldsoh/followers",
+    "following_url": "https://api.github.com/users/haroldsoh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/haroldsoh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/haroldsoh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/haroldsoh/subscriptions",
+    "organizations_url": "https://api.github.com/users/haroldsoh/orgs",
+    "repos_url": "https://api.github.com/users/haroldsoh/repos",
+    "events_url": "https://api.github.com/users/haroldsoh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/haroldsoh/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/haroldsoh/pac.jl",
+  "description": "POMDP and associated solvers in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/haroldsoh/pac.jl",
+  "forks_url": "https://api.github.com/repos/haroldsoh/pac.jl/forks",
+  "keys_url": "https://api.github.com/repos/haroldsoh/pac.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/haroldsoh/pac.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/haroldsoh/pac.jl/teams",
+  "hooks_url": "https://api.github.com/repos/haroldsoh/pac.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/haroldsoh/pac.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/haroldsoh/pac.jl/events",
+  "assignees_url": "https://api.github.com/repos/haroldsoh/pac.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/haroldsoh/pac.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/haroldsoh/pac.jl/tags",
+  "blobs_url": "https://api.github.com/repos/haroldsoh/pac.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/haroldsoh/pac.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/haroldsoh/pac.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/haroldsoh/pac.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/haroldsoh/pac.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/haroldsoh/pac.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/haroldsoh/pac.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/haroldsoh/pac.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/haroldsoh/pac.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/haroldsoh/pac.jl/subscription",
+  "commits_url": "https://api.github.com/repos/haroldsoh/pac.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/haroldsoh/pac.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/haroldsoh/pac.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/haroldsoh/pac.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/haroldsoh/pac.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/haroldsoh/pac.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/haroldsoh/pac.jl/merges",
+  "archive_url": "https://api.github.com/repos/haroldsoh/pac.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/haroldsoh/pac.jl/downloads",
+  "issues_url": "https://api.github.com/repos/haroldsoh/pac.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/haroldsoh/pac.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/haroldsoh/pac.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/haroldsoh/pac.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/haroldsoh/pac.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/haroldsoh/pac.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/haroldsoh/pac.jl/deployments",
+  "created_at": "2015-09-07T05:01:45Z",
+  "updated_at": "2015-09-07T05:36:26Z",
+  "pushed_at": "2015-09-09T10:35:56Z",
+  "git_url": "git://github.com/haroldsoh/pac.jl.git",
+  "ssh_url": "git@github.com:haroldsoh/pac.jl.git",
+  "clone_url": "https://github.com/haroldsoh/pac.jl.git",
+  "svn_url": "https://github.com/haroldsoh/pac.jl",
+  "homepage": null,
+  "size": 200,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 1
+}

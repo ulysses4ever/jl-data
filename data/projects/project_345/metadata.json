@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:23:52 GMT
+Date: Thu, 27 Apr 2017 17:59:54 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5375
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3216
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "6d121a80cec2b8909df635690d60b1be"
+Last-Modified: Thu, 07 Jul 2016 19:03:39 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 30
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E524:0711:7134E57:87E0753:58C351A8
+Vary: Accept-Encoding
+X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
+X-GitHub-Request-Id: 6013:6637:13316A6:18C62FC:5902319A
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 57903567,
+  "name": "ColorMaps.jl",
+  "full_name": "lobingera/ColorMaps.jl",
+  "owner": {
+    "login": "lobingera",
+    "id": 5199059,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/5199059?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/lobingera",
+    "html_url": "https://github.com/lobingera",
+    "followers_url": "https://api.github.com/users/lobingera/followers",
+    "following_url": "https://api.github.com/users/lobingera/following{/other_user}",
+    "gists_url": "https://api.github.com/users/lobingera/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/lobingera/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/lobingera/subscriptions",
+    "organizations_url": "https://api.github.com/users/lobingera/orgs",
+    "repos_url": "https://api.github.com/users/lobingera/repos",
+    "events_url": "https://api.github.com/users/lobingera/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/lobingera/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/lobingera/ColorMaps.jl",
+  "description": "prototype for collecting color map generation and application",
+  "fork": false,
+  "url": "https://api.github.com/repos/lobingera/ColorMaps.jl",
+  "forks_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/forks",
+  "keys_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/teams",
+  "hooks_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/events",
+  "assignees_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/tags",
+  "blobs_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/subscription",
+  "commits_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/merges",
+  "archive_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/downloads",
+  "issues_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/lobingera/ColorMaps.jl/deployments",
+  "created_at": "2016-05-02T16:23:42Z",
+  "updated_at": "2016-07-07T19:03:39Z",
+  "pushed_at": "2016-08-19T17:11:59Z",
+  "git_url": "git://github.com/lobingera/ColorMaps.jl.git",
+  "ssh_url": "git@github.com:lobingera/ColorMaps.jl.git",
+  "clone_url": "https://github.com/lobingera/ColorMaps.jl.git",
+  "svn_url": "https://github.com/lobingera/ColorMaps.jl",
+  "homepage": null,
+  "size": 24,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:07:42 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5028
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1715
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "e6f6bc1319596c9fdafa898bbdaee598"
+Last-Modified: Mon, 27 Mar 2017 08:29:42 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 2d7a5e35115884240089368322196939
+X-GitHub-Request-Id: 8693:6631:870675:AE62EE:5902336D
+
+{
+  "id": 64342898,
+  "name": "Espresso.jl",
+  "full_name": "dfdx/Espresso.jl",
+  "owner": {
+    "login": "dfdx",
+    "id": 428171,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/428171?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dfdx",
+    "html_url": "https://github.com/dfdx",
+    "followers_url": "https://api.github.com/users/dfdx/followers",
+    "following_url": "https://api.github.com/users/dfdx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dfdx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dfdx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dfdx/subscriptions",
+    "organizations_url": "https://api.github.com/users/dfdx/orgs",
+    "repos_url": "https://api.github.com/users/dfdx/repos",
+    "events_url": "https://api.github.com/users/dfdx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dfdx/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dfdx/Espresso.jl",
+  "description": "Expression transformation package",
+  "fork": false,
+  "url": "https://api.github.com/repos/dfdx/Espresso.jl",
+  "forks_url": "https://api.github.com/repos/dfdx/Espresso.jl/forks",
+  "keys_url": "https://api.github.com/repos/dfdx/Espresso.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dfdx/Espresso.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dfdx/Espresso.jl/teams",
+  "hooks_url": "https://api.github.com/repos/dfdx/Espresso.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/dfdx/Espresso.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dfdx/Espresso.jl/events",
+  "assignees_url": "https://api.github.com/repos/dfdx/Espresso.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dfdx/Espresso.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dfdx/Espresso.jl/tags",
+  "blobs_url": "https://api.github.com/repos/dfdx/Espresso.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dfdx/Espresso.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dfdx/Espresso.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dfdx/Espresso.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dfdx/Espresso.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dfdx/Espresso.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/dfdx/Espresso.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/dfdx/Espresso.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/dfdx/Espresso.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/dfdx/Espresso.jl/subscription",
+  "commits_url": "https://api.github.com/repos/dfdx/Espresso.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dfdx/Espresso.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dfdx/Espresso.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dfdx/Espresso.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dfdx/Espresso.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dfdx/Espresso.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dfdx/Espresso.jl/merges",
+  "archive_url": "https://api.github.com/repos/dfdx/Espresso.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dfdx/Espresso.jl/downloads",
+  "issues_url": "https://api.github.com/repos/dfdx/Espresso.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dfdx/Espresso.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dfdx/Espresso.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dfdx/Espresso.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dfdx/Espresso.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dfdx/Espresso.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dfdx/Espresso.jl/deployments",
+  "created_at": "2016-07-27T21:26:59Z",
+  "updated_at": "2017-03-27T08:29:42Z",
+  "pushed_at": "2017-04-16T01:22:01Z",
+  "git_url": "git://github.com/dfdx/Espresso.jl.git",
+  "ssh_url": "git@github.com:dfdx/Espresso.jl.git",
+  "clone_url": "https://github.com/dfdx/Espresso.jl.git",
+  "svn_url": "https://github.com/dfdx/Espresso.jl",
+  "homepage": "",
+  "size": 191,
+  "stargazers_count": 11,
+  "watchers_count": 11,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 2,
+  "open_issues": 3,
+  "watchers": 11,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 4
+}

@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:20:49 GMT
+Date: Thu, 27 Apr 2017 17:59:49 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4965
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3234
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "28f7c3ea28f6219b399fa7894d9d8231"
+Last-Modified: Tue, 10 May 2016 12:00:39 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 48
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D4F6:0710:4D4DC53:5C77EA6:58C350F1
+Vary: Accept-Encoding
+X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
+X-GitHub-Request-Id: 7A46:6633:DD3A78:11E71FD:59023194
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 58457291,
+  "name": "MLMC",
+  "full_name": "vollmersj/MLMC",
+  "owner": {
+    "login": "vollmersj",
+    "id": 12613127,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/12613127?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/vollmersj",
+    "html_url": "https://github.com/vollmersj",
+    "followers_url": "https://api.github.com/users/vollmersj/followers",
+    "following_url": "https://api.github.com/users/vollmersj/following{/other_user}",
+    "gists_url": "https://api.github.com/users/vollmersj/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/vollmersj/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/vollmersj/subscriptions",
+    "organizations_url": "https://api.github.com/users/vollmersj/orgs",
+    "repos_url": "https://api.github.com/users/vollmersj/repos",
+    "events_url": "https://api.github.com/users/vollmersj/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/vollmersj/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/vollmersj/MLMC",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/vollmersj/MLMC",
+  "forks_url": "https://api.github.com/repos/vollmersj/MLMC/forks",
+  "keys_url": "https://api.github.com/repos/vollmersj/MLMC/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/vollmersj/MLMC/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/vollmersj/MLMC/teams",
+  "hooks_url": "https://api.github.com/repos/vollmersj/MLMC/hooks",
+  "issue_events_url": "https://api.github.com/repos/vollmersj/MLMC/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/vollmersj/MLMC/events",
+  "assignees_url": "https://api.github.com/repos/vollmersj/MLMC/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/vollmersj/MLMC/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/vollmersj/MLMC/tags",
+  "blobs_url": "https://api.github.com/repos/vollmersj/MLMC/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/vollmersj/MLMC/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/vollmersj/MLMC/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/vollmersj/MLMC/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/vollmersj/MLMC/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/vollmersj/MLMC/languages",
+  "stargazers_url": "https://api.github.com/repos/vollmersj/MLMC/stargazers",
+  "contributors_url": "https://api.github.com/repos/vollmersj/MLMC/contributors",
+  "subscribers_url": "https://api.github.com/repos/vollmersj/MLMC/subscribers",
+  "subscription_url": "https://api.github.com/repos/vollmersj/MLMC/subscription",
+  "commits_url": "https://api.github.com/repos/vollmersj/MLMC/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/vollmersj/MLMC/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/vollmersj/MLMC/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/vollmersj/MLMC/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/vollmersj/MLMC/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/vollmersj/MLMC/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/vollmersj/MLMC/merges",
+  "archive_url": "https://api.github.com/repos/vollmersj/MLMC/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/vollmersj/MLMC/downloads",
+  "issues_url": "https://api.github.com/repos/vollmersj/MLMC/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/vollmersj/MLMC/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/vollmersj/MLMC/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/vollmersj/MLMC/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/vollmersj/MLMC/labels{/name}",
+  "releases_url": "https://api.github.com/repos/vollmersj/MLMC/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/vollmersj/MLMC/deployments",
+  "created_at": "2016-05-10T11:56:25Z",
+  "updated_at": "2016-05-10T12:00:39Z",
+  "pushed_at": "2016-05-10T12:04:11Z",
+  "git_url": "git://github.com/vollmersj/MLMC.git",
+  "ssh_url": "git@github.com:vollmersj/MLMC.git",
+  "clone_url": "https://github.com/vollmersj/MLMC.git",
+  "svn_url": "https://github.com/vollmersj/MLMC",
+  "homepage": null,
+  "size": 5,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

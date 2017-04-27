@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:57:07 GMT
+Date: Thu, 27 Apr 2017 18:00:11 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6144
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3134
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "429d10035a39f9a5910334a3d68b779d"
+Last-Modified: Thu, 07 Apr 2016 14:27:01 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 3
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D7B5:0712:7334DC7:8A255EE:58C35973
+Vary: Accept-Encoding
+X-Served-By: 9e60649f02cd840ee8baa9960690f79f
+X-GitHub-Request-Id: 66EE:6633:DD4723:11E834D:590231AB
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 46944514,
+  "name": "Nanomsg.jl",
+  "full_name": "redsift/Nanomsg.jl",
+  "owner": {
+    "login": "redsift",
+    "id": 8962613,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8962613?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/redsift",
+    "html_url": "https://github.com/redsift",
+    "followers_url": "https://api.github.com/users/redsift/followers",
+    "following_url": "https://api.github.com/users/redsift/following{/other_user}",
+    "gists_url": "https://api.github.com/users/redsift/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/redsift/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/redsift/subscriptions",
+    "organizations_url": "https://api.github.com/users/redsift/orgs",
+    "repos_url": "https://api.github.com/users/redsift/repos",
+    "events_url": "https://api.github.com/users/redsift/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/redsift/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/redsift/Nanomsg.jl",
+  "description": "Nanomsg bindings for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/redsift/Nanomsg.jl",
+  "forks_url": "https://api.github.com/repos/redsift/Nanomsg.jl/forks",
+  "keys_url": "https://api.github.com/repos/redsift/Nanomsg.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/redsift/Nanomsg.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/redsift/Nanomsg.jl/teams",
+  "hooks_url": "https://api.github.com/repos/redsift/Nanomsg.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/redsift/Nanomsg.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/redsift/Nanomsg.jl/events",
+  "assignees_url": "https://api.github.com/repos/redsift/Nanomsg.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/redsift/Nanomsg.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/redsift/Nanomsg.jl/tags",
+  "blobs_url": "https://api.github.com/repos/redsift/Nanomsg.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/redsift/Nanomsg.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/redsift/Nanomsg.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/redsift/Nanomsg.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/redsift/Nanomsg.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/redsift/Nanomsg.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/redsift/Nanomsg.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/redsift/Nanomsg.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/redsift/Nanomsg.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/redsift/Nanomsg.jl/subscription",
+  "commits_url": "https://api.github.com/repos/redsift/Nanomsg.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/redsift/Nanomsg.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/redsift/Nanomsg.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/redsift/Nanomsg.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/redsift/Nanomsg.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/redsift/Nanomsg.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/redsift/Nanomsg.jl/merges",
+  "archive_url": "https://api.github.com/repos/redsift/Nanomsg.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/redsift/Nanomsg.jl/downloads",
+  "issues_url": "https://api.github.com/repos/redsift/Nanomsg.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/redsift/Nanomsg.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/redsift/Nanomsg.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/redsift/Nanomsg.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/redsift/Nanomsg.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/redsift/Nanomsg.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/redsift/Nanomsg.jl/deployments",
+  "created_at": "2015-11-26T19:54:05Z",
+  "updated_at": "2016-04-07T14:27:01Z",
+  "pushed_at": "2016-07-16T21:40:50Z",
+  "git_url": "git://github.com/redsift/Nanomsg.jl.git",
+  "ssh_url": "git@github.com:redsift/Nanomsg.jl.git",
+  "clone_url": "https://github.com/redsift/Nanomsg.jl.git",
+  "svn_url": "https://github.com/redsift/Nanomsg.jl",
+  "homepage": null,
+  "size": 11,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "redsift",
+    "id": 8962613,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8962613?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/redsift",
+    "html_url": "https://github.com/redsift",
+    "followers_url": "https://api.github.com/users/redsift/followers",
+    "following_url": "https://api.github.com/users/redsift/following{/other_user}",
+    "gists_url": "https://api.github.com/users/redsift/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/redsift/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/redsift/subscriptions",
+    "organizations_url": "https://api.github.com/users/redsift/orgs",
+    "repos_url": "https://api.github.com/users/redsift/repos",
+    "events_url": "https://api.github.com/users/redsift/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/redsift/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 4
 }

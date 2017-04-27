@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:20:14 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4916
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 505
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "1fd05dead37aeefb90d79b24a58e490e"
+Last-Modified: Thu, 05 Nov 2015 14:06:16 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 7b641bda7ec2ca7cd9df72d2578baf75
+X-GitHub-Request-Id: 1784:6633:DFFE45:122065B:5902365D
+
+{
+  "id": 5680473,
+  "name": "j-dog",
+  "full_name": "saolsen/j-dog",
+  "owner": {
+    "login": "saolsen",
+    "id": 508702,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/508702?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/saolsen",
+    "html_url": "https://github.com/saolsen",
+    "followers_url": "https://api.github.com/users/saolsen/followers",
+    "following_url": "https://api.github.com/users/saolsen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/saolsen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/saolsen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/saolsen/subscriptions",
+    "organizations_url": "https://api.github.com/users/saolsen/orgs",
+    "repos_url": "https://api.github.com/users/saolsen/repos",
+    "events_url": "https://api.github.com/users/saolsen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/saolsen/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/saolsen/j-dog",
+  "description": "julia and ml test code",
+  "fork": false,
+  "url": "https://api.github.com/repos/saolsen/j-dog",
+  "forks_url": "https://api.github.com/repos/saolsen/j-dog/forks",
+  "keys_url": "https://api.github.com/repos/saolsen/j-dog/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/saolsen/j-dog/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/saolsen/j-dog/teams",
+  "hooks_url": "https://api.github.com/repos/saolsen/j-dog/hooks",
+  "issue_events_url": "https://api.github.com/repos/saolsen/j-dog/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/saolsen/j-dog/events",
+  "assignees_url": "https://api.github.com/repos/saolsen/j-dog/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/saolsen/j-dog/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/saolsen/j-dog/tags",
+  "blobs_url": "https://api.github.com/repos/saolsen/j-dog/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/saolsen/j-dog/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/saolsen/j-dog/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/saolsen/j-dog/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/saolsen/j-dog/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/saolsen/j-dog/languages",
+  "stargazers_url": "https://api.github.com/repos/saolsen/j-dog/stargazers",
+  "contributors_url": "https://api.github.com/repos/saolsen/j-dog/contributors",
+  "subscribers_url": "https://api.github.com/repos/saolsen/j-dog/subscribers",
+  "subscription_url": "https://api.github.com/repos/saolsen/j-dog/subscription",
+  "commits_url": "https://api.github.com/repos/saolsen/j-dog/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/saolsen/j-dog/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/saolsen/j-dog/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/saolsen/j-dog/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/saolsen/j-dog/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/saolsen/j-dog/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/saolsen/j-dog/merges",
+  "archive_url": "https://api.github.com/repos/saolsen/j-dog/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/saolsen/j-dog/downloads",
+  "issues_url": "https://api.github.com/repos/saolsen/j-dog/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/saolsen/j-dog/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/saolsen/j-dog/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/saolsen/j-dog/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/saolsen/j-dog/labels{/name}",
+  "releases_url": "https://api.github.com/repos/saolsen/j-dog/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/saolsen/j-dog/deployments",
+  "created_at": "2012-09-05T00:25:47Z",
+  "updated_at": "2015-11-05T14:06:16Z",
+  "pushed_at": "2012-09-16T22:07:05Z",
+  "git_url": "git://github.com/saolsen/j-dog.git",
+  "ssh_url": "git@github.com:saolsen/j-dog.git",
+  "clone_url": "https://github.com/saolsen/j-dog.git",
+  "svn_url": "https://github.com/saolsen/j-dog",
+  "homepage": null,
+  "size": 100,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 0
+}

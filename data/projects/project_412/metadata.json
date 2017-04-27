@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:43:56 GMT
+Date: Thu, 27 Apr 2017 18:00:08 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5104
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3151
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "80fd7c60df2d57e60fe9fc54b457c539"
+Last-Modified: Sun, 11 Sep 2016 03:34:21 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 23
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D6DA:0711:7165C5F:881AAB3:58C3565C
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 8F0D:6633:DD447C:11E7FBB:590231A7
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 56047252,
+  "name": "julia-ex",
+  "full_name": "zxteloiv/julia-ex",
+  "owner": {
+    "login": "zxteloiv",
+    "id": 517994,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/517994?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zxteloiv",
+    "html_url": "https://github.com/zxteloiv",
+    "followers_url": "https://api.github.com/users/zxteloiv/followers",
+    "following_url": "https://api.github.com/users/zxteloiv/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zxteloiv/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zxteloiv/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zxteloiv/subscriptions",
+    "organizations_url": "https://api.github.com/users/zxteloiv/orgs",
+    "repos_url": "https://api.github.com/users/zxteloiv/repos",
+    "events_url": "https://api.github.com/users/zxteloiv/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zxteloiv/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/zxteloiv/julia-ex",
+  "description": "exercise for julia lang",
+  "fork": false,
+  "url": "https://api.github.com/repos/zxteloiv/julia-ex",
+  "forks_url": "https://api.github.com/repos/zxteloiv/julia-ex/forks",
+  "keys_url": "https://api.github.com/repos/zxteloiv/julia-ex/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/zxteloiv/julia-ex/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/zxteloiv/julia-ex/teams",
+  "hooks_url": "https://api.github.com/repos/zxteloiv/julia-ex/hooks",
+  "issue_events_url": "https://api.github.com/repos/zxteloiv/julia-ex/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/zxteloiv/julia-ex/events",
+  "assignees_url": "https://api.github.com/repos/zxteloiv/julia-ex/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/zxteloiv/julia-ex/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/zxteloiv/julia-ex/tags",
+  "blobs_url": "https://api.github.com/repos/zxteloiv/julia-ex/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/zxteloiv/julia-ex/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/zxteloiv/julia-ex/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/zxteloiv/julia-ex/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/zxteloiv/julia-ex/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/zxteloiv/julia-ex/languages",
+  "stargazers_url": "https://api.github.com/repos/zxteloiv/julia-ex/stargazers",
+  "contributors_url": "https://api.github.com/repos/zxteloiv/julia-ex/contributors",
+  "subscribers_url": "https://api.github.com/repos/zxteloiv/julia-ex/subscribers",
+  "subscription_url": "https://api.github.com/repos/zxteloiv/julia-ex/subscription",
+  "commits_url": "https://api.github.com/repos/zxteloiv/julia-ex/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/zxteloiv/julia-ex/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/zxteloiv/julia-ex/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/zxteloiv/julia-ex/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/zxteloiv/julia-ex/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/zxteloiv/julia-ex/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/zxteloiv/julia-ex/merges",
+  "archive_url": "https://api.github.com/repos/zxteloiv/julia-ex/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/zxteloiv/julia-ex/downloads",
+  "issues_url": "https://api.github.com/repos/zxteloiv/julia-ex/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/zxteloiv/julia-ex/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/zxteloiv/julia-ex/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/zxteloiv/julia-ex/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/zxteloiv/julia-ex/labels{/name}",
+  "releases_url": "https://api.github.com/repos/zxteloiv/julia-ex/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/zxteloiv/julia-ex/deployments",
+  "created_at": "2016-04-12T08:58:17Z",
+  "updated_at": "2016-09-11T03:34:21Z",
+  "pushed_at": "2016-05-25T16:32:47Z",
+  "git_url": "git://github.com/zxteloiv/julia-ex.git",
+  "ssh_url": "git@github.com:zxteloiv/julia-ex.git",
+  "clone_url": "https://github.com/zxteloiv/julia-ex.git",
+  "svn_url": "https://github.com/zxteloiv/julia-ex",
+  "homepage": null,
+  "size": 71,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

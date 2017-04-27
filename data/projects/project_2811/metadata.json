@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:15:50 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5337
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 877
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "427bb443aa7cf9c7252d595b6a33647f"
+Last-Modified: Fri, 21 Apr 2017 07:31:33 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: a51acaae89a7607fd7ee967627be18e4
+X-GitHub-Request-Id: BD4E:6634:136EEA7:191EC0B:59023556
+
+{
+  "id": 47862683,
+  "name": "Query.jl",
+  "full_name": "davidanthoff/Query.jl",
+  "owner": {
+    "login": "davidanthoff",
+    "id": 1036561,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/1036561?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/davidanthoff",
+    "html_url": "https://github.com/davidanthoff",
+    "followers_url": "https://api.github.com/users/davidanthoff/followers",
+    "following_url": "https://api.github.com/users/davidanthoff/following{/other_user}",
+    "gists_url": "https://api.github.com/users/davidanthoff/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/davidanthoff/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/davidanthoff/subscriptions",
+    "organizations_url": "https://api.github.com/users/davidanthoff/orgs",
+    "repos_url": "https://api.github.com/users/davidanthoff/repos",
+    "events_url": "https://api.github.com/users/davidanthoff/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/davidanthoff/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/davidanthoff/Query.jl",
+  "description": "Query almost anything in julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/davidanthoff/Query.jl",
+  "forks_url": "https://api.github.com/repos/davidanthoff/Query.jl/forks",
+  "keys_url": "https://api.github.com/repos/davidanthoff/Query.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/davidanthoff/Query.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/davidanthoff/Query.jl/teams",
+  "hooks_url": "https://api.github.com/repos/davidanthoff/Query.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/davidanthoff/Query.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/davidanthoff/Query.jl/events",
+  "assignees_url": "https://api.github.com/repos/davidanthoff/Query.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/davidanthoff/Query.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/davidanthoff/Query.jl/tags",
+  "blobs_url": "https://api.github.com/repos/davidanthoff/Query.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/davidanthoff/Query.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/davidanthoff/Query.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/davidanthoff/Query.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/davidanthoff/Query.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/davidanthoff/Query.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/davidanthoff/Query.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/davidanthoff/Query.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/davidanthoff/Query.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/davidanthoff/Query.jl/subscription",
+  "commits_url": "https://api.github.com/repos/davidanthoff/Query.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/davidanthoff/Query.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/davidanthoff/Query.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/davidanthoff/Query.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/davidanthoff/Query.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/davidanthoff/Query.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/davidanthoff/Query.jl/merges",
+  "archive_url": "https://api.github.com/repos/davidanthoff/Query.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/davidanthoff/Query.jl/downloads",
+  "issues_url": "https://api.github.com/repos/davidanthoff/Query.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/davidanthoff/Query.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/davidanthoff/Query.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/davidanthoff/Query.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/davidanthoff/Query.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/davidanthoff/Query.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/davidanthoff/Query.jl/deployments",
+  "created_at": "2015-12-12T03:33:03Z",
+  "updated_at": "2017-04-21T07:31:33Z",
+  "pushed_at": "2017-04-26T22:48:06Z",
+  "git_url": "git://github.com/davidanthoff/Query.jl.git",
+  "ssh_url": "git@github.com:davidanthoff/Query.jl.git",
+  "clone_url": "https://github.com/davidanthoff/Query.jl.git",
+  "svn_url": "https://github.com/davidanthoff/Query.jl",
+  "homepage": "",
+  "size": 522,
+  "stargazers_count": 42,
+  "watchers_count": 42,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": false,
+  "has_pages": true,
+  "forks_count": 4,
+  "mirror_url": null,
+  "open_issues_count": 36,
+  "forks": 4,
+  "open_issues": 36,
+  "watchers": 42,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 4,
+  "subscribers_count": 6
+}

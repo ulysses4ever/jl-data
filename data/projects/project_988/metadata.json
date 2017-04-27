@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:02:39 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5187
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 2643
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2c5ff8ef2961bfa443b3baccefa61aa2"
+Last-Modified: Tue, 26 Apr 2016 04:48:50 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 52437fedc85beec8da3449496900fb9a
+X-GitHub-Request-Id: 6779:6631:8681AA:ADBB56:5902323F
+
+{
+  "id": 46596315,
+  "name": "Persist.jl",
+  "full_name": "eschnett/Persist.jl",
+  "owner": {
+    "login": "eschnett",
+    "id": 213514,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/213514?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/eschnett",
+    "html_url": "https://github.com/eschnett",
+    "followers_url": "https://api.github.com/users/eschnett/followers",
+    "following_url": "https://api.github.com/users/eschnett/following{/other_user}",
+    "gists_url": "https://api.github.com/users/eschnett/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/eschnett/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/eschnett/subscriptions",
+    "organizations_url": "https://api.github.com/users/eschnett/orgs",
+    "repos_url": "https://api.github.com/users/eschnett/repos",
+    "events_url": "https://api.github.com/users/eschnett/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/eschnett/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/eschnett/Persist.jl",
+  "description": "Persistent jobs",
+  "fork": false,
+  "url": "https://api.github.com/repos/eschnett/Persist.jl",
+  "forks_url": "https://api.github.com/repos/eschnett/Persist.jl/forks",
+  "keys_url": "https://api.github.com/repos/eschnett/Persist.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/eschnett/Persist.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/eschnett/Persist.jl/teams",
+  "hooks_url": "https://api.github.com/repos/eschnett/Persist.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/eschnett/Persist.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/eschnett/Persist.jl/events",
+  "assignees_url": "https://api.github.com/repos/eschnett/Persist.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/eschnett/Persist.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/eschnett/Persist.jl/tags",
+  "blobs_url": "https://api.github.com/repos/eschnett/Persist.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/eschnett/Persist.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/eschnett/Persist.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/eschnett/Persist.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/eschnett/Persist.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/eschnett/Persist.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/eschnett/Persist.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/eschnett/Persist.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/eschnett/Persist.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/eschnett/Persist.jl/subscription",
+  "commits_url": "https://api.github.com/repos/eschnett/Persist.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/eschnett/Persist.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/eschnett/Persist.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/eschnett/Persist.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/eschnett/Persist.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/eschnett/Persist.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/eschnett/Persist.jl/merges",
+  "archive_url": "https://api.github.com/repos/eschnett/Persist.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/eschnett/Persist.jl/downloads",
+  "issues_url": "https://api.github.com/repos/eschnett/Persist.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/eschnett/Persist.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/eschnett/Persist.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/eschnett/Persist.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/eschnett/Persist.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/eschnett/Persist.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/eschnett/Persist.jl/deployments",
+  "created_at": "2015-11-21T01:37:42Z",
+  "updated_at": "2016-04-26T04:48:50Z",
+  "pushed_at": "2016-07-13T02:08:23Z",
+  "git_url": "git://github.com/eschnett/Persist.jl.git",
+  "ssh_url": "git@github.com:eschnett/Persist.jl.git",
+  "clone_url": "https://github.com/eschnett/Persist.jl.git",
+  "svn_url": "https://github.com/eschnett/Persist.jl",
+  "homepage": null,
+  "size": 29,
+  "stargazers_count": 12,
+  "watchers_count": 12,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 3,
+  "forks": 2,
+  "open_issues": 3,
+  "watchers": 12,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 3
+}

@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:42:28 GMT
+Date: Thu, 27 Apr 2017 18:00:04 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6362
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3167
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "41f640e95794130fdea9fc8d3ae80c6e"
+Last-Modified: Sun, 04 Sep 2016 04:15:15 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 35
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E679:0711:7162214:8816349:58C35604
+Vary: Accept-Encoding
+X-Served-By: a51acaae89a7607fd7ee967627be18e4
+X-GitHub-Request-Id: BF39:6634:1343257:18E6004:590231A3
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 56370359,
+  "name": "CVCore.jl",
+  "full_name": "JuliaOpenCV/CVCore.jl",
+  "owner": {
+    "login": "JuliaOpenCV",
+    "id": 18496360,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/18496360?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaOpenCV",
+    "html_url": "https://github.com/JuliaOpenCV",
+    "followers_url": "https://api.github.com/users/JuliaOpenCV/followers",
+    "following_url": "https://api.github.com/users/JuliaOpenCV/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaOpenCV/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaOpenCV/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaOpenCV/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaOpenCV/orgs",
+    "repos_url": "https://api.github.com/users/JuliaOpenCV/repos",
+    "events_url": "https://api.github.com/users/JuliaOpenCV/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaOpenCV/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaOpenCV/CVCore.jl",
+  "description": "Core functionality",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl",
+  "forks_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaOpenCV/CVCore.jl/deployments",
+  "created_at": "2016-04-16T07:00:55Z",
+  "updated_at": "2016-09-04T04:15:15Z",
+  "pushed_at": "2016-10-11T15:31:34Z",
+  "git_url": "git://github.com/JuliaOpenCV/CVCore.jl.git",
+  "ssh_url": "git@github.com:JuliaOpenCV/CVCore.jl.git",
+  "clone_url": "https://github.com/JuliaOpenCV/CVCore.jl.git",
+  "svn_url": "https://github.com/JuliaOpenCV/CVCore.jl",
+  "homepage": "",
+  "size": 19,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaOpenCV",
+    "id": 18496360,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/18496360?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaOpenCV",
+    "html_url": "https://github.com/JuliaOpenCV",
+    "followers_url": "https://api.github.com/users/JuliaOpenCV/followers",
+    "following_url": "https://api.github.com/users/JuliaOpenCV/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaOpenCV/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaOpenCV/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaOpenCV/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaOpenCV/orgs",
+    "repos_url": "https://api.github.com/users/JuliaOpenCV/repos",
+    "events_url": "https://api.github.com/users/JuliaOpenCV/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaOpenCV/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 1,
+  "subscribers_count": 1
 }

@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 19:02:09 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5460
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4359
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "492becdae4b3f00274dbefef27e4543a"
+Last-Modified: Mon, 03 Oct 2016 19:32:35 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 0e17b94a265a427d9cafe798ceea7c02
+X-GitHub-Request-Id: AF68:6633:E5D0E7:129887A:59024031
+
+{
+  "id": 33303856,
+  "name": "FunctionZeros.jl",
+  "full_name": "jlapeyre/FunctionZeros.jl",
+  "owner": {
+    "login": "jlapeyre",
+    "id": 1969884,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1969884?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/jlapeyre",
+    "html_url": "https://github.com/jlapeyre",
+    "followers_url": "https://api.github.com/users/jlapeyre/followers",
+    "following_url": "https://api.github.com/users/jlapeyre/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jlapeyre/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jlapeyre/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jlapeyre/subscriptions",
+    "organizations_url": "https://api.github.com/users/jlapeyre/orgs",
+    "repos_url": "https://api.github.com/users/jlapeyre/repos",
+    "events_url": "https://api.github.com/users/jlapeyre/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jlapeyre/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/jlapeyre/FunctionZeros.jl",
+  "description": "Zeros of Bessel J function",
+  "fork": false,
+  "url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl",
+  "forks_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/forks",
+  "keys_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/teams",
+  "hooks_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/events",
+  "assignees_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/tags",
+  "blobs_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/subscription",
+  "commits_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/merges",
+  "archive_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/downloads",
+  "issues_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jlapeyre/FunctionZeros.jl/deployments",
+  "created_at": "2015-04-02T10:48:27Z",
+  "updated_at": "2016-10-03T19:32:35Z",
+  "pushed_at": "2016-10-13T16:50:12Z",
+  "git_url": "git://github.com/jlapeyre/FunctionZeros.jl.git",
+  "ssh_url": "git@github.com:jlapeyre/FunctionZeros.jl.git",
+  "clone_url": "https://github.com/jlapeyre/FunctionZeros.jl.git",
+  "svn_url": "https://github.com/jlapeyre/FunctionZeros.jl",
+  "homepage": null,
+  "size": 9,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

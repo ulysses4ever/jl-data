@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:59:38 GMT
+Date: Thu, 27 Apr 2017 18:00:26 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5422
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3098
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "26d178bbb83a8b3076fe7c68faf35d4a"
+Last-Modified: Wed, 28 Sep 2016 14:47:03 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D807:0712:733AA77:8A2C4FA:58C35A0A
+Vary: Accept-Encoding
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 79C3:6637:1332F78:18C837E:590231B9
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 53528251,
+  "name": "blurnet",
+  "full_name": "greenflash1357/blurnet",
+  "owner": {
+    "login": "greenflash1357",
+    "id": 8362810,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/8362810?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/greenflash1357",
+    "html_url": "https://github.com/greenflash1357",
+    "followers_url": "https://api.github.com/users/greenflash1357/followers",
+    "following_url": "https://api.github.com/users/greenflash1357/following{/other_user}",
+    "gists_url": "https://api.github.com/users/greenflash1357/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/greenflash1357/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/greenflash1357/subscriptions",
+    "organizations_url": "https://api.github.com/users/greenflash1357/orgs",
+    "repos_url": "https://api.github.com/users/greenflash1357/repos",
+    "events_url": "https://api.github.com/users/greenflash1357/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/greenflash1357/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/greenflash1357/blurnet",
+  "description": "A Convolutional Neural Network for Blur Segmentation",
+  "fork": false,
+  "url": "https://api.github.com/repos/greenflash1357/blurnet",
+  "forks_url": "https://api.github.com/repos/greenflash1357/blurnet/forks",
+  "keys_url": "https://api.github.com/repos/greenflash1357/blurnet/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/greenflash1357/blurnet/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/greenflash1357/blurnet/teams",
+  "hooks_url": "https://api.github.com/repos/greenflash1357/blurnet/hooks",
+  "issue_events_url": "https://api.github.com/repos/greenflash1357/blurnet/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/greenflash1357/blurnet/events",
+  "assignees_url": "https://api.github.com/repos/greenflash1357/blurnet/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/greenflash1357/blurnet/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/greenflash1357/blurnet/tags",
+  "blobs_url": "https://api.github.com/repos/greenflash1357/blurnet/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/greenflash1357/blurnet/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/greenflash1357/blurnet/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/greenflash1357/blurnet/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/greenflash1357/blurnet/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/greenflash1357/blurnet/languages",
+  "stargazers_url": "https://api.github.com/repos/greenflash1357/blurnet/stargazers",
+  "contributors_url": "https://api.github.com/repos/greenflash1357/blurnet/contributors",
+  "subscribers_url": "https://api.github.com/repos/greenflash1357/blurnet/subscribers",
+  "subscription_url": "https://api.github.com/repos/greenflash1357/blurnet/subscription",
+  "commits_url": "https://api.github.com/repos/greenflash1357/blurnet/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/greenflash1357/blurnet/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/greenflash1357/blurnet/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/greenflash1357/blurnet/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/greenflash1357/blurnet/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/greenflash1357/blurnet/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/greenflash1357/blurnet/merges",
+  "archive_url": "https://api.github.com/repos/greenflash1357/blurnet/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/greenflash1357/blurnet/downloads",
+  "issues_url": "https://api.github.com/repos/greenflash1357/blurnet/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/greenflash1357/blurnet/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/greenflash1357/blurnet/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/greenflash1357/blurnet/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/greenflash1357/blurnet/labels{/name}",
+  "releases_url": "https://api.github.com/repos/greenflash1357/blurnet/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/greenflash1357/blurnet/deployments",
+  "created_at": "2016-03-09T20:11:11Z",
+  "updated_at": "2016-09-28T14:47:03Z",
+  "pushed_at": "2016-03-31T14:12:27Z",
+  "git_url": "git://github.com/greenflash1357/blurnet.git",
+  "ssh_url": "git@github.com:greenflash1357/blurnet.git",
+  "clone_url": "https://github.com/greenflash1357/blurnet.git",
+  "svn_url": "https://github.com/greenflash1357/blurnet",
+  "homepage": "",
+  "size": 26890,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

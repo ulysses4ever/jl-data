@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 00:36:02 GMT
+Date: Thu, 27 Apr 2017 17:59:47 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 6702
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3238
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "7db8983b25db23eba1d7c35e5600d8e9"
+Last-Modified: Mon, 08 Aug 2016 17:09:33 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 52
-X-RateLimit-Reset: 1489196061
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,122 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: E2E7:0712:7269DB4:89316AE:58C34671
+Vary: Accept-Encoding
+X-Served-By: d0b3c2c33a23690498aa8e70a435a259
+X-GitHub-Request-Id: 1D6A:6637:133120D:18C5C8E:59023193
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 44947647,
+  "name": "juliasim",
+  "full_name": "oaklandanalytics/juliasim",
+  "owner": {
+    "login": "oaklandanalytics",
+    "id": 20910389,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/20910389?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/oaklandanalytics",
+    "html_url": "https://github.com/oaklandanalytics",
+    "followers_url": "https://api.github.com/users/oaklandanalytics/followers",
+    "following_url": "https://api.github.com/users/oaklandanalytics/following{/other_user}",
+    "gists_url": "https://api.github.com/users/oaklandanalytics/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/oaklandanalytics/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/oaklandanalytics/subscriptions",
+    "organizations_url": "https://api.github.com/users/oaklandanalytics/orgs",
+    "repos_url": "https://api.github.com/users/oaklandanalytics/repos",
+    "events_url": "https://api.github.com/users/oaklandanalytics/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/oaklandanalytics/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/oaklandanalytics/juliasim",
+  "description": "A little trial of the Julia language using UrbanSim as a testbed",
+  "fork": false,
+  "url": "https://api.github.com/repos/oaklandanalytics/juliasim",
+  "forks_url": "https://api.github.com/repos/oaklandanalytics/juliasim/forks",
+  "keys_url": "https://api.github.com/repos/oaklandanalytics/juliasim/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/oaklandanalytics/juliasim/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/oaklandanalytics/juliasim/teams",
+  "hooks_url": "https://api.github.com/repos/oaklandanalytics/juliasim/hooks",
+  "issue_events_url": "https://api.github.com/repos/oaklandanalytics/juliasim/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/oaklandanalytics/juliasim/events",
+  "assignees_url": "https://api.github.com/repos/oaklandanalytics/juliasim/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/oaklandanalytics/juliasim/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/oaklandanalytics/juliasim/tags",
+  "blobs_url": "https://api.github.com/repos/oaklandanalytics/juliasim/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/oaklandanalytics/juliasim/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/oaklandanalytics/juliasim/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/oaklandanalytics/juliasim/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/oaklandanalytics/juliasim/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/oaklandanalytics/juliasim/languages",
+  "stargazers_url": "https://api.github.com/repos/oaklandanalytics/juliasim/stargazers",
+  "contributors_url": "https://api.github.com/repos/oaklandanalytics/juliasim/contributors",
+  "subscribers_url": "https://api.github.com/repos/oaklandanalytics/juliasim/subscribers",
+  "subscription_url": "https://api.github.com/repos/oaklandanalytics/juliasim/subscription",
+  "commits_url": "https://api.github.com/repos/oaklandanalytics/juliasim/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/oaklandanalytics/juliasim/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/oaklandanalytics/juliasim/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/oaklandanalytics/juliasim/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/oaklandanalytics/juliasim/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/oaklandanalytics/juliasim/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/oaklandanalytics/juliasim/merges",
+  "archive_url": "https://api.github.com/repos/oaklandanalytics/juliasim/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/oaklandanalytics/juliasim/downloads",
+  "issues_url": "https://api.github.com/repos/oaklandanalytics/juliasim/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/oaklandanalytics/juliasim/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/oaklandanalytics/juliasim/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/oaklandanalytics/juliasim/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/oaklandanalytics/juliasim/labels{/name}",
+  "releases_url": "https://api.github.com/repos/oaklandanalytics/juliasim/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/oaklandanalytics/juliasim/deployments",
+  "created_at": "2015-10-26T05:20:03Z",
+  "updated_at": "2016-08-08T17:09:33Z",
+  "pushed_at": "2015-10-26T06:53:10Z",
+  "git_url": "git://github.com/oaklandanalytics/juliasim.git",
+  "ssh_url": "git@github.com:oaklandanalytics/juliasim.git",
+  "clone_url": "https://github.com/oaklandanalytics/juliasim.git",
+  "svn_url": "https://github.com/oaklandanalytics/juliasim",
+  "homepage": null,
+  "size": 144,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "oaklandanalytics",
+    "id": 20910389,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/20910389?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/oaklandanalytics",
+    "html_url": "https://github.com/oaklandanalytics",
+    "followers_url": "https://api.github.com/users/oaklandanalytics/followers",
+    "following_url": "https://api.github.com/users/oaklandanalytics/following{/other_user}",
+    "gists_url": "https://api.github.com/users/oaklandanalytics/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/oaklandanalytics/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/oaklandanalytics/subscriptions",
+    "organizations_url": "https://api.github.com/users/oaklandanalytics/orgs",
+    "repos_url": "https://api.github.com/users/oaklandanalytics/repos",
+    "events_url": "https://api.github.com/users/oaklandanalytics/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/oaklandanalytics/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

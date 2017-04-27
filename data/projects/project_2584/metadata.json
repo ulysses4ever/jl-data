@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:12:56 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5004
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1114
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "3a87c14fd7166abbaacc8e2242b24eac"
+Last-Modified: Fri, 13 Mar 2015 18:41:37 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: a30e6f9aa7cf5731b87dfb3b9992202d
+X-GitHub-Request-Id: E171:6634:1367402:1914BC4:590234A8
+
+{
+  "id": 25792142,
+  "name": "Lasem.jl",
+  "full_name": "acroy/Lasem.jl",
+  "owner": {
+    "login": "acroy",
+    "id": 6170781,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/6170781?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/acroy",
+    "html_url": "https://github.com/acroy",
+    "followers_url": "https://api.github.com/users/acroy/followers",
+    "following_url": "https://api.github.com/users/acroy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/acroy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/acroy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/acroy/subscriptions",
+    "organizations_url": "https://api.github.com/users/acroy/orgs",
+    "repos_url": "https://api.github.com/users/acroy/repos",
+    "events_url": "https://api.github.com/users/acroy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/acroy/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/acroy/Lasem.jl",
+  "description": "Julia interface to Lasem, a library for rendering of SVG and MathML using Pango/Cairo",
+  "fork": false,
+  "url": "https://api.github.com/repos/acroy/Lasem.jl",
+  "forks_url": "https://api.github.com/repos/acroy/Lasem.jl/forks",
+  "keys_url": "https://api.github.com/repos/acroy/Lasem.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/acroy/Lasem.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/acroy/Lasem.jl/teams",
+  "hooks_url": "https://api.github.com/repos/acroy/Lasem.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/acroy/Lasem.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/acroy/Lasem.jl/events",
+  "assignees_url": "https://api.github.com/repos/acroy/Lasem.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/acroy/Lasem.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/acroy/Lasem.jl/tags",
+  "blobs_url": "https://api.github.com/repos/acroy/Lasem.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/acroy/Lasem.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/acroy/Lasem.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/acroy/Lasem.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/acroy/Lasem.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/acroy/Lasem.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/acroy/Lasem.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/acroy/Lasem.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/acroy/Lasem.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/acroy/Lasem.jl/subscription",
+  "commits_url": "https://api.github.com/repos/acroy/Lasem.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/acroy/Lasem.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/acroy/Lasem.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/acroy/Lasem.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/acroy/Lasem.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/acroy/Lasem.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/acroy/Lasem.jl/merges",
+  "archive_url": "https://api.github.com/repos/acroy/Lasem.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/acroy/Lasem.jl/downloads",
+  "issues_url": "https://api.github.com/repos/acroy/Lasem.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/acroy/Lasem.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/acroy/Lasem.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/acroy/Lasem.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/acroy/Lasem.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/acroy/Lasem.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/acroy/Lasem.jl/deployments",
+  "created_at": "2014-10-26T21:40:48Z",
+  "updated_at": "2015-03-13T18:41:37Z",
+  "pushed_at": "2014-10-26T21:41:18Z",
+  "git_url": "git://github.com/acroy/Lasem.jl.git",
+  "ssh_url": "git@github.com:acroy/Lasem.jl.git",
+  "clone_url": "https://github.com/acroy/Lasem.jl.git",
+  "svn_url": "https://github.com/acroy/Lasem.jl",
+  "homepage": null,
+  "size": 104,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 2
+}

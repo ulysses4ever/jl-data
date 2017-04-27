@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:21:04 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5432
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 413
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "6c4d3136b420799a99ee1fb222bae50f"
+Last-Modified: Fri, 30 Dec 2016 15:12:43 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 0e17b94a265a427d9cafe798ceea7c02
+X-GitHub-Request-Id: CC3C:6631:884165:AFFA73:59023690
+
+{
+  "id": 6215747,
+  "name": "RNGTest.jl",
+  "full_name": "andreasnoack/RNGTest.jl",
+  "owner": {
+    "login": "andreasnoack",
+    "id": 505001,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/505001?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/andreasnoack",
+    "html_url": "https://github.com/andreasnoack",
+    "followers_url": "https://api.github.com/users/andreasnoack/followers",
+    "following_url": "https://api.github.com/users/andreasnoack/following{/other_user}",
+    "gists_url": "https://api.github.com/users/andreasnoack/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/andreasnoack/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/andreasnoack/subscriptions",
+    "organizations_url": "https://api.github.com/users/andreasnoack/orgs",
+    "repos_url": "https://api.github.com/users/andreasnoack/repos",
+    "events_url": "https://api.github.com/users/andreasnoack/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/andreasnoack/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/andreasnoack/RNGTest.jl",
+  "description": "Code for testing of Julia's random numbers",
+  "fork": false,
+  "url": "https://api.github.com/repos/andreasnoack/RNGTest.jl",
+  "forks_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/forks",
+  "keys_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/teams",
+  "hooks_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/events",
+  "assignees_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/tags",
+  "blobs_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/subscription",
+  "commits_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/merges",
+  "archive_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/downloads",
+  "issues_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/andreasnoack/RNGTest.jl/deployments",
+  "created_at": "2012-10-14T16:46:51Z",
+  "updated_at": "2016-12-30T15:12:43Z",
+  "pushed_at": "2017-03-08T08:39:43Z",
+  "git_url": "git://github.com/andreasnoack/RNGTest.jl.git",
+  "ssh_url": "git@github.com:andreasnoack/RNGTest.jl.git",
+  "clone_url": "https://github.com/andreasnoack/RNGTest.jl.git",
+  "svn_url": "https://github.com/andreasnoack/RNGTest.jl",
+  "homepage": null,
+  "size": 6259,
+  "stargazers_count": 5,
+  "watchers_count": 5,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 4,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 4,
+  "open_issues": 2,
+  "watchers": 5,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 4,
+  "subscribers_count": 1
+}

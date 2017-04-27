@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:54:15 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5400
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4702
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a5d38cc192753c03912c7588f5925420"
+Last-Modified: Sun, 09 Apr 2017 07:03:25 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 5513:6633:E4CCC7:12838E9:59023E57
+
+{
+  "id": 41641059,
+  "name": "Drawing.jl",
+  "full_name": "andrewcooke/Drawing.jl",
+  "owner": {
+    "login": "andrewcooke",
+    "id": 1429281,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/1429281?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/andrewcooke",
+    "html_url": "https://github.com/andrewcooke",
+    "followers_url": "https://api.github.com/users/andrewcooke/followers",
+    "following_url": "https://api.github.com/users/andrewcooke/following{/other_user}",
+    "gists_url": "https://api.github.com/users/andrewcooke/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/andrewcooke/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/andrewcooke/subscriptions",
+    "organizations_url": "https://api.github.com/users/andrewcooke/orgs",
+    "repos_url": "https://api.github.com/users/andrewcooke/repos",
+    "events_url": "https://api.github.com/users/andrewcooke/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/andrewcooke/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/andrewcooke/Drawing.jl",
+  "description": "A library for easy, extensible drawing (diagrams, lines, shapes)",
+  "fork": false,
+  "url": "https://api.github.com/repos/andrewcooke/Drawing.jl",
+  "forks_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/forks",
+  "keys_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/teams",
+  "hooks_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/events",
+  "assignees_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/tags",
+  "blobs_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/subscription",
+  "commits_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/merges",
+  "archive_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/downloads",
+  "issues_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/andrewcooke/Drawing.jl/deployments",
+  "created_at": "2015-08-30T19:53:46Z",
+  "updated_at": "2017-04-09T07:03:25Z",
+  "pushed_at": "2016-02-15T16:03:46Z",
+  "git_url": "git://github.com/andrewcooke/Drawing.jl.git",
+  "ssh_url": "git@github.com:andrewcooke/Drawing.jl.git",
+  "clone_url": "https://github.com/andrewcooke/Drawing.jl.git",
+  "svn_url": "https://github.com/andrewcooke/Drawing.jl",
+  "homepage": "",
+  "size": 3253,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 3,
+  "open_issues": 0,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 2
+}

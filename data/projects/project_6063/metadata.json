@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:59:56 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4869
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4451
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "52ab9c1bd02ac54f899f7abb7abc54d7"
+Last-Modified: Wed, 03 Jun 2015 04:33:58 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 08BC:6637:13E6E33:19AF466:59023FAB
+
+{
+  "id": 36642982,
+  "name": "Log.jl",
+  "full_name": "tmlbl/Log.jl",
+  "owner": {
+    "login": "tmlbl",
+    "id": 6007526,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/6007526?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tmlbl",
+    "html_url": "https://github.com/tmlbl",
+    "followers_url": "https://api.github.com/users/tmlbl/followers",
+    "following_url": "https://api.github.com/users/tmlbl/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tmlbl/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tmlbl/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tmlbl/subscriptions",
+    "organizations_url": "https://api.github.com/users/tmlbl/orgs",
+    "repos_url": "https://api.github.com/users/tmlbl/repos",
+    "events_url": "https://api.github.com/users/tmlbl/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tmlbl/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/tmlbl/Log.jl",
+  "description": "A friendly and simple logger for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/tmlbl/Log.jl",
+  "forks_url": "https://api.github.com/repos/tmlbl/Log.jl/forks",
+  "keys_url": "https://api.github.com/repos/tmlbl/Log.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/tmlbl/Log.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/tmlbl/Log.jl/teams",
+  "hooks_url": "https://api.github.com/repos/tmlbl/Log.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/tmlbl/Log.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/tmlbl/Log.jl/events",
+  "assignees_url": "https://api.github.com/repos/tmlbl/Log.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/tmlbl/Log.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/tmlbl/Log.jl/tags",
+  "blobs_url": "https://api.github.com/repos/tmlbl/Log.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/tmlbl/Log.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/tmlbl/Log.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/tmlbl/Log.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/tmlbl/Log.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/tmlbl/Log.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/tmlbl/Log.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/tmlbl/Log.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/tmlbl/Log.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/tmlbl/Log.jl/subscription",
+  "commits_url": "https://api.github.com/repos/tmlbl/Log.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/tmlbl/Log.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/tmlbl/Log.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/tmlbl/Log.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/tmlbl/Log.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/tmlbl/Log.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/tmlbl/Log.jl/merges",
+  "archive_url": "https://api.github.com/repos/tmlbl/Log.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/tmlbl/Log.jl/downloads",
+  "issues_url": "https://api.github.com/repos/tmlbl/Log.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/tmlbl/Log.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/tmlbl/Log.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/tmlbl/Log.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/tmlbl/Log.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/tmlbl/Log.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/tmlbl/Log.jl/deployments",
+  "created_at": "2015-06-01T06:49:03Z",
+  "updated_at": "2015-06-03T04:33:58Z",
+  "pushed_at": "2015-06-03T04:33:58Z",
+  "git_url": "git://github.com/tmlbl/Log.jl.git",
+  "ssh_url": "git@github.com:tmlbl/Log.jl.git",
+  "clone_url": "https://github.com/tmlbl/Log.jl.git",
+  "svn_url": "https://github.com/tmlbl/Log.jl",
+  "homepage": null,
+  "size": 132,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

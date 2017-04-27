@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:08:45 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5413
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1549
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "c86efb92c0c76a17ea9c654c3049541f"
+Last-Modified: Mon, 25 Apr 2016 02:05:54 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 13d09b732ebe76f892093130dc088652
+X-GitHub-Request-Id: 375E:6637:134B694:18E798C:590233AD
+
+{
+  "id": 47728128,
+  "name": "PooledElements.jl",
+  "full_name": "tshort/PooledElements.jl",
+  "owner": {
+    "login": "tshort",
+    "id": 636420,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/636420?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tshort",
+    "html_url": "https://github.com/tshort",
+    "followers_url": "https://api.github.com/users/tshort/followers",
+    "following_url": "https://api.github.com/users/tshort/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tshort/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tshort/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tshort/subscriptions",
+    "organizations_url": "https://api.github.com/users/tshort/orgs",
+    "repos_url": "https://api.github.com/users/tshort/repos",
+    "events_url": "https://api.github.com/users/tshort/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tshort/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/tshort/PooledElements.jl",
+  "description": "Pooled strings, elements, and arrays for Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/tshort/PooledElements.jl",
+  "forks_url": "https://api.github.com/repos/tshort/PooledElements.jl/forks",
+  "keys_url": "https://api.github.com/repos/tshort/PooledElements.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/tshort/PooledElements.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/tshort/PooledElements.jl/teams",
+  "hooks_url": "https://api.github.com/repos/tshort/PooledElements.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/tshort/PooledElements.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/tshort/PooledElements.jl/events",
+  "assignees_url": "https://api.github.com/repos/tshort/PooledElements.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/tshort/PooledElements.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/tshort/PooledElements.jl/tags",
+  "blobs_url": "https://api.github.com/repos/tshort/PooledElements.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/tshort/PooledElements.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/tshort/PooledElements.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/tshort/PooledElements.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/tshort/PooledElements.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/tshort/PooledElements.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/tshort/PooledElements.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/tshort/PooledElements.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/tshort/PooledElements.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/tshort/PooledElements.jl/subscription",
+  "commits_url": "https://api.github.com/repos/tshort/PooledElements.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/tshort/PooledElements.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/tshort/PooledElements.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/tshort/PooledElements.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/tshort/PooledElements.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/tshort/PooledElements.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/tshort/PooledElements.jl/merges",
+  "archive_url": "https://api.github.com/repos/tshort/PooledElements.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/tshort/PooledElements.jl/downloads",
+  "issues_url": "https://api.github.com/repos/tshort/PooledElements.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/tshort/PooledElements.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/tshort/PooledElements.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/tshort/PooledElements.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/tshort/PooledElements.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/tshort/PooledElements.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/tshort/PooledElements.jl/deployments",
+  "created_at": "2015-12-10T00:38:20Z",
+  "updated_at": "2016-04-25T02:05:54Z",
+  "pushed_at": "2016-07-13T05:11:52Z",
+  "git_url": "git://github.com/tshort/PooledElements.jl.git",
+  "ssh_url": "git@github.com:tshort/PooledElements.jl.git",
+  "clone_url": "https://github.com/tshort/PooledElements.jl.git",
+  "svn_url": "https://github.com/tshort/PooledElements.jl",
+  "homepage": null,
+  "size": 24,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 1,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 1,
+  "open_issues": 1,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 1,
+  "subscribers_count": 2
+}

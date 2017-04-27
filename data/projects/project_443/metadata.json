@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Sat, 11 Mar 2017 01:58:05 GMT
+Date: Thu, 27 Apr 2017 18:00:14 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 4837
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3126
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4dd330d56474805916e717eeaeda2c2a"
+Last-Modified: Thu, 14 Apr 2016 18:13:36 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489200041
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: D7D9:0712:73371B9:8A280E6:58C359AD
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: BD76:6631:863C2F:AD61AF:590231AE
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 55581301,
+  "name": "rlntm",
+  "full_name": "ulucs/rlntm",
+  "owner": {
+    "login": "ulucs",
+    "id": 11823240,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/11823240?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ulucs",
+    "html_url": "https://github.com/ulucs",
+    "followers_url": "https://api.github.com/users/ulucs/followers",
+    "following_url": "https://api.github.com/users/ulucs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ulucs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ulucs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ulucs/subscriptions",
+    "organizations_url": "https://api.github.com/users/ulucs/orgs",
+    "repos_url": "https://api.github.com/users/ulucs/repos",
+    "events_url": "https://api.github.com/users/ulucs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ulucs/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/ulucs/rlntm",
+  "description": "Implementation of http://arxiv.org/abs/1505.00521",
+  "fork": false,
+  "url": "https://api.github.com/repos/ulucs/rlntm",
+  "forks_url": "https://api.github.com/repos/ulucs/rlntm/forks",
+  "keys_url": "https://api.github.com/repos/ulucs/rlntm/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ulucs/rlntm/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ulucs/rlntm/teams",
+  "hooks_url": "https://api.github.com/repos/ulucs/rlntm/hooks",
+  "issue_events_url": "https://api.github.com/repos/ulucs/rlntm/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ulucs/rlntm/events",
+  "assignees_url": "https://api.github.com/repos/ulucs/rlntm/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ulucs/rlntm/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ulucs/rlntm/tags",
+  "blobs_url": "https://api.github.com/repos/ulucs/rlntm/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ulucs/rlntm/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ulucs/rlntm/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ulucs/rlntm/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ulucs/rlntm/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ulucs/rlntm/languages",
+  "stargazers_url": "https://api.github.com/repos/ulucs/rlntm/stargazers",
+  "contributors_url": "https://api.github.com/repos/ulucs/rlntm/contributors",
+  "subscribers_url": "https://api.github.com/repos/ulucs/rlntm/subscribers",
+  "subscription_url": "https://api.github.com/repos/ulucs/rlntm/subscription",
+  "commits_url": "https://api.github.com/repos/ulucs/rlntm/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ulucs/rlntm/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ulucs/rlntm/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ulucs/rlntm/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ulucs/rlntm/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ulucs/rlntm/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ulucs/rlntm/merges",
+  "archive_url": "https://api.github.com/repos/ulucs/rlntm/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ulucs/rlntm/downloads",
+  "issues_url": "https://api.github.com/repos/ulucs/rlntm/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ulucs/rlntm/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ulucs/rlntm/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ulucs/rlntm/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ulucs/rlntm/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ulucs/rlntm/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ulucs/rlntm/deployments",
+  "created_at": "2016-04-06T06:28:53Z",
+  "updated_at": "2016-04-14T18:13:36Z",
+  "pushed_at": "2016-04-30T11:40:34Z",
+  "git_url": "git://github.com/ulucs/rlntm.git",
+  "ssh_url": "git@github.com:ulucs/rlntm.git",
+  "clone_url": "https://github.com/ulucs/rlntm.git",
+  "svn_url": "https://github.com/ulucs/rlntm",
+  "homepage": "",
+  "size": 1050,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

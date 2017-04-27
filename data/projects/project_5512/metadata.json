@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:50:24 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6474
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4931
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "933881e9b9e96ef5c043d4943d9035b5"
+Last-Modified: Sun, 23 Apr 2017 07:30:46 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 2d7a5e35115884240089368322196939
+X-GitHub-Request-Id: CDF2:6634:13D36C7:19A0A3C:59023D70
+
+{
+  "id": 38933145,
+  "name": "PETSc.jl",
+  "full_name": "JuliaParallel/PETSc.jl",
+  "owner": {
+    "login": "JuliaParallel",
+    "id": 10119367,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/10119367?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaParallel",
+    "html_url": "https://github.com/JuliaParallel",
+    "followers_url": "https://api.github.com/users/JuliaParallel/followers",
+    "following_url": "https://api.github.com/users/JuliaParallel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaParallel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaParallel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaParallel/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaParallel/orgs",
+    "repos_url": "https://api.github.com/users/JuliaParallel/repos",
+    "events_url": "https://api.github.com/users/JuliaParallel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaParallel/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaParallel/PETSc.jl",
+  "description": "Julia wrappers for Petsc library",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaParallel/PETSc.jl",
+  "forks_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaParallel/PETSc.jl/deployments",
+  "created_at": "2015-07-11T16:49:27Z",
+  "updated_at": "2017-04-23T07:30:46Z",
+  "pushed_at": "2016-11-23T00:08:19Z",
+  "git_url": "git://github.com/JuliaParallel/PETSc.jl.git",
+  "ssh_url": "git@github.com:JuliaParallel/PETSc.jl.git",
+  "clone_url": "https://github.com/JuliaParallel/PETSc.jl.git",
+  "svn_url": "https://github.com/JuliaParallel/PETSc.jl",
+  "homepage": null,
+  "size": 5951,
+  "stargazers_count": 31,
+  "watchers_count": 31,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 8,
+  "mirror_url": null,
+  "open_issues_count": 14,
+  "forks": 8,
+  "open_issues": 14,
+  "watchers": 31,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaParallel",
+    "id": 10119367,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/10119367?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaParallel",
+    "html_url": "https://github.com/JuliaParallel",
+    "followers_url": "https://api.github.com/users/JuliaParallel/followers",
+    "following_url": "https://api.github.com/users/JuliaParallel/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaParallel/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaParallel/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaParallel/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaParallel/orgs",
+    "repos_url": "https://api.github.com/users/JuliaParallel/repos",
+    "events_url": "https://api.github.com/users/JuliaParallel/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaParallel/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 8,
+  "subscribers_count": 7
+}

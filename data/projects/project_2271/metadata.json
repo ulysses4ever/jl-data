@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:10:03 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5948
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1421
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "1d677218d7fc5fa78f94d34c33620e8f"
+Last-Modified: Tue, 28 Mar 2017 10:14:19 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 593010132f82159af0ded24b4932e109
+X-GitHub-Request-Id: 6CBF:6631:873BA4:AEA7B0:590233FB
+
+{
+  "id": 22965435,
+  "name": "XGBoost.jl",
+  "full_name": "dmlc/XGBoost.jl",
+  "owner": {
+    "login": "dmlc",
+    "id": 11508361,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/11508361?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dmlc",
+    "html_url": "https://github.com/dmlc",
+    "followers_url": "https://api.github.com/users/dmlc/followers",
+    "following_url": "https://api.github.com/users/dmlc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dmlc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dmlc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dmlc/subscriptions",
+    "organizations_url": "https://api.github.com/users/dmlc/orgs",
+    "repos_url": "https://api.github.com/users/dmlc/repos",
+    "events_url": "https://api.github.com/users/dmlc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dmlc/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dmlc/XGBoost.jl",
+  "description": "XGBoost Julia Package",
+  "fork": false,
+  "url": "https://api.github.com/repos/dmlc/XGBoost.jl",
+  "forks_url": "https://api.github.com/repos/dmlc/XGBoost.jl/forks",
+  "keys_url": "https://api.github.com/repos/dmlc/XGBoost.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dmlc/XGBoost.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dmlc/XGBoost.jl/teams",
+  "hooks_url": "https://api.github.com/repos/dmlc/XGBoost.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/dmlc/XGBoost.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dmlc/XGBoost.jl/events",
+  "assignees_url": "https://api.github.com/repos/dmlc/XGBoost.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dmlc/XGBoost.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dmlc/XGBoost.jl/tags",
+  "blobs_url": "https://api.github.com/repos/dmlc/XGBoost.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dmlc/XGBoost.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dmlc/XGBoost.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dmlc/XGBoost.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dmlc/XGBoost.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dmlc/XGBoost.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/dmlc/XGBoost.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/dmlc/XGBoost.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/dmlc/XGBoost.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/dmlc/XGBoost.jl/subscription",
+  "commits_url": "https://api.github.com/repos/dmlc/XGBoost.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dmlc/XGBoost.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dmlc/XGBoost.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dmlc/XGBoost.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dmlc/XGBoost.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dmlc/XGBoost.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dmlc/XGBoost.jl/merges",
+  "archive_url": "https://api.github.com/repos/dmlc/XGBoost.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dmlc/XGBoost.jl/downloads",
+  "issues_url": "https://api.github.com/repos/dmlc/XGBoost.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dmlc/XGBoost.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dmlc/XGBoost.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dmlc/XGBoost.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dmlc/XGBoost.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dmlc/XGBoost.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dmlc/XGBoost.jl/deployments",
+  "created_at": "2014-08-14T19:10:42Z",
+  "updated_at": "2017-03-28T10:14:19Z",
+  "pushed_at": "2017-04-23T21:45:52Z",
+  "git_url": "git://github.com/dmlc/XGBoost.jl.git",
+  "ssh_url": "git@github.com:dmlc/XGBoost.jl.git",
+  "clone_url": "https://github.com/dmlc/XGBoost.jl.git",
+  "svn_url": "https://github.com/dmlc/XGBoost.jl",
+  "homepage": "",
+  "size": 240,
+  "stargazers_count": 71,
+  "watchers_count": 71,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 35,
+  "mirror_url": null,
+  "open_issues_count": 7,
+  "forks": 35,
+  "open_issues": 7,
+  "watchers": 71,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "dmlc",
+    "id": 11508361,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/11508361?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dmlc",
+    "html_url": "https://github.com/dmlc",
+    "followers_url": "https://api.github.com/users/dmlc/followers",
+    "following_url": "https://api.github.com/users/dmlc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dmlc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dmlc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dmlc/subscriptions",
+    "organizations_url": "https://api.github.com/users/dmlc/orgs",
+    "repos_url": "https://api.github.com/users/dmlc/repos",
+    "events_url": "https://api.github.com/users/dmlc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dmlc/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 35,
+  "subscribers_count": 17
+}

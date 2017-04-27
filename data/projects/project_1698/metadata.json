@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:06:20 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5100
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1972
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "c3c93b37ea4218de69e41d7a55a3a0b2"
+Last-Modified: Tue, 11 Aug 2015 22:36:07 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 09A3:6634:1354D31:18FCC93:5902331C
+
+{
+  "id": 36947531,
+  "name": "Strings.jl",
+  "full_name": "quinnj/Strings.jl",
+  "owner": {
+    "login": "quinnj",
+    "id": 2896623,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/2896623?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/quinnj",
+    "html_url": "https://github.com/quinnj",
+    "followers_url": "https://api.github.com/users/quinnj/followers",
+    "following_url": "https://api.github.com/users/quinnj/following{/other_user}",
+    "gists_url": "https://api.github.com/users/quinnj/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/quinnj/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/quinnj/subscriptions",
+    "organizations_url": "https://api.github.com/users/quinnj/orgs",
+    "repos_url": "https://api.github.com/users/quinnj/repos",
+    "events_url": "https://api.github.com/users/quinnj/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/quinnj/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/quinnj/Strings.jl",
+  "description": "Testing out a new String representation",
+  "fork": false,
+  "url": "https://api.github.com/repos/quinnj/Strings.jl",
+  "forks_url": "https://api.github.com/repos/quinnj/Strings.jl/forks",
+  "keys_url": "https://api.github.com/repos/quinnj/Strings.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/quinnj/Strings.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/quinnj/Strings.jl/teams",
+  "hooks_url": "https://api.github.com/repos/quinnj/Strings.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/quinnj/Strings.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/quinnj/Strings.jl/events",
+  "assignees_url": "https://api.github.com/repos/quinnj/Strings.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/quinnj/Strings.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/quinnj/Strings.jl/tags",
+  "blobs_url": "https://api.github.com/repos/quinnj/Strings.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/quinnj/Strings.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/quinnj/Strings.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/quinnj/Strings.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/quinnj/Strings.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/quinnj/Strings.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/quinnj/Strings.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/quinnj/Strings.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/quinnj/Strings.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/quinnj/Strings.jl/subscription",
+  "commits_url": "https://api.github.com/repos/quinnj/Strings.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/quinnj/Strings.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/quinnj/Strings.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/quinnj/Strings.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/quinnj/Strings.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/quinnj/Strings.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/quinnj/Strings.jl/merges",
+  "archive_url": "https://api.github.com/repos/quinnj/Strings.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/quinnj/Strings.jl/downloads",
+  "issues_url": "https://api.github.com/repos/quinnj/Strings.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/quinnj/Strings.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/quinnj/Strings.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/quinnj/Strings.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/quinnj/Strings.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/quinnj/Strings.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/quinnj/Strings.jl/deployments",
+  "created_at": "2015-06-05T18:05:38Z",
+  "updated_at": "2015-08-11T22:36:07Z",
+  "pushed_at": "2016-08-11T13:45:33Z",
+  "git_url": "git://github.com/quinnj/Strings.jl.git",
+  "ssh_url": "git@github.com:quinnj/Strings.jl.git",
+  "clone_url": "https://github.com/quinnj/Strings.jl.git",
+  "svn_url": "https://github.com/quinnj/Strings.jl",
+  "homepage": null,
+  "size": 21,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 4,
+  "mirror_url": null,
+  "open_issues_count": 2,
+  "forks": 4,
+  "open_issues": 2,
+  "watchers": 2,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 4,
+  "subscribers_count": 3
+}

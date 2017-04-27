@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:55:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5112
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4657
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "23e016e32f282eab4fffa1abac7b261e"
+Last-Modified: Wed, 19 Apr 2017 00:15:44 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: B6C9:6637:13D87CD:199CFDE:59023E85
+
+{
+  "id": 42363084,
+  "name": "Julia",
+  "full_name": "tyleransom/Julia",
+  "owner": {
+    "login": "tyleransom",
+    "id": 13243576,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/13243576?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/tyleransom",
+    "html_url": "https://github.com/tyleransom",
+    "followers_url": "https://api.github.com/users/tyleransom/followers",
+    "following_url": "https://api.github.com/users/tyleransom/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tyleransom/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tyleransom/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tyleransom/subscriptions",
+    "organizations_url": "https://api.github.com/users/tyleransom/orgs",
+    "repos_url": "https://api.github.com/users/tyleransom/repos",
+    "events_url": "https://api.github.com/users/tyleransom/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tyleransom/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/tyleransom/Julia",
+  "description": "Intro files for beginners hoping to learn Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/tyleransom/Julia",
+  "forks_url": "https://api.github.com/repos/tyleransom/Julia/forks",
+  "keys_url": "https://api.github.com/repos/tyleransom/Julia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/tyleransom/Julia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/tyleransom/Julia/teams",
+  "hooks_url": "https://api.github.com/repos/tyleransom/Julia/hooks",
+  "issue_events_url": "https://api.github.com/repos/tyleransom/Julia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/tyleransom/Julia/events",
+  "assignees_url": "https://api.github.com/repos/tyleransom/Julia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/tyleransom/Julia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/tyleransom/Julia/tags",
+  "blobs_url": "https://api.github.com/repos/tyleransom/Julia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/tyleransom/Julia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/tyleransom/Julia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/tyleransom/Julia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/tyleransom/Julia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/tyleransom/Julia/languages",
+  "stargazers_url": "https://api.github.com/repos/tyleransom/Julia/stargazers",
+  "contributors_url": "https://api.github.com/repos/tyleransom/Julia/contributors",
+  "subscribers_url": "https://api.github.com/repos/tyleransom/Julia/subscribers",
+  "subscription_url": "https://api.github.com/repos/tyleransom/Julia/subscription",
+  "commits_url": "https://api.github.com/repos/tyleransom/Julia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/tyleransom/Julia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/tyleransom/Julia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/tyleransom/Julia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/tyleransom/Julia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/tyleransom/Julia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/tyleransom/Julia/merges",
+  "archive_url": "https://api.github.com/repos/tyleransom/Julia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/tyleransom/Julia/downloads",
+  "issues_url": "https://api.github.com/repos/tyleransom/Julia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/tyleransom/Julia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/tyleransom/Julia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/tyleransom/Julia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/tyleransom/Julia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/tyleransom/Julia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/tyleransom/Julia/deployments",
+  "created_at": "2015-09-12T15:58:26Z",
+  "updated_at": "2017-04-19T00:15:44Z",
+  "pushed_at": "2017-02-27T20:22:01Z",
+  "git_url": "git://github.com/tyleransom/Julia.git",
+  "ssh_url": "git@github.com:tyleransom/Julia.git",
+  "clone_url": "https://github.com/tyleransom/Julia.git",
+  "svn_url": "https://github.com/tyleransom/Julia",
+  "homepage": null,
+  "size": 3767,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 2
+}

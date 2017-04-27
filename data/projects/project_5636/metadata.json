@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:52:01 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5356
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4845
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "22fd743c41d08b0259edfc77dce85799"
+Last-Modified: Tue, 03 Jan 2017 13:13:54 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 276F:6637:13CF9AC:1991A6E:59023DD1
+
+{
+  "id": 47914830,
+  "name": "sphere-julia",
+  "full_name": "anders-dc/sphere-julia",
+  "owner": {
+    "login": "anders-dc",
+    "id": 567297,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/567297?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/anders-dc",
+    "html_url": "https://github.com/anders-dc",
+    "followers_url": "https://api.github.com/users/anders-dc/followers",
+    "following_url": "https://api.github.com/users/anders-dc/following{/other_user}",
+    "gists_url": "https://api.github.com/users/anders-dc/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/anders-dc/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/anders-dc/subscriptions",
+    "organizations_url": "https://api.github.com/users/anders-dc/orgs",
+    "repos_url": "https://api.github.com/users/anders-dc/repos",
+    "events_url": "https://api.github.com/users/anders-dc/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/anders-dc/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/anders-dc/sphere-julia",
+  "description": "Discrete element method implemented in Julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/anders-dc/sphere-julia",
+  "forks_url": "https://api.github.com/repos/anders-dc/sphere-julia/forks",
+  "keys_url": "https://api.github.com/repos/anders-dc/sphere-julia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/anders-dc/sphere-julia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/anders-dc/sphere-julia/teams",
+  "hooks_url": "https://api.github.com/repos/anders-dc/sphere-julia/hooks",
+  "issue_events_url": "https://api.github.com/repos/anders-dc/sphere-julia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/anders-dc/sphere-julia/events",
+  "assignees_url": "https://api.github.com/repos/anders-dc/sphere-julia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/anders-dc/sphere-julia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/anders-dc/sphere-julia/tags",
+  "blobs_url": "https://api.github.com/repos/anders-dc/sphere-julia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/anders-dc/sphere-julia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/anders-dc/sphere-julia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/anders-dc/sphere-julia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/anders-dc/sphere-julia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/anders-dc/sphere-julia/languages",
+  "stargazers_url": "https://api.github.com/repos/anders-dc/sphere-julia/stargazers",
+  "contributors_url": "https://api.github.com/repos/anders-dc/sphere-julia/contributors",
+  "subscribers_url": "https://api.github.com/repos/anders-dc/sphere-julia/subscribers",
+  "subscription_url": "https://api.github.com/repos/anders-dc/sphere-julia/subscription",
+  "commits_url": "https://api.github.com/repos/anders-dc/sphere-julia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/anders-dc/sphere-julia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/anders-dc/sphere-julia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/anders-dc/sphere-julia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/anders-dc/sphere-julia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/anders-dc/sphere-julia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/anders-dc/sphere-julia/merges",
+  "archive_url": "https://api.github.com/repos/anders-dc/sphere-julia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/anders-dc/sphere-julia/downloads",
+  "issues_url": "https://api.github.com/repos/anders-dc/sphere-julia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/anders-dc/sphere-julia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/anders-dc/sphere-julia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/anders-dc/sphere-julia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/anders-dc/sphere-julia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/anders-dc/sphere-julia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/anders-dc/sphere-julia/deployments",
+  "created_at": "2015-12-13T10:34:46Z",
+  "updated_at": "2017-01-03T13:13:54Z",
+  "pushed_at": "2017-04-14T14:23:31Z",
+  "git_url": "git://github.com/anders-dc/sphere-julia.git",
+  "ssh_url": "git@github.com:anders-dc/sphere-julia.git",
+  "clone_url": "https://github.com/anders-dc/sphere-julia.git",
+  "svn_url": "https://github.com/anders-dc/sphere-julia",
+  "homepage": null,
+  "size": 20,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 3
+}

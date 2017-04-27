@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:10:13 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5492
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1392
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4a9574f601b09e9d235cd6de0732cc73"
+Last-Modified: Fri, 12 Sep 2014 22:45:06 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 8690:6634:135FB4E:190AD64:59023405
+
+{
+  "id": 22198866,
+  "name": "NeuNet.jl",
+  "full_name": "loliverhennigh/NeuNet.jl",
+  "owner": {
+    "login": "loliverhennigh",
+    "id": 4978408,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/4978408?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/loliverhennigh",
+    "html_url": "https://github.com/loliverhennigh",
+    "followers_url": "https://api.github.com/users/loliverhennigh/followers",
+    "following_url": "https://api.github.com/users/loliverhennigh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/loliverhennigh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/loliverhennigh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/loliverhennigh/subscriptions",
+    "organizations_url": "https://api.github.com/users/loliverhennigh/orgs",
+    "repos_url": "https://api.github.com/users/loliverhennigh/repos",
+    "events_url": "https://api.github.com/users/loliverhennigh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/loliverhennigh/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/loliverhennigh/NeuNet.jl",
+  "description": "A Neural Network package for julia",
+  "fork": false,
+  "url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl",
+  "forks_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/forks",
+  "keys_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/teams",
+  "hooks_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/events",
+  "assignees_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/tags",
+  "blobs_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/subscription",
+  "commits_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/merges",
+  "archive_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/downloads",
+  "issues_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/loliverhennigh/NeuNet.jl/deployments",
+  "created_at": "2014-07-24T04:25:19Z",
+  "updated_at": "2014-09-12T22:45:06Z",
+  "pushed_at": "2014-09-18T20:37:47Z",
+  "git_url": "git://github.com/loliverhennigh/NeuNet.jl.git",
+  "ssh_url": "git@github.com:loliverhennigh/NeuNet.jl.git",
+  "clone_url": "https://github.com/loliverhennigh/NeuNet.jl.git",
+  "svn_url": "https://github.com/loliverhennigh/NeuNet.jl",
+  "homepage": null,
+  "size": 184,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

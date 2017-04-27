@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:10:05 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6531
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1418
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "04f3ba5e644d88dea5c7cfce1967b32b"
+Last-Modified: Wed, 21 Dec 2016 08:53:37 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 7f48e2f7761567e923121f17538d7a6d
+X-GitHub-Request-Id: 90C9:6637:134F8E1:18ECDE0:590233FC
+
+{
+  "id": 47901546,
+  "name": "POMDPSolve.jl",
+  "full_name": "JuliaPOMDP/POMDPSolve.jl",
+  "owner": {
+    "login": "JuliaPOMDP",
+    "id": 16347008,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16347008?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPOMDP",
+    "html_url": "https://github.com/JuliaPOMDP",
+    "followers_url": "https://api.github.com/users/JuliaPOMDP/followers",
+    "following_url": "https://api.github.com/users/JuliaPOMDP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPOMDP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPOMDP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPOMDP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPOMDP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPOMDP/repos",
+    "events_url": "https://api.github.com/users/JuliaPOMDP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPOMDP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaPOMDP/POMDPSolve.jl",
+  "description": "A Julia wrapper for pomdp-solve that interfaces with the POMDPs.jl framework",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/deployments",
+  "created_at": "2015-12-13T01:28:17Z",
+  "updated_at": "2016-12-21T08:53:37Z",
+  "pushed_at": "2017-01-05T00:48:02Z",
+  "git_url": "git://github.com/JuliaPOMDP/POMDPSolve.jl.git",
+  "ssh_url": "git@github.com:JuliaPOMDP/POMDPSolve.jl.git",
+  "clone_url": "https://github.com/JuliaPOMDP/POMDPSolve.jl.git",
+  "svn_url": "https://github.com/JuliaPOMDP/POMDPSolve.jl",
+  "homepage": null,
+  "size": 33,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 1,
+  "forks": 0,
+  "open_issues": 1,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaPOMDP",
+    "id": 16347008,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16347008?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPOMDP",
+    "html_url": "https://github.com/JuliaPOMDP",
+    "followers_url": "https://api.github.com/users/JuliaPOMDP/followers",
+    "following_url": "https://api.github.com/users/JuliaPOMDP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPOMDP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPOMDP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPOMDP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPOMDP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPOMDP/repos",
+    "events_url": "https://api.github.com/users/JuliaPOMDP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPOMDP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 2
+}

@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:07:59 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6996
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 1670
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "2750b2dc9d31fee1b0464e2157be01a8"
+Last-Modified: Sun, 16 Apr 2017 15:20:08 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: FE0D:6637:134945A:18E4CFB:5902337F
+
+{
+  "id": 11658634,
+  "name": "MinimalPerfectHashes.jl",
+  "full_name": "soundcloud/MinimalPerfectHashes.jl",
+  "owner": {
+    "login": "soundcloud",
+    "id": 21021,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/21021?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/soundcloud",
+    "html_url": "https://github.com/soundcloud",
+    "followers_url": "https://api.github.com/users/soundcloud/followers",
+    "following_url": "https://api.github.com/users/soundcloud/following{/other_user}",
+    "gists_url": "https://api.github.com/users/soundcloud/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/soundcloud/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/soundcloud/subscriptions",
+    "organizations_url": "https://api.github.com/users/soundcloud/orgs",
+    "repos_url": "https://api.github.com/users/soundcloud/repos",
+    "events_url": "https://api.github.com/users/soundcloud/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/soundcloud/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/soundcloud/MinimalPerfectHashes.jl",
+  "description": "An implementation of minimal perfect hash function generation as described in Czech et. al. 1992.",
+  "fork": false,
+  "url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl",
+  "forks_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/forks",
+  "keys_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/teams",
+  "hooks_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/events",
+  "assignees_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/tags",
+  "blobs_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/subscription",
+  "commits_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/merges",
+  "archive_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/downloads",
+  "issues_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/soundcloud/MinimalPerfectHashes.jl/deployments",
+  "created_at": "2013-07-25T11:13:23Z",
+  "updated_at": "2017-04-16T15:20:08Z",
+  "pushed_at": "2016-11-11T13:42:38Z",
+  "git_url": "git://github.com/soundcloud/MinimalPerfectHashes.jl.git",
+  "ssh_url": "git@github.com:soundcloud/MinimalPerfectHashes.jl.git",
+  "clone_url": "https://github.com/soundcloud/MinimalPerfectHashes.jl.git",
+  "svn_url": "https://github.com/soundcloud/MinimalPerfectHashes.jl",
+  "homepage": "bit.ly/137iukS",
+  "size": 8,
+  "stargazers_count": 13,
+  "watchers_count": 13,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 4,
+  "forks": 2,
+  "open_issues": 4,
+  "watchers": 13,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "soundcloud",
+    "id": 21021,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/21021?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/soundcloud",
+    "html_url": "https://github.com/soundcloud",
+    "followers_url": "https://api.github.com/users/soundcloud/followers",
+    "following_url": "https://api.github.com/users/soundcloud/following{/other_user}",
+    "gists_url": "https://api.github.com/users/soundcloud/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/soundcloud/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/soundcloud/subscriptions",
+    "organizations_url": "https://api.github.com/users/soundcloud/orgs",
+    "repos_url": "https://api.github.com/users/soundcloud/repos",
+    "events_url": "https://api.github.com/users/soundcloud/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/soundcloud/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 2,
+  "subscribers_count": 136
+}

@@ -1,0 +1,142 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:54:43 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 6251
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4672
+X-RateLimit-Reset: 1493322526
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a9bb2f463035008b1908ac6d36bfe6a3"
+Last-Modified: Fri, 31 Mar 2017 08:05:16 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: d256f86292c6dde5d09d15d926ec67a3
+X-GitHub-Request-Id: DF10:6637:13D79BF:199BDFE:59023E73
+
+{
+  "id": 42039070,
+  "name": "jugds.jl",
+  "full_name": "CoreArray/jugds.jl",
+  "owner": {
+    "login": "CoreArray",
+    "id": 14102053,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/14102053?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CoreArray",
+    "html_url": "https://github.com/CoreArray",
+    "followers_url": "https://api.github.com/users/CoreArray/followers",
+    "following_url": "https://api.github.com/users/CoreArray/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CoreArray/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CoreArray/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CoreArray/subscriptions",
+    "organizations_url": "https://api.github.com/users/CoreArray/orgs",
+    "repos_url": "https://api.github.com/users/CoreArray/repos",
+    "events_url": "https://api.github.com/users/CoreArray/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CoreArray/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/CoreArray/jugds.jl",
+  "description": "Julia Interface to CoreArray Genomic Data Structure (GDS) Files (prerelease version)",
+  "fork": false,
+  "url": "https://api.github.com/repos/CoreArray/jugds.jl",
+  "forks_url": "https://api.github.com/repos/CoreArray/jugds.jl/forks",
+  "keys_url": "https://api.github.com/repos/CoreArray/jugds.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/CoreArray/jugds.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/CoreArray/jugds.jl/teams",
+  "hooks_url": "https://api.github.com/repos/CoreArray/jugds.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/CoreArray/jugds.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/CoreArray/jugds.jl/events",
+  "assignees_url": "https://api.github.com/repos/CoreArray/jugds.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/CoreArray/jugds.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/CoreArray/jugds.jl/tags",
+  "blobs_url": "https://api.github.com/repos/CoreArray/jugds.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/CoreArray/jugds.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/CoreArray/jugds.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/CoreArray/jugds.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/CoreArray/jugds.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/CoreArray/jugds.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/CoreArray/jugds.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/CoreArray/jugds.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/CoreArray/jugds.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/CoreArray/jugds.jl/subscription",
+  "commits_url": "https://api.github.com/repos/CoreArray/jugds.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/CoreArray/jugds.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/CoreArray/jugds.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/CoreArray/jugds.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/CoreArray/jugds.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/CoreArray/jugds.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/CoreArray/jugds.jl/merges",
+  "archive_url": "https://api.github.com/repos/CoreArray/jugds.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/CoreArray/jugds.jl/downloads",
+  "issues_url": "https://api.github.com/repos/CoreArray/jugds.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/CoreArray/jugds.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/CoreArray/jugds.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/CoreArray/jugds.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/CoreArray/jugds.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/CoreArray/jugds.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/CoreArray/jugds.jl/deployments",
+  "created_at": "2015-09-07T07:52:18Z",
+  "updated_at": "2017-03-31T08:05:16Z",
+  "pushed_at": "2017-04-23T08:26:48Z",
+  "git_url": "git://github.com/CoreArray/jugds.jl.git",
+  "ssh_url": "git@github.com:CoreArray/jugds.jl.git",
+  "clone_url": "https://github.com/CoreArray/jugds.jl.git",
+  "svn_url": "https://github.com/CoreArray/jugds.jl",
+  "homepage": "",
+  "size": 485,
+  "stargazers_count": 1,
+  "watchers_count": 1,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 1,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "CoreArray",
+    "id": 14102053,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/14102053?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/CoreArray",
+    "html_url": "https://github.com/CoreArray",
+    "followers_url": "https://api.github.com/users/CoreArray/followers",
+    "following_url": "https://api.github.com/users/CoreArray/following{/other_user}",
+    "gists_url": "https://api.github.com/users/CoreArray/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/CoreArray/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/CoreArray/subscriptions",
+    "organizations_url": "https://api.github.com/users/CoreArray/orgs",
+    "repos_url": "https://api.github.com/users/CoreArray/repos",
+    "events_url": "https://api.github.com/users/CoreArray/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/CoreArray/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
+}

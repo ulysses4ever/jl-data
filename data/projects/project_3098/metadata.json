@@ -1,0 +1,123 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Thu, 27 Apr 2017 18:19:11 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 5568
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 623
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a64e45f1b33926522d2ad4338d407282"
+Last-Modified: Sat, 16 Jan 2016 00:38:53 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
+X-GitHub-Media-Type: github.v3; format=json
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+Content-Security-Policy: default-src 'none'
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+Vary: Accept-Encoding
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: BAE1:6634:13783CD:192ACD3:5902361E
+
+{
+  "id": 9777840,
+  "name": "ValueDispatch.jl",
+  "full_name": "zachallaun/ValueDispatch.jl",
+  "owner": {
+    "login": "zachallaun",
+    "id": 503938,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/503938?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/zachallaun",
+    "html_url": "https://github.com/zachallaun",
+    "followers_url": "https://api.github.com/users/zachallaun/followers",
+    "following_url": "https://api.github.com/users/zachallaun/following{/other_user}",
+    "gists_url": "https://api.github.com/users/zachallaun/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/zachallaun/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/zachallaun/subscriptions",
+    "organizations_url": "https://api.github.com/users/zachallaun/orgs",
+    "repos_url": "https://api.github.com/users/zachallaun/repos",
+    "events_url": "https://api.github.com/users/zachallaun/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/zachallaun/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/zachallaun/ValueDispatch.jl",
+  "description": "Function dispatch on values",
+  "fork": false,
+  "url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl",
+  "forks_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/forks",
+  "keys_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/teams",
+  "hooks_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/events",
+  "assignees_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/tags",
+  "blobs_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/subscription",
+  "commits_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/merges",
+  "archive_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/downloads",
+  "issues_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/zachallaun/ValueDispatch.jl/deployments",
+  "created_at": "2013-04-30T18:57:06Z",
+  "updated_at": "2016-01-16T00:38:53Z",
+  "pushed_at": "2016-08-01T10:31:14Z",
+  "git_url": "git://github.com/zachallaun/ValueDispatch.jl.git",
+  "ssh_url": "git@github.com:zachallaun/ValueDispatch.jl.git",
+  "clone_url": "https://github.com/zachallaun/ValueDispatch.jl.git",
+  "svn_url": "https://github.com/zachallaun/ValueDispatch.jl",
+  "homepage": null,
+  "size": 3,
+  "stargazers_count": 4,
+  "watchers_count": 4,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 2,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 2,
+  "open_issues": 0,
+  "watchers": 4,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 2,
+  "subscribers_count": 3
+}

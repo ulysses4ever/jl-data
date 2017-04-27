@@ -1,13 +1,19 @@
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Fri, 10 Mar 2017 23:31:56 GMT
+Date: Thu, 27 Apr 2017 17:59:23 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 93
-Status: 401 Unauthorized
+Content-Length: 5308
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3356
+X-RateLimit-Reset: 1493318926
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "4e00917fdf0cf5aaa0996bd704d14e5b"
+Last-Modified: Mon, 08 Aug 2016 23:58:10 GMT
+X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1489191937
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
 Content-Security-Policy: default-src 'none'
@@ -15,9 +21,103 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-X-GitHub-Request-Id: DDDA:0710:4C93302:5B9CDB4:58C3376C
+Vary: Accept-Encoding
+X-Served-By: b535085e7f4d6e3423e016e684de0829
+X-GitHub-Request-Id: 7973:6637:1330185:18C46D5:5902317B
 
 {
-  "message": "Bad credentials",
-  "documentation_url": "https://developer.github.com/v3"
+  "id": 65229729,
+  "name": "CelesteDev.jl",
+  "full_name": "rgiordan/CelesteDev.jl",
+  "owner": {
+    "login": "rgiordan",
+    "id": 4494910,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/4494910?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/rgiordan",
+    "html_url": "https://github.com/rgiordan",
+    "followers_url": "https://api.github.com/users/rgiordan/followers",
+    "following_url": "https://api.github.com/users/rgiordan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/rgiordan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/rgiordan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/rgiordan/subscriptions",
+    "organizations_url": "https://api.github.com/users/rgiordan/orgs",
+    "repos_url": "https://api.github.com/users/rgiordan/repos",
+    "events_url": "https://api.github.com/users/rgiordan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/rgiordan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/rgiordan/CelesteDev.jl",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/rgiordan/CelesteDev.jl",
+  "forks_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/forks",
+  "keys_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/teams",
+  "hooks_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/events",
+  "assignees_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/tags",
+  "blobs_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/subscription",
+  "commits_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/merges",
+  "archive_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/downloads",
+  "issues_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/rgiordan/CelesteDev.jl/deployments",
+  "created_at": "2016-08-08T18:42:05Z",
+  "updated_at": "2016-08-08T23:58:10Z",
+  "pushed_at": "2017-02-03T01:44:09Z",
+  "git_url": "git://github.com/rgiordan/CelesteDev.jl.git",
+  "ssh_url": "git@github.com:rgiordan/CelesteDev.jl.git",
+  "clone_url": "https://github.com/rgiordan/CelesteDev.jl.git",
+  "svn_url": "https://github.com/rgiordan/CelesteDev.jl",
+  "homepage": null,
+  "size": 65574,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }
