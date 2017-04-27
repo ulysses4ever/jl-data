@@ -735,7 +735,7 @@ bool Downloader::DeleteClonedProjects = true;
 
 bool Downloader::Debug_ReuseClonedProjects = false;
 
-long Downloader::Debug_MaxProjects = 1000;
+long Downloader::Debug_MaxProjects = 10000;
 
 long Downloader::Debug_FirstProjectOffset = 0;
 
