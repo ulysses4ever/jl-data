@@ -6,9 +6,11 @@
 
  */
 
-#include <cstdlib>
 #include <iostream>
+#include <string>
 #include <unordered_map>
+
+#include <cstdlib>
 #include <cassert>
 
 #include "include/csv.h"
@@ -680,7 +682,7 @@ private:
 
 
 
-	/** Contains the local path where the current project is stored. 
+	/** Contains the local path where the current project is stored.
 	 */
 	std::string localPath_;
     std::string localRepo_;
@@ -706,7 +708,7 @@ private:
      */
     static std::unordered_set<Project> projects_;
 
-	/** Vector which contains a list of failed projects so that they can be reattempted in the future. 
+	/** Vector which contains a list of failed projects so that they can be reattempted in the future.
 	 */
     static std::unordered_set<Project> failedProjects_;
 
@@ -738,21 +740,10 @@ long Downloader::Debug_MaxProjects = 1000;
 long Downloader::Debug_FirstProjectOffset = 0;
 
 
-
-
 std::vector<std::string> Downloader::apiTokens_;
 int Downloader::currentApiToken_ = 0;
 
 std::mutex Downloader::apiTokensGuard_;
-
-
-
-
-
-
-
-
-
 
 std::unordered_map<Hash, long> Downloader::fileHashes_;
 
@@ -766,23 +757,7 @@ std::mutex Downloader::projectsGuard_;
 std::mutex Downloader::contentsGuard_;
 
 
-
-
-
-
-
-
-
-
-
-
 std::atomic<long> Project::idIndex_(0);
-
-
-
-
-
-
 
 
 /** Things to do:
@@ -795,33 +770,22 @@ std::atomic<long> Project::idIndex_(0);
 
  */
 
-
-
-
-
-
+std::string PREFIX = "../data/";
 
 int main(int argc, char * argv[]) {
-std::cout << "starting main method";
-//    CSVParser p("/data/ele/apitokens.csv");
-//    CSVParser p("~/jl-proj/ght-pipeline/data/apitokens.csv");
-    CSVParser p("/afs/athena.mit.edu/user/g/l/glnpease/jl-proj/ght-pipeline/data/apitokens.csv");
-    
+    std::cout << "starting main method";
+    CSVParser p(PREFIX + "apitokens.csv");
+
     for (auto row : p) {
         Downloader::apiTokens_.push_back(row[0]);
     }
-std::cout << "done with opening api tokens";
-//    Settings::OutputPath = "/data/ele";
-    Settings::OutputPath = "/afs/athena.mit.edu/user/g/l/glnpease/jl-proj/ght-pipeline/data";
-	//Settings::OutputPath = "/home/peta/ele";
-//    Downloader::Initialize(PatternList::JavaScript());
-    Downloader::Initialize(PatternList::Julia()); //TODO what is this? 
+    std::cout << "done with opening api tokens";
+    Settings::OutputPath = PREFIX;
+    Downloader::Initialize(PatternList::Julia());
     Downloader::Spawn(8);
     Downloader::Run();
-    //Downloader::FeedProjectsFrom("/home/peta/devel/ele-pipeline/project_urls.csv");
-//    Downloader::FeedProjectsFrom("/data/ele/projects.csv");
-    Downloader::FeedProjectsFrom("/afs/athena.mit.edu/user/g/l/glnpease/jl-proj/ght-pipeline/data/projects-julia.csv");
-	//Downloader::FeedProjectsFrom("/home/peta/ele/projects.csv");
+
+    Downloader::FeedProjectsFrom(PREFIX + "projects-julia.csv");
     Downloader::Wait();
     Downloader::Finalize();
     std::cout << "DONE" << std::endl;
@@ -871,4 +835,3 @@ std::cout << "done with opening api tokens";
 
     return EXIT_SUCCESS;
 }
-
