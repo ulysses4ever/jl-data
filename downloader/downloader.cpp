@@ -509,13 +509,22 @@ private:
     void processAllBranches(Project & p) {
         std::unordered_set<std::string> branches = Git::GetBranches(localRepo_);
         std::string current = Git::GetCurrentBranch(localRepo_);
+        branches.erase(current);
         while (true) {
-            branches.erase(current); // remove current branch
+            if (current != "master")
+		if (branches.empty()) {
+                    Log(STR("No more branches."));
+		    return;
+		} else
+                    goto next_br;
             Log(STR("Analyzing branch " << current));
             // process all files we can find in the branch
             processFiles(p, current);
+            Log(STR("All files in " << current << " processed."));
+	    break;
             // move to the next branch
-            while (true) {
+next_br:    while (true) {
+                Log(STR("About to peek up next branch."));
                 if (branches.empty())
                     return; // we are done
                 // otherwise get new branch, remove from the list
@@ -729,7 +738,7 @@ private:
 };
 
 
-bool Downloader::CompressFileContents = true;
+bool Downloader::CompressFileContents = false;
 
 bool Downloader::DeleteClonedProjects = true;
 
@@ -773,13 +782,13 @@ std::atomic<long> Project::idIndex_(0);
 std::string PREFIX = "../data/";
 
 int main(int argc, char * argv[]) {
-    std::cout << "starting main method";
+    std::cout << "starting main method" << std::endl;
     CSVParser p(PREFIX + "apitokens.csv");
 
     for (auto row : p) {
         Downloader::apiTokens_.push_back(row[0]);
     }
-    std::cout << "done with opening api tokens";
+    std::cout << "done with opening api tokens" << std::endl;
     Settings::OutputPath = PREFIX;
     Downloader::Initialize(PatternList::Julia());
     Downloader::Spawn(8);
