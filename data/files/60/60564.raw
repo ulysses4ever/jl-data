@@ -1,0 +1,20 @@
+module DebugTools
+
+include("output.jl")
+include("assert.jl")
+include("show.jl")
+
+export releasemode, debugmode
+
+function releasemode()
+  disable_debug_assert()
+  disable_debug_show()
+end
+function debugmode()
+  enable_debug_assert()
+  enable_debug_show()
+end
+
+
+end ## module
+

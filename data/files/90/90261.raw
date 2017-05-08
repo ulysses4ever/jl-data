@@ -1,0 +1,8 @@
+module EvolvingGraphAlgs
+
+using Reexport
+@reexport using EvolvingGraphs
+
+include("random_walk.jl")
+
+end # module

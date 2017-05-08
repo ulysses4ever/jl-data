@@ -1,0 +1,62 @@
+#= Reference:
+
+Ercsey-Ravasz et. al. *A Predictive Network Model of Cerebral Cortical Connectivity Based on a Distance Rule*
+
+The EDR model depends on the number of vertices and edges, 29 and 536 in their case, a set of distances between vertices, and a single parameter, $\lambda$, describing the exponential distribution of axonal distances.
+
+1. Pick a distance, d, according to the exponential rule, $p(d) \propto e^{-\lambda d}$.
+2. Pick a random area pair i,j from those whose distance $d_{i,j}$ is in the *same distance bin* as d.
+3. Insert, or add to the weight of, an edge between i and j, flipping a coin to determine its direction.
+4. Repeat until the required number of edges are obtained.
+
+=#
+
+import Distributions
+
+"""
+Read raw_data/PLOS_Biol_2016/*_interareal_distance.csv, where * is macaque or mouse.
+"""
+function read_distances(subject::Symbol; datadir=joinpath("raw_data","PLOS_Biol_2016"))
+    tmp=readcsv(joinpath(datadir,
+                     string(subject==:mouse ?
+                            "mouse_flatmap_" : "macaque_",
+                            "interareal_distances.csv")),
+            header=true)
+    u,v = size(tmp[1]);
+    D = Array(Float64,(u,v-1))
+    for i in 1:u, j in 2:v
+        D[i,j-1]=tmp[1][i,j]
+    end
+    rows = Array(AbstractString,u)
+    for i in 1:u
+        rows[i] = string(tmp[1][i,1])
+    end
+    return D, rows, reshape(tmp[2][2:end],v-1)
+end
+
+"""
+Given a rate parameter and a distance matrix, return a categorical distribution on directed edges which respects an exponential distribution on distances with the given rate parameter. 
+"""
+function edge_sampler(rate::Float64, D::Matrix{Float64})
+    expd = Distributions.Exponential(1/rate)
+    u,v = size(D)
+    P = reshape(Distributions.pdf(expd,D), u*v)
+    return Distributions.Categorical(P/sum(P))
+end
+
+"""
+Given a rate parameter, distance matrix, and edge count, return the weight matrix of a randomly generated digraph with the given number of edges, a digraph which respects an exponential distribution on the given distances with the given rate parameter. The returned weights, w[i,j] count the number of directed edges from i to j.  
+"""
+function edr(rate::Real, D::Array{Float64,2}, E::Int)
+    u,v = size(D)
+    w = zeros(Int,u,v)
+    sampler = edge_sampler(rate,D)
+    edgelist = [x.I for x in CartesianRange((u,v))]
+    edges = 0
+    while edges < E
+        i,j = edgelist[Distributions.rand(sampler,1)[1]]
+        if w[i,j] == 0 edges += 1 end
+        w[i,j] += 1
+    end
+    return w
+end

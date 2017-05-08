@@ -1,0 +1,985 @@
+##############################################################################
+#    FemLab - Finite Element Library                                         #
+#    Copyright (C) 2014 Raul Durand <raul.durand at gmail.com>               #
+#                                                                            #
+#    This file is part of FemLab.                                            #
+#                                                                            #
+#    FemLab is free software: you can redistribute it and/or modify          #
+#    it under the terms of the GNU General Public License as published by    #
+#    the Free Software Foundation, either version 3 of the License, or       #
+#    any later version.                                                      #
+#                                                                            #
+#    FemLab is distributed in the hope that it will be useful,               #
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of          #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           #
+#    GNU General Public License for more details.                            #
+#                                                                            #
+#    You should have received a copy of the GNU General Public License       #
+#    along with FemLab.  If not, see <http://www.gnu.org/licenses/>.         #
+##############################################################################
+
+export Domain
+export track, set_trackers
+export get_node
+
+"""
+`Domain(mesh, [filekey="out"])`
+
+Creates an `Domain` object based on a Mesh object `mesh` and represents the geometric domain to be analysed by the finite element analysis.
+
+**Fields**
+
+`nodes`: An array of nodes
+
+`elems`: An array of finite elements
+
+`faces`: An array of `Face` objects containing the boundary faces
+
+`edges`: An array of `Edge` objects containing all the boundary faces
+
+`node_bcs`: An array of `NodeBC` objects containing all nodal boundary conditions
+
+`face_bcs`: An array of `FaceBC` objects conditions all face boundary conditions
+
+`edge_bcs`: An array of `EdgeBC` objects conditions all edge boundary conditions
+
+`filekey` : An string object that is used as part of the filename of resulting analyses files
+
+"""
+type Domain
+    ndim ::Int
+    nodes::Array{Node,1}
+    elems::Array{Element,1}
+    faces::Array{Face,1}
+    edges::Array{Edge,1}
+    node_bcs::Array{BC, 1}
+    face_bcs::Array{BC, 1}
+    edge_bcs::Array{BC, 1}
+    filekey::AbstractString
+
+    trackers::Array{Tracker,1}
+
+    function Domain(;filekey::AbstractString="out")
+        this = new()
+
+        this.node_bcs = []
+        this.face_bcs = []
+        this.edge_bcs = []
+        this.filekey = filekey
+
+        this.trackers = []
+        return this
+    end
+end
+
+
+function Domain(mesh::Mesh; filekey::AbstractString="out")
+    dom = Domain(filekey=filekey)
+    ndim = dom.ndim = mesh.ndim
+
+    # Setting nodes
+    dom.nodes = [ Node(point, id=i) for (i,point) in enumerate(mesh.points)]
+
+    # Setting elements
+    dom.elems = Array(Element,0)
+    for (i,cell) in enumerate(mesh.cells)
+        conn = [ p.id for p in cell.points ]
+        elem = Element(cell.shape, dom.nodes[conn], ndim, cell.tag)
+        elem.id = i
+        push!(dom.elems, elem)
+    end
+
+    # Setting linked cells
+    for (i,cell) in enumerate(mesh.cells)
+        for lcell in cell.linked_cells
+            id = lcell.id
+            push!(dom.elems[i].linked_elems, dom.elems[id])
+        end
+    end
+
+    # Setting faces
+    dom.faces = Array(Face,0)
+    for cell in mesh.faces
+        conn = [ p.id for p in cell.points ]
+        face = Face(cell.shape, dom.nodes[conn], ndim)
+        face.oelem = dom.elems[cell.ocell.id]
+        push!(dom.faces, face)
+    end
+
+    # Setting edges
+    dom.edges = Array(Edge,0)
+    for cell in mesh.edges
+        conn = [ p.id for p in cell.points ]
+        edge = Face(cell.shape, dom.nodes[conn], ndim)
+        edge.oelem = dom.elems[cell.ocell.id]
+        push!(dom.edges, edge)
+    end
+
+    # Setting 1D joints
+    #edict = Dict{UInt64, Element}()
+    #for elem in dom.elems
+        #hs = hash(getconns(elem))
+        #edict[hs] = elem
+    #end
+    #for elem in dom.elems
+        #if elem.shape in (LINK2, LINK3)
+            #nbnodes = elem.shape==LINK2? 2 : 3
+            #conns = getconns(elem)
+            #hs_hook  = hash(conns[1:end-nbnodes])
+            #hs_truss = hash(conns[end-nbnodes+1:end])
+            #elem.extra[:hook] = edict[hs_hook]
+            #elem.extra[:bar ] = edict[hs_truss]
+        #end
+    #end
+
+    return dom
+end
+
+
+function dom_load_json(filename::AbstractString)
+    mesh = Mesh(filename)
+    dom  = Domain(mesh)
+
+    file = open(filename)
+    data = JSON.parse(readall(file))
+    close(file)
+
+    # Read materials list
+    mats  = Material[]
+    for dmat in data["materials"] # array of materials data
+        id    = dmat["id"]
+        model = eval(parse(dmat["model"]))
+        delete!(dmat, "id")
+        delete!(dmat, "model")
+
+        args = [ Symbol(k) => v for (k,v) in dmat ]
+        mat = model(;args...)
+        push!(mats, mat)
+    end
+
+    # Read and set material for each element
+    cells = data["cells"]
+    for i in 1:endof(cells)
+        mat_id = cells[i]["mat"]
+        set_mat( dom.elems[i], mats[mat_id] )
+    end
+
+    # Node boundary conditions
+    node_bc = data["node_bc"]
+    for bc in node_bc
+        id = get(bc,"id",0)
+
+        if id>0
+            delete!(bc, "id")
+            args = [ Symbol(k) => v for (k,v) in  bc]
+            set_bc(dom.nodes[id]; args...)
+        else
+            cond = parse(bc["cond"])
+            delete!(bc, "cond")
+            args = [ Symbol(k) => v for (k,v) in  bc]
+            set_bc( dom.nodes[cond]; args...)
+        end
+    end
+
+    # Face boundary conditions
+    face_bc = data["face_bc"]
+    for bc in face_bc
+        if haskey(bc, "id")
+            error("Unsupported key id for face boundary condition while reading input file.")
+        end
+
+        cond = parse(bc["cond"])
+        delete!(bc, "cond")
+        args = [ Symbol(k) => v for (k,v) in  bc]
+        set_bc( dom.faces[cond]; args...)
+    end
+
+    return dom
+end
+
+
+function Domain(filename::AbstractString; filekey::AbstractString="out")
+    ext  = splitext(filename)[2]
+
+    if ext in (".json", ".msh")
+        dom = dom_load_json(filename)
+        dom.filekey = filekey
+        return dom
+    else
+        mesh = Mesh(filename)
+        return Domain(mesh, filekey=filekey)
+    end
+
+end
+
+
+function set_bc(dom::Domain, bcs::BC...)
+    dom.node_bcs = []
+    dom.face_bcs = []
+    dom.edge_bcs = []
+    for bc in bcs
+        ty = typeof(bc)
+
+        if ty == NodeBC
+            if bc.expr != :()  bc.nodes = dom.nodes[bc.expr] end
+            push!(dom.node_bcs, bc)
+        end
+
+        if ty == FaceBC
+            if bc.expr != :()  bc.faces = dom.faces[bc.expr] end
+            push!(dom.face_bcs, bc)
+        end
+
+        if ty == EdgeBC
+            if bc.expr != :()  bc.edges = dom.edges[bc.expr] end
+            push!(dom.edge_bcs, bc)
+        end
+    end
+end
+
+
+function calc_nodal_vals(dom::Domain)
+    # Get incidence matrix (shares) (fast)
+    np = length(points)
+    Shares = [ Element[] for i=1:np]
+    for elem in dom.elems
+        for node in elem.nodes
+            push!(Shares[node.id], elem)
+        end
+    end
+
+    # Interpolating solid elements
+    #for node in dom.nodes
+        #patch = @list(elem, elem in node.shares, if issolid(elem) end)
+        #patch = node.shares[ [issolid(elem) for elem in node.shares]  ]
+        #patch = node.shares[ map(is_solid, node.shares) ]
+    #end
+end
+
+
+function make_backup(elems::Array{Element,1})
+    for elem in elems
+        for ip in elem.ips
+            ip.data0 = deepcopy(ip.data)
+        end
+    end
+end
+
+
+function node_and_elem_vals(nodes::Array{Node,1}, elems::Array{Element,1})
+
+    # Calculate max number of node and elem labes
+    matset  = Set{Material}()
+    nlabels = Set{Symbol}()
+    elabels = Set{Symbol}()
+    for elem in elems
+        if !(elem.mat in matset)
+            # getting values from current element
+            node_vals, elem_vals = node_and_elem_vals(elem.mat, elem)
+            union!(nlabels, keys(node_vals))
+            union!(elabels, keys(elem_vals))
+            push!(matset, elem.mat)
+        end
+    end
+
+    nlabels_idx = [ key=>i for (i,key) in enumerate(nlabels) ]
+    elabels_idx = [ key=>i for (i,key) in enumerate(elabels) ]
+    nncomps     = length(nlabels)
+    necomps     = length(elabels)
+
+    nnodes     = length(nodes)
+    nelems     = length(elems)
+    Node_vals  = zeros(Float32, nnodes, nncomps) # float32 is important for paraview
+    Node_reps  = zeros(Int64  , nnodes, nncomps)
+    Elem_vals  = zeros(Float32, nelems, necomps) # float32 is important for paraview
+
+    # In elements
+    for elem in elems
+        # getting values from current element
+        node_vals, elem_vals = node_and_elem_vals(elem.mat, elem)
+
+        # filling nodal values and node repetitions
+        for (key, values) in node_vals
+            idx = nlabels_idx[key]
+            for (i, node) in enumerate(elem.nodes)
+                Node_reps[node.id, idx] += 1
+                Node_vals[node.id, idx] += values[i]
+            end
+        end
+
+        # filling element values
+        for (key,value) in elem_vals
+            idx = elabels_idx[key]
+            Elem_vals[elem.id, idx] = value
+        end
+    end
+
+    # averaging nodal values
+    for i = 1:nnodes
+        for j=1:length(nlabels_idx)
+            if Node_reps[i,j]>0
+                Node_vals[i,j] /= Node_reps[i,j]
+            end
+        end
+    end
+
+    # Filling nodal labels list
+    node_keys = [ nlabels... ]
+    elem_keys = [ elabels... ]
+
+    return Node_vals, node_keys, Elem_vals, elem_keys
+end
+
+
+function node_and_elem_vals2(nodes::Array{Node,1}, elems::Array{Element,1})
+
+    # Calculate max number of node and elem labes
+    matset  = Set{Material}()
+    nlabels = Set{Symbol}()
+    elabels = Set{Symbol}()
+    for elem in elems
+        if !(elem.mat in matset)
+            # getting values from current element
+            node_vals, elem_vals = node_and_elem_vals(elem.mat, elem)
+            union!(nlabels, keys(node_vals))
+            union!(elabels, keys(elem_vals))
+            push!(matset, elem.mat)
+        end
+    end
+
+    nlabels_idx = [ key=>i for (i,key) in enumerate(nlabels) ]
+    elabels_idx = [ key=>i for (i,key) in enumerate(elabels) ]
+    nncomps     = length(nlabels)
+    necomps     = length(elabels)
+
+    nnodes     = length(nodes)
+    nelems     = length(elems)
+    Node_vals  = zeros(Float32, nnodes, nncomps) # float32 is important for paraview
+    Node_reps  = zeros(Int64  , nnodes, nncomps)
+
+    # In elements
+    for elem in elems
+        # getting values from current element
+        node_vals, elem_vals = node_and_elem_vals(elem.mat, elem)
+
+        # filling nodal values and node repetitions
+        for (key, values) in node_vals
+            idx = nlabels_idx[key]
+            for (i, node) in enumerate(elem.nodes)
+                Node_reps[node.id, idx] += 1
+                Node_vals[node.id, idx] += values[i]
+            end
+        end
+
+        # filling element values
+        #for (key,value) in elem_vals
+            #idx = elabels_idx[key]
+            #Elem_vals[elem.id, idx] = value
+        #end
+    end
+
+    # averaging nodal values
+    for i = 1:nnodes
+        for j=1:length(nlabels_idx)
+            if Node_reps[i,j]>0
+                Node_vals[i,j] /= Node_reps[i,j]
+            end
+        end
+    end
+
+    # Get element vals
+    Elem_vals  = DTable()
+
+    # Filling nodal labels list
+    node_keys = [ nlabels... ]
+    elem_keys = [ elabels... ]
+
+    return Node_vals, node_keys, Elem_vals, elem_keys
+end
+
+
+function get_node(dom::Domain, coord::Array{Float64,1})
+    X = [ coord, 0.0 ][1:3]
+    tol     = 1.0e-8
+    for node in dom.nodes
+        if norm(X-node.X) < tol
+            return node
+        end
+    end
+    return nothing
+end
+
+#function get_ips(dom::Domain)
+    #return get_ips(dom.elems)
+#end
+
+function set_trackers(dom::Domain, ts::Tracker...)
+    for t in ts
+        push!(dom.trackers, t)
+    end
+end
+
+
+function tracking(dom::Domain)
+    for trk in dom.trackers
+        ty = typeof(trk)
+
+        if ty == NodeTracker
+            vals = getvals(trk.node)
+            push!(trk.table, vals)
+        elseif ty == NodesTracker
+            table = DTable()
+            for node in trk.nodes
+                vals = getvals(node)
+                push!(table, vals)
+            end
+            push!(trk.book, table)
+        elseif ty == IpTracker
+            vals = getvals(trk.ip.owner.mat, trk.ip.data)
+            push!(trk.table, vals)
+        elseif ty == IpsTracker
+            table = DTable()
+            for ip in trk.ips
+                vals = getvals(ip)
+                push!(table, vals)
+            end
+            push!(trk.book, table)
+        end
+
+    end
+end
+
+
+function track(dom::Domain, node::Node)
+    println("Warning: track function is deprecated. Use NodeTrack and set_tracks functions")
+    t = NodeTracker(node)
+    push!(dom.trackers, t)
+    return t
+end
+
+function track(dom::Domain, ip::Ip)
+    println("Warning: track function is deprecated. Use IpTrack and set_tracks functions")
+    t = IpTracker(ip)
+    push!(dom.trackers, t)
+    return t
+end
+
+function track(dom::Domain, elem::Element)
+    println("Warning: track function is deprecated. Use IpTrack and set_tracks functions")
+    t = IpTracker(elem.ips[1])
+    push!(dom.trackers, t)
+    return t
+end
+
+function track(dom::Domain, nodes::Array{Node,1})
+    println("Warning: track function is deprecated. Use NodesTrack and set_tracks functions")
+    t = NodesTracker(nodes)
+    push!(dom.trackers, t)
+    return t
+end
+
+function track(dom::Domain, ips::Array{Ip,1})
+    println("Warning: track function is deprecated. Use IpTrack and set_tracks function")
+    t = IpTracker(ips)
+    push!(dom.trackers, t)
+    return t
+end
+
+
+function save(dom::Domain, filename::AbstractString; verbose=true, save_ips=false)
+    # Saves the dom information in vtk format
+    nnodes = length(dom.nodes)
+    nelems  = length(dom.elems)
+
+    # Number of total connectivities
+    nconns = 0
+    for elem in dom.elems
+        nconns += 1 + length(elem.nodes)
+    end
+
+    # Open filename
+    f = open(filename, "w")
+
+    println(f, "# vtk DataFile Version 3.0")
+    println(f, "FemLab output ")
+    println(f, "ASCII")
+    println(f, "DATASET UNSTRUCTURED_GRID")
+    println(f, "")
+    println(f, "POINTS ", nnodes, " float64")
+
+    # Write nodes
+    for node in dom.nodes
+        @printf f "%23.15e %23.15e %23.15e \n" node.X[1] node.X[2] node.X[3]
+    end
+    println(f)
+
+    # Write connectivities
+    println(f, "CELLS ",nelems, " ", nconns)
+    for elem in dom.elems
+        print(f, length(elem.nodes), " ")
+        for node in elem.nodes
+            print(f, node.id-1, " ")
+        end
+        println(f)
+    end
+    println(f)
+
+    # Write elem types
+    println(f, "CELL_TYPES ", nelems)
+    for elem in dom.elems
+        println(f, get_vtk_type(elem.shape))
+    end
+    println(f)
+
+    # check if all elements have material defined
+    has_data = all([ isdefined(elem, :mat) for elem in dom.elems])
+
+    if has_data
+        # Get node and elem values
+        node_vals, node_labels, elem_vals, elem_labels = node_and_elem_vals(dom.nodes, dom.elems)
+        nncomps = length(node_labels)
+        necomps = length(elem_labels)
+    else
+        close(f)
+        return
+    end
+
+    # Write point data
+    println(f, "POINT_DATA ", nnodes)
+
+    # Write vectors
+    if :ux in keys(dom.nodes[1].dofdict)
+        println(f, "VECTORS ", "|u| float64")
+        for node in dom.nodes
+            @printf f "%23.10e"   node.dofdict[:ux].U
+            @printf f "%23.10e"   node.dofdict[:uy].U
+            @printf f "%23.10e\n" dom.ndim==3?node.dofdict[:uz].U:0.0
+        end
+    end
+    println(f, )
+
+    # Write nodal scalar data
+    for i=1:nncomps
+        println(f, "SCALARS ", node_labels[i], " float64 1")
+        println(f, "LOOKUP_TABLE default")
+        for j in 1:nnodes
+            @printf f "%23.10e"  node_vals[j,i]
+        end
+        println(f, )
+    end
+
+    # Write element data
+    println(f, "CELL_DATA ", nelems)
+    for i=1:necomps
+        println(f, "SCALARS ", elem_labels[i], " float64 1")
+        println(f, "LOOKUP_TABLE default")
+        for j in 1:nelems  #naelems
+            e_idx = dom.elems[j].id  #aelems
+            @printf f "%23.10e"  elem_vals[e_idx,i]
+        end
+        println(f, )
+    end
+
+    # Write elem type
+    println(f, "SCALARS cell_type int 1")
+    println(f, "LOOKUP_TABLE default")
+    for elem in dom.elems
+        println(f, elem.shape, " ")
+    end
+    println(f, )
+
+    close(f)
+
+    if verbose
+        pcolor(:green, "  file $filename written (Domain)\n")
+    end
+
+    # save ip information as vtk
+    if has_data && save_ips
+        basename, ext = splitext(filename)
+        save_dom_ips(dom, basename*"-ip"*ext, verbose)
+    end
+end
+
+
+# Saves ips information from domain as a vtk file
+function save_dom_ips(dom::Domain, filename::AbstractString, verbose=true)
+
+    # Get all ips
+    ips = Ip[]
+    for elem in dom.elems
+        for ip in elem.ips
+            push!(ips, ip)
+        end
+    end
+
+    nips   = length(ips)
+    ncells = nips
+
+    # Number of total connectivities
+    nconns = nips*2 
+
+    # Open filename
+    f = open(filename, "w")
+
+    println(f, "# vtk DataFile Version 3.0")
+    println(f, "FemLab output ")
+    println(f, "ASCII")
+    println(f, "DATASET UNSTRUCTURED_GRID")
+    println(f, "")
+    println(f, "POINTS ", nips, " float64")
+
+    # Write ip points
+    for ip in ips
+        x = ip.X[1]
+        y = ip.X[2]
+        z = length(ip.X)>2? ip.X[3] : 0.0
+        @printf f "%23.15e %23.15e %23.15e \n" x y z
+    end
+    println(f)
+
+    # Write ip connectivities (vertex)
+    println(f, "CELLS ", ncells, " ", nconns)
+    for (i,ip) in enumerate(ips)
+        println(f, "1 $(i-1)", )
+    end
+    println(f)
+
+    # Ips cell types
+    println(f, "CELL_TYPES ", nips)
+    vtk_vertex = 1
+    for ip in ips
+        print(f, vtk_vertex, " ")
+    end
+    println(f)
+
+    # Get values at ips
+    table = DTable()
+    for ip in ips
+        push!(table, getvals(ip))
+    end
+
+    # Write point data
+    println(f, "POINT_DATA ", nips)
+
+    # Write ip scalar data TODO
+    for field in table.header
+        println(f, "SCALARS ", field, " float64 1")
+        println(f, "LOOKUP_TABLE default")
+        field_data = table.dict[field]
+        for i in 1:nips
+            @printf f "%23.10e" field_data[i]
+        end
+        println(f, )
+    end
+
+    close(f)
+
+    if verbose
+        pcolor(:green, "  file $filename written (Domain)\n")
+    end
+end
+
+
+function save2(dom::Domain, filename::AbstractString; verbose=true)
+    # Saves the dom information in vtk format
+    nnodes = length(dom.nodes)
+    nelems = length(dom.elems)
+    npoints = nnodes
+
+    # check if all elements have material defined
+    has_data = all([ isdefined(elem, :mat) for elem in dom.elems])
+
+    ips = Ip[]
+    if has_data
+        # Get all ips
+        for elem in dom.elems
+            for ip in elem.ips
+                push!(ips, ip)
+            end
+        end
+    end
+    nips = length(ips)
+
+    # Number of total connectivities
+    nconns = 0
+    for elem in dom.elems
+        nconns += 1 + length(elem.nodes)
+    end
+
+    # Add integration points
+    nconns  += nips*2
+    npoints += nips
+    ncells   = nelems + nips
+
+    # Open filename
+    f = open(filename, "w")
+
+    println(f, "# vtk DataFile Version 3.0")
+    println(f, "FemLab output ")
+    println(f, "ASCII")
+    println(f, "DATASET UNSTRUCTURED_GRID")
+    println(f, "")
+    println(f, "POINTS ", npoints, " float64")
+
+    # Write nodes
+    for node in dom.nodes
+        @printf f "%23.15e %23.15e %23.15e \n" node.X[1] node.X[2] node.X[3]
+    end
+    # Write ip points
+    for ip in ips
+        @printf f "%23.15e %23.15e %23.15e \n" ip.X[1] ip.X[2] ip.X[3]
+    end
+    println(f)
+
+    # Write connectivities
+    println(f, "CELLS ", ncells, " ", nconns)
+    for elem in dom.elems
+        print(f, length(elem.nodes), " ")
+        for node in elem.nodes
+            print(f, node.id-1, " ")
+        end
+        println(f)
+    end
+    # Write ip connectivities (vertex)
+    for (i,ip) in enumerate(ips)
+        println(f, "1 $(i-1)", )
+    end
+    println(f)
+
+    # Write cell types
+    println(f, "CELL_TYPES ", nelems)
+    for elem in dom.elems
+        println(f, get_vtk_type(elem.shape))
+    end
+    # Ips cell types
+    vtk_vertex = 1
+    for ip in ips
+        print(f, vtk_vertex, " ")
+    end
+    println(f)
+
+    if has_data
+        # Get node and elem values
+        node_vals, node_labels, elem_vals, elem_labels = node_and_elem_vals(dom.nodes, dom.elems)
+        nncomps = length(node_labels)
+        necomps = length(elem_labels)
+    else
+        close(f)
+        return
+    end
+
+    point_data = DTable()
+    cell_data  = DTable()
+
+    # Write point data
+    println(f, "POINT_DATA ", nnodes)
+
+    # Write vectors
+    if :ux in keys(dom.nodes[1].dofdict)
+        println(f, "VECTORS ", "|u| float64")
+        for node in dom.nodes
+            @printf f "%23.10e"   node.dofdict[:ux].U
+            @printf f "%23.10e"   node.dofdict[:uy].U
+            @printf f "%23.10e\n" dom.ndim==3?node.dofdict[:uz].U:0.0
+        end
+        for ip in ips
+            print(f, "0.0 0.0 0.0\n")
+        end
+    end
+    println(f, )
+
+    # Write nodal scalar data
+    for i=1:nncomps
+        println(f, "SCALARS ", node_labels[i], " float64 1")
+        println(f, "LOOKUP_TABLE default")
+        for j in 1:nnodes
+            @printf f "%23.10e"  node_vals[j,i]
+        end
+        for ip in ips
+            print(f, "0.0 ")
+        end
+        println(f, )
+    end
+
+    # Get values at ips
+    table = DTable()
+    for ip in ips
+        push!(table, getvals(ip))
+    end
+
+    # Write ip scalar data TODO
+    for field in table.header
+        println(f, "SCALARS ", field, " float64 1")
+        println(f, "LOOKUP_TABLE default")
+        for elem in dom.elems
+            print(f, "0.0 ")
+        end
+        field_data = table.dict[field]
+        for i in 1:nips
+            @printf f "%23.10e" field_data[i]
+        end
+        println(f, )
+    end
+
+    # Write element data
+    println(f, "CELL_DATA ", ncells)
+    for i=1:necomps
+        println(f, "SCALARS ", elem_labels[i], " float64 1")
+        println(f, "LOOKUP_TABLE default")
+        for j in 1:nelems  #naelems
+            e_idx = dom.elems[j].id  #aelems
+            @printf f "%23.10e"  elem_vals[e_idx,i]
+        end
+        for ip in ips
+            print(f, "0.0 ")
+        end
+        println(f, )
+    end
+
+    # Write elem type
+    println(f, "SCALARS cell_type int 1")
+    println(f, "LOOKUP_TABLE default")
+    for elem in dom.elems
+        println(f, elem.shape, " ")
+    end
+    println(f, )
+
+    close(f)
+
+    if verbose
+        pcolor(:green, "  file $filename written (Domain)\n")
+    end
+end
+
+
+function save(nodes::Array{Node,1}, filename::AbstractString; dir::Symbol=:nodir, rev::Bool=false, verbose::Bool=true)
+    # sort nodes
+    if dir in (:x, :y, :z)
+        nodes = sort(nodes, dir=dir, rev=rev)
+    end
+
+    # filling table
+    table = DTable()
+    dist  = 0.0
+    X0    = nodes[1].X
+    for node in nodes
+        dist += norm(node.X - X0)
+        X0    = node.X
+        vals  = getvals(node)
+        vals[:dist] = dist
+        vals[:x]    = node.X[1]
+        vals[:y]    = node.X[2]
+        vals[:z]    = node.X[3]
+        push!(table, vals)
+    end
+
+    save(table, filename, verbose)
+end
+
+
+function save(ips::Array{Ip,1}, filename::AbstractString; offset::Float64=0.0, dir::Symbol=:nodir, rev::Bool=false, verbose=true)
+    # sort ips
+    if dir in (:x, :y, :z)
+        ips = sort(ips, dir=dir, rev=rev)
+    end
+
+    basename, ext = splitext(filename)
+    format = (ext == "")? "dat" : ext[2:end]
+
+    if format=="dat"
+
+        # filling table
+        table = DTable()
+        dist  = offset
+        X0    = ips[1].X
+        for node in ips
+            dist += norm(node.X - X0)
+            X0    = node.X
+            vals  = getvals(ip.data)
+            vals[:dist] = dist
+            vals[:x]    = ip.X[1]
+            vals[:y]    = ip.X[2]
+            vals[:z]    = ip.X[3]
+            push!(table, vals)
+        end
+
+        save(table, filename, verbose)
+        return
+    end
+
+    if format=="vtk"
+        # Saves the integration points in vtk format
+
+        # Find nips
+        nips = length(ips)
+
+        # Open filename
+        f = open(filename, "w")
+
+        println(f, "# vtk DataFile Version 3.0")
+        println(f, "pyfem output ")
+        println(f, "ASCII")
+        println(f, "DATASET UNSTRUCTURED_GRID")
+        println(f, "")
+        println(f, "POINTS ", nips, " float64")
+
+        # Write ip points
+        for ip in ips
+            @printf f "%23.15e %23.15e %23.15e \n" ip.X[1] ip.X[2] ip.X[3]
+        end
+        println(f)
+
+        # Write connectivities
+        println(f, "CELLS $nips  $(nips*2)")
+        for (i,ip) in enumerate(ips)
+            println(f, "1 $(i-1)", )
+        end
+        println(f)
+
+        # Write cell types
+        println(f, "CELL_TYPES ", nips)
+        vtk_vertex = 1
+        for ip in ips
+            print(f, vtk_vertex, " ")
+        end
+        println(f)
+
+        # Get values at ips
+        table = DTable()
+        for ip in ips
+            push!(table, getvals(ip))
+        end
+
+        # Write point data
+        println(f, "POINT_DATA ", nips)
+
+        # Write ip scalar data
+        for field in table.header
+            println(f, "SCALARS ", field, " float64 1")
+            println(f, "LOOKUP_TABLE default")
+            field_data = table.dict[field]
+            for i in 1:nips
+                @printf f "%23.10e" field_data[i]
+            end
+            println(f, )
+        end
+
+        # Write cell data
+        println(f, "CELL_DATA ", nips)
+
+        # Write owner elem type
+        println(f, "SCALARS cell_shape_tag int 1")
+        println(f, "LOOKUP_TABLE default")
+        for ip in ips
+            print(f, get_shape_tag(ip.owner.shape), " ")
+        end
+        println(f, )
+
+        close(f)
+
+        if verbose
+            println("  file $filename written (Domain)")
+        end
+    end
+end

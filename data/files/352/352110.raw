@@ -1,0 +1,15 @@
+type Instancia
+  function Instancia(path::String = string(homedir(), "/Documentos/TEEO/instâncias/v10.txt"))
+    text = readdlm(path, ' ')[4, :]
+
+    prizes = text[find(r -> isa(r, Float64), text)]
+
+    text = readdlm(path, ' ')[7, :]
+
+    penalties = text[find(r -> isa(r, Float64), text)]
+
+    matrix = readdlm(path)[10:end, :]
+
+    return prizes, penalties, matrix;
+  end
+end

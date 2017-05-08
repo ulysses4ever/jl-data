@@ -1,0 +1,22 @@
+## =============================================================================
+## xxxxx.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using Gadfly
+using Cairo
+
+p = plot(x=1:10, y=2.^rand(10),
+         Scale.y_sqrt, Geom.point, Geom.smooth,
+         Guide.xlabel("Stimulus"),
+         Guide.ylabel("Response"),
+         Guide.title("Dog Training"))
+
+q = plot(x=rand(50), y=rand(50), Geom.point, Geom.line)
+
+
+p = plot(x=[1,2,3], y=[4,5,6])
+draw(SVG("./myplot.svg", 12cm, 6cm), p)
+draw(PNG("./myplot.png", 4inch, 3inch), p)
+
+plot([sin, cos], 0, 25)
+

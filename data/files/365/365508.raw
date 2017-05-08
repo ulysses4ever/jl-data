@@ -1,0 +1,63 @@
+#Appelo and Nilsson start numbering from 0, so all indices will have 1 added to them, since that's how Julia's array indexing works. I will use the convention of a grid extending from [1, Nx] * [1, Ny], with the interior being [2, Nx - 1] * [2, Ny - 1] (note that Appelo defines the Dirichlet points as being interior points, but that seems sort of silly, so I am ignoring that convention). As a result, there are Nx - 2 interior squares in the x direction, and Ny - 2 interior squares in the y direction, so the hx and hy are defined accordingly.
+
+const alpha = 0.0
+const Nx = 800
+const Ny = 800
+const hx = 1/(Nx - 2)
+const hy = 1/(Ny - 2)
+const K = 1.75 #1.76 at 800
+const DeltaT = 0.0005*K
+const gamma = 0.00003
+function enforceDirichlet(A::Array{Float64, 2})
+	for y in 2:Ny-1
+		A[Nx, y] = 0.0
+	end
+end
+function enforcePeriodic(A::Array{Float64, 2})
+	for x in 1:Nx
+		A[x, 1] = A[x, Ny - 1]
+		A[x, Ny] = A[x, 2]
+	end
+end
+function enforceFree(A::Array{Float64, 2})
+	for y in 2:Ny-1
+		A[1, y] = A[3, y] + alpha*hx/hy*(A[2, y + 1] - A[2, y - 1])
+	end
+end
+function updateBulk(arr1::Array{Float64, 2}, arr2::Array{Float64, 2}, arr3::Array{Float64, 2})
+	for j in 2:Ny-1
+		arr1[2, j] = 2*arr2[2, j] - arr3[2, j] + DeltaT^2*((arr2[3,j] - 2*arr2[2,j] + arr2[1,j])/(hx^2) + (arr2[2,j+1] - 2*arr2[2,j] + arr2[2,j-1])/(hy^2) + 2*alpha*(arr2[3,j+1] - arr2[2,j+1] + arr2[3,j-1] - arr2[2,j-1])/(2*hx*hy))
+	end
+	for j in 2:Ny-1
+		for i in 3:Nx-1
+			arr1[i, j] = 2*arr2[i, j] - arr3[i, j] + DeltaT^2*((arr2[i+1,j] - 2*arr2[i,j] + arr2[i-1,j])/(hx^2) + (arr2[i,j+1] - 2*arr2[i,j] + arr2[i,j-1])/(hy^2) + 2*alpha*(arr2[i+1,j+1] - arr2[i-1,j+1] - arr2[i+1,j-1] + arr2[i-1,j-1])/(4*hx*hy))
+		end
+	end
+end
+function test()
+	arr1 = zeros(Nx, Ny);
+#	arr2 = [gamma/(x^2*hx^2 + 0.0303*y^2*hx^2 + gamma) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)];
+#	arr3 = [gamma/((x-0.00046/hx*K)^2*hx^2 + 0.03*y^2*hx^2 + gamma) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)];
+	arr2 = [exp(-0.04(sqrt((x^2+y^2)) - 200.0 + 0.000501*K/hx)^2) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)]
+	arr3 = [exp(-0.04(sqrt((x^2+y^2)) - 200.0)^2) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)]
+	enforceDirichlet(arr3)
+	enforcePeriodic(arr3)
+	enforceFree(arr3)
+	enforceDirichlet(arr2)
+	m = 500
+	@time for j in 0:m-1
+		IPM.ExportImage(IPM.EndolithModified(1.0*arr2),string("LinearLstar",j,".png"))
+		for i in 1:iround(10/K/3)
+			enforcePeriodic(arr2)
+			enforceFree(arr2)
+			updateBulk(arr1, arr2, arr3)
+			enforcePeriodic(arr1)
+			enforceFree(arr1)
+			updateBulk(arr3, arr1, arr2)
+			enforcePeriodic(arr3)
+			enforceFree(arr3)
+			updateBulk(arr2, arr3, arr1)
+		end
+	end
+	IPM.ExportImage(IPM.EndolithModified(1.0*arr2),string("LinearLstar", m, ".png"))
+end

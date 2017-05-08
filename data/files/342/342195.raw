@@ -1,0 +1,66 @@
+#1-argument functions
+#d_assign_call must return an array of Exprs/symbols/numbers
+
+#function d_assign_call(ops,ex,state,::CallExpr{:exp})
+#    lhs = ex.args[1]::Active
+#    rhs = ex.args[2].args[2]::Active
+#    [Expr(ops[1], dsym(rhs), :($(dsym(lhs)).*$(sym(lhs))) )]
+#end
+
+#########################################
+## two-(or more)-argument functions below
+function d_assign_call(ops,ex,state,c::CallExpr{:+})
+    newargs = {}
+    lhs = ex.args[1]::Active
+    for (ix,rhsArg) in enumerate(ex.args[2].args[2:end])
+        if isa(rhsArg,Active)
+            push!(newargs,Expr(ops[ix],dsym(rhsArg),dsym(lhs)))
+        end
+    end
+    newargs
+end
+
+function d_assign_call(ops,ex,state,c::CallExpr{:*})
+    newargs = {}
+    lhs = ex.args[1]::Active
+    rhs = ex.args[2].args[2:end]
+    if length(rhs) > 2
+        error("grad can't (yet) accept *(a,b,...) with >2 args")
+    end
+    if isa(rhs[1],Active)
+        push!(newargs,Expr(ops[1],dsym(rhs[1]),:($(dsym(lhs))*$(sym(rhs[2])))))
+    end
+    if isa(rhs[2],Active)
+        push!(newargs,Expr(ops[2],dsym(rhs[2]),:($(sym(rhs[1]))'*$(dsym(lhs))) ))
+    end
+    newargs
+end
+
+#make fallback method to call appropriate method of function, e.g. foo(Seed(seed))
+function d_assign_call{T}(ops,ex,state,c::CallExpr{T}) 
+    lhs = ex.args[1]::Active
+    rhs = ex.args[2].args[2:end]
+    newargs = {}
+    newrhs = {(isa(x,Active) ? :(WRT($(sym(x)))) : x) for x in rhs}
+    actives = find(x->isa(x,Active),rhs)
+    #if we call a 1-arg fn, or a fn with one active argument e.g. :(h=sin(z)), then want to return e.g. :(dz += sin(Seed(dh),WRT(z))[2])
+    if length(actives) == 1
+        ii = actives[1]
+        push!(newargs,Expr(ops[ii],dsym(rhs[ii]), Expr(:call,T,:(SeedWithVal($(sym(lhs)),$(dsym(lhs)))), newrhs...  )))
+    else #otherwise, call the function once, then assign the derivs w/r/t the various functions
+        t = gensym("temp")
+        push!(newargs,Expr(:(=),t,Expr(:call,T,:(SeedWithVal($(sym(lhs)),$(dsym(lhs)))), newrhs...  )))
+        for ii in actives
+            push!(newargs,Expr(ops[ii],dsym(rhs[ii]),t[ii]))
+        end
+    end
+    newargs
+end
+
+Base.sin(y::SeedWithVal,x::WRT) = cos(x.val).*(y.dval)
+Base.exp(y::SeedWithVal,x::WRT) = y.val .* y.dval
+
+Base.dot(y::SeedWithVal,x1::WRT,x2::WRT) = (x2.val.*y.dval, x1.val.*y.dval)
+Base.dot(y::SeedWithVal,x1::WRT,x2::Any) = x2.*(y.dval)
+Base.dot(y::SeedWithVal,x1::Any,x2::WRT) = x1.*(y.dval)
+

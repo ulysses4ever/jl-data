@@ -1,0 +1,50 @@
+# Scheduler (callback container)
+type Scheduler
+    registered_cf::Ptr{Void}
+    registered_callback::Any
+    reregistered_cf::Ptr{Void}
+    reregistered_callback::Any
+    disconnected_cf::Ptr{Void}
+    disconnected_callback::Any
+    resourceOffers_cf::Ptr{Void}
+    resourceOffers_callback::Any
+    offerRescinded_cf::Ptr{Void}
+    offerRescinded_callback::Any
+    statusUpdate_cf::Ptr{Void}
+    statusUpdate_callback::Any
+    frameworkMessage_cf::Ptr{Void}
+    frameworkMessage_callback::Any
+    slaveLost_cf::Ptr{Void}
+    slaveLost_callback::Any
+    executorLost_cf::Ptr{Void}
+    executorLost_callback::Any
+    error_cf::Ptr{Void}
+    error_callback::Any
+
+    function Scheduler(;callbacks...)
+        callbacks = Dict(callbacks)
+        registered = get(:registered, callbacks, nothing)
+        reregistered = get(:reregistered, callbacks, nothing)
+        disconnected = get(:disconnected, callbacks, nothing)
+        resourceOffers = get(:resourceOffers, callbacks, nothing)
+        offerRescinded = get(:offerRescinded, callbacks, nothing)
+        statusUpdate = get(:statusUpdate, callbacks, nothing)
+        frameworkMessage = get(:frameworkMessage, callbacks, nothing)
+        slaveLost = get(:slaveLost, callbacks, nothing)
+        executorLost = get(:executorLost, callbacks, nothing)
+        error = get(:error, callbacks, nothing)
+
+        return new(
+            registered_wrap_c, registered,
+            reregistered_wrap_c, reregistered,
+            disconnected_wrap_c, disconnected,
+            resourceOffers_wrap_c, resourceOffers,
+            offerRescinded_wrap_c, offerRescinded,
+            statusUpdate_wrap_c, statusUpdate,
+            frameworkMessage_wrap_c, frameworkMessage,
+            slaveLost_wrap_c, slaveLost,
+            executorLost_wrap_c, executorLost
+            error_wrap_c, error
+        )
+    end
+end

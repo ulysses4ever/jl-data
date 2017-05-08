@@ -1,0 +1,48 @@
+function baum_welch!(hmm::binomial_HMM, max_iter, tol, scaling)
+    # convergence history of the fit, log-liklihood
+    ch = (Float64)[]
+
+    for k = 1:max_iter
+        # E step
+        log_p_obs, x, g = calc_stats(hmm,scaling)
+        push!(ch, log_p_obs)
+        
+        # Test for convergence
+        if length(ch)>1 && (ch[end]-ch[end-1] < tol)
+            println("Baum-Welch converged, stopping early")
+            break
+        end
+
+        # M step (re-estimation)
+        re_estimate!(hmm, x, g)
+    end
+
+    return ch
+end
+
+function re_estimate!(hmm::binomial_HMM,x,g)
+    # Update hmm.A 
+    for i = 1:hmm.n_states
+        denom = sum(g[1:end-1,i]) # Expected number of transitions from state 'i'
+        for j = 1:hmm.n_states
+            # Numerator is the expected number of transitions from state 'i' to 'j' 
+            hmm.A[i,j] = sum(x[:,i,j]) / denom
+        end
+    end
+
+    # Update hmm.B
+    for i = 1:hmm.n_states
+        for z = 1:hmm.n_ctxt
+            ## Weighted MLE for binomial distribution
+            ind = hmm.c .== z # only consider observations in nucleotide context z
+            wt = g[ind,i]     # weight observations by probability of being in state 'i'
+
+            # weighted MLE calculation: number of methylation sites / total number of sites
+            hmm.B[i,z] = sum(wt .* hmm.o[ind]) ./ sum(wt .* hmm.k[ind])
+        end
+    end
+
+    # Update hmm.p (initial state variables)
+    hmm.p = vec(g[1,:])
+end
+

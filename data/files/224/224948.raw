@@ -1,0 +1,17 @@
+module MacroUtils
+
+include("Parallel.jl")
+using .Parallel
+include("MacroIterators.jl")
+using .MacroIterators
+include("Extract.jl")
+using .Extract
+include("Ccall.jl")
+using .Ccall
+
+export @modeverywhere, @dopara,
+       @zip, @enumerate,
+       @extract,
+       @C
+
+end # module

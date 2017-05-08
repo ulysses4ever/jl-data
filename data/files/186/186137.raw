@@ -1,0 +1,16 @@
+using MAT
+using LightGraphs
+
+function c_elegans_mat2lg(path_to_matfile::AbstractString,
+                   path_to_dotfile::AbstractString)
+    # 280x280 boolean adjacency matrix
+    bam = MAT.matread(path_to_matfile)["J2"]
+    g = LightGraphs.DiGraph(280)
+    for i in 1:280, j in 1:280
+        if bam[i,j] LightGraphs.add_edge!(g,i,j) end
+    end
+    dotfile = open(path_to_dotfile,"w+")
+    save(dotfile, g, "C elegans")
+    close(dotfile)
+    nothing
+end

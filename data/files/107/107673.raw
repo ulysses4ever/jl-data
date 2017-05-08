@@ -1,0 +1,405 @@
+#Caterpillar Tube Pricing Benchmark
+#Julia Ver. 0.0.8 # improved hyperparameter search via simple Validation, categorical data was included. Improved matrix generation.
+
+#Install Needed Libraries
+#Pkg.add("BinDeps")
+#Pkg.add("JSON")
+#Pkg.add("DataFrames")
+#Pkg.add("TextAnalysis")
+#Pkg.add("Gadfly")
+#Pkg.add("PyPlot")
+#Pkg.add("XGBoost")
+#Pkg.add("GLMNet")
+#Pkg.add("ExtremelyRandomizedTrees")
+#Pkg.add("Loess")
+
+#Libraries, directories, options and extra functions----------------------
+Pkg.update()
+
+using JSON
+using DataFrames
+using TextAnalysis
+using Dates
+#using Gadfly
+#using PyPlot
+#using XGBoost
+using ExtremelyRandomizedTrees
+#using Loess
+#using GLMNet
+
+#Read Settings file & external modules
+cd(dirname(@__FILE__()))
+
+#Import External Modules
+include(pwd() * "/dateAdjusters.jl")
+include(pwd() * "/helperFunctions.jl")
+
+#Set Directory Variables
+directories = JSON.parsefile("SETTINGS.json")
+
+dataDirectory = directories["dataDirectory"]
+edaDirectory = directories["EDALoc"]
+
+#Load data
+train = readtable(dataDirectory * "train_set.csv")
+test = readtable(dataDirectory * "test_set.csv")
+test = test[:, 2:size(test, 2)]
+test[:cost] = 0
+train[:idx] = -[1:size(train, 1)]
+test[:idx] = [1:size(test, 1)]
+dataFull = vcat(train, test)
+
+#Data Transformations
+#Quote Dates to numeric columns
+dataFull[:quote_date] = Date(dataFull[:quote_date], "y-m-d")
+
+#New Columns with date information
+dataFull[:year] = year(dataFull[:quote_date])
+dataFull[:month] = month(dataFull[:quote_date])
+dataFull[:day] = day(dataFull[:quote_date])
+dataFull[:dayWeek] = dayofweek(dataFull[:quote_date])
+dataFull[:quarter] = quarterofyear(dataFull[:quote_date])
+dataFull[:dayQuarter] = dayofquarter(dataFull[:quote_date])
+dataFull[:dayYear] = dayofyear(dataFull[:quote_date])
+dataFull[:weekInMonth] = dayofweekofmonth(dataFull[:quote_date])
+#New Columns with holiday information
+dataFull[:newYearsBool] = convert(Array{Int64}, map(isnewyears, dataFull[:quote_date]))
+dataFull[:easterBool] = convert(Array{Int64}, map(iseaster, dataFull[:quote_date]))
+dataFull[:veteransBool] = convert(Array{Int64}, map(isveteransday, dataFull[:quote_date]))
+dataFull[:mlkBool] = convert(Array{Int64}, map(ismartinlutherking, dataFull[:quote_date]))
+dataFull[:memorialBool] = convert(Array{Int64}, map(ismemorialday, dataFull[:quote_date]))
+dataFull[:laborBool] = convert(Array{Int64}, map(islaborday, dataFull[:quote_date]))
+dataFull[:columbusBool] = convert(Array{Int64}, map(iscolumbusday, dataFull[:quote_date]))
+dataFull[:winHolidaysBool] = convert(Array{Int64}, map(isWinterHolidays, dataFull[:quote_date]))
+
+#Merge all dataframes
+dataFull = join(dataFull, readtable(dataDirectory * "bill_of_materials.csv"),
+                on = :tube_assembly_id, kind = :inner)
+dataFull = join(dataFull, readtable(dataDirectory * "specs.csv"),
+                on = :tube_assembly_id, kind = :inner)
+dataFull = join(dataFull, readtable(dataDirectory * "tube.csv"),
+                on = :tube_assembly_id, kind = :inner)
+
+print("Current index order. First 6 elements: " * string(head(test[:idx])))
+print("The size of the merged dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+files2Merge = readdir(dataDirectory)[[2:8, 10:14]]
+
+#Take the component data files and merge them together
+for csv2read in files2Merge
+  tempFile = readtable(dataDirectory * csv2read)
+  originalNamesTempFile = names(tempFile)
+  for i in [1:8]
+    newColNames = [symbol(string(nameCol) * "_" * string(i)) for nameCol in originalNamesTempFile]
+    names!(tempFile, newColNames)
+    column2JoinOn = symbol("component_id_" * string(i))
+    dataFull = join(dataFull, tempFile, on = column2JoinOn, kind = :left)
+  end
+end
+
+print("The size of the merged dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+#Reduce Data Size; NA Removal from data frames
+accumulatedNAInfo = colwise(isna, dataFull)
+numberOfNAsPerColumn = map((x) -> sum(x) / length(x), accumulatedNAInfo)
+namesAndTypes = hcat(names(dataFull), eltypes(dataFull), numberOfNAsPerColumn)
+
+naThreshold = 0.75
+validColumnsIdxs = bool(map(x -> x < naThreshold, numberOfNAsPerColumn))
+dataFull = dataFull[:, [validColumnsIdxs]]
+
+print("The size of the reduced dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+namesAndTypesReduced = hcat(names(dataFull),
+                            eltypes(dataFull),
+                            numberOfNAsPerColumnReduced)
+
+#Name of columns to merge with type_end_form.csv & tube_end_form.csv
+nestedFiles = [("end_form_id", ["type_end_form.csv", "tube_end_form.csv"]),
+               ("component_type_id", ["type_component.csv"]),
+               ("connection_type_id", ["type_connection.csv"])]
+
+for listOfFiles in nestedFiles
+  for file2merge in listOfFiles[2]
+    file2MergeWith = readtable(dataDirectory * file2merge)
+    originalColNames = names(file2MergeWith)
+    stringNameColData = [string(nameColData) for nameColData in names(dataFull)]
+    endFormCols = stringNameColData[bool([contains(colString, listOfFiles[1]) for colString in stringNameColData])]
+    for endFormCol in endFormCols
+      colSuffix = endFormCol[length(listOfFiles[1]) + 1:length(endFormCol)]
+      newColNames = [symbol(string(newNames) * colSuffix) for newNames in originalColNames]
+      newColNames = convert(Array{Symbol}, newColNames)
+      names!(file2MergeWith, newColNames)
+      column2JoinOn = symbol(listOfFiles[1] * string(colSuffix))
+      dataFull = join(dataFull, file2MergeWith, on = column2JoinOn, kind = :left)
+    end
+  end
+end
+
+print("The size of the 2nd merge dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+
+validColumnsIdxs = bool(map(x -> x < naThreshold, numberOfNAsPerColumnReduced))
+dataFull = dataFull[:, [validColumnsIdxs]]
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+namesAndTypesReduced2 = hcat(names(dataFull),
+                            eltypes(dataFull),
+                            numberOfNAsPerColumnReduced)
+
+#EDA
+#EDA 1; Cost Histograms
+#Cost histogram
+plot(x = dataFull[dataFull[:idx].< 0, :cost], Geom.histogram,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost"))
+#Log Cost histogram; useful for linear models and posible outlier detection
+plot(x = dataFull[dataFull[:idx].< 0, :cost], Geom.histogram, Scale.x_log,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost in Log Scale"))
+
+#EDA #2; tube cost vs. volume order
+#This plot was based on the script found on:
+#https://www.kaggle.com/timabram/caterpillar-tube-pricing/tube-pricing-data-exploration-v2
+plot(x = dataFull[dataFull[:idx].< 0, :quantity], y = dataFull[dataFull[:idx].< 0, :cost],
+     Geom.histogram, Geom.point, Scale.x_log, Scale.y_log,
+     Geom.smooth(method = :loess, smoothing = 0.9),
+     Guide.xlabel("Quantity Bought in Log Scale"), Guide.ylabel("Cost in Log Scale"))
+
+#EDA #3: Number of NAs per column in merged dataframes
+plot(x = 1:size(namesAndTypes, 1), y = namesAndTypes[:, 3], Geom.bar,
+     Guide.xlabel("Column Names"), Guide.ylabel("Percentage of NAs in data"))
+
+plot(x = 1:size(namesAndTypesReduced, 1), y = namesAndTypesReduced[:, 3], Geom.bar,
+     Guide.xlabel("Column Names"), Guide.ylabel("Percentage of NAs in data"))
+
+plot(x = 1:size(namesAndTypesReduced2, 1), y = namesAndTypesReduced2[:, 3], Geom.bar,
+     Guide.xlabel("Column Names"), Guide.ylabel("Percentage of NAs in data"))
+
+
+#Define Categorical and Numeric Rows
+namesAndTypesReduced2[:, 2] = map(x -> string(x), namesAndTypesReduced2[:, 2])
+categoricalColumns = names(dataFull)[namesAndTypesReduced2[:, 2] .== "UTF8String"]
+numericalColumns = names(dataFull)[namesAndTypesReduced2[:, 2] .≠ "UTF8String"]
+
+#Clean Idx, cost and idx values from training features
+cleanNumeric = !bool([bool(string(colSymbol) == "cost") | bool(string(colSymbol) == "quote_date") | bool(string(colSymbol) == "idx")
+                      for colSymbol in numericalColumns])
+
+numericalColumns = numericalColumns[cleanNumeric]
+
+responseCategoricalColumns = [string(catCol) * "Response" for catCol in categoricalColumns]
+responseCategoricalColumns = convert(Array{Symbol}, responseCategoricalColumns)
+
+#Categorical Columns to Sparse Matrices
+categoricalSparse = sparse(rep(0, size(dataFull, 1)))
+
+for singleCol in categoricalColumns
+  colSparse = categorical2SparseMatrix(dataFull[singleCol])
+  categoricalSparse = hcat(categoricalSparse, colSparse)
+  #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+print("The size of the one hot encoded categorical data is " * string(size(categoricalSparse, 1)) * " rows and " *
+      string(size(categoricalSparse, 2)) * " columns.")
+
+#Categorical Columns to Function+Response
+#Get Training Indices
+#trainingDataIdxs = find(dataFull[:idx] .< 0)
+#costFullDataset = dataFull[:cost]
+
+#For debugging purposes
+#singleCol = categoricalColumns[4]
+#dataVector = dataFull[singleCol]
+#dataResponse = log1p(costFullDataset)
+#subsetIdx = trainingDataIdxs
+#length(unique(dataVector)) / length(dataVector)
+
+#for singleCol in categoricalColumns
+#  dataFull[symbol(string(singleCol) * "Response")] = categorical2response(dataFull[singleCol],
+#                                                                          log1p(costFullDataset),
+#                                                                          trainingDataIdxs)
+#  #Print progress
+#  print(string(singleCol) * " Column Processed")
+#end
+
+#print("The size of the extended dataset is " * string(size(dataFull, 1)) * " rows and " *
+#      string(size(dataFull, 2)) * " columns.")
+
+#Categorical Columns to Frequency (Counts)
+for singleCol in categoricalColumns
+  dataFull[singleCol] = categorical2frequency(dataFull[singleCol])
+  #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+#Remove NAs from numerical data
+for singleCol in numericalColumns
+  dataFull[isna(dataFull[singleCol]) .== true, singleCol] = -999
+    #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+dataFullArray = convert(Array{Float32}, dataFull[:, vcat(numericalColumns, categoricalColumns)])
+dataFullArraySparse = hcat(sparse(dataFullArray), categoricalSparse)
+
+#Remap the data to the original partitions, SPARSE
+trainIdx = dataFull[:idx].< 0
+testIdx = dataFull[:idx].> 0
+
+train = dataFullArraySparse[trainIdx, :]
+test = dataFullArraySparse[testIdx, :]
+testIds = dataFull[:idx][testIdx]
+print("Current index order. First 6 elements of test:" * string(head(testIds)))
+
+#Shuffle training data
+shuffledIdxs = shuffle([1:size(train, 1)])
+train = train[shuffledIdxs, :]
+
+costTraining = convert(Array{Float32}, dataFull[:cost][trainIdx][shuffledIdxs])
+costTrainingLog = log1p(costTraining)
+
+#XGBOOST
+#Create Binary Matrices from SparseMatrixCSC
+dtrain = DMatrix(train, label = costTrainingLog)
+dtest = DMatrix(test)
+
+#Matrix for validation
+train80Idx = 1:int(floor(size(train, 1) * 0.8))
+trainValIdx = int(floor(size(train, 1) * 0.8) + 1):size(train, 1)
+dTrain80 = DMatrix(train[train80Idx, :], label = costTrainingLog[train80Idx])
+dTrainVal = DMatrix(train[trainValIdx, :])
+
+#Define the evaluation function (xgboost currently doesn't support RMSLE)
+function RMSLE(preds, actual)
+  differenceLogs = log(1 + preds) - log(1 + actual)
+  RMSLEError = sqrt(1/length(differenceLogs) * sum([x ^ 2 for x in differenceLogs]))
+  return RMSLEError
+end
+
+#RMSLE as function evaluation
+function evalRMSLE(preds::Array{Float32, 1}, dtrain::DMatrix)
+  labels = get_info(dtrain, "label")
+  # return a pair metric_name, result
+  RMSLEError = RMSLE(preds, labels)
+  return ("RMSLE", RMSLEError)
+end
+
+#Hyperparameter Selection - Grid Search + Approximate Final Score
+rowSampling = [0.25, 0.5, 0.75, 1]
+colSampling = [0.2, 0.4, 0.6, 0.8, 1]
+
+#Fixed Parameters
+num_round = 2500
+num_round_cv = 1500
+
+param = ["eta" => 10/num_round_cv, "max_depth" => 20, "objective" => "reg:linear",
+         "silent" => 1]
+
+rSamplings = []
+cSamplings = []
+errors = []
+bestError = 1e+20
+bestRowSamp = 0
+bestColSamp = 0
+for rs in rowSampling
+  for cs in colSampling
+    #Update dictionary pameters
+    param["subsample"] = rs
+    param["colsample_bytree"] = cs
+    cvModel = xgboost(dTrain80, num_round_cv, param = param, seed = 0, feval = evalRMSLE)
+    predCv = exp(predict(cvModel, dTrainVal)) - 1
+    cvError = RMSLE(predCv, costTraining[trainValIdx])
+    errors = vcat(errors, cvError)
+    rSamplings = vcat(rSamplings, rs)
+    cSamplings = vcat(cSamplings, cs)
+    print("Validation Error of: " * string(cvError) * " With a row sampling rate of: "
+          * string(rs) * " and a column sampling rate of: " * string(cs))
+    if cvError < bestError
+      bestError = cvError
+      bestRowSamp = rs
+      bestColSamp = cs
+    end
+  end
+end
+
+#Plot the grid search
+plot(x = rSamplings, y = cSamplings, color = errors, Geom.rectbin)
+
+#Numeric + Categorical counts + Categorical Sparse Best Parameters
+#param["subsample"] = 0.5
+#param["colsample_bytree"] = 0.6
+
+#Update dictionary with best pameters
+param["subsample"] = bestRowSamp
+param["colsample_bytree"] = bestColSamp
+param["eta"] = 30/num_round
+
+#Model Training Tree Booster
+numberOfModels = 10
+predictionVector = []
+
+for i in 1:numberOfModels
+  #with RMSLE Evaluation
+  #XGBoostModel = xgboost(dtrain, num_round, param = param, feval = evalRMSLE)
+  #without RMSLE Evaluation
+  XGBoostModel = xgboost(dtrain, num_round, param = param)
+  #Predictions using test data
+  preds = exp(predict(XGBoostModel, dtest)) - 1
+  predictionVector = vcat(predictionVector, preds)
+  print("Model Number " * string(i) * " Processed")
+end
+predictionArrayTrees = reshape(predictionVector, size(test, 1), numberOfModels)
+meanPredictionsTrees = vec(mean(predictionArrayTrees, 2))
+
+#Write Results
+sampleSubmission = DataFrame(id = testIds, cost = meanPredictionsTrees)
+
+writetable("juliaXGBoostXVIII.csv", sampleSubmission)
+
+#Extremely Randomized Trees
+trainSmall = dataFullArray[trainIdx, :]
+trainSmallShuffled = trainSmall[shuffledIdxs, :]
+testSmall = dataFullArray[testIdx, :]
+
+#Validation Set
+train80Small = trainSmallShuffled[train80Idx, :]
+trainValidation = trainSmallShuffled[trainValIdx, :]
+
+predictionVector = []
+for i in 1:numberOfModels
+  ExtraTreesModel = ExtraTrees(transpose(train80Small), reshape(costTrainingLog[train80Idx], 1, length(train80Idx));
+                               regression = true)
+  predictionsExtraTrees = exp(predict(ExtraTreesModel, transpose(trainValidation))) - 1
+  predictionVector = vcat(predictionVector, vec(predictionsExtraTrees))
+  print("Model Number " * string(i) * " Processed")
+end
+
+predictionArrayExtraTrees = reshape(predictionVector, length(trainValIdx), numberOfModels)
+meanPredictionsTreesVal = vec(mean(predictionArrayExtraTrees, 2))
+print("RMSLE validation error of: " * string(RMSLE(meanPredictionsTreesVal, costTraining[trainValIdx])))
+
+#Model with full data
+predictionVector = []
+for i in 1:numberOfModels
+  ExtraTreesModel = ExtraTrees(transpose(trainSmall), reshape(costTrainingLog, 1, size(trainSmall, 1));
+                               regression = true)
+  predictionsExtraTrees = exp(predict(ExtraTreesModel, transpose(testSmall))) - 1
+  predictionVector = vcat(predictionVector, vec(predictionsExtraTrees))
+  print("Model Number " * string(i) * " Processed")
+end
+
+predictionArrayExtraTrees = reshape(predictionVector, size(predictionVector, 1), numberOfModels)
+meanPredictionsExtraTrees = vec(mean(predictionArrayExtraTrees, 2))
+
+#Write Results
+sampleSubmission = DataFrame(id = testIds, cost = meanPredictionsExtraTrees)
+writetable("juliaXGBoostXVIII.csv", sampleSubmission)

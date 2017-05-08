@@ -1,0 +1,229 @@
+module FEMMHeatDiffusionModule
+
+using JFFoundationModule: JFInt, JFFlt, JFFltVec, JFIntVec, JFFltMat, JFIntMat
+
+using FESetModule
+using FEMMBaseModule
+using NodalFieldModule
+using ForceIntensityModule
+using AssemblyModule
+
+# Class for heat diffusion models of materials.
+type FEMMHeatDiffusion
+    femmbase::FEMMBaseModule.FEMMBase
+end
+
+function  FEMMHeatDiffusion(;fes::FESetModule.FESet = FESetModule.FESet(), material = nothing, integration_rule = nothing, Rm = nothing)
+    femmbase=FEMMBaseModule.FEMMBase(fes=fes, material=material, integration_rule=integration_rule, Rm=Rm)
+    self =FEMMHeatDiffusion(femmbase)
+    return self
+end
+
+function conductivity(self::FEMMHeatDiffusion, assembler, geom::NodalFieldModule.NodalField, temp::NodalFieldModule.NodalField)
+#  Compute the conductivity matrix.
+#
+#  function K = conductivity(self, assembler, geom, temp)
+#
+#  Returns K as a matrix.
+#  Arguments
+#            self  = heat diffusion model
+#            assembler = descendent of the sysmat_assembler class
+#            geom=geometry field
+#            temp=temperature field
+# code_typed(FEMMHeatDiffusionModule.conductivity,(FEMMHeatDiffusionModule.FEMMHeatDiffusion,Any,NodalFieldModule.NodalField,Nodal
+# FieldModule.NodalField))
+     # Constants
+    const nfens::JFInt=FESetModule.count(self.femmbase.fes); # number of finite elements in the set
+    const ddim::JFInt=NodalFieldModule.dim(temp); # number of degrees of freedom per node
+    const enfens::JFInt =FESetModule.nfens(self.femmbase.fes); # number of nodes for element
+    const Kedim::JFInt =ddim*enfens;                          # dimension of the element matrix
+    const sdim::JFInt =NodalFieldModule.dim(geom);            # number of space dimensions
+    const mdim::JFInt=FESetModule.dim(self.femmbase.fes);     # manifold dimension of the element
+    # Where we supplied assembler object?  If not make a default.
+    if assembler== nothing
+        assembler = AssemblyModule.SysmatAssemblerSparse()
+    end
+    # Precompute basis f. values + basis f. gradients wrt parametric coor
+    npts, Ns, gradNparams, w, pc = FEMMBaseModule.integrationdata(self.femmbase);
+    # Material
+    mat = self.femmbase.material;
+    # Note that the thermal conductivity matrix is in the
+    # local  material orientation coordinates.
+    kappa_bar =  mat.property.thermal_conductivity;
+    # Prepare some data:
+    labels=self.femmbase.fes.label; # individual element labels
+    if length(self.femmbase.fes.label)==0
+        labels=zeros(JFInt,nfens);
+    end
+    # Prepare assembler and temporaries
+    Ke::JFFltMat =zeros(JFFlt,Kedim,Kedim);                # element matrix -- used as a buffer
+    x::JFFltMat =zeros(JFFlt,enfens,sdim); # array of node coordinates -- used as a buffer
+    dofnums::JFIntMat=zeros(JFInt,1,Kedim); # degree of freedom array -- used as a buffer
+    loc::JFFltMat =zeros(JFFlt,1,sdim); # quadrature point location -- used as a buffer
+    Rm::JFFltMat=eye(JFFlt,sdim,mdim); # material orientation matrix -- used as a buffer
+    J::JFFltMat =eye(JFFlt,sdim,mdim); # Jacobian matrix -- used as a buffer
+    RmTJ::JFFltMat =zeros(JFFlt,mdim,mdim); # intermediate result -- used as a buffer
+    gradN::JFFltMat =zeros(JFFlt,enfens,mdim); # intermediate result -- used as a buffer
+    AssemblyModule.startassembly!(assembler, Kedim, Kedim, nfens, temp.nfreedofs, temp.nfreedofs);
+    for i=1:nfens # Loop over elements
+        NodalFieldModule.gathervalues!(geom,x,self.femmbase.fes.conn[i,:]);# retrieve element coordinates
+        fill!(Ke, 0.0); # Initialize element matrix
+        for j=1:npts # Loop over quadrature points 
+            At_mul_B!(loc,Ns[j],x);# Quadrature points location
+            At_mul_B!(J, x, gradNparams[j]); # calculate the Jacobian matrix 
+            Jac = FESetModule.Jacobianvolume(self.femmbase.fes,self.femmbase.fes.conn[i,:], Ns[j], J, x);# Jacobian
+            FEMMBaseModule.getRm!(self.femmbase,Rm,loc,J,labels[i]); # Material orientation matrix 
+            At_mul_B!(RmTJ, Rm, J); # local Jacobian matrix 
+            # gradient WRT material coordinates
+            FESetModule.gradN!(self.femmbase.fes,gradN,gradNparams[j],RmTJ);#Do: gradN = gradNparams[j]/RmTJ;
+            for nx=1:Kedim # Do: Ke = Ke + gradN*(kappa_bar*(Jac*w[j]))*gradN' ;
+                for kx=1:sdim
+                    for px=1:sdim
+                        for mx=1:Kedim
+                            Ke[mx,nx] = Ke[mx,nx] + gradN[mx,px]*((Jac*w[j])*kappa_bar[px,kx])*gradN[nx,kx]
+                        end
+                    end
+                end
+            end
+        end # Loop over quadrature points
+        NodalFieldModule.gatherdofnums!(temp,dofnums,self.femmbase.fes.conn[i,:]);# retrieve degrees of freedom
+        AssemblyModule.assemblesymmetric!(assembler, Ke, dofnums);# assemble symmetric matrix
+    end # Loop over elements
+    K = AssemblyModule.makematrix!(assembler);
+    return K
+end
+
+function nzebcloadsconductivity(self::FEMMHeatDiffusion, assembler, geom::NodalFieldModule.NodalField, temp::NodalFieldModule.NodalField)
+    #  Compute load vector for nonzero EBC for fixed temperature.
+    # 
+    # %    Arguments
+    # %      assembler =  descendent of sysvec_assembler
+    # %      geom=geometry field
+    # %      temp=temperature field
+    # %
+    # % Return the assembled system vector F.
+
+    # Constants
+    const nfens::JFInt=FESetModule.count(self.femmbase.fes); # number of finite elements in the set
+    const ddim::JFInt=NodalFieldModule.dim(temp); # number of degrees of freedom per node
+    const enfens::JFInt =FESetModule.nfens(self.femmbase.fes); # number of nodes for element
+    const Kedim::JFInt =ddim*enfens;                          # dimension of the element matrix
+    const sdim::JFInt =NodalFieldModule.dim(geom);            # number of space dimensions
+    const mdim::JFInt=FESetModule.dim(self.femmbase.fes);     # manifold dimension of the element
+    # Where we supplied assembler object?  If not make a default.
+    if assembler== nothing
+        assembler = AssemblyModule.SysvecAssembler()
+    end
+    # Precompute basis f. values + basis f. gradients wrt parametric coor
+    npts, Ns, gradNparams, w, pc = FEMMBaseModule.integrationdata(self.femmbase);
+    # Material
+    mat = self.femmbase.material;
+    # Note that the thermal conductivity matrix is in the
+    # local  material orientation coordinates.
+    kappa_bar =  mat.property.thermal_conductivity;
+    # Prepare some data:
+    labels=self.femmbase.fes.label; # individual element labels
+    if length(self.femmbase.fes.label)==0
+        labels=zeros(JFInt,nfens);
+    end
+    # Prepare assembler and temporaries
+    Ke::JFFltMat =zeros(JFFlt,Kedim,Kedim);                # element matrix -- used as a buffer
+    x::JFFltMat =zeros(JFFlt,enfens,sdim); # array of node coordinates -- used as a buffer
+    dofnums::JFIntMat=zeros(JFInt,1,Kedim); # degree of freedom array -- used as a buffer
+    loc::JFFltMat =zeros(JFFlt,1,sdim); # quadrature point location -- used as a buffer
+    Rm::JFFltMat=eye(JFFlt,sdim,mdim); # material orientation matrix -- used as a buffer
+    J::JFFltMat =eye(JFFlt,sdim,mdim); # Jacobian matrix -- used as a buffer
+    RmTJ::JFFltMat =zeros(JFFlt,mdim,mdim); # intermediate result -- used as a buffer
+    gradN::JFFltMat =zeros(JFFlt,enfens,mdim); # intermediate result -- used as a buffer
+    pT::JFFltMat=zeros(JFFlt,Kedim,1);
+    AssemblyModule.startassembly!(assembler, temp.nfreedofs);
+    # Now loop over all finite elements in the set
+    for i=1:nfens # Loop over elements
+        NodalFieldModule.gathervalues!(temp,pT,self.femmbase.fes.conn[i,:]);# retrieve element coordinates
+        if norm(pT) != 0     # Is the load nonzero?
+            NodalFieldModule.gathervalues!(geom,x,self.femmbase.fes.conn[i,:]);# retrieve element coordinates
+            fill!(Ke, 0.0);
+            for j=1:npts # Loop over quadrature points 
+                At_mul_B!(loc,Ns[j],x);# Quadrature points location
+                At_mul_B!(J, x, gradNparams[j]); # calculate the Jacobian matrix 
+                Jac = FESetModule.Jacobianvolume(self.femmbase.fes,self.femmbase.fes.conn[i,:], Ns[j], J, x);# Jacobian
+                FEMMBaseModule.getRm!(self.femmbase,Rm,loc,J,labels[i]); # Material orientation matrix 
+                At_mul_B!(RmTJ, Rm, J); # local Jacobian matrix 
+                # gradient WRT material coordinates
+                FESetModule.gradN!(self.femmbase.fes,gradN,gradNparams[j],RmTJ);#Do: gradN = gradNparams[j]/RmTJ;
+                for nx=1:Kedim # Do: Ke = Ke + gradN*(kappa_bar*(Jac*w[j]))*gradN' ;
+                    for kx=1:sdim
+                        for px=1:sdim
+                            for mx=1:Kedim
+                                Ke[mx,nx] = Ke[mx,nx] + gradN[mx,px]*((Jac*w[j])*kappa_bar[px,kx])*gradN[nx,kx]
+                            end
+                        end
+                    end
+                end
+            end # Loop over quadrature points
+            NodalFieldModule.gatherdofnums!(temp,dofnums,self.femmbase.fes.conn[i,:]); # retrieve degrees of freedom
+            AssemblyModule.assemble!(assembler, -Ke*pT, dofnums); # assemble element load vector
+        end
+    end
+    F= AssemblyModule.makevector!(assembler);
+    return F
+end
+
+
+function distribloads(self::FEMMHeatDiffusion, assembler, geom::NodalFieldModule.NodalField, temp::NodalFieldModule.NodalField, fi::ForceIntensityModule.ForceIntensity, m::JFInt)
+    #  % Compute the distributed-load vector.
+    #  %
+    #  % function F = distrib_loads(self, assembler, geom, temp, fi, m)
+    #  %
+    #  % Return the assembled vector due to either internal heat generation
+    #  % (load per unit volume), or due to applied heat flux on the surface.
+    #  %
+    #  % Arguments
+    #  %       assembler =  descendent of sysvec_assembler
+    #  %       geom=geometry field
+    #  %       temp=temperature field
+    #  %       fi=force intensity object
+    #  %       m= manifold dimension, 2= surface, 3= volume
+
+     # Constants
+    const nfens::JFInt=FESetModule.count(self.femmbase.fes); # number of finite elements in the set
+    const ddim::JFInt=NodalFieldModule.dim(temp); # number of degrees of freedom per node
+    const enfens::JFInt =FESetModule.nfens(self.femmbase.fes); # number of nodes for element
+    const Kedim::JFInt =ddim*enfens;                          # dimension of the element matrix
+    const sdim::JFInt =NodalFieldModule.dim(geom);            # number of space dimensions
+    const mdim::JFInt=FESetModule.dim(self.femmbase.fes);     # manifold dimension of the element
+    # Where we supplied assembler object?  If not make a default.
+    if assembler== nothing
+        assembler = AssemblyModule.SysvecAssembler()
+    end
+    # Precompute basis f. values + basis f. gradients wrt parametric coor
+    npts, Ns, gradNparams, w, pc = FEMMBaseModule.integrationdata(self.femmbase);
+    # Prepare some data:
+    x::JFFltMat =zeros(JFFlt,enfens,sdim); # array of node coordinates -- used as a buffer
+    dofnums::JFIntMat=zeros(JFInt,1,Kedim); # degree of freedom array -- used as a buffer
+    loc::JFFltMat =zeros(JFFlt,1,sdim); # quadrature point location -- used as a buffer
+    J::JFFltMat =eye(JFFlt,sdim,mdim); # Jacobian matrix -- used as a buffer
+    Fe::JFFltMat =zeros(JFFlt,Kedim,1);  
+    f::JFFltMat =zeros(JFFlt,1,1);
+    AssemblyModule.startassembly!(assembler, temp.nfreedofs);
+    for i=1:nfens # Loop over elements  
+        NodalFieldModule.gathervalues!(geom,x,self.femmbase.fes.conn[i,:]);# retrieve element coordinates
+        fill!(Fe, 0.0);
+        for j=1:npts
+            At_mul_B!(loc,Ns[j],x);# Quadrature points location
+            At_mul_B!(J, x, gradNparams[j]); # calculate the Jacobian matrix 
+            Jac = FESetModule.Jacobianvolume(self.femmbase.fes,self.femmbase.fes.conn[i,:], Ns[j], J, x);# Jacobian
+            ForceIntensityModule.getforce!(fi,f,loc,J); # retrieve the applied load
+            Factor::JFFlt= (f[1] * Jac * w[j]);
+            for kx=1:Kedim # Fe = Fe + Ns[j] *  (f * Jac * w[j]);
+                Fe[kx] = Fe[kx] + Ns[j][kx] * Factor; 
+            end 
+        end
+        NodalFieldModule.gatherdofnums!(temp,dofnums,self.femmbase.fes.conn[i,:]);
+        AssemblyModule.assemble!(assembler, Fe, dofnums); 
+    end
+    F= AssemblyModule.makevector!(assembler);
+    return F
+end
+
+end

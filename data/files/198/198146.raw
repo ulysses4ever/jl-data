@@ -1,0 +1,3 @@
+mix = Mixture{2}(5)
+
+@assert size(centroids(mix), 1) == 5

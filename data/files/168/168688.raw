@@ -1,0 +1,17 @@
+function call{T1,T2}(fn::Function, v1::Vector{T1}, v2::Vector{T2})
+	RT = promote_type(T1,T2) #For type stability!
+	return RT[fn(v1[i],v2[i]) for i in 1:length(v1)]
+end
+
+myadd(x::Number, y::Number) = x+y+1
+
+@show myadd(5,6)
+
+#But this works, but is not what we want:
+@show call(myadd,collect(1:10),collect(21:30.0))
+
+#Does not work for some reason (not sure why):
+@show myadd(collect(1:10),collect(21:30.0)) #Type stable
+
+
+:DONE

@@ -1,0 +1,22 @@
+#=
+
+Largest prime factor
+Problem 3
+The prime factors of 13195 are 5, 7, 13 and 29.
+
+What is the largest prime factor of the number 600851475143 ?
+
+=#
+
+using FactCheck
+
+facts("Largest prime factor") do
+  @time @fact largest_prime_factor(2) => 2
+  @time @fact largest_prime_factor(3) => 3
+  @time @fact largest_prime_factor(5) => 5
+  @time @fact largest_prime_factor(8) => 2
+  @time @fact largest_prime_factor(10) => 5
+  @time @fact largest_prime_factor(20) => 5
+  @time @fact largest_prime_factor(97) => 97
+  @time @fact largest_prime_factor(100) => 5
+end

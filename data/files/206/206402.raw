@@ -1,0 +1,15 @@
+type RandomDispatcher <: Dispatcher
+    k::Int # Number of clusters
+    p::Int # Replication factor
+end
+
+cluster_keys(d::RandomDispatcher) = 1:d.k
+
+function dispatch(d::RandomDispatcher, x)
+    if d.p == 1
+        return [rand(1:d.k)]
+    else
+        perm = sortperm(d.k)
+        return perm[1:d.p]
+    end
+end

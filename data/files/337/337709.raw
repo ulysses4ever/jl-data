@@ -1,0 +1,294 @@
+module MonetDB
+
+using PyCall, Nettle
+export monetdbconn
+
+#@pyimport monetdb.sql as monetdb
+
+#export monetdb
+#export getcursor, execute, fetchone, fetchall, fetchmany, next
+
+
+#### connection.py - A MonetDB SQL database connection
+#connect(username::AbstractString, password::AbstractString, hostname::AbstractString, database::AbstractString, port::Int) = #
+#	monetdb.connect(username=username, password=password, hostname=hostname, database=database, port=port)
+
+
+#### cursors.py - represents a database cursor, which is used to manage the context of a fetch operation.
+# getcursor(conn) = conn["cursor"]()
+
+# execute(sql::AbstractString, cursor) = cursor["execute"](sql)
+
+# fetchone(cursor) = cursor["fetchone"]()
+# next(cursor) = fetchone(cursor)
+
+# fetchall(cursor) = cursor["fetchall"]()
+
+# fetchmany(nrows, cursor) = cursor["fetchmany"](nrows)
+
+#Works, need to capture Python exception if execute is called after cursor closed
+#close(cursor) = cursor["close"]()
+
+#function executemany()
+#
+#end
+
+#function nextset()
+#
+#end
+
+#function scroll()
+#
+#end
+
+
+#### pythonize.py - functions for converting monetdb SQL fields to Python objects
+
+#### types.py - definition of MonetDB column types (is this needed?)
+
+#### control.py - Use this module to manage your MonetDB databases.
+
+#### exceptions.py - MonetDB Python API specific exceptions (is this needed?)
+
+#### mapi.py - low-level inteface, needs to be written in Julia to remove Python dependency
+type MonetDBConnection
+	MAX_PACKAGE_LENGTH::Int
+	MSG_PROMPT::AbstractString
+	MSG_MORE::AbstractString
+	MSG_INFO::AbstractString
+	MSG_ERROR::AbstractString
+	MSG_Q::AbstractString
+	MSG_QTABLE::AbstractString
+	MSG_QUPDATE::AbstractString
+	MSG_QSCHEMA::AbstractString
+	MSG_QTRANS::AbstractString
+	MSG_QPREPARE::AbstractString
+	MSG_QBLOCK::AbstractString
+	MSG_HEADER::AbstractString
+	MSG_TUPLE::AbstractString
+	MSG_TUPLE_NOSLICE::AbstractString
+	MSG_REDIRECT::AbstractString
+	MSG_OK::AbstractString
+	STATE_INIT::Int
+	STATE_READY::Int
+	hostname::AbstractString
+	port::Int
+	username::AbstractString
+	password::AbstractString
+	database::AbstractString
+	language::AbstractString
+	unix_socket::Any
+	monetdb_socket::TCPSocket
+end
+
+#connect(self, database, username, password, language, hostname=None, port=None, unix_socket=None):
+function connect(;
+				hostname::AbstractString = "localhost", 
+				port::Int = 50000, 
+				username::AbstractString = "monetdb",
+				password::AbstractString = "monetdb",
+				database::AbstractString = "demo",
+				language::AbstractString = "sql",
+				unix_socket::Any = nothing
+				)
+
+	#Julia function opens connection first, then you pass messages for authentication
+	conn = try
+		Base.connect(hostname, port)
+	catch 
+		error("Could not connect to given hostname/port")
+	end
+
+    #Create global to hold constants, remove finicky need for everyone to name 
+	global monetdbconn = MonetDBConnection(
+	(1024 * 8) - 2, 	#MAX_PACKAGE_LENGTH::Int
+	"", 				#MSG_PROMPT::AbstractString
+	"\1\2\n", 			#MSG_MORE::AbstractString
+	"#", 				#MSG_INFO::AbstractString
+	"!", 				#MSG_ERROR::AbstractString
+	"&", 				#MSG_Q::AbstractString
+	"&1", 				#MSG_QTABLE::AbstractString
+	"&2", 				#MSG_QUPDATE::AbstractString
+	"&3", 				#MSG_QSCHEMA::AbstractString
+	"&4", 				#MSG_QTRANS::AbstractString
+	"&5", 				#MSG_QPREPARE::AbstractString
+	"&6", 				#MSG_QBLOCK::AbstractString
+	"%", 				#MSG_HEADER::AbstractString
+	"[", 				#MSG_TUPLE::AbstractString
+	"=", 				#MSG_TUPLE_NOSLICE::AbstractString
+	"^", 				#MSG_REDIRECT::AbstractString
+	"=OK", 				#MSG_OK::AbstractString
+	0, 					#STATE_INIT::Int
+	1, 					#STATE_READY::Int
+	hostname, 			#hostname::AbstractString
+	port,				#port::Int
+	username,			#username::AbstractString
+	password,			#password::AbstractString
+	database,			#database::AbstractString
+	language,			#language::AbstractString
+	unix_socket,		#unix_socket::Any
+	conn				#monetdb_socket::TCPSocket
+	)
+
+	return "Connected to MonetDB: $(hostname):$(port)"
+end
+
+#Assumes s = connect("localhost", 50000) already called
+function getblock_inet(s::TCPSocket)
+    length = last = 0
+    while last != 1
+        flag = readbytes(s,2)
+        unpacked = [Int(x) for x in flag][1] # little endian short
+        length = unpacked >> 1
+        last = unpacked & 1
+    end
+    return bytestring(readbytes(s, length)) #convert array of length 'length' bytes to string, returns colon-separated
+end
+
+function challenge_response(challenge::AbstractString, 
+							username::AbstractString, 
+							password::AbstractString, 
+							language::AbstractString, 
+							database::AbstractString
+							)
+
+    challenges = split(challenge, ':')
+    salt, identity, protocol, hashes, endian = challenges[1:5]
+    
+    if protocol in ("9", '9')
+        algo = challenges[6] #sha512
+        password_hex = hexdigest(lowercase(algo), password)
+    else
+        error("We only speak protocol v9")
+    end
+    
+    #Python code uses encode on password_hex and salt separately, before concat
+    #If errors, explore this first
+    h = split(hashes, ',')
+    if "SHA1" in h
+        pwhash = "{SHA1}" * hexdigest("sha1", password_hex * salt)
+    elseif "MD5" in h
+        pwhash = "{MD5}" * hexdigest("md5", password_hex * salt)
+    else
+        error("Unsupported hash algorithms required")
+    end
+    
+    loopstr = ""
+    for val in ["BIG", username, pwhash, language, database]
+        loopstr *= val * ":"
+    end
+    return loopstr #Ex: 'BIG:voc:{MD5}211a6fca6f4b3c979970e4bfd9c22f17:sql:voc:'
+    
+end
+
+#@pyimport struct
+function putblock_inet(s::TCPSocket, block::AbstractString)
+    pos = 1
+    last = 0
+    while last != 1
+        l = length(block)
+        if l <= MAX_PACKAGE_LENGTH
+            data = block[pos:end]
+            last = 1
+        else
+            data = block[pos:pos+MAX_PACKAGE_LENGTH]
+        end
+        #flag = struct.pack("<H", (l << 1) + last)
+        flag = bytestring(reinterpret(UInt8, Int16[(l << 1) + last]))
+        write(s, flag)
+        write(s, block)
+        pos += l
+    end
+end
+
+function login(s::TCPSocket,
+               username::AbstractString, 
+               password::AbstractString, 
+               language::AbstractString, 
+               database::AbstractString;
+               iteration::Int = 1)
+    
+        challenge = MonetDB.getblock_inet(s)
+        response = MonetDB.challenge_response(challenge, username, password, language, database)
+        MonetDB.putblock_inet(s, response)
+        prompt = MonetDB.getblock_inet(s)
+    
+        if length(prompt) == 0 || prompt == MSG_OK
+            # Empty response, server is happy
+            return "Login Successful"
+
+        elseif startswith(prompt, MSG_ERROR)
+            error(prompt)
+
+        elseif startswith(prompt, MSG_REDIRECT)
+            # a redirect can contain multiple redirects, only use the first
+            redirect = split(prompt[2:end], ":")
+            
+            if redirect[2] == "merovingian"
+                
+                if iteration <= 10
+                    login(s,username,password,language,database,iteration = iteration + 1)
+                else
+                    error("Maximum number of redirects reached (10)")
+                end
+                
+            elseif redirect[2] == "monetdb"
+#                 hostname = redirect[3][3:]
+#                 port, database = redirect[4].split('/')
+#                 port = int(port)
+#                 close(s)
+#                 connect(hostname, port, username, password, database, language)
+            else
+                error(prompt)
+            end
+
+        else
+            error(prompt)
+        end
+    
+end
+
+function disconnect(s::TCPSocket)
+
+	Base.close(s)
+	return("MonetDB connection closed")
+
+end
+
+function cmd(s::TCPSocket, operation::AbstractString)
+    
+    language = "sql"
+    MonetDB.putblock_inet(s, operation)
+    response = MonetDB.getblock_inet(s)
+    
+    if length(response) == 0
+        return ""
+    elseif startswith(response, MSG_OK)
+        return response[4:end] || ""
+    end
+        
+    if response == MSG_MORE
+    # tell server it isn't going to get more
+        return cmd(s, "")
+    end
+        
+    if response[1] in [MSG_Q, MSG_HEADER, MSG_TUPLE]
+        return response
+    elseif response[1] == MSG_ERROR
+        error(response)
+    elseif language == "control" #and not hostname -- What is this?
+        if startswith(response, "OK")
+            return response[3:end] || ""
+        else
+            return response
+        end
+    else
+        error(response)
+    end
+    
+end
+
+
+
+
+end # module

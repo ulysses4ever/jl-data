@@ -1,0 +1,46 @@
+include("jb2048.jl")
+include("dag2048.jl")
+# julia set working module
+
+jb2048.setgamma(jb2048.gamma[1:3,:])
+# jb2048.setcareful([5,7,9,12,12])
+jb2048.setcareful([4,6,8,12,12])
+targetmin,targetmax=5,6
+empty!(maxdag);empty!(meandag)
+gc()
+λ,μ=length(maxdag),length(meandag)
+log(λ)/log(9)
+
+g=jb2048.initgame()
+    xplay!(g,display=true,minfrozen=4)
+jb2048.back!(g,i);plot(g)
+jb2048.play!(g,moves=1,display=true)
+target(g.board);MaxNode(g.board)
+play!(g,display=true)
+xplay!(g,display=true,minfrozen=4)
+
+i=0
+i-=1;h=g.hist[i];plot(h...)
+    b=h[1];u = find(b .≥ targetmax)
+    if length(u)>3 && compact(b,u)
+        target(b);targetmax,MaxNode(b)
+    end
+i+=1;h=g.hist[i];plot(h...)
+    b=h[1];u = find(b .≥ targetmax)
+    if length(u)>3 && compact(b,u)
+        target(b);targetmax,MaxNode(b)
+    end
+ifrozen,itarget,ixtarget
+jb2048.back!(g,i)
+jb2048.force!(g,2)
+xplay!(g,display=true,minfrozen=3)
+
+jb2048.setcareful([4,6,8,12,12])
+targetmin,targetmax=5,6
+@time r=xrepartition(100,verbose=8:12,spot=12,minfrozen=4)
+@time r=jb2048.repartition(100,verbose=8:12)
+@time r=xrepartition(1000)
+
+@which near(1,(3,4),2)
+code_native(near,(Int,Tuple{Int,Int},Int))
+targetmax,jb2048.careful

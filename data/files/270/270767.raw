@@ -1,0 +1,24 @@
+#!/usr/bin/env julia
+using DebbyPacker
+using RudeOil
+
+const workspace = "workspace"
+const machine = Machine("bempp-machine")
+
+include("Cookoff.jl")
+include("TBB.jl")
+include("DuneFoamgrid.jl")
+
+#= macro add_package(name) =#
+#=   quote =#
+#=     include(string($name) * ".jl") =#
+#=     activate!(machine) do machine =#
+#=       eval($name).prepare(distribution="utopic") =#
+#=       #= command(machine, "apt-cache search hdf5"; image="packaging") |> run =# =#
+#=       #= command(machine, "apt-get install libdune-common-2.3.1"; image="packaging") |> run =# =#
+#=       eval($name).make(machine) |> run =#
+#=       #= eval($name).test(machine) |> run =# =#
+#=       #= eval($name).publish(machine) |> run =# =#
+#=     end =#
+#=   end =#
+#= end =#

@@ -1,18 +1,15 @@
-HTTP/1.1 200 OK
+HTTP/1.1 301 Moved Permanently
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:59:09 GMT
+Date: Wed, 03 May 2017 20:59:14 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5654
-Status: 200 OK
+Content-Length: 168
+Status: 301 Moved Permanently
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3421
-X-RateLimit-Reset: 1493318926
-Cache-Control: private, max-age=60, s-maxage=60
-Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "95dd89d2dfcd30405be2ac78073bf035"
-Last-Modified: Mon, 08 Aug 2016 14:23:04 GMT
+X-RateLimit-Remaining: 4253
+X-RateLimit-Reset: 1493847972
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
-X-Accepted-OAuth-Scopes: repo
+X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo:task, repo_deployment, write:repo_hook
+Location: https://api.github.com/repositories/45356979
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
@@ -22,102 +19,11 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 5aeb3f30c9e3ef6ef7bcbcddfd9a68f7
-X-GitHub-Request-Id: 6CB5:6631:8621A8:AD3F0D:5902316D
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: A7B9:5CA3:FF409E:1483446:590A44A2
 
 {
-  "id": 64102997,
-  "name": "ExercicioOverfitting",
-  "full_name": "hugdiniz/ExercicioOverfitting",
-  "owner": {
-    "login": "hugdiniz",
-    "id": 5092719,
-    "avatar_url": "https://avatars2.githubusercontent.com/u/5092719?v=3",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/hugdiniz",
-    "html_url": "https://github.com/hugdiniz",
-    "followers_url": "https://api.github.com/users/hugdiniz/followers",
-    "following_url": "https://api.github.com/users/hugdiniz/following{/other_user}",
-    "gists_url": "https://api.github.com/users/hugdiniz/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/hugdiniz/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/hugdiniz/subscriptions",
-    "organizations_url": "https://api.github.com/users/hugdiniz/orgs",
-    "repos_url": "https://api.github.com/users/hugdiniz/repos",
-    "events_url": "https://api.github.com/users/hugdiniz/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/hugdiniz/received_events",
-    "type": "User",
-    "site_admin": false
-  },
-  "private": false,
-  "html_url": "https://github.com/hugdiniz/ExercicioOverfitting",
-  "description": "Exercicio 4.3 do Livro Learning From data",
-  "fork": false,
-  "url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting",
-  "forks_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/forks",
-  "keys_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/teams",
-  "hooks_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/hooks",
-  "issue_events_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/events",
-  "assignees_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/tags",
-  "blobs_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/languages",
-  "stargazers_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/stargazers",
-  "contributors_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/contributors",
-  "subscribers_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/subscribers",
-  "subscription_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/subscription",
-  "commits_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/merges",
-  "archive_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/downloads",
-  "issues_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/labels{/name}",
-  "releases_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/hugdiniz/ExercicioOverfitting/deployments",
-  "created_at": "2016-07-25T04:12:41Z",
-  "updated_at": "2016-08-08T14:23:04Z",
-  "pushed_at": "2016-09-18T17:57:00Z",
-  "git_url": "git://github.com/hugdiniz/ExercicioOverfitting.git",
-  "ssh_url": "git@github.com:hugdiniz/ExercicioOverfitting.git",
-  "clone_url": "https://github.com/hugdiniz/ExercicioOverfitting.git",
-  "svn_url": "https://github.com/hugdiniz/ExercicioOverfitting",
-  "homepage": null,
-  "size": 9011,
-  "stargazers_count": 0,
-  "watchers_count": 0,
-  "language": "Julia",
-  "has_issues": true,
-  "has_projects": true,
-  "has_downloads": true,
-  "has_wiki": true,
-  "has_pages": false,
-  "forks_count": 0,
-  "mirror_url": null,
-  "open_issues_count": 0,
-  "forks": 0,
-  "open_issues": 0,
-  "watchers": 0,
-  "default_branch": "master",
-  "permissions": {
-    "admin": false,
-    "push": false,
-    "pull": true
-  },
-  "network_count": 0,
-  "subscribers_count": 1
+  "message": "Moved Permanently",
+  "url": "https://api.github.com/repositories/45356979",
+  "documentation_url": "https://developer.github.com/v3/#http-redirects"
 }

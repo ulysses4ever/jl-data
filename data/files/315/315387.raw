@@ -1,0 +1,37 @@
+include("jb2048.jl")
+# julia set working module
+g=initgame()
+@time play!(g,moves=1000)
+play!(g,display=true)
+plot(g)
+
+play!(g,moves=1,display=true)
+
+i=-42
+i+=1;plot(g.hist[i]...)
+i-=1;plot(g.hist[i]...)
+evals(g.hist[i][1],4)
+back!(g,i)
+force!(g,3)
+g[16]=2
+
+b=[20 19 5 1; 18 4 3 1; 2 0 0 0; 1 0 0 0]
+gb=Game(b)
+plot(gb)
+play!(gb,display=true)
+
+careful
+@time r=repartition(100,verbose=8:14)
+gamma
+
+versioninfo()
+Pkg.status()
+
+g
+g.board.>5
+g[g.board.<5]
+find(g.board.<3)
+transpose(g.board)
+g.board'
+
+slide

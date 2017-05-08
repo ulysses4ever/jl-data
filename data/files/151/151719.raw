@@ -1,0 +1,15 @@
+MCLikelihood(
+  lik::Function,
+  prior::Function;
+  grad::FunctionOrNothing = nothing,
+  tensor::FunctionOrNothing = nothing,
+  dtensor::FunctionOrNothing = nothing,
+  allgrad::FunctionOrNothing = nothing,
+  alltensor::FunctionOrNothing = nothing,
+  alldtensor::FunctionOrNothing = nothing,
+  init::F64OrVectorF64 = [1.0],
+  scale::F64OrVectorF64 = 1.0,
+  pmap::Union(Nothing, Dict) = nothing) =
+  MCLikelihood(
+    lik+prior
+  )

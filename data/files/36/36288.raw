@@ -1,0 +1,16 @@
+function maker(i)
+    if i==0
+        g(x)=x*0
+        else
+            g(x) =x*2
+        end
+    return g
+end
+
+g=maker(0)
+
+
+g(3)
+typeof(g)
+
+h= f(x) =3

@@ -1,0 +1,8 @@
+export SparseCholesky
+
+immutable SparseCholesky{S<:SparseMatrixCSC}
+    factors::S               # factor matrix 
+    perm::Vector{Int} # permutation vector
+    tree::Vector{Int}   # elimination tree
+    symbolic::Bool    # whether factors store symblolic factorization
+end

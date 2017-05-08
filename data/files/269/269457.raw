@@ -1,0 +1,48 @@
+module Config
+
+use_truth_table = false
+
+max_threshold = 3
+min_threshold = -3
+max_weight = 2
+min_weight = -2
+
+population_size = 100
+num_generations = 10000
+print_interval = 10
+
+generations_per_target_switch = 1000
+expression_1 = [1, 1, 0, 0, 1, 0, 1, 1, 1, 0]
+#expression_2 = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1]
+expression_2 = [1, 1, 1, 0, 1, 0, 1, 0, 0, 0]
+
+extermination_tournament_size = 4
+breeding_tournament_size = 4
+births_and_deaths_per_generation = 10
+
+mutate_dup_del_prob = 0.2
+mutate_conn_prob = 0.1
+max_num_conn_muts = 2
+min_num_conn_muts = 1
+mutate_activation_prob = 0.1
+max_num_activation_muts = 5
+min_num_activation_muts = 3
+mutate_truth_table_prob = 0.3
+max_num_tt_muts = 2
+min_num_tt_muts = 1
+delete_conn_prob = 0.1
+max_num_conn_dels = 2
+min_num_conn_dels = 1
+add_conn_prob = 0.1
+max_num_conn_adds = 2
+min_num_conn_adds = 1
+
+max_num_connections = 5
+num_simulation_iterations = 30
+initial_max_num_connections = 3
+initial_num_nodes = 20
+min_num_nodes = 20
+min_num_connections = 1
+
+end
+

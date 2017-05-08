@@ -1,0 +1,332 @@
+const PRE_EQ_TOL     = 1e-10
+const PRE_REL_EQ_TOL = 1e-06
+const PRE_INF        = 1e+10
+const DEBUG          = false
+
+function debug_print(data)
+    A = data.A
+    m, n = size(A)
+        print("  |")
+        for j = 1:n
+            print(lpad(string(j),4," "))
+        end
+        println()
+    for i = 1:m
+        print(lpad(string(i),2," "),"|")
+        for j = 1:n
+            if abs(A[i,j]) <= PRE_EQ_TOL
+                print("    ")
+            else
+                print(lpad(string(round(A[i,j],1)),4," "))
+            end
+        end
+        print("|", lpad(string(round(data.rowlb[i],1)),4," "),
+                   lpad(string(round(data.rowub[i],1)),4," "))
+        println()
+    end
+        print("LB|")
+        for j = 1:n
+            print(lpad(string(data.collb[j]),4," "))
+        end
+        println()
+        print("UB|")
+        for j = 1:n
+            print(lpad(string(data.colub[j]),4," "))
+        end
+        println()
+end
+
+
+function presolve(data_in::InteriorPointModel)
+    
+    data = InteriorPointModel(  copy(data_in.A),
+                                copy(data_in.collb), copy(data_in.colub),
+                                copy(data_in.obj),
+                                copy(data_in.rowlb), copy(data_in.rowub),
+                                data_in.sense, 0.0, data_in.objval, 
+                                copy(data_in.x), copy(data_in.dual))
+    DEBUG && debug_print(data)
+    m, n = size(data.A)
+    
+    var_removed = zeros(Bool, n)
+    var_changed =  ones(Bool, n)
+
+    con_removed = zeros(Bool, m)
+    con_changed =  ones(Bool, m)
+
+    any_change  = true
+    iterations  = 0
+    while any_change
+        any_change = false
+        iterations += 1
+
+        # PASS 1
+        # Check if variable bounds are at equality - if so, eliminate
+        # them from the constraints
+        any_change |= presolve_eliminate_variables(data, var_changed, var_removed,
+                                                         con_changed, con_removed)
+        DEBUG && println("PASS 1 - $any_change")
+        var_changed = zeros(Bool, n)
+
+        # PASS 2
+        # Use constraints to tighten variable bounds
+        any_change |= presolve_tighten_var_bnd(data, var_changed, var_removed,
+                                                     con_changed, con_removed)
+        any_change |= presolve_tighten_var_bnd(data, var_changed, var_removed,
+                                                     con_changed, con_removed)
+        DEBUG && println("PASS 2 - $any_change")
+
+        # PASS 3
+        # Infer upper bounds on variables from constraint RHS
+        #any_change |= presolve_rhs_tighten(m, 
+        #                var_changed, var_removed,
+        #                con_changed, con_removed)
+        #con_changed = zeros(Bool, length(m.linconstr))
+        
+        DEBUG && debug_print(data)
+        DEBUG && readline()
+    end
+
+    num_var_removed = countnz(var_removed)
+    num_con_removed = countnz(con_removed)
+    num_var_left    = n - num_var_removed
+    num_con_left    = m - num_con_removed
+
+    A      = zeros(num_con_left, num_var_left)
+    collb  = zeros(num_var_left)
+    colub  = zeros(num_var_left)
+    obj    = zeros(num_var_left)
+    rowlb  = zeros(num_con_left)
+    rowub  = zeros(num_con_left)
+
+    new_row = 0
+    for i = 1:m
+        con_removed[i] && continue
+        new_row += 1
+
+        # Copy A matrix
+        new_col = 0
+        for j = 1:n
+            var_removed[j] && continue
+            new_col += 1
+            A[new_row,new_col] = data.A[i,j]
+        end
+
+        # Row bounds
+        rowlb[new_row] = data.rowlb[i]
+        rowub[new_row] = data.rowub[i]
+    end
+
+    new_col = 0
+    for j = 1:n
+        var_removed[j] && continue
+        new_col += 1
+        # Column bounds and objective coefficient
+        collb[new_col] = data.collb[j]
+        colub[new_col] = data.colub[j]
+        obj[  new_col] = data.obj[j]
+    end
+
+    DEBUG && debug_print(data)
+    DEBUG && readline()
+    return InteriorPointModel(  A, collb, colub, obj, rowlb, rowub,
+                                data.sense, data.obj_constant,
+                                0.0, zeros(num_var_left), zeros(num_con_left))
+end
+
+#############################################################################
+# PASS 1
+# Check if bounds are at equality - if so, eliminate them
+# from the constraints
+function presolve_eliminate_variables(data::InteriorPointModel,
+                                        var_changed, var_removed,
+                                        con_changed, con_removed)
+    m, n = size(data.A)
+    any_change = false
+    
+    for j = 1:n
+        (!var_changed[j] || var_removed[j]) && continue
+       
+        # Check equality of bounds
+        if abs(data.colub[j] - data.collb[j]) < PRE_EQ_TOL
+            # Bounds are equal - remove this variable
+            var_removed[j] = true
+            updates = presolve_remove_col(data, j, data.collb[j], con_removed)
+            for i in updates
+                con_changed[i] = true
+                any_change = true
+            end
+        end
+    end
+
+    return any_change
+end
+
+#############################################################################
+
+function presolve_remove_col(data::InteriorPointModel,
+                             j::Int, new_value::Float64,
+                             con_removed::Vector{Bool})
+    m, n = size(data.A)
+    con_changed = Int[]
+
+    for i = 1:m
+        # Don't consider this constraint at all if its already dead
+        con_removed[i] && continue
+        coeff = data.A[i,j]
+        # If nonzero, we need to do something too
+        coeff == 0.0 && continue
+        # Remove it from the constraints and update the bounds
+        data.rowlb[i] -= coeff * new_value
+        data.rowub[i] -= coeff * new_value
+        data.A[i,j] = 0.0
+        push!(con_changed, i)
+        # Check if this constraint is dead
+        any_nonzero = false
+        for k = 1:n
+            if data.A[i,k] != 0.0
+                any_nonzero = true
+                break
+            end
+        end
+        # If it is all zeros, remove it
+        con_removed[i] = !any_nonzero
+    end
+    # Finally check objective
+    data.obj_constant += data.obj[j] * new_value
+    data.obj[j] = 0.0
+
+    return con_changed
+end
+
+
+#############################################################################
+# PASS 2
+# Tighten variable bounds
+function presolve_tighten_var_bnd(data::InteriorPointModel,
+                                    var_changed, var_removed,
+                                    con_changed, con_removed)
+    m, n = size(data.A)
+    any_change = false
+    
+    for i = 1:m
+        (!con_changed[i] || con_removed[i]) && continue
+        
+        # Check to see if this is a singleton constraint
+        num_nonzero = 0
+        nonzero_pos = Int[]
+        nonzero_val = 0.0
+        for j = 1:n
+            if abs(data.A[i,j]) >= PRE_EQ_TOL
+                num_nonzero += 1
+                push!(nonzero_pos,j)
+                nonzero_val = data.A[i,j]
+            end
+        end
+        if num_nonzero == 0
+            # Empty row
+            con_removed[i] = true
+            any_change = true
+            DEBUG && println("  tighten_var_bnd : row $i is empty")
+        elseif num_nonzero == 1
+            # Singleton row
+            j = nonzero_pos[1]
+            DEBUG && println("  tighten_var_bnd : row $i is singleton, removing $j, coeff $nonzero_val")
+            DEBUG && println("                      before: $(data.collb[j]) <= . <= $(data.colub[j])")
+            if abs(data.rowlb[i] - data.rowub[i]) <= PRE_EQ_TOL
+                # Equality constraint
+                new_bnd = data.rowlb[i] / nonzero_val
+                @assert data.collb[j] <= new_bnd
+                @assert data.colub[j] >= new_bnd
+                data.collb[j] = new_bnd
+                data.colub[j] = new_bnd
+            elseif data.rowlb[i] <= -PRE_INF
+                # LEQ constraint
+                @assert data.rowub[i] < +PRE_INF
+                new_bnd = data.rowub[i] / nonzero_val
+                data.colub[j] = min(data.colub[j], new_bnd)
+            else
+                # GEQ constraint
+                @assert data.rowlb[i] > -PRE_INF
+                new_bnd = data.rowlb[i] / nonzero_val
+                data.collb[j] = max(data.collb[j], new_bnd)
+            end
+            DEBUG && println("                      after: $(data.collb[j]) <= . <= $(data.colub[j])")
+            data.A[i,j] = 0.0
+            con_removed[i] = true
+            var_changed[j] = true
+            any_change = true
+         elseif num_nonzero > 1
+            # Try to tighten bounds
+
+            if abs(data.rowlb[i] - data.rowub[i]) <= PRE_EQ_TOL
+
+            elseif data.rowlb[i] <= -PRE_INF
+                # LEQ constraint
+                rhs = data.rowub[i]
+                @assert rhs < +PRE_INF
+
+                for j in nonzero_pos
+                    coeff = data.A[i,j]
+                    if coeff > 0.0
+                        # LEQ, +ve coeff var - how small can we make RHS
+                        tight = rhs
+                        for k in nonzero_pos
+                            k == j && continue
+                            tight -= min(data.collb[k]*data.A[i,k], 
+                                         data.colub[k]*data.A[i,k])
+                        end
+                        new_bnd = tight / coeff
+                        if new_bnd < data.colub[j] - PRE_EQ_TOL
+                            DEBUG && println("  tighten_var_bnd : row $i tightened ub on $j, $(data.colub[j]) to $new_bnd")
+                            data.colub[j] = min(data.colub[j], new_bnd)
+                            var_changed[j] = true
+                            any_change = true
+                        end
+                    elseif coeff < 0.0
+                        # LEQ, -ve coeff var - how big can we make RHS
+                        tight = rhs
+                        for k in nonzero_pos
+                            k == j && continue
+                            tight += max(data.collb[k]*data.A[i,k], 
+                                         data.colub[k]*data.A[i,k])
+                        end
+                        new_bnd = tight / coeff
+                        if new_bnd > data.collb[j] + PRE_EQ_TOL
+                            DEBUG && println("  tighten_var_bnd : row $i tightened lb on $j, $(data.collb[j]) to $new_bnd")
+                            data.collb[j] = max(data.collb[j], new_bnd)
+                            var_changed[j] = true
+                            any_change = true
+                        end
+                    end
+                end
+            else
+                # GEQ constraint
+                rhs = data.rowlb[i]
+                @assert rhs > -PRE_INF
+
+                for j in nonzero_pos
+                    coeff = data.A[i,j]
+                    if coeff > 0.0
+                        # GEQ, +ve coeff var - how big can me make RHS
+                        tight = rhs
+                        for k in nonzero_pos
+                            k == j && continue
+                            tight += max(data.collb[k]*data.A[i,k], 
+                                         data.colub[k]*data.A[i,k])
+                        end
+                        new_bnd = tight / coeff
+                        if new_bnd > data.collb[j] + PRE_EQ_TOL
+                            DEBUG && println("  tighten_var_bnd : row $i tightened lb on $j, $(data.collb[j]) to $new_bnd")
+                            data.collb[j] = max(data.collb[j], new_bnd)
+                            var_changed[j] = true
+                            any_change = true
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return any_change
+end

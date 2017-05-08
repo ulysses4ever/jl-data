@@ -1,0 +1,64 @@
+using Jules, Streaming, Logging
+using Base.Test
+setloglevel()
+
+function MomentsTests()
+  xs = [0.101,-0.172,0.183,0.045,0.408,-1.156,-0.064,0.282,1.145,-1.042,1.595,-0.212,-0.606,-0.464,0.64,-0.957,0.773,0.274,0.631,-0.526]
+  mmts = foldl(update, emptymoments(), xs)
+
+  @test_approx_eq_eps(mean(xs), mean(mmts), 0.001)
+  @test_approx_eq_eps(var(xs), var(mmts), 0.03)
+  @test_approx_eq_eps(skewness(xs), skewness(mmts), 0.001)
+  @test_approx_eq_eps(kurtosis(xs), kurtosis(mmts), 0.001)
+
+  n = 100
+  for i in 1:n
+    k = rand(100:1000)
+    xs = sqrt(rand(1:10000,k))
+
+    mmts = foldl(update, emptymoments(), xs)
+
+    m1 = mean(xs)
+    m2 = mean(mmts)
+    @test_approx_eq_eps(m1, m2, max(0.03 * abs(m1), 10 * eps()))
+
+    v1 = std(xs)
+    v2 = std(mmts)
+    @test_approx_eq_eps(v1, v2, max(0.03 * abs(v1), 10 * eps()))
+
+    s1 = skewness(xs)
+    s2 = skewness(mmts)
+    @test_approx_eq_eps(s1, s2, max(0.03 * abs(s1), 10 * eps()))
+
+    k1 = kurtosis(xs)
+    k2 = kurtosis(mmts)
+    @test_approx_eq_eps(k1, k2, max(0.03 * abs(k1), 10 * eps()))
+  end
+end
+
+function streammseTests()
+  n = 100
+
+  for i in 1:n
+    y = rand(rand(1:100))
+    mse1 = mean((y .- mean(y)).^2)
+
+    x0, mse2 = streammse(y, add = true)
+
+    @test_approx_eq_eps(mse1, mse2, 0.001 * mse1)
+
+    rmi = rand(1:length(y))
+    rm = y[rmi]
+    splice!(y, rmi)
+    mse3 = mean((y .- mean(y)).^2)
+    x1, mse4 = streammse(x0, rm, false)
+
+    @test_approx_eq_eps(mse3, mse4, max(0.001 * mse3, 10 * eps()))
+  end
+
+end
+
+println("  MomentsTests")
+MomentsTests()
+println("  streammseTests")
+streammseTests()

@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:59:45 GMT
+Date: Wed, 03 May 2017 20:59:50 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5157
+Content-Length: 5229
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3248
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4169
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "2ad6d6149cb9c160038eb6c1ae8c747a"
-Last-Modified: Fri, 13 May 2016 04:33:59 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "9a96aa0ead040289b5e43d81e9b8cba7"
+Last-Modified: Thu, 18 Dec 2014 03:30:55 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,82 +22,82 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: e14705a23c085afeff5e104b1fc3922a
-X-GitHub-Request-Id: EED8:6637:13310BE:18C5ACE:59023191
+X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
+X-GitHub-Request-Id: 7FA7:5CA3:FF5B0B:148564A:590A44C6
 
 {
-  "id": 58697756,
-  "name": "krauth",
-  "full_name": "davidamaro/krauth",
+  "id": 27745196,
+  "name": "intersect.jl",
+  "full_name": "intdxdt/intersect.jl",
   "owner": {
-    "login": "davidamaro",
-    "id": 4453955,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/4453955?v=3",
+    "login": "intdxdt",
+    "id": 932946,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/932946?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/davidamaro",
-    "html_url": "https://github.com/davidamaro",
-    "followers_url": "https://api.github.com/users/davidamaro/followers",
-    "following_url": "https://api.github.com/users/davidamaro/following{/other_user}",
-    "gists_url": "https://api.github.com/users/davidamaro/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/davidamaro/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/davidamaro/subscriptions",
-    "organizations_url": "https://api.github.com/users/davidamaro/orgs",
-    "repos_url": "https://api.github.com/users/davidamaro/repos",
-    "events_url": "https://api.github.com/users/davidamaro/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/davidamaro/received_events",
+    "url": "https://api.github.com/users/intdxdt",
+    "html_url": "https://github.com/intdxdt",
+    "followers_url": "https://api.github.com/users/intdxdt/followers",
+    "following_url": "https://api.github.com/users/intdxdt/following{/other_user}",
+    "gists_url": "https://api.github.com/users/intdxdt/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/intdxdt/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/intdxdt/subscriptions",
+    "organizations_url": "https://api.github.com/users/intdxdt/orgs",
+    "repos_url": "https://api.github.com/users/intdxdt/repos",
+    "events_url": "https://api.github.com/users/intdxdt/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/intdxdt/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/davidamaro/krauth",
-  "description": "Todos los pseudocódigos del libro de Krauth en Julia",
+  "html_url": "https://github.com/intdxdt/intersect.jl",
+  "description": "segment intersection - Julia",
   "fork": false,
-  "url": "https://api.github.com/repos/davidamaro/krauth",
-  "forks_url": "https://api.github.com/repos/davidamaro/krauth/forks",
-  "keys_url": "https://api.github.com/repos/davidamaro/krauth/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/davidamaro/krauth/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/davidamaro/krauth/teams",
-  "hooks_url": "https://api.github.com/repos/davidamaro/krauth/hooks",
-  "issue_events_url": "https://api.github.com/repos/davidamaro/krauth/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/davidamaro/krauth/events",
-  "assignees_url": "https://api.github.com/repos/davidamaro/krauth/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/davidamaro/krauth/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/davidamaro/krauth/tags",
-  "blobs_url": "https://api.github.com/repos/davidamaro/krauth/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/davidamaro/krauth/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/davidamaro/krauth/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/davidamaro/krauth/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/davidamaro/krauth/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/davidamaro/krauth/languages",
-  "stargazers_url": "https://api.github.com/repos/davidamaro/krauth/stargazers",
-  "contributors_url": "https://api.github.com/repos/davidamaro/krauth/contributors",
-  "subscribers_url": "https://api.github.com/repos/davidamaro/krauth/subscribers",
-  "subscription_url": "https://api.github.com/repos/davidamaro/krauth/subscription",
-  "commits_url": "https://api.github.com/repos/davidamaro/krauth/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/davidamaro/krauth/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/davidamaro/krauth/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/davidamaro/krauth/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/davidamaro/krauth/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/davidamaro/krauth/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/davidamaro/krauth/merges",
-  "archive_url": "https://api.github.com/repos/davidamaro/krauth/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/davidamaro/krauth/downloads",
-  "issues_url": "https://api.github.com/repos/davidamaro/krauth/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/davidamaro/krauth/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/davidamaro/krauth/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/davidamaro/krauth/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/davidamaro/krauth/labels{/name}",
-  "releases_url": "https://api.github.com/repos/davidamaro/krauth/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/davidamaro/krauth/deployments",
-  "created_at": "2016-05-13T03:55:10Z",
-  "updated_at": "2016-05-13T04:33:59Z",
-  "pushed_at": "2016-06-13T02:57:12Z",
-  "git_url": "git://github.com/davidamaro/krauth.git",
-  "ssh_url": "git@github.com:davidamaro/krauth.git",
-  "clone_url": "https://github.com/davidamaro/krauth.git",
-  "svn_url": "https://github.com/davidamaro/krauth",
-  "homepage": null,
-  "size": 2,
+  "url": "https://api.github.com/repos/intdxdt/intersect.jl",
+  "forks_url": "https://api.github.com/repos/intdxdt/intersect.jl/forks",
+  "keys_url": "https://api.github.com/repos/intdxdt/intersect.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/intdxdt/intersect.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/intdxdt/intersect.jl/teams",
+  "hooks_url": "https://api.github.com/repos/intdxdt/intersect.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/intdxdt/intersect.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/intdxdt/intersect.jl/events",
+  "assignees_url": "https://api.github.com/repos/intdxdt/intersect.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/intdxdt/intersect.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/intdxdt/intersect.jl/tags",
+  "blobs_url": "https://api.github.com/repos/intdxdt/intersect.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/intdxdt/intersect.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/intdxdt/intersect.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/intdxdt/intersect.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/intdxdt/intersect.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/intdxdt/intersect.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/intdxdt/intersect.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/intdxdt/intersect.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/intdxdt/intersect.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/intdxdt/intersect.jl/subscription",
+  "commits_url": "https://api.github.com/repos/intdxdt/intersect.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/intdxdt/intersect.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/intdxdt/intersect.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/intdxdt/intersect.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/intdxdt/intersect.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/intdxdt/intersect.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/intdxdt/intersect.jl/merges",
+  "archive_url": "https://api.github.com/repos/intdxdt/intersect.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/intdxdt/intersect.jl/downloads",
+  "issues_url": "https://api.github.com/repos/intdxdt/intersect.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/intdxdt/intersect.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/intdxdt/intersect.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/intdxdt/intersect.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/intdxdt/intersect.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/intdxdt/intersect.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/intdxdt/intersect.jl/deployments",
+  "created_at": "2014-12-09T02:12:46Z",
+  "updated_at": "2014-12-18T03:30:55Z",
+  "pushed_at": "2014-12-18T03:30:54Z",
+  "git_url": "git://github.com/intdxdt/intersect.jl.git",
+  "ssh_url": "git@github.com:intdxdt/intersect.jl.git",
+  "clone_url": "https://github.com/intdxdt/intersect.jl.git",
+  "svn_url": "https://github.com/intdxdt/intersect.jl",
+  "homepage": "",
+  "size": 128,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",

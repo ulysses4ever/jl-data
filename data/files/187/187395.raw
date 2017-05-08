@@ -1,0 +1,17 @@
+using Plotly
+Plotly.signin("user_name", "api_key")
+
+data = [
+  [
+    "x" => [1, 2, 3, 4],
+    "y" => [10, 15, 13, 17]
+  ],
+  [
+    "x" => [1, 2, 3, 4],
+    "y" => [16, 5, 11, 9]
+  ]
+]
+
+response = Plotly.plot([data], ["filename" => "basic-line", "fileopt" => "overwrite"])
+
+url = response["url"]

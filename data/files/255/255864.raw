@@ -1,0 +1,30 @@
+using HTTPClient.HTTPC
+using ZipFile
+
+## Generate filenames specific to BSE website
+function generateBSEEquityEODReportFileName (dateValue::TmStruct)
+	return String ( "EQ", lpad(dateValue.mday,2,0), lpad(dateValue.month+1,2,0), lpad(dateValue.year%100,2,0), "_CSV.ZIP" )
+end
+
+## function to download any file
+function downloadFile (urlSting::String, filename::String)
+	ofs = open ("/tmp/$(filename)", "w+")
+	res = HTTPClient.get("$(urlString)", RequestOptions(ostream=ostream))
+	close (ofs)
+end
+
+## extract any file
+function extractZip (filename::String)
+	zipData = ZipFile.Reader("$(filename)");
+	for f in zipData.files
+		ofs = open("/tmp/$(f.name)","w+")
+		write (ofs,readall(f))
+		close (ofs)
+	end
+	close(zipData)
+end
+
+## fetch report or a date range
+function getReport (fromDate::Sting, toDate::String)
+end
+

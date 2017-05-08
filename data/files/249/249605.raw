@@ -1,0 +1,12 @@
+module Mesos
+
+import Base: start, join, run, error
+
+include("mesos_pb.jl")
+include("utils.jl")
+include("executor.jl")
+
+export ExecutorDriver, start, stop, abort, join, run, sendStatusUpdate, sendFrameworkMessage,
+       Executor, registered, reregistered, disconnected, launchTask, killTask, frameworkMessage, shutdown, error
+
+end # module

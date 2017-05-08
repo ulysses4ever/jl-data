@@ -1,0 +1,32 @@
+#############################################################################
+# InteriorPoint.jl
+# Pure-Julia interior point solver for linear programs
+# By Iain Dunning
+# http://github.com/IainNZ/InteriorPoint.jl
+#############################################################################
+
+# The model type used internally by JuMP
+type InteriorPointMathProgModel <: AbstractMathProgModel
+    inner #::InteriorPointModel
+end
+
+# The solver the user can select when building a model in JuMP
+export InteriorPointSolver
+immutable InteriorPointSolver <: AbstractMathProgSolver
+end
+
+
+#############################################################################
+# BEGIN MATHPROGBASE INTERFACE
+#############################################################################
+
+model(s::InteriorPointSolver) = InteriorPointMathProgModel(nothing)
+
+function loadproblem!(m::InteriorPointMathProgModel, A, collb, colub, obj, rowlb, rowub, sense)
+    m.inner = InteriorPointModel( full(A), collb, colub, obj, rowlb, rowub, sense )
+end
+
+optimize!(m::InteriorPointMathProgModel)    = solveIP(m.inner)
+status(m::InteriorPointMathProgModel)       = :Optimal
+getobjval(m::InteriorPointMathProgModel)    = 0
+getsolution(m::InteriorPointMathProgModel)  = zeros(length(m.inner.obj))

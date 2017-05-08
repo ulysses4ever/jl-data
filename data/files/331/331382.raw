@@ -1,0 +1,64 @@
+###################################################
+## Run simulation
+###################################################
+
+"""
+Takes a Data object as an argument, and runs a simulation of dynamic matching where
+the matching policy and other parameters are defined a Params element.
+The length of the simulation is specified by the steps parameters
+
+Returns a DataFrame object with the statistics of the simulation run.
+"""
+function run_dynamic(d::Data, steps::Int64, brain::Brain, p::Params;
+        pool::InstanceGraph = InstanceGraph())
+  if p.verbose >= 0
+    println("Running with steps = $steps, batch = $(p.batchSize), techno = $(p.techno), priorities= $(p.priorities)")
+  end
+
+  srand(p.seed)
+  l = Log(length(d.type_names), 1, false)
+  nb_time = 0
+  for k in 1:steps
+    time_tot_tic = time()
+    arriving_node_id = rand(1:d.n)
+    arrival!(pool, arriving_node_id, d, k, l)
+    if k%p.batchSize == 0
+      time_tic = time()
+      w = generate_weights(brain, pool.nodes, p)
+      matched_nodes, value = match(pool.graph, w, l, techno = p.techno, solver = p.solver)
+      matched_value = match_value(pool, matched_nodes)
+      if length(matched_nodes) > 0
+        remove_matched!(pool, matched_nodes, k, l)
+      end
+      if k >= steps/2 #Only learn in steady-state (after 50% of time steps)
+        update_weights(brain, float(value), pool.nodes)
+      end
+      if k == steps/2
+        l.record = true
+      end
+      push!(l.time_tot, time() - time_tot_tic)
+      nb_time += 1
+    end
+    departures!(pool, k, l)
+    if k%(steps/20) == 0
+      print_status(pool, k, p, l)
+      nb_time = 0
+    end
+  end
+  return l
+end
+
+function print_status(pool::InstanceGraph, k::Int64, p::Params, l::Log)
+  if p.verbose >= 1
+    println("It: $k,  \t total time: $(round(mean(l.time_tot),5)), \t lp time: $(round(mean(l.time_lp),5)),  \tJuMP time: $(round(mean(l.time_jump),5)), \t pool size: $(pool.n)")
+  end
+end
+
+function match_value(pool::InstanceGraph, matched::Array{Float64})
+  ret = find(matched .>= 1 - 1e-6)
+  value = 0
+  for i in ret
+    value += pool.nodes[i].weight
+  end
+  return value
+end

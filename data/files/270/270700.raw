@@ -1,0 +1,33 @@
+module EulerUtil
+
+export eratosthenes, is_pandigital
+
+function eratosthenes(n)
+  primes = fill(true,n)
+  primes[1] = false
+  for p = 2:n
+    primes[p] || continue
+    for i = 2:div(n,p)
+      primes[p*i] = false
+    end
+  end
+  find(primes)
+end
+
+function is_pandigital(x)
+  digits = collect(1:9)
+  chars = collect(string(x))
+  nums = reinterpret(Int32, chars) .-48
+  sort!(nums)
+  if length(unique(nums)) == length(nums)
+    for i = 1:length(nums)
+      if nums[i] != digits[i]
+        return false
+      end
+    end
+    return true
+  end
+  return false
+end
+
+end

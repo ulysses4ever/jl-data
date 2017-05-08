@@ -1,0 +1,179 @@
+module dag2048
+
+using jb2048
+import Base.show
+
+abstract DagNode
+
+function effective(p::Vector{Float64})
+    i = findfirst(p)
+    j = findlast(p)
+    i:j
+end
+effective(d::DagNode) = effective(d.proba)
+stabilized(p::Vector{Float64}) = length(effective(p)) < 2
+stabilized(d::DagNode) = stabilized(d.proba)
+
+meandag = Dict{Board,DagNode}()
+type MeanNode <: DagNode
+    board::Board
+    child::Vector{DagNode}
+    proba::Vector{Float64}
+    height::Int
+
+    function MeanNode(b::Board)
+        global meandag::Dict{Board,DagNode}
+        node = get(meandag, b, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        proba = zeros(10)
+        height = 0
+        fc = find(b .== 0)  # free cells (indices)
+        nf = length(fc)
+        p1 = 0.9/nf
+        p2 = 0.1/nf
+        for i in fc
+            b[i] = 1
+            c =  MaxNode(copy(b))
+            push!(child, c)
+            proba += c.proba * p1
+            h = c.height + 1
+            h > height && (height = h)
+            b[i] = 2
+            c =  MaxNode(copy(b))
+            push!(child, c)
+            proba += c.proba * p2
+            h = c.height + 1
+            h > height && (height = h)
+            b[i] = 0
+        end
+        node = new(b, child, proba, height)
+        meandag[b] = node
+    end
+end
+
+function meantree(b::Board)
+    empty!(meandag)
+    empty!(maxdag)
+    MeanNode(b, 1)
+end
+
+maxdag = Dict{Board,DagNode}()
+type MaxNode <: DagNode
+    board::Board
+    child::Vector{DagNode}
+    proba::Vector{Float64}
+    best::Tuple{Int,Int}
+    height::Int
+    # target::Int
+
+    # function MaxNode(b::Board, target=32)
+    function MaxNode(b::Board)
+        # global maxdag::Dict{Board,DagNode}
+        node = get(maxdag, b, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        proba = zeros(10)
+        # ip = collect(Float64, [1<<i for i=1:10])
+        ip = collect(Float64, 1:10)
+        best = (0,0)
+        height = 0
+        i = 0
+        local p::Float64
+        for d = 1:4
+            bs, score, moved, stable = slide(b, d)
+            stable || continue
+            if moved
+                i += 1
+                c = MeanNode(bs)
+                push!(child, c)
+                if i < 2
+                    best = (i,d)
+                    proba = c.proba
+                    p = sum(ip .* proba)
+                else
+                    cp = sum(ip .* c.proba)
+                    cp > p && (p = cp; proba = c.proba; best = (i,d))
+                end
+                h = c.height
+                h > height && (height=h)
+            end
+        end
+        if i < 1  # leaf
+            lp = length(proba)
+            sup = maximum(b[b .<= lp])
+            proba[sup] = 1.0
+        # elseif stabilized(proba)
+        #     for node in child
+        #         delete!(meandag, node)
+        #     end
+        #     child = DagNode[]
+        end
+        node = new(b, child, proba, best, height)
+        maxdag[b] = node
+    end
+end
+
+# function maxtree(b::Board, target=32)
+function maxtree(b::Board)
+    empty!(meandag)
+    empty!(maxdag)
+    MaxNode(b)
+    # MaxNode(b,target)
+end
+
+isleaf(d::DagNode) = length(d.child) == 0
+
+function show(io::IO, d::DagNode)
+    b = d.board
+    m, n = size(b)
+    print(io, "[")
+    for i in 1:m
+        for j in 1:n
+            print(io, " ", b[i,j])
+        end
+        if i < m
+            print(io, ";")
+        else
+            print(io, "]")
+        end
+    end
+    e = effective(d)
+    p = d.proba[e]
+    p = round(p,4)
+    if length(d.child) == 0
+        print(io, ", leaf -> proba $e$p")
+        return
+    end
+    if isa(d, MeanNode)
+        print(io, " mean -> proba $e$p\n  height $(d.height)")
+    else
+        print(io, " max -> proba $e$p\n  height $(d.height), best $(d.best)")
+    end
+end
+
+function play!(g::Game, moves=32768; target=32, display=false,verbose=false)
+    b = g.board
+    if g.length < 2
+        g.hist = jb2048.History(128)
+        jb2048.append(g.hist, g.board, 0)
+    end
+    while g.length < moves
+        verbose && println("move $(g.length)")
+        node = maxdag[b]
+        verbose && println(node)
+        isleaf(node) && break
+        c = node.child[node.best[1]]
+        b = copy(c.board)
+        g.newtile = tileinsert!(b)
+        verbose && println("$c, new tile $(g.newtile)")
+        g.length += 1
+        g.board = b
+        display && plot(g)
+        jb2048.append(g.hist, b, g.newtile)
+        b[1] >= target && break
+    end
+    g.length
+end
+
+end

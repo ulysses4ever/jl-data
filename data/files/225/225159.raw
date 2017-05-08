@@ -1,0 +1,8 @@
+function Run()
+	sum = 0
+	for i in primes(2000000)
+		sum = sum + i
+	end
+	return sum
+end
+

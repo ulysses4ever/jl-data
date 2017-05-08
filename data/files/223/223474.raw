@@ -1,0 +1,32 @@
+# Load image
+include ("myImage.jl")
+
+#load interation function
+include("julia_set_iteration.jl")
+
+#create an array 1000x500 for the set
+h = 500
+w = 1000
+m = Array(Int64, h, w)
+
+#time measurements
+print("starting..\n")
+tStart = time()
+
+#for each pixal 
+for y = 1:h, x = 1: w
+  #translate numbers [1:w, 1:h] -> -2:2 + -1:1 im
+  c = complex((x-w/2)/(h/2), (y-h/2)/(h/2))
+  #interate through
+  m[y, x] = julia_set_iteration(c, 256)
+end
+
+tStop = time()
+
+#write out to ppm-file
+myppmwrite(m, "julia_set.ppm")
+
+print("done.\n took ", tstop-tStart, "seconds\n");
+
+
+

@@ -1,0 +1,16 @@
+#push!(LOAD_PATH,"/home/facuq/dev/Boosting.jl/src")
+
+
+using Classifiers
+using RandomHyperplaneClassifiers
+
+
+x,y,labels=iris_dataset_binary()
+
+for i=1:10
+  c=RandomHyperplaneConfig()
+  m=fit(c,x,y)::RandomHyperplaneClassifiers
+  predicted=predict(m,x)
+  l=loss(m,x,y)
+  assert(l>=0.5)
+end

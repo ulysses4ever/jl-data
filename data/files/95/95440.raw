@@ -1,0 +1,5 @@
+include("common.jl")
+
+OUTFILE = joinpath(OUTDIR, "mean_spectrum_signal01.txt")
+
+mean_spectrum(SIGNALFILE01, OUTFILE)

@@ -1,0 +1,154 @@
+function scenario_risk_export(tree_outputs::Dict{ASCIIString, Vector{ScenarioRiskOutput}},
+                              export_dir::ASCIIString)
+  insured_losses = false
+  file_name = "results"
+  assets_file = export_dir * file_name * "_assets.out"
+  portfolio_file = export_dir * file_name * "_portfolio.out"
+  fa = open(assets_file, "w")
+  fp = open(portfolio_file, "w")
+  write(fa, "branch, assetRef, meanLoss, stdLoss \n")
+  write(fp, "branch, meanLoss, stdLoss \n")
+  for (branch_ref, branch_output) in tree_outputs
+    alm = branch_output[1].asset_loss_moments
+    plm = branch_output[1].portfolio_loss_moments
+    if length(branch_output) > 1
+      insured_losses = true
+    end
+    for asset_ref in sort(collect(keys(alm)))
+      loss_moment = alm[asset_ref]
+      write(fa, join((branch_ref, asset_ref, loss_moment.mean_l, loss_moment.std_l), ", "), "\n")
+    end
+    write(fp, join((branch_ref, plm.mean_l, plm.std_l), ", "), "\n")
+  end
+  close(fa)
+  close(fp)
+
+  if insured_losses
+    assets_file = export_dir * file_name * "_assets_ins.out"
+    portfolio_file = export_dir * file_name * "_portfolio_ins.out"
+    fa = open(assets_file, "w")
+    fp = open(portfolio_file, "w")
+    write(fa, "branch, assetRef, meanInsuredLoss, stdInsuredLoss \n")
+    write(fp, "branch, meanInsuredLoss, stdInsuredLoss \n")
+    for (branch_ref, branch_output) in tree_outputs
+      alm = branch_output[2].asset_loss_moments
+      plm = branch_output[2].portfolio_loss_moments
+      if length(branch_output) > 1
+        insured_losses = true
+      end
+      for asset_ref in sort(collect(keys(alm)))
+        loss_moment = alm[asset_ref]
+        write(fa, join((branch_ref, asset_ref, loss_moment.mean_l, loss_moment.std_l), ", "), "\n")
+      end
+      write(fp, join((branch_ref, plm.mean_l, plm.std_l), ", "), "\n")
+    end
+    close(fa)
+    close(fp)
+  end
+end
+
+
+function scenario_damage_export(tree_outputs::Dict{ASCIIString, ScenarioDamageOutput},
+                                export_dir::ASCIIString)
+  file_name = "results"
+  assets_file = export_dir * file_name * "_assets.out"
+  taxonomy_file = export_dir * file_name * "_taxonomy.out"
+  portfolio_file = export_dir * file_name * "_portfolio.out"
+  fa = open(assets_file, "w")
+  ft = open(taxonomy_file, "w")
+  fp = open(portfolio_file, "w")
+  write(fa, "assetRef, dmg_state, mean, stddev \n")
+  write(ft, "taxonomy, dmg_state, mean, stddev \n")
+  write(fp, "dmg_state, mean, stddev \n")
+  for (branch_ref, branch_output) in tree_outputs
+    states = branch_output.states
+    num_states = length(states)
+    adm = branch_output.asset_dmg_moments
+    tdm = branch_output.taxonomy_dmg_moments
+    pdm = branch_output.portfolio_dmg_moments
+    for (asset_ref, dmg_moment) in adm
+      for i in 1:num_states
+        write(fa, join((asset_ref, states[i], dmg_moment.mean_d[i], dmg_moment.std_d[i]), ", "), "\n")
+      end
+    end
+    for (tax, dmg_moment) in tdm
+      for i in 1:num_states
+        write(ft, join((tax, states[i], dmg_moment.mean_d[i], dmg_moment.std_d[i]), ", "), "\n")
+      end
+    end
+    for i in 1:num_states
+      write(fp, join((states[i], pdm.mean_d[i], pdm.std_d[i]), ", "), "\n")
+    end
+  end
+  close(fa)
+  close(ft)
+  close(fp)
+end
+
+
+function event_based_risk_export(tree_outputs::Dict{ASCIIString, Vector{EventBasedRiskOutput}},
+                                 export_dir::ASCIIString)
+  insured_losses = false
+  file_name = "results"
+  assets_file = export_dir * file_name * "_assets.out"
+  portfolio_file = export_dir * file_name * "_portfolio.out"
+  fa = open(assets_file, "w")
+  fp = open(portfolio_file, "w")
+  for (branch_ref, branch_output) in tree_outputs
+    alc = branch_output[1].asset_loss_curves
+    plc = branch_output[1].portfolio_loss_curve
+    aal = branch_output[1].avg_asset_losses
+    pal = branch_output[1].avg_portfolio_loss
+    for (asset_ref, loss_curve) in alc
+      write(fa, join((asset_ref, "poes", loss_curve.poes), ", "), "\n")
+      write(fa, join((asset_ref, "losses", loss_curve.lrs), ", "), "\n")
+      write(fa, join((asset_ref, "avg", aal[asset_ref]), ", "), "\n")
+    end
+    write(fp, join(("poes", plc.poes), ", "), "\n")
+    write(fp, join(("losses", plc.lrs), ", "), "\n")
+    write(fp, join(("avg", pal), ", "), "\n")
+  end
+  close(fa)
+  close(fp)
+
+  if insured_losses
+    assets_file = export_dir * file_name * "_assets_ins.out"
+    portfolio_file = export_dir * file_name * "_portfolio_ins.out"
+    fa = open(assets_file, "w")
+    fp = open(portfolio_file, "w")
+    for (branch_ref, branch_output) in tree_outputs
+      alc = branch_output[2].asset_loss_curves
+      plc = branch_output[2].portfolio_loss_curve
+      aal = branch_output[2].avg_asset_losses
+      pal = branch_output[2].avg_portfolio_loss
+      for (asset_ref, loss_curve) in alc
+        write(fa, join((asset_ref, "poes", loss_curve.poes), ", "), "\n")
+        write(fa, join((asset_ref, "losses", loss_curve.lrs), ", "), "\n")
+        write(fa, join((asset_ref, "avg", aal[asset_ref]), ", "), "\n")
+      end
+      write(fp, join(("poes", plc.poes), ", "), "\n")
+      write(fp, join(("losses", plc.lrs), ", "), "\n")
+      write(fp, join(("avg", pal), ", "), "\n")
+    end
+    close(fa)
+    close(fp)
+  end
+end
+
+
+function classical_risk_export(tree_outputs::Dict{ASCIIString, ClassicalRiskOutput},
+                               export_dir::ASCIIString)
+  file_name = "results"
+  assets_file = export_dir * file_name * "_assets.out"
+  fa = open(assets_file, "w")
+  for (branch_ref, branch_output) in tree_outputs
+    alc = branch_output.asset_loss_curves
+    avg = branch_output.avg_asset_losses
+    for (asset_ref, loss_curve) in alc
+      write(fa, join((asset_ref, "poes", loss_curve.poes), ", "), "\n")
+      write(fa, join((asset_ref, "losses", loss_curve.lrs), ", "), "\n")
+      write(fa, join((asset_ref, "avg", avg[asset_ref]), ", "), "\n")
+    end
+  end
+  close(fa)
+end

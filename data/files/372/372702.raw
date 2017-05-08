@@ -1,0 +1,26 @@
+include("/home/betrema/Julia/workspace/jb2048.jl")
+include("/home/betrema/Julia/workspace/dag2048.jl")
+# julia set working module
+
+b=[1 1 0; 0 0 0]
+@time tb=maxtree(b)
+length(maxdag),length(meandag)
+
+begin
+    g=Game(b)
+    play!(g,target=6,display=true)
+end
+
+i=-8
+i+=1;plot(g.hist[i]...)
+i-=1;plot(g.hist[i]...)
+
+g.hist
+
+i=1;g=Game(b)
+begin
+    plot(g)
+    i+=1;play!(g,i,verbose=true)
+end
+
+@time repartition(b,1000,6)

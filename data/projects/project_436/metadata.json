@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:13 GMT
+Date: Wed, 03 May 2017 21:00:22 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5512
+Content-Length: 6414
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3130
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4106
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "f92f387ae2b97c7182398492e6c62a98"
-Last-Modified: Tue, 21 Feb 2017 14:41:36 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "60306782de351b31e40dad30627821a7"
+Last-Modified: Sat, 25 Mar 2017 13:08:33 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,121 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
-X-GitHub-Request-Id: 4E7B:6633:DD47EC:11E8461:590231AD
+X-Served-By: 46808ddc41c302090177e58148908b23
+X-GitHub-Request-Id: 40E3:5CA5:FD0622:1457D33:590A44E6
 
 {
-  "id": 55726086,
-  "name": "InspectDR.jl",
-  "full_name": "ma-laforge/InspectDR.jl",
+  "id": 20811727,
+  "name": "RegERMs.jl",
+  "full_name": "JuliaStats/RegERMs.jl",
   "owner": {
-    "login": "ma-laforge",
-    "id": 11205411,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/11205411?v=3",
+    "login": "JuliaStats",
+    "id": 2761531,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/2761531?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/ma-laforge",
-    "html_url": "https://github.com/ma-laforge",
-    "followers_url": "https://api.github.com/users/ma-laforge/followers",
-    "following_url": "https://api.github.com/users/ma-laforge/following{/other_user}",
-    "gists_url": "https://api.github.com/users/ma-laforge/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/ma-laforge/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/ma-laforge/subscriptions",
-    "organizations_url": "https://api.github.com/users/ma-laforge/orgs",
-    "repos_url": "https://api.github.com/users/ma-laforge/repos",
-    "events_url": "https://api.github.com/users/ma-laforge/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/ma-laforge/received_events",
-    "type": "User",
+    "url": "https://api.github.com/users/JuliaStats",
+    "html_url": "https://github.com/JuliaStats",
+    "followers_url": "https://api.github.com/users/JuliaStats/followers",
+    "following_url": "https://api.github.com/users/JuliaStats/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaStats/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaStats/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaStats/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaStats/orgs",
+    "repos_url": "https://api.github.com/users/JuliaStats/repos",
+    "events_url": "https://api.github.com/users/JuliaStats/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaStats/received_events",
+    "type": "Organization",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/ma-laforge/InspectDR.jl",
-  "description": "Fast, interactive Julia/GTK+ plots (+Smith charts +Gtk widget +Cairo-only images)",
+  "html_url": "https://github.com/JuliaStats/RegERMs.jl",
+  "description": "Regularised Empirical Risk Minimisation Framework (SVMs,  LogReg, Linear Regression) in Julia",
   "fork": false,
-  "url": "https://api.github.com/repos/ma-laforge/InspectDR.jl",
-  "forks_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/forks",
-  "keys_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/teams",
-  "hooks_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/events",
-  "assignees_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/tags",
-  "blobs_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/subscription",
-  "commits_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/merges",
-  "archive_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/downloads",
-  "issues_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/ma-laforge/InspectDR.jl/deployments",
-  "created_at": "2016-04-07T20:32:40Z",
-  "updated_at": "2017-02-21T14:41:36Z",
-  "pushed_at": "2017-03-29T22:40:28Z",
-  "git_url": "git://github.com/ma-laforge/InspectDR.jl.git",
-  "ssh_url": "git@github.com:ma-laforge/InspectDR.jl.git",
-  "clone_url": "https://github.com/ma-laforge/InspectDR.jl.git",
-  "svn_url": "https://github.com/ma-laforge/InspectDR.jl",
-  "homepage": "https://sites.google.com/site/malaforgeweb/plotting/inspectdr",
-  "size": 263,
-  "stargazers_count": 5,
-  "watchers_count": 5,
+  "url": "https://api.github.com/repos/JuliaStats/RegERMs.jl",
+  "forks_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaStats/RegERMs.jl/deployments",
+  "created_at": "2014-06-13T17:14:01Z",
+  "updated_at": "2017-03-25T13:08:33Z",
+  "pushed_at": "2016-08-09T23:28:30Z",
+  "git_url": "git://github.com/JuliaStats/RegERMs.jl.git",
+  "ssh_url": "git@github.com:JuliaStats/RegERMs.jl.git",
+  "clone_url": "https://github.com/JuliaStats/RegERMs.jl.git",
+  "svn_url": "https://github.com/JuliaStats/RegERMs.jl",
+  "homepage": "",
+  "size": 82,
+  "stargazers_count": 14,
+  "watchers_count": 14,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 2,
+  "forks_count": 6,
   "mirror_url": null,
-  "open_issues_count": 1,
-  "forks": 2,
-  "open_issues": 1,
-  "watchers": 5,
+  "open_issues_count": 7,
+  "forks": 6,
+  "open_issues": 7,
+  "watchers": 14,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 2,
-  "subscribers_count": 2
+  "organization": {
+    "login": "JuliaStats",
+    "id": 2761531,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/2761531?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaStats",
+    "html_url": "https://github.com/JuliaStats",
+    "followers_url": "https://api.github.com/users/JuliaStats/followers",
+    "following_url": "https://api.github.com/users/JuliaStats/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaStats/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaStats/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaStats/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaStats/orgs",
+    "repos_url": "https://api.github.com/users/JuliaStats/repos",
+    "events_url": "https://api.github.com/users/JuliaStats/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaStats/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 6,
+  "subscribers_count": 18
 }

@@ -1,0 +1,68 @@
+
+# a simple spiking network
+type SSNetwork
+
+  t::Integer  # the number of steps that have been taken
+  dt::Float64 # the time step of the network simulation
+
+  num_neurons::Integer
+  state::Array         # the one dimensional real-valued state of each neuron
+  spike_times::Array   # an array of the most recent spike times for each neuron
+  tau::Array           # an array of membrane time constants
+  W::SparseMatrixCSC   # a sparse matrix of network connection weights
+
+  function SSNetwork(num_neurons, dt=1e-4, spike_history_length=10)
+    this = new()
+
+    this.num_neurons = num_neurons
+
+    this.t = 0
+    this.dt = dt
+
+    this.state = zeros(num_neurons)
+    this.tau = zeros(num_neurons)
+
+    this.spike_times = zeros(num_neurons, spike_history_length)
+
+    this.W = sparse([], [], [], num_neurons, num_neurons)
+
+    return this
+  end
+
+end
+
+# run the network for a single time step
+function step(net)
+
+  # compute the EPSPs
+  u = sum(synapse_function(net.t, net.spike_times, 0.010), 2)
+
+  # get the overall change in state
+  du = net.tau .* net.state + net.W * u
+
+  # do a forward euler step for the network state
+  net.state += du*net.dt
+  net.t += 1
+
+  # determine firing probabilites
+  p = 1. / (1. + exp(-u))
+
+  # sample from a uniform distribution to determine which neurons fire
+  r = rand(net.num_neurons)
+  i = r .> p
+
+  # add the new spike times to the spike times array
+  net.spike_times[i, 1:end-1] = net.spike_times[i, 2:end]
+  net.spike_times[i, end] = net.t*net.dt
+
+  # reset the state of the neurons that fired
+  net.state[i] = 0
+
+end
+
+# computes an exponential PSP at time t resulting from input spikes at spike_times
+function synapse_function(t, spike_times, time_const)
+  return exp(-(t - spike_times) / time_const)
+end
+
+

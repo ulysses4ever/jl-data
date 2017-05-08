@@ -1,0 +1,41 @@
+test_case = "case_1h"
+calculation_mode = "scenario_risk"
+case_file = "test/$(calculation_mode)/data/$(test_case).jld"
+
+number_of_ground_motion_fields = 10000
+
+gm_means = {"b1"=>[-0.64757464]}
+gm_stds  = {"b1"=>[0.564]}
+branches = keys(gm_means)
+
+a_ref = ["a1"]
+a_loc = [1]
+a_tax = ["tax1"]
+a_num = [1]
+a_occ = [1]
+a_val = [10000]
+a_ded = [NaN]
+a_lim = [NaN]
+num_assets = length(a_ref)
+
+vf_type = {"vf1"=>"PM"}
+vf_ids = keys(vf_type)
+
+vf1_imls = [0.05, 0.20, 0.40, 0.60, 1.00, 1.40, 1.60, 2.00]
+vf1_lrs = [0.000, 0.005, 0.050, 0.200, 0.450, 0.800, 1.000]
+vf1_probs = [0.995 0.950 0.490 0.300 0.140 0.030 0.010 0.004;
+             0.004 0.030 0.380 0.400 0.300 0.100 0.030 0.006;
+             0.001 0.015 0.080 0.160 0.240 0.300 0.100 0.010;
+             0.000 0.004 0.020 0.080 0.160 0.260 0.300 0.030;
+             0.000 0.001 0.015 0.030 0.100 0.180 0.300 0.180;
+             0.000 0.000 0.010 0.020 0.040 0.100 0.180 0.390;
+             0.000 0.000 0.005 0.010 0.020 0.030 0.080 0.380]
+
+vf_imls = {"vf1"=>vf1_imls}
+vf_lrs = {"vf1"=>vf1_lrs}
+vf_probs = {"vf1"=>vf1_probs}
+
+tax_vf_map = {"tax1"=>["vf1"]}
+taxonomies = keys(tax_vf_map)
+
+include("write_jld.jl")

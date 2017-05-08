@@ -1,0 +1,130 @@
+using Base.Test
+using MethylHMM
+
+##################
+## Simple Tests ##
+##################
+
+# Create a betabinomial HMM
+filename = "/Users/alex/Dropbox/code/MethylHMM/data/allc_AM_E1_2_chr2subset.tsv"
+n_states = 2
+hmm = betabinom_HMM(n_states,filename)
+
+# Set hmm parameters to a simple case
+hmm.A = eye(2)
+hmm.B[:,:,1] = [1e+5 1e-5 1e+5 1e-5; 1e-5 1e+5 1e-5 1e+5]  # alpha param
+hmm.B[:,:,2] = [1e-5 1e+5 1e-5 1e+5; 1e+5 1e-5 1e+5 1e-5]  # beta param
+
+# Generate some synthetic data:
+# state sequence s, observation sequence o, context sequence c
+n_obs = 100
+c = rand(1:4,n_obs)
+k = ones(Int,n_obs) # reduce the problem to Bernoulli outputs
+
+hmm.p = vec([1 0])  # start in state 1
+s,o = generate(hmm,k,c)
+
+# Test that the synthetic data was correctly generated
+@test(all(s .== 1)) # should never transition to state 2
+@test(all(o[c.==1] .== 1)) # state 1 should always be methylated in context 1
+@test(all(o[c.==2] .== 0)) # state 1 should never be methylated in context 2
+@test(all(o[c.==3] .== 1)) # state 1 should always be methylated in context 3
+@test(all(o[c.==4] .== 0)) # state 1 should never be methylated in context 4
+
+# New synthetic data, starting in state 2
+hmm.p = vec([0 1])
+s,o = generate(hmm,k,c)
+
+# Replace hmm data with synthetic data
+hmm.c = c
+hmm.k = k
+hmm.o = o
+hmm.n_sites = n_obs
+
+@test(all(s .== 2)) # should never transition to state 1
+@test(all(o[c.==1] .== 0)) # state 2 should never be methylated in context 1
+@test(all(o[c.==2] .== 1)) # state 2 should always be methylated in context 2
+@test(all(o[c.==3] .== 0)) # state 2 should never be methylated in context 3
+@test(all(o[c.==4] .== 1)) # state 2 should always be methylated in context 4
+
+# check forward algorithm on perfect sequence
+α,p_obs = forward(hmm; scaling=false)
+@test(p_obs > 0.999999)
+@test(all(round(α[:,2],6) .== 1)) # should always be in state 2
+@test(all(round(α[:,1],6) .== 0)) # should never be in state 1
+
+# test forward with scaling
+α,log_p_obs,coeff = forward(hmm)
+@test(log_p_obs < 1e-6)
+@test(all(round(α[:,2],6) .== 1))
+@test(all(round(α[:,1],6) .== 0))
+@test(all(round(coeff,6) .== 1.0))
+
+# check backward algorithm on perfect sequence
+β = backward(hmm)
+@test(all(β[end,:] .== 1))
+@test(all(round(β[:,2],6) .== 1))
+
+# test backward with scaling
+β = backward(hmm; scale_coeff=coeff)
+@test(all(round(β[end,:]) .== 1))
+@test(all(round(β[:,2]) .== 1))
+
+# check viterbi algorithm on perfect sequence
+@test(all(viterbi(hmm) .== s))
+
+# check forward-backward algorithm on complement observation sequence
+hmm.o = (hmm.o+1)%2
+α,p_obs = forward(hmm; scaling=false)
+β = backward(hmm)
+@test(round(p_obs,6) == 0)
+@test(all(round(α,6) .== 0)) # impossible given we start in state 2
+@test(all(round(β[1:end-1,2],6) .== 0)) # impossible if we end in state 2
+@test(all(round(β[1:end-1,1],6) .== 1)) # (o+1)%2 occurs with probability 1 if we end in state 1
+
+# results should be the same if we increase k (read coverage)
+hmm.o = (hmm.o+1)%2
+hmm.k = 10*hmm.k
+hmm.o = 10*hmm.o
+α,log_p_obs,coeff = forward(hmm)
+β = backward(hmm; scale_coeff=coeff)
+@test(round(log_p_obs,6) == 0)
+@test(all(round(α[:,2],6) .== 1))
+@test(all(round(α[:,1],6) .== 0))
+@test(all(round(coeff,6) .== 1.0))
+@test(all(round(β[end,:],6) .== 1))
+@test(all(round(β[:,2],6) .== 1))
+
+#####################################
+## Test for reasonable performance ##
+#####################################
+
+# Set hmm parameters to an easily recoverable case
+hmm.A = [ 0.95 0.05 ;
+          0.03 0.97 ]
+hmm.B[:,:,1] = [ 800 700 600 650 ; # high methylated state
+                 0.7 0.9 0.8 0.7 ] # low methylation state
+hmm.B[:,:,2] = [ 400 250 400 300 ; # high methylated state
+                 2.2 2.8 2.4 2.3 ] # low methylation state
+hmm.p = [0.5, 0.5]
+
+# draw observations from this hmm
+n_obs = 10_000
+c = rand(1:4,n_obs)
+k = rand(5:15,n_obs)
+
+true_s,o = generate(hmm,k,c)
+
+# input data
+hmm.c = c
+hmm.k = k
+hmm.o = o
+hmm.n_sites = n_obs
+
+# Randomize hmm parameters and re-fit
+hmm.A = rand(2,2)
+hmm.A ./= sum(hmm.A,2)
+hmm.B = rand(2,4,2)
+
+fit!(hmm; max_iter=200, tol=1e-2)
+

@@ -1,0 +1,12 @@
+#!/usr/bin/env julia
+
+type Foo
+    bar
+    baz::Int
+    qux::Float64
+end
+
+foo = Foo("Hello, world", 23, 1.5)
+
+println(foo.baz)
+

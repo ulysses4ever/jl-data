@@ -1,0 +1,169 @@
+module mc
+import Roots
+# un iteratore è un qualsiasi tipo che abbia definiti i metodi start, next e done
+
+# Un iteratore che campiona usando metropolis. Lo si inizializza con la distribuzione da campionare e lui produce uno alla volta i campioni
+# si potrebbe aggiungere un campo per la lunghezza di correlazione così dico a next di tirare fuori solo punti scorrelati
+type MarkovChain{T}
+    value::T
+    delta::Float64
+    p::Function
+    accepted::Int # ci mettiamo anche un campo che conta quelli proposti?
+    steps::Int
+end
+
+# Un costruttore comodo con dei valori di default sensati
+MarkovChain(;init=0.0, delta=1.0, p=gauss, steps=100000) = MarkovChain{typeof(init)}(init, delta, p, 0, steps)
+
+# state inizia da 1 ed è un intero, conta quanta roba ho prodotto
+Base.start(chain::MarkovChain) = 1
+
+# next deve restituire il valore dell'iteratore ed il prossimo stato (che è un intero)
+function Base.next(chain::MarkovChain, state::Int)
+    # devo assicurarmi che sia dello stesso tipo di value
+    # in generale deve funzionare con gli array, TODO
+    if length(chain.value)==1
+        proposal = chain.value + chain.delta*(rand() - 0.5) 
+    else
+        proposal = chain.value + chain.delta*(rand(length(chain.value)) - 0.5) 
+    end
+    w = chain.p(proposal)/chain.p(chain.value)         
+    if w >= 1 || w > rand() # se è più probabile starci lo accetto, altrimenti uniforme
+        chain.accepted += 1
+        chain.value = proposal
+    else # se ho rifutato rimango dove sono
+        chain.value = chain.value
+    end
+    return chain.value, state+1
+end
+
+# definendo questo metodo posso fare le comprehensions
+Base.length(chain::MarkovChain) = chain.steps
+
+# in questo modo i cicli sono 'for val in catena' e sanno quando fermarsi  
+Base.done(chain::MarkovChain, state) = state > chain.steps
+
+function gauss(x)
+    # variabile gaussiana standard
+    return exp(-dot(x,x)/2)
+end
+
+function regola_acc_rate!(target_rate::Float64, catena::MarkovChain)
+    # aggiusta delta in place finché accepted/steps non fa target_rate
+    old_steps = catena.steps
+    function acceptance_rate(delta::Float64)
+        catena.accepted = 0
+        catena.steps = 1000
+        catena.delta = delta
+        for val in catena # è vuoto perchè deve solo produrre i valori e non farci niente
+        end
+        return catena.accepted/catena.steps - target_rate
+    end
+    catena.delta    = Roots.fzero(acceptance_rate, 0.0, 50.0) # lentissimo FIXME
+    catena.accepted = 0
+    catena.steps    = old_steps
+    return catena.delta
+end
+
+function monte_carlo(stimatori, catena::MarkovChain)
+    # gli passo un dizionario di funzioni da integrare con la catena e lui restituisce
+    # un dizionario di risultati numerici con le stesse chiavi
+    integrali = [nome => 0.0 for nome in keys(stimatori)]
+    for val in catena
+        for (nome,funzione) in stimatori
+            integrali[nome] += funzione(val)
+        end
+    end
+    for (nome,somma) in integrali
+        integrali[nome] = somma/catena.steps
+    end
+    return integrali 
+end
+
+
+# Oscillatore armonico 1D, il risultato deve essere (0.5,0.5,1.0,1.0)
+a    = 0.5
+p(x) = exp(-2a*x^2)
+
+en_kin(x) = 2a - 4a^2*x^2       # en. cinetica standard
+en_pot(x) = x^2                 # en. potenziale
+en_loc(x) = en_kin(x)+en_pot(x) # en. locale, in queste unità deve fare 0
+test(x)   = 1.0                 # controllo che l'integrale faccia 1
+stimatori = ["En. cinetica"=>en_kin, "En. potenziale"=>en_pot, "En. locale"=>en_loc, "Test"=> test]
+
+catena = MarkovChain(steps=500000, p=p)
+regola_acc_rate!(0.5, catena)
+
+risultati = monte_carlo(stimatori, catena)
+
+function E(a)
+    # calcola l'energia in unita hw/2 col parametro variazionale a
+    p(x)      = exp(-2*a*x*x)
+    en_loc(x) = 2a - 4a*a*x*x + x*x
+    stimatori = ["En. locale"=>en_loc]
+    catena    = MarkovChain(steps=500000, p=p)
+    regola_acc_rate!(0.5, catena)
+    # println("a = $(round(a,3))\tdelta = $(round(catena.delta, 2))")
+    return  monte_carlo(stimatori, catena)["En. locale"]
+end
+
+function gradiente(f, p, a, da)
+    # fa il gradiente con il ripesamento del funzionale ∫f⋅p valutato in a±da
+    #= return (E(a+da) - E(a-da))/2da =#
+    fd(x)    = f(x,a+da)*p(x,a+da)/p(x,a)
+    wd(x)    = p(x,a+da)/p(x,a)
+    fs(x)    = f(x, a+da)*p(x,a-da)/p(x,a)
+    ws(x)    = p(x,a-da)/p(x,a)
+    distr(x) = p(x,a)
+    catena   = MarkovChain(steps=100000, p=distr)
+    regola_acc_rate!(0.5, catena)
+    stimatori = ["Peso a-da"=>ws, "Peso a+da"=>wd, "Integr. a+da"=>fd, "Integr. a-da"=>fs]
+    res =  monte_carlo(stimatori, catena)
+    return (res["Integr. a+da"]/res["Peso a+da"] - res["Integr. a-da"]/res["Peso a-da"])/2da  
+end
+
+function minimizza_energia_braveness(a_iniz, braveness, da, tolerance)
+    a = a_iniz
+    while true
+        en_loc(x,a) = 2a - 4a^2*x^2 + x^2
+        p(x,a)      = exp(-2a*x^2)
+        grad        = gradiente(en_loc, p, a, da)
+        print("\r a = $(round(a, 5)) \t grad = $(round(grad, 5))")
+        if norm(grad)<tolerance
+            break
+        else
+            a = a - grad*braveness
+            println(" --> \ta_new = $(round(a, 5))")
+        end
+    end
+    println("")
+    return a
+end
+
+minimizza_energia_braveness(0.6, 0.1, 1e-3, 1e-3)
+
+#= function correlation(data, stretches) =#
+#=     N = length(data) =#
+#=     len = div(N,stretches) =#
+#=     # finestra =#
+#=     hamming(n) = 0.54 - 0.46*cos(2pi*n/(N-1)) =#
+#=     window = map(hamming, 1:len) =#
+#=     pieces = abs(ifft!(complex(mean([abs2(fft!(complex(window .* data[i*len+1:(i+1)*len]))) for i in 1:stretches-1])))) =#
+#= end =#
+
+# calcolo le energie per alcuni valori del parametro, per farmi un'idea di dove sta il minimo
+#= as      = linspace(0.3, 0.7, 32) =#
+#= energie = map(E, as) =#
+#= using PyPlot =#
+#= plot(as, energie, linestyle="-", marker=".") =#
+
+
+end # fine modulo
+
+
+
+
+
+
+
+

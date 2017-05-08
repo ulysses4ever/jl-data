@@ -1,0 +1,22 @@
+module PropertyHeatDiffusionModule
+
+
+using JFFoundationModule: JFInt, JFFlt, JFFltVec, JFIntVec, JFFltMat, JFIntMat
+
+# Type for heat diffusion material property.
+# Fields:
+#     thermal_conductivity=matrix of conductivities; 2x2 for 2-D domains, 3x3
+#                  for 3-D domains; the components are given in the local
+#                  coordinate frame (femm decides what that frame is by reference to the material orientation matrix).
+#     specific_heat=specific heat per unit volume
+#
+type PropertyHeatDiffusion
+    thermal_conductivity::JFFltMat;# Thermal conductivity
+    specific_heat::JFFlt;# Specific heat per unit volume
+end
+
+function  PropertyHeatDiffusion (;thermal_conductivity=[1.0],specific_heat=1.0)
+    return  PropertyHeatDiffusion (thermal_conductivity,specific_heat)
+end
+
+end

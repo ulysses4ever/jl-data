@@ -1,0 +1,59 @@
+#=this file contains code for use with "Think Stats 2",
+by Allen B. Downey, available from greenteapress.com
+
+Copyright 2015 Barrie Callender
+License: GNU GPLv3 http://www.gnu.org/licenses/gpl.html
+=#
+
+include("Chapter1.jl")
+
+importall Chapter1
+importall Chapter1.DataFrames
+##
+# Run script
+#
+using Base.Test
+
+columns = readdictfile("2002FemPreg.dct")
+
+for (column, newfunc, newdatatype) in [
+                                       ("agepreg", x -> x / 100.0, Float64),
+                                       ("birthwgt_lb", x -> x > 20 ? DataFrames.NA : x, Integer),
+                                       ("birthwgt_oz", x -> x > 96 && x < 100 ? DataFrames.NA : x, Integer),
+                                       ("hpagelb", x -> x > 96 && x < 100 ? DataFrames.NA : x, Integer),
+                                       ("babysex", x -> x == 7 || x == 9 ? DataFrames.NA : x, Integer),
+                                       ("nbrnaliv", x -> x == 9 ? DataFrames.NA : x, Integer)
+                                      ]
+
+    columns[column].func = newfunc
+    columns[column].datatype = newdatatype
+end
+
+columns["totalwgt_lb"] = FixedWidthColumn(0,Float64,"totalwgt_lb","0","calculated total weight",0)
+
+df = readdatafile(columns, "2002FemPreg.dat.gz",x->x)
+
+data = eachrow(df)
+
+for record in data
+    record[:totalwgt_lb] = record[:birthwgt_lb] + record[:birthwgt_oz] / 16.0
+end
+
+
+
+print("$(size(df))")
+
+@test DataFrames.nrow(df) == 13593
+
+@test df[:caseid][13592] == "12571"
+valuecounts(df, :pregordr)[1]
+@test valuecounts(df, :pregordr)[1] == 5033
+@test valuecounts(df, :nbrnaliv)[1] == 8981
+@test valuecounts(df, :babysex)[1] == 4641
+@test valuecounts(df, :birthwgt_lb)[7] == 3049
+@test valuecounts(df, :birthwgt_oz)[0] == 1037
+@test valuecounts(df, :prglngth)[39] == 4744
+@test valuecounts(df, :outcome)[1] == 9148
+@test valuecounts(df, :birthord)[1] == 4413
+@test valuecounts(df, :agepreg)[22.75] == 100
+@test valuecounts(df, :totalwgt_lb)[7.5] == 302

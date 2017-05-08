@@ -1,0 +1,14 @@
+function gencoi( n, dt=1.0, tSmo=1.0 )
+    ## GENCOI Generates Cone of influence after Torrence & Compo for 
+    # a Morlet wavelet with w0=6
+    #
+    #   IN:
+    #       n:      length of t or x
+    #       dt:     time step (default=1/2500)
+    # 
+    # Author: Michael von Papen, Felix Gerick
+    # 
+    # Date: 14.10.15
+    
+    return 1.033/sqrt(2)/tSmo*dt*[1e-5;1:(n+1)/2-1;flipdim(1:n/2-1,1);1e-5];  
+end 

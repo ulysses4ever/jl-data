@@ -1,0 +1,22 @@
+using Distributions
+using PyPlot
+# y_t = α + βy_t-1 + σϵ_t
+type AR1
+  α::Array
+  β::Array
+  σ::Array
+  ϵ::Distribution
+end
+
+ar1 = AR1(rand(1,1),rand(1,1),rand(1,1),MixtureModel(Normal[Normal(0,1),Normal(2,0.5)]))
+
+function simulate_var(model::AR1, T::Int64)
+  y = zeros(T,1)
+  for i in 2:T
+    y[i,:] = y[i-1,:]*model.β' + rand(model.ϵ,1,1)
+  end
+  return y
+end
+
+sim = simulate_var(ar1, 100)
+plot(sim)

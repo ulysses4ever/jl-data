@@ -1,0 +1,12 @@
+module MonetDB
+
+using PyCall, Nettle
+@pyimport struct
+
+export monetdbconn
+
+include("types.jl")
+# mapi low-level interface
+include("mapi.jl")
+
+end # module

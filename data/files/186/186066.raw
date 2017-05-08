@@ -1,0 +1,22 @@
+import Distributions
+
+function stickbreak(x::Array{Float64,1}, range::UnitRange{Int}, alpha::Real)
+    a = rand(Distributions.Dirichlet(length(range),alpha),1)
+    y = zeros(Real, length(x))
+    for k in range
+        u = 2*pi*rand(1)[1]
+        y += a[k+1-range[1]]*cos(2*pi*k*x + u)
+    end
+    return y,a
+end
+
+function rotationMatrix{T<:Real}(u::Array{T,1},theta::Float64)
+    length(u) == 3 || error("axis of rotation, u must have length 3")
+    normu = sqrt(sum(u.^2))
+    if isapprox(normu,0.0) && !isapprox(theta, 0.0)
+        error("axis of rotation, u, cannot be zero unless angle of rotation, theta, is zero")
+    end
+    u = u/normu
+    N = reshape([0, u[3], -u[2], -u[3], 0, u[1], u[2], -u[1], 0],(3,3))
+    eye(3) + sin(theta)*N + (1-cos(theta))*(N*N)
+end

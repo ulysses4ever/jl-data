@@ -1,0 +1,57 @@
+using Images
+using ImageView
+using Color
+
+
+# Run non-interactively, accept either an image or a directory
+# If directory, iterate through image filetypes
+
+
+
+function dominant_colors (image)
+	if isfile(image)
+		img = imread(image,RGB)
+		kmeans(img)
+	elseif isdir(image)
+		files = filter!(abspath(r"\.(?:jpe?g|gif|png|tiff)$")), readdir()) #creates an array of filenames by filtering out only files that in file extensions.
+		for i in files
+			dominant_colors(i)
+		end
+	else 
+		error("No image found.")
+	end
+end
+
+type Point
+	coords # Color associated with pt, a 3D array.
+	xk::Int # Location in m x n array
+	ct:Int # Count
+end
+
+type Cluster
+	points::Array # Points associated with cluster, C_k
+	centroid::Point # Center of cluster, assumed mean of pt values
+	k::Int # Cluster count
+end
+
+function init(img)
+# Convert color space from sRGB (linear) to CIEXYZ to CIELAB
+	points = []
+	
+# Define distance
+
+function euclidean (p1, p2)
+	return sqrt()
+
+
+# Define centroid
+
+# Randomly assign pixels to represent intial centroid
+
+# K-Means Algorithm (alternate between resigning points to a cluster based on similarity and cluster centroid based on the points assigned)
+
+# Repeat n number of times 
+
+# Optionally convert returned clusters back to sRGB
+
+# At this point the program should loop through if ther any more images, then finish

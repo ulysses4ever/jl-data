@@ -1,0 +1,20 @@
+module MethylHMM
+
+using Distributions, Optim
+
+export binomial_HMM,
+       betabinom_HMM,
+       generate,
+       forward,
+       backward,
+       viterbi,
+       fit!
+
+include("init.jl") # Type definitions, constructors, initialization
+include("fit.jl")  # fitting methods for binomial HMM
+
+include("file_io.jl")          # functions for loading data
+include("stat_funcs.jl")       # statistics helper functions
+include("forward_backward.jl") # dynamic programming functions
+
+end

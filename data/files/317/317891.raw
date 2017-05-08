@@ -1,0 +1,122 @@
+include("Task_algo.jl")
+
+
+#a(k)  need c(k-1)
+#b(k)  need c(k-1)
+#c(k) need a(k) and b(b) ;
+#both action require 1 second to execute 
+
+
+
+#Create the state model
+etat = State() ;
+tacheAcreer = ["a","b","c"] ;  
+for i in tacheAcreer
+    etat.states[i] = DictChannel() 
+    put!(etat.states[i],0,true) ; 
+end
+
+
+
+
+#create the dependancy between state :
+
+depend_tache_a = TaskDependancy() ; 
+depend_tache_a.dependency = [("c",-1)] ; 
+
+depend_tache_b = TaskDependancy() ; 
+depend_tache_b.dependency = [("c",-1)] ; 
+
+depend_tache_c = TaskDependancy() ; 
+depend_tache_c.dependency = [("a",0)] ;
+depend_tache_c.dependency = [("b",0)] ; 
+
+#Create a node with one procesor :
+node = Nodes(2) ; 
+
+#create the task 
+tache_a = Task_algo("a",depend_tache_a,1,1.0,node) ;
+tache_b = Task_algo("b",depend_tache_b,1,1.0,node) ;
+tache_c = Task_algo("c",depend_tache_c,1,1.0,node) ;
+
+##
+#on se place dans le cas ou il y a deux proceseurs.
+
+N_max = 10; 
+keepGoing = true ; 
+
+
+
+ListeAFaire = [tache_a,tache_b,tache_c]  ; 
+
+
+function temp(tache::Task_algo,etat::State,iterMax=100)
+	iterationNumber=tache.iterationNumber
+	taskName=tache.taskName
+	isReady(tache,etat) ; 
+	##on attent q'un processuer soit libre pour effectuer le calcul
+	nodeToExecute = tache.nodeToExecute ;
+	index_node =getOneProc(nodeToExecute)
+	sleep(tache.timeToCompute) ; 
+	nodeToExecute.availabeWorker[index_node] = true ; 
+	notify(nodeToExecute.cond_take; all=false)
+
+	put!(etat.states[taskName],iterationNumber,true) ;
+	println(taskName)
+	if (iterationNumber<iterMax)
+		@schedule(temp(tache +1 ,etat,iterMax)) ;
+	end
+end
+
+
+
+for t in ListeAFaire
+	temp(t,etat,N_max)
+
+end
+for i in ["a","b","c"]
+	wait(etat.states[i],N_max)
+end
+
+
+
+
+
+
+
+
+
+##ancienne version du scheduler 
+
+
+
+
+ListeAFairea = [ tache_a + k   for k in [0:N_max]  ] ; 
+ListeAFaireb = [ tache_b + k   for k in [0:N_max]  ] ;
+ListeAFairec = [ tache_c + k   for k in [0:N_max]  ] ;
+ListeAFaire = [ListeAFairea,ListeAFaireb,ListeAFairec]  ; 
+
+
+
+
+for t in ListeAFaire
+	@schedule begin 
+		##La tache doit être executable
+		isReady(t,etat) ; 
+		##on attent q'un processuer soit libre pour effectuer le calcul
+		nodeToExecute = t.nodeToExecute ;
+		index_node =getOneProc(nodeToExecute)
+		sleep(t.timeToCompute) ; 
+		nodeToExecute.availabeWorker[index_node] = true ; 
+		notify(nodeToExecute.cond_take; all=false)
+
+		put!(etat.states[t.taskName],t.iterationNumber,true) ;
+		println(t.taskName)
+
+
+
+	end
+
+end
+
+

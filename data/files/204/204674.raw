@@ -1,0 +1,188 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using DataStructures
+
+##### custom implementation of QuickSort
+function swap{T<:Integer}(A::Array{T,1},i::T,j::T)
+	t = A[i]
+	A[i] = A[j]
+	A[j] = t
+end
+
+function partition{T<:Integer}(A::Array{T,1},R::Array{T,1},l::T,h::T)
+	pvalue = A[h]
+	sindex = l
+	for j in l:(h-1)
+		if A[j] < pvalue 
+			(sindex != j && A[sindex] != a[j]) && begin swap(A,sindex,j); swap(R,sindex,j) end
+			sindex += 1
+		end
+	end
+	(sindex != h && A[sindex] != A[h]) && begin swap(A,sindex,h); swap(R,sindex,h) end
+	return sindex
+end
+
+function quicksort_iterative!{T<:Integer}(A::Array{T,1},l::T,h::T)
+	s = Stack((T,T))
+	push!(s,(l,h))
+	R = [convert(T,1):convert(T,length(A))]
+	while !isempty(s)
+		l,h = pop!(s)
+		p = partition(A,R,l,h)
+		if (p-1) > l
+			push!(s,(l,(p-1)))
+		end
+		if (p+1) < h
+			push!(s,((p+1),h))
+		end
+	end
+	return R
+end
+#####
+
+##### custom implementation of MergeSort
+function bottom_up_sort!{T<:Integer}(A::Array{T,1})
+	n = convert(T,length(A))
+	B = zeros(T,n)
+	# permutation array
+	R = [convert(T,1):n]
+	S = zeros(T,n)
+	width = 1
+	while width < n
+		i = 0
+		while i < n
+			bottom_up_merge(A,convert(T,i),convert(T,min(i+width,n)),convert(T,min(i+2*width,n)),B,R,S)
+			i += 2*width
+		end
+		A = copy(B)
+		R = copy(S)
+		width = 2*width
+	end
+	return R
+end
+
+function bottom_up_merge{T<:Integer}(A::Array{T,1},iLeft::T,iRight::T,iEnd::T,B::Array{T,1},R::Array{T,1},S::Array{T,1})
+	i0 = iLeft
+	i1 = iRight
+	for j in (iLeft+1):iEnd
+		if i0 < iRight && (i1 >= iEnd || A[i0+1] <= A[i1+1])
+			B[j] = A[i0+1]
+			S[j] = R[i0+1]
+			i0 += 1
+		else
+			B[j] = A[i1+1]
+			S[j] = R[i1+1]
+			i1 += 1
+		end
+	end
+end
+#####
+
+# custom binary search
+# NB: array A is assumed to be sorted in ascending order
+function binary_search(A,x)
+	low = 1 
+	high = length(A)
+	while true
+		if high == low
+			if A[low] == x
+				return low
+			else
+				return -1
+			end
+		else
+			p = low + ifloor((high-low)/2)
+			if x == A[p]
+				return p
+			elseif x > A[p]
+				if p < high
+					low = p+1
+				else
+					return -1
+				end
+			else
+				if p > low
+					high = p-1
+				else
+					return -1
+				end
+			end
+		end
+	end
+end
+
+# total variation distance between 2 distributions
+function TV(p,q)
+	s = 0.
+	for i in 1:length(p)
+		s += abs(p[i]-q[i])	
+	end
+	return s/2
+end
+
+# Pearson correlation between two vectors
+function pearson(X,Y)
+	mx = mean(X)
+	my = mean(Y)
+	n = 0.
+	dx = 0.
+	dy = 0.
+	for i in 1:length(X)
+		n += (X[i]-mx)*(Y[i]-my)
+		dx += (X[i]-mx)^2
+		dy += (Y[i]-my)^2
+	end
+	return n/sqrt(dx*dy)
+end
+
+# normalize vector
+function normalize(d)
+	return d/norm(d)
+end
+
+# make vector stochastic
+function stochastic(d)
+	return d/sum(d)
+end
+
+# get a uniform sample
+function get_sample{T}(A::Array{T,1},size)
+	s = T[]
+	l = length(A)
+	p = size/l
+	while true
+		for i in 1:l
+			if rand() < p
+				v = A[i]
+				if !(v in s)
+					push!(s,v)
+					if length(s) == size
+						return s
+					end
+				end
+			end
+		end
+	end
+end
+
+# euclidean distance between 2 vectors
+function dist(x,y)
+	s = 0.
+	for i in 1:length(x)
+		s += (x[i] - y[i])^2
+	end
+	return sqrt(s)
+end

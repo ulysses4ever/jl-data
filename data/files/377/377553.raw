@@ -1,0 +1,14 @@
+
+# Pkg.clone("https://github.com/MichaelHatherly/Lapidary.jl")
+# Pkg.checkout("Lapidary", "deploy-multiple-versions")
+
+using Lapidary
+
+makedocs(
+    # options
+)
+
+deploydocs(
+    # options
+    repo = "github.com/MichaelHatherly/LapidaryTests.jl.git"
+)

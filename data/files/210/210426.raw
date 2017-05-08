@@ -1,0 +1,53 @@
+Pkg.resolve()
+#Pkg.add("DataFrames")
+#Pkg.add("Requests")
+
+using Requests
+import Requests: get
+using DataFrames
+
+
+function fetchInquirim(ticker_list::Array{ASCIIString,1}, auth_token::ASCIIString)
+	ticker_string = join(ticker_list, ",")
+	url = "http://www.inquirim.com/api/series/?ticker=$(ticker_string)&format=json&expand=obs"
+	res = get(url, headers= Dict("Authorization" => "Token "*auth_token))
+
+	js_data = Requests.json(res)
+
+	results = js_data["results"]
+
+	dates = Set{AbstractString}()
+	for item in results
+		for t in item["data"]["dates"]
+			push!(dates, t)
+		end
+	end
+	datelist = sort(collect(dates))
+
+	function parseDate(x)
+		Date(x,"y-m-d")
+	end
+
+	datadict = Dict{AbstractString, Any}("dates" => map(Date, datelist) )
+	for item in results
+		expanded = []
+		for (n,date) in enumerate(datelist)
+			ix_list = findin(item["data"]["dates"],[date])
+			if length(ix_list) > 0
+				ix = ix_list[1]
+			else
+				ix = 0
+			end
+			if ix == 0
+				push!(expanded, NaN)
+			else
+				push!(expanded, parse(Float64,item["data"]["values"][ix]))
+			end
+		end
+		ticker = item["ticker"]
+		datadict[ticker] = expanded
+	end
+
+	return DataFrame(datadict)
+
+end

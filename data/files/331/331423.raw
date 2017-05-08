@@ -1,0 +1,49 @@
+###################################################
+## Defines the 'TypeGraph' type
+###################################################
+
+
+type TypeNode
+  name::AbstractString
+  id::Int64
+  dep_rate::Float64
+  weight::Float64
+
+  "Constructor: reference to the node type"
+  function TypeNode(t::AbstractString, id::Int64, dep_rate::Float64)
+    obj = new()
+    obj.name = t
+    obj.id = id
+    obj.dep_rate = dep_rate
+    obj.weight = 1
+    return obj
+  end
+end
+
+type TypeGraph
+  graph::DiGraph
+  nodes::Array{TypeNode,1}
+  n::Int64
+
+  "Constructor: reference to a list of nodes and the adjacency matrix
+  m[i,j] = 1 is understood as an edge from node i to node j"
+  function TypeGraph(matrix::Array{Float64,2},
+        type_list::Array{AbstractString,1}, dep_list::Array{Float64,1})
+    obj = new()
+    if size(matrix) != (length(type_list),length(type_list))
+      error("The adjacency matrix is not the right size.")
+    end
+    obj.n = length(type_list)
+    obj.graph = DiGraph(obj.n)
+    obj.nodes = Array(TypeNode,0)
+    for i in 1:obj.n
+      push!(obj.nodes, TypeNode(type_list[i],i,dep_list[i]))
+      for j in 1:obj.n
+        if matrix[i,j] == 1
+          add_edge!(obj.graph, i,j)
+        end
+      end
+    end
+    return obj
+  end
+end

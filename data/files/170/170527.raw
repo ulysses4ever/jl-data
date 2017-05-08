@@ -1,0 +1,16 @@
+using SimpleStats
+using SimpleStats.Comandline
+using Base.Test
+
+let data = read_data("incomplete_iris.csv", delimiter=",", skip="1")
+  @test size(data) == (150,5)
+  let stats = describe_univariate(data[:,1])
+    @test stats["N rows"] == 150
+    @test stats["N observations"] == 148
+    @test stats["NaN"] == 1
+    @test stats["NaN%"] == "0.67"
+    @test stats["NA"] == 1
+    @test stats["NA%"] == "0.67"
+  end
+end
+

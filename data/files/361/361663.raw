@@ -1,0 +1,62 @@
+# As explained in week 1 lectures of Stanford's Coursera Algorithms course
+# Inversion counter tagging onto merge sort algorithm. Naming has not been changed but functions have been altered
+
+module MyMergeSort
+
+export myMergeSort
+export myMerge
+
+function myMergeSort(unsorted)
+  unsortedLength = length(unsorted)
+
+  # base cases of n = 0 or n = 1
+  if unsortedLength == 0 || unsortedLength == 1
+    return (unsorted, 0)
+  end
+
+  firstHalf = splice!(unsorted, 1:floor(unsortedLength ÷ 2))
+  secondHalf = unsorted
+
+  firstHalf, firstInversionCount = myMergeSort(firstHalf)
+  secondHalf, secondInversionCount = myMergeSort(secondHalf)
+  mergedArray, inversionCount = myMerge(firstHalf, secondHalf)
+  totalInversions = firstInversionCount + secondInversionCount + inversionCount
+
+  return myMerge(firstHalf, secondHalf)[1], totalInversions
+end
+
+function myMerge(array1, array2)
+  elementCount = length(array1) + length(array2)
+  D = Array(Int64, elementCount)
+  i = 1
+  j = 1
+  invCount = 0
+
+  for k = 1:elementCount
+    if i <= length(array1) && j <= length(array2)
+      if array1[i] <= array2[j] # for duplicate numbers
+        D[k] = array1[i]
+        i += 1
+      elseif array2[j] < array1[i]
+        D[k] = array2[j]
+        invCount += length(array1) - i + 1 # since i is now larger, excluding 1 element
+        j += 1
+      end
+    elseif i > length(array1) # when first array has ended and all other numbers are from second array
+      D[k] = array2[j]
+      j += 1
+    elseif j > length(array2) # when second array has ended and all other numbers are from array array
+      D[k] = array1[i]
+      i += 1
+    end
+  end
+  return D, invCount
+end
+
+end
+
+f = open("/Users/stonefruit/Dropbox/coursera_algo/IntegerArray.txt")
+arrayOfStrings = readlines(f)
+close(f)
+arrayOfInts = map(x -> parse(rstrip(x)), arrayOfStrings)
+@show myMergeSort(arrayOfInts)[2]

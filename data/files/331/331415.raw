@@ -1,0 +1,44 @@
+###################################################
+## Defines the 'TypeGraph' type
+###################################################
+
+using LightGraphs
+
+type Node
+  node_type::AbstractString
+  id::Int64
+
+  "Constructor: reference to the node type"
+  function Node(t::AbstractString, id::Int64)
+    obj = new()
+    obj.node_type = t
+    obj.id = id
+    return obj
+  end
+end
+
+type TypeGraph
+  graph::DiGraph
+  nodes::Array{Node,1}
+
+  "Constructor: reference to a list of nodes and the adjacency matrix
+  m[i,j] = 1 is understood as an edge from node i to node j"
+  function TypeGraph(matrix::Array{Float64,2}, type_list::Array{AbstractString,1})
+    obj = new()
+    if size(matrix) != (length(type_list),length(type_list))
+      error("The adjacency matrix is not the right size.")
+    end
+    n = length(type_list)
+    obj.graph = DiGraph(n)
+    obj.nodes = Array(Node,0)
+    for i in 1:n
+      push!(obj.nodes, Node(type_list[i],i))
+      for j in i:n
+        if matrix[i,j] == 1
+          add_edge!(obj.graph, i,j)
+        end
+      end
+    end
+    return obj
+  end
+end

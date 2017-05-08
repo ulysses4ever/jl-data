@@ -1,0 +1,79 @@
+module ModelInterface
+
+export Model,ModelConfig,fit
+abstract Model{I,O}
+abstract ModelConfig{I,O}
+
+
+macro mustimplement(sig)
+    fname = sig.args[1]
+    arg1 = sig.args[2]
+    if isa(arg1,Expr)
+        arg1 = arg1.args[1]
+    end
+    :($(esc(sig)) = error(typeof($(esc(arg1))),
+                          " must implement ", $(Expr(:quote,fname))))
+end
+
+@mustimplement fit(c::ModelConfig)
+
+# function fit{I,O}(c::ModelConfig{I,O},x::Vector{I},y::Vector{O})
+#   error("fit() not implemented for $c")
+# end
+
+# function predict(m::Model,x)
+#   error("predict() not implemented for $m")
+# end
+
+
+end
+
+module Inner
+  import ModelInterface.fit,ModelInterface.Model,ModelInterface.ModelConfig
+  export InnerModel,InnerModelConfig,fit
+
+  type InnerModel <: Model
+    foo::Int
+  end
+  type InnerModelConfig <: ModelConfig{Vector{Float64},Int}
+
+  end
+  function fit(c::InnerModelConfig,x::Vector{Vector{Float64}},y::Vector{Int})
+    return InnerModel(1)
+  end
+
+end
+
+module Outer
+  import ModelInterface.fit,ModelInterface.Model,ModelInterface.ModelConfig
+  export OuterModel,OuterModelConfig,fit
+  type OuterModel <: Model
+    inner::Model
+  end
+
+  type OuterModelConfig <: ModelConfig{Vector{Float64},Int}
+    inner_config::ModelConfig
+  end
+  function fit(c::OuterModelConfig,x::Vector{Vector{Float64}},y::Vector{Int})
+    m=OuterModel(fit(c.inner_config,x,y))
+  end
+
+end
+
+using ModelInterface
+using Outer
+using Inner
+a=rand(3)
+x=Vector{Float64}[a,a,a,a ]
+y=[1;2;3;4]
+inner_config=Inner.InnerModelConfig()
+println(inner_config)
+inner=fit(inner_config,x,y)
+println(inner)
+
+outer_config=OuterModelConfig(inner_config)
+println(outer_config)
+println(outer_config.inner_config)
+outer=fit(outer_config,x,y)
+println(outer)
+#println(outer.inner)

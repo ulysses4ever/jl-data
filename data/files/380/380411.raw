@@ -1,0 +1,14 @@
+include("../src/util/ngrams.jl")
+
+function test_ngrams()
+    tkns = ["the", "man", "loves", "the", "cat"]
+    @assert(unigrams(tkns) == tkns)
+    @assert(bigrams(tkns)[1] == ["the", "man"])
+    @assert(bigrams(tkns)[end] == ["the", "cat"])
+    @assert(trigrams(tkns)[1] == ["the", "man", "loves"])
+    @assert(trigrams(tkns)[end] == ["loves", "the", "cat"])
+end
+
+# run the tests
+test_ngrams()
+info("Tests pass [ngrams]")

@@ -1,0 +1,115 @@
+
+
+# reverse-mode evaluation of an expression tree
+
+# assumes forward_storage is already updated
+# dense gradient output, assumes initialized to zero
+function reverse_eval{T}(output::Vector{T},rev_storage::Vector{T},forward_storage::Vector{T},nd::Vector{NodeData},adj,const_values,x_values::Vector{T})
+
+    @assert length(forward_storage) == length(rev_storage) == length(nd)
+
+    # nd is already in order such that parents always appear before children
+    # so a forward pass through nd is a backwards pass through the tree
+
+    children_arr = rowvals(adj)
+
+    if nd[1].nodetype == VARIABLE
+        output[nd[1].index] += 1
+        return # trivial case
+    end
+
+    # reverse_storage[k] is the partial derivative of the output with respect to
+    # the value of node k
+    rev_storage[1] = 1
+
+    for k in 2:length(nd)
+        @inbounds nod = nd[k]
+        (nod.nodetype == VALUE) && continue
+        # compute the value of reverse_storage[k]
+        parentidx = nod.parent
+        @inbounds par = nd[parentidx]
+        op = par.index
+        if par.nodetype == CALL
+            if op == 1 # :+
+                @inbounds rev_storage[k] = rev_storage[parentidx]
+            elseif op == 2 # :-
+                @inbounds siblings_idx = nzrange(adj,parentidx)
+                if nod.whichchild == 1
+                    @inbounds rev_storage[k] = rev_storage[parentidx]
+                else
+                    @inbounds rev_storage[k] = -rev_storage[parentidx]
+                end
+            elseif op == 3 # :*
+                # dummy version for now
+                parent_val = forward_storage[parentidx]
+                if parent_val == 0.0
+                    @inbounds siblings_idx = nzrange(adj,parentidx)
+                    # product of all other siblings
+                    prod_others = 1.0
+                    for r in 1:length(siblings_idx)
+                        r == nod.whichchild && continue
+                        prod_others *= forward_storage[children_arr[siblings_idx[r]]]
+                        prod_others == 0.0 && break
+                    end
+                    @inbounds rev_storage[k] = rev_storage[parentidx]*prod_others
+                else
+                    @inbounds rev_storage[k] = rev_storage[parentidx]*(parent_val/forward_storage[k])
+                end
+            elseif op == 4 # :^
+                @inbounds siblings_idx = nzrange(adj,parentidx)
+                if nod.whichchild == 1 # base
+                    @inbounds exponentidx = children_arr[last(siblings_idx)]
+                    @inbounds exponent = forward_storage[exponentidx]
+                    if exponent == 2
+                        @inbounds rev_storage[k] = rev_storage[parentidx]*2*forward_storage[k]
+                    else
+                        rev_storage[k] = rev_storage[parentidx]*exponent*forward_storage[k]^(exponent-1)
+                    end
+                else
+                    baseidx = children_arr[first(siblings_idx)]
+                    base = forward_storage[baseidx]
+                    rev_storage[k] = rev_storage[parentidx]*forward_storage[parentidx]*log(base)
+                end
+            elseif op == 5 # :/
+                @inbounds siblings_idx = nzrange(adj,parentidx)
+                if nod.whichchild == 1 # numerator
+                    @inbounds denomidx = children_arr[last(siblings_idx)]
+                    @inbounds denom = forward_storage[denomidx]
+                    @inbounds rev_storage[k] = rev_storage[parentidx]/denom
+                else # denominator
+                    @inbounds numeratoridx = children_arr[first(siblings_idx)]
+                    @inbounds numerator = forward_storage[numeratoridx]
+                    @inbounds rev_storage[k] = -rev_storage[parentidx]*numerator*forward_storage[k]^(-2)
+                end
+            else
+                error()
+            end
+        else
+            @assert par.nodetype == CALLUNIVAR
+            @inbounds this_value = forward_storage[k]
+            @inbounds rev_storage[k] = rev_storage[parentidx]*univariate_deriv(op,this_value)
+        end
+
+        if nod.nodetype == VARIABLE
+            @inbounds output[nod.index] += rev_storage[k]
+        end
+    end
+    #@show storage
+
+    nothing
+
+end
+
+export reverse_eval
+
+switchblock = Expr(:block)
+for i = 1:length(univariate_operators)
+    deriv_expr = univariate_operator_deriv[i]
+	ex = :(return $deriv_expr)
+    push!(switchblock.args,i,ex)
+end
+switchexpr = Expr(:macrocall, Expr(:.,:Lazy,quot(symbol("@switch"))), :operator_id,switchblock)
+
+@eval @inline function univariate_deriv(operator_id,x)
+    $switchexpr
+end

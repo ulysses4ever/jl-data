@@ -1,0 +1,56 @@
+type ModelSpec
+  target::String
+  pred_sets::Array{String}
+  fit_type::String
+end
+
+function ModelSpec(spec::String)
+  fit_type, formula = split(spec, r"\s*:\s*")
+  target, preds = split(formula, r"\s*~\s*")
+  preds = split(preds, r"\s*\+\s*")
+  ModelSpec(target, preds, fit_type)
+end
+
+function Base.string(ms::ModelSpec)
+  ms.fit_type * ": " * ms.target * " ~ " * join(ms.pred_sets, " + ")
+end
+
+function model_fn(ms::ModelSpec)
+  fit_type_map = {
+    "glm" => predict_spikes_glm,
+    "lm" => predict_spikes_lm
+  }
+  fit_type_map[ms.fit_type]
+end
+
+function pred_columns(ms::ModelSpec, df::DataFrame)
+  mapreduce(vcat, ms.pred_sets) do ps get_colnames(ps, df) end
+end
+
+function pred_abbreviations(ms::ModelSpec)
+  map(ms.pred_sets) do ps field(ps).abbreviation end
+end
+
+function colpattern(ms::ModelSpec)
+  join(["$(field(ms.target).abbreviation)", ms.fit_type, pred_abbreviations(ms)...], '_')
+end
+
+function colpattern(ms::ModelSpec, i)
+  parts = split(colpattern(ms), r"_")
+  join( [parts[1] * string(i), parts[2:end]], "_")
+end
+
+function predict_spikes_glm(df::DataFrame, target::String, s::ModelSpec)
+  sumexpr = :( +($(map(x->symbol(x),pred_columns(s,df))...)) )
+  expr = :( $(symbol(target)) ~ $sumexpr )
+  mod = glm(expr,df,Poisson())
+  predict(mod)
+end
+
+function predict_spikes_lm(df::DataFrame, target::String, s::ModelSpec)
+  X = hcat(ones(size(df)[1]), matrix(df[pred_columns(s,df)]))
+  Y = df[target]
+  B = pinv(X'X)*X'*Y
+  X*B
+end
+

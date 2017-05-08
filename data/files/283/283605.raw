@@ -1,0 +1,55 @@
+include("saddle_point_solve.jl")
+
+# Solve 
+# min 1/2 ||x||_2^2
+# s.t. Ax = b
+function min_length(A,b)
+# by forming the Lagrangian L(x,s) = 1/2 x'x + s'(Ax-b) and 
+# equating grad to zero:
+# grad_x L(x,s) = x + A's = 0
+# grad_s L(x,s) = Ax - b  = 0
+# We get the quasi-definite linear system
+# [I A'] [x] = [0]
+# [A 0 ] [s]   [b]
+# A is m x n, then b is m x 1, x is n x 1
+	(m,n) = size(A)
+	size(b) == (m,) || error("b should be of size (m)")
+	m <= n || error("m should be <= n")
+	F = speye(n,n)
+	G = spzeros(m,m)
+	H = A'
+	f = zeros(n)
+	g = b 
+	norm2A = est_2norm(A)
+	(x,s) = saddle_point_solve(F,G,H,f,g,norm2A)
+	return x
+end
+
+
+# Solve
+# min 1/2 ||x||_2^2 + 1/2 ||s||_2^2
+# s.t. Ax + Ds = b
+function regularized_min_length(A,D,b)
+# by forming the Lagrangian L(x,s,y) = 1/2 x'x + 1/2 s's + y'(Ax+Ds-b)
+# and equation grad to zero:
+# grad_x L(x,s,y) = x + A'y = 0
+# grad_s L(x,s,y) = s + D'y = 0
+# grad_y L(x,s,y) = Ax + Ds - b = 0
+# We get the quasi-definite linear system
+# [I 0 A'] [x]   [0]
+# [0 I D'] [s] = [0]
+# [A D 0 ] [y]   [b]
+	(m,n1) = size(A)
+	if size(b) != (m,) || size(D,1) != m
+		error("Wrong sizes") 
+	end
+	(m,n2) = size(D)
+	F = speye(n1+n2,n1+n2)
+	G = spzeros(m,m)
+	H = [A' ; D']
+	f = zeros(n1+n2)
+	g = b 
+	norm2H = est_2norm(H)
+	(xs,y) = saddle_point_solve(F,G,H,f,g,norm2H)
+	return (xs[1:n1], xs[n1+1:n1+n2])
+end

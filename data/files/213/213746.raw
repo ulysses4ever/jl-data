@@ -1,0 +1,21 @@
+## ====================================================================
+## mysql.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## ====================================================================
+using MySQL
+
+con = mysql_connect("localhost", "root", "passw0rd", "test")
+ret = mysql_query(con, "select * from churn;")
+
+# mysql_display_error(con, ret != 0,
+#                     "Error occured while executing mysql_query on \"$command\"")
+
+res = mysql_store_result(con)
+
+for row in MySQLRowIterator(res)
+    println(row)
+end
+
+
+mysql_free_result(res)
+mysql_disconnect(con)    

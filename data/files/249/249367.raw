@@ -1,0 +1,57 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+
+type ClusterWorker <: Executor
+    worker::Task
+end
+
+function start_worker()
+    manager = task_local_storage(:manager)
+    c = connect(manager, Mesos.Manager.ExecutorPort)
+    Base.wait_connected(c)
+    redirect_stdout(c)
+    redirect_stderr(c)
+    Base.start_worker(c)
+end
+
+# Define executor callback functions
+function cme_registered(driver::ExecutorDriver, executorInfo::Proto.ExecutorInfo,
+                        frameworkInfo::Proto.FrameworkInfo, slaveInfo::Proto.SlaveInfo)
+    info("Julia: Registered executor on $(slaveInfo.hostname)")
+end
+
+function cme_launchTask(driver::ExecutorDriver, taskInfo::Proto.TaskInfo)
+    info("CME: Starting task $(taskInfo.task_id.value)")
+
+    # Start new worker
+    driver.executor.worker.storage[:manager] = bytestring(taskInfo.data)
+    schedule(driver.executor.worker)
+
+    # Send status update
+    taskStatus = @proto Proto.TaskStatus (
+        :task_id => @proto(Proto.TaskID, :value => taskInfo.task_id.value),
+        :state => Proto.TaskState.TASK_RUNNING
+    )
+    if driver.executor.worker.state == :failed
+        set_field!(taskStatus, :state, Proto.TaskState.TASK_FAILED)
+        set_field!(taskStatus, :message, string(driver.executor.worker.exception))
+    elseif driver.executor.worker.state == :done
+        set_field!(taskStatus, :state, Proto.TaskState.TASK_FINISHED)
+    end
+    sendStatusUpdate(driver, taskStatus)
+end
+
+function cme_error(driver::ExecutorDriver, err::String)
+    info("CME: Got error message: $err")
+end
+
+worker = Task(start_worker)
+worker.storage = ObjectIdDict()
+
+info("Julia: Start executor")
+executor_cb = ExecutorCallback(ClusterWorker(worker),
+                    registered = cme_registered,
+                    launchTask = cme_launchTask,
+                    error = cme_error)
+run(executor_cb)

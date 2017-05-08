@@ -1,0 +1,1030 @@
+module Genotype
+
+
+using Config
+using Preallocation
+
+
+type Type_Genotype
+
+    # Values that get fed into the C libraries are 32 bit.
+
+    num_nodes::Int32
+    used_connections::Array{Int32, 1}
+    connections::Array{Int32, 1}
+    activations::Array{Int32, 1}
+    output_activations::Array{Int32, 1}
+    weights::Array{Int32, 1}
+    thresholds::Array{Int32, 1}
+    fitness::Float64
+    all_targets_fitnesses::Array{Float64, 1}
+    marked_for_removal::Bool
+    evaluated::Bool
+    difference_from_parent::Int32
+    #parents_fitness
+
+end
+
+
+function make_random_genotype(config_vals::Config.Type_Config_Values)
+
+    num_nodes = config_vals.initial_num_nodes
+    used_connections::Array{Int32, 1} = zeros(Int32, config_vals.max_num_nodes)
+    connections::Array{Int32, 1} = zeros(Int32, config_vals.max_num_nodes * config_vals.max_num_connections)
+    weights::Array{Int32, 1} = zeros(Int32, config_vals.max_num_nodes * config_vals.max_num_connections)
+
+    for i = 1:num_nodes
+        used_connections[i] = rand(config_vals.initial_min_num_connections:config_vals.initial_max_num_connections)
+        start_index = (i - 1) * config_vals.max_num_connections
+        
+        for j = 1:used_connections[i]
+            weight_value = 0
+            
+            while weight_value == 0
+                weight_value = rand(config_vals.min_weight:config_vals.max_weight)
+            end
+            
+            weights[start_index + j] = weight_value
+            connection_value = 0
+            found_connection_value = false
+            
+            while !found_connection_value
+                connection_value = rand(1:num_nodes)
+                found_connection_value = true
+                
+                for k = 1:(j - 1)
+                    if connection_value == connections[start_index + k]
+                        found_connection_value = false
+                    end
+                end
+                
+                if config_vals.feed_forward
+                    found_connection_value = true
+                    if i < 5
+                        connection_value = 1
+                    elseif i < 9
+                        connection_value = rand(1:4)
+                    else
+                        layer = floor((i - 1) / 4)
+                        connection_value = rand(((layer - 1) * 4):((layer * 4) - 1))
+                    end
+                    
+                end
+            end
+            
+            connections[start_index + j] = connection_value
+        end
+        
+    end
+
+    activations::Array{Int32, 1} = rand(convert(Int32, 0):convert(Int32, 1), config_vals.max_num_nodes * (config_vals.network_timesteps + 1))
+    output_activations::Array{Int32, 1} = zeros(Int32, length(config_vals.logic_network_outputs[1, :]))
+    thresholds::Array{Int32, 1} = rand(config_vals.min_threshold:config_vals.max_threshold, convert(Int64, config_vals.max_num_nodes))
+    all_targets_fitnesses::Array{Float64, 1} = zeros(Float64, length(config_vals.logic_network_outputs[:, 1]))
+    
+    return Type_Genotype(num_nodes, used_connections, connections, activations, output_activations, weights, thresholds, 0.0, all_targets_fitnesses, false, false, 0)
+
+end
+
+
+function randomize_genotype(genotype::Type_Genotype, config_vals::Config.Type_Config_Values)
+
+    num_nodes = config_vals.initial_num_nodes
+    fill!(genotype.used_connections, convert(Int32, 0))
+    fill!(genotype.connections, convert(Int32, 0))
+    fill!(genotype.weights, convert(Int32, 0))
+
+    for i = 1:num_nodes
+        genotype.used_connections[i] = rand(config_vals.initial_min_num_connections:config_vals.initial_max_num_connections)
+        start_index = (i - 1) * config_vals.max_num_connections
+
+        for j = 1:genotype.used_connections[i]
+            weight_value = 0
+            
+            while weight_value == 0
+                weight_value = rand(config_vals.min_weight:config_vals.max_weight)
+            end
+            
+            genotype.weights[start_index + j] = weight_value
+            connection_value = 0
+            found_connection_value = false
+            
+            while !found_connection_value
+                connection_value = rand(1:num_nodes)
+                found_connection_value = true
+                
+                for k = 1:(j - 1)
+                    if connection_value == genotype.connections[start_index + k]
+                        found_connection_value = false
+                    end
+                end
+                
+            end
+            
+            genotype.connections[start_index + j] = connection_value
+        end
+        
+    end
+    
+    rand!(sub(genotype.activations, 1:num_nodes), 0:1)
+    rand!(sub(genotype.thresholds, 1:num_nodes), config_vals.min_threshold:config_vals.max_threshold)
+    
+    genotype.evaluated = false
+    genotype.marked_for_removal = false
+
+    return 0
+
+end
+
+
+import Base
+Base.(:(==))(x::Type_Genotype, y::Type_Genotype) = (
+                                                    function (x::Type_Genotype, y::Type_Genotype)
+
+                                                    for i = 1:length(x.connections)
+                                                    if x.connections[i] != y.connections[i]
+                                                    return false
+                                                    end
+                                                    end
+                                                        
+                                                        for i = 1:length(x.weights)
+                                                            if x.weights[i] != y.weights[i]
+                                                                return false
+                                                            end
+                                                        end
+                                                        
+                                                        for i = 1:length(x.thresholds)
+                                                            if x.thresholds[i] != y.thresholds[i]
+                                                                return false
+                                                            end
+                                                        end
+                                                        
+                                                        for i = 1:length(x.activations)
+                                                            if x.activations[i] != y.activations[i]
+                                                                return false
+                                                            end
+                                                        end
+
+                                                        return true
+
+                                                    end) (x::Type_Genotype, y::Type_Genotype)
+
+
+Base.hash(genotype::Type_Genotype) = (
+                                      function (genotype::Type_Genotype)
+
+                                      hash_code::Int64 = 1
+
+                                      for i = 1:length(genotype.connections)
+                                      hash_code += genotype.connections[i] * 2^i
+                                      end
+                                      
+                                      for i = 1:length(genotype.activations)
+                                          hash_code += genotype.activations[i] * 2^i
+                                      end
+
+                                          for i = 1:length(genotype.weights)
+                                              hash_code += genotype.weights[i] * 2^i
+                                          end
+
+                                          for i = 1:length(genotype.thresholds)
+                                              hash_code += genotype.thresholds[i] * 2^i
+                                          end
+
+                                          return hash_code
+
+                                      end) (genotype::Type_Genotype)
+
+
+function write_to_file(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, file_suffix::ASCIIString)
+
+    non_arrays_file = open(string("saved_genotype/non_arrays", file_suffix), "w")
+    write(non_arrays_file, dec(genotype.num_nodes), "\n")
+    write(non_arrays_file, string(genotype.fitness), "\n")
+    close(non_arrays_file)
+    
+    writecsv(string("saved_genotype/used_connections", file_suffix), genotype.used_connections)
+    writecsv(string("saved_genotype/connections", file_suffix), genotype.connections)
+    writecsv(string("saved_genotype/activations", file_suffix), genotype.activations)
+    writecsv(string("saved_genotype/weights", file_suffix), genotype.weights)
+    writecsv(string("saved_genotype/thresholds", file_suffix), genotype.thresholds)
+
+    return 0
+
+end
+
+
+function read_from_file(config_vals::Config.Type_Config_Values, file_suffix::ASCIIString)
+
+    non_arrays_file = open(string("saved_genotype/non_arrays", file_suffix))
+    num_nodes::Int32 = parse(Int32, readline(non_arrays_file))
+    fitness::Float32 = parse(Float32, readline(non_arrays_file))
+    close(non_arrays_file)
+    
+    used_connections::Array{Int32, 1} = vec(readcsv(string("saved_genotype/used_connections", file_suffix)))
+    connections::Array{Int32, 1} = vec(readcsv(string("saved_genotype/connections", file_suffix)))
+    activations::Array{Int32, 1} = vec(readcsv(string("saved_genotype/activations", file_suffix)))
+    weights::Array{Int32, 1} = vec(readcsv(string("saved_genotype/weights", file_suffix)))
+    thresholds::Array{Int32, 1} = vec(readcsv(string("saved_genotype/thresholds", file_suffix)))
+    
+    output_activations::Array{Int32, 1} = zeros(Int32, length(config_vals.logic_network_outputs[1, :]))
+    all_targets_fitnesses::Array{Float64, 1} = zeros(Float64, length(config_vals.logic_network_outputs[:, 1]))
+
+    return Type_Genotype(num_nodes, used_connections, connections, activations, output_activations, weights, thresholds, 0.0, all_targets_fitnesses, false, false, 0)    
+end
+
+
+function write_for_scikit(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, file::IOStream)
+
+    for connection in genotype.connections
+        write(file, string(connection), " ")
+    end
+
+    for weight in genotype.weights
+        write(file, string(weight), " ")
+    end
+
+    for threshold in genotype.thresholds
+        write(file, string(threshold), " ")
+    end
+
+    write(file, "\n")
+
+    return 0
+
+end
+
+
+function write_to_graphml(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, file_path::ASCIIString)
+
+    file = open(file_path, "w")
+    
+    file_lines = ["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+                  "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n",
+                  "xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n",
+                  "<graph id=\"G\" edgedefault=\"directed\">\n",
+                  "</graph>\n",
+    "</graphml>\n"]
+    
+    for i = 1:genotype.num_nodes
+        insert!(file_lines, 4 + i, string("<node id=\"n", i, "\"\/>\n"))
+    end
+
+    index_tracker = 1
+    for i = (length(config_vals.logic_network_inputs[1, :]) + 1):genotype.num_nodes
+        for j = 1:genotype.used_connections[i]
+            insert!(file_lines, 4 + genotype.num_nodes + index_tracker, string("<edge id=\"e", index_tracker,"\" source=\"n", genotype.connections[(i - 1) * config_vals.max_num_connections + j],"\" target=\"n", i,"\" />\n"))
+            index_tracker += 1
+        end
+    end
+
+    write(file, file_lines)
+    close(file)
+
+    return 0
+
+end
+
+
+function copy_into(target::Type_Genotype, source::Type_Genotype)
+
+    target.num_nodes = source.num_nodes
+
+    for i = 1:length(target.used_connections)
+        target.used_connections[i] = source.used_connections[i]
+    end
+
+    for i = 1:length(target.connections)
+        target.connections[i] = source.connections[i]
+    end
+
+    for i = 1:length(target.activations)
+        target.activations[i] = source.activations[i]
+    end
+
+    for i = 1:length(target.output_activations)
+        target.output_activations[i] = source.output_activations[i]
+    end
+
+    for i = 1:length(target.weights)
+        target.weights[i] = source.weights[i]
+    end
+
+    for i = 1:length(target.thresholds)
+        target.thresholds[i] = source.thresholds[i]
+    end
+    
+    for i = 1:length(target.all_targets_fitnesses)
+        target.all_targets_fitnesses[i] = source.all_targets_fitnesses[i]
+    end
+
+    target.fitness = source.fitness
+    target.marked_for_removal = source.marked_for_removal
+    target.evaluated = source.evaluated
+    target.difference_from_parent = source.difference_from_parent
+
+    return 0
+
+end
+
+
+
+function crossover(config_vals::Config.Type_Config_Values, target::Type_Genotype, parent_1::Type_Genotype, parent_2::Type_Genotype)
+
+    target.num_nodes = parent_1.num_nodes
+
+    for i = 1:target.num_nodes
+
+        if rand(0:1) == 0
+            target.weights[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)] = 
+            parent_1.weights[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)]
+            target.connections[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)] = 
+            parent_1.connections[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)]
+            target.activations[i] = parent_1.activations[i]
+            target.used_connections[i] = parent_1.used_connections[i]
+            target.thresholds[i] = parent_1.thresholds[i]
+
+        else
+            target.weights[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)] = 
+            parent_2.weights[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)]
+            target.connections[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)] = 
+            parent_2.connections[(((i - 1) * config_vals.max_num_connections) + 1):(i * config_vals.max_num_connections)]
+            target.activations[i] = parent_2.activations[i]
+            target.used_connections[i] = parent_2.used_connections[i]
+            target.thresholds[i] = parent_2.thresholds[i]
+        end
+        
+    end
+
+    target.marked_for_removal = false
+    target.evaluated = false
+
+    return 0
+
+end
+
+
+function run_network(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, verbose::Int32)
+
+    ccall((:run_network, "./libboolnet"), Void,
+          (Int32, Int32, Int32, Int32, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Int32),
+          config_vals.network_timesteps, genotype.num_nodes,
+          config_vals.max_num_nodes, config_vals.max_num_connections,
+          genotype.activations,
+          genotype.connections, genotype.weights, genotype.thresholds, verbose)
+
+    return 0
+
+end
+
+
+function evaluate(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, target_number::Int64, generation::Int64,
+                  preallocation::Preallocation.Type_Preallocation)
+
+    if !genotype.evaluated | (generation == 40)
+        genotype.evaluated = true
+        if config_vals.logic_network
+            genotype.fitness = 0.0
+            
+            for i = 1:length(genotype.all_targets_fitnesses)
+                genotype.all_targets_fitnesses[i] = 0
+            end
+
+            for i = 1:length(config_vals.logic_network_outputs[target_number, :])
+
+                for j = 1:length(config_vals.logic_network_inputs[1, :])
+                    genotype.connections[config_vals.max_num_connections * (j - 1) + 1] = j
+                    genotype.connections[config_vals.max_num_connections * (j - 1) + 2] = 1
+                    for k = 3:config_vals.max_num_connections
+                        genotype.connections[config_vals.max_num_connections * (j - 1) + k] = 1
+                    end
+                end
+                for j = 1:length(config_vals.logic_network_inputs[1, :])
+                    genotype.weights[config_vals.max_num_connections * (j - 1) + 1] = 1
+                    for k = 2:config_vals.max_num_connections
+                        genotype.weights[config_vals.max_num_connections * (j - 1) + k] = 0
+                    end
+                end
+
+                for j = 1:length(config_vals.logic_network_inputs[1, :])
+                    genotype.thresholds[j] = 0
+                end
+
+                for j = (length(config_vals.logic_network_inputs[1, :]) + 1):length(genotype.activations)
+                    genotype.activations[j] = 0
+                end
+
+                for j = 1:length(config_vals.logic_network_inputs[1, :])
+                    genotype.activations[j] = Int32(config_vals.logic_network_inputs[i, j])
+                end
+
+                run_network(genotype, config_vals, convert(Int32, 0))
+                genotype.output_activations[i] = genotype.activations[end]
+            end
+            
+            for i = 1:length(genotype.all_targets_fitnesses)
+                
+                for j = 1:length(config_vals.logic_network_outputs[1, :])
+                    if genotype.output_activations[j] == config_vals.logic_network_outputs[i, j]
+                        genotype.all_targets_fitnesses[i] += 1
+                    end
+                end
+                
+            end
+
+            genotype.fitness = genotype.all_targets_fitnesses[target_number]
+            
+            # if generation > 100
+            #     if genotype.fitness < 16.0
+            #         genotype.fitness = 0
+            #     end
+        # if genotype.fitness > 14.0
+        #     genotype.fitness = 14.0
+        # end
+        # end
+            # else
+            #     if genotype.fitness < 14.0
+            #         genotype.fitness = 0
+            #     elseif genotype.fitness > 14.0
+            #         genotype.fitness = 14.0
+            #     end
+            # end
+            
+            if config_vals.use_stop_condition_target & (genotype.all_targets_fitnesses[config_vals.stop_condition_target] == length(config_vals.logic_network_outputs[1, :]))
+                println("Huzzah")
+                # println(genotype.weights)
+                # println(genotype.connections)
+                # println(generation)
+                #Genotype.write_to_graphml(genotype, config_vals, string("nand", generation, ".graphml"))
+                Genotype.write_to_file(genotype, config_vals)
+                exit()
+            end
+        else
+            genotype.fitness = 0.0
+            run_network(genotype, config_vals, convert(Int32, 0))
+            if config_vals.use_sim
+                index = activations_to_int(genotype, config_vals)
+                fitness = get(fitness_vals, index, -1)
+                if fitness == -1
+
+                    for i = 1:1
+                        objective_type = 0
+                        if config_vals.wall_avoidance_objective
+                            objective_type = 1
+                        end
+                        num_walls = 4
+                        if config_vals.wall_avoidance_objective
+                            if target_number == 1
+                                num_walls = 8
+                            else
+                                num_walls = 5
+                            end
+                        end
+                        ccall((:simulate, "./librobosim"), Void,
+                              (Int32, Ptr{Float32}, Int32, Ptr{Float32}, Int32, Ptr{Int32}, Int32, Int32, Int32, 
+                               Int32, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, 
+                               Int32, Int32, Int32),
+                              config_vals.simulation_iterations, preallocation.walls, convert(Int32, num_walls), config_vals.GRN_target_expressions, 
+                        #convert(Int32, length(target_expression)/2),
+                        convert(Int32, 5),
+                        genotype.activations[(config_vals.network_timesteps * 
+                                              config_vals.max_num_nodes + 1):((config_vals.network_timesteps + 1) 
+                                                                              * config_vals.max_num_nodes)],
+                        config_vals.bits_per_weight, config_vals.num_input_nn_nodes, config_vals.num_hidden_nn_nodes, 
+                        config_vals.num_output_nn_nodes, preallocation.layer_1_weights, preallocation.layer_2_weights, 
+                        preallocation.inputs, preallocation.hidden_activations, 
+                        preallocation.outputs, preallocation.fitness_ref, target_number, convert(Int32, objective_type), convert(Int32, 0))
+                    end
+                    fitness_vals[index] = fitness_ref[1]
+                    genotype.fitness = fitness_ref[1]
+                else
+                    genotype.fitness = fitness
+                end
+            else
+                start_1 = genotype.num_nodes * (config_vals.network_timesteps - 1) + 1
+                end_1 = start_1 + genotype.num_nodes - 1
+                start_2 = genotype.num_nodes * config_vals.network_timesteps + 1
+                end_2 = start_2 + genotype.num_nodes - 1
+                if (!isequal(sub(genotype.activations, start_1:end_1), sub(genotype.activations, start_2:end_2))) & config_vals.enforce_point_attractors
+                    genotype.marked_for_removal = true
+                end
+
+                for i = 1:length(config_vals.GRN_target_expressions[target_number, :])
+                    if genotype.activations[(config_vals.network_timesteps * config_vals.max_num_nodes)  + i] == config_vals.GRN_target_expressions[target_number, i]
+                        genotype.fitness += 1.0
+                    end
+                end
+
+            end #if config_vals.use_sim else
+        end #if config_vals.logic_network else 
+    end #if !genotype.evaluated
+
+    return 0
+
+end
+
+
+# Treats the activations as a binary number and produces the corresponding base 10 integer.
+function activations_to_int(genotype::Type_Genotype, config_vals::Config.Type_Config_Values)
+
+    integer::Int64 = 0
+
+    for i = 1:config_vals.initial_num_nodes
+        integer += genotype.activations[(config_vals.network_timesteps * config_vals.max_num_nodes)  + i] * 2^(i - 1)
+    end
+
+    integer += 1
+
+    return integer
+
+end
+
+
+#=
+    In this mutation scheme either a mutation or deletion is done. If neither is done then 
+    each mutation type occurs with a certain probability.
+    =#
+    function mutate(genotype::Type_Genotype, config_vals::Config.Type_Config_Values)
+
+        genotype.evaluated = false
+
+        if rand(1:10000) < 10000 * config_vals.mutate_dup_del_prob
+            if rand(0:1) == 0
+                
+                for i = 1:rand(config_vals.min_num_dups_or_dels:config_vals.max_num_dups_or_dels)
+                    delete_node(genotype, config_vals, convert(Int32, rand(1:genotype.num_nodes)))
+                end
+                
+            else
+                
+                for i = 1:rand(config_vals.min_num_dups_or_dels:config_vals.max_num_dups_or_dels)
+                    duplicate_node(genotype, config_vals, convert(Int32, rand(1:genotype.num_nodes)))
+                end
+                
+            end
+        else
+            if rand(1:10000) <= 10000 * config_vals.mutate_conn_prob 
+                
+                for i = 1:rand(config_vals.min_num_conn_muts:config_vals.max_num_conn_muts)
+                    node = rand(1:genotype.num_nodes)
+                    mutate_connection(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+                end
+                
+            end
+            if rand(1:10000) <= 10000 * config_vals.mutate_activation_prob
+                
+                for i = 1:rand(config_vals.min_num_activation_muts:config_vals.max_num_activation_muts)
+                    mutate_activation(genotype, config_vals, convert(Int32, rand(1:genotype.num_nodes)))
+                end
+                
+            end
+            if rand(1:10000) <= 10000 * config_vals.delete_conn_prob
+                
+                for i = 1:rand(config_vals.min_num_conn_dels:config_vals.max_num_conn_dels)
+                    node = rand(1:genotype.num_nodes)
+                    delete_incomming_connection(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+                end
+                
+            end
+            if rand(1:10000) <= 10000 * config_vals.add_conn_prob
+                node::Int32 = rand(1:genotype.num_nodes)
+                
+                for i = 1:rand(config_vals.min_num_conn_adds:config_vals.max_num_conn_adds)
+                    add_incoming_connection(genotype, config_vals, node, convert(Int32, 0), convert(Int32, 0))
+                end
+                
+            end
+            if rand(1:10000) <= 10000 * config_vals.mutate_threshold_prob
+                
+                for i = 1:rand(config_vals.min_num_thresh_muts:config_vals.max_num_thresh_muts)
+                    mutate_threshold(genotype, config_vals, convert(Int32, rand(1:genotype.num_nodes)))
+                end
+                
+            end
+            if rand(1:10000) <= 10000 * config_vals.mutate_weight_prob
+                
+                for i = 1:rand(config_vals.min_num_weight_muts:config_vals.max_num_weight_muts)
+                    node = rand(1:genotype.num_nodes)
+                    mutate_weight(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+                end
+                
+            end
+        end
+        
+        return 0
+
+    end
+
+
+#=
+    In this mutation scheme mutations can occur on every node or edge with a certain
+    probability. No duplications or deletions are done. 
+    =#
+    function mutate_at_global_rate(genotype::Type_Genotype, config_vals::Config.Type_Config_Values)
+
+        genotype.evaluated = false
+
+        for i = 1:config_vals.max_num_nodes
+
+            for j = 1:genotype.used_connections[i]
+                if rand(1:10000) <= (10000 * config_vals.global_weight_mutation_rate) 
+                    mutate_weight(genotype, config_vals, convert(Int32, i), convert(Int32, j))
+                end
+            end
+            
+        end
+
+        done_mutation = false
+        for i = 1:config_vals.max_num_nodes
+            
+            for j = 1:genotype.used_connections[i]
+                if rand(1:100000) <= (100000 * config_vals.global_weight_mutation_rate) 
+                    mutate_connection(genotype, config_vals, convert(Int32, i), convert(Int32, j))
+                    done_mutation = true
+                end
+            end
+            
+        end
+        # if !done_mutation
+        #     index = rand(1:Int64(config_vals.max_num_nodes))
+        #     mutate_connection(genotype, config_vals, Int32(index), Int32(rand(1:genotype.used_connections[index])))
+        # end
+        # for i = 1:config_vals.max_num_nodes
+        
+        #         if rand(1:100000) <= 100000 * config_vals.global_weight_mutation_rate 
+        #             mutate_connection(genotype, config_vals, convert(Int32, i), convert(Int32, rand(1:2)))
+        #         end
+        
+        # end
+        
+        for i = 1:config_vals.max_num_nodes
+            if rand(1:10000) <= 10000 * config_vals.global_mutation_rate 
+                mutate_activation(genotype, config_vals, convert(Int32, i))
+            end
+        end
+        
+        for i = 1:config_vals.max_num_nodes
+            if rand(1:10000) <= 10000 * config_vals.global_mutation_rate 
+                delete_incomming_connection(genotype, config_vals, convert(Int32, i), convert(Int32, rand(1:genotype.used_connections[i])))
+            end
+        end
+        
+        for i = 1:config_vals.max_num_nodes
+            if rand(1:10000) <= 10000 * config_vals.global_mutation_rate 
+                add_incoming_connection(genotype, config_vals, convert(Int32, i), convert(Int32, 0), convert(Int32, 0))
+            end
+        end
+        
+        for i = 1:config_vals.max_num_nodes
+            if rand(1:10000) <= 10000 * config_vals.global_mutation_rate 
+                mutate_threshold(genotype, config_vals, convert(Int32, i))
+            end
+        end
+
+        return 0
+
+    end
+
+
+# A single mutation is done.
+function point_mutate(genotype::Type_Genotype, config_vals::Config.Type_Config_Values)
+    
+    genotype.evaluated = false
+    # for i = 1:5
+    #     choice = rand(1:5)
+    #     if choice == 1
+    #         node = rand(1:genotype.num_nodes)
+    #         mutate_connection(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+    #     elseif choice == 2
+    #         mutate_activation(genotype, config_vals, convert(Int32, rand(1:genotype.num_nodes)))
+    #     elseif choice == 3
+    #         node = rand(1:genotype.num_nodes)
+    #         delete_incomming_connection(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+    #     elseif choice == 4
+    #         node::Int32 = rand(1:genotype.num_nodes)
+    #         add_incoming_connection(genotype, config_vals, node, convert(Int32, 0))
+    #     else
+    #         node = rand(1:genotype.num_nodes)
+    #         mutate_weight(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+    #     end
+    # end
+    choice = rand(1:4)
+    #if choice == 1
+    node1 = rand(1:genotype.num_nodes)
+    connection1 = rand(1:genotype.used_connections[node1])
+    mutate_connection(genotype, config_vals, convert(Int32, node1), convert(Int32, connection1))
+    node2 = rand(1:genotype.num_nodes)
+    connection2 = rand(1:genotype.used_connections[node2])
+    while (node2 == node1) & (connection2 == connection1)
+        node2 = rand(1:genotype.num_nodes)
+        connection2 = rand(1:genotype.used_connections[node2])
+    end
+    mutate_connection(genotype, config_vals, convert(Int32, node2), convert(Int32, connection2))
+    node3 = rand(1:genotype.num_nodes)
+    connection3 = rand(1:genotype.used_connections[node3])
+    while ((node3 == node1) & (connection3 == connection1)) | ((node3 == node2) & (connection3 == connection2))
+        node3 = rand(1:genotype.num_nodes)
+        connection3 = rand(1:genotype.used_connections[node3])
+    end
+    mutate_connection(genotype, config_vals, convert(Int32, node3), convert(Int32, connection3))
+    # elseif choice == 2
+    #     mutate_activation(genotype, config_vals, convert(Int32, rand(1:genotype.num_nodes)))
+    # elseif choice == 3
+    #     node = rand(1:genotype.num_nodes)
+    #     delete_incomming_connection(genotype, config_vals, convert(Int32, node), convert(Int32, rand(1:genotype.used_connections[node])))
+    # else
+    #     node::Int32 = rand(1:genotype.num_nodes)
+    #     add_incoming_connection(genotype, config_vals, node, convert(Int32, 0), convert(Int32, 0))
+    # end
+
+    return 0
+
+end
+
+
+function move_node(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, from_index::Int32, to_index::Int32)
+
+    from_range_start = ((from_index - 1) * config_vals.max_num_connections) + 1
+    from_range_end = ((from_index - 1) * config_vals.max_num_connections) + genotype.used_connections[from_index]
+    
+    for i = from_range_start:from_range_end
+        genotype.connections[i + ((to_index - from_index) * config_vals.max_num_connections)] = genotype.connections[i]
+        genotype.connections[i] = 0
+        genotype.weights[i + ((to_index - from_index) * config_vals.max_num_connections)] = genotype.weights[i]
+        genotype.weights[i] = 0
+    end
+    
+    genotype.used_connections[to_index] = genotype.used_connections[from_index]
+    genotype.used_connections[from_index] = 0
+    genotype.activations[to_index] = genotype.activations[from_index]
+    genotype.activations[from_index] = 0
+    genotype.thresholds[to_index] = genotype.thresholds[from_index]
+    genotype.thresholds[from_index] = 0
+
+    for i = 1:genotype.num_nodes
+        
+        for j = 1:genotype.used_connections[i]
+            if genotype.connections[(i - 1) * config_vals.max_num_connections + j] == from_index
+                genotype.connections[(i - 1) * config_vals.max_num_connections + j] = to_index
+            end
+        end
+        
+    end
+
+    return 0
+
+end
+
+
+function delete_node(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, index::Int32)
+
+    if genotype.num_nodes > config_vals.min_num_nodes
+
+        for i = 1:genotype.num_nodes
+            
+            for j = 1:genotype.used_connections[i]
+                if genotype.connections[(i - 1) * config_vals.max_num_connections + j] == index
+                    delete_incomming_connection(genotype, config_vals, convert(Int32, i), convert(Int32, j))
+                end
+            end
+            
+        end
+        
+        genotype.num_nodes -= 1
+        range_start = ((index - 1) * config_vals.max_num_connections) + 1
+        range_end = ((index - 1) * config_vals.max_num_connections) + genotype.used_connections[index]
+        
+        for i = range_start:range_end
+            genotype.connections[i] = 0
+            genotype.weights[i] = 0
+        end
+        
+        genotype.used_connections[index] = 0
+        genotype.activations[index] = 0
+        genotype.thresholds[index] = 0
+        move_node(genotype, config_vals, genotype.num_nodes + convert(Int32, 1), index)
+    end
+
+    return 0
+
+end
+
+
+function duplicate_node(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, index::Int32)
+
+    if genotype.num_nodes < config_vals.max_num_nodes
+        genotype.num_nodes += 1
+
+        for i = 1:genotype.num_nodes
+            
+            for j = 1:genotype.used_connections[i]
+                if genotype.connections[(i - 1) * config_vals.max_num_connections + j] == index
+                    add_incoming_connection(genotype, config_vals, convert(Int32, i), genotype.num_nodes)
+                end
+            end
+            
+        end
+        
+        genotype.used_connections[genotype.num_nodes] = genotype.used_connections[index]
+        genotype.activations[genotype.num_nodes] = genotype.activations[index]
+        genotype.thresholds[genotype.num_nodes] = genotype.thresholds[index]
+        from_start = (index - 1) * config_vals.max_num_connections
+        to_start = (genotype.num_nodes - 1) * config_vals.max_num_connections
+        
+        for i = 1:genotype.used_connections[index]
+            genotype.connections[to_start + i] = genotype.connections[from_start + i]
+            genotype.weights[to_start + i] = genotype.weights[from_start + i]
+        end
+        
+    end
+
+    return 0
+
+end
+
+
+function add_incoming_connection(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32, connection_value::Int32,
+                                 weight_value::Int32)
+
+    if genotype.used_connections[node] < config_vals.max_num_connections
+        node_index = (node - 1) * config_vals.max_num_connections
+        insert_index = (node - 1) * config_vals.max_num_connections + 1 + genotype.used_connections[node]
+        
+        while weight_value == 0
+            weight_value = rand(config_vals.min_weight:config_vals.max_weight)
+        end
+        
+        genotype.weights[insert_index] = weight_value
+        if connection_value == 0
+            found_connection_value = false
+            
+            while !found_connection_value
+                connection_value = rand(1:genotype.num_nodes)
+                found_connection_value = true
+                
+                for k = 1:genotype.used_connections[node]
+                    if connection_value == genotype.connections[node_index + k]
+                        found_connection_value = false
+                    end
+                end
+                
+            end
+            
+        end
+        genotype.connections[insert_index] = connection_value
+        genotype.used_connections[node] += 1
+    end
+
+    return 0
+
+end
+
+
+function add_outgoing_connection(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32, connection_value::Int32)
+    
+    connection_value = node
+    
+    while node == connection_value
+        node = rand(1:genotype.num_nodes)
+    end
+    
+    if genotype.used_connections[node] < config_vals.max_num_connections
+        node_index = (node - 1) * config_vals.max_num_connections
+        insert_index = (node - 1) * config_vals.max_num_connections + 1 + genotype.used_connections[node]
+        weight_value = 0
+        
+        while weight_value == 0
+            weight_value = rand(config_vals.min_weight:config_vals.max_weight)
+        end
+        
+        genotype.weights[insert_index] = weight_value
+        if connection_value == 0
+            found_connection_value = false
+            
+            while !found_connection_value
+                connection_value = rand(1:genotype.num_nodes)
+                found_connection_value = true
+                
+                for k = 1:genotype.used_connections[node]
+                    if connection_value == genotype.connections[node_index + k]
+                        found_connection_value = false
+                    end
+                end
+                
+            end
+            
+        end
+        genotype.connections[insert_index] = connection_value
+        genotype.used_connections[node] += 1
+    end
+
+    return 0
+
+end
+
+
+function delete_incomming_connection(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32, conn_num::Int32)
+
+    if genotype.used_connections[node] > config_vals.min_num_connections
+        delete_index = (node - 1) * config_vals.max_num_connections + conn_num
+        nodes_last_index = (node - 1) * config_vals.max_num_connections + genotype.used_connections[node]
+        if conn_num < genotype.used_connections[node]
+            genotype.connections[delete_index] = genotype.connections[nodes_last_index]
+            genotype.weights[delete_index] = genotype.weights[nodes_last_index]
+        end
+        genotype.connections[nodes_last_index] = 0
+        genotype.weights[nodes_last_index] = 0
+        genotype.used_connections[node] -= 1
+    end
+
+    return 0
+
+end
+
+
+function mutate_connection(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32, conn_num::Int32)
+
+    nodes_first_index = (node - 1) * config_vals.max_num_connections
+    connection_value = 0
+    found_connection_value = false
+    
+    while !found_connection_value
+        connection_value = rand(1:genotype.num_nodes)
+        if config_vals.feed_forward
+            if node < 5
+                connection_value = rand(1:10)
+            elseif node < 9
+                connection_value = rand(1:4)
+            else
+                layer = floor((node - 1) / 4)
+                connection_value = rand(1:((layer * 4) - 1))
+            end
+        end
+        found_connection_value = true
+        # for j = 1:genotype.used_connections[node]
+        #     if connection_value == genotype.connections[nodes_first_index + j]
+        #         found_connection_value = false
+        #     end
+        # end
+        
+    end
+    
+    genotype.connections[nodes_first_index + conn_num] = connection_value
+
+    return 0
+
+end
+
+
+function mutate_weight(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32, weight_num::Int32)
+
+    if config_vals.max_weight != config_vals.min_weight
+        index = (node - 1) * config_vals.max_num_connections + weight_num
+        new_weight = 0
+        
+        while true
+            new_weight = rand(config_vals.min_weight:config_vals.max_weight)
+            if (new_weight != genotype.weights[index]) && (new_weight != 0) 
+                break
+            end
+        end
+        
+        genotype.weights[index] = new_weight
+    end
+
+    return 0
+
+end
+
+
+function mutate_activation(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32)
+
+    genotype.activations[node] = 1 - genotype.activations[node]
+
+    return 0
+
+end
+
+
+function mutate_threshold(genotype::Type_Genotype, config_vals::Config.Type_Config_Values, node::Int32)
+
+
+    if config_vals.max_threshold != config_vals.min_threshold
+        new_value = 0
+        
+        while true
+            new_value = rand(config_vals.min_threshold:config_vals.max_threshold)
+            if new_value != genotype.thresholds[node]
+                break
+            end
+        end
+        
+        genotype.thresholds[node] = new_value
+
+        return 0
+    end
+
+end
+
+
+end

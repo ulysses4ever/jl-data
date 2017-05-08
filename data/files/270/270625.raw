@@ -1,0 +1,97 @@
+depends = [
+  "libdune-common-2.3.1", "libdune-geometry-2.3.1", "libdune-grid-2.3.1", "libblas3",
+  "liblapack3", "libgmp10", "libboost-filesystem1.55.0",
+  "libboost-program-options1.55.0", "libboost-thread1.55.0", "libboost-iostreams1.55.0",
+  "zlib1g", "libtbb2"
+]
+source_depends = [
+  "libdune-foamgrid-dev (=0.0.2)", "libdune-common-dev", "libdune-geometry-dev", "libdune-grid-dev",
+  "libdune-localfunctions-dev", "great-cmake-cookoff (>= 2.0.6)",
+  "libboost-dev", "libboost-test-dev",
+  "libboost-filesystem1.55-dev", "libboost-program-options1.55-dev", "libboost-thread1.55-dev",
+  "libboost-iostreams1.55-dev", "libeigen3-dev", "zlib1g-dev",
+  "libcgal-dev", "libtbb-dev",
+]
+build_depends = [
+    "cmake", "gcc (>= 4.0)", "make (>= 3.0)", "g++ (>= 4.0)", "cdbs", "doxygen", "$python-dev",
+    "c$(python[2:end])", "$python-pytest", "$python-sphinx", "$python-mako",  "patchelf",
+    "$python", "$python-numpy", "$python-pip", "gfortran", source_depends...
+]
+
+bempp = Package(
+  "libbempp",
+  GitSource("https://www.github.com/bempp/bempp.git", "development"),
+  :CMake,
+  version=v"2.9.1+development",
+  build_flags="-DPYTHON_PKG_DIR=lib/python$pyver/dist-packages",
+
+  email = "rc-softdev@ucl.ac.uk",
+  maintainer = "Research Software Development Team",
+  license = "mit",
+  build_depends = build_depends,
+  depends = depends,
+  distribution=distribution,
+  homepage = "http://www.bempp.org/",
+
+  install=["usr/lib/libbempp.so*", "usr/share/bempp"],
+  description=[
+    "Galerkin boundary element library"
+    "  BEM++ is an open-source Galerkin boundary element library that handles Laplace, Helmholtz"
+    "  and Maxwell problems on bounded and unbounded domains."
+    "  BEM++ is developed at University College London. The current development team includes Simon"
+    "  Arridge, Timo Betcke, Nicolas Salles, Matthew Scroggs and Elwin Van ‘t Wout. Much of the"
+    "  original work on BEM++ was done by Wojciech Śmigaj, now at Simpleware Ltd. BEM++ is"
+    "  supported by EPSRC Grants EP/I030042/1 and EP/K03829X/1."
+    "  This package contains both c++ libraries and its python bindings."
+  ],
+  architecture="amd64",
+  recommends=["$python-bempp"],
+
+  package="libbempp-dev",
+  install=["usr/include", "usr/share/cmake/Bempp"],
+  description="BEM++ header and cmake files",
+  depends=["libbempp", source_depends...],
+  architecture="amd64",
+
+  package="$python-bempp",
+  install=["usr/lib/python$pyver/dist-packages/bempp"],
+  depends=["libbempp", "$python", "$python-numpy"],
+  description="BEM++ python bindings",
+  architecture="amd64",
+  recommends=["$python-scipy", "$python-pytest"],
+  suggests=["$python-gmsh", "$python-matplotlib"]
+)
+# Add our PPA on top of normal packaging image
+bempp.image = image(
+  "bempp-$(bempp.image.name)", bempp.image, ppa="$(publisher.id)/$(publisher.ppa)")
+
+prepare(bempp)
+path = joinpath(DebbyPacker.packagedir(bempp, workspace), "VERSION")
+# version = convert(VersionNumber, readchomp(path))
+# if version.major != bempp.version.major || version.minor != bempp.version.minor ||
+#     version.patch != bempp.version.patch
+#   error("Versions do not agree $version != $(bempp.version)")
+# end
+
+build(machine, bempp, workspace; cpus=2)
+
+# Test files exists
+test(machine, bempp, workspace) do package
+  "test -f /usr/share/bempp/meshes/cube-h-0.0125.msh\n" *
+  "test -f /usr/include/bempp/assembly/sparse_inverse.hpp\n"
+end
+# Test we can configure cmake project
+test(machine, bempp, workspace) do package
+  "[ -e bempp ] || mkdir -p bempp/build\n" *
+  "echo \"cmake_minimum_required(VERSION 2.8.12)\" > bempp/CMakeLists.txt\n" *
+  "echo \"project(Bempp CXX)\"  >> bempp/CMakeLists.txt\n" *
+  "echo \"find_package(Bempp)\" >> bempp/CMakeLists.txt\n" *
+  "cd bempp/build && cmake ..\n"
+end
+# Test we can run python test suite
+test(machine, bempp, workspace) do package
+  "dpkg -i python-bempp*.deb\n" *
+  "dpkg -L python-bempp\n" *
+  "apt-get install -y $python-scipy $python-gmsh $python-pytest\n" *
+  "$python -c \"import bempp; bempp.test()\"\n"
+end

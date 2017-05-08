@@ -1,0 +1,11 @@
+import pe
+
+s = 0
+for i in 1:1000
+    f = pe.fib(i)
+    if f > 4000000
+        break
+    end
+    f % 2 == 0 ? s += f : 0
+end
+println(s)

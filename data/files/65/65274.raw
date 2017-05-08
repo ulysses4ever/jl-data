@@ -1,0 +1,11 @@
+module Multifrontal
+
+  include("analyse.jl") # analyse phase
+  include("factor.jl") # factor phase 
+  include("solve.jl") # solve phase
+
+  include("cholesky.jl") # sparse Choleksy factorization
+  
+  include("examples.jl") # some SPD sparse matrices 
+
+end # module

@@ -1,0 +1,11 @@
+function normalize_token(wd::String)
+    if ismatch(r"[0-9][0-9][0-9][0-9]", wd)
+        return "<YEAR>"
+    else
+        return wd
+    end
+end
+
+function is_punct(token::String)
+    return ismatch(r"^[\.,!\?\"';:`]+$", token)
+end

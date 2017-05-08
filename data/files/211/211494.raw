@@ -1,0 +1,22 @@
+###############################################################################
+### Script for HW3 functions
+
+function writex(x::Array,name::String)
+	xfile=open("$name.txt","w")
+	@elapsed println("writex time: ",@elapsed print(xfile,x))
+	close(xfile)
+end
+
+function readx(name::String,n::Int)	# read in a 1-d array
+	xfile=open("$name.txt", "r")
+	tic()
+	x1=Array(Float64,(n))
+	for i in 1:n
+		x1[i]=float(split(readline(xfile)))
+	end
+	toc()
+	close(xfile)
+	return(x1)
+end
+
+

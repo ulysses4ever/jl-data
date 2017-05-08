@@ -1,0 +1,71 @@
+module Digger
+
+using Flow, MacroTools, Dagger
+
+g(a...) = IVertex{Any}(a...)
+
+const binary = [(.+), (.-), (.*), (./), (*), (.^), (.%)]
+
+for f in binary
+  @eval nargs(::typeof($f)) = 2
+end
+
+const unary = [sum, exp, log, log10, transpose, ctranspose, sqrt,
+               sin, sinpi, cos, cospi, tan, sec, cot, csc,
+               sinh, cosh, tanh, coth, sech, csch, sinc, cosc]
+
+for f in unary
+  @eval nargs(::typeof($f)) = 1
+end
+
+function pop_random!(xs)
+  i = rand(1:length(xs))
+  x = xs[i]
+  deleteat!(xs, i)
+  x
+end
+
+function grow(bs, n)
+  unused = map(g, bs)
+  nodes = similar(unused, 0)
+  function getnode()
+    isempty(unused) && return rand(nodes)
+    x = pop_random!(unused)
+    push!(nodes, x)
+    x
+  end
+  for i = 1:n
+    op = rand(vcat(binary, unary))
+    push!(unused, g(op, (getnode() for i in 1:nargs(op))...))
+  end
+  unused[end]
+end
+
+function code(bs, xs, g)
+  :(let $([:($b = $x) for (b, x) in zip(bs, xs)]...)
+      $(Flow.syntax(g))
+    end)
+end
+
+export gather_
+
+gather_(x) = x
+gather_(x::Dagger.Computation) = gather(x)
+gather_(x::Dagger.LazyArray) = gather(x)
+
+function maketest(size, n, nodes)
+  ts = [:(Distribute(BlockPartition(100, 100), rand($size))) for i = 1:10]
+  as = [rand(size) for i = 1:n]
+  ds = [Distribute(BlockPartition(100, 100), y) for y in as]
+  bs = [gensym() for x in 1:n]
+  g = grow(bs, nodes)
+  acode = code(bs, as, g)
+  dcode = code(bs, ds, g)
+  tcode = code(bs, ts, g)
+  println(prettify(tcode))
+  acode, dcode
+end
+
+# runtest((10,10), 10)[2] |> eval |> gather
+
+end # module

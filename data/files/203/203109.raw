@@ -1,0 +1,43 @@
+
+const ∞ = Inf
+
+distance(x1,y1,x2,y2) = sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) )
+
+function avg(a)
+    Σ = 0.0
+    for e in a
+        Σ += e
+    end
+    return Σ/length(a)
+end
+
+function main()
+    const n = 10000  # number of particles
+    r = Array((Float64,Float64),n)  # coordinates
+    for i in 1:n
+        r[i] = (rand(), rand())
+    end
+    ζ = Array(Float64, n)
+    for i in 1:n
+        g = r[i]
+        ρ = ∞
+        for j in 1:n
+            if i == j
+                continue
+            end
+            δ = distance(g[1], g[2], r[j][1], r[j][2])
+            if δ < ρ
+                ρ = δ
+            end
+        end
+        ζ[i] = ρ
+    end
+    wz = avg(ζ)
+    rp = 1/sqrt(n)
+    rpp = wz*sqrt(π)
+    @printf("wz = %f rp = %f rpp = %f\n", wz, rp, rpp)
+end
+
+
+main()
+

@@ -1,0 +1,27 @@
+import pe
+
+function divisor_sum(n)
+    sm = @parallel (+) for d in pe.divisors(n)
+        d
+    end
+    return sm - n
+end
+
+function amicable(a)
+    d1 = divisor_sum(a)
+    d2 = divisor_sum(d1)
+    if d2 == a && d1 != d2
+        return d1
+    end
+    return 0
+end
+
+sm = @parallel (+) for i in 2:10000
+    b = amicable(i)
+    if b > 0 && b < 10000
+        i
+    else
+        0
+    end
+end
+println(sm)

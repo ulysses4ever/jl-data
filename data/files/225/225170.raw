@@ -1,0 +1,17 @@
+# Project Euler 3
+
+# Attempt 1
+
+function Run()
+	num = 600851475143
+	out = 0
+	cur = num
+	max = convert(Int64, ceil(sqrt(num)))
+	for pr in primes(max)
+		while mod(cur, pr) == 0
+			out = pr
+			cur = convert(Int64, cur / pr)
+		end
+	end
+	out
+end

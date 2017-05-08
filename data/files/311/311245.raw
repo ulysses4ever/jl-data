@@ -1,0 +1,43 @@
+push!(LOAD_PATH, ".")
+using JuliAMP
+
+# Parameters
+n = 1024
+rho = 0.44
+alpha = 0.72
+delta = 1e-8
+
+t_max = 100
+
+# Generate instance
+k, m = round(Int, ceil(rho * n)), round(Int, ceil(alpha * n))
+
+x = zeros(n)
+supp = randperm(n)[1:k]
+x[supp] = randn(k)
+#F = randn(m, n) / sqrt(n)
+F = (20. / n) + randn(m, n) / sqrt(n)
+w = sqrt(delta) * randn(m)
+y = F * x + w
+
+opts = Dict()
+opts["x"] = x
+opts["prior_prmts"] = [rho, 0.0, 1.0]
+opts["t_max"] = 100
+opts["disp"] = 1
+opts["parallel"] = false    # This is for rBP only
+
+# Run algorithm
+x_hat, mses, elapsed = JuliAMP.iterate_swamp(y, F, opts)
+#x_hat, mses, elapsed = JuliAMP.iterate_rbp(y, F, opts)
+#x_hat, mses, elapsed = JuliAMP.iterate_amp(y, F, opts)
+
+println("elapsed time: $elapsed seconds")
+
+# Process results
+using Winston
+
+@printf("final MSE (dB): %.2f\n", 10 * log10(mean((x - x_hat).^2)))
+plot(10 * log10(mses))
+xlabel("iteration"); ylabel("MSE (dB)")
+savefig("mse.png")

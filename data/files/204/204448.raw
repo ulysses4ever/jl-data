@@ -1,0 +1,64 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Graphs
+
+# Random Walk
+# @return the list of visited nodes
+function RW{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}}, n_steps::Int64, starting_v=convert(T,1))
+	visited_nodes =  T[]
+	v = starting_v
+	for i in 1:n_steps
+		nei = out_neighbors(v,g)
+		nv = nei[rand(1:length(nei))]
+		push!(visited_nodes,v)
+		v = nv
+	end
+	return visited_nodes
+end
+
+# Random Walk
+# @return a dictionary vid -> # visits
+function RW_aggregated{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}}, n_steps::Int64, starting_v=convert(T,1))
+	vv = Dict{T,T}()
+	v = starting_v
+	vv[v] = convert(T,1)
+	for i in 1:n_steps
+		nei = out_neighbors(v,g)
+		nv = nei[rand(1:length(nei))]
+		vv[nv] = convert(T,vv[nv]+1)
+		v = nv
+	end
+	return vv
+end
+
+# Avoiding Random Walk
+# @return a dictionary vid -> # visits
+function ARW(g, starting_v, n_steps, rd)
+	vv =  zeros(Uint32,length(vertices(g)))
+	v = starting_v
+	vv[v] = 1
+	for i in 1:n_steps
+		nei = out_neighbors(v,g)
+		# choose a child uniformly at random
+		pv = nei[rand(1:length(nei))]
+		mp = 1-rd[pv]
+		if rand() <= mp
+			vv[pv] += 1
+			v = pv
+		end
+	end
+	return vv
+end

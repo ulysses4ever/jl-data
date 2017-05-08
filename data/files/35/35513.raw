@@ -1,0 +1,14 @@
+using Debug
+@debug function dec2bin(n::Int64,numBits::Int64)
+# converts decimal n to binary array of size numBits
+# dec2bin(13,4) converts to [true;true;false;true].
+# First element is MSB, last element is LSB.
+    nb = n;
+    op = zeros(Bool,numBits,1);
+    for i = 1:numBits
+        op[i] = n & 1;
+        n = n>>>1;
+    end
+    op = fliplr(op.')[:];
+    return(op);
+end

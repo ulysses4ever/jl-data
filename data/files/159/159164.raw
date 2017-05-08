@@ -1,0 +1,70 @@
+type AllVersusAllClassifier <:MulticlassWithBinaryClassifier
+  binary_models::Vector{Classifier}
+  classes::Int
+end
+
+
+abstract  MulticlassWithBinaryClassifierConfig <: ClassifierConfig
+
+type AllVersusAllClassifierConfig <:MulticlassWithBinaryClassifierConfig
+    binary_classifier_config::ClassifierConfig
+end
+
+loss(m::AllVersusAllClassifier,predicted::Vector{Int},y::Vector{Int}) = predicted.!=y
+
+function samples_for_class(x,y::Vector{Int},class::Int,new_class_value::Int)
+  class_x=x[y.==class]
+  class_y=ones(Int,length(class_x))*new_class_value
+  class_x,class_y
+end
+
+function fit(c::AllVersusAllClassifierConfig,x,y)
+    classes=maximum(y)
+    binary_models=Classifier[]
+    total_models=classes*(classes-1)/2
+    i=1
+    for classA=1:classes
+      classA_x,classA_y=samples_for_class(x,y,classA,1)
+      println("($i / $total_models): Training models for class $classA vs other classes")
+      for classB=classA+1:classes
+        classB_x,classB_y=samples_for_class(x,y,classB,-1)
+        xs=append!(classB_x,classA_x)
+        ys=append!(classB_y,classA_y)
+        #println("($i / $total_models): Training model for class $classA vs class $classB")
+        binary_model=fit(c.binary_classifier_config,xs,ys)
+        push!(binary_models,binary_model)
+        i+=1
+      end
+    end
+    AllVersusAllClassifier(binary_models,classes)
+end
+function predict(m::AllVersusAllClassifier,x)
+    classes=m.classes
+    models=length(m.binary_models)
+    n=length(x)
+    binary_models=Classifier[]
+    results=zeros(Int,n,classes,classes)
+    i=1;
+    for classA=1:classes
+      for classB=classA+1:classes
+        binary_model=m.binary_models[i]
+        results[:,classA,classB]=predict(binary_model,x)
+        results[:,classB,classA]=-results[:,classA,classB]
+        i+=1
+      end
+    end
+    predicted=zeros(Int,n)
+    for i=1:n
+      x_result=results[i,:,:]
+      confidence_per_class=sum(x_result.==1,2)/(classes-1)
+      #println(confidence_per_class)
+      best_confidence=maximum(confidence_per_class)
+      best_classes=find(confidence_per_class.==best_confidence)
+      if (length(best_classes)==1)
+        predicted[i]=best_classes[1]
+      else
+        predicted[i]=0
+      end
+    end
+    predicted
+end

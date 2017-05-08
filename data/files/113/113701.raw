@@ -1,0 +1,97 @@
+module CoinFlips
+
+export Coin, flip, length, show, collect, heads, tails, loglik
+using Distributions
+
+immutable Coin
+    p::Float64
+
+    function Coin(p::Float64)
+        if p > 1.0 || p < 0.0
+            error("p must be between 0 and 1, inclusive.")
+        else
+            new(p)
+        end
+    end
+end
+
+immutable Flip
+    side::Int
+
+    function Flip(side::Int)
+        side in [0, 1] ? new(side) : error("side must be 0 or 1.")
+    end
+end
+
+immutable Flips
+    n::Int
+    flips::Vector{Flip}
+
+    function Flips(n::Int, flips::Vector{Flip})
+        if length(flips) != n
+            error("n must equal the number of flips.")
+        else
+            new(n, flips)
+        end
+    end
+end
+
+immutable MixedFlips
+    n1::Int
+    n2::Int
+    flips::Vector{Flip}
+end
+
+
+# Constructors for a flip and series of flips.
+flip(c::Coin) = Flip(rand(Bernoulli(c.p)))
+flip(c::Coin, n::Int) = Flips(n, [flip(c) for i = 1:n])
+function flip(c1::Coin, c2::Coin, n1::Int, n2::Int)
+    fs = [[flip(c1) for i = 1:n1], [flip(c2) for i= 1:n2]]
+    MixedFlips(n1, n2, fs)
+end
+
+
+Base.length(fs::Flips) = fs.n
+function Base.show(io::IO, fs::Flips)
+    println(reduce(*, map(f -> f.side == 1 ? "H": "T", fs.flips)))
+    println("Heads: ", heads(fs), " Tails: ", tails(fs))
+end
+
+# Outcomes into a 1-D array/vector.
+Base.collect(fs::Flips) = [flip.side for flip in fs.flips]
+
+Base.getindex(fs::Union(Flips, MixedFlips), index) =
+    Flips(length(index), getindex(fs.flips, index))
+
+Base.endof(fs::Union(Flips, MixedFlips)) = endof(fs.flips)
+
+# Count heads (1s) and tails (0s)
+heads(fs::Flips) = sum(collect(fs))
+tails(fs::Flips) = length(fs) - heads(fs)
+
+# Likelihood of a draws from a binomial variable is:
+#     p^(# of 1s) * (1-p)^(# of 0s)
+# So the log likelihood is:
+#     (# of 1s) * log(p) + (# of 0s) * log(1-p)
+loglik(fs::Flips, p::Float64) = heads(fs) * log(p) + tails(fs) * log(1-p)
+
+
+function loglik(fs::MixedFlips, p1::Float64, p2::Float64, n1::Int)
+    fs1 = fs[1:n1]
+    fs2 = fs[(n1+1):end]
+    h1 = heads(fs1)
+    h2 = heads(fs2)
+    loglik(fs1, p1) + loglik(fs2, p2)
+end
+
+loglik(fs::MixedFlips, params::Vector) = loglik(fs, params...)
+
+
+end # module
+
+
+
+
+
+

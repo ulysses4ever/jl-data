@@ -1,0 +1,223 @@
+const ERR_TOL = 1e-3
+const GAP_TOL = 1e-3
+const DEBUG = false
+
+# Represents the convexification of a product of variables
+# z = x * y
+type Linearization
+    x::Variable
+    y::Variable
+    z::Variable
+end
+function Linearization(m::Model,
+                       x::Variable, y::Variable)
+    x_L, x_U = getLower(x), getUpper(x)
+    y_L, y_U = getLower(y), getUpper(y)
+    z_L = min(x_L*y_L, x_L*y_U, x_U*y_L, x_U*y_U)
+    z_U = max(x_L*y_L, x_L*y_U, x_U*y_L, x_U*y_U)
+    z = Variable(m, z_L, z_U, :Cont)
+    @addConstraint(m, z >= y_L*x + x_L*y - x_L*y_L)
+    @addConstraint(m, z >= y_U*x + x_U*y - x_U*y_U)
+    @addConstraint(m, z <= y_L*x + x_U*y - x_U*y_L)
+    @addConstraint(m, z <= y_U*x + x_L*y - x_L*y_U)
+    return Linearization(x, y, z)
+end
+function calculate_error(lin::Linearization)
+    z_val = getValue(lin.z)
+    x_val, y_val = getValue(lin.x), getValue(lin.y)
+    return abs(z_val - x_val*y_val)
+end
+
+
+function solve_relax(jm::JunquoModel, collb, colub)
+    # Create initial model
+    m = Model()  #solver=GurobiSolver(OutputFlag=0))
+    @defVar(m, collb[i] <= x[i=1:length(collb)] <= colub[i])
+
+    # Analyze objective to find bilinear terms
+    # Add constraints to link linearization to variables
+    lins = Dict{Tuple{Int,Int},Linearization}()
+    for j in 1:length(jm.Q_val)
+        R, C = jm.Q_rowidx[j], jm.Q_colidx[j]
+        if (R,C) ∉ keys(lins)
+            lins[(R,C)] = Linearization(m, x[R], x[C])
+        end
+    end
+
+    # Add objective and original constraints
+    @setObjective(m, Min, dot(jm.q, x) +
+        sum{jm.Q_val[j] * lins[jm.Q_rowidx[j],jm.Q_colidx[j]].z,
+            j in 1:length(jm.Q_val)} )
+    @addConstraint(m, jm.rowlb  .<=  jm.A * x  .<= jm.rowub)
+
+    # Solve it
+    status = solve(m)
+    if status == :Infeasible
+        return -Inf, -Inf, Float64[], Inf, -1
+    end
+
+    # Analyze the relaxation gap, and find the biggest error
+    errors = zeros(length(collb))
+    for (key,lin) in lins
+        error = calculate_error(lin)
+        errors[key[1]] += error
+        errors[key[2]] += error
+    end
+    max_error, max_error_j = findmax(errors)
+
+    # Calculate the true objective function value
+    relax_obj = getObjectiveValue(m)
+    x_val = copy(getValue(x))
+    true_obj = dot(jm.q, x_val)
+    for j in 1:length(jm.Q_val)
+        true_obj += jm.Q_val[j] *
+                        x_val[jm.Q_rowidx[j]] *
+                        x_val[jm.Q_colidx[j]]
+    end
+
+    return relax_obj, true_obj, x_val, max_error, max_error_j
+end
+
+
+
+function solve_problem(jm::JunquoModel)
+    # Check we were actually passed a quadratic objective
+    isempty(jm.Q_val) && error("Junquo requires a quadratic objective")
+
+    # Canonicalize the objective sense to minimization
+    # This modifies the data in-place, and restores it at the end
+    if jm.sense == :Max
+        jm.q     *= -1
+        jm.Q_val *= -1
+    end
+
+    # Keep track of nodes/problems to solve
+    # The bounds on the variables
+    collb_queue, colub_queue = Vector{Float64}[], Vector{Float64}[]
+    # The maximum per-variable error of the parent problem
+    error_queue = Float64[]
+    # The objective function value of the parent problem
+    relax_queue = Any[]
+
+    # Start at the root of the B&B tree
+    push!(collb_queue, jm.collb)
+    push!(colub_queue, jm.colub)
+    push!(relax_queue, +Inf)
+    push!(error_queue, +Inf)
+    iter = 0
+
+    # Keep track of progress made
+    objval_ub = +Inf  # the best true objective so far
+    objval_lb = -Inf  # the best relaxed objective so far
+    incumbent = Float64[]  # Best solution so far
+
+    # While still problems to solve...
+    if DEBUG
+        print(lpad("ITER",       5," ")," |")
+        print(lpad("LBOUND",    10," ")," |")
+        print(lpad("UBOUND",    10," ")," |")
+        print(lpad("RELAX OBJ", 10," ")," |")
+        print(lpad("TRUE OBJ",  10," ")," |")
+        println(" ACTION")
+    end
+    while !isempty(collb_queue)
+        iter += 1
+
+        # Update lower bound based on remaining nodes
+        objval_lb = minimum(relax_queue)
+        gap = abs(objval_ub - objval_lb)/abs(objval_lb)
+        if objval_ub != Inf && gap <= 0.01
+            println("GAP $gap")
+            break
+        end
+
+        # Node selection strategy:
+        # "Pick node with smallest error" (depth-first, raises lower bound)
+        # "Pick node with lowest relaxation" (breadth-first, lowers upper bound)
+        #node_idx = rand(1:length(relax_queue))
+        node_idx = indmin(relax_queue)
+        collb = splice!(collb_queue, node_idx)
+        colub = splice!(colub_queue, node_idx)
+        relax = splice!(relax_queue, node_idx)
+        _     = splice!(error_queue, node_idx)
+
+        # Solve the node
+        relax_obj, true_obj, x_val, max_err, max_err_j =
+            solve_relax(jm, collb, colub)
+
+        if DEBUG
+            print(lpad(string(iter)              , 5," ")," |")
+            print(lpad(string(round(objval_lb,4)),10," ")," |")
+            print(lpad(string(round(objval_ub,4)),10," ")," |")
+            print(lpad(string(round(relax_obj,4)),10," ")," |")
+            print(lpad(string(round( true_obj,4)),10," ")," | ")
+            print(length(relax_queue))
+        end
+
+        # Check if infeasible
+        if isempty(x_val)
+            DEBUG && println(" INFEASIBLE")
+            continue
+        end
+
+        # Check if we can fathom
+        if relax_obj >= objval_ub
+            DEBUG && println(" FATHOM (relax_obj >= objval_ub)")
+            continue
+        end
+
+        # Check if we can update incumbent
+        if true_obj <= objval_ub
+            objval_ub = true_obj
+            incumbent = copy(x_val)
+            DEBUG && println(" NEW UBOUND")
+        end
+
+        # Check if error is low enough
+        if max_err <= ERR_TOL
+            DEBUG && println(" ERROR BELOW TOL")
+            continue
+        end
+
+        # Largest error was above tolerance, so worth branching
+        DEBUG && println(" BRANCHING")
+        k = max_err_j
+        colmid = (collb[k] + colub[k])/2
+        branch_point = colmid
+        #branch_point = 0.15*colmid + 0.85*x_val[k]
+        #println()
+        #iter >= 10000 && @show max_err_j
+        #iter >= 10000 && @show max_err
+        #iter >= 10000 && println(" BRANCH ON $k [$(round(collb[k],4)),$(round(x_val[k],4)),$(round(colub[k],4))]")
+        down_branch_collb       = collb[:]
+        down_branch_colub       = colub[:]
+        down_branch_colub[k]    = branch_point
+        #iter >= 10000 && println("    Down branch: was [$(collb[k]), $(colub[k])], now [$(down_branch_collb[k]), $(down_branch_colub[k])]")
+        push!(collb_queue, down_branch_collb)
+        push!(colub_queue, down_branch_colub)
+        push!(relax_queue, relax_obj)
+        push!(error_queue, max_err)
+
+        up_branch_collb         = collb[:]
+        up_branch_colub         = colub[:]
+        up_branch_collb[k]      = branch_point
+        #iter >= 10000 && println("    Up   branch: was [$(collb[k]), $(colub[k])], now [$(up_branch_collb[k]), $(up_branch_colub[k])]")
+        push!(collb_queue, up_branch_collb)
+        push!(colub_queue, up_branch_colub)
+        push!(relax_queue, relax_obj)
+        push!(error_queue, max_err)
+
+        #readline()
+        if iter >= 50000
+            break
+        end
+    end  # while
+
+    # Restore objective if we flipped it earlier
+    if jm.sense == :Max
+        jm.q     *= -1
+        jm.Q_val *= -1
+    end
+    jm.colval = incumbent
+    jm.objval = objval_ub
+end

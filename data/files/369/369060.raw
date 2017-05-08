@@ -1,0 +1,48 @@
+require("custom_types.jl")
+
+#Run by parallel map
+function fill_entry(i, j, table, lookup_table, sentence_length, grammar)
+    before = time()
+    new_entries = Array(Entry, length(lookup_table))
+
+    for x = 1:length(lookup_table)
+        possibilities = Array((Int64,Int64,Int64,Float64), sentence_length*(length(lookup_table)^2))
+        new_entries[x] = Entry(true, 1.0, 1, possibilities)
+    end
+
+    #Cover all span splits between first and second child
+    for x=1:j-2
+        #Check all filled nonterminals for first
+        for a=1:length(lookup_table)
+            if table[i-j+x+1,x+1,a].filled == true
+                #Check all filled nonterminals for second
+                for b=1:length(lookup_table)
+                    if table[i,j-x,b].filled == true
+                        #Find all rules
+                        for rule in grammar
+                            if !(rule.nonterminal == start && (i,j) != (n,n+1)) && rule.right_child != "None"
+                                if lookup_table[rule.left_child] == a && lookup_table[rule.right_child] == b
+                                    #Find probability of children
+                                    prob1 = table[i-j+x+1,x+1,a].prob
+                                    prob2 = table[i,j-x,b].prob
+
+                                    #Create new probability
+                                    new_prob = rule.prob * prob1 * prob2
+
+                                    #Update return parameters
+                                    index = lookup_table[rule.nonterminal]
+                                    new_entries[index].prob *= new_prob
+                                    new_entries[index].possibilities[new_entries[index].current_index] = (a,b,x,new_prob)
+                                    new_entries[index].current_index += 1 
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    elapsed = time() - before
+    @printf "Process %d done in %.4f seconds\n" myid() elapsed
+    return new_entries
+end

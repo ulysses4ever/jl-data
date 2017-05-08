@@ -1,0 +1,18 @@
+#!/usr/bin/env julia
+using DebbyPacker
+using RudeOil
+
+const workspace = "workspace"
+const machine = Machine("bempp-machine")
+const python = "python"
+const distribution = "utopic"
+const publisher = Publisher("m-davezac", distribution, "ubuntu-pkg")
+
+startoff(machine)
+
+import DebbyPacker: publish
+publish(package::DebbyPacker.AbstractPackage) = publish(machine, publisher, package, workspace)
+
+include("Cookoff.jl"); publish(cookoff)
+include("TBB.jl"); publish(tbb)
+include("DuneFoamgrid.jl"); publish(foamgrid)

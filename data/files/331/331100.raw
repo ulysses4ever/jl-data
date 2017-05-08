@@ -1,0 +1,51 @@
+#had to convert all files to png via imagemagick, as bmp caused problems with all of my import libraries
+
+cd("/Users/scherf/dev/DataScience/eleusinian_mysteries/julia_tutorial/")
+using Images
+using PyCall
+@pyimport skimage.io as io
+using DataFrames
+
+include("tutorial_functions.jl")
+
+imageSize = 400
+path = "./data"
+#class information on training data
+labelsInfoTrain = readtable("$(path)/trainLabels.csv")
+#import training data in one matrix
+xTrain = read_data("train", labelsInfoTrain, imageSize, path)
+#test data IDs
+labelsInfoTest = readtable("$(path)/sampleSubmission.csv")
+#read test data
+xTest = read_data("test", labelsInfoTest, imageSize, path)
+
+#get char from Class label
+yTrain = map(x->x[1], labelsInfoTrain[:Class])
+#convert to int
+yTrain = int(yTrain)
+
+#train random forest classificator
+#http://www.kaggle.com/wiki/RandomForests
+Pkg.add("DecisionTree")
+using DecisionTree
+#number of features at each level 20 (= sqrt(400))
+#number of trees 50
+#1.0 ratio for subsampling
+
+model = build_forest(yTrain, xTrain, 20, 50, 1.0)
+#test model via nfoldCV
+acc = nfoldCV_forest(yTrain, xTrain, 20, 50, 4, 1.0);
+println("4 fold accuracy: $(mean(acc))")
+
+#predict test set
+predTest = apply_forest(model, xTest)
+
+
+
+
+#convert int label back to char
+labelsInfoTest[:Class] = char(predTest)
+
+#save
+writetable("$(path)/juliaSubmission.csv", labelsInfoTest, separator=',', header = true)
+

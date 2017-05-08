@@ -1,0 +1,110 @@
+module validation
+
+using OVRFF.model
+
+function MSE(pred::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64})
+    vecnorm(pred - y)^2 / length(y)
+end
+
+function RMSE(pred::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64})
+    vecnorm(pred - y) / sqrt(length(y))
+end
+
+immutable Kfolds_idx
+    N::Int64
+    K::Int64
+    chunk::Int64
+    rem::Int64
+    perm::Vector{Int64}
+    start::Int64
+    stop::Int64
+end
+
+function Kfolds_idx(K::Int64, X::StridedVecOrMat{Float64})
+    N = size(X, 2)
+    Kfolds_idx(N, K, div(N, K), mod(N, K), randperm(N), 0, K)
+end
+
+function Kfolds_idx(K::Int64, X::StridedVecOrMat{Float64}, start::Int64, stop::Int64)
+    N = size(X, 2)
+    Kfolds_idx(N, K, div(N, K), mod(N, K), randperm(N), start - 1, stop)
+end
+
+function Base.start(it::Kfolds_idx)
+    state = 0, it.perm
+    for _ = 0:it.start
+        (_, state) = next(it, state)
+    end
+    idx, perm = state
+    (it.start, perm)
+end
+
+function Base.next(it::Kfolds_idx, state::Tuple{Int64, Vector{Int64}})
+    idx, perm = state
+    N = length(perm)
+    if idx == 0
+        t1 = slice(perm, 1:N - it.chunk - it.rem) # train set
+        t2 = slice(perm, N - it.chunk - it.rem + 1:N) # test set
+    else
+        t1 = slice(perm, 1:N - it.chunk) # train set
+        t2 = slice(perm, N - it.chunk + 1:N) # test set
+    end
+    ((t1, t2), (idx + 1, [t2; t1]))
+end
+
+function Base.done(it::Kfolds_idx, state::Tuple{Int64, Vector{Int64}})
+    idx, perm = state
+    return idx >= it.stop
+end
+
+function Base.getindex(it::Kfolds_idx, idx::UnitRange{Int64})
+    Kfolds_idx(it.N, it.K, it.chunk, it.rem, it.perm, idx[1] - 1, idx[end])
+end
+
+function Base.getindex(it::Kfolds_idx, idx::Int64)
+    nit = Kfolds_idx(it.N, it.K, it.chunk, it.rem, it.perm, idx - 1, idx)
+    ret, _ = Base.next(nit, Base.start(nit))
+    ret
+end
+
+function Base.length(it::Kfolds_idx)
+    it.stop - it.start
+end
+
+immutable Kfolds
+    kfold_base::Kfolds_idx
+    X_collection
+end
+
+function Kfolds(K::Int64, X_collection::StridedVecOrMat{Float64}...)
+    Kfolds(Kfolds_idx(K, X_collection[1]), X_collection)
+end
+
+function Base.start(it::Kfolds)
+    Base.start(it.kfold_base)
+end
+
+function Base.next(it::Kfolds, state::Tuple{Int64, Vector{Int64}})
+    ((idx_train, idx_test), state) = Base.next(it.kfold_base, state)
+    (map((X)-> (X[:, idx_train], X[:, idx_test]), it.X_collection), state)
+end
+
+function Base.done(it::Kfolds, state::Tuple{Int64, Vector{Int64}})
+    Base.done(it.kfold_base, state)
+end
+
+function Base.getindex(it::Kfolds, idx::UnitRange{Int64})
+    Kfolds(Kfolds_idx(it.kfold_base.K, it.X_collection[1], idx[1], idx[end]), it.X_collection)
+end
+
+function Base.getindex(it::Kfolds, idx::Int64)
+    nit = Kfolds(Kfolds_idx(it.kfold_base.K, it.X_collection[1], idx, idx), it.X_collection)
+    ret, _ = next(nit, start(nit))
+    ret
+end
+
+function Base.length(it::Kfolds)
+    length(it.kfold_base)
+end
+
+end # module validation

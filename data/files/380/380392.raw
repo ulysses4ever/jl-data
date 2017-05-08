@@ -1,0 +1,22 @@
+## TODO
+
+function get_trees_dir(d, recursive=true)
+    trees = ParseTree[]
+    for fi in readdir(d)
+        path = joinpath(d, fi)
+        if isfile(path)
+            f = open(path)
+            for tree in extract_trees(f)
+                push!(trees, ParseTree(tree))
+            end
+            close(f)
+        elseif recursive && isdir(path)
+            append!(trees, get_trees_dir(path))
+        end
+    end
+    return trees
+end
+
+function get_treebank_tagged_sentences(d, recursive=true)
+    map(tagged_sentence, get_trees_dir(d, recursive))
+end

@@ -1,0 +1,162 @@
+include("CG.jl")
+
+# task 1
+function viewPortTransformation(buffer::FrameBuffer)
+	return translation(Float32((buffer.nx+1)/2),Float32((buffer.ny+1)/2),0f0)*scaling(Float32(buffer.nx/2),-Float32(buffer.ny/2),1f0)
+
+end
+
+function projectionTransformation(camera::OrthoCamera)
+	return scaling(1f0,1f0,1f0)
+end
+
+function rasterizer!(object::Object, buffer::FrameBuffer)
+	for i=2:length(object.vertices)
+
+		x0 = round(Int,object.vertices[i-1].e1)
+		y0 = round(Int,object.vertices[i-1].e2)
+		x1 = round(Int,object.vertices[i].e1)
+		y1 = round(Int,object.vertices[i].e2)
+
+		drawLine!(buffer,x0,y0,x1,y1)
+	end
+end
+
+normalize(v::Vec4f) = Vec4f(v.e1/v.e4,v.e2/v.e4,v.e3/v.e4,1f0)
+function normalize!(o::Object)
+	for i in eachindex(o.vertices)
+		o.vertices[i] = normalize(o.vertices[i])
+	end
+end
+
+function renderPipeline!(object::Object,modelTrafo::Transformation,camera::Camera,buffer::FrameBuffer)
+	# set camera transformation
+	cameraTrafo = camera.worldToCam
+	# construct projection transformation (depends on camera)
+	projectionTrafo = projectionTransformation(camera)
+	# construct viewport trafo from translation and scaling
+	viewPortTrafo = viewPortTransformation(buffer)
+	# Projection is unity, so it can be omitted
+	completeTrafo = viewPortTrafo*projectionTrafo*cameraTrafo*modelTrafo
+
+	# transform object to screen space
+	objectScreen = completeTrafo*object
+
+	normalize!(objectScreen)
+
+	rasterizer!(objectScreen, buffer)
+end
+
+
+# task 2
+# model transformation scales down the house
+modelTransformation = scaling(0.45,0.45,0.45)
+# canonical view direction
+camera = OrthoCamera(Float32[0,0,1],Float32[0,0,-1],Float32[0,1,0])
+# initialize Frame Buffer with 500x500 pixels
+buffer = FrameBuffer(500,500)
+# render scene into buffer
+renderPipeline!(houseOfSantaClaus,modelTransformation,camera,buffer)
+plot(buffer)
+sleep(1)
+
+# camera moved backwards 9 unit length
+clear!(buffer)
+camera = OrthoCamera(Float32[0,0,10],Float32[0,0,-1],Float32[0,1,0]) 
+renderPipeline!(houseOfSantaClaus,modelTransformation,camera,buffer)
+plot(buffer)
+sleep(1)
+
+# rotate screen clockwise 
+for t=0:60 
+	clear!(buffer)
+	camera = OrthoCamera(Float32[0,0,1],Float32[0,0,-1],Float32[sin(2*pi*t /60),cos(2*pi*t/60),0]) 
+	renderPipeline!(houseOfSantaClaus,modelTransformation,camera,buffer)
+	plot(buffer)
+	sleep(0.01) 
+end
+
+# task 3
+function perspectiveTranformation(camera::PinholeCamera)
+	n = Float32(-camera.d)
+	f = Float32(n-2)
+	v1 = Vec4f(n,0,0,0)
+	v2 = Vec4f(0,n,0,0)
+	v3 = Vec4f(0,0,n+f,1)
+	v4 = Vec4f(0,0,-f*n,0)
+	return Transformation(v1,v2,v3,v4)
+end
+
+function projectionTransformation(camera::PinholeCamera)
+	PerspectiveTrafo = perspectiveTranformation(camera)
+	# create Transformation to canonical viewing Volume
+	v1 = Vec4f(2/camera.w,0,0,0)
+	v2 = Vec4f(0,2/camera.h,0,0)
+	v3 = Vec4f(0,0,1,0)
+	v4 = Vec4f(0,0,-camera.d-1,1)
+	return Transformation(v1,v2,v3,v4)*PerspectiveTrafo
+end
+
+# task 4
+# move camera towards the houseOfSantaClaus 
+for t=0:60 
+	clear!(buffer)
+	camera = PinholeCamera(Float32[0,0,10-9*t/60],Float32[0,0,-1],Float32[0,1,0]) 
+	renderPipeline!(houseOfSantaClaus,modelTransformation,camera,buffer)
+	plot(buffer)
+	sleep(0.01) 
+end
+
+# task 5
+v1 = Vec4f(-1,-1,0,1)
+v2 = Vec4f(1,-1,0,1)
+v3 = Vec4f(1,1,0,1)
+v4 = Vec4f(1,1,0,1)
+v5 = Vec4f(-1,1,0,1)
+v6 = Vec4f(-1,-1,0,1)
+v7 = Vec4f(-1,1,0,1)
+v8 = Vec4f(0,2,0,1)
+v9 = Vec4f(1,1,0,1)
+houseOfSantaClaus = Object(v1,v2,v3,v4,v5,v6,v7,v8,v9)
+
+function triangleRasterizer!(object::Object, buffer::FrameBuffer)
+	for i=3:3:length(object.vertices)
+
+		x0 = round(Int,object.vertices[i-2].e1)
+		y0 = round(Int,object.vertices[i-2].e2)
+		x1 = round(Int,object.vertices[i-1].e1)
+		y1 = round(Int,object.vertices[i-1].e2)
+		x2 = round(Int,object.vertices[i].e1)
+		y2 = round(Int,object.vertices[i].e2)
+
+		drawTriangle!(buffer,x0,y0,x1,y1,x2,y2,0xff)
+	end
+end
+
+
+function renderTrianglePipeline!(object::Object,modelTrafo::Transformation,camera::Camera,buffer::FrameBuffer)
+	# set camera transformation
+	cameraTrafo = camera.worldToCam
+	# construct projection transformation (depends on camera)
+	projectionTrafo = projectionTransformation(camera)
+	# construct viewport trafo from translation and scaling
+	viewPortTrafo = viewPortTransformation(buffer)
+	# Projection is unity, so it can be omitted
+	completeTrafo = viewPortTrafo*projectionTrafo*cameraTrafo*modelTrafo
+
+	# transform object to screen space
+	objectScreen = completeTrafo*object
+
+	normalize!(objectScreen)
+
+	triangleRasterizer!(objectScreen, buffer)
+end
+
+clear!(buffer)
+# model transformation scales down the house
+modelTransformation = scaling(0.45,0.45,0.45)
+# canonical view direction
+camera = OrthoCamera(Float32[0,0,1],Float32[0,0,-1],Float32[0,1,0])
+# render scene into buffer
+renderTrianglePipeline!(houseOfSantaClaus,modelTransformation,camera,buffer)
+plot(buffer)

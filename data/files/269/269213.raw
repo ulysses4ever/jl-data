@@ -1,0 +1,24 @@
+f(x) = x[1]^2 + 4*x[2]^2;
+
+x0 = [0.0;0.0];
+
+function g(x::Vector)
+  return [2*x[1]; 8*x[2]]
+end
+
+function W(x::Vector, y::Vector)
+  return diagm([2.0; 8.0])
+end
+
+function c(x::Vector)
+  return [x[1]+x[2]-1]
+end
+
+function J(x::Vector)
+  return [1.0 1.0]
+end
+
+ncon = 1
+
+x = DCI.solve(f, g, W, c, J, x0, ncon)
+println("x = ", x)

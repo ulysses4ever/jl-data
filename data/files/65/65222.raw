@@ -1,0 +1,29 @@
+using DataStructures
+
+export cholesky!
+
+"""
+Compute a lower triangular G such that A=GG'. 
+For all i >= j, G[i,j] overwrites A[i,j].
+"""
+function cholesky!{T<:Real}(A::SparseMatrixCSC{T})
+    m, n = size(A)
+    m == n || throw(DimensionMismatch(""))
+    ustack = Stack(UpdateMatrix)
+    for j = 1:n        
+        locs = A.colptr[j]:A.colptr[j+1]-1
+        # elimination tree
+        parent = etree(A)
+        children = findin(parent, [j])
+        for child in children
+            # form the update matrix
+            U = pop!(ustack)
+            # form the frontal matrix
+            F = FrontalMatrix(data, colptr)
+            # factor
+            l, U = factor(F)
+            push!(ustack, U)
+        end
+    end
+    SparseMatrixCSC(n, n, )
+end

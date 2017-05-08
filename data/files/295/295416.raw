@@ -1,0 +1,56 @@
+
+propertynames(obj::AbstractFeature) = collect(keys(properties(obj)))
+function propertynames{T <: AbstractFeature}(obj::Vector{T})
+    names = Set()
+    for feature in obj
+        for k in keys(properties(feature))
+            !in(k, names) && push!(names, k)
+        end
+    end
+    [names...]
+end
+
+function geodataframe{T <: AbstractFeature}(fc::FeatureCollection{T}; colnames::Vector{String} = String[], dtypes::Vector{DataType} = DataType[], colnamelimit::Int = 100)
+    geofeatures = features(fc)
+    nrows, ncols, ntypes = length(geofeatures), length(colnames), length(dtypes)
+    if nrows == 0
+        return DataFrames.DataFrame()
+    end
+    if ncols == 0
+        warn("No column names provided. Scanning the first $colnamelimit features for unique property names.")
+        colnames = propertynames(geofeatures[1:min(end,colnamelimit)])
+        ncols = length(colnames)
+        dtypes = repeat([Any], inner = [ncols])
+    elseif ntypes != ncols
+        nmatched = min(ntypes, ncols)
+        warn("Mismatch in length of colnames and dtypes. Using the first $nmatched dtypes.")
+        dtypes = DataType[dtypes[1:nmatched], repeat([Any], inner = [ncols - nmatched])]
+    end
+    df = DataFrames.DataFrame([[AbstractGeometry], dtypes], [[:geometry],Symbol[colnames...]], nrows)
+    for i in 1:nrows
+        df[i, 1] = geometry(geofeatures[i])
+        property = properties(geofeatures[i])
+        for j in 1:ncols
+            df[i, j+1] = get(property, colnames[j], DataFrames.NA)
+        end
+    end
+    df
+end
+
+function featurecollection(df::DataFrames.AbstractDataFrame; geometry = :geometry)
+    nrows, ncols = size(df)
+    colnames = map(string,DataFrames.names(df))
+    indices = filter(i-> colnames[i] != :geometry, 1:ncols)
+
+    fc = Feature[]
+    sizehint(fc, nrows)
+    for i in 1:nrows
+        push!(fc, Feature(df[i, :geometry]))
+        for j in indices
+            if df[i, j] !== DataFrames.NA
+                fc[i].properties[colnames[j]] = df[i, j]
+            end
+        end
+    end
+    FeatureCollection(fc)
+end

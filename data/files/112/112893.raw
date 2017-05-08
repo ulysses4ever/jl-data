@@ -1,0 +1,26 @@
+# wtok 2015-01-09
+# euler problem 001
+#   If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9.
+#   The sum of these multiples is 23. Find the sum of all the multiples of 3 or 5 below 1000.
+#  Answer from C++ solution: 233168 [Correct]
+#  Answer from Julia       : 233168
+
+# general algorithm:
+# for each number below 1000, find mod of n and 3 or 5. if mod is 0, add to list of answers. After loop, find sum.
+
+function eul001(nMax::Int,testNums)
+  ansList = zeros(nMax)
+  ansCount = 0
+  for i = 0:nMax
+    # bitwise modulus i -> testNums
+    if in(0, i .% testNums)
+      ansCount += 1
+      ansList[ansCount] = i
+    end
+  end
+  return sum(ansList[1:ansCount])
+end
+
+# expected: 233168
+eul001(999,[3 5])
+

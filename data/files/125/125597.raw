@@ -1,0 +1,24 @@
+# type definition for Evolutionary Action object
+#  with fields for alignment, tree, evolutionary trace measure,
+#  substitution log-odds scores, and evolutionray action measure
+type EvAc
+	alphabet::Array{Char,1}
+	aln::Array{Any,1}
+	phy::Phylo
+	odds::Array{Float64,2}
+	et::Array{Float64,1}
+	ea::Array{Float64,2}
+	# contructor for default alphabet
+	EvAc() = new(
+		['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y'] )
+	# contructor for default alphabet and user alignment
+	EvAc( aln::Array{Any,1} ) = new(
+		['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y'],
+		aln )
+	# contructor for default alphabet, alignment, and tree
+	EvAc( aln::Array{Any,1}, phy::Phylo ) = new(
+		['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y'],
+		aln,
+		phy )
+end
+

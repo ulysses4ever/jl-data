@@ -1,0 +1,42 @@
+#= SWC format
+uid | structure id | x | y | z | radius | parent uid
+
+where structure id:
+* 1 = soma
+* 2 = axon
+* 3 = basal dendrite
+* 4 = apical dendrite
+* 5+ = custom
+
+=#
+
+import LightGraphs
+
+function read_neurite(n::Int; datadir="../data/neuromorph")
+    list = readdir(datadir)
+    n < length(list) || error("n must be less than ", 1+length(list))
+    readdlm(joinpath(datadir, list[n]))
+end
+
+function neurite_tree(neurite::Array{Float64,2})
+    L = LightGraphs
+    g = L.Graph()
+    n = size(neurite,1)
+    all(neurite[:,1]==collect(1.0:n)) || error("Vertices are not sequentially ordered with origin 1.")
+    for i in 1:size(neurite,1)
+        L.add_vertex!(g)
+        parent = Int(neurite[i,7])
+        if 0 < parent < i
+            L.add_edge!(g,parent,i)
+        end
+    end
+    g
+end
+
+function neurite_tree(n::Int; datadir="../data/neuromorph")
+    neurite_tree(readneurite(n,datadir))
+end
+
+function find_branch_points(g::LightGraphs.Graph)
+    find([L.degree(g,i) > 2 for i in L.vertices(g)])
+end

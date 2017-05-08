@@ -1,0 +1,95 @@
+
+# Pricing functions for MarketRisk module
+
+function _price(m::PMCash, c::FinancialContract, s::Scenario)
+	notional = fc_get_notional(c) # Contract Attribute
+	cur::Float64 = _currencyvalue(m.currency, s) # Market Data
+	#push!(c.log, "Pricing at $(s.date): currency=$(cur)")
+	out_price = notional * cur
+	return PricingResult(out_price, [ m.currency ], [ out_price ])
+end
+
+function _price(m::PMStock, c::FinancialContract, s::Scenario)
+	# Contract Attributes
+	quantity = fc_get_quantity(c)
+	asset_liability_multiplier = fc_get_asset_liability_multiplier(c)
+
+	# Market Data
+	cur::Float64 = _currencyvalue(m.currency, s)
+	stock::Float64 = s.data[m.stock]
+	#push!(c.log, "Pricing at $(s.date): currency=$(cur)")
+	riskfactors_values = [ stock, cur ]
+	out_riskfactors = [ m.stock, m.currency ]
+	out_price = asset_liability_multiplier * quantity * stock * cur
+	currency_exposure_multiplier = m.currency == getfunctionalcurrency() ? 0.0 : 1.0
+	out_exposures = [ out_price, out_price * currency_exposure_multiplier ]
+	return PricingResult(out_price, out_riskfactors, out_exposures)
+end
+
+function _price(m::PMBullet, c::FinancialContract, s::Scenario)
+	# Contract attributes
+	maturity = fc_get_maturity(c)
+	notional = fc_get_notional(c)
+	asset_liability_multiplier = fc_get_asset_liability_multiplier(c)
+
+	# Market Data
+	cur::Float64 = _currencyvalue(m.currency, s)
+	discountfactor_base::Float64 = discountfactor(s.data[m.basecurve], maturity)
+	discountfactor_spread::Float64 = discountfactor(s.data[m.spreadcurve], maturity)
+	#push!(c.log, "Pricing at $(s.date): currency=$(cur), base=$(discountfactor_base), spread=$(discountfactor_spread)")
+	out_price = asset_liability_multiplier * notional * discountfactor_spread * cur * discountfactor_base
+	out_riskfactors = [ m.currency, RFIRCurveVertex(m.basecurve, maturity) ]
+	currency_exposure_multiplier = m.currency == getfunctionalcurrency() ? 0.0 : 1.0
+	out_exposures = [ out_price * currency_exposure_multiplier, out_price ]
+
+	return PricingResult(out_price, out_riskfactors, out_exposures)
+end
+
+function _price(b::PMForwardCurrency, c::FinancialContract, s::Scenario)
+	# Payoff is S - K
+	# price is : f = S*PU(currency) - K*PU(base_curve)
+	# where S is spot currency value, and K is forward price of the contract
+
+	# Contract Attributes
+	maturity = fc_get_maturity(c)
+	notional = fc_get_notional(c)
+	K = fc_get_forward_price(c)
+	asset_liability_multiplier = fc_get_asset_liability_multiplier(c)
+
+	# Market Data
+	cur::Float64 = _currencyvalue(b.currency, s)
+	discountfactor_base::Float64 = discountfactor(s.data[b.basecurve], maturity)
+	discountfactor_currency::Float64 = discountfactor(s.data[b.currencycurve], maturity)
+	#push!(c.log, "Pricing at $(s.date): currency=$(cur), base=$(discountfactor_base), discount_currency=$(discountfactor_currency)")
+	riskfactors_values = [ cur, discountfactor_currency, discountfactor_base ]
+	_pricingkernel_(x) = asset_liability_multiplier * notional * (x[1] * x[2] - K * x[3])
+	_grad_ = ForwardDiff.gradient(_pricingkernel_) # Using ForwardDiff to obtain partial derivatives
+	out_price = _pricingkernel_(riskfactors_values)
+	out_riskfactors = [ b.currency, RFIRCurveVertex(b.currencycurve, maturity), RFIRCurveVertex(b.basecurve, maturity) ]
+	out_exposures = riskfactors_values .* _grad_(riskfactors_values)
+
+	return PricingResult(out_price, out_riskfactors, out_exposures)
+end
+
+function _price(b::PMFutureCurrency, c::FinancialContract, s::Scenario)
+	# Payoff is F(T) - F(T-1)
+	# Price is always 0
+	# Exposure is : F = S*PU(currency) / PU(base)
+	# where S is spot currency value, and K is forward price of the contract
+
+	# Contract attributes
+	maturity = fc_get_maturity(c)
+	notional = fc_get_notional(c)
+	asset_liability_multiplier = fc_get_asset_liability_multiplier(c)
+
+	# Market Data
+	cur::Float64 = _currencyvalue(b.currency, s)
+	discountfactor_base::Float64 = discountfactor(s.data[b.basecurve], maturity)
+	discountfactor_currency::Float64 = discountfactor(s.data[b.currencycurve], maturity)
+	#push!(c.log, "Pricing at $(s.date): currency=$(cur), base=$(discountfactor_base), discount_currency=$(discountfactor_currency)")
+	exposure::Float64 = asset_liability_multiplier * notional * cur * discountfactor_currency / discountfactor_base
+	out_riskfactors = [ b.currency, RFIRCurveVertex(b.currencycurve, maturity), RFIRCurveVertex(b.basecurve, maturity) ]
+	out_exposures = [ exposure, exposure, -exposure ]
+
+	return PricingResult(0.0, out_riskfactors, out_exposures)
+end

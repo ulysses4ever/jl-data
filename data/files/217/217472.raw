@@ -1,0 +1,44 @@
+module PottsMBMC
+	
+	include("io.jl")
+	include("check_inputs.jl")
+	include("propagate.jl")
+	include("energy_functions.jl")
+
+	function do_simulation( J::Array{Float64,3},
+				h::Array{Float64,2},
+				N::Int64,
+				q::Int64,
+				N_samples::Int64,
+				s_init::Int64,
+				s_delta::Int64,
+				output_prefix::String)
+		
+		en_out,sample_out,log_out = define_output_files(output_prefix)
+		
+		# Running Variables
+		state=rand(1:q,N)
+		energy=[get_energy(state,J,h,N,q)]
+		acceptance_rate=0.0
+
+		@printf("Energy before thermalization: %.3f\n", energy[1])
+		for s=1:s_init
+			propagate!(state,energy,J,h,N,q)
+		end
+		@printf("Energy after thermalization: %.3f\n", energy[1])
+		
+		for sample=1:N_samples
+			for s=1:s_delta
+				propagate!(state,energy,J,h,N,q)
+			end
+			@printf("\rCurrent sample energy: %.3f",energy[1])
+			write_sample(energy,state,en_out,sample_out,N)
+		end
+	#/do_simulation
+	end
+#/module
+end
+
+
+
+				

@@ -1,0 +1,14 @@
+type FixedWidthColumn
+    start::Integer
+    datatype::DataType
+    name::String
+    fstring::String
+    desc::String
+    finish::Integer
+    func::Function
+end
+
+FixedWidthColumn(start::Integer,datatype::DataType,name::String,fstring::String,desc::String) = FixedWidthColumn(start,datatype,name,fstring,desc,start)
+FixedWidthColumn(start,datatype,name,fstring,desc,finish)=FixedWidthColumn(start,datatype,name,fstring,desc,finish, x->x)
+
+

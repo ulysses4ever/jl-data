@@ -1,0 +1,17 @@
+###################################################
+## Run simulation
+###################################################
+
+function run_dynamic(t::TypeGraph, steps::Int64, parameters::Params
+                      ;verbose::Int64 = 0)
+  println("Running with steps = $steps, batch = $(p.batchSize), techno = $(p.techno),
+          priorities= $(p.priorities)")
+
+  pool = InstanceGraph(t)
+  for k in 1:steps
+    arriving_node = t.nodes[rand(1:t.n)]
+    arrival!(pool, arriving_node, k)
+    departures!(pool)
+  end
+  return pool
+end

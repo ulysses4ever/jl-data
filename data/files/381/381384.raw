@@ -1,0 +1,234 @@
+module TensorBase
+
+using Reexport
+import Iterators: product
+
+@reexport using Einsum
+
+export unfold,
+       unfold_idx,
+       krprod,
+       tensordot,
+       gen_cpd
+
+"""
+    M = unfold(A, i)
+
+Unfold tensor A along mode i. Returns a matrix M, with size(A,i) rows.
+The columns are populated by linear indexing through A, ignoring mode i.
+"""
+function unfold{T,N}(A::Array{T,N},i::Integer)
+    # dims not unfolded
+    j = setdiff(1:N,i) 
+
+    # Permute dims of A, bring unfolded dimension to front
+    B = permutedims(A,vcat(i,j))
+
+    # size of unfolded dimension
+    n = size(B,1)
+    
+    return reshape(B,(n,div(length(B),n)))
+end
+
+"""
+    M,idx = unfold_idx(A, i)
+
+Unfold tensor A along mode i. Same as `unfold()` but, in addition to returning
+the unfolded matrix, `M`, it also returns `idx` -- a Tuple of arrays
+containing the indices of each column in the unfolded matrix.
+
+For example, `M,idx = unfold_idx(randn(3,5,2),2)` produces
+`idx = ([1,2,3,1,2,3],[1,1,1,2,2,2]))`
+"""
+function unfold_idx{T,N}(A::Array{T,N},i::Integer)
+    # dims not unfolded
+    j = setdiff(1:N,i) 
+    jd = size(A, j...)
+
+    # Permute dims of A, bring unfolded dimension to front
+    B = permutedims(A,vcat(i,j))
+    
+    # size of unfolded dimension
+    n = size(B,1)
+    
+    return ( reshape(B,(n,div(length(B),n))) , ind2sub(jd,1:prod(jd)) ) 
+end
+
+"""
+    M,d = unfold_dims(A, i)
+
+Unfold tensor A along mode i. Same as `unfold()` but, in addition to returning
+the unfolded matrix, `M`, it also returns `idx` -- a Tuple containing the
+dimensions of A, excluding mode `i`.
+"""
+function unfold_dims{T,N}(A::Array{T,N},i::Integer)
+    # dims not unfolded
+    j = setdiff(1:N,i) 
+    jd = size(A, j...)
+
+    # Permute dims of A, bring unfolded dimension to front
+    B = permutedims(A,vcat(i,j))
+    
+    # size of unfolded dimension
+    n = size(B,1)
+    
+    return ( reshape(B,(n,div(length(B),n))) , jd ) 
+end
+
+
+"""
+    C = krprod(A, B)
+
+Compute the Khatri-Rao product of two matrices, A * B.
+"""
+function krprod(A::Matrix, B::Matrix)
+    
+    # determine indices
+    H = size(A,2)
+    @assert H == size(B,2)
+    IJ = size(A,1)*size(B,1)
+
+    # preallocate result
+    C = Array(typeof(A[1]*B[1]),IJ,H)
+    
+    # compute khatri-rao product
+    for h = 1:H
+        ij = 1
+        for ai in sub(A,:,h)
+            for bj in sub(B,:,h)
+                C[ij,h] = ai*bj
+                ij += 1
+            end
+        end
+    end
+
+    return C
+end
+
+"""
+    C = tensordot(A, B, n)
+
+Multiply N-dimensional array A by matrix B along mode n. For inputs
+size(A) = (I_1,...,I_n,...,I_N), and size(B) = (J,I_n), the output is
+a N-dimensional array with size(C) = (I_1,...,J,...,I_N) formed by
+multiplying the mode-n fibers by the matrix B on the left.
+"""
+function tensordot{T,N}(A::Array{T,N}, B::Matrix{T}, n::Integer)
+    J,I_n = size(B)
+    I = collect(size(A))
+    @assert I[n] == I_n
+    K = [ 1:d for d in I[setdiff(1:N,n)] ]
+ 
+    # preallocate result
+    I[n] = J
+    C = Array(T,I...)
+
+    # do multiplication
+    for i in product(K...)
+        i1 = i[1:(n-1)]
+        i2 = i[n:end]
+        C[i1...,:,i2...] = B*vec(A[i1...,:,i2...])
+    end
+
+    return C
+
+end
+
+"""
+    B = tensordot(A, b, n)
+
+Multiply N-dimensional array A by vector b along mode n. For inputs
+size(A) = (I_1,...,I_n,...,I_N), and length(x) = (I_n), the output is
+a (N-1)-dimensional array with size(B) = (I_1,...,I_n-1,I_n+1,...,I_N)
+formed by taking the vector dot product of b and the mode-n fibers
+of B.
+"""
+function tensordot{T,N}(A::Array{T,N}, b::Vector{T}, n::Integer)
+
+    I = size(A)
+    @assert I[n] == length(b)
+    D = I[setdiff(1:N,n)]
+    K = [ 1:d for d in D ]
+
+    # preallocate result
+    
+    C = Array(T,D...)
+
+    # do multiplication
+    for i in product(K...)
+        C[i...] = dot(b, vec(A[i[1:(n-1)]...,:,i[n:end]...]))
+    end
+
+    return C
+
+end
+
+
+
+"""
+    A,factors = gen_cpd(dims,r=1,ξ=0.0)
+
+Generates a toy dataset for CP-decomposition. Returns
+tensor A with dimensions given by input dims and rank
+r. Also returns a tuple of the ground truth factors.
+Isotropic, additive gaussian noise with variance ξ is
+added to A.
+"""
+function gen_cpd{T<:Integer}(
+        dims::Vector{T},
+        r::Integer=1,
+        ξ::AbstractFloat=0.0
+    )
+
+    factors = [ randn(d,r) for d in dims ]
+    ridx = [ 1:d for d in dims ]
+
+    A = zeros(dims...)
+    for  u = 1:r
+        for idx in product(ridx...)
+            A[idx...] += prod([ f[i,u] for (f,i) in zip(factors,idx) ])
+        end
+    end
+
+    A += sqrt(ξ)*randn(dims...)
+
+    return A,factors
+
+end
+
+
+"""
+    A,factors = gen_cpd(dims,r=1,ξ=0.0)
+
+Generates a toy dataset for CP-decomposition. Returns
+tensor A with dimensions given by input dims and rank
+r. Also returns a tuple of the ground truth factors.
+Isotropic, additive gaussian noise with variance ξ is
+added to A.
+"""
+function gen_cpd{T<:Integer}(
+        dims::Vector{T},
+        r::Integer=1,
+        ξ::AbstractFloat=0.0
+    )
+
+    factors = [ randn(d,r) for d in dims ]
+    ridx = [ 1:d for d in dims ]
+
+    A = zeros(dims...)
+    for  u = 1:r
+        for idx in product(ridx...)
+            A[idx...] += prod([ f[i,u] for (f,i) in zip(factors,idx) ])
+        end
+    end
+
+    A += sqrt(ξ)*randn(dims...)
+
+    return A,factors
+
+end
+
+
+
+
+end

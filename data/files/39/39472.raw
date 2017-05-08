@@ -1,0 +1,69 @@
+module IntervalTrees
+
+	export Interval, Node, buildnode
+	using Base.Test
+
+	typealias Interval (Int, Int)
+
+	abstract ANode
+    type Node <: ANode
+		center::Float32
+		left::ANode
+		right::ANode
+		inter_by_left::Vector{Interval}
+		inter_by_right::Vector{Interval}
+	end
+	type Sentinel <: ANode
+	end
+
+  	function buildnode(intervals::Vector{Interval})
+		if isempty(intervals)
+			return Sentinel()
+		end
+		lefts = map( i ->i[1], intervals)
+		rights = map( i ->i[2], intervals)
+		center = mean([lefts; rights])
+		to_left = filter(i-> i[2]<center, intervals)
+		to_right = filter(i-> i[1]>center, intervals)
+		intersecting = filter(i-> (i[1]<center) && (i[2]>center), intervals)
+		inter_by_left = sort(intersecting, by=i->i[1])
+		inter_by_right = sort(intersecting, by=i->i[2])
+		leftnode = buildnode(to_left)
+		rightnode = buildnode(to_right)
+		Node(center, leftnode, rightnode, inter_by_left, inter_by_right)
+  	end
+
+  	function search(tree::ANode, point::Int)
+    	[]
+  	end
+  	function search(tree::Node, point::Int)
+		if point < tree.center
+		    res = search(tree.left, point)
+		    idx = searchsorted(tree.inter_by_left, point, by=i->i[1])
+	        append!(res, tree.inter_by_left[1:idx.start-1])
+	        return res
+		elseif point == tree.center
+		    return tree.inter_by_left
+		else
+			res = search(tree.right, point)
+	    	idx = searchsorted(tree.inter_by_right, point, by=-i->i[2])
+	    	append!(res, tree.inter_by_right[1:idx.start-1])
+	    	return res
+		end
+  	end
+
+	function test()
+  		intervals = [(1, 10), (2, 4), (6, 9), (2, 15)]
+  		println(intervals)
+  		tree=buildnode(intervals)
+    	intersecting = search(tree, 3)
+		@test contains(intersecting, (1, 10))
+		@test contains(intersecting, (2, 4))
+		@test contains(intersecting, (2, 15))
+		@test !contains(intersecting, (6, 9))
+  	end
+
+	function contains(res, int)
+		findfirst(i -> i==int, res) > 0
+	end
+end

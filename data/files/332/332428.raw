@@ -1,0 +1,104 @@
+include("config.jl")
+include("genotype.jl")
+
+import Genotype
+import Config
+
+function test()
+
+    num_samples = 100000000
+    num_samples_around = 1000
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+
+    test_genotype::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    neighbour_genotype::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    neighbour_neighbour_genotype::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+
+    mutation_tracker::Array{Int32, 1} = zeros(Int32, 200)
+    evaluation_tracker::Array{Int64, 1} = [0]
+    j = 1
+    neighbour_frequencies::Array{Int64, 1} = zeros(Int64, 1000)
+    neighbour_neighbour_frequencies::Array{Int64, 2} = zeros(Int64, (1000, 1000))
+    ratios::Array{Float64, 1} = zeros(Int64, 1000)
+
+
+
+    for i = 1:num_samples
+        
+        #=if i % 50000 == 0
+            for k = 1:200
+                if sum(neighbour_neighbour_frequencies[k, (k + 1):end]) > 0
+                    ratios[k] = sum(neighbour_neighbour_frequencies[k, 1:k]) / sum(neighbour_neighbour_frequencies[k, :])
+                elseif k > 1
+                    ratios[k] = ratios[k - 1]
+                else
+                    ratios[k] = 0
+                end
+            end
+            println("iteration ", i)
+            for k = 1:10:200
+                print(k - 1, " ", sum(neighbour_frequencies[k:(k + 19)]), " [")
+                for j = 1:20:500
+                    if sum(neighbour_neighbour_frequencies[k:(k + 9), :]) > 0
+                        @printf("%.2f ", sum(neighbour_neighbour_frequencies[k:(k + 9), j:(j+19)]) / sum(neighbour_neighbour_frequencies[k:(k + 9), :]))
+                    else
+                        print("0.00 ")
+                    end
+                end
+                print("] ")
+                @printf("%.2f", sum(ratios[k:(k + 9)]) / 10)
+                println(sum(neighbour_neighbour_frequencies[k:(k + 9), 501:end]), " ", 
+                        sum(neighbour_neighbour_frequencies[k:(k + 9), :]))
+            end
+        end=#
+
+        if i % 500000 == 0
+            println(neighbour_neighbour_frequencies[10, :])
+            outfile = open("out_distribution", "w")
+            write(outfile, string(i), "\n")
+            for k = 1:1000
+                write(outfile, string(neighbour_frequencies[k]), "\n")
+                for j = 1:1000
+                    write(outfile, string(neighbour_neighbour_frequencies[k, j]), " ")
+                end
+                write(outfile, "\n")
+            end
+        end
+
+  
+        Genotype.evaluate(test_genotype, config_vals, config_vals.expression_2, config_vals.expression_1, 
+                          config_vals.expression_2, mutation_tracker, evaluation_tracker)
+        if test_genotype.fitness == length(config_vals.expression_2)
+            neighbours = 1
+            temp::Array{Int64, 1} = zeros(Int64, 1000)
+            for i = 1:num_samples_around
+                neighbour_neighbours = 1
+                Genotype.copy_into(neighbour_genotype, test_genotype)
+                Genotype.point_mutate(neighbour_genotype, config_vals)
+                Genotype.evaluate(neighbour_genotype, config_vals, config_vals.expression_1, config_vals.expression_1, 
+                          config_vals.expression_2, mutation_tracker, evaluation_tracker)
+                if neighbour_genotype.fitness == length(config_vals.expression_2)
+                    neighbours += 1
+                    for i = 1:num_samples_around
+                        Genotype.copy_into(neighbour_neighbour_genotype, neighbour_genotype)
+                        Genotype.point_mutate(neighbour_neighbour_genotype, config_vals)
+                        Genotype.evaluate(neighbour_neighbour_genotype, config_vals, config_vals.expression_2, config_vals.expression_1, 
+                                          config_vals.expression_2, mutation_tracker, evaluation_tracker)
+                        if neighbour_neighbour_genotype.fitness == length(config_vals.expression_2)
+                            neighbour_neighbours += 1
+                        end
+                    end
+                    temp[neighbour_neighbours] += 1
+                end
+            end
+            for i = 1:length(temp)
+                neighbour_neighbour_frequencies[neighbours, i] += temp[i]                
+            end
+            neighbour_frequencies[neighbours] += 1
+        end # if test_genotype.fitness == length(config_vals.expression_2)
+        Genotype.randomize_genotype(test_genotype, config_vals)
+    end # for i = 1:num_samples
+end # function test()
+
+test()

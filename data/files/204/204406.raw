@@ -1,0 +1,185 @@
+using Graphs, Logging, Stats
+
+@Logging.configure(level=DEBUG)
+
+include("utils.jl")
+include("graphs.jl")
+include("io.jl")
+include("RW.jl")
+
+# core or sub
+gtype = ARGS[1]
+step = int(ARGS[2])
+
+if step == 0
+	g = load_serialized(ARGS[3])
+	serialize_to_file(g,"sub.jld")
+
+	#g = load_serialized(ARGS[1])
+	rg = get_reverse_graph(g)
+	serialize_to_file(rg,"rsub.jld")
+
+	display_basic_stats(g,rg)
+elseif step == 1
+	big = load_serialized("core.jld")
+	vids = load_serialized(ARGS[3])
+	g,oni,noi = subgraph(big,vids)
+	serialize_to_file(g,"sub.jld")
+
+	#g = load_serialized(ARGS[1])
+	rg = get_reverse_graph(g)
+	serialize_to_file(rg,"rsub.jld")
+
+	display_basic_stats(g,rg)
+# compute # potential colinks and triangles per vertex
+elseif step == 2
+	g = load_serialized("$gtype.jld")
+	rg = load_serialized("r$gtype.jld")
+
+	# count the number of potential colinks and triangles per node (arrays of Uint64)
+	mn2,mn3 = init_mn23_arrays(g,rg)
+	
+	@info("Total # of potential colinks: ", sum(mn2))
+	@info("Total # of potential triangles: ", sum(mn3))
+	
+	serialize_to_file(mn2,"$gtype-vertex-mn2.jld")
+	serialize_to_file(mn3,"$gtype-vertex-mn3.jld")
+# compute # colink and triangle candidates per vertex
+elseif step == 3
+	g = load_serialized("$gtype.jld")
+	rg = load_serialized("r$gtype.jld")
+
+	mn3 = load_serialized("$gtype-vertex-mn3.jld")
+	smn3 = bottom_up_sort!(mn3)
+	serialize_to_file(smn3,"$gtype-vertex-smn3.jld")
+	#smn3 = load_serialized("sub-vertex-smn3.jld")
+	
+	dpos = Dict{Uint32,Uint32}()
+	pos = 1
+	for v in smn3
+		dpos[v] = pos
+		pos += 1
+	end
+	serialize_to_file(dpos,"$gtype-dpos3.jld")
+	
+	# count the number of colink and triangle candidates per node (arrays of Uint64)
+	un2,un3 = init_un23_arrays(g,rg,dpos)
+	
+	@info("Total # of colink candidates: ", sum(un2))
+	@info("Total # of triangle candidates: ", sum(un3))
+	
+	serialize_to_file(un2,"$gtype-vertex-un2.jld")
+	serialize_to_file(un3,"$gtype-vertex-un3.jld")
+#
+elseif step == 4
+	g = load_serialized("$gtype.jld")
+	rg = load_serialized("r$gtype.jld")
+	
+	# list colinks
+	list_colinks(g,rg,"$gtype-colinks.jld")
+
+	# list triangles
+	list_triangles(g,rg,"$gtype-triangles.jld")
+#
+elseif step == 5
+	c1_stats = load_colinks_distribution(uint32(150000),"$gtype-colinks.jld")
+	c2_stats = load_triangles_distribution(uint32(150000),"$gtype-triangles.jld")
+	
+	serialize_to_file(c1_stats,"$gtype-vertex-n2.jld")
+	serialize_to_file(c2_stats,"$gtype-vertex-n3.jld")
+
+	@info("Total # of colinks: ", sum(c1_stats))
+	@info("Total # of triangles: ", sum(c2_stats))
+#
+elseif step == 6
+	un2 = load_serialized("$gtype-vertex-n2.jld")
+	un3 = load_serialized("$gtype-vertex-n3.jld")
+	
+	mn2 = load_serialized("$gtype-vertex-mn2.jld")
+	mn3 = load_serialized("$gtype-vertex-mn3.jld")
+
+	ac1 = 0.
+	ac2 = 0.
+
+	n = length(un2)
+	for i in 1:n
+		if mn2[i] != 0 
+			ac1 += un2[i]/mn2[i]
+		end
+		if mn3[i] != 0
+			ac2 += un3[i]/mn3[i]
+		end
+	end
+
+	ac1 = ac1/n	
+	ac2 = ac2/n	
+
+	@info("Avg # colinks per node: ", mean(un2))
+	@info("Avg # triangles per node: ", mean(un3))
+	
+	@info("Max # colinks per node: ", maximum(un2))
+	@info("Max # triangles per node: ", maximum(un3))
+	
+	@info("Avg colink coefficient: $ac1")
+	@info("Avg clustering coefficient: $ac2")
+#
+elseif step == 7
+	un2 = load_serialized("$gtype-vertex-n2.jld")
+	un3 = load_serialized("$gtype-vertex-n3.jld")
+	
+	cn2 = load_serialized("$gtype-vertex-un2.jld")
+	cn3 = load_serialized("$gtype-vertex-un3.jld")
+	
+	R = sum(un2)/sum(cn2)	
+	T = sum(un3)/sum(cn3)	
+
+	@info("Reciprocity: $R")
+	@info("Transitivity: $T")
+elseif step == 8
+	g = load_serialized("$gtype.jld")
+	rg = load_serialized("r$gtype.jld")
+
+	# vertex degree correlation
+	id = Uint32[]
+	od = Uint32[]
+
+	for v in vertices(g)
+		push!(od,length(out_neighbors(v,g)))
+		push!(id,length(out_neighbors(v,rg)))
+	end
+
+	rid = tiedrank(id)
+	rod = tiedrank(od)
+
+	n = length(vertices(g))
+	
+	ad = mean(id)
+	@info("AVG degree: $ad")
+
+	sn = 0.
+	sd1 = 0.
+	sd2 = 0.
+	for v in vertices(g)
+		sn = sn + (id[v]-ad)*(od[v]-ad)
+		sd1 = sd1 + (id[v]-ad)^2	
+		sd2 = sd2 + (od[v]-ad)^2	
+	end
+	vdc = sn/(sqrt(sd1)*sqrt(sd2))
+	@info("Vertex degree correlation: $vdc")
+
+	sn = 0.
+	sd1 = 0.
+	sd2 = 0.
+	for v in vertices(g)
+		children = out_neighbors(v,g)
+		odv = rod[v]
+		for c in children
+			idc = rid[c] 
+			sn = sn + (idc-ad)*(odv-ad)
+			sd1 = sd1 + (idc-ad)^2	
+			sd2 = sd2 + (odv-ad)^2
+		end
+	end
+	vdc = sn/(sqrt(sd1)*sqrt(sd2))
+	@info("(o-i) assortativity: $vdc")
+end

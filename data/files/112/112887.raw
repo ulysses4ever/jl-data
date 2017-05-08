@@ -1,0 +1,9 @@
+# Walter O'Keefe
+# Created 2015-01-12
+# Project Euler, problem 06
+#   Find the difference between the sum of the squares of the first one hundred
+#   natural numbers and the square of the sum.
+
+import Euler
+
+eul06(maxn::Int) = squareofsum(maxn) - sumofsquares(maxn)

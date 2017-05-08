@@ -1,0 +1,29 @@
+#=
+Incidental code related to Feldman, Volkov, and Rus, ["Dimensionality Reduction of Massive Sparse Datasets Using Coresets,"](http://arxiv.org/abs/1503.01663v1)
+=#
+
+#= Toy data:
+
+To create a random sparse matrix use sprand(n,d,sparsity) or sprandn(n,d,sparsity) for uniform or normal entries respectivly. E.g.,
+
+>  A = sprandn(100, 90, 0.3);
+>  sum(A .!= 0.0)/9000
+0.29088888888888886
+
+=#
+
+typealias Mx Union{Array{Float64,2},SparseMatrixCSC{Float64,Int}}
+
+""" projection_operator(B::Matrix{Float64})
+
+Project A on the rowspace of B.
+
+"""
+function project{T<:Mx,U<:Mx}(A::T, B::U)
+    (A/B)*B
+end
+
+function project{U<:Mx}(A::Array{Float64,1},B::U)
+    project(reshape(A,(1,size(A,1))), B)
+end
+

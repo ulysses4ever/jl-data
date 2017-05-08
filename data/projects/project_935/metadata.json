@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:02:07 GMT
+Date: Wed, 03 May 2017 21:02:30 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5030
+Content-Length: 5585
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2691
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3868
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "ab181343b3e2a89555a325481bc2485a"
-Last-Modified: Sat, 05 Dec 2015 06:08:42 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "a19c594716cd9dd025381de7fc4b11dd"
+Last-Modified: Wed, 26 Apr 2017 23:12:18 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 9e60649f02cd840ee8baa9960690f79f
-X-GitHub-Request-Id: 130A:6637:1337BEB:18CE7F6:5902321F
+X-Served-By: 1e9204dbc0447a6f39c3b3c44d87b3f8
+X-GitHub-Request-Id: 5CE1:5CA3:FFD07A:148EED3:590A4565
 
 {
-  "id": 47440996,
-  "name": "ITCC",
-  "full_name": "slongwell/ITCC",
+  "id": 21109833,
+  "name": "Julia-Playground",
+  "full_name": "yurivish/Julia-Playground",
   "owner": {
-    "login": "slongwell",
-    "id": 7357443,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/7357443?v=3",
+    "login": "yurivish",
+    "id": 114388,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/114388?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/slongwell",
-    "html_url": "https://github.com/slongwell",
-    "followers_url": "https://api.github.com/users/slongwell/followers",
-    "following_url": "https://api.github.com/users/slongwell/following{/other_user}",
-    "gists_url": "https://api.github.com/users/slongwell/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/slongwell/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/slongwell/subscriptions",
-    "organizations_url": "https://api.github.com/users/slongwell/orgs",
-    "repos_url": "https://api.github.com/users/slongwell/repos",
-    "events_url": "https://api.github.com/users/slongwell/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/slongwell/received_events",
+    "url": "https://api.github.com/users/yurivish",
+    "html_url": "https://github.com/yurivish",
+    "followers_url": "https://api.github.com/users/yurivish/followers",
+    "following_url": "https://api.github.com/users/yurivish/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yurivish/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yurivish/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yurivish/subscriptions",
+    "organizations_url": "https://api.github.com/users/yurivish/orgs",
+    "repos_url": "https://api.github.com/users/yurivish/repos",
+    "events_url": "https://api.github.com/users/yurivish/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yurivish/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/slongwell/ITCC",
-  "description": "Julia implementation of Information Theoretic Co-Clustering (ITCC)",
+  "html_url": "https://github.com/yurivish/Julia-Playground",
+  "description": "A collection of various experiments and utilities for graphical explorations in Julia. Note: This is prototype-quality code. Peek in at your own risk!",
   "fork": false,
-  "url": "https://api.github.com/repos/slongwell/ITCC",
-  "forks_url": "https://api.github.com/repos/slongwell/ITCC/forks",
-  "keys_url": "https://api.github.com/repos/slongwell/ITCC/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/slongwell/ITCC/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/slongwell/ITCC/teams",
-  "hooks_url": "https://api.github.com/repos/slongwell/ITCC/hooks",
-  "issue_events_url": "https://api.github.com/repos/slongwell/ITCC/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/slongwell/ITCC/events",
-  "assignees_url": "https://api.github.com/repos/slongwell/ITCC/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/slongwell/ITCC/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/slongwell/ITCC/tags",
-  "blobs_url": "https://api.github.com/repos/slongwell/ITCC/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/slongwell/ITCC/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/slongwell/ITCC/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/slongwell/ITCC/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/slongwell/ITCC/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/slongwell/ITCC/languages",
-  "stargazers_url": "https://api.github.com/repos/slongwell/ITCC/stargazers",
-  "contributors_url": "https://api.github.com/repos/slongwell/ITCC/contributors",
-  "subscribers_url": "https://api.github.com/repos/slongwell/ITCC/subscribers",
-  "subscription_url": "https://api.github.com/repos/slongwell/ITCC/subscription",
-  "commits_url": "https://api.github.com/repos/slongwell/ITCC/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/slongwell/ITCC/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/slongwell/ITCC/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/slongwell/ITCC/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/slongwell/ITCC/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/slongwell/ITCC/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/slongwell/ITCC/merges",
-  "archive_url": "https://api.github.com/repos/slongwell/ITCC/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/slongwell/ITCC/downloads",
-  "issues_url": "https://api.github.com/repos/slongwell/ITCC/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/slongwell/ITCC/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/slongwell/ITCC/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/slongwell/ITCC/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/slongwell/ITCC/labels{/name}",
-  "releases_url": "https://api.github.com/repos/slongwell/ITCC/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/slongwell/ITCC/deployments",
-  "created_at": "2015-12-05T03:43:28Z",
-  "updated_at": "2015-12-05T06:08:42Z",
-  "pushed_at": "2015-12-10T00:29:15Z",
-  "git_url": "git://github.com/slongwell/ITCC.git",
-  "ssh_url": "git@github.com:slongwell/ITCC.git",
-  "clone_url": "https://github.com/slongwell/ITCC.git",
-  "svn_url": "https://github.com/slongwell/ITCC",
-  "homepage": null,
-  "size": 1295,
-  "stargazers_count": 1,
-  "watchers_count": 1,
+  "url": "https://api.github.com/repos/yurivish/Julia-Playground",
+  "forks_url": "https://api.github.com/repos/yurivish/Julia-Playground/forks",
+  "keys_url": "https://api.github.com/repos/yurivish/Julia-Playground/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/yurivish/Julia-Playground/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/yurivish/Julia-Playground/teams",
+  "hooks_url": "https://api.github.com/repos/yurivish/Julia-Playground/hooks",
+  "issue_events_url": "https://api.github.com/repos/yurivish/Julia-Playground/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/yurivish/Julia-Playground/events",
+  "assignees_url": "https://api.github.com/repos/yurivish/Julia-Playground/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/yurivish/Julia-Playground/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/yurivish/Julia-Playground/tags",
+  "blobs_url": "https://api.github.com/repos/yurivish/Julia-Playground/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/yurivish/Julia-Playground/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/yurivish/Julia-Playground/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/yurivish/Julia-Playground/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/yurivish/Julia-Playground/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/yurivish/Julia-Playground/languages",
+  "stargazers_url": "https://api.github.com/repos/yurivish/Julia-Playground/stargazers",
+  "contributors_url": "https://api.github.com/repos/yurivish/Julia-Playground/contributors",
+  "subscribers_url": "https://api.github.com/repos/yurivish/Julia-Playground/subscribers",
+  "subscription_url": "https://api.github.com/repos/yurivish/Julia-Playground/subscription",
+  "commits_url": "https://api.github.com/repos/yurivish/Julia-Playground/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/yurivish/Julia-Playground/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/yurivish/Julia-Playground/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/yurivish/Julia-Playground/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/yurivish/Julia-Playground/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/yurivish/Julia-Playground/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/yurivish/Julia-Playground/merges",
+  "archive_url": "https://api.github.com/repos/yurivish/Julia-Playground/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/yurivish/Julia-Playground/downloads",
+  "issues_url": "https://api.github.com/repos/yurivish/Julia-Playground/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/yurivish/Julia-Playground/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/yurivish/Julia-Playground/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/yurivish/Julia-Playground/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/yurivish/Julia-Playground/labels{/name}",
+  "releases_url": "https://api.github.com/repos/yurivish/Julia-Playground/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/yurivish/Julia-Playground/deployments",
+  "created_at": "2014-06-23T00:56:03Z",
+  "updated_at": "2017-04-26T23:12:18Z",
+  "pushed_at": "2014-09-25T23:29:00Z",
+  "git_url": "git://github.com/yurivish/Julia-Playground.git",
+  "ssh_url": "git@github.com:yurivish/Julia-Playground.git",
+  "clone_url": "https://github.com/yurivish/Julia-Playground.git",
+  "svn_url": "https://github.com/yurivish/Julia-Playground",
+  "homepage": "",
+  "size": 354,
+  "stargazers_count": 16,
+  "watchers_count": 16,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 0,
+  "forks_count": 4,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 0,
+  "forks": 4,
   "open_issues": 0,
-  "watchers": 1,
+  "watchers": 16,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 0,
-  "subscribers_count": 2
+  "network_count": 4,
+  "subscribers_count": 1
 }

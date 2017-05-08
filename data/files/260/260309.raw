@@ -1,0 +1,38 @@
+using SimulationModels
+using Base.Test
+sim = SimulationModels
+
+# Test the Input datatype (setters and getters)
+# InputVector
+test = sim.InputVector{Float64}([1.0:2.0], [1.0,2.0], ["a","b"])
+@test_approx_eq  test[["a","b"]] [1.0,1.0]
+@test_approx_eq  test["a"] 1.0
+@test_approx_eq  test["b"] 1.0
+@test_approx_eq  test[1] 1.0
+@test_approx_eq  test[2] 1.0
+@test_approx_eq  test[[1,2]] [1.0,1.0]
+@test_approx_eq  test[1:2] [1.0,1.0]
+test[2] = 5
+@test_approx_eq  test[1:2] [1.0,5.0]
+@test_approx_eq  test.Values [1.0,10.0]
+test["a"] = 10
+@test_approx_eq  test[1:2] [10.0,5.0]
+@test_approx_eq  test.Values [10.0,10.0]
+test[1:2] = [1,1]
+@test_approx_eq  test[1:2] [1,1]
+@test_approx_eq  test.Values [1.0,2]
+test[["a","b"]] = [2,2]
+@test_approx_eq  test[1:2] [2,2]
+@test_approx_eq  test.Values [2.0,4]
+@test_approx_eq  test[:]./test[1] [1. 1.]
+
+
+# InputMatrix
+test = sim.InputMatrix{Float64}([[1., 2] [1., 2]], [1.0,2.0], ["a","b"])
+@test_approx_eq  test[1,["a","b"]] [1, 0.5]
+@test_approx_eq  test[1:2,["a","b"]] [[1., 2] [0.5, 1]]
+@test_approx_eq  test[1,"a"] 1
+@test_approx_eq  test[[1:2],"a"] [1., 2]
+@test_approx_eq  test[1:2,[1:2]] [[1., 2] [0.5, 1]]
+@test_approx_eq  test[1,[1:2]] test[1,["a","b"]]
+@test_approx_eq   test[:,"a"]./test[:,1] [1. 1.]

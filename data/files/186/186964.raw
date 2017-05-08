@@ -1,0 +1,49 @@
+#=
+@module Point
+@description Point 2d module , type Float64 for coordinates
+=#
+module Point
+
+export Pt, Pt2D;
+
+import Base: convert, - , + , ==
+
+abstract  Pt2D{T <: Real}
+
+immutable Pt{T<:Float64} <: Pt2D{T}
+   x::T
+   y::T
+   Pt(x, y) = new (x, y)
+end
+Pt{T<:Float64}(x::T, y::T) = Pt{T}(x, y)
+Pt(x::Real, y::Real)       = Pt{Float64}(promote(x,y)... )
+Pt(p::Pt2D) = Pt(p.x, p.y)
+
+#tuple
+Pt(x::(Real, Real)) = Pt(x...)
+
+#subtypes real
+Pt(x::Vector) = Pt(x...)
+
+#convert int or float vector to Pt type
+convert{T<:Real}(::Type{Pt{Float64}},  v::Vector{T}) =  Pt(v)
+
+#convert Pt type to  vector subtype real , return vector float
+convert{T<:Real}(::Type{Vector{T}}, Pt::Pt{Float64}) =  [Pt.x , Pt.y];
+
+#minus extend
+-(p::Pt, v::Vector) =	Pt(convert(Vector{Float64}, p) - v)
+-(p1::Pt, p2::Pt)   =	p1 - convert(Vector{Float64}, p2)
+-(v::Vector, p::Pt) = -(-(p, v))
+
+#plus extend
++(p::Pt,  v::Vector) = Pt(convert(Vector{Float64}, p) + v)
++(p1::Pt, p2::Pt)    = p1 + convert(Vector{Float64}, p2)
++(v::Vector,p::Pt)   = +(p, v)
+
+#(==) extend
+==(p::Pt, v::Vector) = convert(Vector{Float64}, p) == v
+==(v::Vector,p::Pt)  = (==(p, v))
+==(p1::Pt,p2::Pt)    = (==(p1, convert(Vector{Float64}, p2)))
+
+end

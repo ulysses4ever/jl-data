@@ -1,0 +1,389 @@
+#|
+
+Lookup Sawfish Module.  Version 1.8.
+
+Copyright (c) 2003-2004 Ewan Mellor <sawfish@ewanmellor.org.uk>.
+Copyright (c) 2002      Free Software Foundation, Inc.
+
+Author: Ewan Mellor <sawfish@ewanmellor.org.uk>.
+Author: Yuan <yuan@cs.umd.edu>.
+
+The most recent work, bringing this module into being was by Ewan Mellor.
+This module is based upon sawfish.swim by Yuan, who seems to have assigned
+his copyright to the FSF.
+
+
+This file is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+This file is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+
+The most important function that this module exports is lookup.  In the
+default configuration, this function starts by take a search term either from
+the current selection or by prompting the user.  If the term contains a URL,
+then it will visit that URL.  Otherwise, the term will be sent to either
+Google, Google with the "I'm feeling lucky" parameter set, dictionary.com,
+thesaurus.com, Multimap, IMDb or Rotten Tomatoes.  The mode parameter should
+be one of "google", "googleI", "dict", "thes", "map", "imdb", or "rotten"
+respectively, to indicate your desire in this regard.
+
+Note that the search term need only contain a URL within it to have that URL
+visited.  This means that one may be sloppy in highlighting, selecting an
+entire line for example, and regardless of any surrounding text the URL will
+still be visited.
+
+If the mode is "java" then the search term will be looked up in the Java
+class documentation using the javadoc module.  The search term in this case
+must be a partially or fully qualified class or package name.
+
+If the mode is "lyrics" then the search term will be taken from the file
+~/.current-song.  Use the XMMS song change plugin to create this file, with
+the command 'echo "%s" >~/.current-song'.
+
+Once the destination URL has been calculated, it is sent to the currently
+running web browser instance, and that browser window is focussed.
+
+If the parameter focus is nil then the browser window is not focussed.
+
+If the parameter usesel is nil then the X primary selection is ignored,
+and the user is prompted for the search term regardless.
+
+Here's how I configure this module from ~/.sawfish/rc (in my case, meta is
+actually the Windows key):
+
+(require 'lookup)
+(bind-keys
+ global-keymap
+ "M-s"   '(lookup "google"    t   t)
+ "M-C-s" '(lookup "google"    t   nil)
+ "M-S"   '(lookup "google"    nil t)
+ "M-i"   '(lookup "googleI"   t   t)
+ "M-t"   '(lookup "thes"      t   t)
+ "M-d"   '(lookup "dict"      t   t)
+ "M-w"   '(lookup "map"       t   t)
+ "M-j"   '(lookup "java"      t   t)
+ "M-l"   '(lookup "lyrics"    t   nil)
+ "M-f"   '(lookup "imdb"      t   t)
+ "M-r"   '(lookup "rotten"    t   t)
+ "M-e"   '(lookup "wikipedia" t   t)
+)
+
+
+This module depends upon the modules javadoc (version 1.0.2+), url (version
+1.7+), and string2 (version 1.6+), all available from
+
+http://www.ewanmellor.org.uk/sawfish.html
+
+In order to actually use the Javadoc functionality, the javadoc module is
+dependent upon the javadoc-indexer.py, available from the same place.  The
+other aspects of this module will function without that script, though the
+javadoc module is still required.
+
+
+Note that all of the above discussion applies only to the default
+configuration.  This module may be configured differently to suit your needs,
+if required.  This is achieved through the special variable
+*lookup-behaviour*, describing the behaviour desired using either your own
+functions or appropriate combinations of the functions provided here --
+lookup-term-selection-or-prompt, lookup-term-current-song-lyrics,
+lookup-visit-using-url-pattern, and lookup-visit-javadoc.
+
+Each call to lookup passes a "mode".  This mode is used as a key against
+*lookup-behaviour* to find a term-function and a visit-function.  These two
+functions are used to get the search term and to visit that term,
+respectively, and are described in detail in the documentation for
+*lookup-behaviour*.  In the default configuration, *lookup-behaviour* is
+configured to use the exported lookup-term-... and lookup-visit-... functions
+to achieve the behaviour described above.
+
+|#
+
+
+(define-structure lookup
+  (export lookup
+          lookup-term-selection-or-prompt
+          lookup-term-current-song-lyrics
+          lookup-visit-using-url-pattern
+          lookup-visit-javadoc
+          lookup-behaviour-built-in
+          *lookup-behaviour*
+          *lookup-cannot-find*)
+
+  (open user
+        rep
+        rep.regexp
+        rep.io.files
+        sawfish.wm
+        sawfish.wm.workspace
+        sawfish.wm.util.prompt
+        sawfish.wm.util.selection
+        sawfish.wm.util.display-window
+        sawfish.wm.util.decode-events
+        javadoc
+        string2
+        url
+        )
+
+
+(defvar *lookup-cannot-find*
+  "Cannot find\n\n\"%s\".\n\nTry again.\n\n"
+
+  "The pattern used for the prompt if an entry cannot be found.  %s is
+substituted with the term for which the search failed."
+  )
+
+  
+(defconst built-in-lookups
+  (
+   ("google"  "Google:"        "http://www.google.co.uk/search?q=%s")
+   ("googleI" "Feeling Lucky?" "http://www.google.co.uk/search?q=%s&btnI=1")
+   ("dict"    "Dictionary:"    "http://dictionary.reference.com/search?q=%s")
+   ("thes"    "Thesaurus:"     "http://thesaurus.reference.com/search?q=%s")
+   ("map"     "Where?"
+    "http://www.multimap.co.uk/map/places.cgi?quicksearch=%s")
+   ("imdb"    "IMDb:"          "http://imdb.com/find?tt=on;nm=on;mx=20;q=%s")
+   ("rotten"  "Rotten Tomatoes:"
+    "http://www.rottentomatoes.com/search/full_search.php?search=%s")
+   ("wikipedia"  "Wikipedia:"
+    "http://www.google.co.uk/search?q=%s+site:wikipedia.org")
+   )
+  )
+
+
+(define lookup-behaviour-built-in
+  (list*
+   (list "java"
+         '(lambda (usesel mode attempt last-term)
+            (lookup-term-selection-or-prompt "Class?" usesel attempt
+                                             last-term))
+         'lookup-visit-javadoc)
+   (list "lyrics"
+         '(lambda (usesel mode attempt last-term)
+            (lookup-term-current-song-lyrics attempt))
+         '(lambda (term focus mode)
+            (lookup-visit-using-url-pattern
+             "http://www.google.co.uk/search?q=%s"
+             term focus mode)))
+
+   (mapcar (lambda (pattern)
+             (list (car pattern)
+                   (lambda (usesel mode attempt last-term)
+                     (declare (unused mode))
+                     
+                     (lookup-term-selection-or-prompt
+                      (nth 1 pattern)
+                      usesel
+                      attempt
+                      last-term))
+                   (lambda (term focus mode)
+                     (lookup-visit-using-url-pattern
+                      (nth 2 pattern)
+                      term focus mode)))
+             )
+           built-in-lookups)
+   )
+  )
+
+
+(defvar *lookup-behaviour* lookup-behaviour-built-in
+  "A list of lists.  The inner lists must all have the form
+(mode term-function visit-function) where mode is the value given to the
+lookup function to reference this behaviour, and term-function and
+visit-function detail how to get the search term and to visit that
+search term respectively.
+
+The term-function must be of type (usesel:boolean, mode:string,
+attempt:integer last-term:string) -> string.  The usesel parameter indicates
+whether the X primary selection should be used.  The mode parameter is the
+value given to lookup.  The attempt parameter indicates how many times this
+search has been attempted (starting from 1).  The last-term parameter gives
+the last search term returned by the term-function, if attempt > 1, or nil
+otherwise.  The return value is the search term taken from that selection or
+obtained in some other way (such as by prompting the user), or nil or the
+empty string if the lookup is to be cancelled.
+
+The visit-function should be of type (term:string, focus:boolean, mode:string)
+-> boolean.  The term parameter gives the search term offered by the user.
+The focus parameter indicates whether or not the visit method should focus the
+window in which the search results are to be presented.  The mode parameter is
+the value given to lookup.  The return value should be t if the search has
+been successful, or nil if not and another attempt to get the search term
+should be made."
+  )
+
+
+(define (lookup mode focus usesel)
+  "Look something up.  With all options enabled, this function starts by take
+a search term either from the current selection or by prompting the user.  If
+the term contains a URL, then it will visit that URL.  Otherwise, the term
+will be sent to either Google, dictionary.com, thesaurus.com, or Multimap.
+The mode parameter should be one of 'google', 'dict', 'thes', or 'map'
+respectively, to indicate your desire in this regard.
+
+Note that the search term simply has to contain a URL to have that URL
+visited.  This means that one may be sloppy in highlighting, selecting an
+entire line for example, and the URL will still be visited.
+
+If the mode is 'java' then the search term will be looked up in the Java class
+documentation.  The search term in this case must be a partially or fully
+qualified class or package name.
+
+Once the destination URL has been calculated, it is sent to the currently
+running web browser instance, and that browser window is focussed.
+
+If the parameter focus is nil then the browser window is not focussed.
+
+If the parameter usesel is nil then the X primary selection is ignored, and
+the user is prompted for the search term regardless."
+  (let loop ((attempt 1)
+             (last-term nil))
+       (let* ((term (get-search-term mode usesel attempt last-term)))
+         (unless (null-string term)
+           (unless (visit-search-term mode term focus)
+             (loop (1+ attempt) term)
+             )
+           )
+         )
+       )
+  )
+
+
+(define (mode-find mode)
+  (let ((result (cdar (filter
+                       (lambda (pair) (= mode (car pair)))
+                       *lookup-behaviour*))))
+    (if result
+        result
+      (error (concat "Lookup: Invalid mode constant \"" mode "\""))
+      )
+    )
+  )
+
+(define (get-term-function mode)
+  (eval (car (mode-find mode)))
+  )
+
+(define (get-visit-function mode)
+  (eval (cadr (mode-find mode)))
+  )
+
+(define (get-search-term mode usesel attempt last-term)
+  ((get-term-function mode) usesel mode attempt last-term)
+  )
+
+(define (visit-search-term mode term focus)
+  ((get-visit-function mode) term focus mode)
+  )
+
+
+;;; Built-in term functions.
+
+(defvar last-successful-term "")
+
+(define (lookup-term-selection-or-prompt prompt usesel attempt last-term)
+  "If usesel is set, try to use the X primary selection as the search term.
+If that selection is empty, or the selection has not changed since the last
+time a search was performed, or usesel is not set, then prompt for the search
+term instead, using the given prompt.
+
+If a search term is rejected by the visit function, then the extended 'cannot
+find' prompt is used.  This is specified by *lookup-cannot-find*."
+  
+  (let* ((sel-contents (string2-trim (x-get-selection 'PRIMARY)))
+         (sel-ok (and usesel
+                      (not (null-string sel-contents))
+                      (not (equal last-successful-term sel-contents))))
+         (will-use-sel (and sel-ok (= attempt 1)))
+         (extended-prompt (if sel-ok
+                              (> attempt 2)
+                            (> attempt 1)))
+         )
+    (if will-use-sel
+        (progn
+          (setq last-successful-term sel-contents)
+          sel-contents
+          )
+      (prompt-for-string
+       (if extended-prompt
+           (concat (format nil *lookup-cannot-find* last-term) prompt)
+         prompt))
+      )
+    )
+  )
+
+
+(define (lookup-term-current-song-lyrics attempt)
+  (unless (> attempt 1)
+    (let* ((f (open-file "~/.current-song" 'read))
+           (s (string2-trim (read-line f))))
+      (concat s " lyrics")
+      )
+    )
+  )
+
+
+;;; Built-in visit functions.
+
+(define (lookup-visit-using-url-pattern pattern term focus mode)
+  "Guess which URL to visit, and visit it (using the url.jl module).  The URL
+visited is either a fragment of the given term if there is something that
+looks like a URL in there, otherwise it's the URL formed by applying the
+given pattern to the given term.  In the latter case, the search term has
+all whitespace folded to a single space.  This ensures that multimap
+searches upon multi-line addresses work, for example."
+  
+  (declare (unused mode))
+
+  (let ((url (or (url-match term)
+                 (format nil pattern
+                         (url-escape-query (fold-whitespace term))))))
+    (when url
+      (url-call url focus)
+      t
+      )
+    )
+  )
+
+
+(define (lookup-visit-javadoc term focus mode)
+  "Open the Javadoc page corresponding to the given term."
+  
+  (declare (unused mode))
+
+  (let* ((doc (javadoc-lookup term)))
+    (when doc
+      (url-call (concat "file://localhost" doc) focus)
+      t
+      )
+    )
+  )
+
+
+;;; Helpers.
+
+(define (null-string str)
+  (or (= str "") (= str ()))
+  )
+
+
+(define (fold-whitespace str)
+  (string-replace "[ \t\r\n]+" " " str)
+  )
+
+
+(define (contains-whitespace s)
+  (or (string2-contains s "\n")
+      (string2-contains s "\r")
+      (string2-contains s "\t")
+      (string2-contains s " ")
+      )
+  )
+
+
+)

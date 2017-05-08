@@ -1,0 +1,63 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Logging
+
+# binary search for a sorted array (ascending order)
+function indexsorted(a,k)
+	low = 1
+	high = length(a)
+	while true
+		pos = div(high-low+1,2)+low
+		pivot = a[pos]
+		k == pivot && return pos 
+		high == low && return 0
+		k > pivot ? low = pos+1 : high = pos-1
+	end
+end
+
+# total variation distance between 2 distributions
+function TV(p,q)
+	s = 0.
+	for i in 1:length(p)
+		s += abs(p[i]-q[i])	
+	end
+	return s/2
+end
+
+# Pearson correlation between two vectors
+function pearson(X,Y)
+	mx = mean(X)
+	my = mean(Y)
+	n = 0.
+	dx = 0.
+	dy = 0.
+	for i in 1:length(X)
+		n += (X[i]-mx)*(Y[i]-my)
+		dx += (X[i]-mx)^2
+		dy += (Y[i]-my)^2
+	end
+	return n/sqrt(dx*dy)
+end
+
+# normalize vector
+function normalize(d)
+	return d/norm(d)
+end
+
+# make vector stochastic
+function stochastic(d)
+	return d/sum(d)
+end

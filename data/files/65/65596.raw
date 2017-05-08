@@ -1,0 +1,27 @@
+#=
+@author titus 
+=#
+A = [1,2,3,4,5,6,7,8,9]
+lst = LinkList{Integer}()
+[push!(lst, x) for x in A ]
+
+exports["test_list_items"] = function test_list()
+  @test strictequal(items(lst), A);
+  @test strictequal(first(lst), 1);
+  @test strictequal(last(lst), 9);
+  unshift!(lst,0)
+  @test strictequal(first(lst), 0);
+  @test strictequal(at(lst,1), first(lst));
+  @test strictequal(at(lst,0), nothing);
+  @test strictequal(last(lst), at(lst,lst.length));
+  @test strictequal(shift!(lst), 0);
+  @test strictequal(lst.length, 9);
+  x2(x) = x*x 
+  m1 = items(map(x2,lst))
+  m2 = map(x2,A)
+  @test strictequal(m1, m2);
+
+
+end
+
+

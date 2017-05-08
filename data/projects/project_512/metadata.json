@@ -1,18 +1,15 @@
-HTTP/1.1 200 OK
+HTTP/1.1 301 Moved Permanently
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:32 GMT
+Date: Wed, 03 May 2017 21:00:37 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 8014
-Status: 200 OK
+Content-Length: 168
+Status: 301 Moved Permanently
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3068
-X-RateLimit-Reset: 1493318926
-Cache-Control: private, max-age=60, s-maxage=60
-Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "52509b20c3e1b04944ba45e2222ad222"
-Last-Modified: Sat, 05 Mar 2016 22:59:05 GMT
+X-RateLimit-Remaining: 4058
+X-RateLimit-Reset: 1493847972
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
-X-Accepted-OAuth-Scopes: repo
+X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo:task, repo_deployment, write:repo_hook
+Location: https://api.github.com/repositories/65243128
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
@@ -22,121 +19,11 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
-X-GitHub-Request-Id: 5537:6634:1344947:18E7DDA:590231C0
+X-Served-By: ef96c2e493b28ffea49b891b085ed2dd
+X-GitHub-Request-Id: 9D1E:5C90:ABDCF7:DCD267:590A44F4
 
 {
-  "id": 53098178,
-  "name": "SymWoodburyMatrices.jl",
-  "full_name": "MPF-Optimization-Laboratory/SymWoodburyMatrices.jl",
-  "owner": {
-    "login": "MPF-Optimization-Laboratory",
-    "id": 1294528,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/1294528?v=3",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/MPF-Optimization-Laboratory",
-    "html_url": "https://github.com/MPF-Optimization-Laboratory",
-    "followers_url": "https://api.github.com/users/MPF-Optimization-Laboratory/followers",
-    "following_url": "https://api.github.com/users/MPF-Optimization-Laboratory/following{/other_user}",
-    "gists_url": "https://api.github.com/users/MPF-Optimization-Laboratory/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/MPF-Optimization-Laboratory/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/MPF-Optimization-Laboratory/subscriptions",
-    "organizations_url": "https://api.github.com/users/MPF-Optimization-Laboratory/orgs",
-    "repos_url": "https://api.github.com/users/MPF-Optimization-Laboratory/repos",
-    "events_url": "https://api.github.com/users/MPF-Optimization-Laboratory/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/MPF-Optimization-Laboratory/received_events",
-    "type": "Organization",
-    "site_admin": false
-  },
-  "private": false,
-  "html_url": "https://github.com/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl",
-  "description": "Symmetric Woodbury operators.",
-  "fork": false,
-  "url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl",
-  "forks_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/forks",
-  "keys_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/teams",
-  "hooks_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/events",
-  "assignees_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/tags",
-  "blobs_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/subscription",
-  "commits_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/merges",
-  "archive_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/downloads",
-  "issues_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl/deployments",
-  "created_at": "2016-03-04T01:40:10Z",
-  "updated_at": "2016-03-05T22:59:05Z",
-  "pushed_at": "2016-07-15T03:33:37Z",
-  "git_url": "git://github.com/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl.git",
-  "ssh_url": "git@github.com:MPF-Optimization-Laboratory/SymWoodburyMatrices.jl.git",
-  "clone_url": "https://github.com/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl.git",
-  "svn_url": "https://github.com/MPF-Optimization-Laboratory/SymWoodburyMatrices.jl",
-  "homepage": null,
-  "size": 7,
-  "stargazers_count": 0,
-  "watchers_count": 0,
-  "language": "Julia",
-  "has_issues": true,
-  "has_projects": true,
-  "has_downloads": true,
-  "has_wiki": true,
-  "has_pages": false,
-  "forks_count": 0,
-  "mirror_url": null,
-  "open_issues_count": 0,
-  "forks": 0,
-  "open_issues": 0,
-  "watchers": 0,
-  "default_branch": "master",
-  "permissions": {
-    "admin": false,
-    "push": false,
-    "pull": true
-  },
-  "organization": {
-    "login": "MPF-Optimization-Laboratory",
-    "id": 1294528,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/1294528?v=3",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/MPF-Optimization-Laboratory",
-    "html_url": "https://github.com/MPF-Optimization-Laboratory",
-    "followers_url": "https://api.github.com/users/MPF-Optimization-Laboratory/followers",
-    "following_url": "https://api.github.com/users/MPF-Optimization-Laboratory/following{/other_user}",
-    "gists_url": "https://api.github.com/users/MPF-Optimization-Laboratory/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/MPF-Optimization-Laboratory/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/MPF-Optimization-Laboratory/subscriptions",
-    "organizations_url": "https://api.github.com/users/MPF-Optimization-Laboratory/orgs",
-    "repos_url": "https://api.github.com/users/MPF-Optimization-Laboratory/repos",
-    "events_url": "https://api.github.com/users/MPF-Optimization-Laboratory/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/MPF-Optimization-Laboratory/received_events",
-    "type": "Organization",
-    "site_admin": false
-  },
-  "network_count": 0,
-  "subscribers_count": 2
+  "message": "Moved Permanently",
+  "url": "https://api.github.com/repositories/65243128",
+  "documentation_url": "https://developer.github.com/v3/#http-redirects"
 }

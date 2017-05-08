@@ -1,0 +1,71 @@
+module Entropy
+
+import StatsBase.entropy
+
+export est_entropy, entropy
+
+## entropy function for an arbitrary log base (should be added to StatsBase)
+function entropy{T<:Real}(p::AbstractArray{T}, b::Real)
+	return entropy(p) / log(b)
+end
+
+## Interface to estimating entropy
+function est_entropy{T<:Real}(x::Vector{T}; variant=:shrink, base=2, nbins=nothing, range=nothing)
+	# Discretize x into bins to produce a categorical distribution
+	counts,Δx = discretize(x;nbins=nbins,range=range)
+	n = length(x)
+
+	# Compute entropy based on specified algorithm
+	if variant == :mle
+		return mle_entropy(counts,n;base=base)
+	elseif variant == :shrink
+		return shrink_entropy(counts,n;base=base) 
+	end
+end
+
+## Maximum-Likelihood estimator
+function mle_entropy(counts::Vector{Int}, n::Int; base=2)
+	return entropy(mle_freqs(counts,n),base)
+end
+
+function mle_freqs(counts::Vector{Int}, n::Int)
+	return counts / n
+end
+
+## James-Stein shrinkage estimator. Reference:
+##     Hausser & Strimmer (2009). Entropy inference and the James-Stein estimator, with
+##     application to nonlinear gene association networks. J Mach Learn Res. 10: 1469-1484.
+function shrink_entropy(counts::Vector{Int}, n::Int; base=2)
+	entropy(shrink_freqs(counts,n),base)
+end
+
+function shrink_freqs(counts::Vector{Int}, n::Int)
+	θ_mle = mle_freqs(counts,n) # zero bias, high variance estimator of freqs
+	t = 1/length(counts)        # zero variance, high bias estimator of freqs
+	λ = (1 - sum(θ_mle.^2)) / ((n-1)*sum((t-θ_mle).^2))
+	return λ*t + (1-λ)*θ_mle
+end
+
+## discretizes a continuous variable into nbins
+function discretize{T<:Real}(x::Vector{T}; nbins=nothing, range=nothing)
+	if range == nothing
+		range = [minimum(x)-eps(), maximum(x)+eps()]
+	else
+		length(range) == 2 || error("range must be a 2 element array")
+		range[1] < range[2] || error("range array must be [min,max]")
+		range[1] < minimum(x) || error("specified range smaller than observed range, min(x) < range[1]")
+		range[2] > maximum(x) || error("specified range smaller than observed range, max(x) > range[2]")
+	end
+
+	if nbins == nothing
+		nbins = int(ceil(range[2]-range[1]+1))
+	end
+
+	e = linspace(range[1],range[2],nbins+1)
+	Δx = e[2]-e[1] # bin width
+	e,counts = hist(x,e)
+	
+	return counts,Δx
+end
+
+end

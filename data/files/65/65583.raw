@@ -1,0 +1,18 @@
+include("../stack.jl")
+s =  Stack{Int64}(5);
+push!(s,200)
+push!(s,400)
+push!(s,800)
+push!(s,900)
+push!(s,600)
+println(cap(s))
+println(size(s))
+println(top(s))
+println(isempty(s))
+
+hasnext, next = iter(s)
+k = Int64[]
+while(hasnext())
+	push!(k, next())
+end
+println(k)

@@ -1,0 +1,100 @@
+module optimizer
+
+using OVRFF.model
+using OVRFF.risk
+
+immutable SGD
+    loss::risk.Loss
+    reg::risk.Regularizer
+    T::Int64
+    B::Int64
+    step_size::Float64
+end
+
+function SGD(loss::risk.Loss, T::Int64, step_size::Float64)
+    SGD(loss, risk.reg_None(), T, 1, step_size)
+end
+
+function SGD(loss::risk.Loss, reg::risk.Regularizer, T::Int64, step_size::Float64)
+    SGD(loss, reg, T, 1, step_size)
+end
+
+function fit!(opt::SGD, X::StridedVecOrMat{Float64},
+    y::StridedVecOrMat{Float64}, h::model.Linear;
+    warm_start::Bool=false)
+
+    if !warm_start
+        model.reset(h)
+    end
+    if opt.B > 1
+        fit_bsto!(opt, X, y, h)
+    else
+        fit_fsto!(opt, X, y, h)
+    end
+end
+
+function fit_fsto!(opt::SGD, X::StridedVecOrMat{Float64},
+    y::StridedVecOrMat{Float64}, h::model.Linear)
+
+    m = size(y, 2)
+    p = size(y, 1)
+    phi_x = Vector{Float64}(2 * h.phi.D)
+    pred = Vector{Float64}(p)
+    grad = Matrix{Float64}(2 * h.phi.D, h.phi.kernel.r)
+    buffer = Vector{Float64}(h.phi.kernel.r)
+
+    @inbounds @simd for i = 1:opt.T
+        idx = (i % m) + 1
+        model.map!(h.phi, slice(X, :, idx), phi_x)
+        model.predict!(h, phi_x, pred, buffer)
+
+        # Accumulate gradient
+        fill!(grad, 0)
+        risk.gradient!(opt.loss, h,
+            phi_x, slice(y, :, idx),
+            pred, grad, buffer)
+        risk.gradient!(opt.reg, h,
+            phi_x, slice(y, :, idx),
+            pred, grad, buffer)
+
+        # Gradient update
+        BLAS.axpy!(length(grad),
+            -opt.step_size, grad, stride(grad, 1),
+            h.ff_coefs, stride(h.ff_coefs, 1))
+    end
+end
+
+function fit_bsto!(opt::SGD, X::StridedVecOrMat{Float64},
+    y::StridedVecOrMat{Float64}, h::model.Linear)
+
+    m = size(y, 2)
+    p = size(y, 1)
+    phi_x = Matrix{Float64}(2 * h.phi.D, opt.B)
+    pred = Matrix{Float64}(p, opt.B)
+    grad = Matrix{Float64}(2 * h.phi.D, h.phi.kernel.r)
+    buffer = Matrix{Float64}(h.phi.kernel.r, opt.B)
+
+    @inbounds @simd for i = 1:opt.B:(opt.B * opt.T)
+        idx = (i % m) + 1
+        idx_end = min(idx + opt.B - 1, m)
+        x_col = idx_end - idx + 1
+        model.map!(h.phi, slice(X, :, idx:idx_end), slice(phi_x, :, 1:x_col))
+        model.predict!(h,
+            slice(phi_x, :, 1:x_col),
+            slice(pred, :, 1:x_col), slice(buffer, :, 1:x_col))
+
+        # Accumulate gradient
+        fill!(grad, 0)
+        risk.gradient!(opt.loss, h,
+            slice(phi_x, :, 1:x_col), slice(y, :, idx:idx_end),
+            slice(pred, :, 1:x_col), grad, slice(buffer, :, 1:x_col))
+        risk.gradient!(opt.reg, h, grad)
+
+        # Gradient update
+        BLAS.axpy!(length(grad),
+            -opt.step_size, grad, stride(grad, 1),
+            h.ff_coefs, stride(h.ff_coefs, 1))
+    end
+end
+
+end # module Optimizer

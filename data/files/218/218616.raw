@@ -1,0 +1,54 @@
+#twiddle
+#= 
+	interleave bits with 64-bit multiply
+=#
+function mort2d(x::Uint64, y::Uint64)
+	m1 = 0x0101010101010101
+	m2 = 0x8040201008040201
+	m3 = 0x0102040810204081
+	a = (((x * m1) & m2) * m3) >> 49
+	b = (((y * m1) & m2) * m3) >> 48
+	return (a & 0x5555) | (b & 0xAAAA)
+end
+
+#= 
+	is power of 2
+=#
+function pow2(v::Uint64)
+	return  (v != 0) && ((v & (v - 1)) == 0)
+end
+
+#= sign, use julia sign =#
+
+#= opposite sign =# 
+function opsign(x::Integer, y::Integer)
+	return (x $ y) < 0
+end
+
+#= min, max  use julia min,  max =#
+
+#= abs use julia abs =#
+
+#= base 2 use julia int/ceil/trunc(base2) =#
+
+# compute the next highest power of 2 of 64bit v
+function nextpow2(v::Uint64)
+	a = 0x0000000000000001
+	b = 0x0000000000000002
+	v > 0 && (v -= a) #avoid underflow wrap by unsigned(0) -1
+	v |= v >> 1
+	v |= v >> 2
+	v |= v >> 4
+	v |= v >> 8
+	v |= v >> 16
+	v < b && (v += a) #fix 0 and 1 as next pow  == 2
+	v < b && (v += a)
+	v > b && (v += a)
+	return v
+end
+
+println(nextpow2(uint(2^32)))
+
+println([uint(i) for i in 0:32])
+println([nextpow2(uint(i)) for i in -4:32])
+println(nextpow2(uint(-32)))

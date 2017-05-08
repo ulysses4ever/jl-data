@@ -1,0 +1,6 @@
+fib(n) = ([1 1 ; 1 0]^n)[1,2]
+function se(n)
+  m = fib(n)
+  return m<4e6&&m%2<1?m:0
+end
+println(sum(se(x),1:50)))

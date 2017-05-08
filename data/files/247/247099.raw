@@ -1,0 +1,71 @@
+
+# Performance tests for InterestRates module
+
+println("Running perftests...")
+
+using InterestRates
+
+dt_curve = Date(2015,08,08)
+
+vert_x = [11, 15, 19, 23, 25, 200, 500]
+vert_y = [0.10, 0.12, 0.20, 0.19, 0.21, 0.21, 0.22]
+NS_params = [0.1, 0.2, 0.3, 0.5]
+SVEN_params = [0.1, 0.2, 0.3, 0.4, 0.5, 0.8]
+
+mat_vec = [ Date(2015,08,08), Date(2015,08,12), Date(2015,08,17), Date(2015,08,18), Date(2015,08,19), 
+	Date(2015,08,21), Date(2015,08,22), Date(2015,08,23), Date(2015,08,25), Date(2015,08,26),
+	Date(2015,08,27), Date(2015,08,29), Date(2015,08,30), Date(2015,08,31), Date(2015,09,26)]
+
+days_vec = [Dates.Day(i) for i=1:1500]
+
+curve_linear = InterestRates.IRCurve("dummy-linear", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.Linear(), dt_curve,
+	vert_x, vert_y)
+
+curve_flatforward = InterestRates.IRCurve("dummy-flatforward", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.FlatForward(), dt_curve,
+	vert_x, vert_y)
+
+curve_ns = InterestRates.IRCurve("dummy-ns", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.NelsonSiegel(), dt_curve,
+	NS_params)
+
+curve_sven = InterestRates.IRCurve("dummy-sven", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.Svensson(), dt_curve,
+	SVEN_params)
+
+curve_spline_rates = InterestRates.IRCurve("dummy-spline_rates", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.CubicSplineOnRates(), dt_curve,
+	vert_x, vert_y)
+
+curve_spline_df = InterestRates.IRCurve("dummy-spline_df", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.CubicSplineOnDiscountFactors(), dt_curve,
+	vert_x, vert_y)
+
+curve_step = InterestRates.IRCurve("dummy-step", InterestRates.Actual360(),
+	InterestRates.ExponentialCompounding(), InterestRates.StepFunction(), dt_curve,
+	vert_x, vert_y)
+
+c_array = [curve_linear, curve_flatforward, curve_ns, curve_sven, curve_spline_rates, curve_spline_df, curve_step]
+
+# Warm up
+
+for c in c_array
+	zero_rate(c, mat_vec)
+	ERF(c, mat_vec)
+	discountfactor(c, mat_vec)
+end
+
+sp = InterestRates.splinefit(vert_x, vert_y)
+InterestRates.splineint(sp, convert(Vector{Int}, 1:30))
+
+# Perftests
+
+for c in c_array
+	println("$(curve_get_method(c))")
+	@time for i=1:1000 zero_rate(c, curve_get_date(c) + days_vec) end
+	@time for i=1:1000 ERF(c, curve_get_date(c) + days_vec) end
+	@time for i=1:1000 discountfactor(c, curve_get_date(c) + days_vec) end
+end
+
+println("Perftests end")

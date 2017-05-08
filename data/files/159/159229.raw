@@ -1,0 +1,54 @@
+module RandomHyperplaneClassifiers
+using Classifiers
+using Distributions
+import Classifiers.fit,Classifiers.predict
+
+export RandomHyperplaneClassifier,RandomHyperplaneConfig,fit,predict
+
+type RandomHyperplaneClassifier <: Classifier
+  b::Float64 #bias
+  w::Array{Float64} #normal
+  polarity::Float64
+end
+
+type RandomHyperplaneConfig  <: ClassifierConfig
+
+end
+
+typealias Input Vector{Float64}
+typealias Inputs Vector{Input}
+typealias Output Int
+typealias Outputs Vector{Output}
+
+function fit(c::RandomHyperplaneConfig,x::Inputs,y::Outputs)
+  d=length(x[1])
+  extended_x=map(data -> [data;1], x)
+  norms=map(norm, extended_x)
+  μ_norm=mean(norms)
+  σ_norm=std(norms)
+  norm_generator=Normal(μ_norm, σ_norm)
+  new_norm=rand(norm_generator,1)[1]
+  w=rand(d+1)
+  w=w./norm(w)*new_norm
+
+  m=RandomHyperplaneClassifier(w[end],w[1:end-1],1)
+
+  e=loss(m,x,y)
+  if (e>0.5)
+    m=RandomHyperplaneClassifier(m.b,m.w,-1)
+  end
+  return m
+end
+
+function predict(c::RandomHyperplaneClassifier,x::Input)
+  # println(x)
+  # println(c.w)
+  # println(c.b)
+  sign(sum(x.*c.w)+c.b)*c.polarity
+end
+
+function predict(c::RandomHyperplaneClassifier,x::Inputs)
+  map(d -> predict(c,d),x)
+end
+
+end

@@ -1,0 +1,119 @@
+############# forward sweep and encoding ##############
+walk(f::Function,ex::Expr) = f(Expr(ex.head,map(x->walk(f,x),ex.args)...))
+walk(f::Function,ex)       = f(ex)
+
+#find active symbols in an expression.  return list of Symbols and list of Actives
+#used in encode.jl
+active_syms(ex) = active_syms!({},{},ex)
+function active_syms!(s_list, AS_list, ex::Expr)
+    map(x->active_syms!(s_list,AS_list,x), ex.args)
+    (s_list, AS_list)
+end
+function active_syms!(s_list, AS_list, s::Active)
+    push!(s_list, s.sym)
+    push!(AS_list,s)
+    (s_list, AS_list)
+end
+active_syms!(s_list, AS_list, a::Any) = (s_list,AS_list)
+
+#activate! declare a symbol active if it isn't already, and return the appropriate Active type
+function activate!(s::SymDict,x::Symbol)
+    if !haskey(s,x)
+        merge!(s,[x=>ASymbol(x)])
+    else
+        warn("$x already active")
+    end
+    s[x]
+end
+function activate!(s::SymDict,x::Expr)
+    if Meta.isexpr(x,:ref)
+        activate_ref!(s,x)
+    elseif Meta.isexpr(x,:(::))
+        activate!(s,x.args[1])
+    else
+        error("can't activate $x with head $(x.head)")
+    end
+end
+function activate_ref!(s::SymDict,x::Expr)
+    if !haskey(s,x.args[1])
+        merge!(s,[x=>ASymbol(x.args[1])])
+    else
+        warn("$x already active")
+    end
+    ARef(s[x],x.args[2])
+end
+
+function activate!(s::SymDict,x::Symbol,dx::Symbol)
+    merge!(s,[x=>ASymbol(x,dx)])
+    s[x]
+end
+
+#tag: find symbols that are active and replace with appropriate Active type
+tag(x,s::SymDict) = walk(y->_tag(y,s),x)
+_tag(x::Symbol, s::SymDict) = get(s,x,x)
+function _tag(x::Expr)
+    if meta.isexpr(x,:ref) && isa(x.args[1],Active) #x.head == :ref && isa(x.args[1],Active)
+        ARef(x.args[1], x.args[2:end])
+    elseif meta.isexpr(x,symbol('\'')) && isa(x.args[1],Active)
+        ATrans(x.args[1])
+    elseif meta.isexpr(x,:(::)) && isa(x.args[1],Active)
+        ATypeassert(x.args[1],x.args[2])
+    else
+        x
+    end
+end
+_tag(x::Any, s::SymDict) = x
+
+#encode_*:
+function encode_function!(f::Expr, s::SymDict)
+    #expect s to contain all args w/r/t/ which we want to differentiate
+    fsig = tag(f.args[1],s)
+    block = encode!(f.args[2],s)
+    Expr(:function,fsig,block)
+end
+
+function encode_block!(b::Expr,s::SymDict)
+    @assert b.head == :block
+    args = map(ex->encode!(ex,s),b.args)
+    Expr(:block,args...)
+end
+
+function encode_for!(b::Expr,s::SymDict)
+    @assert b.head == :for
+    s_inner = copy(s)  #s_inner may contain additional active vars local to loop body
+    block=encode!(b.args[2], s_inner)
+    AFor(b.args[1],block,s_inner)
+end
+
+function encode_assign!(ex::Expr,s::SymDict)
+    @assert ex.head == :(=)
+    rhs = tag(ex.args[2],s)
+    n_active_rhs = active_syms(rhs)[1]
+    if length(n_active_rhs) > 0
+        Expr(:(=), activate!(s,ex.args[1]),rhs)
+    else
+        #even if the LHS var is not active, we need to note that it was assigned
+        #e.g. if we write y = zeros(10) then we'll know y isn't local later
+        activate!(s,ex.args[1])
+        Expr(:(=), ex.args[1], rhs)
+    end
+end
+
+function encode_incr!(ex::Expr,s::SymDict)
+    @assert ex.head == :(+=)
+    Expr(:(+=),map(x->tag(x,s),ex.args)...)
+end
+
+function encode_call!(ex::Expr,s::SymDict)
+    Expr(:(=),activate!(s,gensym("val")),tag(ex,s))
+end
+
+encode!(ex::Expr,s::SymDict) = encode_lookup![ex.head](ex,s)
+encode!(x::Any,s::SymDict) = tag(x,s)
+encode_lookup! = [:function=>encode_function!,
+                  :block=>encode_block!,
+                  :for=>encode_for!,
+                  :(=)=>encode_assign!,
+                  :(+=)=>encode_incr!,
+                  :line => ((x,s)->x),
+                  :call => encode_call!]

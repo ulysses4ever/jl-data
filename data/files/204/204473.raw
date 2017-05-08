@@ -1,0 +1,58 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Plotly, Logging
+
+# plot x->y points
+function plot_data(X,Y, fname)
+	data = [
+	  [
+	    "x" => X, 
+	    "y" => Y, 
+	    "type" => "scatter"
+	  ]
+	]
+
+	response = Plotly.plot([data], ["filename" => fname, "fileopt" => "overwrite"])
+	plot_url = response["url"]
+end
+
+
+# plot 2 histograms
+function plot_histograms(hist1, hist2, fname, title)
+	trace1 = [
+	  "x" => hist1,
+	  "name" => "true distribution",
+	  "opacity" => 0.75,
+	  "histnorm" => "probability density",
+	  "type" => "histogram"
+	]
+	trace2 = [
+	  "x" => hist2,
+	  "name" => "random walk",
+	  "opacity" => 0.75,
+	  "histnorm" => "probability density",
+	  "type" => "histogram"
+	]
+
+	data = [trace1, trace2]
+	layout = ["title" => title,
+	  "xaxis" => ["title" => "Degree"],
+	  "yaxis" => ["title" => "Frequency"],
+	  "barmode" => "overlay"]
+
+	response = Plotly.plot([data], ["layout" => layout, "filename" => fname, "fileopt" => "overwrite"])
+	plot_url = response["url"]
+end

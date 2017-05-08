@@ -1,0 +1,4 @@
+g = random_evolving_graph(4,5)
+g2 = reverse(g)
+@test g.ilist == g2.jlist
+@test g.jlist == g2.ilist

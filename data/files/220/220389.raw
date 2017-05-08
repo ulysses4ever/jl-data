@@ -1,0 +1,49 @@
+include( "IO_MCITW-1P.jl" )
+include( "verification.jl" )
+include( "searching.jl" )
+include( "neighbourhoods.jl" )
+
+function VND( prob, penPar )
+  
+  sol = GIS( prob )
+  
+  currObj = sol.trspCost + sol.invCost + sol.penCost*penPar
+  newObj = 0
+  
+  aux = 1
+  indP = [0 0]
+  while ( aux == 1 )
+    for j1 in 1:(prob.cardP-1)
+      for j2 = (j1+1):prob.cardP
+      
+        newSol = swapPickups( prob, sol, [j1 j2] )
+        
+        newObj = newSol.trspCost + newSol.invCost + newSol.penCost*penPar
+        
+        if ( ( sol.feas == newSol.feas ) && ( newObj < currObj ) )
+          println("optima local found: swapPickups[", j1,", ", j2,"]")
+          sol = newSol
+          printSol(prob,sol)
+          currObj = sol.trspCost + sol.invCost + sol.penCost*penPar
+          aux = 2
+        elseif ( sol.feas == false ) && ( newSol.feas == true )
+          println("optima local found: swapPickups[", j1,", ", j2,"]")
+          sol = newSol
+          printSol(prob,sol)
+          currObj = sol.trspCost + sol.invCost + sol.penCost*penPar
+          aux = 2
+        end
+        
+      end
+    end
+    
+    if ( aux == 2 )
+      aux = 1
+    else
+      aux = 0
+    end
+  end
+  
+  return sol
+  
+end

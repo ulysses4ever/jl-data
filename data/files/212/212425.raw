@@ -1,0 +1,38 @@
+function MP1(DvF0,y0,x0)
+      
+    # 1. Dimensiones de las variables relevantes:
+        ny = size(y0,1); 
+        nx = size(x0,1); 
+        n0 = nx + ny;   
+
+    # 2. Matrices A y B [1]:  
+        A  = + DvF0[ : ,      1 : 1*n0 ];
+        B  = - DvF0[ : , n0 + 1 : 2*n0 ];
+
+    # 3. Solución al problema de valores propios relevante para aplicar el método [1]:
+        (vecD,V) = eig(B,A);      
+
+    # 4. Reordenamiento de D y V [1][2]:
+        sortDV = sortcols([abs(vecD)';vecD';V]);
+        D      = diagm(vec(sortDV[2,:]));
+        V      = sortDV[3:end,:];
+
+    # 5. Cálculo de las matrices DxZ y DxT [1]:
+        D11  = D[      1 : nx , 1 : nx ];
+        V11  = V[      1 : nx , 1 : nx ];
+        V21  = V[ nx + 1 : n0 , 1 : nx ];
+        Dxg0 = V21/V11;
+        Dxh0 = V11*D11/V11;
+
+    # 6. Resultados:
+        return Dxg0, Dxh0
+        
+end
+
+# ================================================================================================================================= 
+#   Observaciones:
+# ================================================================================================================================= 
+#     [1] Vea el capítulo 2 de la tesis para más detalles.
+#     [2] A diferencia de MATLAB, actualmente Julia no puede ordenar los valores propios con un solo comando,
+#         pero de seguro eso se corregirá en un futuro próximo. Mejoraré estas líneas cuando eso pase.
+# =================================================================================================================================

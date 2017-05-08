@@ -1,0 +1,94 @@
+module OrderStatistics
+
+using Ordering
+using Sorting
+using Utility
+
+export select!
+
+#returns the index of the median
+#TODO: make it prettier
+function selectMoM!{T}(arr::AbstractArray{T},
+                    k::Integer,
+                    ord::Order = LesserEQ)
+  if k < 1 && k > length(arr)
+    error("This median doesn't exist k = $k len = $(length(arr))")
+  end
+
+  if length(arr) <= 140
+    quicksort!(arr)
+    return k
+  end
+
+  #these are used for the 5-grouping of the array
+  #medians = Array(T, 0)
+  const len = length(arr)
+  const numMedians = iceil(len/5) #-fld(-length(arr), 5)
+  i = 1
+  left = 1
+  right = 1
+  mid = 1 #midpoint
+
+  for i in 1:numMedians
+    left = i*5 - 4
+    right = i*5 > len ? len : i*5 #takes care of the case length(arr) != 5k for some integer k
+    mid = fld(left + right, 2)
+    insertionsort!(sub(arr, left:right), ord)
+    (arr[i], arr[mid]) = (arr[mid], arr[i]) #puts the
+  end
+
+  #finds the median element of the medians
+  momIdx = selectMoM!(sub(arr, 1:numMedians), fld(numMedians, 2), ord)
+  idx = partition!(arr, ord, pivIdx = momIdx)
+
+  if idx == k
+    return idx
+  elseif idx < k
+    return selectMoM!(sub(arr, (idx+1):len), k-idx, ord)
+  else #idx > k
+    return selectMoM!(sub(arr, 1:(idx-1)), k, ord)
+  end
+end
+
+function selectQuick!{T}(arr::AbstractArray{T},
+                         k::Integer,
+                         ord::Order = LesserEQ;
+                         randPiv = true)
+  if k < 1 && k > length(arr)
+    error("This median doesn't exist")
+  end
+
+  if length(arr) <= 140
+    quicksort!(arr, randPiv = randPiv)
+    return k
+  end
+
+  idx = 0
+  if random
+    idx = partition!(arr, ord, randPiv = randPiv)
+  else
+    idx = partition!(arr, ord, pivIdx = rp)
+  end
+
+  if idx == k
+    return idx
+  elseif idx < k
+    return selectQuick!(sub(arr, (idx+1):len), k-idx, ord, randPiv = randPiv)
+  else #idx > k
+    return selectQuick!(sub(arr, 1:(idx-1)), k, ord, randPiv = randPiv)
+  end
+end
+
+#returns the index of the kth biggest element in the array
+function select!{T}(arr::AbstractArray{T},
+                    k::Integer,
+                    ord::Order = LesserEQ;
+                    random = false,
+                    randPiv = false)
+  if random
+    selectQuick!(arr, k, ord, randPiv = randPiv)
+  else
+    selectMoM!(arr, k, ord)
+  end
+end
+end

@@ -1,0 +1,33 @@
+using Distributions
+using Entropy
+using Base.Test
+
+# Test on one-bit Bernoulli random variable
+d = Bernoulli(0.5)
+@test(entropy(d,2) == 1.0)
+
+variants = [:mle,:shrink]
+for v = variants
+	h = est_entropy(rand(d,10000); variant=v)
+	@test(abs(h-1.0)<1e-2)
+end
+
+# 4-bit uniform categorical distribution
+d = Categorical(16)
+@test(entropy(d,2) == 4.0)
+
+for v = variants
+	h = est_entropy(rand(d,10000); variant=v)
+	@test(abs(h-4.0)<1e-2)
+end
+
+# Non-uniform categorical distribution
+d1 = Categorical([0.1, 0.5, 0.4])
+d2 = Categorical([0.1, 0.5, 0.0, 0.4]) # should have equal entropy
+
+for v = variants
+	h1 = est_entropy(rand(d1,100000); variant=v)
+	h2 = est_entropy(rand(d2,100000); variant=v)
+	@test(abs(h1-1.3609)<1e-2)
+	@test(abs(h2-1.3609)<1e-2)
+end

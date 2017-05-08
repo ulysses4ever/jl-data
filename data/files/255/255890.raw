@@ -1,0 +1,47 @@
+#!/usr/bin/julia
+
+using HTTPClient.HTTPC
+using ZipFile
+
+## function to download any file
+function downloadFile(urlSting::String, filename::String)
+## supposed to use a randon fileName
+#	outFile = random string
+	outFile = filename
+	try	
+		ofs = open ("/tmp/$(outFile)", "w+")
+		res = HTTPClient.get("$(urlString)", RequestOptions(ostream=ostream))
+		if ( r.http_code != 200 )
+			throw (Exception())
+		end
+	catch err
+		println ("downloadFile(): $e")
+		outFile = ""
+	finally
+		close (ofs)
+	end
+
+# supposed to return downloaded filename
+	return outFile
+end
+
+## extract any file
+function extractZip(filename::String)
+	try
+		zipData = ZipFile.Reader("$(filename)");
+		for f in zipData.files
+			ofs = open("/tmp/$(f.name)","w+")
+			write (ofs,readall(f))
+			close (ofs)
+# assuming that there is only one file
+# else we need ot store filenames in a array
+			extractedFilename = f.name
+		end
+		close(zipData)
+	catch err
+		println ("extractZip: $err")
+		extractedFilename = ""
+	end
+
+	return extractedFilename
+end

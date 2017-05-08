@@ -1,0 +1,14 @@
+#=
+@author titus 
+=#
+lst = [1, 2, 2, 2, 3, 5, 9]
+flt = [0.0, 0.1, 0.2, 0.3, 0.4]
+
+exports["test_bs"] = function test_bs()
+  @test strictequal(bs(lst,3), 5);
+  @test strictequal(bs(lst,2), 4);
+  @test strictequal(bs(Int64[],42), -1);
+  @test strictequal(bs(flt, 0.25), -5);
+end
+
+

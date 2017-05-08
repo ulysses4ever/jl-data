@@ -1,0 +1,76 @@
+using MethylClust
+using PyPlot
+
+### Example fit
+A,P,c = generate_reads(N=100,W=30);
+
+figure()
+perm = randperm(100)
+subplot(1,2,1), plot_meth(A[perm,:],ones(100))
+subplot(1,2,2), plot_meth(A,c)
+savefig("./figs/01_01.svg")
+
+
+# Plot fit
+X,Y,ch = fit_soft(A,2)
+MethylClust.eval_synthetic_results(X,Y,c,P;make_plots=true,save_plots=true)
+
+### Synthetic Data Parameter Sweep
+Nlevs = [10:10:100]
+Wlevs = [7:3:36]
+nr = 20 # number of replicates
+L = 100 # genome length
+
+# Storage for X and Y errors/distance
+Xd = zeros(length(Nlevs),length(Wlevs),nr)
+Yd = zeros(length(Nlevs),length(Wlevs),nr)
+
+# Main loop -- fit for a variety of parameters
+for n = 1:length(Nlevs)
+    N = Nlevs[n]
+    for w = 1:length(Wlevs)
+        W = Wlevs[w]
+        println("Fitting with N = ",N," reads of length W = ",W,".")
+        for r = 1:nr
+            print("*")
+            A,P,c = generate_reads(N=N, W=W, L=L, Cprob=[0.5,0.5]);
+            X,Y,ch = fit_soft(A,2)
+            Xd[n,w,r],Yd[n,w,r] = MethylClust.eval_synthetic_results(X,Y,c,P;make_plots=false)
+        end
+        println()
+    end
+end
+
+# Average classification error vs number and length of reads
+Xdm = squeeze(mean(Xd,3),3)
+
+imshow(Xdm,cmap=ColorMap("Greys"),interpolation="None")
+xticks(0:length(Wlevs)-1,Wlevs),yticks(0:length(Nlevs)-1,Nlevs)
+xlabel("Read Length"),ylabel("Number of Reads"),title("Xdist, Num Sites = "*string(L))
+colorbar(label="proportion misclassified")
+savefig("./figs/02_01.svg")
+
+# Average classification error vs coverage and number of reads
+N = repmat(Nlevs,1,length(Wlevs))
+W = repmat(Wlevs',length(Nlevs),1)
+
+figure()
+scatter(vec(N).*vec(W)./L,vec(Xdm),c=vec(W),s=40,cmap=ColorMap("Reds_r"))
+colorbar(ticks=[10,30],label="sites per read")
+ylabel("proportion misclassified"), xlabel("coverage")
+savefig("./figs/02_02.svg")
+
+# Methylation Profile reconstruction error
+Ydm = squeeze(mean(Yd,3),3)
+
+imshow(Ydm,cmap=ColorMap("Greys"),interpolation="None")
+xticks(0:length(Wlevs)-1,Wlevs),yticks(0:length(Nlevs)-1,Nlevs)
+xlabel("Read Length"),ylabel("Number of Reads"),title("Ydist, Num Sites = "*string(L))
+savefig("./figs/02_03.svg")
+
+figure()
+scatter(vec(N).*vec(W)./L,vec(Ydm),c=vec(W),s=40,cmap=ColorMap("Reds_r"))
+colorbar(ticks=[10,30],label="sites per read")
+ylabel("reconstruction error"), xlabel("coverage")
+savefig("./figs/02_04.svg")
+

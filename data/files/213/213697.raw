@@ -1,0 +1,15 @@
+## =============================================================================
+## 15_hexbin.jl - Bin data into tiled hexagonal bins and color by count.
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+X = rand(MultivariateNormal([0.0, 0.0], [1.0 0.5; 0.5 1.0]), 10000)
+
+## 1. 
+plot(x=X[1,:], y=X[2,:], Geom.hexbin)
+
+## 2.
+plot(x=X[1,:], y=X[2,:], Geom.hexbin(xbincount=100, ybincount=100))
+

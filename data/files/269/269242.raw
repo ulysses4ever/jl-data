@@ -1,0 +1,15 @@
+module Preallocation
+
+type Type_Preallocation
+
+    layer_1_weights::Array{Float32, 1}
+    layer_2_weights::Array{Float32, 1}
+    inputs::Array{Float32, 1}
+    hidden_activations::Array{Float32, 1}
+    outputs::Array{Float32, 1}
+    fitness_ref::Array{Float32, 1}
+    walls::Array{Float32, 1}
+
+end
+
+end

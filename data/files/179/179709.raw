@@ -1,0 +1,9 @@
+using cme257hw4
+using Base.Test
+
+# write your own tests here
+R(z) = z.^2
+x = [-2:.1:2]
+y = [-2:.1:2]
+J = julia_set(R, x, y)
+@test J[1,1] == 4.0

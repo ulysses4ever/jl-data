@@ -1,0 +1,108 @@
+module Spike
+
+# include("constants.jl")
+const MOUSE = 0
+
+import GLFW
+using ModernGL
+
+# Initialize OpenGL library
+GLFW.Init()
+
+# Hints for OS X to use proper version of OpenGL
+@osx_only begin
+    GLFW.WindowHint(GLFW.CONTEXT_VERSION_MAJOR, 3)
+    GLFW.WindowHint(GLFW.CONTEXT_VERSION_MINOR, 2)
+    GLFW.WindowHint(GLFW.OPENGL_PROFILE, GLFW.OPENGL_CORE_PROFILE)
+    GLFW.WindowHint(GLFW.OPENGL_FORWARD_COMPAT, GL_TRUE)
+end
+
+
+######
+# Windowing
+######
+
+export WindowInstance, update, clear, close, open, terminate
+
+type WindowInstance
+	width::Int
+	height::Int
+	title::String
+	xposition::Int
+	yposition::Int
+	# framerate::Int - coming soon
+	windowObject
+
+	function WindowInstance(width::Int, height::Int, title::String, xposition::Int, yposition::Int)
+		# Create window
+		windowObject = GLFW.CreateWindow(width, height, title)
+
+		# Make window current OpenGL context
+		GLFW.MakeContextCurrent(windowObject)
+
+		# Set window position
+		GLFW.SetWindowPos(windowObject, xposition, yposition)
+
+		# Return new WindowInstace
+		new(width::Int, height::Int, title::String, xposition::Int, yposition::Int, windowObject)
+	end
+end
+
+function update(window::WindowInstance)
+	# Swap front and back buffers
+	GLFW.SwapBuffers(window.windowObject)
+
+	# Poll for and process events
+	GLFW.PollEvents()
+end
+
+function clear(window::WindowInstance)
+	# Clear buffer
+	glClear(GL_COLOR_BUFFER_BIT)
+end
+
+function close(window::WindowInstance)
+	# Close window
+	GLFW.SetWindowShouldClose(window.windowObject, 1)
+end
+
+function open(window::WindowInstance)
+	# Check to see if window is closed
+	!GLFW.WindowShouldClose(window.windowObject)
+end
+
+function terminate()
+	# Terminate OpenGL
+	GLFW.Terminate()
+end
+
+
+######
+# Inputs
+######
+
+export Mouse, input # update is already exported in windowing area
+
+type Mouse
+	window::WindowInstance
+	x::Float64
+	y::Float64
+
+	function Mouse(window, x=0.0, y=0.0)
+		window = window
+		x = GLFW.GetCursorPos(window.windowObject)[1]
+		y = GLFW.GetCursorPos(window.windowObject)[2]
+
+		new(window, x, y)
+	end
+end
+
+function update(mouse::Mouse)
+	mouse.x = GLFW.GetCursorPos(mouse.window.windowObject)[1]
+	mouse.y = GLFW.GetCursorPos(mouse.window.windowObject)[2]
+	return (mouse.x,mouse.y)
+end
+
+
+end # module
+

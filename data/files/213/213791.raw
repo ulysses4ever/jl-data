@@ -1,0 +1,11 @@
+## =============================================================================
+## xxxxx.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using Gadfly
+
+plot(layer(x=[1 2], y=[1 2], Geom.point, Geom.line),
+     layer(x=[2 3], y=[2 1], Geom.point, Geom.line),
+     layer(x=[0.5 1], y=[0 1], Geom.point, Geom.line)
+##     layer(x=[2 3], y=[2 1], Geom.point, Geom.line)
+     )

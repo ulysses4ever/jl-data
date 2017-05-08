@@ -1,0 +1,12 @@
+using LoraMPI
+using MPI
+
+function main()
+    MPI.Init()
+
+    MPIState(0)
+
+    MPI.Finalize()
+end
+
+main()

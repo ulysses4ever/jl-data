@@ -1,0 +1,245 @@
+using Graphs, Plotly, Distance, DataStructures, Logging
+
+### Graph IO 
+
+# load serialized adjacency list
+function load_serialized(filename)
+	x = open(filename, "r") do file
+		deserialize(file)
+	end
+	return x
+end
+
+# serialize graph
+function serialize_to_file(x, filename)
+	open(filename, "w") do file
+		serialize(file, x)
+	end
+end
+
+### Basic stats ###
+
+# get # vertices, # of edges and density
+function get_basic_stats(g)
+	nvs = length(vertices(g))
+	nes = num_edges(g)
+	density = nes/(nvs*(nvs-1))
+	return nvs,nes,density
+end
+
+# get out degree stats (avg, max, array of sinks)
+function get_out_degree_stats{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	sum = 0
+	sinks = T[]
+	max_degree = 0
+	vs = vertices(g)
+	for v in vs
+		children = out_neighbors(v,g)
+		od = length(children)
+		sum += od
+		if od == 0
+			push!(sinks,v)
+		end
+		if od > max_degree
+			max_degree = od
+		end
+	end
+	return sum/length(vs),max_degree,sinks
+end
+
+# get array of sinks
+function get_sinks{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	sinks = T[]
+	vs = vertices(g)
+	for v in vs
+		children = out_neighbors(v,g)
+		od = length(children)
+		if od == 0
+			push!(sinks,v)
+		end
+	end
+	return sinks
+end
+
+# get array of sources 
+function get_sources{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	achildren = T[]
+	vs = vertices(g)
+	for v in vs
+		children = out_neighbors(v,g)
+		achildren = union(achildren,children)
+	end
+	return setdiff(vs,achildren)
+end
+
+# Tarjan algorithm (recursive version)
+#
+# NB: successfully tested with FA core
+# NB: the recursive calls may create a stack overflow error
+function tarjan{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	sccs = Array(Array{T,1},0)
+	n = length(vertices(g))
+	indices = zeros(T,n)
+	lowlinks = zeros(T,n)
+	S = T[]
+	index = 1
+
+	# recursive function
+	function visit(v)
+		indices[v] = index
+		lowlinks[v] = index
+		index += 1
+		push!(S,v)
+		children = out_neighbors(v,g)
+		for w in children
+			# w was not visited yet
+			if indices[w] == 0
+				# recursive call
+				visit(w)
+				# back propagate the lowlink
+				lowlinks[v] = min(lowlinks[v], lowlinks[w])
+			# w is in S and hence in the current SCC
+			elseif findfirst(S,w) != 0
+				lowlinks[v] = min(lowlinks[v], indices[w])
+			end
+		end
+
+		if lowlinks[v] == indices[v]
+			component = T[]
+			while true
+				w = pop!(S)
+				push!(component,w)
+				w == v && break
+			end
+			push!(sccs,component)
+		end
+	end
+
+	for v in vertices(g)
+		indices[v] == 0 && visit(v)
+	end
+
+	return sccs
+end
+
+# Pearce version of Tarjan algorithm
+#
+# NB: successfully tested with FA core
+# NB: the recursive calls may create a stack overflow error
+function pearce{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	n = length(vertices(g))
+	rindex = zeros(T,n)
+	S = T[]
+	index = 1
+	c = n-1
+
+	# recursive function
+	function visit(v)
+		root = true
+		rindex[v] = index
+		index += 1
+		children = out_neighbors(v,g)
+		for w in children
+			rindex[w] == 0 && visit(w)
+			rindex[w] < rindex[v] && begin rindex[v] = rindex[w]; root = false end
+		end
+		if root
+			index -= 1
+			while !isempty(S) && rindex[v] <= rindex[S[end]]
+				w = pop!(S)
+				rindex[w] = c
+				index -= 1
+			end
+			rindex[v] = c
+			c -= 1
+		else
+			push!(S,v)
+		end
+	end
+
+	for v in vertices(g)
+		if rindex[v] == 0
+			visit(v)
+		end
+	end
+
+	return rindex
+end
+
+type state{T}
+	v::T
+	stage::T
+	root::Bool
+end
+
+# Pearce version of Tarjan algorithm - iterative version
+function pearce_iterative{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	n = length(vertices(g))
+	rindex = zeros(T,n)
+	S = T[]
+	index = 1
+	c = n-1
+
+	function visit(v)
+		states = state[]
+		current_state = state(v,convert(T,0),true)
+		push!(states, current_state)
+
+		@label start
+		while !isempty(states)
+			current_state = pop!(states)
+			active_loop = false
+			#println("----------")
+			#println("v: ", current_state.v, ", stage: ", current_state.stage, " (index: ", index, ", #states: ", length(states), ")")
+
+			if current_state.stage == 0
+				#root = true
+				rindex[current_state.v] = index
+				index += 1
+				active_loop = true
+			end
+			children = out_neighbors(current_state.v,g)
+			for w in children
+				if active_loop
+					if rindex[w] == 0
+						current_state.stage = w
+						push!(states,current_state)
+
+						#println("- new state: ", w)
+						new_state = state(w,convert(T,0),true)
+						push!(states,new_state)
+						@goto start
+					end
+					rindex[w] < rindex[current_state.v] && begin rindex[current_state.v] = rindex[w]; current_state.root = false end
+				elseif current_state.stage == w
+					active_loop = true
+					rindex[w] < rindex[current_state.v] && begin rindex[current_state.v] = rindex[w]; current_state.root = false end
+				end
+			end
+			if current_state.root
+				index -= 1
+				while !isempty(S) && rindex[current_state.v] <= rindex[S[end]]
+					w = pop!(S)
+					rindex[w] = c
+					index -= 1
+				end
+				rindex[current_state.v] = c
+				c -= 1
+			else
+				push!(S,current_state.v)
+			end
+		end
+	end
+
+	for v in vertices(g)
+		if rindex[v] == 0
+			visit(v)
+		end
+	end
+
+	return rindex
+end
+
+### Plotly ###
+
+### deprecated code ###

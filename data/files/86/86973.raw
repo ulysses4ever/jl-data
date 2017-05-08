@@ -1,0 +1,15 @@
+module SplineDesignMatrix
+
+using StatsBase
+using DataFrames
+using GLM
+
+export
+    FormulaHelper,
+    Poly,
+    DataFrameRegressionModelPlus
+
+include("main.jl")
+include("poly.jl")
+
+end # module

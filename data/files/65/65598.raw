@@ -1,0 +1,42 @@
+#=
+@author titus 
+=#
+
+exports["test_stack_fn"] = function test_stack()
+  s =  Stack{Int64}(5)
+  push!(s, 200)
+  push!(s, 400)
+  push!(s, 800)
+
+  @test strictequal(cap(s), 5);
+  @test strictequal(size(s), 3);
+  @test strictequal(top(s), 800);
+  push!(s, 500)
+  @test strictequal(size(s), 4);
+  @test strictequal(pop!(s), 500);
+  @test strictequal(pop!(s), 800);
+  @test strictequal(isempty(s), false);
+  @test strictequal(is(empty!(s),s), true);
+  @test strictequal(size(s), 0);
+  @test strictequal(isempty(s), true);
+
+end
+
+exports["test_iter"] = function test_iter()
+  s =  Stack{Int64}(5)
+  push!(s,200)
+  push!(s,400)
+  push!(s,800)
+  push!(s,200)
+  push!(s,300)
+
+  hasnext, next = iter(s)
+  k = Int64[]
+  while(hasnext())
+    push!(k, next())
+  end
+  e = [200,400,800,200,300]
+  @test strictequal(k, reverse(e));
+end
+
+

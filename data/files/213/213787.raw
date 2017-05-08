@@ -1,0 +1,13 @@
+## =============================================================================
+## k-means.jl - k means sample code in Julia
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using Clustering
+
+x = rand(100, 10000)
+k = 50
+# result = kmeans(x, k; max_iter=50, display=:iter)
+result = kmeans(x, k)
+
+# Show Cluster ID
+result.assignments

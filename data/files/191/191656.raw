@@ -1,0 +1,3 @@
+using Iterators
+f(u,v)=string(prod(v))==reverse(string(prod(v)))?v:u
+println(prod(reduce(f,product(1:999,1:999))))

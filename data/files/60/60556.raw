@@ -1,0 +1,20 @@
+
+export set_debug_output, debug_output
+export open_debug_output, close_debug_output
+
+output = STDERR
+function set_debug_output(out::IO)
+  global output = out
+end
+debug_output() = output
+
+function open_debug_output(filename::String, mode::String = "w")
+  global output = open(filename, mode)
+end
+function close_debug_output()
+  if output != STDERR
+    close(output)
+    global output = STDERR
+  end
+end
+

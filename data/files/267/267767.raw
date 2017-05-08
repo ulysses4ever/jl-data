@@ -1,0 +1,19 @@
+function computeNumericalGradient(costFunction, params)
+
+  numgrad = zeros(size(params))
+  perturb = zeros(size(params))
+  ep = 1e-4
+
+  for p = 1:length(params)
+    # set perturbation vector
+    perturb[p] = ep
+    loss1 = costFunction(params .- perturb)
+    loss2 = costFunction(params .+ perturb)
+
+    # compute numerical gradient
+    numgrad[p] = (loss2 - loss1) / (2 * ep)
+    perturb[p] = 0
+  end
+  return numgrad
+end
+

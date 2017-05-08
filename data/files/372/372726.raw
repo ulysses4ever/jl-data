@@ -1,0 +1,486 @@
+# Version 1.3 is clean
+#   * move!() has no display parameter
+#   * move!() doesn't call tileinsert
+# Two passes in move!(), for tentative pruning
+
+module jb2048
+
+import PyPlot
+plt = PyPlot
+plt.ion()
+
+export Board, back!, initgame, play!, slide, tileinsert!
+
+typealias Board Matrix{Int}
+
+plotcolor = Dict(2=>"white", 4=>"lightyellow",
+             8=>"orange", 16=>"orange",
+             32=>"tomato", 64=>"tomato",
+             128=>"yellow", 256=>"yellow",
+             512=>"gold", 1024=>"gold",
+             2048=>"peru", 4096=>"chocolate",
+             8192=>"orangered", 16384 =>"red",
+             32768=>"lime")
+plotstyle = Dict("alpha"=>0.5, "boxstyle"=>"round")
+
+function plot(b::Board, newtile=0)
+    plt.figure("2048",figsize=(7,5))
+    plt.subplots_adjust(left=0.02, right=0.98, bottom=0.02, top=0.98)
+    fs = 36 # font size
+    m, n = size(b)
+    plt.clf()
+    plt.axis([0.5, n+0.5, 0.5, m+0.5])
+    plt.xticks([])
+    plt.yticks([])
+    for i in 1:m
+        for j in 1:n
+            t = b[i,j]
+            if t > 0
+                t = 1 << t
+                k = sub2ind((m,n),i,j)
+                plotstyle["facecolor"] =
+                    (k == newtile) ? "lightgreen" : plotcolor[t]
+                # t == 16384 && (t = "16K")
+                plt.text(j, m+1-i, t,
+                    ha = "center", va = "center",
+                    size = fs, bbox = plotstyle)
+            end
+        end
+    end
+    plt.draw()
+end
+
+function tileinsert!(b::Board)
+    u = find(b .== 0)
+    i = u[rand(1:end)]
+    rand() < 0.9 ? t = 1 : t = 2
+    b[i] = t
+    i
+end
+
+# directions = ["Left", "Right", "Up", "Down"]
+
+function slide(b::Board, direction:: Int)
+    m, n = size(b)
+    r = zeros(b)
+    score = 0
+    moved = false
+    if direction < 3    # horizontal slide
+        (direction == 1) ? (start = 1; delta = 1) : (start = n; delta = -1)
+        for i in 1:m
+            j = target = start
+            t0 = 0
+            for k in 1:n
+                t = b[i,j]
+                if t > 0
+                    if t == t0  # tiles merge
+                        t += 1
+                        target -= delta
+                        t0 = 0
+                        score += 1 << t
+                    else
+                        t0 = t
+                    end
+                    r[i,target] = t
+                    target == j || (moved = true)
+                    target += delta
+                end
+                j += delta
+            end
+        end
+    else    # vertical slide
+        (direction == 3) ? (start = 1; delta = 1) : (start = m; delta = -1)
+        for j in 1:n
+            i = target = start
+            t0 = 0
+            for k in 1:m
+                t = b[i,j]
+                if t > 0
+                    if t == t0  # tiles merge
+                        t += 1
+                        target -= delta
+                        t0 = 0
+                        score += 1 << t
+                    else
+                        t0 = t
+                    end
+                    r[target,j] = t
+                    target == i || (moved = true)
+                    target += delta
+                end
+                i += delta
+            end
+        end
+    end
+    return r, moved, score
+end
+
+worse_eval = -128.0     # updated in move!()
+gamma = [16 11 8 6; 11 6 4 3; 8 4 2 1.4; 6 3 1.4 1]
+# gamma = [10 6 4 3; 6 4 3 2; 4 3 2 1.42; 3 2 1.42 1]
+# gamma = 0.25 * [64 32 16 8; 32 12 6 4; 16 6 3 2; 8 4 2 1]
+# gamma = 0.5 * [14 12 10 8; 12 9 6 4; 10 6 3 2; 8 4 2 1]
+
+# staticache = Dict{Board,Float64}()
+staticache = Dict{Uint64,Float64}()
+hits_staticeval = misses_staticeval = 0
+
+function staticeval(b::Board)
+    ### cache
+    # It's a little faster to store only a key in the cache,
+    # instead of the matrix b, and it's safe in this context
+
+    # global staticache # memory leak !!
+    global staticache::Dict{Uint64,Float64}
+    global hits_staticeval::Int, misses_staticeval::Int
+    key = hash(b)
+    val = get(staticache, key, 0.0)
+    val == 0.0 || (hits_staticeval += 1; return val)
+    ### end cache
+    penalty(d) = 1 - 0.5*d
+    global gamma::Array{Float64,2}
+    val::Float64
+    local yval::Float64
+    m, n = size(b)
+    x = b[1]
+    val = (1<<x) * gamma[1]
+    for i in 2:m
+        y = b[i,1]
+        if y>0
+            yval = (1<<y) * gamma[i,1]
+            if x > 0
+                d = y-x
+                if d>0  # y squeezes x
+                    yval = penalty(d) * yval
+                elseif d==0 # mergeable
+                    yval = 2 * yval
+                end
+            end
+            val += yval
+        end
+        x = y
+    end
+    x = b[1]
+    for j in 2:n
+        y = b[1,j]
+        if y>0
+            yval = (1<<y) * gamma[1,j]
+            if x>0
+                d = y-x
+                if d>0  # y squeezes x
+                    yval = penalty(d) * yval
+                elseif d==0 # mergeable
+                    yval = 2 * yval
+                end
+            end
+            val += yval
+        end
+        x = y
+    end
+    for i in 2:m
+        for j in 2:n
+            y = b[i,j]
+            if y>0
+                yval = (1<<y) * gamma[i,j]
+                d = merge = 0
+                x = b[i,j-1]
+                if x>0
+                    d1 = y-x
+                    if d1>0      # y squeezes x
+                        d += d1
+                    elseif d1==0 # mergeable
+                        merge += 1
+                    end
+                end
+                x = b[i-1,j]
+                if x>0
+                    d1 = y-x
+                    if d1>0      # y squeezes x
+                        d += d1
+                    elseif d1==0 # mergeable
+                        merge += 1
+                    end
+                end
+                if merge>0
+                    yval = (merge+1) * yval
+                elseif d>0
+                    yval = penalty(d) * yval
+                end
+                val += yval
+            end
+        end
+    end
+    ### cache
+    misses_staticeval += 1
+    staticache[key] = val
+    ### end cache
+    val
+end
+
+function maxeval(b::Board, depth::Int, score = 0)
+    besteval = worse_eval
+    for d = 1:4
+        bs, moved, sc = slide(b, d)
+        if moved
+            val = meaneval(bs, depth-1, score+sc)
+            (val > besteval) && (besteval = val)
+        end
+    end
+    besteval
+end
+
+# meancache = Dict{(Board,Int,Int),Float64}()
+meancache = Dict{Uint64,Float64}()
+hits_meaneval = misses_meaneval = 0
+
+function meaneval(b::Board, depth::Int, score=0)
+    depth <= 0 && return score + staticeval(b)
+    ### cache
+    # It's a little faster to store only a key in the cache,
+    # instead of (b,depth,score), and it's safe in this context
+
+    # global meancache # memory leak !!!
+    global meancache::Dict{Uint64,Float64}
+    global hits_meaneval::Int, misses_meaneval::Int
+    key = hash((b,depth,score))
+    val = get(meancache, key, 0.0)
+    val == 0.0 || (hits_meaneval += 1; return val)
+    ## end cache
+    val::Float64
+    fc = find(b .== 0)  # free cells (indices)
+    nf = length(fc)
+    if nf == 0
+        return worse_eval
+    end
+    val = score
+    for i in fc
+        b[i] = 1
+        val += 0.9 * maxeval(b, depth, score)
+        b[i] = 2
+        val += 0.1 * maxeval(b, depth, score)
+        b[i] = 0
+    end
+    val = val / nf
+    ### cache
+    misses_meaneval += 1
+    meancache[key] = val
+    ### end cache
+end
+
+type History
+    length::Int
+    circular::Int
+    start::Int
+    board::Array{Board}
+    newtile::Array{Int}
+
+    function History(length)
+        circular = 0
+        start = 1
+        board = Array(Board,length)
+        newtile = Array(Int,length)
+        new(length, circular, start, board, newtile)
+    end
+end
+
+import Base.show
+function show(io::IO, h::History)
+    n = endof(h)
+    print(io, "history of size $n")
+end
+
+function append(h::History, b::Board, t::Int)
+    # first values of (start,circular) for length 128, phase 1:
+    #  (1,0) -> (1,1) -> (1,2) -> (1,3) ... -> (1,127) -> (1,128)
+    # now buffer is full, transition to phase 2 occurs: (1,128) -> (2,1)
+    # values of (circular,start) during phase 2:
+    #  (1,2) -> (2,3) -> (3,4) ... -> (127, 128) -> (128,1) -> (1,2)
+    h.circular += 1
+    if h.circular > h.length  # (128,1) -> (1,2)
+        h.circular = 1
+        h.start = 2
+    elseif h.start > 1  # phase 2
+        h.start = 1 + rem(h.start, h.length)
+    end
+    h.board[h.circular] = b
+    h.newtile[h.circular] = t
+end
+
+import Base.getindex, Base.setindex!
+function getindex(h::History, i::Int)
+    n = h.start == 1 ? h.circular : h.length
+    i = mod(h.start + i - 2, n) + 1
+    h.board[i], h.newtile[i]
+end
+
+import Base.endof
+function endof(h::History)
+    h.start == 1 ? h.circular : h.length
+end
+
+type Game
+    board::Board
+    newtile::Int
+    length::Int
+    hist::History
+
+    function Game(board)
+        newtile = 0
+        length = 1
+        hist = History(128)
+        new(board, newtile, length, hist)
+    end
+end
+
+getindex(g::Game, i...) = g.board[i...]
+setindex!(g::Game, x::Int, i...) = setindex!(g.board, x, i...)
+
+function plot(g::Game)
+    plot(g.board, g.newtile)
+end
+
+function initgame()
+    g = Game(zeros(gamma))
+    tileinsert!(g.board)
+    g.newtile=tileinsert!(g.board)
+    g
+end
+
+careful = [7, 12, 16]
+bettereval = Dict{Int,Tuple{Int,Int,Int}}()
+function move!(g::Game)
+    empty!(staticache)
+    empty!(meancache)
+
+    ### update worse_eval
+    sup = maximum(g.board)
+    global worse_eval = -16 * (1 << sup) * gamma[1]
+
+    ### compute depth
+    depth = length(careful)
+    small = length(find(g.board .< 3))
+    for step in careful
+        small > step && (depth -= 1)
+    end
+    large = length(find(g.board .> 8))
+    large > 3 && (depth += 1)
+
+    ### first pass, rough evaluation (depth 1)
+    logboard = Dict{Int,Tuple{Board,Int}}()
+    logrough = Dict{Int,Int}()
+    for d = 1:4
+        b, moved, score = slide(g.board, d)
+        if moved
+            logboard[d] = (b, score)
+            logrough[d] = round(meaneval(b, 1, score))
+        end
+    end
+    sortedrough = sort(collect(logrough), by=p->p.second, rev=true)
+
+    # compute best move
+    besteval::Float64 = worse_eval
+    bestdir = 0
+    count = 0
+    local newboard, preceding  # otherwise scope=loop
+    for (d, rough) in sortedrough
+        count += 1
+        if count == 1
+            sup = rough
+        else
+            delta1 = sup - preceding
+            delta2 = preceding - rough
+        end
+        preceding = rough
+        # pruning
+        count > 3 && break
+        # evaluation
+        b, score = logboard[d]
+        val = meaneval(b, depth, score)
+        if val > besteval
+            # count > 3 && (bettereval[g.length]=(depth, delta1, delta2))
+            besteval = val
+            bestdir = d
+            newboard = b
+        end
+        depth < 2 && break
+    end
+    if bestdir > 0
+        g.board = newboard
+    end
+    bestdir
+end
+
+function play!(g::Game; display=false, moves=32768)
+    global gamma
+    global hits_meaneval, misses_meaneval
+    global hits_staticeval, misses_staticeval
+    empty!(bettereval)
+    if g.length < 2
+        hits_meaneval = misses_meaneval = 0
+        hits_staticeval = misses_staticeval = 0
+        g.hist = History(128)
+        append(g.hist, g.board, 0)
+    end
+    while g.length < moves
+        move!(g) > 0 || break
+        g.newtile = tileinsert!(g.board)
+        display && plot(g)
+        g.length += 1
+        append(g.hist, g.board, g.newtile)
+    end
+    g.length
+end
+
+function back!(g::Game, n)
+    g.board, g.newtile = g.hist[n]
+end
+
+function evals(b::Board, depth::Int)
+    for dir = 1:4
+        bs, moved, score = slide(b, dir)
+        if moved
+            print((dir,score))
+            for d = 1:depth
+                val = meaneval(bs, d, score)
+                print((d,round(val,2)))
+            end
+            println()
+        end
+    end
+end
+
+function force!(g::Game, dir::Int)
+    b, moved, score = slide(g.board, dir)
+    moved || error("Illegal direction")
+    g.board = b
+    g.newtile = tileinsert!(b)
+    plot(g)
+    score
+end
+
+function repartition(n; verbose = true)
+    r = Dict{Int, Int}()
+    nmoves = 0
+    local hmoves, rs
+    for i=1:n
+        g = initgame()
+        play!(g)
+        nmoves += g.length
+        sup = maximum(g.board)
+        if haskey(r, sup)
+            r[sup] += 1
+        else
+            r[sup] = 1
+        end
+        rs = sort(collect(r))
+        hmoves = div(nmoves,i)
+        if verbose
+            println((g.length, 1<<sup), " -> $hmoves $rs")
+        end
+    end
+    hmoves, rs
+end
+
+end
+
+"V.1.3 clean, pruning 4th dir if any"

@@ -1,0 +1,182 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+
+import Genotype
+import Config
+
+function enumerate()
+
+    max_num_genotypes::Int64 = 10000
+    depth::Int64 = 1
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+
+    temp::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    genotypes::Array{Genotype.Type_Genotype, 1} = [temp,]
+
+    for i = 1:max_num_genotypes
+        temp = Genotype.make_random_genotype(config_vals)
+        push!(genotypes, temp)
+    end
+
+    num_genotypes::Array{Int64, 1} = [0]
+
+    dictionary::Dict{Array{Int32, 1}, Int64} = Dict{Array{Int32, 1}, Int64}()
+    sizehint!(dictionary, 10000)
+    
+    data_file = open("scikit_enumeration_data", "w")
+    fitness_file = open("scikit_enumeration_fitness", "w")
+
+    start_genotype::Genotype.Type_Genotype = Genotype.read_from_file(config_vals)
+
+    Genotype.run_network(start_genotype, config_vals, convert(Int32, 0))
+    dictionary[vcat(start_genotype.connections, start_genotype.activations, start_genotype.weights, start_genotype.thresholds)] = num_genotypes[1]
+    
+    Genotype.write_for_scikit(start_genotype, config_vals, data_file)
+    write(fitness_file, string(start_genotype.fitness), "\n")
+    num_genotypes[1] += 1
+
+    generate_genotypes(config_vals, start_genotype, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+
+    close(data_file)
+    close(fitness_file)
+
+end
+
+
+
+function generate_genotypes(config_vals::Config.Type_Config_Values, parent::Genotype.Type_Genotype, depth::Int64, 
+                            num_genotypes::Array{Int64, 1}, dictionary::Dict{Array{Int32, 1}, Int64},
+                            max_num_genotypes::Int64, genotypes::Array{Genotype.Type_Genotype, 1}, data_file::IOStream, fitness_file::IOStream)
+
+    parent_index = dictionary[vcat(parent.connections, parent.activations, parent.weights, parent.thresholds)]
+
+    #=for i = 1:parent.num_nodes
+        temp = genotypes[num_genotypes[1]]
+        Genotype.copy_into(temp, parent)
+        if temp.activations[i] == 0
+            temp.activations[i] = 1
+        else
+            temp.activations[i] = 0
+        end
+        Genotype.run_network(temp, config_vals, convert(Int32, 0))
+        add_node(config_vals, temp, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+    end
+
+    for i = 1:parent.num_nodes
+
+        for j = config_vals.min_threshold:config_vals.max_threshold
+            temp = genotypes[num_genotypes[1]]
+            Genotype.copy_into(temp, parent)
+            println(temp.thresholds)
+            if j != temp.thresholds[i]
+                println(j, " ", temp.thresholds[i], " ", i, " foo")
+                temp.thresholds[i] = j
+                Genotype.run_network(temp, config_vals, convert(Int32, 0))
+                add_node(config_vals, temp, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+            else
+                continue
+            end
+        end
+
+    end
+
+    for i = 1:parent.num_nodes
+        if parent.used_connections[i] < config_vals.max_num_connections
+
+            for j = 1:parent.num_genotypes
+                if !(j in parent.connections[(config_vals.max_num_connections * (i - 1) + 1):(config_vals.max_num_connections * i)])
+                    temp = genotypes[num_genotypes[1]]
+                    Genotype.copy_into(temp, parent)
+                    Genotype.add_incoming_connection(temp, config_vals, Int32(i), Int32(j), Int32(-1))
+                    Genotype.run_network(temp, config_vals, convert(Int32, 0))
+                    add_node(config_vals, temp, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+                end
+            end
+
+        else
+            continue
+        end
+    end
+
+    for i = 1:parent.num_nodes
+        if parent.used_connections[i] > config_vals.min_num_connections
+
+            for j = 1:parent.used_connections[i]
+                temp = genotypes[num_genotypes[1]]
+                Genotype.copy_into(temp, parent)
+                Genotype.delete_incomming_connection(temp, config_vals, Int32(i), Int32(j))
+                Genotype.run_network(temp, config_vals, convert(Int32, 0))
+                add_node(config_vals, temp, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+            end
+
+        else
+            continue
+        end
+    end
+
+    for i = 1:length(parent.weights)
+        if parent.weights[i] != 0
+
+            for j = config_vals.min_weight:config_vals.max_weight
+                if j != parent.weights[i] & j != 0
+                    temp = genotypes[num_genotypes[1]]
+                    Genotype.copy_into(temp, parent)
+                    temp.weights[i] = j
+                    Genotype.run_network(temp, config_vals, convert(Int32, 0))
+                    add_node(config_vals, temp, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+                else
+                    continue
+                end
+            end
+
+        end
+    end=#
+
+    for i = 1:length(parent.connections)
+
+        for j = 1:config_vals.max_num_nodes
+            if j != parent.connections[i]
+                temp = genotypes[num_genotypes[1]]
+                Genotype.copy_into(temp, parent)
+                temp.evaluated = false
+                temp.connections[i] = j
+                Genotype.run_network(temp, config_vals, convert(Int32, 0))
+                add_node(config_vals, temp, depth, num_genotypes, dictionary, max_num_genotypes, genotypes, data_file, fitness_file)
+            else
+                continue
+            end
+        end
+
+    end
+
+    return 0
+
+end
+
+function add_node(config_vals::Config.Type_Config_Values, genotype::Genotype.Type_Genotype, 
+                  depth::Int64, num_genotypes::Array{Int64, 1}, dictionary::Dict{Array{Int32, 1}, Int64},
+                   max_num_genotypes::Int64, genotypes::Array{Genotype.Type_Genotype, 1}, data_file::IOStream, fitness_file::IOStream)
+    
+
+    index = get(dictionary, vcat(genotype.connections, genotype.activations, genotype.weights, genotype.thresholds), -1)
+    if index == -1
+        if (num_genotypes[1] < max_num_genotypes) & (depth > 0)
+            dictionary[vcat(genotype.connections, genotype.activations, genotype.weights, genotype.thresholds)] = num_genotypes[1]
+            num_genotypes[1] += 1
+            if num_genotypes[1] % 100 == 0
+                println(num_genotypes[1])
+            end
+            Genotype.write_for_scikit(genotype, config_vals, data_file)
+            write(fitness_file, string(genotype.fitness), "\n")
+            generate_genotypes(config_vals, genotype, depth - 1, num_genotypes, dictionary,
+                               max_num_genotypes, genotypes, data_file, fitness_file)
+        end
+    end
+
+    return 0
+end
+
+
+enumerate()

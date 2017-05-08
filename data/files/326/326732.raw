@@ -1,0 +1,286 @@
+using DataFrames
+
+Assum = readtable("assumption.txt")
+
+function Lives(FixedLives::Float64, t::Integer, h::Integer)
+	
+	qmo::Float64 = 0
+	wmo::Float64 = 0
+	sQmo::Float64 = 0
+	sWmo::Float64 = 0
+	Death::Float64 = 0
+	Lapse::Float64 = 0
+	Live::Float64 = FixedLives
+	Livet1::Float64 = Live
+	th::Integer = (t-1) * 12 + h
+	yr::Integer = 0
+	mo::Integer = 0
+	i::Integer = 0
+	LivesAll = zeros(1200)
+	
+	if t == 1 && h == 1
+		return FixedLives
+	end
+	
+	for i=1:th
+		yr = div(i-1,12) + 1
+		mo = mod(i-1,12) + 1
+		
+		if mo == 1
+			if yr > 10
+				wmo = Assum[10,1] / 12
+				qmo = Assum[10,2] / 12
+			else
+				wmo = Assum[yr,1] / 12
+				qmo = Assum[yr,2] / 12
+			end
+			sWmo = 0
+			sQmo = qmo
+		else
+			sWmo += wmo
+			sQmo += qmo
+		end
+		
+		if i != 1
+			Live = Live - Death - Lapse
+			if mo == 1
+				Livet1 = Live
+			end
+		end
+
+		Death = Livet1 * (1 - sWmo) * qmo
+		Lapse = Livet1 * (1 - sQmo) * wmo
+#		println(i, "\t\t", Live, "\t\t", qmo, "\t\t", wmo, "\t\t", Livet1)
+		LivesAll[i] = Live
+	end
+	
+	return LivesAll
+end
+
+
+GenDeathQx = readtable("GenDeathQx.csv")
+EquityScn = readtable("EquityScn.csv")
+BondScn = readtable("BondScn.csv")
+
+function Variable(IssAge::Integer, ScnNo::Integer)
+	FixedLives::Integer = 5
+	Face::Integer = 100000
+	GP::Integer = 2000000
+	Ival::Float64 = 0.0325
+	InsPeriod::Integer = 53
+	PremPeriod::Integer = 46
+	AlphaLoadAmortYears::Integer = 10
+	AlphaLoad1p::Float64 = 3.75
+	AlphaLoad2p::Float64 = 0.0334
+	BetaLoadp::Float64 = 0.02
+	BetaLoadPPUnit::Integer = 5000
+	GammaLoadp::Float64 = 0.02
+	RUnit::Integer = 100000
+	GenDeathLsumBenp::Float64 = 30.0
+	saPremAIL = zeros(100)
+	saPremAIL[100] = 1.0
+	saPremAIL[1] = 0.2
+	saPremAIL[2] = 0.3
+	saPremAIL[3] = 0.5
+	CFAlloc = zeros(100)
+	saAVb = zeros(100)
+	saAV = zeros(100)
+	GMDBChargeFacep::Float64 = 0
+	GMDBChargep::Float64 = 0.0005
+	GMABChargeMonthly = 0
+	saIMFp = zeros(100)
+	saIMFp[1] = 0.00885
+	saIMFp[2] = 0.00785
+	saIMFp[3] = 0.00385
+	saothIMFp = zeros(100)
+	saothIMFp[1] = 0.0065951
+	saothIMFp[2] = 0.00098055
+	saothIMFp[3] = 0.00011094
+	saMGRp = zeros(100)
+	saBondMGRp::Float64 = 0.0
+	saEquityMGRp::Float64 = 0.0
+	saEquityp = zeros(100)
+	saEquityp[1] = 1
+	saEquityp[2] = 1
+	saEquityp[3] = 0
+	CreditPrem::Integer = GP
+	saAVTot = zeros(1200)
+	sa1AVTot = zeros(1200)
+	v::Float64
+	Tamt::Integer
+	AlphaLoadAmortChg::Float64 = 0.0
+	th::Integer = 0
+	t::Integer = 0
+	AttAge::Integer = 0
+	AmMon::Integer = 0
+	AmMon2::Integer = 0
+	LoadAlpPrem1::Float64 = 0.0
+	LoadAlpPrem2::Float64 = 0.0
+	LoadBetaPrem::Float64 = 0.0
+	LoadBetaUnit::Float64 = 0.0
+	DeductAlphaLoad::Float64 = 0.0
+	DeductBetaLoad::Float64 = 0.0
+	DeductGammaLoad::Float64 = 0.0
+	DeductRiskPrem::Float64 = 0.0
+	RiskRate::Float64 = 0.0
+	RiskPremMfac::Float64 = 0.0
+	RiskPremGenDeath::Float64 = 0.0
+	RiskPremTot::Float64 = 0.0
+	CvAVbcf::Float64 = 0.0
+	saAVbcf::Float64 = 0.0
+	PremRep::Float64 = 0.0
+	AVRatioCurr::Float64 = 0.0
+	GMABCharge::Float64 = 0.0
+	GMDBCharge::Float64 = 0.0
+	GMDBChargeMon::Float64 = 0.0
+	InvRetp::Float64 = 0.0
+	Feep::Float64 = 0.0
+	LongIMFreturnp::Float64 = 0.0
+	LongIMFreturn::Float64 = 0.0
+	LongBonus::Float64 = 0.0
+	GPBaseMon::Integer = 144
+	MinUnitLoad::Float64 = 0.0
+	LoadTblMinBetaAVp::Float64 = 0.00007
+	MinUnitLoadMax::Float64 = 0.0
+	LoadTblMinBetaUnitAdd::Float64 = 10000.0
+	LoadTblMinBetaUnitMax::Float64 = 50000.0
+	AccountAmt::Float64 = 1000000.0
+	BegBalsum1year = zeros(100)
+	saAVAccumPrev = zeros(100)
+	
+	v = 1 / (1 + Ival)
+	Tamt = min(PremPeriod, AlphaLoadAmortYears)
+	AlphaLoadAmortChg = round(AlphaLoad1p * (1 - v^(1/12)) / (1 - v^Tamt) * 10000, 0) / 10000
+	
+	for th=1:1200
+		saAVTot[th] = 0.0
+		
+		# t, h index 생성
+		t = div(th-1,12) + 1
+		h = mod(th-1,12) + 1
+		
+		# 장기유지수수료보너스?
+		if t >= 12 && t <= 16
+			LongIMFreturnp = 0.05
+		elseif t >= 17 && t <= 21
+			LongIMFreturnp = 0.075
+		elseif t >= 22
+			LongIMFreturnp = 0.1
+		else
+			LongIMFreturnp = 0
+		end
+		
+		# 경과연령
+		AttAge = IssAge + t - 1
+		
+		# 납기초과시 영업보험료 0 처리
+		if t > PremPeriod
+			GP = 0
+		end
+		
+		# 예정신계약비
+		LoadAlpPrem1 = GP * AlphaLoadAmortChg
+		AmMon2 = 12 * min(PremPeriod, 7)
+		
+		if (th > AmMon2)
+			LoadAlpPrem2 = 0
+		else
+			LoadAlpPrem2 = GP * AlphaLoad2p
+		end
+		
+		AmMon = 12 * Tamt
+		
+		if (th > AmMon)
+			DeductAlphaLoad = 0
+		else
+			DeductAlphaLoad = LoadAlpPrem1 + LoadAlpPrem2
+		end
+		
+		# 예정유지비
+		LoadBetaPrem = GP * BetaLoadp
+		LoadBetaUnit = BetaLoadPPUnit
+		
+		MinUnitLoad = LoadTblMinBetaUnitAdd * round(GP / AccountAmt, 0)
+		MinUnitLoadMax = LoadTblMinBetaUnitMax * round(GP / AccountAmt, 0)
+		LoadBetaObl = min(MinUnitLoad + saAV[100] * LoadTblMinBetaAVp, MinUnitLoadMax)
+		
+		# 예정수금비
+		DeductGammaLoad = CreditPrem * GammaLoadp
+		
+		# 위험보험료
+		RiskRate = GenDeathQx[min(150, AttAge),1]
+		RiskPremMfac = (1 + Ival)^(-0.5) / ((13/24) + (11/24) * (1 - RiskRate) / (1 + Ival))
+		RiskPremGenDeath = round(RiskRate * RiskPremMfac / 12 * RUnit, 0) * GenDeathLsumBenp * GP / RUnit
+		RiskPremTot = RiskPremGenDeath
+		DeductRiskPrem = RiskPremTot
+		
+		if th <= GPBaseMon
+			DeductBetaLoad = LoadBetaPrem + LoadBetaUnit
+			PremRep = DeductRiskPrem
+		else
+			DeductBetaLoad = LoadBetaObl
+			PremRep = DeductRiskPrem + DeductBetaLoad
+		end
+		
+		# 투입보험료
+		CvAVbcf = CreditPrem - DeductAlphaLoad - DeductBetaLoad - DeductGammaLoad - DeductRiskPrem
+		saAVbcf = CvAVbcf
+		
+		# 펀드자산별 시나리오
+		saBondMGRp = BondScn[th, ScnNo]
+		saEquityMGRp = EquityScn[th, ScnNo]
+		
+		for fn=1:30
+			CFAlloc[fn] = saPremAIL[fn] / saPremAIL[100]
+			saAVb[fn] = saAV[fn] + CFAlloc[fn] * (saAVbcf + PremRep)
+			
+			if saAV[100] == 0
+				AVRatioCurr = saPremAIL[fn] / saPremAIL[100]
+			else
+				AVRatioCurr = saAV[fn] / saAV[100]
+			end
+			
+			GMABCharge = saAVb[fn] * GMABChargeMonthly
+			GMDBChargeMon = GMDBChargep / 12
+			GMDBCharge = saAVb[fn] * GMDBChargeMon + GMDBChargeFacep * Face / 12 * AVRatioCurr
+			
+			saMGRp[fn] = saBondMGRp * (1 - saEquityp[fn]) + saEquityMGRp * saEquityp[fn]
+			InvRetp = 1 + saMGRp[fn]
+			
+			Feep = 1 - (saIMFp[fn] + saothIMFp[fn]) / 12
+			
+			if t > 11 && h == 1
+				BegBalsum1year[fn] = saAVAccumPrev[fn]
+			else
+				BegBalsum1year[fn] = 0
+			end
+			
+			LongIMFreturn = BegBalsum1year[fn] * LongIMFreturnp * saIMFp[fn] / 12
+			LongBonus = 0
+			
+			saAV[fn] = (saAVb[fn] - GMABCharge - GMDBCharge - AVRatioCurr * PremRep + LongIMFreturn + LongBonus * AVRatioCurr) * InvRetp * Feep
+			
+			saAVTot[th] += saAV[fn]
+			
+			if h > 1
+				saAVAccumPrev[fn] += saAV[fn]
+			else
+				saAVAccumPrev[fn] = saAV[fn]
+			end
+		end
+		saAV[100] = saAVTot[th]
+		sa1AVTot[th] = saAV[1]
+	end
+	return sa1AVTot
+end
+
+vout = zeros(1200)
+
+@time for i in 1:10000
+	vout = Variable(65, min(i, 200))
+	a = rand(1)*100
+	result = Lives(a[1], 100, 12)
+end
+
+df = DataFrame(A = vout)
+writetable("Output.dat", df, header=false)

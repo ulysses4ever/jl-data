@@ -1,0 +1,25 @@
+## =============================================================================
+## parametric.jl - parametric programming in Julia
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+type Point{T}
+    x::T
+    y::T
+
+    Point(x, y) = new(x::T, y::T)
+end
+
+## the case if T is Float64
+function norm_float{Float64}(p::Point{Float64})
+    return sqrt(p.x^2 + p.y^2)
+end
+
+## the case if T is Int
+function norm_int{Int}(p::Point{Int})
+    return sqrt(p.x^2 + p.y^2)
+end
+
+## the case including T <: Real
+function norm{T<:Real}(p::Point{T})
+    return sqrt(p.x^2 + p.y^2)
+end

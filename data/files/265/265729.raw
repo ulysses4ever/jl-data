@@ -1,0 +1,12 @@
+export HttpServer
+
+# exported
+
+type HttpServer
+    events::Dict{String, Array}
+    handle::Function
+    port::Integer
+    socket::Base.UVServer
+
+    HttpServer(port::Integer, handle::Function) = new((String=>Array)[], handle, port, Base.TcpServer())
+end

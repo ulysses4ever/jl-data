@@ -1,0 +1,44 @@
+# Walter O'Keefe 2015-01-12
+# Project Euler, problem 09
+#   There exists exactly one Pythagorean triplet for which
+#   a + b + c = 1000. Find the product abc.
+
+# because a + b + c = 1000
+#   a < b < c < 1000
+#   a^2 + b^2 = c^2
+
+# regulate that a < b
+# regulate that c^2 = a^2 + b^2
+# ^ the above also guarantees that a < c and b < c, so only a < b is
+# necessary. Regulate that [a b c] < 1000
+
+# it's almost certainly best to write a function to produce a
+# pythagorean triplet, then build the other function around that.
+
+p(a,b) = sqrt(a^2 + b^2)
+
+function pt(i::Int = 1, mx::Int = 1000)
+    # produce valid pythagorean triplets
+    # i returns i'th triplet
+    n = 1              # n triplets generated
+    valid = false      # is triplet valid?
+    for a = 1:mx       # iterate a
+        for b = 1:mx     #     and b
+            !(a < b) && continue               # ensure b > a
+            c = p(a,b)                         # produce c
+            valid = (a < b) && isinteger(c)    # validate triplet
+            if valid
+                n == i ? (return [a b c]) : (n += 1)  # correct triplet?
+            end
+        end
+    end
+end
+
+function eul09(sumofabc)
+    n = 1
+    while true
+        r = pt(n)
+        sum(r) == sumofabc ? (return r) : (n += 1)
+    end
+end
+

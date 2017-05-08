@@ -1,0 +1,21 @@
+function newton(x,n)
+  i=0
+  while(i<n)
+    if fd(x) == 0
+      return x
+    end
+    x = x - f(x)/fd(x)
+      println (x)
+    i=i+1
+  end
+end
+
+function f(x)
+  return x^2-2
+end
+
+function fd(x)
+  return 2*x
+end
+
+println(newton(5,6))

@@ -1,0 +1,16 @@
+## =============================================================================
+## 16_step.jl - Connect points using a stepwise function.
+##              Equivalent to Geom.line with Stat.step.
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+## 1.
+plot(x=rand(25), y=rand(25), Geom.step)
+
+## 2.
+plot(x=rand(25), y=rand(25), Geom.step(direction=:hv))
+
+## 3.
+plot(x=rand(25), y=rand(25), Geom.step(direction=:vh))

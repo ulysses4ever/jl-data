@@ -1,0 +1,45 @@
+###########################################################################
+# calcolo un integrale facile per far vedere che i monte carlo funzionano #
+###########################################################################
+
+# l'integrale di p(x)f(x) su tutta la retta reale fa 6
+
+# distribuzione da campionare, può non essere normalizzata
+p(x, y) = (x>0 && y>0) ? exp(-x-y) : 0
+# p(x, y) = exp(-(x^2+y^2))
+# funzione integranda
+f(x, y) = tanh(x*y)
+# f(x, y) = 1
+# iniziamo da un valore a caso della variabile
+x = [0.0, 0.0]
+# numero di catene, alla fine medio
+n_catene = 100
+# vettore con la somma di ogni catena
+I = zeros(n_catene)
+# passi in una catena, ignoro i primi l
+N, l = 100000, 10
+S = 0
+for i in 1:n_catene
+    for n in 1:N
+        x_prop = x + (rand(length(x)) - 0.5)
+        w = p(x_prop...)/p(x...)
+        if w >= 1
+            x = x_prop
+        else
+            if w > rand()
+                x = x_prop
+            else
+                x = x
+            end
+        end
+        if n>l
+            S += f(x...)
+        end
+    end
+    S /= N-l
+    println("$i/$n_catene\tS = $S")
+    # salvo l'integrale
+    I[i] = S
+    # resetto la variabile che contiene la somma
+    S = 0
+end

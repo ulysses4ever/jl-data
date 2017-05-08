@@ -1,0 +1,47 @@
+function findcircularprimes()
+    circprimes = IntSet(2)
+    # Hardcoded upper limit -> can explicitly form loops
+    # TODO: make macro to form loops?
+    for d6 in [0, 100000:200000:900000]
+        for d5 in [d6 == 0 ? [0] : [], 10000:20000:90000]
+            for d4 in [d5 == 0 ? [0] : [], 1000:2000:9000]
+                for d3 in [d4 == 0 ? [0] : [], 100:200:900]
+                    for d2 in [d3 == 0 ? [0] : [], 10:20:90]
+                        for d1 in [d2 == 0 ? [0] : [], 1:2:9]
+
+                            x = d1 + d2 + d3 + d4 + d5 + d6
+                            if !isprime(x) || x in circprimes
+                                continue
+                            end
+
+                            curprimes = IntSet(x)
+
+                            circprime = true
+                            xdigitarr = circshift(split(string(x), ""), 1)
+                            xshift = int(join(xdigitarr))
+                            while xshift != x
+                                if !isprime(xshift)
+                                    circprime = false
+                                    break
+                                end
+                                push!(curprimes, xshift)
+                                xdigitarr = circshift(xdigitarr, 1)
+                                xshift = int(join(xdigitarr))
+                            end
+                            if circprime
+                                union!(circprimes, curprimes)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return circprimes
+end
+
+@time res = length(findcircularprimes())
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

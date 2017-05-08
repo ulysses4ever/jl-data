@@ -1,0 +1,10 @@
+function classical_damage(hazard_poes, fragility_poes,
+                          hazard_investigation_time,
+                          risk_investigation_time)
+  hazard_afoes = -log(1.0 - hazard_poes)./hazard_investigation_time
+  hazard_afoos = -transpose(diff(pairwise_mean(hazard_afoes)))
+  damage_afoes = transpose(sum(hazard_afoos.*fragility_poes, 2))
+  damage_poes = 1.0 - exp(-damage_afoes.*risk_investigation_time)
+  damage_poos = -diff([1.0 damage_poes 0.0], 2)
+  return damage_poos
+end

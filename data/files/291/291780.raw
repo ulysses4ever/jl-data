@@ -1,0 +1,23 @@
+
+coefficientPolynomial=complex([-1.,0.,0.,0.,0.,0.,0., 1.])
+
+using Polynomials
+
+function polynomialToNewtonRationalFunction(coefficienlist)
+    pol=Poly(coefficienlist)
+    polx=Poly([0.0,1.0])
+    numerator=polyder(pol)*polx-pol
+    denominator=polyder(pol)
+    coeffnumerator=complex([numerator[i] for i in 0:1:length(numerator)])
+    coeffdenominator=complex([denominator[i] for i in 0:1:length(denominator)])
+    return coeffnumerator, coeffdenominator
+end
+
+
+rationalNewtonmap=polynomialToNewtonRationalFunction(coefficientPolynomial)
+
+using PBURF
+
+result=plottingBasinsUnivariateRationalFunctions(rationalNewtonmap[1],rationalNewtonmap[2])
+
+result[2]

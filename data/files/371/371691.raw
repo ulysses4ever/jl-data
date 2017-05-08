@@ -1,0 +1,313 @@
+#
+# GTSM: Genes Transcription Simple Model 
+# Copyright (C) 2015  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Distances, Distributions, StatsBase, Logging
+
+@Logging.configure(level=DEBUG)
+
+include("bientropy.jl")
+
+# is: initial state
+# cs: current state
+# fs: final state
+# ps: parent links (state pos -> array of np bits)
+# sl: length of states
+# np: # of parent links
+# il: lag around position
+# cd: current distance from final state
+# ns: # of steps
+type Ring
+	is:: Array{Int8,1}
+	cs:: Array{Int8,1}
+	fs:: Array{Int8,1}
+	ps::Dict{Int,Array{Int8,1}}
+	sl:: Int
+	np::Int
+	il::Int
+	cd::Int
+	ns::Int
+end
+
+# initialize new ring
+#
+# sl: state length
+# sp: state success probability
+# lp: link success probability
+function init(sl::Int, sp::Float64, np::Int, lp::Float64)
+	ds = Bernoulli(sp)
+	is = rand(ds,sl)
+	fs = rand(ds,sl)
+	il = int(floor(np/2))
+
+	ps = Dict{Int,Array{Int8,1}}()
+	dl = Bernoulli(lp)
+	for i in 1:sl
+		ps[i] = rand(dl,np)
+	end
+
+	return Ring(is, is, fs, ps, sl, np, il, hamming(is, fs), 0)
+end
+
+# initialize a ring with 2 binary string representing initial and final states
+function init(bis::String, bfs::String, np::Int, lp::Float64)
+	is = int8([i=='0'?0:1 for i in bis])
+	fs = int8([i=='0'?0:1 for i in bfs])
+	sl = length(is)
+	il = int(floor(np/2))
+	
+	ps = Dict{Int,Array{Int8,1}}()
+	dl = Bernoulli(lp)
+	for i in 1:sl
+		ps[i] = rand(dl,np)
+	end
+	
+	return Ring(is, is, fs, ps, sl, np, il, hamming(is, fs), 0)
+end
+
+# get a periodic slice of array a
+#
+# a: array
+# i: current index
+# il: lag around current 
+#
+# RETURN (indices array, state values array)
+function periodic_slice(a::Array{Int8,1}, i::Int, il::Int)
+	s = length(a)
+	if i-il<1
+		return append!(collect((s-il+i):s), collect(1:(i+il))), append!(a[(s-il+i):s], a[1:(i+il)])
+	elseif i+il>s
+		return append!(collect((i-il):s), collect(1:(i-s+il))), append!(a[(i-il):s], a[1:(i-s+il)])
+	else
+		return collect(collect((i-il):(i+il))), collect(a[(i-il):(i+il)])
+	end
+end
+
+### evaluation functions
+
+# simple evaluation function
+function simple(pv::Array{Int8,1}, ls::Array{Int8,1}, f_args)
+	th = f_args[1]
+	if dot(pv,ls) >= th
+		return 1
+	else
+		return 0
+	end
+end
+
+function simple_XOR(pv::Array{Int8,1}, ls::Array{Int8,1}, f_args)
+	th = f_args[1]
+	x = pv$ls
+	lcc = sum(x)
+	if lcc >= th
+		return 1
+	else
+		return 0
+	end
+end
+
+function majority_vote(pv::Array{Int8,1}, ls::Array{Int8,1}, f_args)
+	th = f_args[1]
+	if dot(pv,ls)/sum(pv) >= th
+		return 1
+	else
+		return 0
+	end
+end
+
+function majority_vote_XOR(pv::Array{Int8,1}, ls::Array{Int8,1}, f_args)
+	th = f_args[1]
+	x = pv$ls
+	lcc = sum(x)
+	if lcc/sum(pv) >= th
+		return 1
+	else
+		return 0
+	end
+end
+
+# game of life evaluation function
+function game_of_life(pv::Array{Int8,1}, ls::Array{Int8,1}, f_args)
+	# XOR the 9-cells array
+	x = pv$ls
+	# is the central cell alive?
+	isa = (x[end-4]==1)
+	# count the number of living neighbors
+	x[end-4] = 0
+	lcc = sum(x)
+	if !isa
+		if lcc == 3
+			return 1
+		else
+			return 0
+		end
+	else
+		if lcc == 2 || lcc == 3
+			return 1
+		else
+			return 0
+		end
+	end
+end
+
+# compute next ring state 
+#
+# f_eval: function of evaluation
+function next_state!(r::Ring, f_eval::Function, f_args...)
+	# choose one link uniformly at random
+	# si: pos in current state differing from final state
+	# li: pos in parent links array
+	
+	# find indices of mismatching bits
+	#x = r.cs$r.fs
+	# select one at random
+	#si = sample(findin(x,[1]))
+	
+	# select one bit of the current state at random
+	si = rand(1:r.sl)
+	# select one parent link at random
+	li = rand(1:r.np)
+			
+	pp, pv = periodic_slice(r.cs, si, r.il)
+	# switch one link among the parents
+	ls = copy(r.ps[si])
+	ls[li] = abs(1-ls[li])
+	# compute new bit state
+	nb = f_eval(pv, ls, f_args)	
+
+	# if one bit of the current state was changed 
+	if nb != r.cs[si]
+		# switch the corresponding bit of the current state and check if the distance is reduced
+		r.cs[si] = abs(1-r.cs[si])
+		d = hamming(r.fs, r.cs)
+		# if the distance is reduced or remains unchanged
+		# keep and store changes 
+		if d <= r.cd
+			r.cd = d
+			r.ps[si][li] = abs(1-r.ps[si][li])
+			r.ns += 1
+		# the distance is increased
+		# cancel all changes
+		else
+			# cancel change and continue
+			r.cs[si] = abs(1-r.cs[si])
+		end
+	# the current state is not changed
+	# but keep the modified links
+	else
+		r.ps[si][li] = abs(1-r.ps[si][li])
+		r.ns += 1
+	end
+end
+
+### MAIN ###
+
+# sl: state length
+sl = 30
+# sp: state 1s density
+sp = 0.5
+# lp: links density
+#lp = 0.75
+lp = 1.
+
+# function to be used
+fn = 2
+# init mode
+imode = 1
+
+# AVG initial distance
+aid = 0.
+# AVG link density
+ald = 0.
+# AVG parent links bientropy
+albe = 0.
+
+for i in 1:100
+	#@info("Iteration $i")
+	if fn == 1
+		# np: # parent links
+		np = 5
+		#f_eval = simple
+		f_eval = simple_XOR
+		f_args = 2
+	elseif fn == 2
+		# np: # parent links
+		np = 5
+		#f_eval = majority_vote
+		f_eval = majority_vote_XOR
+		f_args = 0.5
+	else
+		# np: # parent links
+		np = 9
+		f_eval = game_of_life
+		f_args = ()
+	end
+
+	if imode == 1
+		# initialize with random strings
+		r = init(sl, sp, np, lp)
+	elseif imode == 2
+		s = "000000000000000000000000000000"
+		f = "111111111111111111111111111111"
+		#s = "101000110001101100110101000111"
+		#f = "010111001110010011001010111000"
+		r = init(s, f, np, lp)
+	end
+
+	#@info("Init  state: ", r.is)
+	#@info("Final state: ", r.fs)
+	#@info("Init  dist.: ", r.cd)
+	#@info("f_eval     : ", f_eval)
+	#@info("Init l.  d.: ", lp)
+	#@info("---")
+
+	aid += r.cd
+
+	i = 0
+	max_iter = 1e4
+	#tic()
+
+	while r.cd > 0 && i < max_iter
+		next_state!(r, f_eval, f_args)
+		i += 1
+	end
+
+	#toc()
+	#@info("# ierations: $max_iter")
+
+	#@info("---")
+	#@info("#     steps: ", r.ns)
+	#@info("Best  state: ", r.cs)
+	#@info("Final state: ", r.fs)
+	#@info("Best  dist.: ", r.cd)
+
+	lds = sum(values(r.ps))/length(values(r.ps))
+
+	#@info("Final links density")
+	#@info("-> by pos. : ", lds)
+	#@info("-> AVG     : ", mean(lds))
+
+	ald += mean(lds) 
+
+	W = Int8[]
+	for i in 1:r.sl
+		append!(W,r.ps[i])
+	end
+	@info("Links BiEntropy : ", TBiEn(W))
+	albe += TBiEn(W)
+end
+
+@info("AVG initial distance: ", aid/100)
+@info("AVG links density   : ", ald/100)
+@info("AVG links BiEntropy : ", albe/100)

@@ -1,0 +1,44 @@
+# Project Euler 5
+
+# Attempt 1
+
+function checkDiv(n)
+	for i in [12,14,15,16,18,20]
+		if ifloor(mod(n, i)) != 0
+			return false
+		end
+	end
+	return true
+end
+
+function Run()
+	step = 11*13*17*19
+	i = step
+	while true
+		if checkDiv(i)
+			return i
+		end
+		i += step
+	end
+end
+
+# Reference from another developer's implementation
+
+# function gcd(a::Int64, b::Int64)
+    # while b != 0
+        # (a, b) = (b, a % b)
+    # end
+    # return a
+# end
+
+# function lcm(a::Int64, b::Int64)
+    # return div(a*b,gcd(a, b))
+# end
+
+# function problem5(num::Int64)
+    # reduce(lcm, 1:num)
+# end
+
+# function Run()
+	# return problem5(20)
+# end

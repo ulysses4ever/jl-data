@@ -1,0 +1,65 @@
+letters = ['a':'z',
+		'A':'Z',
+		'1':'9',
+		' ',
+		'	',
+		'.',
+		'"',
+		'!',
+		'?',
+		'/',
+		'\n',
+		'(',
+		')',
+		'[',
+		']',
+		'{',
+		'}',
+		'\\']
+
+function setupFontCharacters()
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+
+	tex = GLuint[0]
+	glGenTextures(1, tex)
+	glActiveTexture(GL_TEXTURE1)
+	glBindTexture(GL_TEXTURE_2D, tex[1])
+
+	w = 0
+	h = 0
+	for c in letters
+		img, metric = renderface(fontState.face, c)
+		w += size(img, 1)
+		h = max(h, size(img, 2))
+	end
+	fontState.atlasWidth = w
+	fontState.atlasHeight = h
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, C_NULL)
+	glGenerateMipmap(GL_TEXTURE_2D)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+	x = 0
+	for c in letters
+		img, metric = renderface(fontState.face, c)
+
+		w = size(img, 1)
+		h = size(img, 2)
+
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, w, h, GL_RED, GL_UNSIGNED_BYTE, img)
+
+        character = textCharacter([w, h], metric.horizontal_bearing, metric.advance, x / fontState.atlasWidth)
+        fontState.characters[c] = character
+        x += w
+	end
+
+	fontState.textAltas = tex[1]
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 0)
+    FT_Done_Face(fontState.face[1])
+end

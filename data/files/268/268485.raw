@@ -1,0 +1,62 @@
+###################################################
+## Run simulation
+###################################################
+
+using DataFrames
+
+function run_dynamic(t::TypeGraph, steps::Int64, parameters::Params
+                      ;verbose::Int64 = 0)
+  println("Running with steps = $steps, batch = $(p.batchSize), techno = $(p.techno),
+          priorities= $(p.priorities)")
+
+  pool = InstanceGraph(t)
+  tic()
+  for k in 1:steps
+    arriving_node = t.nodes[rand(1:t.n)]
+    arrival!(pool, arriving_node, k)
+    am = am_generator(pool)
+    edges = edge_list_generator(pool)
+    matched_nodes, solve_time = match(edges, am, parameters)
+    if verbose > 0 && k%(steps/20) == 0
+      println("iteration $k, solve time: $solve_time")
+    end
+    remove_matched!(pool, matched_nodes, k)
+    departures!(pool, k)
+  end
+  toc()
+  return pool_summary(pool, steps)
+end
+
+function pool_summary(pool::InstanceGraph, steps::Int64)
+  n_types = length(pool.type_graph.nodes)
+  summary = DataFrame(n_arr = zeros(Int64, n_types),
+                      n_match = zeros(Int64, n_types),
+                      n_dep = zeros(Int64, n_types),
+                      n_inpool = zeros(Int64, n_types),
+                      wait_match = zeros(Float64, n_types),
+                      wait_dep = zeros(Float64, n_types),
+                      )
+  for n in pool.all_nodes
+    if n.arr_time >= steps/5
+      id = n.node_type.id
+      summary[id, :n_arr] += 1
+      if n.dep_time == -1
+        wait = steps - n.arr_time
+      elseif n.dep_time - n.arr_time >= 0
+        wait = n.dep_time - n.arr_time
+      else
+        println("Error, departure before arrival: dep= $(n.dep_time), arr= $(n.arr_time)")
+      end
+      if n.matched
+        summary[id, :n_match] += 1
+        summary[id, :wait_match] += wait
+      elseif n.departed
+        summary[id, :n_dep] += 1
+        summary[id, :wait_dep] += wait
+      else
+        summary[id, :n_inpool] += 1
+      end
+    end
+  end
+  return summary
+end

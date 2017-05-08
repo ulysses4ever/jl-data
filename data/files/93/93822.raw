@@ -1,0 +1,94 @@
+# Players properties structure
+type Player{P,N,UF}
+  name::String
+  nodes::Array{N,1}
+  examines::Dict{P,Bool}
+  utilityfunctions::Array{UF,1}
+end
+
+# Nodes properties structure
+type Node{P,N,M}
+  name::String
+  parentnodeplayer::Nullable{P}
+  parentnode::Nullable{N}
+  parentmove::Nullable{M}
+  timeposistion::Int
+  examinedby::Dict{P,Bool}
+  moves::Array{M,1}
+end
+
+# Moves properties structure
+type Move{P,N,R,V}
+  name::String
+  length::Int
+  parentplayer::P
+  parentnode::N
+  childnode::Nullable{N}
+  examinedby::Dict{P,Bool}
+  payoffset::Dict{R,V}
+end
+
+allplayers = Player{Player,Node,Int}[]
+
+# add a player 
+function addplayer()
+	if length(allplayers) == 0 
+		push!(allplayers, Player{Player,Node,Int}("Player 1", Node{Player,Node,Move}[], Dict{Player,Bool}(), Int[]))
+	else
+		oldplayers = length(allplayers)
+		newplayer = length(allplayers) + 1
+		name::String = string("Player ",newplayer)
+		push!(allplayers, Player{Player,Node,Int}(name, Node{Player,Node,Move}[], Dict{Player, Bool}(), Int[]))
+		for index in 1:oldplayers
+			allplayers[newplayer].examines[allplayers[index]] = 1
+			allplayers[index].examines[allplayers[newplayer]] = 1
+		end
+	end
+end
+
+# add root node for a specified player based on its index
+function addnode(pindex::Int)
+	name::String = "PX:N1"
+	if length(allplayers[pindex].nodes) == 0
+		name = string("P",pindex,":N1")
+		push!(allplayers[pindex].nodes, Node{Player,Node,Move}(name, nothing, nothing, nothing, 0, Dict{Player, Bool}(), Move{Player, Node, Int, Int}[]))
+	else
+		x = length(allplayers[pindex].nodes) + 1 
+		name = string("P",pindex,":N",x)
+		push!(allplayers[pindex].nodes, Node{Player,Node,Move}(name, nothing, nothing, nothing, 0, Dict{Player, Bool}(), Move{Player, Node, Int, Int}[]))
+	end
+end
+
+#delete a player based on its index
+function delete(pindex::Int)
+	splice!(allplayers,pindex)
+	x = length(allplayers)
+	for index in pindex:x
+		for n in allplayers[index].nodes
+			for m in n.moves
+				m.parentplayer = allplayers[index]
+			end
+			n.owningplayer = allplayers[index]
+		end
+	end
+end
+
+function printplayers()
+	for p in allplayers
+		println(p.name)
+	end
+end
+
+addplayer()
+addplayer()
+addplayer()
+addplayer()
+addplayer()
+addnode(3)
+addnode(3)
+addnode(3)
+addnode(2)
+addnode(2)
+addnode(2)
+addnode(2)
+delete(2)

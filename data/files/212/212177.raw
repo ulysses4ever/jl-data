@@ -1,0 +1,59 @@
+using JuMP
+using GPTest
+
+function test_wall()
+    #=
+    Optimize shape of a box-shaped structure with
+    - height h
+    - width w
+    - depth d
+
+    Limit on wall area: 2(hw+hd)
+    Limit on floor area: wd
+    Bounds on ratios: h/w, w/d
+
+    max hwd
+     st 2(hw + hd) ≤ Awall
+        wd ≤ Afloor
+        α ≤ h/w ≤ β
+        γ ≤ d/w ≤ δ
+    
+    or in standard form
+
+    min h⁻¹ w⁻¹ d⁻¹
+     st (2/Awall)*hw + (2/Awall)*hd ≤ 1
+        (1/Aflr)wd ≤ 1
+        αh⁻¹w ≤ 1
+        (1/β)hw⁻¹ ≤ 1
+        γw⁻¹d ≤ 1
+        (1/δ)w⁻¹d ≤ 1
+    =#
+
+    Afloor = 1000
+    Awall  = 200
+    α = 0.5
+    β = 2.0
+    γ = 0.5
+    δ = 2.0
+
+    m = Model(solver=GPSolver())
+    
+    @defVar(m, h)
+    @defVar(m, w)
+    @defVar(m, d)
+
+    @setNLObjective(m, Max, h*w*d)
+
+    @addNLConstraint(m, 2(h*w+h*d) ≤ Awall)
+    @addNLConstraint(m, w*d ≤ Afloor)
+
+    @addNLConstraint(m, α ≤ h/w)
+    @addNLConstraint(m, h/w ≤ β)
+
+    @addNLConstraint(m, γ ≤ d/w)
+    @addNLConstraint(m, d/w ≤ δ)
+
+    solve(m)
+end
+
+test_wall()

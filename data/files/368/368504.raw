@@ -1,0 +1,66 @@
+"""
+    Relaxed belief propagation for CS-like problems. See Guo and Wang (2006),
+        Rangan (2010) and Krzakala et al. (2011).
+"""
+function iterate_rbp(y, F, opts)
+    # Parameters
+    x = get(opts, "x", nothing)
+    prior_prmts = get(opts, "prior_prmts", nothing)
+    channel_prmts = get(opts, "channel_prmts", nothing)
+    t_max = get(opts, "t_max", 100)
+    disp = get(opts, "disp", 1)
+    parallel = get(opts, "parallel", true)
+
+    if prior_prmts == nothing
+        error()
+    end
+
+    # Init vars, arrays and other structures
+    m, n = size(F)
+    sqrF = F.^2
+
+    A, B = zeros(n), zeros(n)
+    a, c = zeros(m, n), ones(m, n)
+    g, dg = zeros(m, n), ones(m, n)
+    x_hat = zeros(n)
+    Fa, F2c = zeros(m, n), ones(m, n)
+    sum_Fa, sum_F2c = zeros(m), n * ones(m)
+    d = channel_prmts != nothing ? channel_prmts[1] : 1.
+
+    mses = zeros(t_max)
+    diff = 0.
+
+    tic()
+    for t = 1:t_max
+        a_old = copy(a)
+
+        # Update (w, v), (g, dg) ...
+        Fa, F2c = F .* a, sqrF .* c
+        sum_Fa, sum_F2c = sum(Fa, 2), sum(F2c, 2)
+        #g, dg = channel_probit(y, broadcast(-, sum_Fa, Fa), broadcast(-, sum_F2c, F2c), channel_prmts)
+        g, dg = channel_probit(y, sum_Fa, sum_F2c, channel_prmts)
+
+        # ... then (A, B), (a, c)
+        dA = -sqrF .* dg
+        #dB = F .* g
+        dB = dA .* a + F .* g
+        A, B = sum(dA, 1), sum(dB, 1)
+        a, c = prior_gbc(broadcast(-, A, dA), broadcast(-, B, dB), prior_prmts)
+
+        diff = mean(abs(a_old - a))
+
+        x_hat = vec( prior_gbc(A, B, prior_prmts)[1] )
+        if channel_prmts == nothing
+            d *= sum(g.^2) / sum(dg)
+        end
+
+        if x != nothing; mses[t] = norm(x / norm(x) - x_hat / norm(x_hat))^2; end
+        if disp == 1
+            @printf("t = %d; diff = %.4e, delta = %.4e, MSE = %.2f, RSS = %.4e\n", 
+                t, diff, d, 10 * log10(mses[t]), norm(y - F * x_hat)^2 / m)
+        end
+    end
+    elapsed = toq()
+
+    return x_hat, mses, elapsed
+end

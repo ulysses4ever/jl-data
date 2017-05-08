@@ -1,0 +1,27 @@
+include("common.jl")
+
+OUTFILE = joinpath(OUTDIR, "stratified_driver_laser.txt")
+
+data = readdlm(XDATAFILE, header=true)
+npoints = size(data[1], 1)
+
+xextrema = extrema(data[1][:, 1])
+nxsteps = 36
+xstep = (xextrema[2]-xextrema[1])/nxsteps
+xrange = xextrema[1]:xstep:xextrema[2]
+
+outstream = open(OUTFILE, "w+")
+
+for i = 1:npoints
+  k = 1
+
+  while k <= nxsteps
+    uc = (k != nxsteps ? < : <=)
+    if xrange[k] <= data[1][i] && uc(data[1][i], xrange[k+1])
+      @printf(outstream, "%d\n", k)
+    end
+    k += 1
+  end
+end
+
+close(outstream)

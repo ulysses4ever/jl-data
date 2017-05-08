@@ -1,0 +1,5 @@
+#import("../src/SequentialPattern.jl")
+#println(LOAD_PATH)
+
+push!(LOAD_PATH,abspath("../src"))
+include("Boosting.jl")

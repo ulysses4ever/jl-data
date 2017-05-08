@@ -1,0 +1,24 @@
+type Scalar
+	name::String
+	moduleName::String
+	value
+end
+
+file = open("test.sca", "r")
+currentScalar = 0
+scalars = Set()
+for line in eachline(file)
+	if search(line, "scalar") != [0:-1]
+		if currentScalar != 0
+			push!(scalars, currentScalar)
+		end
+		strings = split(line, " ")
+		currentScalar = Scalar(strings[3], strings[2], strings[4])
+	end
+	if search(line, "attr") != [0:-1]
+	end
+end
+println("scalarcount = ", length(scalars) )
+for scalar in scalars
+	print(scalar.name)
+end

@@ -1,0 +1,94 @@
+# Unit tests for decimal.jl
+
+include("decimal.jl")
+
+# Decimal constructor
+d = [
+    Decimal(0, 2, -1),
+    Decimal(0, 1, -1),
+    Decimal(0, 100, -4),
+    Decimal(0, 1512, -2),
+    Decimal(1, 3, -2),
+    Decimal(1, 4, -6),
+]
+@assert typeof(d) == Array{Decimal,1}
+
+# Equality
+@assert equals(Decimal(0, 2, -3), Decimal(0, 2, -3))
+@assert equals(Decimal(0, 2, -3), 0.002)
+@assert equals(Decimal(1, 2, 0), -2)
+@assert triple_equals(Decimal(0, 2, -3), Decimal(0, 2, -3))
+
+# Normalization
+@assert Decimal(1, 151100, -4) == Decimal(1, 1511, -2)
+@assert Decimal(0, 100100, -5) == Decimal(0, 1001, -3)
+
+# Addition, negation, and subtraction
+@assert add(d[1], d[2]) == Decimal(0, 3, -1)
+@assert d[1] + d[2] == Decimal(0, 3, -1)
+@assert subtract(d[1], d[2]) == Decimal(0, 1, -1)
+@assert d[1] - d[2] == Decimal(0, 1, -1)
+@assert subtract(d[3], d[4]) == Decimal(1, 1511, -2)
+@assert d[3] - d[4] == Decimal(1, 1511, -2)
+@assert subtract(d[4], d[3]) == Decimal(0, 1511, -2)
+@assert d[4] - d[3] == Decimal(0, 1511, -2)
+@assert negative(d[1]) == Decimal(1, 2, -1)
+@assert -d[1] == Decimal(1, 2, -1)
+@assert negative(d[5]) == Decimal(0, 3, -2)
+@assert -d[5] == Decimal(0, 3, -2)
+
+# Multiplication
+@assert multiply(d[1], d[2]) == Decimal(0, 2, -2)
+@assert d[1] * d[2] == Decimal(0, 2, -2)
+@assert multiply(d[1], d[5]) == Decimal(1, 6, -3)
+@assert d[1] * d[5] == Decimal(1, 6, -3)
+@assert multiply(d[5], d[6]) == Decimal(0, 12, -8)
+@assert d[5] * d[6] == Decimal(0, 12, -8)
+
+# String-to-decimal conversions
+@assert from_string("0.01") == Decimal(0, 1, -2)
+@assert from_string(".001") == Decimal(0, 1, -3)
+@assert from_string("15.23") == Decimal(0, 1523, -2)
+@assert from_string("543") == Decimal(0, 543, 0)
+@assert from_string("-345") == Decimal(1, 345, 0)
+@assert from_string("000123") == Decimal(0, 123, 0)
+@assert from_string("-00032") == Decimal(1, 32, 0)
+@assert from_string("200100") == Decimal(0, 2001, 2)
+@assert from_string("-.123") == Decimal(1, 123, -3)
+@assert from_string("1.23000") == Decimal(0, 123, -2)
+
+# Number-to-decimal conversions
+@assert from_number(0.01) == Decimal(0, 1, -2)
+@assert from_number(.001) == Decimal(0, 1, -3)
+@assert from_number(15.23) == Decimal(0, 1523, -2)
+@assert from_number(543) == Decimal(0, 543, 0)
+@assert from_number(-345) == Decimal(1, 345, 0)
+@assert from_number(000123) == Decimal(0, 123, 0)
+@assert from_number(-00032) == Decimal(1, 32, 0)
+@assert from_number(200100) == Decimal(0, 2001, 2)
+@assert from_number(-.123) == Decimal(1, 123, -3)
+@assert from_number(1.23000) == Decimal(0, 123, -2)
+
+# Decimal-to-string conversions
+@assert to_string(Decimal(0, 1, -2)) == "0.01"
+@assert to_string(Decimal(0, 1, -3)) == "0.001"
+@assert to_string(Decimal(0, 1523, -2)) == "15.23"
+@assert to_string(Decimal(0, 543, 0)) == "543"
+@assert to_string(Decimal(1, 345, 0)) == "-345"
+@assert to_string(Decimal(0, 123, 0)) == "123"
+@assert to_string(Decimal(1, 32, 0)) == "-32"
+@assert to_string(Decimal(0, 2001, 2)) == "200100"
+@assert to_string(Decimal(1, 123, -3)) == "-0.123"
+@assert to_string(Decimal(0, 123, -2)) == "1.23"
+
+# Decimal-to-number conversions
+@assert to_float(Decimal(0, 1, -2)) == 0.01
+@assert to_float(Decimal(0, 1, -3)) == 0.001
+@assert to_float(Decimal(0, 1523, -2)) == 15.23
+@assert to_float(Decimal(0, 543, 0)) == 543
+@assert to_float(Decimal(1, 345, 0)) == -345
+@assert to_float(Decimal(0, 123, 0)) == 123
+@assert to_float(Decimal(1, 32, 0)) == -32
+@assert to_float(Decimal(0, 2001, 2)) == 200100
+@assert to_float(Decimal(1, 123, -3)) == -0.123
+@assert to_float(Decimal(0, 123, -2)) == 1.23

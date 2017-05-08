@@ -1,0 +1,67 @@
+#Caterpillar Tube Pricing Benchmark
+#Julia Ver. 0.0.1 # Reading data
+
+#Install Needed Libraries
+#Pkg.add("BinDeps")
+#Pkg.add("JSON")
+#Pkg.add("DataFrames")
+#Pkg.add("Gadfly")
+#Pkg.add("XGBoost")
+
+#Libraries, directories, options and extra functions----------------------
+Pkg.update()
+
+using JSON
+using DataFrames
+using Gadfly
+using XGBoost
+
+#Read Settings file
+cd(dirname(@__FILE__()))
+directories = JSON.parsefile("SETTINGS.json")
+
+dataDirectory = directories["dataDirectory"]
+edaDirectory = directories["EDALoc"]
+
+#Load data
+train = readtable(dataDirectory * "train_set.csv")
+test = readtable(dataDirectory * "test_set.csv")
+
+#Data Transformations
+function pricing2Numeric(br_pricing)
+  if br_pricing == "Yes"
+    1.0
+  else
+    0.0
+  end
+end
+
+train[:bracket_pricing] = map(pricing2Numeric, train[:, :bracket_pricing])
+test[:bracket_pricing] = map(pricing2Numeric, test[:, :bracket_pricing])
+
+#EDA (Example)
+# This section contains a few simple examples; if you want to learn more about Gadfly, check out
+# http://www.gadflyjl.org/
+
+#EDA 1; Cost Histograms
+#Cost histogram
+plot(train, x = "cost", Geom.histogram,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost"))
+#Log Cost histogram; useful for linear models and posible outlier detection
+plot(train, x = "cost", Geom.histogram, Scale.x_log,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost in Log Scale"))
+
+#EDA #2; tube cost vs. volume order
+#This plot was based on the script found on:
+#https://www.kaggle.com/timabram/caterpillar-tube-pricing/tube-pricing-data-exploration-v2
+plot(train, x = "quantity", y = "cost", Geom.histogram, Geom.point, Scale.x_log, Scale.y_log,
+     Geom.smooth(method = :loess, smoothing = 0.9), Guide.xlabel("Quantity Bought in Log Scale"), Guide.ylabel("Cost in Log Scale"))
+
+#Random Forests
+#Transform DataFrame into Array (which is currently supported by xgboost in julia)
+trainArray = convert(Array, train[:, [:annual_usage, :min_order_quantity, :bracket_pricing, :quantity]])
+costTraining = convert(Array, train[:, :cost])
+testArray = convert(Array, test[:, [:annual_usage, :min_order_quantity, :bracket_pricing, :quantity]])
+
+#5-Fold Cross Validation
+

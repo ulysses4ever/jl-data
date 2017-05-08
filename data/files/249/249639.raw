@@ -1,0 +1,63 @@
+module Mesos
+
+using ProtoBuf
+
+depsfile = Pkg.dir("Mesos","deps","deps.jl")
+if isfile(depsfile)
+    include(depsfile)
+else
+    error("Mesos not properly installed. Please run Pkg.build(\"Mesos\")")
+end
+
+#####################
+# Types for Executor
+#####################
+abstract Executor
+immutable EmptyExecutor <: Executor
+end
+
+immutable ExecutorDriver
+    handle::Ptr{Void}
+    executor::Executor
+    ExecutorDriver(handle::Ptr{Void}, executor::Executor) = new(handle, executor)
+end
+
+#####################
+# Types for Scheduler
+#####################
+abstract Scheduler
+immutable EmptyScheduler <: Scheduler
+end
+
+immutable SchedulerDriver
+    handle::Ptr{Void}
+    scheduler::Scheduler
+    SchedulerDriver(handle::Ptr{Void}, scheduler::Scheduler) = new(handle, scheduler)
+end
+#####################
+
+include("proto/Proto.jl")
+include("utils.jl")
+#include("upid.jl")
+include("executor_driver.jl")
+include("executor.jl")
+include("scheduler_driver.jl")
+include("scheduler.jl")
+include("clustermanager/manager.jl")
+
+export UPID, Proto,
+       Executor, ExecutorDriver, ExecutorCallback,
+       Scheduler, SchedulerDriver, SchedulerCallback,
+       # in executor_driver.jl, scheduler.jl, scheduler_driver.jl
+       start, stop, abort, join, run,
+       # in executor_driver.jl, scheduler_driver.jl
+       sendStatusUpdate, sendFrameworkMessage,
+       # in scheduler_driver.jl
+       launchTasks, killTask, acceptOffers, reviveOffers, acknowledgeStatusUpdate,
+       # TODO missing: requestResources, declineOffer, reconcileTasks
+       # in utils.jl
+       @proto, createFramework,
+       createScalarResourse, getScalarResourse,
+       createRangeResourse, getRangeResourse
+
+end # module

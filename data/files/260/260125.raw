@@ -1,0 +1,43 @@
+function sample_loss_ratio(lr_mean::Float64,
+                           lr_std::Float64,
+                           dist::ASCIIString="LN")
+  if lr_std < 0
+    error("Standard deviation cannot be negative!")
+  elseif lr_std == 0
+    lr = lr_mean
+  else
+    if dist == "LN"
+      μ, σ = lognormal_params(lr_mean, lr_std)
+      lr = rand_lognormal(μ, σ)
+    elseif dist == "BT"
+      α, β = beta_params(lr_mean, lr_std)
+      lr = rand_beta(α, β)
+    else
+      error("Unsupported vulnerability distribution!")
+    end
+  end
+  return lr
+end
+
+
+function sample_loss_ratio(lrs::Vector{Float64},
+                           probs::Vector{Float64},
+                           dist::ASCIIString="PM")
+  if dist == "PM"
+    cdf = cumsum(probs)
+    lr = lrs[findfirst(cdf .> rand())]
+  else
+    error("Unsupported vulnerability distribution!")
+  end
+  return lr
+end
+
+
+function sample_gmfs(gm_means::Vector{Float64},
+                     gm_stds::Vector{Float64},
+                     num_gmfs::Int=1)
+  num_locs = length(gm_means)
+  gmfs = [GroundMotionField([loc => rand_lognormal(gm_means[loc], gm_stds[loc])
+                             for loc=1:num_locs]) for i=1:num_gmfs]
+  return gmfs
+end

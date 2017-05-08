@@ -1,0 +1,155 @@
+using Plotly
+
+include("random_matrix.jl")
+
+## sort Dn dictionary by values length
+#Dc = Dict{String,Int64}()
+#sDn = sort(collect(Dn), by = tuple -> length(last(tuple)), rev=true)
+#
+
+# option number
+o = ARGS[1]
+
+if o == "1"
+	# dimension, alpha_min, alpha_max, beta_min, beta_max, gamma_min, gamma_max
+	#alphas,betas,gammas,H = init_H(2, 5.0,8.0, -1.0, 2.0, 4.0, 8.0)
+	alphas,betas,gammas,H = init_H(2, -3.0,-1.0, -0.2,0.2, -0.2, 0.2)
+
+	println("--- ALPHAS ---")
+	println(alphas)
+	println("--- BETAS ---")
+	println(betas)
+	println("--- GAMMAS ---")
+	println(gammas)
+	println("--- H ---")
+	println(H)
+
+	lambda,R = get_principal_eigenvector(H)
+	lambda,L = get_principal_eigenvector(H')
+
+	normalize_H(H,lambda,R)
+	println("--- norm. H ---")
+	println(H)
+
+	p = get_stationary_distribution(L,R)
+	println("--- stationary dist. ---")
+	println(p)
+
+	Ep = get_entropy(H,p)
+	println("--- entropy ---")
+	println(Ep)
+elseif o == "2"
+	n = 2
+	alpha_min = -3.0
+	alpha_max = -1.0
+	beta_min = -0.2
+	beta_max = 0.2
+	gamma_min = -0.2
+	gamma_max = 0.2
+	m = 100
+
+	entropies = Float64[]
+	for i in 1:m
+		alphas,betas,gammas,H = init_H(n, alpha_min,alpha_max, beta_min,beta_max, gamma_min,gamma_max)
+		lambda,R = get_principal_eigenvector(H)
+		lambda,L = get_principal_eigenvector(H')
+		normalize_H(H,lambda,R)
+		p = get_stationary_distribution(L,R)
+		Ep = get_entropy(H,p)
+		push!(entropies,Ep)
+	end
+
+	println(entropies)
+	println("min: ", minimum(entropies))
+	println("max: ", maximum(entropies))
+	println("mean: ", mean(entropies))
+	println("var: ", var(entropies))
+elseif o == "3"
+	Dn,Db,Dt = load_data(ARGS[2],20.)
+
+	println("# bins:", length(keys(Db)))
+	println("# firing neurons:", length(keys(Dn)))
+elseif o == "4"
+	Dn,Db,Dt = load_data2(ARGS[2],20.)
+
+	println("# bins:", length(keys(Db)))
+	println("# firing neurons:", length(keys(Dn)))
+
+	export_data("test.txt", Dt)
+elseif o == "5"
+	Dn,Db,Dt = load_data2(ARGS[2],20.)
+
+	#println("# bins:", length(keys(Db)))
+	nn = length(keys(Dt))
+	println("# firing neurons: $nn")
+	
+	bin_length = 0.02
+	xbl = 4
+	ybl = 1
+
+	TE = generate_te_matrix(Dt, bin_length, xbl, ybl)
+
+	println("mean(TE): ", mean(TE))
+	println("var(TE): ", var(TE))
+	println("maximum(TE): ", maximum(TE))
+	println("minimum(TE): ", minimum(TE))
+	
+	open("TE_$bin_length-$xbl-$ybl.jld", "w") do file
+		serialize(file, TE)
+	end
+elseif o == "6"
+	filename = ARGS[2]
+	TE = open(filename, "r") do file
+		deserialize(file)
+	end
+
+	println("# NNT(TE), % NNZ(TE): ", countnz(TE), " ", countnz(TE)/length(TE))
+	
+	#Plotly.signin("xxxx", "xxxx")
+
+	Y = sort(vec(reshape(TE,1,length(TE))))
+	X = [i for i in 1:length(Y)]
+
+	# plot matrix values
+	trace = [
+	  [
+	  "x" => X,
+	  "y" => Y,
+	  "type" => "scatter"
+	  ]
+	]
+
+	layout = [
+	  "xaxis" => [
+	      "type" => "log",
+	          "autorange" => true
+		    ],
+	      "yaxis" => [
+		  "type" => "log",
+		  "autorange" => true
+		]
+	]
+	
+	data = [trace]
+	#response = Plotly.plot(data, ["layout" => layout, "filename" => replace(filename, ".jld", "_values"), "fileopt" => "overwrite"])
+	response = Plotly.plot(data, ["filename" => replace(filename, ".jld", "_values"), "fileopt" => "overwrite"])
+	plot_url = response["url"]
+
+	# plot matrix heatmap
+	data = [
+	  [
+	      "z" => TE,
+	      "type" => "heatmap"
+		]
+	]
+	response = Plotly.plot(data, ["filename" => replace(filename, ".jld", "_matrix"), "fileopt" => "overwrite"])
+	plot_url = response["url"]
+elseif o == "7"
+	filename = ARGS[2]
+	TE = open(filename, "r") do file
+		deserialize(file)
+	end
+
+	gamma = 0.02
+	export_2_graphml(replace(filename,".jld", "-$gamma.graphml"), TE, gamma)
+end

@@ -1,0 +1,50 @@
+using Distributions
+
+# TODO: seems awkward to import from GLM.jl
+import GLM: Link,canonicallink,linkinv
+abstract GenerativeModel 
+
+type CPDecompModel{T,N,D<:Distribution} <: GenerativeModel
+    cpd::CPDecomp{T,N}
+    noise::Type{D}
+    moments::CentralMoments
+    link::Link
+end
+Base.size(model::CPDecompModel) = size(model.cpd)
+
+function CPDecompModel{D<:Distribution}(
+        cpd::CPDecomp;
+        noise::Type{D}=Normal,
+        moments::CentralMoments=CentralMoments([0.0,1.0]),
+        link::Link=canonicallink(noise())
+    )
+    CPDecompModel(cpd,noise,moments,link)
+end
+
+function CPDecompModel(
+        r::Integer = 2,
+        dims::Tuple = (100,100,100);
+        kwargs...
+    )
+    CPDecompModel(CPDecomp(r,dims);kwargs...)
+end
+
+function Base.rand!{T,N}(dest::Array{T,N},model::CPDecompModel{T,N})
+    compose!(dest,model.cpd)
+    for i in eachindex(dest)
+        dest[i] = rand(model,dest[i])
+        model.moments.val[1] = linkinv(model.link, dest[i]) # expected value
+        noise_distribution = model.noise(model.moments)
+        dest[i] = rand(noise_distribution)
+    end
+    return dest
+end
+
+function Base.rand{T}(model::CPDecompModel{T})
+    dest = Array(T,size(model))
+    rand!(dest,model)
+end
+
+function Base.rand{T}(model::GenerativeModel,input::T)
+    
+end

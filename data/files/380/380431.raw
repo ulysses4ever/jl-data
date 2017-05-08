@@ -1,0 +1,72 @@
+###
+### a counter type!
+###
+
+### this is useful for doing discrete probability
+
+## Counter type
+
+
+type Counter{T, C<:Number}
+    map::Dict{T,C}
+    total::Int
+end
+
+## constructors
+
+Counter{T,C<:Number}(::Type{T}, ::Type{C}) = Counter{T, C}(Dict{T,C}(), 0)
+counter(T::Type) = Counter(T,Int)
+
+function counter{T}(seq::AbstractArray{T})
+    ctr = counter(T)
+    for item in seq
+        push!(ctr, item)
+    end
+    return ctr
+end
+
+
+## retrieving values
+
+## function haskey{T<:String,T2<:String,C}(ctr::Counter{T,C}, x::T2)
+##     haskey(ctr.map, convert(T, x))
+## end
+
+function haskey{T,C}(ctr::Counter{T,C}, x::T)
+    haskey(ctr.map, x)
+end
+
+function getindex{T,C}(ctr::Counter{T,C}, x::T)
+    if haskey(ctr.map, x)
+        return ctr.map[x]
+    else
+        return zero(C)        
+    end
+end
+
+
+function keys(ctr::Counter)
+    keys(ctr.map)
+end
+
+## updating
+
+function push!{T, C<:Number}(ctr::Counter{T, C}, x::T, n::C)
+    ctr.map[x] = ctr[x] + n
+    ctr.total = ctr.total += n
+end
+
+function push!{T, C<:Number,C2<:Number}(ctr::Counter{T, C}, x::T, a::C2)
+    push!(ctr, x, convert(C,a))
+end
+
+function push!{T, C<:Number}(ctr::Counter{T,C}, x::T)
+    push!(ctr, x, one(C))
+end
+
+
+## iterating through a counter
+
+start(ctr::Counter) = start(ctr.map)
+next(ctr::Counter, state) = next(ctr.map, state)
+done(ctr::Counter, state) = done(ctr.map, state)

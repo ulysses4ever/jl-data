@@ -1,0 +1,60 @@
+import Base.LinAlg: elementaryLeft!, eigvals, eigvals!
+
+immutable SymmetricTridiagonalFactorization{T} <: Factorization{T}
+	factors::Matrix{T}
+	scalarfactors::Vector{T}
+	diagonals::SymTridiagonal
+end
+
+symtri!(A::Hermitian) = A.uplo == 'L' ? symtriLower!(A.S) : symtriUpper!(A.S)
+
+function symtriLower!{T}(AS::Matrix{T}) # Assume that lower triangle stores the relevant part
+	n = size(AS,1)
+	τ = zeros(T,n-1)
+	u = Array(T,n,1)
+	@inbounds begin
+	for k = 1:n-2+!(T<:Real)
+		τk = elementaryLeft!(AS,k+1,k)
+		τ[k] = τk
+
+		for i = k+1:n u[i] = AS[i,k+1] end
+		for j = k+2:n
+			ASjk = AS[j,k]
+			for i = j:n
+				u[i] += AS[i,j]*ASjk
+			end
+		end
+		for j = k+1:n-1
+			tmp = zero(T)
+			for i = j+1:n
+				tmp += AS[i,j]'AS[i,k]
+			end
+			u[j] += tmp
+		end
+
+		vcAv = u[k+1]
+		for i = k+2:n vcAv += AS[i,k]'u[i] end
+		ξτ2 = real(vcAv)*abs2(τk)/2
+
+		u[k+1] = u[k+1]*τk - ξτ2
+		for i = k+2:n 
+			u[i] = u[i]*τk - ξτ2*AS[i,k]
+		end
+
+		AS[k+1,k+1] -= 2real(u[k+1])
+		for i = k+2:n AS[i,k+1] -= u[i] + AS[i,k]*u[k+1]' end
+		for j = k+2:n
+			ASjk = AS[j,k]
+			uj = u[j]
+			AS[j,j] -= 2real(uj*ASjk')
+			for i = j+1:n
+				AS[i,j] -= u[i]*ASjk' + AS[i,k]*uj'
+			end
+		end
+	end
+	end
+	SymmetricTridiagonalFactorization(AS,τ,SymTridiagonal(real(diag(AS)),real(diag(AS,-1))))
+end
+
+eigvals(A::SymmetricTridiagonalFactorization, l::Real=1, h::Real=size(A,1)) = eigvals(A.diagonals, l, h)
+eigvals!(A::Hermitian, l::Real=1, h::Real=size(A,1)) = eigvals(symtri!(A), l, h)

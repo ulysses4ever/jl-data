@@ -1,0 +1,18 @@
+export enable_debug_assert, disable_debug_assert, can_debug_assert
+export @debug_assert
+
+b_debug_assert = true
+
+function enable_debug_assert( flag::Bool = true)
+  global b_debug_assert = flag
+end
+disable_debug_assert( flag::Bool = true) = enable_debug_assert(!flag)
+can_debug_assert() = b_debug_assert
+
+macro debug_assert(xs...)
+  if can_debug_assert()
+    :( @assert( $(esc(xs...) ) ) )
+  else
+    :nothing
+  end
+end

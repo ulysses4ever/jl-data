@@ -1,0 +1,57 @@
+using HTTPClient.HTTPC
+using ZipFile
+
+
+function generateFileName(dateValue)
+	today = TmStruct(dateValue)
+#	if ( today.wday > 0 && today.wday < 6 )
+		return string ("EQ", lpad(today.mday,2,0) , lpad(today.month+1,2,0) , lpad(today.year%100,2,0), "_CSV.ZIP")
+#	else
+#		return string ("")
+#	end
+end
+
+function downloadBhavFile(filename::String)
+	ostream=open("/tmp/$(filename)", "w+")
+	try	
+		r=HTTPClient.get("http://www.bseindia.com/download/BhavCopy/Equity/$(filename)", RequestOptions(ostream=ostream))
+		if ( r.http_code == 200 )
+			throw (ErrorException())
+		end
+	catch err
+		if isa (err, ErrorException)
+			println ("downloadFile: $err")
+		else 
+			println ("incomplete download error")
+		end
+		outFile = ""
+	end
+	close(ostream)
+end
+
+function extractZip(filename::String)
+	try
+		r = ZipFile.Reader("/tmp/$(filename)");
+		for f in r.files
+			ostream = open("/tmp/$(f.name)","w+")
+			write (ostream,readall(f))
+			close (ostream)
+		end
+		close(r)
+	catch err
+		println ("extractZip: $err")
+	end
+end
+
+function downloadAndExtract (filename::String)
+#	if ( filename != "" )
+		downloadBhavFile(filename)
+		extractZip(filename)
+#	end
+end
+
+function getHistoricalData(numOfDays)
+	for i = 0:numOfDays
+		downloadAndExtract(generateFileName(time()-60*60*24*i))
+	end
+end

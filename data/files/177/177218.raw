@@ -1,0 +1,27 @@
+module config
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# paths and constants pertaining to extracting features
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+export wavdir, specdir, speclength, path_rel, test_size
+
+#the following paths are all relative to the project directory and will be concatenated
+#To use absolute paths sets path_rel = false
+path_rel = true
+wavdir = "data/wavs/"
+specdir = "data/specs/"
+speclength = 10 #seconds
+test_size = 0.3 #percentage of data to be used for the test set
+
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# paths and constants pertaining to training the Random Forest
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+
+end

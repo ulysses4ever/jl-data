@@ -1,0 +1,114 @@
+# The following is copied from Julia test/blas.jl (replacing BLAS with BLIS),
+# therefore this file is under the same MIT License as Julia:
+# Copyright (c) 2009-2014: Jeff Bezanson, Stefan Karpinski, Viral B. Shah, and other contributors:
+# https://github.com/JuliaLang/julia/contributors
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+# and associated documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+# is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies or
+# substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import Base.LinAlg
+## BLAS tests - testing the interface code to BLAS routines
+for elty in (Float32, Float64, Complex64, Complex128)
+
+    o4 = ones(elty, 4)
+    z4 = zeros(elty, 4)
+
+    I4 = eye(elty, 4)
+    I43 = eye(elty, 4, 3)    
+    L4 = tril(ones(elty, (4,4)))    
+    U4 = triu(ones(elty, (4,4)))
+    Z4 = zeros(elty, (4,4))
+
+    elm1 = convert(elty, -1)    
+    el2 = convert(elty, 2)
+    v14 = convert(Vector{elty}, [1:4])
+    v41 = convert(Vector{elty}, [4:-1:1])    
+
+    # dot
+    if elty <: Real
+        x1 = convert(Vector{elty}, randn(10))
+        x2 = convert(Vector{elty}, randn(10))
+        @test_approx_eq BLIS.dot(x1,x2) sum(x1.*x2)
+    else
+        z1 = convert(Vector{elty}, complex(randn(10),randn(10)))
+        z2 = convert(Vector{elty}, complex(randn(10),randn(10)))
+        @test_approx_eq BLIS.dotc(z1,z2) sum(conj(z1).*z2)
+        @test_approx_eq BLIS.dotu(z1,z2) sum(z1.*z2)
+    end
+
+    # gemv
+    @test all(BLIS.gemv('N', I4, o4) .== o4)
+    @test all(BLIS.gemv('T', I4, o4) .== o4)
+    @test all(BLIS.gemv('N', el2, I4, o4) .== el2 * o4)
+    @test all(BLIS.gemv('T', el2, I4, o4) .== el2 * o4)
+    @test_throws DimensionMismatch BLIS.gemv('N',I43,o4)
+    o4cp = copy(o4)
+    @test_throws DimensionMismatch BLIS.gemv!('T',one(elty),I43,o4,one(elty),o4cp)
+    @test all(BLIS.gemv!('N', one(elty), I4, o4, elm1, o4cp) .== z4)
+    @test all(o4cp .== z4)
+    o4cp[:] = o4
+    @test all(BLIS.gemv!('T', one(elty), I4, o4, elm1, o4cp) .== z4)
+    @test all(o4cp .== z4)
+    @test all(BLIS.gemv('N', U4, o4) .== v41)
+    @test all(BLIS.gemv('N', U4, o4) .== v41)
+    
+    # gemm
+    @test all(BLIS.gemm('N', 'N', I4, I4) .== I4)
+    @test all(BLIS.gemm('N', 'T', I4, I4) .== I4)
+    @test all(BLIS.gemm('T', 'N', I4, I4) .== I4)
+    @test all(BLIS.gemm('T', 'T', I4, I4) .== I4)
+    @test all(BLIS.gemm('N', 'N', el2, I4, I4) .== el2 * I4)    
+    @test all(BLIS.gemm('N', 'T', el2, I4, I4) .== el2 * I4)    
+    @test all(BLIS.gemm('T', 'N', el2, I4, I4) .== el2 * I4)    
+    @test all(BLIS.gemm('T', 'T', el2, I4, I4) .== el2 * I4)
+    I4cp = copy(I4)
+    @test all(BLIS.gemm!('N', 'N', one(elty), I4, I4, elm1, I4cp) .== Z4)
+    @test all(I4cp .== Z4)
+    I4cp[:] = I4
+    @test all(BLIS.gemm!('N', 'T', one(elty), I4, I4, elm1, I4cp) .== Z4)
+    @test all(I4cp .== Z4)
+    I4cp[:] = I4
+    @test all(BLIS.gemm!('T', 'N', one(elty), I4, I4, elm1, I4cp) .== Z4)
+    @test all(I4cp .== Z4)
+    I4cp[:] = I4
+    @test all(BLIS.gemm!('T', 'T', one(elty), I4, I4, elm1, I4cp) .== Z4)
+    @test all(I4cp .== Z4)
+    @test all(BLIS.gemm('N', 'N', I4, U4) .== U4)
+    @test all(BLIS.gemm('N', 'T', I4, U4) .== L4)
+    
+    # gemm compared to (sy)(he)rk
+    if iseltype(elm1,Complex)
+        @test all(triu(BLIS.herk('U', 'N', U4)) .== triu(BLIS.gemm('N', 'T', U4, U4)))
+        @test all(tril(BLIS.herk('L', 'N', U4)) .== tril(BLIS.gemm('N', 'T', U4, U4)))
+        @test all(triu(BLIS.herk('U', 'N', L4)) .== triu(BLIS.gemm('N', 'T', L4, L4)))
+        @test all(tril(BLIS.herk('L', 'N', L4)) .== tril(BLIS.gemm('N', 'T', L4, L4)))
+        @test all(triu(BLIS.herk('U', 'C', U4)) .== triu(BLIS.gemm('T', 'N', U4, U4)))
+        @test all(tril(BLIS.herk('L', 'C', U4)) .== tril(BLIS.gemm('T', 'N', U4, U4)))
+        @test all(triu(BLIS.herk('U', 'C', L4)) .== triu(BLIS.gemm('T', 'N', L4, L4)))
+        @test all(tril(BLIS.herk('L', 'C', L4)) .== tril(BLIS.gemm('T', 'N', L4, L4)))
+        ans = similar(L4)
+        @test all(tril(BLIS.herk('L','C', L4)) .== tril(BLIS.herk!('L', 'C', one(elty), L4, zero(elty), ans)))
+        @test all(Base.LinAlg.copytri!(ans, 'L') .== BLIS.gemm('T', 'N', L4, L4))
+    else
+        @test all(triu(BLIS.syrk('U', 'N', U4)) .== triu(BLIS.gemm('N', 'T', U4, U4)))
+        @test all(tril(BLIS.syrk('L', 'N', U4)) .== tril(BLIS.gemm('N', 'T', U4, U4)))
+        @test all(triu(BLIS.syrk('U', 'N', L4)) .== triu(BLIS.gemm('N', 'T', L4, L4)))
+        @test all(tril(BLIS.syrk('L', 'N', L4)) .== tril(BLIS.gemm('N', 'T', L4, L4)))
+        @test all(triu(BLIS.syrk('U', 'T', U4)) .== triu(BLIS.gemm('T', 'N', U4, U4)))
+        @test all(tril(BLIS.syrk('L', 'T', U4)) .== tril(BLIS.gemm('T', 'N', U4, U4)))
+        @test all(triu(BLIS.syrk('U', 'T', L4)) .== triu(BLIS.gemm('T', 'N', L4, L4)))
+        @test all(tril(BLIS.syrk('L', 'T', L4)) .== tril(BLIS.gemm('T', 'N', L4, L4)))
+        ans = similar(L4)
+        @test all(tril(BLIS.syrk('L','T', L4)) .== tril(BLIS.syrk!('L', 'T', one(elty), L4, zero(elty), ans)))
+        @test all(Base.LinAlg.copytri!(ans, 'L') .== BLIS.gemm('T', 'N', L4, L4))
+    end
+end

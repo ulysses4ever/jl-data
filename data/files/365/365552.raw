@@ -1,0 +1,23 @@
+include("StreamPlotMethods.jl")
+
+function SerialStreamPlot()
+#   gr = readcsv("/Users/peterrichter/angles.CSV")
+    gr = readcsv("C:\\Users\\Peter\\AppData\\Local\\Julia-0.3.3\\angles.CSV")
+    writecsv("Bmatrix.CSV", StreamPlotMethods.HelicityStreamPlot(gr, 2000*3, 5000))
+end
+
+function ParallelStreamPlot()
+    gr = readcsv("C:\\Users\\Peter\\AppData\\Local\\Julia-0.3.3\\angles.CSV")
+#   gr = readcsv("/Users/peterrichter/angles.CSV")
+	if nprocs() == 1
+		addprocs(3)
+	end
+	@everywhere using StreamPlotMethods
+    danceTime::Int64 = 2000*5
+    numDancers::Int64 = 5000
+    S1 = @spawnat 1 StreamPlotMethods.HelicityStreamPlot(gr, danceTime, numDancers)
+    S2 = @spawnat 2 StreamPlotMethods.HelicityStreamPlot(gr, danceTime, numDancers)
+    S3 = @spawnat 3 StreamPlotMethods.HelicityStreamPlot(gr, danceTime, numDancers)
+    S4 = @spawnat 4 StreamPlotMethods.HelicityStreamPlot(gr, danceTime, numDancers)
+    writecsv("Bmatrix.CSV", fetch(S1) + fetch(S2) + fetch(S3) + fetch(S4))
+end

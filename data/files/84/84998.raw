@@ -1,0 +1,10 @@
+include("../binsearch.jl")
+lst = [1, 2, 2, 2, 3, 5, 9]
+
+println(binsearch(lst, 3))
+println(binsearch(lst, 2))
+println(binsearch(Int64[], 42))
+println(binsearch([0.0, 0.1, 0.2, 0.3, 0.4], 0.25))
+println( binsearch([1, 2, 3, 4], 3))
+println( binsearch([1, 2, 4, 5], 3))
+

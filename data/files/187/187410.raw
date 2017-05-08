@@ -1,0 +1,14 @@
+df = readcsv("gasoline.csv")
+
+#The independant variables
+x = df[:, 2:4]
+
+#The depenndant variable
+y = df[:,6]
+
+
+coefs = linreg(x,y)
+
+println(coefs)
+
+

@@ -1,0 +1,7 @@
+Pkg.update()
+Pkg.add("AudioIO")
+Pkg.add("DSP")
+Pkg.add("Glob")
+Pkg.clone("https://github.com/jlep/WebRTCVAD.jl")
+Pkg.clone("https://github.com/jlep/MergeIterator.jl")
+Pkg.build("WebRTCVAD")

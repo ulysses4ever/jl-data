@@ -1,0 +1,28 @@
+DATADIR = "../../../data/experiment01"
+OUTDIR = "../../output/experiment01"
+
+DATAFILE = joinpath(DATADIR, "driver_laser.txt")
+
+data = readdlm(DATAFILE, has_header=true)
+npoints = size(data[1], 1)
+
+xextrema = extrema(data[1][:, 1])
+nxsteps = 36
+xstep = (xextrema[2]-xextrema[1])/nxsteps
+xrange = xextrema[1]:xstep:xextrema[2]
+
+outstream = open(joinpath(OUTDIR, "stratified_driver_laser.txt"), "w+")
+
+for i = 1:npoints
+  k = 1
+
+  while k <= nxsteps
+    uc = (k != nxsteps ? < : <=)
+    if xrange[k] <= data[1][i] && uc(data[1][i], xrange[k+1])
+      @printf(outstream, "%d\n", k)
+    end
+    k += 1
+  end
+end
+
+close(outstream)

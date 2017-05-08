@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:59:52 GMT
+Date: Wed, 03 May 2017 20:59:56 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5049
+Content-Length: 5568
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3226
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4141
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "01e3cf90a72ad90b8ecee36785a873d4"
-Last-Modified: Fri, 06 May 2016 06:18:53 GMT
+ETag: "28a9e28880e639698e5bca713906bec7"
+Last-Modified: Fri, 04 Dec 2015 13:48:09 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: cee4c0729c8e9147e7abcb45b9d69689
-X-GitHub-Request-Id: AB2F:6637:133152B:18C60E7:59023198
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: 3A95:5C90:ABC33E:DCB159:590A44CC
 
 {
-  "id": 58185319,
-  "name": "TouchOSC.jl",
-  "full_name": "ssfrr/TouchOSC.jl",
+  "id": 17870976,
+  "name": "UCIMLRepo.jl",
+  "full_name": "siddhantjain/UCIMLRepo.jl",
   "owner": {
-    "login": "ssfrr",
-    "id": 734386,
-    "avatar_url": "https://avatars2.githubusercontent.com/u/734386?v=3",
+    "login": "siddhantjain",
+    "id": 4835232,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/4835232?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/ssfrr",
-    "html_url": "https://github.com/ssfrr",
-    "followers_url": "https://api.github.com/users/ssfrr/followers",
-    "following_url": "https://api.github.com/users/ssfrr/following{/other_user}",
-    "gists_url": "https://api.github.com/users/ssfrr/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/ssfrr/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/ssfrr/subscriptions",
-    "organizations_url": "https://api.github.com/users/ssfrr/orgs",
-    "repos_url": "https://api.github.com/users/ssfrr/repos",
-    "events_url": "https://api.github.com/users/ssfrr/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/ssfrr/received_events",
+    "url": "https://api.github.com/users/siddhantjain",
+    "html_url": "https://github.com/siddhantjain",
+    "followers_url": "https://api.github.com/users/siddhantjain/followers",
+    "following_url": "https://api.github.com/users/siddhantjain/following{/other_user}",
+    "gists_url": "https://api.github.com/users/siddhantjain/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/siddhantjain/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/siddhantjain/subscriptions",
+    "organizations_url": "https://api.github.com/users/siddhantjain/orgs",
+    "repos_url": "https://api.github.com/users/siddhantjain/repos",
+    "events_url": "https://api.github.com/users/siddhantjain/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/siddhantjain/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/ssfrr/TouchOSC.jl",
-  "description": null,
+  "html_url": "https://github.com/siddhantjain/UCIMLRepo.jl",
+  "description": "A small package to allow for easy access and download of datasets from UCI ML repository",
   "fork": false,
-  "url": "https://api.github.com/repos/ssfrr/TouchOSC.jl",
-  "forks_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/forks",
-  "keys_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/teams",
-  "hooks_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/events",
-  "assignees_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/tags",
-  "blobs_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/subscription",
-  "commits_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/merges",
-  "archive_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/downloads",
-  "issues_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/ssfrr/TouchOSC.jl/deployments",
-  "created_at": "2016-05-06T06:18:46Z",
-  "updated_at": "2016-05-06T06:18:53Z",
-  "pushed_at": "2016-05-10T23:51:31Z",
-  "git_url": "git://github.com/ssfrr/TouchOSC.jl.git",
-  "ssh_url": "git@github.com:ssfrr/TouchOSC.jl.git",
-  "clone_url": "https://github.com/ssfrr/TouchOSC.jl.git",
-  "svn_url": "https://github.com/ssfrr/TouchOSC.jl",
+  "url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl",
+  "forks_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/forks",
+  "keys_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/teams",
+  "hooks_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/events",
+  "assignees_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/tags",
+  "blobs_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/subscription",
+  "commits_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/merges",
+  "archive_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/downloads",
+  "issues_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/siddhantjain/UCIMLRepo.jl/deployments",
+  "created_at": "2014-03-18T15:26:57Z",
+  "updated_at": "2015-12-04T13:48:09Z",
+  "pushed_at": "2014-04-03T02:58:07Z",
+  "git_url": "git://github.com/siddhantjain/UCIMLRepo.jl.git",
+  "ssh_url": "git@github.com:siddhantjain/UCIMLRepo.jl.git",
+  "clone_url": "https://github.com/siddhantjain/UCIMLRepo.jl.git",
+  "svn_url": "https://github.com/siddhantjain/UCIMLRepo.jl",
   "homepage": null,
-  "size": 9,
-  "stargazers_count": 0,
-  "watchers_count": 0,
+  "size": 195,
+  "stargazers_count": 1,
+  "watchers_count": 1,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 0,
+  "forks_count": 1,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 0,
+  "forks": 1,
   "open_issues": 0,
-  "watchers": 0,
+  "watchers": 1,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 0,
+  "network_count": 1,
   "subscribers_count": 1
 }

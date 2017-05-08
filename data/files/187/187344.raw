@@ -1,0 +1,36 @@
+#######################################################################
+# Contains functions for calculating the mean, median and mode values #
+#######################################################################
+
+function mean(x)
+  # Calculates the mean of the array
+  if length(x) == 0
+    throw(ArgumentError("Error! Empty array given!"))
+  else
+    return sum(x)/length(x)
+  end
+end
+
+
+function median(x)
+  # Calculates the median of the array
+  if length(x) == 0
+    throw(ArgumentError("Error! Empty array given!"))
+  end
+  center_element = length(x)/2
+  if (length(x)%2) != 0
+    return x[convert(Int, round(center_element))]
+  else
+    med = (x[convert(Int, center_element)] + x[convert(Int, center_element + 1)])/2
+    return med
+  end
+end
+
+
+function mode(x)
+  # Calculates the mode of the array
+  if length(x) == 0
+    throw(ArgumentError("Error! Empty array given!"))
+  end
+  return maximum(x)
+end

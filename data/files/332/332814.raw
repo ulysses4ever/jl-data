@@ -1,0 +1,170 @@
+include("config.jl")
+include("fixed_genotype.jl")
+include("fixed_population.jl")
+
+import Fixed_Genotype
+import Config
+import Fixed_Population
+
+function evolve()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    population::Fixed_Population.Type_Population = Fixed_Population.make_population(config_vals)    
+    j = 2
+    for i = convert(Int32, 1):config_vals.num_generations
+        Fixed_Population.evaluate(population, i, config_vals)
+        if (i % config_vals.generations_per_target_switch) in config_vals.print_times
+            print("gen ", i % config_vals.generations_per_target_switch, " ")
+            if i % config_vals.generations_per_target_switch == 1
+                Fixed_Population.print_stats(population, config_vals, true)
+            else
+                Fixed_Population.print_stats(population, config_vals, false)
+            end
+        end
+        Fixed_Population.breed_and_exterminate(population, config_vals)
+        if i % config_vals.generations_per_target_switch == 0
+            println("\n target switch ", j, " ", i / config_vals.generations_per_target_switch, "\n")
+            if j == 1
+                j = 2
+            else
+                j = 1
+            end
+            Fixed_Population.switch_target(population, config_vals)
+        end
+    end
+
+
+    best = population.genotypes[1]
+    max_fitness::Float32 = 0
+    for genotype in population.genotypes
+        if genotype.fitness > max_fitness
+            max_fitness = genotype.fitness
+            best = genotype
+        end
+    end
+    println("connections")
+    for i = 1:config_vals.max_num_nodes
+        print("node ", i, " ")
+        println(best.connections[((i - 1) * config_vals.max_num_connections + 1):(i * config_vals.max_num_connections)])
+    end
+    println("thresholds")
+    println(best.thresholds)
+    println("weights")
+    for i = 1:config_vals.max_num_nodes
+        print("node ", i, " ")
+        println(best.weights[((i - 1) * config_vals.max_num_connections + 1):(i * config_vals.max_num_connections)])
+    end
+    println("activations")
+    for i = 1:config_vals.num_simulation_iterations
+        println(best.activations[((i - 1) * best.num_nodes + 1):(i * best.num_nodes)])
+    end
+end
+
+function test_functionality()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    println("\n INITIALISE \n")
+    #println(methods(Fixed_Genotype.make_random_fixed_genotype))
+    #println(methods(Genotype.make_random_genotype))
+    foo = Fixed_Genotype.make_random_genotype(config_vals)
+
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+    println("\n DELETE NODE \n")
+    Fixed_Genotype.delete_node(foo, config_vals, convert(Int32, 2))
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+    println("\n DUPLICATE NODE \n")
+    Fixed_Genotype.duplicate_node(foo, config_vals, convert(Int32, 2))
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+    println("\n ADD CONNECTION \n")
+    Fixed_Genotype.add_connection(foo, config_vals, convert(Int32, 2), convert(Int32, 0))
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+    println("\n DELETE CONNECTION \n")
+    Fixed_Genotype.delete_connection(foo, config_vals, convert(Int32, 2), convert(Int32, 3))
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+    println("\n MUTATE CONNECTION \n")
+    Fixed_Genotype.mutate_connection(foo, config_vals, convert(Int32, 3), convert(Int32, 2))
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+
+    println("\n MUTATE WEIGHT \n")
+    Fixed_Genotype.mutate_weight(foo, config_vals, convert(Int32, 3), convert(Int32, 2))
+    println("connections")
+    println(foo.connections)
+    println("used connections")
+    println(foo.used_connections)
+    println("weights")
+    println(foo.weights)
+    println("thresholds")
+    println(foo.thresholds)
+    println("activations")
+    println(foo.activations)
+
+    println("\n SIMULATE \n")
+    Fixed_Genotype.simulate(foo, config_vals)
+    println("activations")
+    for i = 1:config_vals.num_simulation_iterations
+        println(foo.activations[((i - 1) * config_vals.max_num_nodes + 1):((i) * config_vals.max_num_nodes)])
+    end
+end
+
+@time evolve()
+
+#test_functionality()
+    

@@ -1,0 +1,15 @@
+include("/home/jeb/Teaching/Research/Thermodynamics/eclipse-julia/HnFFTFp/src/Element.jl")
+println("> Element test")
+N = Int(10)
+V1 = [1,0,1,1,0,0,1,0,0,1]
+V2 = [1,1,1,1,0,0,0,0,1,1]
+println("> dimension ", N)
+println("> random vertex ", hn_vertex(N))
+println("> index ", 77, " is vertex ", index_vertex(N, Int(77)))
+println("> index ", 0, " is vertex ", index_vertex(N, Int(0)))
+println("> vertex $V1 has index ", index(V1))
+("> $V1 has index ", index(V1))
+println("> identity is ", hn_identity(N))
+println("> $V1 * $V2 = ", hn_multiply(V1, V2))
+println("> inverse of $V2 = ", hn_inverse(V2))
+println("> success")

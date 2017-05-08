@@ -1,0 +1,75 @@
+function beta_params(m, s)
+  α = ((1.0 - m) / s^2 - 1.0 / m) * m^2
+  β = α * (1.0 / m - 1.0)
+  return (α, β)
+end
+
+
+function lognormal_params(m, s)
+  μ = log(m^2 / sqrt(s^2 + m^2))
+  σ = sqrt(log(s^2 / (m^2) + 1.0))
+  return (μ, σ)
+end
+
+
+function sample_loss_ratio(lr_mean::Float64,
+                           lr_std::Float64,
+                           dist::ASCIIString="LN")
+  if lr_std < 0
+    error("Standard deviation cannot be negative!")
+  elseif lr_std == 0
+    lr = lr_mean
+  else
+    if dist == "LN"
+      μ, σ = lognormal_params(lr_mean, lr_std)
+      lr = rand(LogNormal(μ, σ))
+    elseif dist == "BT"
+      α, β = beta_params(lr_mean, lr_std)
+      lr = rand(Beta(α, β))
+    else
+      error("Unsupported vulnerability distribution!")
+    end
+  end
+  return lr
+end
+
+
+function sample_loss_ratio(lrs::Vector{Float64},
+                           probs::Vector{Float64},
+                           dist::ASCIIString="PM")
+  if dist == "PM"
+    cdf = cumsum(probs)
+    unifrnd = rand()
+    lr = lrs[findfirst(cdf .> unifrnd)]
+  else
+    error("Unsupported vulnerability distribution!")
+  end
+  return lr
+end
+
+
+# sampling when no correlation model is used
+function sample_gmfs(gm_means::Vector{Float64},
+                     gm_stds::Vector{Float64},
+                     num_gmfs::Int=1)
+  num_locs = length(gm_means)
+  gmfs = [GroundMotionField([loc=>rand(LogNormal(gm_means[loc], gm_stds[loc]))
+                             for loc=1:num_locs]) for i=1:num_gmfs]
+  return gmfs
+end
+
+# sampling with a correlation model
+function sample_gmfs(gm_means::Vector{Float64},
+                     gm_stds_intra::Vector{Float64},
+                     gm_stds_inter::Vector{Float64},
+                     corr_matrix::Matrix{Float64},
+                     num_gmfs::Int=1)
+  num_locs = length(gm_means)
+  residuals_inter = reshape(rand(Normal(), num_locs*num_gmfs), num_locs, num_gmfs)
+  residuals_intra = corr_matrix * reshape(rand(Normal(), num_locs*num_gmfs), num_locs, num_gmfs)
+  gmvs = exp(repmat(gm_means, 1, num_gmfs)
+             + scale(gm_stds_intra, residuals_intra)
+             + scale(gm_stds_inter, residuals_inter))
+  gmfs = [GroundMotionField([loc=>gmvs[loc, i] for loc=1:num_locs]) for i=1:num_gmfs]
+  return gmfs
+end

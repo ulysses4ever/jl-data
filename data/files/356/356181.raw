@@ -1,0 +1,38 @@
+function largest_prime_factor(num::Int64)
+  while num % 2 == 0
+    num /= 2
+  end
+
+  # return in order for loop to be odd numbers only
+  if num == 1
+    return 2
+  end
+
+  num = convert(Int64,num)
+
+  if isprime(num::Int64)
+    return num
+  end
+
+  test_num = ceil(sqrt(num))
+  odd_array = Array(Int64, 0)
+
+# get all the odd factors
+  for i = 3:test_num
+    if num % i == 0
+      push!(odd_array, i)
+    end
+    i += 2
+  end
+
+# check which odd number is the largest prime
+  sort!(odd_array, rev=true)
+  for i in odd_array
+    if isprime(i)
+      return i
+    end
+  end
+end
+
+
+largest_prime_factor(600851475143)

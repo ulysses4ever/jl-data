@@ -1,0 +1,34 @@
+module Sandbox
+
+# McCracken
+include("macro_time_series.jl")
+
+# Multinomials
+export +, *, -, ^
+include("structures.jl")
+include("algorithms.jl")    
+
+
+# Onion Decomposition
+include("util.jl")
+include("algo.jl")
+
+# Sparse Ops
+include("multiply.jl")
+
+# Data prep
+include("dataprep.jl")
+
+# EDR
+include("edr.jl")
+
+# RKHS
+include("rkhs.jl")
+
+# collatz
+include("gencoll.jl")
+
+# neurite
+include("neurite.jl")
+
+end

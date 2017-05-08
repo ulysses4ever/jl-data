@@ -1,0 +1,5 @@
+clusters = Clusters{2}()
+actual = kmeans(clusters)
+expected = centroids(clusters)
+
+@assert sum(sum(actual - expected)) < 0.1

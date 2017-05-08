@@ -1,0 +1,39 @@
+
+# an iterator for an NxT matrix, N is number of features, T is number of time points
+type VectorTimeSeries
+  X::Array
+end
+
+Base.start(v::VectorTimeSeries) = 1
+Base.done(v::VectorTimeSeries, state) = size(v.X)[2] == state-1
+Base.next(v::VectorTimeSeries, state) = v.X[:, state], state+1
+
+# a vector of poisson processes driven by random walks
+type PoissonTimeSeries
+  N::Integer
+  rate::Array
+  dt::Float64
+
+end
+
+Base.start(g::PoissonTimeSeries) = 1
+Base.done(g::PoissonTimeSeries, state) = false
+function Base.next(g::PoissonTimeSeries, state)
+
+
+
+  g.cum_sum += randn(g.N)*g.sd + g.mean, state+1
+
+end
+
+
+function construct_input_stream(cfg, num_inputs)
+
+  istream = None
+  if cfg["name"] == "gaussian"
+    istream = GaussianTimeSeries(num_inputs, cfg["mean"], cfg["sd"])
+  end
+
+  return istream
+end
+

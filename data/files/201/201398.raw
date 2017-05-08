@@ -1,0 +1,14 @@
+module FracjackRun
+
+using Fracjack
+using ImageView
+
+export go
+
+function go()
+    data = gen_data((800, 800), 128, Constraints(-2.0, 2.0, -2.0, 2.0))
+    img = gen_img(data)
+    view(img)
+end
+
+end

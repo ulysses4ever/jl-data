@@ -1,0 +1,21 @@
+using FLANN
+
+"Container for all information neccessary to dispatch data to learners."
+type FLANNDispatcher <: Dispatcher
+    X::Array{Float64, 2}
+    flann_index::FLANN.FLANNIndex
+    clustering::ClusterSolution
+end
+
+function FLANNDispatcher(X, clustering)
+    flann_index = flann(X, FLANNParameters(cores=1))
+    return FLANNDispatcher(X, flann_index, clustering)
+end
+
+cluster_keys(d::FLANNDispatcher) = cluster_keys(d.clustering)
+
+"Returns a the set of cluster indices that point `x` should be dispatched to."
+function dispatch(d::FLANNDispatcher, x)
+    nn_ix = nearest(d.flann_index, x)[1][1]
+    return d.clustering.p2cs[nn_ix]
+end

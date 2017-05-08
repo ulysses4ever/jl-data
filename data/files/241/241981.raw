@@ -1,0 +1,163 @@
+module Patch
+
+export Original, Mock, patch
+
+module Original
+end
+
+include("signature.jl")
+
+type Mock
+    original::Function
+    replacement::Function  # only non-generic functions
+    signature::Signature
+
+    function Mock(original::Function, replacement::Function, signature::Signature)
+        if isgeneric(replacement)
+            m = methods(replacement, signature)
+            if length(m) == 1
+                replacement = m[1].func
+            elseif length(m) == 0
+                error("explicit signature does not match any method")
+            else
+                error("explicit signature is ambigious; please make signature more specific")
+            end
+        end
+
+        return Mock(original, replacement, signature)
+    end
+end
+
+function Mock(original::Function, replacement::Function)
+    if !isgeneric(replacement)
+        signature = Signature(replacement)
+    else
+        error("explicit signature required when replacement is a generic function")
+    end
+    Mock(original, replacement, signature)
+end
+
+patch(body::Function, mocks::Array{Mock}) = patch(body, mocks...)
+
+function patch(body::Function, mocks::Mock...)
+    if length(mocks) > 0
+        patch(mocks[1]) do
+            if length(mocks) > 1
+                patch(body, mocks[2:end]...)
+            else
+                body()
+            end
+        end
+    else
+        body()
+    end
+end
+
+function patch(body::Function, mock::Mock)
+    patch(body, mock.original, mock.replacement, mock.signature)
+end
+
+function patch(body::Function, old_func::Function, new_func::Function)
+    if !isgeneric(new_func)
+        signature = Signature(new_func)
+    else
+        error("explicit signature required when replacement is a generic function")
+    end
+    patch(body, old_func, new_func, signature)
+end
+
+function patch(body::Function, old_func::Function, new_func::Function, signature::Signature)
+    backup(old_func, signature) do
+        override(body, old_func, new_func, signature)
+    end
+end
+
+function backup(body::Function, new_func::Function, signature::Signature)
+    name = Base.function_name(new_func)
+    types = [:(::$t) for t in signature.types]
+    expr = :($name($(types...)) = nothing)
+    const org_func = Original.eval(expr)
+    return override(body, org_func, new_func, signature)
+end
+
+
+function override(body::Function, old_func::Function, new_func::Function)
+    if !isgeneric(new_func)
+        signature = Signature(new_func)
+    else
+        error("explicit signature required when replacement is a generic function")
+    end
+    override(body, old_func, new_func, signature)
+end
+
+function override(body::Function, old_func::Function, new_func::Function, signature::Signature)
+    if isgeneric(new_func)
+        m = methods(new_func, signature)
+        if length(m) == 1
+            new_func = m[1].func
+        elseif length(m) == 0
+            error("explicit signature does not match any method")
+        else
+            error("explicit signature is ambigious; please make signature more specific")
+        end
+    end
+
+
+    # Replace the old Function with the new anonymous Function
+    if isgeneric(old_func)
+        m = methods(old_func, signature)
+        if length(m) == 1
+            method = m[1]
+        elseif length(m) == 0
+            error("function signature does not exist")
+        else
+            error("ambigious function signature; please make signature more specific")
+        end
+
+        return override_internal(body, method, new_func)
+    else
+        return override_internal(body, old_func, new_func)
+    end
+end
+
+function override_internal(body::Function, old_func::Function, new_func::Function)
+    isgeneric(old_func) && error("original function cannot be a generic")
+    isgeneric(new_func) && error("replacement function cannot be a generic")
+
+    org_fptr = old_func.fptr
+    org_code = old_func.code
+    old_func.fptr = new_func.fptr
+    old_func.code = new_func.code
+
+    try
+        return body()
+    finally
+        old_func.fptr = org_fptr
+        old_func.code = org_code
+    end
+end
+
+function override_internal(body::Function, old_method::Method, new_func::Function)
+    isgeneric(new_func) && error("replacement function cannot be a generic")
+
+    mod = old_method.func.code.module
+    name = old_method.func.code.name
+
+    # Overwrite a method such that Julia calls the updated function.
+    isdefined(mod, name) || throw(MethodError("method $name does not exist in module $mod"))
+    types = [:(::$t) for t in Signature(old_method).types]
+    expr = :($name($(types...)) = nothing)
+
+    org_func = old_method.func
+    mod.eval(expr)  # Causes warning
+    old_method.func = new_func
+
+    try
+        return body()
+    finally
+        mod.eval(expr)  # Causes warning
+        old_method.func = org_func
+    end
+end
+
+end # module

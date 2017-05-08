@@ -1,0 +1,222 @@
+#= DegreeAndSimilarity
+
+Adaptation of BCT's [degree and similarity](https://sites.google.com/site/bctnet/measures/list#TOC-Degree-and-Similarity) API.
+
+BCT's degree functions are omitted since Julia's Graphs package provides similar functionality.
+
+=#
+
+import Graphs
+
+function has_edge_attribute{G<:Graphs.GenericGraph}(g::G, key::AbstractString)
+    if Graphs.num_edges(g) == 0 return false end
+    if findfirst(fieldnames(g.edges[1]),:attributes) == 0 return false end
+    for edge in Graphs.edges(g)
+        if findfirst(collect(keys(edge.attributes)), key) == 0 return false end
+    end
+    return true;
+end
+
+""" strengths{G<:Graphs.GenericGraph}(g::G, key::AbstractString="weight")
+
+Returns a Float64 array, one row per vertex. The array's first column will contain the total weight of all incident edges.
+
+If `g` is directed, a second column will contain the total weight of all incoming vectors.
+
+If `g` is undirected, there will be no second column.
+
+If all edges of `g` have a `weight` attribute with `key` as given in the argument, it will be used as such. If not, each edge will be given a weight of 1.0.
+"""
+function strengths{G<:Graphs.GenericGraph}(g::G, key::AbstractString = "weight")
+    n = Graphs.num_vertices(g);
+    # Do edges have attributes?
+    has_weights = has_edge_attribute(g, key);
+    if is_directed(g)
+        # Allocate nx2 array of zeros.
+        S = fill(0.0, (n,2));
+        for edge in edges(g)
+            W = has_weights ? edge.attributes[key] : 1.0;
+            S[edge.source.index, 1] += W; 
+            S[edge.target.index, :] += W;
+        end
+        return S;
+    else
+        # Allocate n-long array of zeros.
+        S = fill(0.0, n);
+        for edge in edges(g)
+            W = has_weights ? edge.attributes[key] : 1.0;
+            S[edge.source.index] += W;
+            S[edge.target.index] += W;
+        end
+        return S;
+    end
+end
+
+""" joint_degree{G <: Graphs.GenericGraph}(g::G)
+
+If `g` is directed, `joint_degree` returns a 2D array whose the i,jth element is the number of vertices that have i-1 outgoing and j-1 incoming edges. Edge weights are ignored. 
+
+If `g` is undirected, `joint_degree` returns a vector whose ith element is the number of vertices of degree i-1, i.e, have i-1 incident edges. Edge weights are ignored.
+
+Origin shifts, i-1, j-1, are to accommodate cases with no edges of one type or another.
+"""
+function joint_degree{G <: Graphs.GenericGraph}(g::G)
+    if g.is_directed
+        tmp =  hcat([Graphs.in_degree(v,g) for v in g.vertices],
+                    [Graphs.out_degree(v,g) for v in g.vertices]);
+        n = maximum(tmp)+1;
+        JD = fill(0::Int, (n,n));
+        for k in 1:size(tmp,1)
+            JD[tmp[k,1]+1, tmp[k,2]+1] += 1;
+        end
+    else
+        tmp = [Graphs.out_degree(v,g) for v in g.vertices];
+        JD = fill(0::Int, maximum(tmp)+1);
+        for k in 1:size(tmp,1)
+            JD[tmp[k]+1] += 1;
+        end
+    end
+    return JD;
+end
+
+""" general_topological_overlap{G <: Graphs.GenericGraph}(g::G, m::Int)
+    
+Computes the generalized topological overlap measure, a.k.a, gtom, as presented in Yip and Horvath [Gene network interconnectedness and the generalized topological overlap measure](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-8-22) (2007). As defined in the reference, the measure applies **only** to undirected. As implemented here, it applies to directed graphs as well but reduces to the referenced definition for undirected graphs.
+
+The measure compares neighborhoods of radius m of a vertex, `v`. Such a neighborhood consists of all vertices which can be reached in at most m steps, beginning at `v` and travelling along edges. In the case of directed graphs, this implementation distinguishes between outward neighborhoods in which steps must be along outward-pointing edges, and inward neighborhoods in which steps must be along inward-pointing edges. The measure is essentially the ratio of the number of vertices common to both neighborhoods, and the size of the smaller of the two individual neighborhoods.
+
+A square matrix, `A`, with side `num_vertices(g)` is returned. `A[i,j]` measures the similarity of the neighborhoods of vertices `i` and `j`. In the case of undirected graphs, `A[i,j]==A[j,i]`. In the case of directed graphs, `A[i,j]` applies to outward neighborhoods when `i < j` and inward neighborhoods when `i > j`.
+
+As defined and as implemented here, the measure does not apply to weighted graphs. All edges are assumed to have weight 1. The Floyd-Warshall algorithm from the Graphs package is used to compute minimum distances between vertices.
+"""
+function general_topological_overlap{G <: Graphs.GenericGraph}(g::G, m::Int)
+    # Adjacency matrix: 1 if connected, 0 else
+    A = Graphs.weight_matrix(g, fill(1.0,Graphs.num_edges(g)));
+    n = size(A,1);
+    if n == 1 return fill(1.0,(1,1)); end # degenerate case
+    # Minimum distances are computed by the Floyd-Warshall algorithm, starting
+    # with distances of 1 if vertices are directly connected, Inf else.
+    # The only information of interest is whether or not two vertices
+    # are within a distance m of one another, hence a boolean  matrix
+    # conveying this information suffices.
+    D = Graphs.floyd_warshall(1.0 ./ A) .<= m;
+    # Set diagonal to false to exclude neighborhood centers from measure.
+    for i=1:n D[i,i] = false; end
+    # Use A to store computed measures
+    # Self-overlaps are 1 by definition
+    for i=1:size(A,1) A[i,i] = 1; end
+    # Precompute outward neighborhood sizes; row sums.
+    N = [sum(D[i,:]) for i in 1:n];
+    # Compute sizes of (outward) neighborhood intersections;
+    # inner products of D's rows.
+    S = D * D';
+    if !g.is_directed
+        # Outward and inward neighborhoods are the same thing.
+        # Calculate measures.
+        for i in 1:(n-1), j in (i+1):n
+            A[i,j] = (S[i,j]+A[i,j])/(min(N[i],N[j])+1-A[i,j]);
+            A[j,i] = A[i,j];
+        end
+    else
+        # Store outward measures in upper triangular part of A.
+        for i in 1:(n-1), j in (i+1):n
+            # Store fwd adjacency, i->j as A[j,i] for inwards calc
+            A[j,i] = A[i,j];
+            A[i,j] = (S[i,j]+A[i,j])/(min(N[i],N[j])+1-A[i,j]);
+        end
+        # Calculate inward measures in lower triangular part of A.
+        # Precompute inward neighborhood sizes; column sums of D
+        N = [sum(D[:,i]) for i in 1:n];
+        # Compute sizes of inward neighborhood intersections;
+        # inner products of D's columns.
+        S = D' * D;
+        # Compute measures for inward neighborhoods. Recall that the
+        # previous step replaced adjacency A[j,i] with A[i,j] for all i < j.
+        # Prior to replacement, A[j,i], i < j, was an outward adjacency, j->i.
+        # Now A[j,i], i < j,  is a inward adjacency, j<-i.
+        for j in 2:n, i in 1:(j-1)
+             A[j,i] = (S[j,i]+A[j,i])/(min(N[i],N[j])+1-A[j,i]);           
+        end
+    end
+    return A;
+end
+
+""" edge_neighborhood_overlap{G <: Graphs.GenericGraph}(`g`::G)
+
+For each edge in `g`, computes the proportional overlap of the neighborhoods of its source and target, returning an array of results. Proportional overlap is the ratio of the size of the intersection to the size of the union of the neighborhoods, where the source and target are excluded from both factors.
+
+According to the Matlab BCT functions (`edge_nei_overlap_bd` and `edge_nei_overlap_bu`,) on which this implementation is based, small values indicate edges which are "weak ties" between neighborhoods. In the extereme case, a value of zero indicates a "local bridge" between completely non-overlapping neighborhoods.
+
+Except for the order in which they appear, the return value corresponds to the "ec" array returned by the Matlab functions. The order, here, depends on the order of the edges of `g`.
+
+The Matlab BCT references Easley and Kleinberg, *Networks, Crowds, and Markets* (2010), Chapter 3.
+
+    [ungated draft](https://www.cs.cornell.edu/home/kleinber/networks-book/)
+    [Amazon](http://www.amazon.com/Networks-Crowds-Markets-Reasoning-Connected/dp/0521195330)
+
+"""
+function edge_neighborhood_overlap{G <: Graphs.GenericGraph}(g::G)
+    # Derive neighborhoods of individual vertices
+    Nbd = [union( Graphs.in_neighbors(v,g),
+                  Graphs.out_neighbors(v,g))
+           for v in Graphs.vertices(g)];
+    # Allocate array for return values
+    Eno = fill(0.0, num_edges(g));
+    # Compute overlaps
+    k = 0;
+    for edge in Graphs.edges(g)
+        k += 1;
+        u = Graphs.source(edge);
+        v = Graphs.target(edge);
+        meet = intersect(Nbd[u.index], Nbd[v.index]);
+        join = union(Nbd[u.index], Nbd[v.index]);
+        Eno[k] = length(setdiff(meet, [u,v]))/length(setdiff(join,[u,v]));
+    end
+    return Eno;
+end
+
+function mi_helper{G <: Graphs.GenericGraph}(g::G, i::Int, j::Int, Nbd)
+    x = [g.vertices[i], g.vertices[j]];
+    meet = setdiff( intersect(Nbd[i], Nbd[j]), x);
+    join = setdiff( union(Nbd[i], Nbd[j]), x);
+    return 2*length(meet)/length(join);
+end
+
+""" matching_index{G <: Graphs.GenericGraph}(`g`::G)
+
+The matching index computes proportional overlap of the connection patterns of every two vertices, u and v. If N(u) and N(v) are neighborhoods of u and v, respectively, then the index is the ratio, 2*|union(N(u),N(v))~{u,v}|/|intersection(N(u),N(v))~{u,v}|, where |.| indicates set cardinality and ~{u,v} indicates removal of u and v if present. The index is clearly symmetric in u and v.
+
+If `g` is undirected a (symmetric) matrix of values is returned.
+
+If `g` is directed, a tuple of two matrices are returned. The first is symmetric and uses both inward and outward edges to define a neighborhood. The second distinguishes between inward and outward neighborhoods. Indices for outward neighborhoods are given in its upper triangular part, and indices for inward neighborhoods in its lower triangular part.
+
+This implementation is based on the Matlab functions `matching_ind` by Olaf Sporns and `matching_ind_und` by Richard Betzel.
+
+"""
+function matching_index{G <: Graphs.GenericGraph}(g::G)
+    n = Graphs.num_vertices(g);
+    if !g.is_directed
+        # For an undirected graph, in and out neighbors are the same.
+        Nbd = [Graphs.in_neighbors(g.vertices[i], g) for i in 1:n];
+        Mall = eye(n,n);
+        for i in 1:(n-1), j in (i+1):n
+            Mall[i,j] = Mall[j,i] = mi_helper(g, i, j, Nbd);
+        end
+        return Mall;
+    else
+        inNbd = [Graphs.in_neighbors(g.vertices[i], g) for i in 1:n];
+        outNbd = [Graphs.out_neighbors(g.vertices[i], g) for i in 1:n];
+        M = eye(n,n);
+        for i in 1:(n-1), j in (i+1):n
+            M[i,j] = mi_helper(g, i, j, outNbd);
+            M[j,i] = mi_helper(g, i, j, inNbd);
+        end
+        Mall = eye(n,n);
+        Nbd = [union(Graphs.in_neighbors(g.vertices[i]),
+                     Graphs.out_neighbors(g.vertices[i])) for i in 1:n];
+        for i in 1:(n-1), j in (i+1):n
+            Mall[i,j] = Mall[j,i] = mi_helper(g, i, j, Nbd);
+        end
+        return (Mall, M);
+    end
+end

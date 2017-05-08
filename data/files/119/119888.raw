@@ -1,0 +1,11 @@
+include("../seg2seg.jl")
+a = [-0.8, -2.6]
+b = [-1, 1]	# [6, 2]; [5, 2]
+c = [-2, 3]
+d = [7, -3]
+println(round(seg2seg(a, b, c, d),15))
+println(seg2seg(a, b, c, d));
+println(seg2seg(a, b, d, c));
+println(seg2seg(b, a, c, d));
+println(seg2seg(c, d, a, b));
+

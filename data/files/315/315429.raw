@@ -1,0 +1,182 @@
+module dag2048
+
+using jb2048
+import Base.show
+
+abstract DagNode
+
+meandag = Dict{Board,DagNode}()
+type MeanNode <: DagNode
+    board::Board
+    child::Vector{DagNode}
+    val::Float64
+    branch::Int     # max length
+    height::Int
+
+    function MeanNode(b::Board, h)
+        global meandag::Dict{Board,DagNode}
+        node = get(meandag, b, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        val = 0.0
+        branch = 0
+        fc = find(b .== 0)  # free cells (indices)
+        nf = length(fc)
+        p1 = 0.9/nf
+        p2 = 0.1/nf
+        for i in fc
+            b[i] = 1
+            c =  MaxNode(copy(b), h+1)
+            push!(child, c)
+            val += c.val * p1
+            p = c.branch + 1
+            p > branch && (branch = p)
+            b[i] = 2
+            c =  MaxNode(copy(b), h+1)
+            push!(child, c)
+            val += c.val * p2
+            p = c.branch + 1
+            p > branch && (branch = p)
+            b[i] = 0
+        end
+        node = new(b, child, val, branch, h)
+        meandag[b] = node
+    end
+end
+
+function meantree(b::Board)
+    empty!(meandag)
+    empty!(maxdag)
+    MeanNode(b, 1)
+end
+
+maxdag = Dict{Board,DagNode}()
+type MaxNode <: DagNode
+    board::Board
+    child::Vector{DagNode}
+    val::Float64
+    best::Int
+    branch::Int     # max length
+    height::Int
+
+    function MaxNode(b::Board, h)
+        global maxdag::Dict{Board,DagNode}
+        node = get(maxdag, b, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        val = 0.0
+        best = 0
+        branch = 0
+        i = 0
+        for d = 1:4
+            bs, moved, score = slide(b, d)
+            if moved
+                i += 1
+                c = MeanNode(bs, h)
+                push!(child, c)
+                c.val > val && (val = c.val; best = i)
+                p = c.branch
+#                 p = c.branch + 1
+                p > branch && (branch = p)
+            end
+        end
+#         i == 0 && (val = 1 << maximum(b))
+        i == 0 && (val = sum([1<<t for t in b]))
+        node = new(b, child, val, best, branch, h)
+        maxdag[b] = node
+    end
+end
+
+function maxtree(b::Board)
+    empty!(meandag)
+    empty!(maxdag)
+    MaxNode(b, 1)
+end
+
+isleaf(d::DagNode) = length(d.child) == 0
+
+function show(io::IO, d::DagNode)
+    b = d.board
+    m, n = size(b)
+    print(io, "[")
+    for i in 1:m
+        for j in 1:n
+            print(io, " ", b[i,j])
+        end
+        if i < m
+            print(io, ";")
+        else
+            print(io, "]")
+        end
+    end
+    val = round(d.val,3)
+    if length(d.child) == 0
+        print(io, ", leaf -> val $val, height $(d.height)")
+        return
+    end
+    if isa(d, MeanNode)
+        print(io, " mean -> val $val, branch $(d.branch), height $(d.height)")
+    else
+        print(io, " max ->  val $val, branch $(d.branch), height $(d.height), best $(d.best)")
+    end
+end
+
+type Game
+    board::Board
+    length::Int
+
+    function Game(board)
+        length = 1
+        new(board, length)
+    end
+end
+
+function initgame(size)
+    g = Game(zeros(Int, size))
+    tileinsert!(g.board)
+    tileinsert!(g.board)
+    g
+end
+
+function play(g::Game, moves=32768; display=false, verbose=false)
+    b = g.board
+    while g.length < moves
+        verbose && println("move $(g.length)")
+        node = maxdag[b]
+        verbose && println(node)
+        isleaf(node) && break
+        c = node.child[node.best]
+        verbose && println(c)
+        b=copy(c.board)
+        i = tileinsert!(b)
+        display && plot(b,i)
+        g.length += 1
+        g.board = b
+    end
+    return g
+end
+
+function repartition(g0::Game, n; verbose = false)
+    r = Dict{Int, Int}()
+    nmoves = 0
+    for i=1:n
+        g = Game(g0.board)
+        play(g)
+        nmoves += g.length
+        sup = maximum(g.board)
+        if haskey(r, sup)
+            r[sup] += 1
+        else
+            r[sup] = 1
+        end
+        if verbose
+            println((g.length, 1<<sup), div(nmoves, i), r)
+        end
+    end
+    div(nmoves,n), [(k,r[k]) for k in sort(collect(keys(r)))]
+end
+
+function quiet()
+end
+
+end

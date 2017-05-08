@@ -1,0 +1,67 @@
+
+
+module Boosting
+using Classifiers
+using Distributions
+
+export fit,BoostedModelConfig,BoostedModel
+
+
+type BoostedModelConfig <: ClassifierConfig
+  fit_function::Function
+  predict_function::Function
+  weak_classifiers::Int
+end
+
+type BoostedModel <:Classifier
+    models::Vector{Classifier}
+    weights::Vector{Float64}
+    config::BoostedModelConfig
+end
+
+function subsample(probabilities::Vector{Float64})
+  c=Categorical(probabilities)
+  a = sampler(c)
+  sampled=0
+  n=length(probabilities)
+  selected=falses(n)
+  while (sampled<0.5)
+    index=rand(a)
+    while (selected[index])
+      index=rand(a)
+    end
+    selected[index]=true
+    sampled+=probabilities[index]
+  end
+
+  return selected
+end
+
+
+function fit(c::BoostedModelConfig,x,y)
+models=Classifier[]
+weights=zeros(c.weak_classifiers)
+n=length(x)
+probabilities=ones(n)/n
+for i=1:c.weak_classifiers
+    indices=subsample(probabilities)
+    model=c.fit_function(x[indices],y[indices])
+    predicted=c.predict_function(model,x)
+    errors=predicted.!=y
+    average_error=mean(errors)
+    println(average_error)
+    weight=0.5*log((1-average_error)/average_error)
+    weights[i]=weight
+    probabilities=probabilities.*exp(-weight.*predicted.*y)
+    probabilities=probabilities./sum(probabilities)
+    push!(models,model)
+end
+
+return BoostedModel(models,weights,c)
+end
+
+function predict(c::BoostedModel,x)
+
+end
+
+end

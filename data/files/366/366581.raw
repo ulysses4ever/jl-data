@@ -1,0 +1,62 @@
+module neurons
+
+abstract Neurons
+
+### Leaky integrate-and-fire neuronal population ###
+type LIFNeurons <: Neurons
+    nneur::Int64
+    #constants for all neurons
+    R::Float64
+    tau::Float64
+    Vthr::Float64
+    Vres::Float64
+    #variables
+    Vm::Array{Float64,1}
+    LastSpikes::Array{Float64,1}
+    LIFNeurons(nneur,R,tau,Vthr,Vres) = new(nneur,R,tau,Vthr,Vres,Vres*ones(nneur),zeros(nneur))
+    # zeros in LastSpikes may cause weird stuff in stdp.
+end
+
+function update_neurons(neurons::LIFNeurons, input, dt)
+    isspike(v) = v > neurons.Vthr
+    VmN = neurons.Vm + dt/neurons.tau*( -neurons.Vm.+neurons.Vres + neurons.R*input)
+    spikeidx = find(isspike,VmN)
+    neurons.Vm = VmN
+    neurons.Vm[spikeidx] = neurons.Vres
+    neurons.LastSpikes .+= dt
+    neurons.LastSpikes[spikeidx] = 0.
+    return neurons.Vm, spikeidx
+end
+
+### Izhikevich neuronal population ###
+type IzhiNeurons <: Neurons
+    nneur::Int64
+    #constants
+    a::Float64
+    b::Float64
+    c::Float64
+    d::Float64
+    Vthr::Float64
+    #variables
+    v::Array{Float64,1}
+    u::Array{Float64,1}
+    LastSpikes::Array{Float64,1}
+    Izhineurons(nneur,a,b,c,d,Vthr) = new(nneur,a,b,c,d,Vthr,c*ones(nneur),a*c*zeros(nneur),zeros(nneur))
+    #check initial values for u and v. zeros in LastSpikes may cause weird stuff in stdp.
+end
+
+function update_neurons(neurons::IzhiNeurons, input, dt)
+    VN = neurons.v + dt*( 0.04*neurons.v.^2 + 5*neurons.v + 140 - neurons.u + input)
+    UN = neurons.u + dt*neurons.a*(neurons.b*neurons.v - neurons.u)
+    isthr(k) = k > neurons.Vthr
+    spikeidx = find(isthr, VN)
+    neurons.v = VN
+    neurons.u = UN
+    neurons.u[spikeidx] .+= neurons.d
+    neurons.v[spikeidx] = neurons.c
+    neurons.LastSpikes .+= dt
+    neurons.LastSpikes[spikeidx] = 0.
+    return neurons.v, spikeidx
+end
+
+end

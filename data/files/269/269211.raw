@@ -1,0 +1,32 @@
+using CUTEst
+using DCI
+
+if length(ARGS) == 0
+  println("Need CUTEst problem as argument")
+  exit(1)
+end
+
+curdir = pwd();
+tmpdir = mktempdir();
+cd(tmpdir)
+
+nlp = CUTEstModel(convert(ASCIIString,ARGS[1]))
+
+if nlp.meta.ncon == 0
+  println("Problem is unconstrained, EXITING")
+  exit(1)
+end
+
+f(x) = obj(nlp, x)
+g(x) = grad(nlp, x)
+W(x,λ) = full(hess(nlp, x, λ))
+h(x) = cons(nlp, x)
+J(x) = full(jac(nlp, x))
+
+@time (x,k) = DCI.solve(f, g, W, h, J, nlp.meta.x0, nlp.meta.ncon,
+    verbose=true)
+
+println("x = ", x)
+println("k = ", k)
+
+cd(curdir)

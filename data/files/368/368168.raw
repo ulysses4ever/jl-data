@@ -1,0 +1,99 @@
+
+
+export dd_plot, edd_plot, loodd_plot, EDDHelperVector
+
+#Following functions construct DD-plots with help of sorted data: these are vectors of sub-matrices X_1, X_2, ..., X_l where l is the count of classes
+#refer to sortData method in common.jl
+
+#Returns the DD-plot of all data points in data_set
+function dd_plot{T<:Number}(data_set::AbstractArray{T,2}, classlabels::AbstractVector, depth_function::Function, mcd::Bool=false, k::Int64=10, randvectors=[])
+	sortedData = sortData(data_set,classlabels)
+	q = length(sortedData) #count of classes 
+	
+	dd = zeros(length(data_set[:,1]),q)
+	
+	if((depth_function == depth_projection || depth_function == depth_halfspace) && length(randvectors) == 0)
+		randvectors = randn(length(data_set[1,:]),k)
+		for i in 1:k
+			randvectors[:,i] = v(randvectors[:,i])
+		end
+		randvectors = randvectors'
+	end
+	
+	for j in 1:q
+		#Pre-calculate inverse scatter matrices and weight vectors for data depths 
+		if(depth_function == depth_mahalanobis || depth_function == depth_L2)
+			scatter = cov(sortedData[j])
+			inv_scatter = pinv(scatter)
+		elseif(depth_function == depth_spatial)
+			scatter = cov(sortedData[j])
+			inv_scatter = scatter^(-0.5)	
+		elseif(depth_function == depth_halfspace_bisectors)
+			w = generateWeightVectors(sortedData[j])
+			proj = preCalculateWeightProjections(sortedData[j],w)
+		else 
+		
+		end
+		
+		for i in 1:length(data_set[:,1])
+			if(depth_function == depth_mahalanobis || depth_function == depth_L2 || depth_function == depth_spatial)
+				dd[i,j] = depth_function(vec(data_set[i,:]),sortedData[j],mcd,inv_scatter)
+			elseif(depth_function == depth_halfspace_bisectors)
+				dd[i,j] = depth_halfspace_bisectors(vec(data_set[i,:]),sortedData[j],w,proj)
+			elseif(depth_function == depth_projection || depth_function == depth_halfspace)
+				dd[i,j] = depth_function(vec(data_set[i,:]),sortedData[j],0,randvectors)
+			else
+				dd[i,j] = depth_function(vec(data_set[i,:]),sortedData[j])
+			end
+		end
+	end
+	
+	return dd
+end
+
+#Returns the extended DD-Plot of all data points in sortedData and corresponding exponents of the columns
+function edd_plot{T<:Number}(data_set::AbstractArray{T,2}, classlabels::AbstractVector , depth_function::Function, p::Int64 = 2, mcd::Bool = false)
+	
+end 
+
+#Helper function to create a vector for EDD construction, especially for q >= 2 classes
+#p comes from chosen p in EDD, q is count of classes
+function EDDHelperVector(p::Int64,q::Int64)
+    res = cell(0,q)
+    for i in product(repmat(Any[0:p],q)...)
+        if(sum(i) >=1 && sum(i) <= p)
+            res = vcat(res,collect(i)')
+        end
+    end
+    return res
+end
+
+#Returns the leave one out DD-Plot of all data points in sortedData
+function loodd_plot{T<:Number}(data_set::AbstractArray{T,2}, classlabels::AbstractVector, depth_function::Function, mcd::Bool = false)
+	sortedData = sortData(data_set,classlabels)
+	q = length(sortedData) #count of classes 
+	
+	dd = zeros(length(data_set[:,1]),q)
+	
+	#Pre-calculation is not possible here because every depth function needs a new inverse scatter matrix without data point i
+	for j in 1:q	
+		for i in 1:length(data_set[:,1])
+			#removes every occurence of data point x_i in X_j
+			tmp_row_loo = find(all(sortedData[j] .== data_set[i,:], 2))
+            tmp_row = setdiff(collect(1:length(sortedData[j][:,1])),tmp_row_loo)
+			loo_sortedData = sortedData[j][tmp_row,:]
+			
+			if(depth_function == depth_mahalanobis || depth_function == depth_L2 || depth_function == depth_spatial)
+				dd[i,j] = depth_function(vec(data_set[i,:]),loo_sortedData,mcd)
+			elseif(depth_function == depth_halfspace_bisectors)
+				w = generateWeightVectors(loo_sortedData)
+				proj = preCalculateWeightProjections(loo_sortedData,w)
+				dd[i,j] = depth_halfspace_bisectors(vec(data_set[i,:]),loo_sortedData,w,proj)
+			else
+				dd[i,j] = depth_function(vec(data_set[i,:]),loo_sortedData)
+			end
+		end
+	end
+	
+	return dd
+end

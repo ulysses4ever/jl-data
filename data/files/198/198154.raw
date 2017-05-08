@@ -1,0 +1,61 @@
+using DataFrames
+using Distributions
+
+#
+# Clusters
+#
+
+type Clusters{T}
+  # generating multivariate distributions
+  generators::Dict{Int,MultivariateNormal}
+
+  K::Int       # number of generating functions
+  n::Int       # number of dimensions for points
+  spread::Int  # how spread out should the centrioids be
+  max::Int     # upper bound on number of samples
+
+  # generated examples
+  points::DataFrame
+
+  function Clusters(K = 2; spread = 24, max = 500)
+    that = new(normals(K, T, spread), K, T, spread, max, DataFrame())
+    generate(that)
+    that
+  end
+end
+
+centroids(c::Clusters) = map(k -> mean(c.generators[k]), [1:c.K])
+length(c::Clusters) = size(c.points, 1)
+
+# private
+
+function frame(points, k)
+  ordinals = map(string, ones(size(points, 1)) * k)
+  DataFrame({ "k" => ordinals, "x" => points[:, 1], "y" => points[:, 2] })
+end
+
+function generate(clusters::Clusters)
+  for k = 1:clusters.K
+    points = generate(clusters.generators[k], clusters.max)
+    clusters.points = vcat(clusters.points, frame(points, k))
+  end
+end
+
+function generate(d::MultivariateNormal, max::Int)
+  n = size(mean(d), 1)
+  m = integer(rand() * max) # random cluster size
+  res = zeros(n, m)
+  rand!(d, res)
+  res'
+end
+
+function normals(K::Int, n::Int, spread::Int)
+  Dict([1:K], map(k -> normal(n, spread), [1:K]))
+end
+
+# TODO: currently not fully general due to diagonal covariance matrix.
+# need correlation in triangles of the covariance matrix
+function normal(n::Int, spread::Int)
+  MultivariateNormal(rand(n) * spread, diagm(rand(n)))
+end
+

@@ -1,0 +1,35 @@
+sexpr(io::IO, ex) = print(io, ex)
+
+jl_to_max = Dict{Symbol, String}(
+    :+ => "\$mplus",
+    :* => "\$mtimes",
+    :^ => "\$mexpt"
+)
+
+issymbol(x) = typeof(x) == Symbol
+
+function sexpr(io::IO, ex::Expr)
+    print(io, '(')
+    #show(io, ex.head)
+    for arg in ex.args
+        if 
+        if ex.head == :block
+            error("Block expressions not supported!")
+        elseif arg in keys(jl_to_max)
+            print(io, " ")
+            sexpr(io, jl_to_max[arg])
+        else 
+            print(io, " ")
+            sexpr(io, arg)
+        end
+    end
+    if isempty(ex.args); print(io, ")")
+    else print(io, ")")
+    end
+end
+
+function maxima_str(expr::Expr)
+    str = IOBuffer()
+    sexpr(str, expr)
+    return String(str)
+end

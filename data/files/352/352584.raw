@@ -1,0 +1,33 @@
+ function psdw(W,coi=[],f=[],dt=1.0)
+    ## PSDW Calculate power spectral density from Wavelet coefficients
+    #
+    #   Pw = PSDW(W,coi,f,dt,dj)
+    #
+    #   INPUT:
+    #           W:   Wavelet coefficient matrix
+    #           coi: Cone of influence vector
+    #           f:   Wavelet frequency vector
+    #           dt:  Time increment
+    #
+    #   OUTPUT:
+    #           Pw: Power spectral density vector of length of f
+    #
+    # Author: Michael von Papen, Felix Gerick
+    #
+    # Date: 15.10.15
+
+    if !isreal(W)
+        W = 2*dt*abs(W).^2;
+    end
+
+
+    # Respect COI
+    if (!isempty(coi) && !isempty(f))
+        W = coi2nan(f,W,dt,coi);
+    end
+
+    # Calculate PSD
+    Pw = nanmean(W,2);
+    return Pw;
+
+end

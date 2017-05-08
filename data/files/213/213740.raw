@@ -1,0 +1,46 @@
+# ====================================================================
+# yhat sample of NN.jl - neural network sample code by yhat
+# enhanced & modified by masaruna@
+# Copyright(C). masaruna@ 2017. All rights reserved.
+# ====================================================================
+using DataFrames
+using DataArrays
+using StatsBase
+using RDatasets
+using DecisionTree
+using ScikitLearn
+using Regression
+using GLM
+using Clustering
+using Distributions
+# using PyPlot
+using Gadfly
+
+cd(expanduser("/home/masaruna/Dropbox/julia/99_yhat"))
+train_df = readtable("./winequality-red.csv", separator=';')
+
+# http://stackoverflow.com/questions/40423658/how-to-plot-statsbase-histogram-object-in-julia
+h = fit(Histogram, train_df[:quality])
+plot(x = h.edges[1][2:end], y = h.weights, Geom.bar, Guide.title("Class distributions (\"quality\")"))
+
+# -------------------------------------------------------------------
+# good way to split data into training and test data sets.
+# -------------------------------------------------------------------
+X, Y = load_iris()
+
+y = train_df[:quality]
+# x = train_df[[names(train_df) .!= :quality]]
+X = train_df[:, names(train_df) .!= :quality]
+# -----------------------------------------------------------------------------
+
+n = length(y)
+
+is_train = shuffle(collect(1:n) .> floor(n * 0.25))
+
+x_train, x_test = x[is_train, :], x[!is_train, :]
+y_train, y_test = y[is_train, :], y[!is_train, :]
+
+##
+println("Total number of observations: ",n)
+println("Training set size: ", sum(is_train))
+println("Test set size: ", sum(!is_train))

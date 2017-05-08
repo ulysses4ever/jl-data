@@ -1,0 +1,69 @@
+module Timing
+
+using Jules
+using FPUtil
+using Streaming
+
+export
+Timer,
+timer,
+tick,
+tick!,
+intervaltrigger
+
+type Timer
+  label::String
+  lasttick::Float64
+  stats::Moments
+  trigger::Function
+  lastmsg::Float64
+end
+
+function intervaltrigger(n::Int64, lbl::String)
+  function f(delta::Float64, t::Timer)
+    d = time() - t.lastmsg
+    (d >= n) ? "$(lbl) - rate=$(t.stats.mean)/s, count=$(t.stats.n), total=$(t.stats.mean * t.stats.n)s" : nothing
+  end
+  f
+end
+
+
+timer(lbl::String,trigger::Function) =
+  Timer(lbl, time(), emptymoments(), trigger, time())
+timer(lbl::String) = timer(lbl, intervaltrigger(5,lbl))
+
+function tick(timer::Timer)
+  now = time()
+  delta = now - timer.lasttick
+  t = Timer(timer.label,
+            now,
+            update(timer.stats, delta),
+            timer.trigger,
+            timer.lastmsg)
+
+  msg = timer.trigger(delta, t)
+  if !isnothing(msg)
+    info(msg)
+    t.lastmsg = time()
+  end
+
+  t
+end
+
+function tick!(timer::Timer)
+  now = time()
+  delta = now - timer.lasttick
+  timer.lasttick = now
+  timer.stats = update(timer.stats, delta)
+
+  msg = timer.trigger(delta, timer)
+  if !isnothing(msg)
+    info(msg)
+    timer.lastmsg = time()
+  end
+
+  timer
+end
+
+
+end ## end module

@@ -1,0 +1,73 @@
+## =============================================================================
+## 01_glm.jl - GLM (generalized linear models) sample
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames
+using GLM, RDatasets
+
+## 1. minimal sample with glm
+df1 = DataFrame(x=[1,2,3], y=[2,4,7])
+OLS = glm(y~x, df1, Normal(), IdentityLink())
+
+stderr(OLS)
+predict(OLS)
+
+# Coefficients:
+#               Estimate Std.Error  z value Pr(>|z|)
+# (Intercept)  -0.666667   0.62361 -1.06904   0.2850
+# x                  2.5  0.288675  8.66025   <1e-17
+
+## 2. probit regression
+df2 = DataFrame(x=[1,2,3], y=[1,0,1])
+Probit = glm(y~x, df2, Binomial(), ProbitLink())
+
+# Coefficients:
+#                  Estimate Std.Error      z value Pr(>|z|)
+# (Intercept)      0.430727   1.98019     0.217518   0.8278
+# x            -3.64399e-19   0.91665 -3.97534e-19   1.0000
+vcov(Probit)
+# 2x2 Array{Float64,2}:
+#   3.92116  -1.6805  
+#  -1.6805    0.840248
+
+
+## 3. linear regression
+df3 = dataset("datasets", "Formaldehyde")
+lm1 = fit(LinearModel, OptDen ~ Carb, df3)
+# Coefficients:
+#                Estimate  Std.Error  t value Pr(>|t|)
+# (Intercept)  0.00508571 0.00783368 0.649211   0.5516
+# Carb           0.876286  0.0135345  64.7444    <1e-6
+
+confint(lm1)
+# 2x2 Array{Float64,2}:
+#  -0.0166641  0.0268355
+#   0.838708   0.913864 
+
+## 4. multiple linear regression
+df4 = dataset("datasets", "LifeCycleSavings")
+fm2 = fit(LinearModel, SR ~ Pop15 + Pop75 + DPI + DDPI, df4)
+
+# Coefficients:
+#                  Estimate   Std.Error   t value Pr(>|t|)
+# (Intercept)       28.5661     7.35452   3.88416   0.0003
+# Pop15           -0.461193    0.144642  -3.18851   0.0026
+# Pop75             -1.6915      1.0836    -1.561   0.1255
+# DPI          -0.000336902 0.000931107 -0.361829   0.7192
+# DDPI             0.409695    0.196197   2.08818   0.0425
+
+## 5. multiple glm
+df5 = DataFrame(Counts = [18.,17,15,20,10,20,25,13,12],
+                Outcome = gl(3, 1, 9),
+                Treatment = gl(3, 3))
+gm1 = fit(GeneralizedLinearModel, Counts ~ Outcome + Treatment, df5, Poisson())
+
+# Coefficients:
+#                    Estimate Std.Error     z value Pr(>|z|)
+# (Intercept)         3.04452  0.170899     17.8148   <1e-70
+# Outcome - 2       -0.454255  0.202171    -2.24689   0.0246
+# Outcome - 3       -0.292987  0.192742     -1.5201   0.1285
+# Treatment - 2   2.62621e-16       0.2  1.3131e-15   1.0000
+# Treatment - 3  -5.44239e-18       0.2 -2.7212e-17   1.0000
+deviance(gm1)
+# 5.129141077001146

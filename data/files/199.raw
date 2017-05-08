@@ -1,0 +1,52 @@
+using IntArrays
+
+# build an internal structure of the wavelet matrix
+function build{T<:Unsigned,B}(::Type{B}, data::AbstractVector{T}, n::Int)
+    len = length(data)
+    bits = B[]
+    ivec = IntVector{n}(data)
+    for d in 1:n
+        # scan d-th bit
+        bits′ = B()
+        for i in 1:len
+            if (ivec[i] >> (n - d)) & 1 == 1
+                # right
+                push!(bits′, 1)
+            else
+                # left
+                push!(bits′, 0)
+            end
+        end
+        nzero = rank0(bits′, len)
+        l = r = 1
+        ivec′ = similar(ivec)
+        for i in 1:len
+            if bits′[i]
+                # right
+                ivec′[nzero+r] = ivec[i]
+                r += 1
+            else
+                # left
+                ivec′[l] = ivec[i]
+                l += 1
+            end
+        end
+        push!(bits, bits′)
+        ivec = ivec′
+    end
+    return tuple(bits...)
+end
+
+# starting points for the rank operation can be precomputed
+function locate_sp(a, bits, nzeros)
+    n = length(bits)
+    sp = 0
+    for d in 1:n
+        bit = (a >> (n - d)) & 1 == 1
+        sp = rank(bit, bits[d], sp)
+        if bit
+            sp += nzeros[d]
+        end
+    end
+    return sp
+end

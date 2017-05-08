@@ -1,0 +1,65 @@
+# tests for tree.jl
+#include("../src/tree.jl")
+using Base.Test
+
+include("../src/trees/tree.jl")
+
+datapath = Pkg.dir("SyntaxTrees", "test", "data")
+
+function test_tree()
+
+    @test( extract_trees("") == [] )
+    @test( extract_trees("()") == ["()"] )
+    @test( extract_trees(")(") == [] )
+    @test( extract_trees(")()") == ["()"] )
+    @test( extract_trees("( )") == ["( )"] )
+    @test( extract_trees("(S (NP cats) (VP eat))") == ["(S (NP cats) (VP eat))"] )
+    @test( extract_trees("( ) ") == ["( )"])
+    @test( extract_trees(" ( ) ") == ["( )"])
+    @test( extract_trees("(T1 (L1 l1)) (T2 (L2 l2))") == ["(T1 (L1 l1))", "(T2 (L2 l2))"])
+    @test( length(extract_trees("()()()()()")) == 5)
+    wsj1_trees = extract_trees(open(joinpath(datapath, "wsj_0001.prd")))
+    @test( length(wsj1_trees) == 2)
+    for wsjtree in wsj1_trees
+        @test( verify_tree_string(wsjtree) )
+    end
+    @test( verify_tree_string("()" ) )
+    @test_throws( ErrorException, verify_tree_string("") )
+    @test_throws( ErrorException, verify_tree_string(" ()") )
+    @test_throws( ErrorException, verify_tree_string("() ") )
+    @test_throws( ErrorException, verify_tree_string("()()") )
+    @test_throws( ErrorException, verify_tree_string("()(") )
+    @test_throws( ErrorException, verify_tree_string(")(") )
+
+    n1 = TreeNode("word")
+    @test(n1.label == "word")
+    @test(n1.leaf == true)
+    treestring1 = "(S (NP (DT \"the\") (NN \"cat\")) (VP (V \"slept\")))"
+    treestring2 = "( (S (NP (DT \"the\") (NN \"cat\")) (VP (V \"slept\"))) )"
+    tree1 = ParseTree(treestring1)
+    tree2 = ParseTree(treestring2)
+    @test( tree1.productions == tree2.productions )
+    treestring3 = "(S (NP (DT \"the\") (NN \"cat\")) (VP (V \"chased\") (NP (DT \"the\") (NN \"rat\"))))"
+    wsj01 = "( (S (NP-SBJ (NP Pierre Vinken)
+             ,
+             (ADJP (NP 61 years)
+		   old)
+             ,)
+     (VP will
+         (VP join
+             (NP the board)
+             (PP-CLR as
+		     (NP a nonexecutive director))
+	     (NP-TMP Nov. 29)))
+.))"
+    wsjtree01 = ParseTree(wsj01)
+    @test( wsjtree01.leaves == ["Pierre", "Vinken", ",", "61", "years", "old", ",", "will", "join", "the", "board", "as", "a", "nonexecutive", "director", "Nov.", "29", "."] )
+    @test( wsjtree01.productions[1] == ("NP", ["Pierre", "Vinken"]) )
+    @test( wsjtree01.productions[end] == ("S", ["NP-SBJ", "VP", "."]) )
+
+end
+
+
+test_tree()
+
+info("Tests pass [trees]")

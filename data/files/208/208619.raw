@@ -1,0 +1,81 @@
+module pe
+
+    function fib(n)
+        n < 2 ? n : fib(n-1) + fib(n - 2)
+    end
+
+    function digit_sum(n)
+        sm = @parallel (+) for i in string(n)
+            parseint(i)
+        end
+        return sm
+    end
+
+    function divisors(n)
+        if n == 2
+            return Uint128[1, 2]
+        end 
+        divs = Uint128[]
+        d = int(ceil(sqrt(n)))
+        for i in 1:d
+            if n % i == 0
+                push!(divs, i)
+                q = n/i
+                if q != i
+                    push!(divs, q)
+                end
+            end
+        end
+        return unique(divs)
+    end
+
+    function prime_divisors(n)
+        map(f-> f[2], filter(f-> length(f) == 2, pmap(pe.divisors, pe.divisors(n))))
+    end
+
+    function is_palindrome(n)
+        s = string(n)
+        return reverse(s) == s
+    end
+
+    function power_mod(A, p, mod)
+        if p == 1
+            return A % mod
+        end
+        sq = A*A % mod
+        if p%2 == 0
+            return power_mod(sq, p/2, mod) % mod
+        else
+            B = power_mod(sq, (p-1)/2, mod)
+            return (B * A) % mod
+        end
+    end
+
+    function triangle(n)
+        return int(n*(n+1)/2)
+    end
+
+    function sieve(n)
+        primes = Uint128[]
+        sv = Uint128[1:n]
+        sv[1] = 0
+        for i in 2 : n
+            for k in i : n
+                p = i*k
+                if p > n
+                    break 
+                else 
+                    sv[p] = 0
+                end
+            end
+        end
+        primes = filter(f->f != 0, sv)
+        return primes
+    end
+
+end
+
+#println(pe.sieve(25))
+#println(pe.fib(5))
+#println(pe.divisors(3))
+#println(pe.prime_divisors(123456))

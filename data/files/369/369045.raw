@@ -1,0 +1,46 @@
+println("Initializing shared parser...")
+
+before = time()
+
+require("shared_cky.jl")
+
+#Check if a grammar was specified
+if length(ARGS) < 1
+    error("Please specify a grammar as an argument.")
+end
+
+grammar_file = ARGS[1]
+
+grammar = parse_grammar(grammar_file)
+
+#Receive sentence to parse
+#print("Please enter a sentence: ")
+#sentence = readline(STDIN)
+sentence = "he is a man she is a woman he is he is a man she is a woman he is"
+#sentence = "she is a woman"
+
+#Split sentence into words
+tokens = split(replace(sentence, "\n", ""), " ")
+n = length(tokens)
+
+#Check if grammar can parse sentence
+check_coverage(tokens, grammar)
+lookup_table = build_lookup_table(grammar, tokens)
+
+@printf "Parser initialized in %.4f seconds\n" (time() - before) 
+
+println("Parsing...")
+
+before = time()
+parse_table = parse(grammar, tokens, n, lookup_table)
+@printf "Sentence parsed in %.4f seconds\n" (time() - before) 
+#print_table(parse_table, lookup_table)
+
+#x = 100
+
+#while x > 0
+#	parse_table = parse(grammar, tokens, n, start, lookup_table)
+#	x -= 1
+#end
+#@printf "100 sentences of length 20 parsed in %.4f seconds\n" (time() - before) 
+println("done!")

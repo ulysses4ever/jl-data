@@ -1,0 +1,248 @@
+ module VME
+
+####################################### LIBRARY #########################################
+currentdir = @__FILE__
+arch = readall(`uname -m`)[1:end-1]
+const libVME = @eval currentdir[1:end-10]*"lib/"*arch*"/libCAENVME.so.2.50"
+
+##################################### BOARD TYPES ########################################
+export V1718, V2718, A2818, A2719, A3818
+
+const V1718         = 0             # CAEN VME V1718                                      #
+const V2718         = 1             # CAEN VME V2718                                      #
+const A2818         = 2             # CAEN VME A2818                                      #
+const A2719         = 3             # CAEN VME A2719                                      #
+const A3818         = 4             # CAEN VME A3818                                      #
+
+##################################### DATA WIDTH #########################################
+export D8, D16, D32, D64, D16_swapped, D32_swapped, D64_swapped
+
+const D8            = 0x01          # 8 bit                                               #
+const D16           = 0x02          # 16 bit                                              #
+const D32           = 0x04          # 32 bit                                              #
+const D64           = 0x08          # 64 bit                                              #
+const D16_swapped   = 0x12          # 16 bit swapped                                      #
+const D32_swapped   = 0x14          # 32 bit swapped                                      #
+const D64_swapped   = 0x18          # 64 bit swapped                                      #
+
+
+################################# ADDRESS MODIFIERS ######################################
+export A16_S, A16_U, A16_LCK
+export A24_S_BLT, A24_S_PGM, A24_S_DATA, A24_S_MBLT
+export A24_U_BLT, A24_U_PGM, A24_U_DATA, A24_U_MBLT, A24_LCK
+export A32_S_BLT, A32_S_PGM, A32_S_DATA, A32_S_MBLT
+export A32_U_BLT, A32_U_PGM, A32_U_DATA, A32_U_MBLT, A32_LCK
+
+const A16_S         = 0x2D          # A16 supervisory access                              #
+const A16_U         = 0x29          # A16 non-privileged                                  #
+const A16_LCK       = 0x2C          # A16 lock command                                    #
+
+const A24_S_BLT     = 0x3F          # A24 supervisory block transfer                      #
+const A24_S_PGM     = 0x3E          # A24 supervisory program access                      #
+const A24_S_DATA    = 0x3D          # A24 supervisory data access                         #
+const A24_S_MBLT    = 0x3C          # A24 supervisory 64-bit block transfer               #
+const A24_U_BLT     = 0x3B          # A24 non-privileged block transfer                   #
+const A24_U_PGM     = 0x3A          # A24 non-privileged program access                   #
+const A24_U_DATA    = 0x39          # A24 non-privileged data access                      #
+const A24_U_MBLT    = 0x38          # A24 non-privileged 64-bit block trnsfer             #
+const A24_LCK       = 0x32          # A24 lock command                                    #
+
+const A32_S_BLT     = 0x0F          # A32 supervisory block transfer                      #
+const A32_S_PGM     = 0x0E          # A32 supervisory program access                      #
+const A32_S_DATA    = 0x0D          # A32 supervisory data access                         #
+const A32_S_MBLT    = 0x0C          # A32 supervisory 64-bit block trnsfer                #
+const A32_U_BLT     = 0x0B          # A32 non-privileged block transfer                   #
+const A32_U_PGM     = 0x0A          # A32 non-privileged program access                   #
+const A32_U_DATA    = 0x09          # A32 non-privileged data access                      #
+const A32_U_MBLT    = 0x08          # A32 non-privileged 64-bit block trnsfer             #
+const A32_LCK       = 0x05          # A32 lock command                                    #
+
+const CR_CSR        = 0x2F          # CR/CSR space                                        #
+
+
+################################# ERROR CODES  ############################################
+const Success       =  0            # Operation completed successfully                    #
+const BusError      = -1            # VME bus error during the cycle                      #
+const CommError     = -2            # Communication error                                 #
+const GenericError  = -3            # Unspecified error                                   #
+const InvalidParam  = -4            # Invalid parameter                                   #
+const TimeoutError  = -5            # Timeout error                                       #
+
+
+
+##################################### TYPES ##############################################
+export VMEDevice
+
+type VMEDevice ## Need to add finalizer
+    handle::Int32
+end
+
+
+#################################### FUNCTIONS  ##########################################
+"""
+`DecodeError(error::VMEError)` -> `ASCIIString`
+
+Decodes the error code and returns a string describing the error. 
+"""
+function DecodeError(errorcode::Integer)
+    if errorcode == BusError
+        return "VME bus error during the cycle"
+    elseif errorcode == CommError
+        return "Communication error"
+    elseif errorcode == GenericError
+        return "Unspecified error"
+    elseif errorcode == InvalidParam
+        return "Invalid parameter"
+    elseif errorcode == TimeoutError
+        return "Timeout error"
+    else
+        return "Unknown error"
+    end
+end
+
+
+"""
+`SWRelease()` -> `VersionNumber`
+
+Returns the version of the VME software library.
+"""
+function SWRelease()
+end
+
+"""
+`BoardFWRelease(device::VMEDevice)` -> `ASCIIString`
+
+Returns a string describing the firmware release of the VME interface.
+"""
+function BoardFWRelease(device::VMEDevice)
+end
+
+"""
+`DeviceReset(device::VMEDevice)` -> `ASCIIString`
+
+Returns a string describing the software release of the device driver.
+"""
+function DriverRelease(device::VMEDevice)
+end
+
+
+"""
+`DeviceReset(device::VMEDevice)` -> `VMEError`
+
+Resets the device. Implemented for A2818, A2719 and V2718 on Linux
+only. This is a limitation of the CAEN VME library.
+"""
+function DeviceReset(device::VMEDevice)
+end
+
+
+
+
+
+"""
+`Init(device::Integer, link::Integer, bdnum::Integer)` -> `VMEDevice`
+
+This function generates a VMEDevice connection to a module attached to the PC.
+In the case of V1718 bridge it must be specified only the module index (bdnum)
+because the link is USB. In the case of V2718 it must be specified also the link
+because you can have some A2818 optical link inside the PC.
+"""
+function Init(device::Integer, link::Integer, bdnum::Integer)
+     handle = Ref{Int32}(0)
+     errcode =  ccall((:CAENVME_Init, libVME),  Int32,
+          (Int32,  Int16, Int16, Ref{Int32}),
+                   device, link, bdnum,  handle)
+
+    if errcode != 0
+        println(errcode)
+        error(DecodeError(errcode))
+    end
+
+    return VMEDevice(handle[])
+
+end
+
+
+"""
+`End(device::VMEDevice)` -> `VMEError`
+
+Notifies the library of the end of work and frees and deinitializes memory
+and connection. This is called automatically whenever the VMEDevice reference
+is garbage collected.
+"""
+function End(device::VMEDevice)
+
+    errcode = ccall((:CAENVME_End, libVME), Cint,
+                    (Cint,),
+                    VMEDevice.handle)
+    if errcode != 0
+        error(DecodeError(errcode))
+    end
+end
+
+
+"""
+`ReadCycle(device::VMEDevice,  address:UInt32, data::Vector{Integer},
+            addrmod::Integer, datawidth::Integer)` -> `Integer`
+
+This function performs a single VME read cycle. This function stores the resulting read into the first
+element of the array data - this allows the same memory to be reused in multiple reads. 
+"""
+function ReadCycle(device::VMEDevice,  address::UInt32, data,
+                   addrmod, datawidth)
+
+    errcode = ccall((:CAENVME_ReadCycle, libVME), Cint,
+                    (Cint, Cuint, Ptr{Void}, Cint, Cint),
+                    device.handle, address, data, addrmod, datawidth)
+    if errcode != 0
+        error(DecodeError(errcode))
+    end
+
+    return data
+end
+
+
+"""
+`RMWCycle(device::VMEDevice,  address:Integer, data::Vector{Integer},
+          addrmod::Int16, datawidth::Int16)` -> `Integer`
+
+The function performs a Read-Modify-Write cycle. The data parameter is bidirectional:
+it is used to write the value to the VME bus and to return the value read.
+"""
+function RMWCycle(device::VMEDevice,  address::UInt32, data::Vector{Integer},
+                  addrmod::Int16, datawidth::Int16)
+
+    errcode = ccall((:CAENVME_RMWCycle, libVME), Cint,
+                    (Cint, Cuint, Ptr{Void}, Cint, Cint),
+                    device.handle, address, data, addrmod, datawidth)
+    if errcode != 0
+        error(DecodeError(errcode))
+    end
+
+    return data
+end
+
+
+"""
+`WriteCycle(device::VMEDevice,  address:Integer, data::Integer,
+            addrmod::Int16, datawidth::Int16)` -> `Integer`
+
+This function performs a single VME write cycle.
+
+Exaxple: WriteCycle(handle, 0xEE000010, 0xFFFF, A24_U_DATA, D16)
+"""
+function WriteCycle(device::VMEDevice,  address::UInt32, data,
+                    addrmod, datawidth)  
+		    value = Ref{UInt32}(data)
+    errcode =  ccall((:CAENVME_WriteCycle, libVME), Cint,
+                     (Cint, Cuint, Ref{UInt32}, Cint, Cint),
+                     device.handle, address, value, addrmod, datawidth)
+    if errcode != 0
+        error(DecodeError(errcode))
+    end
+
+    return value[]
+end
+
+
+end # module

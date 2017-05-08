@@ -1,0 +1,28 @@
+import FredData
+FredData.Fred() # load api key
+
+#= According to Brad DeLong in lectures 1 & 2, Econ 207 UCB, the six most important macroeconomic variables are
+
+1. Real GDP, GDPC1 (Q), the broadest measure of economic activity
+2. The unemployment rate, UNRATE (M),a measure of slack and waste.
+3. Inflation rate and price level, CPIAUCSL (M), a measure of how well the economy enables rational economic decisions
+4. Stock market indices, business and investor confidence. Shiller will be the best source for this.
+5. Interest rates on short term gov't bonds, TB3MS (M), a measure of liquidity in the economy
+6. Interest rates on long term corporate bonds, a measure of business access to capital. Shiller is also the best source for this.
+=#
+
+#= A far more convenient macro dataset is available from Michael McCracken at the St. Louis Fed's research department https://research.stlouisfed.org/econ/mccracken/fred-databases/.
+
+It does appear that manual download is easiest.
+
+Δ = x[t] - x[t-1]
+Transformation codes are as follows
+
+1. No transform
+2. Δx
+3. Δ^2 x
+4. log(x)
+5. Δlog(x)
+6. Δ^2 log(x)
+
+=#

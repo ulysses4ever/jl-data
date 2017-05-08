@@ -1,0 +1,166 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+#  Affine Gap Penalties
+#  --------------------
+#  id := identity, sub := subsitution
+#
+#                                   delete [-o]                     
+#                          __________________________                              
+#                         /__________________________\                          
+#                        /                            \
+#                       /           insert [-o]        \  
+#                      /     ______________________    ||                         
+#                     /    //                      \\  ||        
+#                    ||   //                        \\ ||        
+#                    ||   |                          | ||   _______{Gapping context: insertion}
+#                    ||   |        id [+s(a,a)]      | ||  /       
+#                     \   |           ___            | || /     
+#               _____  \  \\         |   |          /  / /_____  
+#              |     | \\/ /  [-o]  \ /  |   [-o] \// / /|     |         
+#  delete [-d] |     ------- delete ------- insert -------     | insert [-d]
+#              |____\|  -  | <----- |-   -| -----> |  +  |/____|
+#                   /|  -  | -----> |- - -| <----- |  +  |\
+#                    ------- id/sub ------- id/sub -------
+#                     \    [+s(x,y)] |   /\\[+s(x,y)] 
+#                      \             |   || \_____________{Main context}
+#                       \            -----
+#                        \        sub [+s(a,g)]
+#                         \
+#                          \_{Gapping context: deletion}
+#
+
+#====================================================================================
+
+
+#====================================================================================
+
+abstract AffineAction
+
+type InsertAction <: AffineAction end
+
+type DeleteAction <: AffineAction end
+
+type MatchAction <: AffineAction end
+
+type SubstitutionAction <: AffineAction end
+
+
+abstract AffineState
+
+type InsertionAffineState <: AffineState end
+
+type DeletionAffineState <: AffineState end
+
+type MainAffineState <: AffineState end
+
+type AffineNode
+  _fixedState::AffineState
+  _nextStates::Dict{Any,Any}
+end
+
+function createAffineNode(state::AffineState)
+  return AffineNode(state,Dict()) 
+end
+
+function init!(anAffineNode::AffineNode, transitions::Dict{Any,Any})
+  merge!(anAffineNode._nextStates, transitions) 
+end
+
+type InvalidAffineStateTransition end
+
+function getNext(anAffineNode::AffineNode, anAction::AffineAction)
+  return get(anAffineNode._nextStates, anAction, InvalidAffineStateTransition())
+end
+
+#====================================================================================
+
+#====================================================================================
+
+type AffineGapSystem
+  _startNode::AffineNode
+  _currNode::AffineNode
+
+  _contiguousGapCount::Int64
+end
+
+function createAffineGapAutomata()
+  D = createAffineNode(DeletionAffineState())
+  M = createAffineNode(MainAffineState())
+  I = createAffineNode(InsertionAffineState())
+  
+  init!(D, {DeleteAction()=>D, MatchAction()=>M, SubstitutionAction()=>M})
+  init!(M, {DeleteAction()=>D, MatchAction()=>M, SubstitutionAction()=>M, InsertAction()=>I})
+  init!(I, {InsertAction()=>I, MatchAction()=>M, SubstitutionAction()=>M}) 
+
+  return M
+end
+
+#====================================================================================
+#====================================================================================
+
+function createAffineGapSystem()
+  startNode = createAffineGapAutomata()
+  return AffineGapSystem(startNode, startNode, 0)
+end
+
+function getCurrentState(affineSystem::AffineGapSystem)
+  return affineSystem._currNode._fixedState
+end
+
+function updateSystem!(affineSystem::AffineGapSystem, anAction::AffineAction)
+  affineSystem._currNode = getNext(affineSystem, anAction)
+
+  if (getCurrentState(affineSystem) != MainAffineState())
+
+    affineSystem._contiguousGapCount += 1
+  else
+    affineSystem._contiguousGapCount = 0
+  end    
+
+  return affineSystem._currNode._fixedState
+end
+
+function getNext(affineSystem::AffineGapSystem, anAction::AffineAction)
+  return getNext(affineSystem._currNode, anAction)
+end
+
+function getGapCount(affineSystem::AffineGapSystem)
+  return affineSystem._contiguousGapCount
+end
+
+#====================================================================================
+
+function testAffineGapAutomata()
+  aff_system = createAffineGapSystem()
+
+  println("Testing Affine Gap System")
+  println("Update with Match: $(updateSystem!(aff_system, MatchAction())) $(getGapCount(aff_system))")
+  println("Update with Match: $(updateSystem!(aff_system, MatchAction())) $(getGapCount(aff_system))")
+  println("Update with Insertion: $(updateSystem!(aff_system, InsertAction())) $(getGapCount(aff_system))")
+  println("Update with Insertion: $(updateSystem!(aff_system, InsertAction())) $(getGapCount(aff_system))")
+  println("Update with Substitution: $(updateSystem!(aff_system, SubstitutionAction())) $(getGapCount(aff_system))")
+  println("Update with Deletion: $(updateSystem!(aff_system, DeleteAction())) $(getGapCount(aff_system))")
+  println("Update with Match: $(updateSystem!(aff_system, MatchAction())) $(getGapCount(aff_system))")
+end
+

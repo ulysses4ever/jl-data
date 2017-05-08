@@ -1,0 +1,27 @@
+DATADIR = "../../../data"
+OUTDIR = "../../output"
+
+DATAFILE = joinpath(DATADIR, "experiment01.txt")
+STRATAFILE01 = joinpath(OUTDIR, "experiment01/column02_strata_given_column01.txt")
+STRATAFILE02 = joinpath(OUTDIR, "experiment01/column03_strata_given_column01.txt")
+OUTFILE = joinpath(OUTDIR, "experiment01/experiment01_and_laser_strata.txt")
+
+datastream = open(DATAFILE, "r")
+stratastream01 = open(STRATAFILE01, "r")
+stratastream02 = open(STRATAFILE02, "r")
+outstream = open(OUTFILE, "w+")
+
+title = readline(datastream)
+
+while !(eof(datastream))
+  data = readline(datastream)
+  strata01 = readline(stratastream01)
+  strata02 = readline(stratastream02)
+  output = join([split(rstrip(data)), rstrip(strata01), rstrip(strata02)], " ")
+  @printf(outstream, "%s\n", output)
+end
+
+close(datastream)
+close(stratastream01)
+close(stratastream02)
+close(outstream)

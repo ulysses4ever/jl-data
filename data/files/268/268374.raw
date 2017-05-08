@@ -1,0 +1,28 @@
+###################################################
+## Defines the 'Node' type
+###################################################
+
+type Node
+  type_id::Int64
+  id::Int64  #corresponds to the data element
+  arr_time::Int64
+  departed::Bool
+  matched::Bool
+  dep_time::Int64
+  dep_rate::Float64
+  weight::Float64
+
+  "Constructor"
+  function Node(id::Int64, type_id::Int64, arr::Int64, dep_rate::Float64)
+    obj = new()
+    obj.id = id
+    obj.type_id = type_id
+    obj.departed = false
+    obj.matched = false
+    obj.arr_time = arr
+    obj.dep_time = -1
+    obj.dep_rate = dep_rate
+    obj.weight = 1.0
+    return obj
+  end
+end

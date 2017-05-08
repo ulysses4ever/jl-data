@@ -1,0 +1,20 @@
+module TensorBase
+
+using Reexport
+
+@reexport using Einsum
+
+export unfold
+
+"""
+    unfold(A, i)
+
+Unfold tensor A along mode i.
+"""
+function unfold{T<:Number,N}(A::Array{T,N},i::Integer)
+	B = permutedims(A,vcat(i,setdiff(1:N,i)))
+	d = size(B,1)
+	return reshape(B,(d,div(length(B),d)))
+end
+
+end

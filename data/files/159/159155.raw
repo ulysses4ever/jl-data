@@ -1,0 +1,8 @@
+
+using ClassificationUtils
+using TestUtils
+using SequentialPatterns
+using TestUtils
+
+x,y,subjects=lsa64_kadir_dataset()
+x_train,y_train,x_test,y_test=split_dataset(x,y,0.8)

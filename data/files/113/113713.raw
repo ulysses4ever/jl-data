@@ -1,0 +1,28 @@
+include("Metropolis.jl")
+include("Coin.jl")
+using Distributions
+using Gadfly
+C = CoinFlips
+M = Metropolis
+
+obs = C.flip(C.Coin(.7), 100)
+
+pm = M.model(Beta(10,10), Beta(1,1), C.loglik, obs)
+ss = M.mcmc_sample(pm, 50_000, 45_000)
+
+lp = plot(x=1:length(ss), y=ss, Geom.line)
+h = plot(x=ss, Geom.density )
+draw(SVG("graphs/tsplot.svg", 1200px, 800px), lp)
+draw(SVG("graphs/hist.svg", 1200px, 950px), h)
+
+obs = C.flip(C.Coin(.7), C.Coin(.2), 100, 50)
+
+params = [:p1, :p2, :n1]
+priors = [Beta(1,1), Beta(1, 1), DiscreteUniform(0, 150)]
+proposals = [Beta(1, 1), Beta(1, 1), DiscreteUniform(0, 150)]
+
+pm2 = M.model(params, priors, proposals, C.loglik, obs)
+
+ss = M.mcmc_sample(pm2, 50_000, 45_000)
+
+

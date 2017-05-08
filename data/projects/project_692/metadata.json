@@ -1,18 +1,15 @@
-HTTP/1.1 200 OK
+HTTP/1.1 301 Moved Permanently
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:06 GMT
+Date: Wed, 03 May 2017 21:01:17 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5016
-Status: 200 OK
+Content-Length: 168
+Status: 301 Moved Permanently
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2913
-X-RateLimit-Reset: 1493318926
-Cache-Control: private, max-age=60, s-maxage=60
-Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "adcc1f63f7c873671c5d4b7b8123efdb"
-Last-Modified: Fri, 17 Feb 2017 23:42:28 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
-X-Accepted-OAuth-Scopes: repo
+X-RateLimit-Remaining: 3984
+X-RateLimit-Reset: 1493848245
+X-OAuth-Scopes: repo
+X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo:task, repo_deployment, write:repo_hook
+Location: https://api.github.com/repositories/44048238
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
@@ -22,102 +19,11 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 4537b68c46a1b65b106078b0a2578ee2
-X-GitHub-Request-Id: A9A2:6633:DD6C34:11EB322:590231E2
+X-Served-By: e724c57ebb9961c772a91e2dd7421c8d
+X-GitHub-Request-Id: C61A:5C87:662609:832415:590A451D
 
 {
-  "id": 60866907,
-  "name": "KRLS",
-  "full_name": "lukesonnet/KRLS",
-  "owner": {
-    "login": "lukesonnet",
-    "id": 5298599,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/5298599?v=3",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/lukesonnet",
-    "html_url": "https://github.com/lukesonnet",
-    "followers_url": "https://api.github.com/users/lukesonnet/followers",
-    "following_url": "https://api.github.com/users/lukesonnet/following{/other_user}",
-    "gists_url": "https://api.github.com/users/lukesonnet/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/lukesonnet/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/lukesonnet/subscriptions",
-    "organizations_url": "https://api.github.com/users/lukesonnet/orgs",
-    "repos_url": "https://api.github.com/users/lukesonnet/repos",
-    "events_url": "https://api.github.com/users/lukesonnet/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/lukesonnet/received_events",
-    "type": "User",
-    "site_admin": false
-  },
-  "private": false,
-  "html_url": "https://github.com/lukesonnet/KRLS",
-  "description": null,
-  "fork": false,
-  "url": "https://api.github.com/repos/lukesonnet/KRLS",
-  "forks_url": "https://api.github.com/repos/lukesonnet/KRLS/forks",
-  "keys_url": "https://api.github.com/repos/lukesonnet/KRLS/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/lukesonnet/KRLS/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/lukesonnet/KRLS/teams",
-  "hooks_url": "https://api.github.com/repos/lukesonnet/KRLS/hooks",
-  "issue_events_url": "https://api.github.com/repos/lukesonnet/KRLS/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/lukesonnet/KRLS/events",
-  "assignees_url": "https://api.github.com/repos/lukesonnet/KRLS/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/lukesonnet/KRLS/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/lukesonnet/KRLS/tags",
-  "blobs_url": "https://api.github.com/repos/lukesonnet/KRLS/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/lukesonnet/KRLS/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/lukesonnet/KRLS/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/lukesonnet/KRLS/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/lukesonnet/KRLS/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/lukesonnet/KRLS/languages",
-  "stargazers_url": "https://api.github.com/repos/lukesonnet/KRLS/stargazers",
-  "contributors_url": "https://api.github.com/repos/lukesonnet/KRLS/contributors",
-  "subscribers_url": "https://api.github.com/repos/lukesonnet/KRLS/subscribers",
-  "subscription_url": "https://api.github.com/repos/lukesonnet/KRLS/subscription",
-  "commits_url": "https://api.github.com/repos/lukesonnet/KRLS/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/lukesonnet/KRLS/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/lukesonnet/KRLS/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/lukesonnet/KRLS/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/lukesonnet/KRLS/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/lukesonnet/KRLS/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/lukesonnet/KRLS/merges",
-  "archive_url": "https://api.github.com/repos/lukesonnet/KRLS/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/lukesonnet/KRLS/downloads",
-  "issues_url": "https://api.github.com/repos/lukesonnet/KRLS/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/lukesonnet/KRLS/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/lukesonnet/KRLS/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/lukesonnet/KRLS/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/lukesonnet/KRLS/labels{/name}",
-  "releases_url": "https://api.github.com/repos/lukesonnet/KRLS/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/lukesonnet/KRLS/deployments",
-  "created_at": "2016-06-10T17:55:41Z",
-  "updated_at": "2017-02-17T23:42:28Z",
-  "pushed_at": "2017-03-21T17:34:13Z",
-  "git_url": "git://github.com/lukesonnet/KRLS.git",
-  "ssh_url": "git@github.com:lukesonnet/KRLS.git",
-  "clone_url": "https://github.com/lukesonnet/KRLS.git",
-  "svn_url": "https://github.com/lukesonnet/KRLS",
-  "homepage": null,
-  "size": 145,
-  "stargazers_count": 2,
-  "watchers_count": 2,
-  "language": "R",
-  "has_issues": true,
-  "has_projects": true,
-  "has_downloads": true,
-  "has_wiki": true,
-  "has_pages": false,
-  "forks_count": 0,
-  "mirror_url": null,
-  "open_issues_count": 1,
-  "forks": 0,
-  "open_issues": 1,
-  "watchers": 2,
-  "default_branch": "master",
-  "permissions": {
-    "admin": false,
-    "push": false,
-    "pull": true
-  },
-  "network_count": 0,
-  "subscribers_count": 3
+  "message": "Moved Permanently",
+  "url": "https://api.github.com/repositories/44048238",
+  "documentation_url": "https://developer.github.com/v3/#http-redirects"
 }

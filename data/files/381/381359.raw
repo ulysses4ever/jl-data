@@ -1,0 +1,11 @@
+using TensorBase
+using Distributions
+
+r = 2
+dims = (50,40,30)
+noise = Normal
+
+model = CPDecompModel(r,dims)
+
+data = rand(model)
+

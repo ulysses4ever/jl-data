@@ -1,0 +1,75 @@
+include("jb2048.jl")
+include("dag2048.jl")
+# julia set working module
+
+b=[1 1 0; 0 0 0]
+initgoal,restricted=8,8
+ifrozen,ifree=[],1:6
+@time root=MaxNode(b)
+
+λ,μ=length(maxdag),length(meandag)
+exp(log(λ)/6)
+println((λ,μ))
+
+g=Game(b);play!(g,display=true)
+
+itarget,ixtarget=[1],1:3
+initgoal,restricted=8,4
+empty!(maxdag);empty!(meandag)
+@time root=MaxNode(b)
+
+g=Game(b)
+play!(g,moves=1,display=true)
+node=MaxNode(g.board)
+node.child
+
+i=0
+i-=1;h=g.hist[i];plot(h...)
+    node=MaxNode(h[1])
+i+=1;h=g.hist[i];plot(h...)
+    node=MaxNode(h[1])
+node.child
+
+initgoal,restricted=6,5
+# b=[ 11 10 1 3; 9 8 0 1; 1 3 1 0];plot(b)
+b=[ 11 10 1 1; 9 8 0 1; 1 2 1 0];plot(b)
+target(b,upgoal=true)
+MaxNode(b)
+# b=[ 11 10 9 3; 8 1 0 1; 1 3 1 0];plot(b)
+b=[ 11 10 9 1; 8 1 0 1; 1 2 1 0];plot(b)
+target(b,upgoal=true)
+MaxNode(b)
+b=[ 11 10 8 1; 9 1 0 1; 1 2 1 0];plot(b)
+target(b,upgoal=true)
+MaxNode(b)
+
+state=start(maxdag)
+begin
+    local node
+    while !done(maxdag,state)
+        (key,node),state=next(maxdag,state)
+        b=board(node)
+        sup=maximum(b)
+        b[10]>3 && break
+    end
+    plot(b,0,node.height)
+    state,node
+end
+node.child
+
+fieldnames(MaxNode)
+subtypes(DagNode)
+names(jb2048)
+whos(dag2048)
+root
+Base.summarysize(MaxNode)
+Base.summarysize(root)
+Base.summarysize(root.child)
+Base.summarysize(root.child[1])
+g
+Base.summarysize(Game)
+Base.summarysize(g)
+Base.summarysize(g.board)
+Base.summarysize(g.hist)
+Base.summarysize(g.hist[1])
+whos(r"g")

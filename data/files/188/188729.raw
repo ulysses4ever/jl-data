@@ -1,0 +1,66 @@
+
+# Script to use these VME julia libraries with a CAEN V812 CFD
+# and Wiener MDGG8 32-bit scaler.  The CFD is used 
+# as an intermediary filter between the source and the scaler.
+# The script loops over the full threshold value range 
+# (1 to 255 [mV]) the CFD offers and reads the scaler after 
+# a defined time at each setting.
+# Output: plots the values and prints them to std output.
+# Requirements: In addition to the standard Julia libraries, 
+# this script requires Python Matplotlib and Julia PyCall 
+# packages for plotting.
+
+using VME
+using PyPlot
+
+handle = VME.Init(V1718, 0, 0)
+data = [0]
+
+########## MDGG8 Scaler Configuration Registers ########
+# Scalar Configuration --- 1: Gated Scalar, 32-bit
+VME.WriteCycle(handle, 0x100088, 1, A24_U_DATA, D32)
+# FGG Input Selector Registers -- 0 is I1
+VME.WriteCycle(handle, 0x10008C, 0, A24_U_DATA, D32)
+# FGG Configuration --- 1: DGG --- 2: SRG --- 4: RDGG 
+VME.WriteCycle(handle, 0x100084, 2, A24_U_DATA, D32)
+# Scalar Input Selector Registers
+VME.WriteCycle(handle, 0x1000A4, 0, A24_U_DATA, D32)
+# Gate FGG - set the gate length --- register Value = gate/8*10^-9s
+VME.WriteCycle(handle, 0x100044, 0x10, A24_U_DATA, D32)
+# Action Register -- 1 resets all the FGG SRGs
+#VME.WriteCycle(handle, 0x100080, 1, A24_U_DATA, D32)
+########################################################
+
+########## V812 CFD Configuration ######################
+# V812, Output width
+VME.WriteCycle(handle, 0x12EE40, 255, A24_U_DATA, D32)
+# V812, Pattern of Inhibit
+VME.WriteCycle(handle, 0x12EE4A, 1, A24_U_DATA, D16)
+########################################################
+
+xrange = range(1,100)
+dataV = zeros(0)
+
+for i in xrange
+    VME.WriteCycle(handle, 0x12EE00, i, A24_U_DATA, D16)
+    VME.WriteCycle(handle, 0x100080, 0xFFFF, A24_U_DATA, D32)
+    tic()    
+    sleep(1) # in seconds
+    data = VME.ReadCycle(handle, 0x100100, data, A24_U_DATA, D32)
+    time = toq()
+    temp = data/time
+    println("$i $data $temp $time")
+    append!(dataV, data/time)  # normalize counts to 1 second for rate
+    i += 1
+end
+
+#### Plotting...
+fig = figure("showIt", figsize=(8,6))
+scatter(xrange, dataV, color="blue",marker="o",s=60)
+xlabel("Threshold [mV]")
+ylabel("Counts/sec")
+semilogy()
+ylim(0.1, (maximum(dataV)*2.))
+grid("on")
+fig[:canvas][:draw]()
+plt[:show]()

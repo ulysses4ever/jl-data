@@ -1,0 +1,192 @@
+using Plots,ApproxFun,SingularIntegralEquations;  gr()
+
+##
+#  Ideal fluid flow consists of level sets of the imagainary part of a function
+# that is asymptotic to c*z and whose imaginary part vanishes on Γ
+#
+#
+# On the unit interval, -2*hilbert(ui) gives the imaginary part of cauchy(ui,z)
+#  So if we want to find ui defined on Γ so that hilbert(ui) = imag(c*z)
+#  then c*z + 2cauchy(u,z) vanishes on Γ
+##
+
+
+
+
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-1.,1.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+
+k=50
+    Γ=Interval(0.,1+0.5im)
+    z=Fun(Γ)
+    α=exp(-π*k/50im)
+    S=JacobiWeight(0.5,0.5,Γ)
+    c,ui=[1 Hilbert(S)]\imag(α*z)
+
+u =(x,y)->α*(x+im*y)+2cauchy(ui,x+im*y)+Number(c)
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=50)
+
+
+##
+# On an arc, the Hilbert transform no longer gives the imaginary part
+#  However, pseudohilbert gives the imaginary part of pseudocauchy
+#  So if we want to find ui defined on Γ so that pseudohilbert(ui) = imag(c*z)
+#  then c*z + 2pseudocauchy(u,z) vanishes on Γ
+##
+
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-2.,2.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+
+k=227;
+    Γ=0.5+exp(im*Interval(0.1,-42))
+    z=Fun(Γ)
+    α=exp(-k/50im)
+    S=JacobiWeight(0.5,0.5,Γ)
+    c,ui=[1 PseudoHilbert(S)]\imag(α*z)
+
+
+u=(x,y)->α*(x+im*y)+2pseudocauchy(ui,x+im*y)
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=50)
+
+
+
+
+##
+#  Circle
+##
+
+Γ=Circle()
+z=Fun(Fourier(Γ))
+
+
+u=(x,y)->α*(x+im*y)+2cauchy(ui,x+im*y)
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-2.,2.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+
+k=239;
+    α=exp(-k/45im)
+    c,ui=[0 DefiniteLineIntegral();
+          1 real(Hilbert())]\[Fun(0.);imag(α*z)]
+
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=50)
+
+
+
+##
+# On a curve, the Hilbert transform may be complex, so we
+# take the real part
+##
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-2.,2.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+
+
+Γ=Curve(Fun(x->exp(0.8im)*(x+x^2-1+im*(x-4x^3+x^4)/6)))
+    z=Fun(Γ)
+    α=im
+    S=JacobiWeight(0.5,0.5,Γ)
+    c,ui=[1 real(Hilbert(S))]\imag(α*z)
+
+u=(x,y)->α*(x+im*y)+2cauchy(ui,x+im*y)
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=100)
+
+
+##
+#  Two intervals requires explicitely stating the space (for now)
+##
+
+Γ=Interval(-1.,-0.5)∪Interval(-0.3,1.)
+z=Fun(Γ)
+
+S=PiecewiseSpace(map(d->JacobiWeight(0.5,0.5,Ultraspherical(1,d)),Γ))
+
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-1.,1.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+
+k=114;
+    α=exp(k/50*im)
+    a,b,ui=[ones(Γ[1])+zeros(Γ[2]) zeros(Γ[1])+ones(Γ[2]) Hilbert(S)]\imag(α*z)
+
+u=(x,y)->α*(x+im*y)+2cauchy(ui,x+im*y)
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=100)
+
+
+Γ=Interval(-1.,0.)∪Interval(0.5im,1.)
+z=Fun(Γ)
+S=PiecewiseSpace(map(d->JacobiWeight(0.5,0.5,Ultraspherical(1,d)),Γ))
+
+
+
+
+
+
+
+k=114;
+    α=exp(k/50*im)
+    a,b,ui=[ones(Γ[1])+zeros(Γ[2]) zeros(Γ[1])+ones(Γ[2])  real(Hilbert(S))]\imag(α*z)
+
+u=(x,y)->α*(x+im*y)+2cauchy(ui,x+im*y)
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-1.,1.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=100)
+
+
+
+
+Γ=Interval(-im,1.0-im)∪Curve(Fun(x->exp(0.8im)*(x+x^2-1+im*(x-4x^3+x^4)/6)))
+z=Fun(Γ)
+
+S=PiecewiseSpace(map(d->JacobiWeight(0.5,0.5,Ultraspherical(1,d)),Γ))
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-3.,2.,m+1)
+    xx,yy = x.+0.*y',0.*x.+y'
+
+
+k=114;
+    α=exp(k/50*im)
+    a,b,ui=[ones(Γ[1])+zeros(Γ[2]) zeros(Γ[1])+ones(Γ[2]) real(Hilbert(S))]\imag(α*z)
+
+
+plot(Γ)
+    contour!(x,y,imag(u(xx,yy))';nlevels=100)
+
+
+
+Γ=Interval(-im,1.0-im)∪Curve(Fun(x->exp(0.8im)*(x+x^2-1+im*(x-4x^3+x^4)/6)))∪Circle(2.0,0.2)
+    z=Fun(Γ)
+
+S=PiecewiseSpace(map(d->isa(d,Circle)?Fourier(d):JacobiWeight(0.5,0.5,Ultraspherical(1,d)),Γ))
+
+m=80;x = linspace(-2.,2.,m);y = linspace(-3.,2.,m+1)
+        xx,yy = x.+0.*y',0.*x.+y'
+
+
+k=114;
+    α=exp(k/50*im)
+    a,b,c,ui=[map(d->Fun(ones(d),Γ),Γ)' real(Hilbert(S))]\imag(α*z)
+
+
+
+
+Fun(ones(Γ[3]),Γ)
+
+map(d->Fun(ones(d),Γ),Γ)'
+
+[map(d->Fun(ones(d),Γ),Γ)' 1]
+
+Fun(ones(Γ[1]),Γ)
+
+
+plot(Γ)
+contour!(x,y,imag(u(xx,yy))';nlevels=100)

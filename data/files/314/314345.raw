@@ -1,0 +1,376 @@
+# Elio liquido dentro un confinamento armonico, con VMC. Il resto del modulo sono funioni generali che poi si applicano a quella cosa
+module mc
+srand(1); info("The RNG is seeded")
+import Roots
+using Debug
+# un iteratore è un qualsiasi tipo che abbia definiti i metodi start, next e done
+
+# Un iteratore che campiona usando metropolis. Lo si inizializza con la distribuzione da campionare e lui produce uno alla volta i campioni
+# si potrebbe aggiungere un campo per la lunghezza di correlazione così dico a next di tirare fuori solo punti scorrelati TODO
+type MarkovChain{T}
+    value::T
+    delta::Float64
+    p::Function
+    proposed::Int
+    accepted::Int 
+    steps::Int
+    prop::T
+end
+
+function Base.display(chain::MarkovChain)
+    println("Datatype:\t$(typeof(chain.value))")
+    println("Delta:   \t$(chain.delta)")
+    println("Accepted:\t$(chain.accepted)")
+    println("Length:  \t$(chain.steps)")
+    println("Ratio:   \t$(chain.accepted/chain.steps)")
+end
+
+# Un costruttore comodo con dei valori di default sensati
+MarkovChain(;init=0.0, delta=1.0, p=gauss, steps=100000) = MarkovChain{typeof(init)}(init, delta, p, 0, 0, steps, deepcopy(init))
+
+# state inizia da 1 ed è un intero, conta quanta roba ho prodotto
+Base.start(chain::MarkovChain) = 1
+
+# next deve restituire il valore dell'iteratore ed il prossimo stato (che è un intero)
+function Base.next(chain::MarkovChain{Float64}, state::Int)
+    proposal = chain.value + chain.delta*(rand() - 0.5)
+    chain.proposed += 1
+    w        = chain.p(proposal)/chain.p(chain.value)
+    if w >= 1 || w > rand() # se è più probabile starci lo accetto, altrimenti uniforme
+        chain.accepted += 1
+        chain.value = proposal
+    end # se ho rifutato rimango dove sono
+    return chain.value, state+1
+end
+
+# metodo per gestire configurazioni a molte particelle
+function Base.next{T<:Array}(chain::MarkovChain{T}, state::Int)
+    # la configurazione va generata tutta insieme, non una particella alla volta
+    for i in 1:length(chain.value)
+        rand!(chain.prop[i])
+        for j in 1:length(chain.prop[i])
+            chain.prop[i][j] = chain.value[i][j] + chain.delta*(chain.prop[i][j] - 0.5) 
+        end
+    end
+    chain.proposed += 1
+    # w = chain.p(chain.prop)/chain.p(chain.value) # con distribuzioni esponenziali conviene esponenziare la differenza per avere maggiore precisione
+    w = exp(chain.p(chain.prop)-chain.p(chain.value))
+    if w >= 1 || w > rand() 
+        chain.accepted += 1
+        for i in 1:length(chain.value)
+            for j in 1:length(chain.value[i])
+                chain.value[i][j] = chain.prop[i][j] 
+            end
+        end
+    end 
+    return chain.value, state+1
+end
+
+# definendo questo metodo posso fare le comprehensions
+Base.length(chain::MarkovChain) = chain.steps
+
+# in questo modo i cicli sono 'for val in catena' e sanno quando fermarsi  
+Base.done(chain::MarkovChain, state) = state > chain.steps
+
+function burn!(chain::MarkovChain, num::Int; verbose=false)
+    # fa girare a vuoto chain per num passi regolando delta
+    old_steps   = chain.steps
+    chain.steps = num
+    count = 0
+    for val in chain
+        count += 1
+        if count>1000&&count%1000==0
+            if chain.accepted/chain.proposed<0.5
+                chain.delta *= 0.9
+            else
+                chain.delta *= 1.1
+            end
+        end
+    end
+    if verbose
+        println("Acc. rate = $(chain.accepted/chain.proposed)")
+    end
+    chain.steps = old_steps
+    chain.accepted = 0
+    chain.proposed = 0
+end
+
+cumul = Float64[]
+function monte_carlo(stimatori, catena::MarkovChain)
+    catena.accepted = 0
+    integrali = [nome => 0.0 for nome in keys(stimatori)]
+    # count = 0
+    for val in catena
+        # count += 1
+        # i = div(count, div(catena.steps,50))
+        # print("\rIntegrazione: $count/$(catena.steps) [","*"^i," "^(50-i),"] $(2*i)%")
+        for (nome,funzione) in stimatori
+            integrali[nome] += funzione(val)
+            # push!(cumul, integrali[nome]/count)
+        end
+    end
+    for (nome,somma) in integrali
+        integrali[nome] = somma/catena.steps
+    end
+    return integrali 
+end
+
+function gradiente(f, p, a, b, da, db, catena)
+    # fa il gradiente con il ripesamento del funzionale ∫f⋅p valutato in a±da
+    #= return (E(a+da) - E(a-da))/2da =#
+    fda(x)    = f(x,a+da,b)*exp(p(x,a+da,b)-p(x,a,b))
+    wda(x)    = exp(p(x,a+da,b)-p(x,a,b))
+    fsa(x)    = f(x,a-da,b)*exp(p(x,a-da,b)-p(x,a,b))
+    wsa(x)    = exp(p(x,a-da,b)-p(x,a,b))
+    fdb(x)    = f(x,a,b+db)*exp(p(x,a,b+db)-p(x,a,b))
+    wdb(x)    = exp(p(x,a,b+db)-p(x,a,b))
+    fsb(x)    = f(x,a,b-db)*exp(p(x,a,b-db)-p(x,a,b))
+    wsb(x)    = exp(p(x,a,b-db)-p(x,a,b))
+    stimatori = ["Peso a-da"=>wsa, "Peso a+da"=>wda, "Integr a+da"=>fda, "Integr a-da"=>fsa,"Peso b-db"=>wsb, "Peso b+db"=>wdb, "Integr b+db"=>fdb, "Integr b-db"=>fsb]
+    res =  monte_carlo(stimatori, catena)
+    dela = (res["Integr a+da"]/res["Peso a+da"]-res["Integr a-da"]/res["Peso a-da"])/2da  
+    delb = (res["Integr b+db"]/res["Peso b+db"]-res["Integr b-db"]/res["Peso b-db"])/2db  
+    return [dela, delb]
+end
+
+function sq(x)
+    # gli dai un array di 3vettori e lui fa ∑rᵢ²
+    sum::Float64 = 0.0
+    for i in 1:length(x)
+        for j in 1:length(x[i])
+            sum += x[i][j]*x[i][j]
+        end
+    end
+    return sum
+end
+
+function en_kin_jf(x,a,b)
+    en = -6a/aho^2*particles 
+    A  = 0.0
+    for l in 1:length(x)
+        for i in 1:l-1
+            dx = x[l][1] - x[i][1]
+            dy = x[l][2] - x[i][2]
+            dz = x[l][3] - x[i][3]
+            dr = sqrt(dx*dx+dy*dy+dz*dz)
+            A += 1/dr^7
+        end
+    end
+    en += -20*b^5*A
+    return -zkin/2*en
+end
+
+function en_kin_std(x,a,b)
+    A, B, C, D = 0.,0.,0.,0.
+    for l in 1:length(x)
+        gx, gy, gz = 0.,0.,0.
+        for i in 1:length(x)
+            if i==l
+                continue
+            end
+            dx  = x[l][1] - x[i][1]
+            dy  = x[l][2] - x[i][2]
+            dz  = x[l][3] - x[i][3]
+            dr  = sqrt(dx*dx+dy*dy+dz*dz)
+            r7  = dr*dr*dr*dr*dr*dr*dr
+            gx += dx/r7
+            gy += dy/r7
+            gz += dz/r7
+            A  += 1/r7
+        end
+        B += gx*gx           + gy*gy           + gz*gz
+        C += x[l][1]*gx      + x[l][2]*gy      + x[l][3]*gz
+        D += x[l][1]*x[l][1] + x[l][2]*x[l][2] + x[l][3]*x[l][3]
+    end
+    b5 = b*b*b*b*b
+    A *= -10*b5
+    B *=  25/4*b5*b5
+    C *= -10*a*b5/(aho*aho)
+    D *=  4*a*a/(aho*aho*aho*aho)
+    E  = -6*a/(aho*aho)*length(x)
+    return -zkin*(A+B+C+D+E)
+end
+
+function en_pot(x)
+    en::Float64 = zkin/aho^4*sq(x) 
+    for i in 1:length(x)
+        for l in 1:i-1
+            dx  = x[l][1] - x[i][1]
+            dy  = x[l][2] - x[i][2]
+            dz  = x[l][3] - x[i][3]
+            dr2 = dx*dx+dy*dy+dz*dz
+            r6  = 1/(dr2*dr2*dr2)
+            en += 4.*10.4*r6*(r6-1.) # lennard jones scritto in modo malato, SHAME.
+        end
+    end
+    return en
+end
+
+function consistency_check()
+    kin_jf(x)    = en_kin_jf(x,a,b)
+    kin_std(x)   = en_kin_std(x,a,b)
+    stimatori    = ["En.kin.JF"=>kin_jf, "En.kin.std."=>kin_std] 
+    burn!(catena, div(catena.steps,2))
+    risultati    = [monte_carlo(stimatori, catena) for i in 1:10]
+    jf           = Float64[risultato["En.kin.JF"] for risultato in risultati]
+    stan         = Float64[risultato["En.kin.std."] for risultato in risultati]
+    E            = mean(jf-stan)
+    dE           = sqrt(std(stan)^2+std(jf)^2)
+    println(E, "±", dE)
+    display(catena)
+    display(risultati)
+    if abs(E)<dE
+        info("The kinetic energy estimator is correcly implemented")
+    else
+        warn("The Jackson-Feenberg and the standard estimator do NOT agree")
+    end
+end
+
+# Orbitale gaussiano
+psi(x,a) = -2a/aho^2*sq(x)
+
+# Jastrow
+function phi(x,b)
+    jas = 0.0
+    for l in 1:length(x)
+        for i in 1:l-1
+            dx   = x[l][1] - x[i][1]
+            dy   = x[l][2] - x[i][2]
+            dz   = x[l][3] - x[i][3]
+            dr   = sqrt(dx*dx+dy*dy+dz*dz)
+            jas += 1/(dr*dr*dr*dr*dr)
+        end
+    end
+    jas *= -b^5
+    return jas
+end
+
+function E(a, b; delta=1.0, steps=300000)
+    p(x)         = psi(x,a)+phi(x,b)
+    en_loc(x)    = en_kin_std(x,a,b)+en_pot(x)
+    stimatori    = ["En. locale"=>en_loc]
+    initial_size = aho/sqrt(4a)
+    conf         = [Float64[initial_size*randn() for i in 1:3] for i in 1:particles]
+    catena       = MarkovChain(init=conf, steps=steps, p=p, delta=delta)
+    burn!(catena, div(steps,2))
+    println("a=$(round(a,3))\tb=$(round(b,3))\tdelta = $(round(catena.delta, 2))")
+    return  monte_carlo(stimatori, catena)["En. locale"]
+end
+
+function mesh(as, bs; delta=1.4, steps=100000)
+    res = zeros(length(as)*length(bs), 3)
+    for i in 1:length(as)
+        for j in 1:length(bs)
+            res[(i-1)*length(bs)+j,1] = as[i]
+            res[(i-1)*length(bs)+j,2] = bs[j]
+            res[(i-1)*length(bs)+j,3] = E(as[i], bs[j], delta=delta, steps=steps)
+        end
+    end
+    return res
+end
+
+function steepest_descent(par_iniz, braveness, da, db, tolerance, steps) 
+    par           = par_iniz
+    initial_size  = aho/sqrt(a)
+    conf          = [Float64[initial_size*randn() for i in 1:3] for i in 1:particles]
+    p(x,c,d)      = psi(x,c)+phi(x,d)
+    en_loc(x,c,d) = en_kin_std(x,c,d)+en_pot(x)
+    while true 
+        a,b    = par
+        p(x)   = p(x,a,b)
+        catena = MarkovChain(init=conf, steps=steps, p=p, delta=0.48)
+        burn!(catena, div(steps,2))
+        grad   = gradiente(en_loc, p, a, b, da, db, catena)
+        println(grad)
+        print("\ra=$(round(a, 5))\tb=$(round(b, 5))\tnorm=$(round(norm(grad), 5))") 
+        if norm(grad)<tolerance 
+            break 
+        else 
+            par = par - grad*braveness
+            println(" -->\tp_new=$(round(par[1], 5)),$(round(par[2],5))") 
+        end 
+    end 
+    println("") 
+    return par 
+end 
+
+function density(catena)
+    radii = Float64[]
+    for configuration in catena
+        for i in 1:length(x)
+            push!(radii, norm(configuration[i]))
+        end
+    end
+    return radii
+end
+
+##################################################
+# particelle interagenti LJ in una buca armonica #
+# le unità sono E = Kb, L = σ                    # 
+##################################################
+# Mi aspetto una fase ordinata ed una disordinata, a questa densità dovrebbe essere disordinato e liquido
+# la durezza del confinamento armonico è scelta in modo da avere la densità giusta
+
+# Costanti
+hbar  = 1.0546e-34                 # J s
+kb    = 1.380649e-23               # J/K
+mass  = 6.6465e-27                 # kg
+sigma = 2.556e-10                  # m
+ep    = 10.4                       # K
+dens  = 0.365                      # è in unità ridotte σ per il bulk di He
+zkin  = hbar^2/(2*mass*kb*sigma^2) # ;println("ζkin = $zkin K")
+
+particles = 2 # 13,24,29,34,37 sono massimi locali di stabilità per LJ 
+
+aho = (3/(4*pi) * particles/dens)^(1/3); println("aho  = $aho σ")
+
+# Serve che siano definite per consistency_check e per averle nel prompt
+a            = 0.51 
+b            = 1.12 
+p(x)         = psi(x,a)+phi(x,b)
+
+# stimatori = ["En. kin. JF"=>en_kin_jf, "En. kin. std."=>en_kin_std]
+# stimatori = ["En. kin. JF"=>en_kin_jf, "En.Potenziale"=>en_pot]
+# stimatori = ["En. kin. std."=>en_kin_std, "En.Potenziale"=>en_pot]
+
+initial_size = aho/sqrt(4a) # la configurazione di partenza la pesco da una gauss
+conf         = [Float64[initial_size*randn() for i in 1:3] for i in 1:particles]
+catena       = MarkovChain(init=conf, steps=300000, p=p, delta=0.41)
+
+# # oscillatore 3D
+# zkin = 1.0
+# aho  = 1.0
+# ep   = 0.0
+# b    = 0.0
+# aho  = 1.0
+# a    = 0.5*aho^2
+
+# burn!(catena, 150000)
+# risultati = monte_carlo(stimatori, catena)
+# display(catena)
+# display(risultati)
+# print("\n   E = $(sum(values(risultati))) K\n") 
+
+# Calcolo un po' di valori per vedere dove sta il minimo, da lì parte steepest descent
+# as       = linspace(0.3, 0.8, 100)
+# bs       = linspace(1.0, 1.4, 100)
+# en_sheet = mesh(as, bs, delta=1.4, steps=100000)
+# energie = Float64[] 
+# for a in as 
+#     en = E(a, b, delta=1.4, steps=1000000) 
+#     push!(energie, en) 
+# end 
+
+# Minimizzazione col gradiente
+braveness = 1e-2
+tolerance = 1e-5
+da        = 1e-4
+db        = 1e-4
+par_iniz  = [0.5132, 1.1372]
+steps     = 10000000
+
+a,b = steepest_descent(par_iniz, braveness, da, db, tolerance, steps)
+
+# Campiono la distribuzione ottimale e medio, l'isogramma lo fa gnuplot
+# radii = density(catena)
+end # fine modulo

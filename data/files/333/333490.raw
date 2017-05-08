@@ -1,0 +1,42 @@
+foamgrid = Package(
+  "libdune-foamgrid-dev",
+  ModifySource(
+    GitSource("https://users.dune-project.org/repositories/projects/dune-foamgrid.git", "0fef571"),
+    `rm examples/CMakeLists.txt` |> `echo "# nothing to see"` |> "examples/CMakeLists.txt"
+  ),
+  :CMake,
+
+  version = v"0.0.2",
+  email = "rc-softdev@ucl.ac.uk",
+  maintainer = "Research Software Development Team",
+  license = "lgpl",
+  build_depends = [
+    "cmake", "gcc (>= 4.0)", "make (>= 3.0)", "g++ (>= 4.0)", "gfortran (>= 4.0)", "cdbs",
+    "doxygen",
+  ],
+  distribution = distribution,
+
+  architecture="any",
+  depends=[
+    "libdune-common-dev", "libdune-geometry-dev", "libdune-grid-dev",
+    "libblas-dev", "liblapack-dev", "libgmp-dev"
+  ],
+  description=["One and two dimensional simplex grids",
+    "  This module provides the grid implementation 'FoamGrid'. FoamGrid implements one- and",
+    "  two-dimensional simplex grids, which can be embedded in Euclidean spaces of arbitrary",
+    "  dimension. As a special feature, FoamGrid does not require the grids to be manifolds.",
+    "  All sorts of T-junctions, singular points and the like are allowed. This makes FoamGrid",
+    "  particularly suited to model objects like foams, fracture networks, neuron trees, root",
+    "  networks, and others. FoamGrid is a self-contained grid implementation, and does not",
+    "  depend on an external library."
+  ]
+)
+
+prepare(foamgrid, workspace)
+build(machine, foamgrid, workspace)
+test(machine, foamgrid, workspace) do package
+  "test -e /usr/include/dune/foamgrid/foamgrid.hh\n" *
+  "test -e /usr/include/dune/foamgrid/dgfoam.cc\n" *
+  "test -e /usr/include/dune/foamgrid/dgfoam.cc\n" *
+  "test -e /usr/share/dune/cmake/modules/DuneFoamgridMacros.cmake"
+end

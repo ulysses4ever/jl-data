@@ -1,0 +1,21 @@
+function test()
+  println("Imported successfully")
+end
+
+type Rule
+  nonterminal::ASCIIString
+  left_child::ASCIIString
+  right_child::ASCIIString
+  prob::Float64
+end
+
+function parse_grammar(grammar_file)
+  grammar = Rule[]
+  f = open(grammar_file)
+  for line in eachline(f)
+    new_parsed = split(replace(line, "\n", ""), " ")
+    new_rule = Rule(new_parsed[1], new_parsed[2], new_parsed[3], float64(new_parsed[4]))
+    println(new_rule)
+  end
+  println(grammar)
+end

@@ -1,0 +1,47 @@
+abstract RDD
+abstract Split
+
+type ParallelCollectionSplit <: Split
+    index
+    values
+
+    function ParallelCollectionSplit(index, values)
+        new(index, values)
+    end
+end
+
+type ParallelCollection <: RDD
+    seq
+    num_slices
+    splits
+    # dependencies
+
+    function ParallelCollection(seq, num_slices:: UInt = 1)
+        seq = seq
+        num_slices = num_slices
+        slices = parallel_collection_slice(seq, num_slices)
+        splits = [ParallelCollection(index, slices[index]) for index in range(1, length(slices))]
+        new(seq, num_slices, splits)
+    end
+end
+
+function parallel_collection_slice(seq, num_slices)
+    m = length(seq)
+    n = div(m, num_slices)
+    if m % n != 0
+        n += 1
+    end
+    [seq[i*n: i*n+n] for i in range(1, numSlices)]
+end
+
+type TextFileRDD <: RDD
+end
+
+type MappedRDD <: RDD
+end
+
+type FilterRDD <: RDD
+end
+
+type FlatMappedRDD <: RDD
+end

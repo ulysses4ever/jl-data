@@ -1,0 +1,23 @@
+###################################################
+## Imports the system data
+###################################################
+
+function import_compatibility_matrix(data_folder::AbstractString)
+  compatibility_matrix = readdlm("../data/$data_folder/compatibility_matrix.txt")
+  n = size(compatibility_matrix)[1]
+  return compatibility_matrix, n
+end
+
+"First column is the name of the type, second the departure rates"
+function import_node_types(data_folder::AbstractString)
+  type_data = readdlm("../data/$data_folder/node_types.txt")
+  node_types::Array{AbstractString,1} = type_data[:,1]
+  dep_rates::Array{Float64,1} = type_data[:,2]
+  return node_types, dep_rates
+end
+
+function import_data(data_folder::AbstractString)
+  matrix, n = import_compatibility_matrix(data_folder)
+  node_types, dep_rates = import_node_types(data_folder)
+  return TypeGraph(matrix, node_types, dep_rates)
+end

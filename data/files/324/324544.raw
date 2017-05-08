@@ -1,0 +1,57 @@
+###
+### CompLing.jl
+###
+module CompLing
+
+    importall Base
+
+    # counter type:
+    # a dict of keys (strings, usually) to their counts,
+    # with a default value of 0. Also caches the total.
+    export Counter, counter
+
+    # ngrams, uni/bi/tri-grams
+    export ngrams, bigrams, trigrams, skipgrams
+
+    # simple tokenizer
+    export tokenize_ws
+
+    # normalize tokens, i.e. "2001" -> "<YEAR>",
+    #                        "jim@email.biz" -> "<EMAIL>"
+    export normalize_token, is_punct
+
+    # easily parse tagged tokens (like "the/DT")
+    export token_tag, token_word, token_wordtag
+
+    # Porter Stemmer
+    export stem 
+
+    # stopwords
+    export stopwords
+
+    # context window for a word (for word similarity, etc)
+    export context_window
+
+    # context free grammars
+    export ContextFreeProduction,
+        is_binary, is_unary,
+        ContextFreeGrammar,
+        load_cfg, productions, nonterminals, terminals,
+        convert_to_chomsky_normal_form, is_chomsky_normal_form,
+        collapse_unit_productions, convert_mixed_production
+
+    # syntax trees
+    export TreeNode, ParseTree,
+           formattree, formattree_latex_qtree
+
+    include("contextwindow.jl")
+    include("util/counter.jl")
+    include("lm/ngrams.jl")
+    include("stem/porter.jl")
+    include("preprocess/normalize.jl")
+    include("preprocess/stopwords.jl")
+    include("preprocess/tokenize.jl")
+    include("trees/grammar.jl")
+    include("trees/tree.jl")
+
+end # module

@@ -1,0 +1,82 @@
+###################################################
+## Generating input for JuMP
+###################################################
+
+type Edges
+  n_nodes::Int64
+  list::Array{Tuple{Int64,Int64}, 1}
+  outgoing::Array{Array{Int64,1},1}
+  ingoing::Array{Array{Int64,1},1}
+  impacted_nodes::Array{Int64,1}
+end
+
+function am_generator(pool::InstanceGraph)
+  n = length(pool.present_nodes)
+  adjacency_matrix = zeros(Int64, (n,n))
+  g = pool.type_graph.graph
+  for i =1:n
+    id_i = pool.present_nodes[i].node_type.id
+    for j =(i+1):n
+      id_j = pool.present_nodes[j].node_type.id
+      if has_edge(g, id_i, id_j) == 1
+        adjacency_matrix[i,j] = 1
+      end
+      if has_edge(g, id_j, id_i) == 1
+        adjacency_matrix[j,i] = 1
+      end
+    end
+  end
+  return adjacency_matrix
+end
+
+"# returns a list of all the edges,
+# and two lists of the ingoing and outgoing edges to each of the vertices"
+function edge_list_generator(pool::InstanceGraph, p::Params)
+  edge_list = []
+  n = length(pool.present_nodes)
+  g = pool.type_graph.graph
+  outgoing_edges = [[] for i in 1:n]
+  ingoing_edges = [[] for i in 1:n]
+  impacted = impacted_nodes(pool) #list_non_isolated(pool)
+  for i in impacted
+    id_i = pool.present_nodes[i].node_type.id
+    for j in impacted
+      id_j = pool.present_nodes[j].node_type.id
+      if p.techno == "2_cycles"
+        if has_edge(g, id_i, id_j) == 1 && i != j && has_edge(g, id_j, id_i) == 1
+          push!(edge_list, (i,j))
+          push!(outgoing_edges[i], j)
+          push!(ingoing_edges[j], i)
+        end
+      else
+        if has_edge(g, id_i, id_j) == 1 && i != j
+          push!(edge_list, (i,j))
+          push!(outgoing_edges[i], j)
+          push!(ingoing_edges[j], i)
+        end
+      end
+    end
+  end
+  return Edges(n, edge_list, outgoing_edges, ingoing_edges, impacted)
+end
+
+function impacted_nodes(pool::InstanceGraph)
+  n = length(pool.present_nodes)
+  impacted = []
+  g = pool.type_graph.graph
+  for k in 1:n
+    id_k = pool.present_nodes[k].node_type.id
+    if pool.present_nodes[k] in pool.recent_arrivals
+      push!(impacted, k)
+      continue
+    end
+    for i in pool.recent_arrivals
+      id_i = i.node_type.id
+      if has_edge(g, id_i, id_k) == 1 || has_edge(g, id_k, id_i) == 1
+        push!(impacted, k)
+        break
+      end
+    end
+  end
+  return impacted
+end

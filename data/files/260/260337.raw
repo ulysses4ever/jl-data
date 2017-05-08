@@ -1,0 +1,27 @@
+type Asset
+  loc::Int
+  num::Int
+  tax::String
+  val::Dict{String, Float64}
+  occ::Dict{String, Int}
+end
+
+type HazardCurve
+  imls::Vector{Float64}
+  poes::Vector{Float64}
+end
+
+type FragilityFunction
+  states::Dict{Int, String}
+  imt::String
+  imls::Vector{Float64}
+  poes::Dict{Int, Vector{Float64}}
+end
+
+type VulnerabilityFunction
+  dist::String
+  imt::String
+  imls::Vector{Float64}
+  means::Vector{Float64}
+  stds::Vector{Float64}
+end

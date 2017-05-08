@@ -1,0 +1,102 @@
+
+# Framework for Market Risk calculation
+
+module MarketRisk
+
+using Base.Dates
+using InterestRates
+using ForwardDiff
+
+export
+	HistoricalData, Index, SpreadCurve, RiskFactor, SpotCurrency, 
+	IRCurveRisk, getname, PricingModel, FinancialContract, FixedIncome, Bullet, ForwardCurrency,
+	Scenario, price
+
+import Base.hash, Base.isequal
+
+include("types.jl")
+
+# TODO: generate code for getname function
+getname(rf::SpotCurrency) = rf.name
+getname(rf::IRCurveRisk) = rf.name
+getname(hd::Index) = hd.name
+getname(hd::SpreadCurve) = hd.name
+
+hash(rf::RiskFactor) = hash(getname(rf))
+isequal(x::RiskFactor, y::RiskFactor) = getname(x) == getname(y)
+
+hash(hd::HistoricalData) = hash(getname(hd))
+isequal(x::HistoricalData, y::HistoricalData) = getname(x) == getname(y)
+
+getfunctionalcurrency() = error("Function getfunctionalcurrency should be overloaded.")
+projectCashFlows(c::FinancialContract, s::Scenario) = error("projectCashFlows not defined for $(p) and $(s)")
+
+# Let's multiple-dispatch on pricing models
+price(c::FinancialContract, s::Scenario) = _price(c.model, c, s)
+
+_currencyvalue(c::SpotCurrency, s::Scenario) = getfunctionalcurrency() == c ? 1.0 : s.data[c]
+
+function _price(b::Bullet, c::FinancialContract, s::Scenario)
+	cur = _currencyvalue(b.currency, s)
+	maturity::Date = c.attributes["MATURITY"]
+	discountfactor_base = discountfactor(s.data[b.basecurve], maturity)
+	discountfactor_spread = discountfactor(s.data[b.spreadcurve], maturity)
+	notional::Float64 = c.attributes["NOTIONAL"]
+	asset_liability_multiplier = c.attributes["ASSET_LIABILITY"] == "a" ? 1.0 : -1.0
+	
+	push!(c.log, "currency=$(cur)")
+	push!(c.log, "discountfactor_base=$(discountfactor_base)")
+	push!(c.log, "discountfactor_spread=$(discountfactor_spread)")
+
+	# Using ForwardDiff to obtain partial derivatives
+	riskfactors_values = [ cur, discountfactor_base ]
+	_pricingkernel_(x) = asset_liability_multiplier * notional * discountfactor_spread * x[1] * x[2]
+	_grad_ = forwarddiff_gradient(_pricingkernel_, Float64, fadtype=:typed)
+	out_price = _pricingkernel_(riskfactors_values)
+	out_riskfactors = [ b.currency, IRCurveRiskVertex(b.basecurve, maturity) ]
+	out_exposures = riskfactors_values .* _grad_(riskfactors_values)
+
+	# Hard coded partial derivatives : it's 6 times faster
+	#out_price = asset_liability_multiplier * notional * discountfactor_spread * cur * discountfactor_base
+	#out_riskfactors = [ b.currency, IRCurveRiskVertex(b.basecurve, maturity) ]
+	#out_exposures = [ out_price, out_price ]
+
+	return out_price, out_riskfactors, out_exposures
+end
+
+function _price(b::ForwardCurrency, c::FinancialContract, s::Scenario)
+	
+	# Payoff is S - K
+	# price is : f = S*PU(currency) - K*PU(base_curve)
+	# where S is spot currency value, and K is forward price of the contract
+
+	cur = _currencyvalue(b.currency, s)
+	maturity::Date = c.attributes["MATURITY"]
+	discountfactor_base = discountfactor(s.data[b.basecurve], maturity)
+	discountfactor_currency = discountfactor(s.data[b.currencycurve], maturity)
+	notional::Float64 = c.attributes["NOTIONAL"]
+	asset_liability_multiplier = c.attributes["ASSET_LIABILITY"] == "a" ? 1.0 : -1.0
+	K = c.attributes["FORWARD_PRICE"]
+	
+	push!(c.log, "currency=$(cur)")
+	push!(c.log, "discountfactor_base=$(discountfactor_base)")
+	push!(c.log, "discountfactor_currency=$(discountfactor_currency)")
+
+	# Using ForwardDiff to obtain partial derivatives
+	riskfactors_values = [ cur, discountfactor_currency, discountfactor_base ]
+	_pricingkernel_(x) = asset_liability_multiplier * notional * (x[1] * x[2] - K * x[3])
+	_grad_ = forwarddiff_gradient(_pricingkernel_, Float64, fadtype=:typed)
+	out_price = _pricingkernel_(riskfactors_values)
+	out_riskfactors = [ b.currency, IRCurveRiskVertex(b.currencycurve, maturity), IRCurveRiskVertex(b.basecurve, maturity) ]
+	out_exposures = riskfactors_values .* _grad_(riskfactors_values)
+
+	# Hard coded partial derivatives : about the same performance
+	#out_price = asset_liability_multiplier * notional * (cur * discountfactor_currency - K * discountfactor_base)
+	#out_riskfactors = [ b.currency, IRCurveRiskVertex(b.currencycurve, maturity), IRCurveRiskVertex(b.basecurve, maturity) ]
+	#bond = asset_liability_multiplier * notional * cur * discountfactor_currency
+	#out_exposures = [ bond, bond, -asset_liability_multiplier * notional * K * discountfactor_base ]
+
+	return out_price, out_riskfactors, out_exposures
+end
+
+end # module MarketRisk

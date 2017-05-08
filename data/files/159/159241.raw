@@ -1,0 +1,38 @@
+#import("../src/SequentialPattern.jl")
+#println(LOAD_PATH)
+
+push!(LOAD_PATH,abspath("../src"))
+
+
+
+
+
+function iris_dataset()
+  iris = RDatasets.dataset("datasets", "iris")
+  x = convert(Array,iris[:, 1:end-1])
+  label_strings=convert(Array,iris[:, end])
+  label_to_index = Dict("setosa"=> 1, "versicolor"=> 2, "virginica"=> 3)
+  y = map( (label -> label_to_index[label]),label_strings)
+  data=Vector{Float64}[]
+  for i=1:size(x,1)
+    push!(data,x[i,:][:])
+  end
+  data,y,label_strings
+  # println(x)
+  # println(labels_string)
+  # println(y)
+end
+
+function iris_dataset_binary()
+  x,y,label_strings=iris_dataset()
+  y[y.==1]=-1
+  y[y.==2]=1
+  y[y.==3]=1
+  x,y,label_strings
+  # println(x)
+  # println(labels_string)
+  # println(y)
+end
+
+
+include("Boosting.jl")

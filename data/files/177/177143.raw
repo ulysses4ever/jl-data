@@ -1,0 +1,67 @@
+module signalprocessing
+export filterwav, dumpspectrograms, imgfeature
+using DSP, Images
+
+#filter parameters
+fc = 1250
+npoles = 4
+
+# half widths of feature box
+boxwidth = 3
+boxheight = 10
+
+function filterwav(signal, fs)
+  #filter the wav recording using a high pass Butterworth filter
+  #with cutoff frequency 1250Hz
+  responsetype = Highpass(fc/(fs/2))
+  designmethod = Butterworth(npoles) # fourth order filter
+  signal = filt(digitalfilter(responsetype,designmethod),signal)
+  return  signal
+end
+
+function dumpspectrograms(signal,segments,path,nameprefix,specwidth)
+  left = segments[1:end-1]
+  right = segments[2:end]-1
+  for (i,l) in enumerate(left)
+    #compute a spectrogram with roughly equal time and freq information
+    spec = spectrogram(signal[l:right[i]],specwidth,window=hanning)
+    filename = string(path,nameprefix,"$i.png")
+    imwrite(flipud(spec.power/maximum(spec.power)),filename)
+  end
+end
+
+function imgfeature(img,imgmask)
+
+  nrows = width(img)
+  ncols = height(img)
+  npix = (2*boxheight+1)*(2*boxwidth+1); #number of pixels in a boxheight
+  nbox = (ncols - 2*boxwidth)*(nrows - 2*boxheight); #number of boxes in an image
+  data = Array(Any,nbox,npix)
+  label = zeros(nbox)
+  pcount = 0;
+  for row in (boxheight+1):(nrows-boxheight)
+    for col in (boxwidth+1):(ncols-boxwidth)
+      pcount += 1
+      box = img[ (row-boxheight):(row+boxheight) , (col-boxwidth):(col+boxwidth)]
+      data[pcount,:] = box[:]';
+      label[pcount] = getlabel(imgmask,row,col)
+    end
+  end
+  return data,label
+end
+
+function getlabel(imgmask,r,c)
+
+  if imgmask[r,c,2] == 1
+    label = 2 # pixel labelled as a syllable
+  elseif imgmask[r,c,1] == 1
+    label = 1 # pixel labelled as non-target syllable
+  else
+    label = 0 # pixel unlabelled
+  end
+
+  return label
+
+end
+
+end

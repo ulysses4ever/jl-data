@@ -1,0 +1,45 @@
+### Simulate 10^7 points from the AR(2) process
+### Yt = φ_1*Y_{t-1}+φ_2*Y_{t-2}+ε_t, φ_1 = 1.0, φ_2 = -0.6,  ε_t ~ Normal(0, 1)
+
+include("common.jl")
+
+φ = Any[[1.0, -0.6], [1.5, -0.75]]
+
+for i = 1:length(φ)
+  OUTFILE = joinpath(DATADIR, "signal"*@sprintf("%02d", i)*".txt")
+
+  outstream = open(OUTFILE, "w+")
+
+  n = 10^7
+  a = 10.0
+  b = 7.0
+
+  for j = 1:n
+    c = φ[i][1]*b+φ[i][2]*a+randn()
+    @printf(outstream, "%f\n", c)
+    a = b
+    b = c
+  end
+
+  close(outstream)
+end
+
+### Simulate 10^7 points iteratively using the logistic map 4x(1-x)
+
+using Distributions
+
+OUTFILE = joinpath(DATADIR, "signal03.txt")
+
+outstream = open(OUTFILE, "w+")
+
+n = 10^7
+a = rand(Beta(0.5, 0.5))
+@printf(outstream, "%f\n", a)
+
+for j = 1:n-1
+  b = 4*a*(1-a)
+  @printf(outstream, "%f\n", b)
+  a = b
+end
+
+close(outstream)

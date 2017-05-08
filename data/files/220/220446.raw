@@ -1,0 +1,88 @@
+#Library to with handle with solution and to search parameters
+#Copyright(c) 2015: Kally Chung
+
+#01...searchDelivSol ( prob, sol )
+#
+#
+#
+
+include( "MCITW-1P.jl" )
+
+function searchDelivSol ( prob, sol )
+#searchDelivSol
+#==============#
+#find respective crossdock and time for all deliveries assigned
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#
+#   output: array(int) ansArray --> array contain de corresponding answer of 
+#                                   the searching
+  
+  ansArray = [ -1 -1 ]
+  ansArray2 = Array{ Int, 2 }
+  aux = 1
+  for i in 1:(prob.cardD)
+    ansArray2 = searchDelivSol( prob, sol, i )
+    if ( ansArray2[1,1] != -1 ) && ( aux == 1 )
+      ansArray = ansArray2
+      aux += 1
+    else
+      ansArray = [ ansArray; ansArray2 ]
+    end
+  end
+  
+  return ansArray
+end
+
+function searchPickupSol ( prob, sol )
+  
+  ansArray = [ -1 -1 ]
+  ansArray2 = Array{ Int, 2 }
+  aux = 1
+  for j in 1:(prob.cardP)
+    ansArray2 = searchPickupSol( prob, sol, j )
+    if ( ansArray2[1,1] != -1 ) && ( aux == 1 )
+      ansArray = ansArray2
+      aux += 1
+    else
+      ansArray = [ ansArray; ansArray2 ]
+    end
+  end
+  
+  return ansArray
+end
+
+function searchDelivSol ( prob, sol, indD )
+  
+  ansArray = [-1 -1]
+  aux = 1
+  for k in 1:(prob.cardC)
+    for t in 1:(prob.cardT)
+      if ( sol.solX[ indD, k, t ] == 1 )
+        ansArray( aux, 1) = k
+        ansArray( aux, 2) = t
+        aux += 1
+      end
+    end
+  end
+  
+  return ansArray
+end
+
+function searchPickupSol ( prob, sol, indP )
+  
+  ansArray = [-1 -1]
+  aux = 1
+  for k in 1:(prob.cardC)
+    for t in 1:(prob.cardT)
+      if ( sol.solY[ indP, k, t ] == 1 )
+        ansArray( aux, 1) = k
+        ansArray( aux, 2) = t
+        aux += 1
+      end
+    end
+  end
+  
+  return ansArray
+end

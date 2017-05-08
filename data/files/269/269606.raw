@@ -1,0 +1,18 @@
+include("genotype.jl")
+include("config.jl")
+import Config
+import Genotype
+function evolve()
+  population::Array{Genotype.Type_Genotype} = []
+  for i = 1:Config.population_size
+    push!(population, Genotype.make_random_genotype())
+  end
+  for org in population
+    Genotype.simulate(org)
+  end
+  println(population[1].activations[Config.num_simulation_iterations * population[1].num_nodes])
+  #println(Genotype.delete_node(population[1]))
+end
+
+@time evolve()
+

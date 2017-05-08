@@ -1,0 +1,120 @@
+module FPUtil
+
+using Jules
+
+export
+@bounce,
+append,
+concat,
+drop,
+dropright,
+dropwhile,
+firstopt,
+findwhere,
+flatmap,
+flatten,
+fmap,
+foreach,
+parforeach,
+indexwhere,
+lastopt,
+maxby,
+minby,
+parmap,
+prepend,
+pairnext,
+take,
+takeright,
+takewhile,
+trampoline,
+zipwithindex
+
+
+#### Trampolines (from https://github.com/zachallaun/FunctionalUtils.jl)
+immutable Continue
+  thunk
+end
+macro bounce(ex)
+  :(Continue(() -> $(esc(ex))))
+end
+function trampoline(c::Continue)
+  while isa(c, Continue)
+    c = c.thunk()
+  end
+  c
+end
+trampoline(f::Function, args...) = trampoline(f(args...))
+trampoline(val) = val
+
+#### Sequences
+indexwhere = findfirst
+
+prepend(xs::Vector, x) = vcat([x], xs)
+append(xs::Vector, x) = vcat(xs,[x])
+concat(xs::Vector,ys::Vector) = vcat(vec(xs), vec(ys))
+
+firstopt(xs::Vector) = isempty(xs) ? nothing : first(xs)
+lastopt(xs::Vector) = isempty(xs) ? nothing : last(xs)
+
+Base.take(n::Integer, xs::Vector) = xs[1:n]
+drop(n::Integer, xs::Vector) = xs[(n+1):end]
+
+takeright(n::Integer, xs::Vector) = drop(length(xs) - n, xs)
+dropright(n::Integer, xs::Vector) = take(length(xs) - n, xs)
+
+takewhile(pred::Function, xs::Vector) = xs[1:(findfirst(negate(pred), xs) - 1)]
+dropwhile(pred::Function, xs::Vector) = xs[(findfirst(negate(pred), xs) + 1 - 1):end]
+
+minby(f::Function, xs::Vector) = reduce((x, y) -> (f(x) < f(y)) ? x : y, xs)
+maxby(f::Function, xs::Vector) = reduce((x, y) -> (f(x) > f(y)) ? x : y, xs)
+
+function findwhere(xs::Vector)
+  i = indexwhere(xs)
+  i == 0 ? nothing : xs(i)
+end
+
+flatmap(f::Function, xs::Vector) = foldl((y, x) -> concat(y,f(x)), [], xs)
+flatten(xs::Vector) = flatmap(identity, xs)
+function foreach(f::Function, xs::Vector)
+  for x in xs
+    f(x)
+  end
+end
+
+function parforeach_(f::Function, lst::Vector, np::Integer, save::Bool)
+  n = length(lst)
+  results = nothing
+  if save
+    results = cell(n)
+  end
+  i = 1
+  nextidx() = (idx=i; i+=1; idx)
+  @sync begin
+    for p in 1:np
+      @async begin
+        while true
+          idx = nextidx()
+          if idx > n
+            break
+          end
+          y = f(lst[idx])
+          if save
+            results[idx] = y
+          end
+        end
+      end
+    end
+  end
+  results
+end
+parforeach(f::Function, lst::Vector, np::Integer) = parforeach_(f, lst, np, false)
+parmap(f::Function, lst::Vector, np::Integer) = parforeach_(f, lst, np, true)
+
+pairnext(xs::Vector) = zip(xs, drop(1, xs))
+zipwithindex(xs::Vector) = zip(xs, 1:length(xs))
+
+fmap(f, xs) = map(f, xs)
+fmap(f, nothing) = nothing
+getorelse(x, default) = isnothing(x) ? default : x
+
+end ## end module

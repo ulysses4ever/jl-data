@@ -1,0 +1,30 @@
+#=
+Various numerical experiments vaguely related to reproducing kernel Hilbert spaces.
+=#
+
+import Distributions
+
+function stickbreak(x::Array{Float64,1}, range::UnitRange{Int}, alpha::Real)
+    a = rand(Distributions.Dirichlet(length(range),alpha),1)
+    y = zeros(Real, length(x))
+    for k in range
+        u = 2*pi*rand(1)[1]
+        y += a[k+1-range[1]]*cos(2*pi*k*x + u)
+    end
+    return y,a
+end
+
+"""
+Matérn covariance function
+"""
+function matern(nu::Real, sigma::Real, rho::Real, d::Real)
+    x = sqrt(2*nu)*d/rho
+    (sigma^2*2.0^(1.0-nu)/gamma(nu))*x^nu*besselk(nu,x)
+end
+
+"""
+Gaussian kernel
+"""
+function gaussian_kernel{T1<:Real, T2<:Real, T3<:Real}(x::Array{T1,1}, y::Array{T2,1}, sigma::T3)
+    exp(-sum(((x-y)/sigma).^2/2))
+end

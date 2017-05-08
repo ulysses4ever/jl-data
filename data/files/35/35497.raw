@@ -1,0 +1,7 @@
+
+function measBER(inBits::BitArray{2},outBits::BitArray{2})
+    numErrors::Int64;
+    numErrors = sum(inBits.!=outBits);
+    
+    return(numErrors);
+end

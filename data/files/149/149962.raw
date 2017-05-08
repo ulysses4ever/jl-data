@@ -1,0 +1,154 @@
+s = """
+function f(x)
+    local y::Float64 = 1
+    x + y
+end
+"""
+msgs = lintstr( s )
+@test( contains( msgs[1].message, "but assign a value of") )
+s = """
+function f(c::Char)
+    x = int8(c)
+    x = int16(x)
+    x = int32(x)
+    x = int64(x)
+    x = int(x)
+    x = Rational(x)
+    x = float(x)
+    x = Complex(x)
+    @lintpragma( "Info type x")
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "but now assigned" ) )
+@test( contains( msgs[end].message, "typeof( x ) == Complex" ) )
+
+s = """
+function f()
+    x = rand()
+    @lintpragma( "Info type x")
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( x ) == Float64" ) )
+s = """
+function f()
+    x = rand(3)
+    @lintpragma( "Info type x")
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( x ) == Array{Float64,1}" ) )
+s = """
+function f(x::Int)
+    push!( x, 1)
+end
+"""
+msgs = lintstr( s )
+@test( contains( msgs[1].message, "no method found") )
+
+s = """
+function f(x)
+    d = @compat Dict{Symbol,Int}(:a=>1, :b=>2 )
+    for i in d
+    end
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "Iteration generates tuples of" ))
+s = """
+function f(x)
+    d = @compat Dict{Symbol,Int}(:a=>1, :b=>2 )
+    x = d[:a]
+    x = 1.0
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "but now assigned Float64" ))
+s = """
+function f()
+    a = 1
+    d = @compat Dict{Symbol,Int}(:a=>1, :b=>2 )
+    x = d[a]
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "Key type expects" ))
+s = """
+function f( arr::Array{Any,1})
+    x = arr[1]::Int64
+    @lintpragma( "Info type x")
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( x ) == Int" ) )
+s = """
+g(x) = x
+
+function f()
+    x = g
+    @lintpragma( "Info type x")
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( x ) == Function" ) )
+s = """
+module MyModule
+end
+
+function f()
+    x = MyModule
+    @lintpragma( "Info type x")
+    return x
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( x ) == Module" ) )
+
+s = """
+function f()
+    z = Complex(1.0, 1.0)
+    z.re = 2.0
+    z
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "z is of an immutable type" ) )
+
+s = """
+n = 32
+A = Array{Int32, n } # bug is here
+for i in 1:n
+    A[i] = i
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "has apparent type DataType, not a container"))
+
+s = """
+function f()
+    d = Dict(:a=>1, :b=>"" )
+    @lintpragma( "Info type d" )
+    return d
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( d ) == Dict" ) )
+
+s = """
+function f()
+    d = Dict{Symbol,Any}(:a=>1, :b=>"" )
+    @lintpragma( "Info type d" )
+    return d
+end
+"""
+msgs = lintstr(s)
+@test( contains( msgs[1].message, "typeof( d ) == Dict" ) )

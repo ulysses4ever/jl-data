@@ -1,0 +1,133 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+include("recognitionPDA.jl")
+
+##################################################################################
+
+println("Naive-Needleman-Wunsch")
+
+thePDA = createRecognitionPDA()
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'C')
+
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'B')
+
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+
+# here the first example of a tricky string to recognize. A-B-B here is
+# recognized as B-A-B. I think generally this is fine...though I should
+# check to see when they say (CA)_10 its sort of implicit that it may mean
+# (AC)_10
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'B')
+
+
+# the following example is quirky in that my "intended" pattern is A-A-B, but the
+# interpreted pattern will be seen as A-B-A. So whatever functional mapping we do
+# to recognize a specific repeat string >= 2 we must consider the "isomerisms (correct word?)"
+# and not just a specific string.
+tickPDAGivenInput(thePDA, 'A') # a note here, because the first is congruent with the continuing character of the last set, we wont recognize this pattern as quickly!
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'C')
+
+tickPDAGivenInput(thePDA, 'A') # a note here, because the first is congruent with the continuing character of the last set, we wont recognize this pattern as quickly!
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'T')
+
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'T')
+tickPDAGivenInput(thePDA, 'T')
+
+

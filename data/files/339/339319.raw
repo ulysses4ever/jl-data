@@ -1,0 +1,88 @@
+import Base.cross
+
+function chull(points)
+    T = eltype(points) #get point type
+    N = length(points) #number of pnts
+    # sort the points lexicographically.
+    # copy points into mutable container
+    pnts  = T[]
+    for x in points
+        push!(pnts, x)
+    end
+    
+    #trivial case 0 or 1 point
+    length(pnts) <= 1 && (return pnts)
+
+    lexsort!(pnts)
+    #build lower hull 
+    lower = T[]
+    buildhull!(lower, pnts, 1:1:N)
+
+    #build upper hull
+    upper = T[]
+    buildhull!(upper, pnts, N:-1:1)
+  
+    # omit end points : 
+    #   - reapeated at the beginning of lower & upper
+    length(upper) > 0 && pop!(upper)
+    length(lower) > 0 && pop!(lower)
+
+    # two reapeated points
+    (length(upper)==1 && length(lower)==1) &&
+    isequal(upper, lower) && pop!(upper)
+ 
+    # concat lower and upper hull.
+    hull = [lower, upper]
+
+    #close ring
+    length(hull) > 1 && push!(hull, hull[1]) 
+
+    return hull
+end
+#=
+build boundary
+    @param indxs (1:step:len or len:-1:1)
+=#
+function buildhull!(boundary, points, indxs)
+    for i in indxs
+        pnt = points[i]
+        while length(boundary) >= 2 && orient(boundary, pnt) <= 0
+            pop!(boundary)
+        end
+        push!(boundary, pnt)
+    end
+end
+
+#=
+orient boundry
+=#
+function orient(boundry, pnt)
+  return cross(boundry[end-1], boundry[end], pnt)
+end
+
+#= 
+2D cross product of OA and OB vectors, 
+ i.e. z-component of their 3D cross product.
+ Returns a positive value, if OAB makes a counter-clockwise turn,
+ negative for clockwise turn, and zero if the points are collinear.
+=#
+function cross(o, a, b) 
+    return  ((a[1] - o[1]) * (b[2] - o[2])) - 
+            ((a[2] - o[2]) * (b[1] - o[1]))
+end
+
+#=
+sort points lexicographically
+=#
+function lexsort!(points)
+    sort!(points, lt=lt2d)
+end
+
+#=
+less than comparator
+=#
+function lt2d(a, b) 
+    dx, dy =  a[1] - b[1], a[2] - b[2];
+    dx != 0 &&  (return <(dx, 0))
+    return <(dy, 0)
+end

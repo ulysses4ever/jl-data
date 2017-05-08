@@ -1,0 +1,19 @@
+include("derivative.jl")
+
+
+function squaring(x)
+return x^2
+end
+
+
+function quadratic(f)
+
+        #Computing first derievative
+        f1 = derivative(f)
+
+        c = f(0.0)
+        b = f1(0.0)
+        a = f(1.0) - a - b
+
+        return (-b + sqrt(b^2 - 4*a*c + 0im))/(2*a), (-b - sqrt(b^2 - 4*a*c + 0im))/(2*a)
+end

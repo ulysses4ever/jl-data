@@ -1,0 +1,258 @@
+#flist.jl
+module List
+
+import Base.push!, Base.push!, Base.map, 
+Base.filter, Base.reduce, Base.slice
+
+export LinkList, at, slice, map, filter, each, items,
+reduce, first, last, unshift!, shift!, push!, pop!
+
+abstract ListItem{T}
+#=@type Nil =#
+type Nil{T} <: ListItem{T}
+end
+nil(T)= Nil{T}()
+nil() = nil(Any)
+
+#=@type Item =#
+type Item{T} <:ListItem{T}
+	data::T
+	prev::ListItem{T}
+	next::ListItem{T}
+	function Item(data::T, prev::ListItem{T}=nil(T), next::ListItem{T}=nil(T))
+		this = new()
+		this.next = next
+		isa(next, Item) && (next.prev = this)
+		this.prev = prev
+		isa(prev, Item) && (prev.next = this)
+		this.data = data;
+		return this
+	end
+end
+
+#=@type LinkList =#
+type LinkList{T}
+	head::ListItem{T}
+	tail::ListItem{T}
+	length::Integer
+	function LinkList()
+		t = nil(T)
+		this = new(t, t, 0)
+	end
+end
+
+#=
+ * @description first
+ * @param this{LinkList}
+ =#
+function first(this::LinkList) 
+	isa(this.head, Nil) && return nothing;
+	return this.head.data
+end
+
+#=
+ * @description last
+ * @param this{LinkList}
+ =#
+function last(this::LinkList) 
+ 	isa(this.tail, Nil) && return nothing;
+	return  this.tail.data
+end
+
+#=
+ * @description push
+ * @param this{LinkList}
+ * @param data
+ =#
+function push!(this::LinkList, data)
+	T = typeof(this).parameters[1]
+	item = Item{T}(data::T, this.tail, nil(T));
+	this.tail = item;
+	this.length += 1;
+	this.length == 1 && (this.head = this.tail);
+end
+
+#=
+ * @description unshift
+ * @param this{LinkList}
+ * @param data
+ =#
+function unshift!(this::LinkList, data)
+	T = typeof(this).parameters[1]
+	this.head = Item{T}(data::T, nil(T), this.head);
+	this.length += 1;
+	this.length == 1 && (this.tail = this.head);
+end
+
+
+#=
+ * @description pop
+ * @return {*}
+ =#
+function pop!(this::LinkList)
+	if (this.length == 0)
+		return;
+	end
+	T = typeof(this).parameters[1]
+	t = this.tail;
+	this.tail = t.prev;
+
+	isa(this.tail, Item) && (this.tail.next = nil(T))
+	t.prev = nil(T)
+
+	this.length += -1;
+
+	(this.length == 1 || this.length == 0) &&
+	(this.head = this.tail);
+
+	return t.data;
+end
+
+
+#=
+ * @description shift
+ * @return {*}
+ =#
+function shift!(this::LinkList)
+  if (this.length == 0)
+    return;
+  end
+  T = typeof(this).parameters[1]
+  h = this.head;
+  this.head = h.next;
+  isa(this.head, Item) && (this.head.prev = nil(T))
+  h.next = nil(T);
+
+  this.length += -1;
+
+  (this.length == 1 || this.length == 0) && 
+  (this.tail = this.head);
+
+  return h.data;
+end
+
+
+#=
+ * @description walk
+ * @param src
+ * @param steps{number}
+ * @param [fn]{Function}
+ * @return {*}
+ =#
+function walk(src::ListItem, steps::Integer, fn::Function=identity)
+	T = typeof(src).parameters[1]
+	index = steps;
+	while (isa(src, Item) && steps > 0)
+		steps += -1;
+		!is(fn, identity) && fn(src, index-steps);
+		src = src.next;
+	end
+	return  steps >= 0 ? src : nil(T);
+end
+
+
+#=
+ * @description at index
+ * @param n
+ * @return {*}
+ =#
+function at(this::LinkList, n::Integer)
+	if (n < 0)
+		n = this.length + n + 1 #1 indexing
+	end
+	h = walk(this.head, n-1);
+	return isa(h, Item)? h.data : nothing
+end
+
+#=
+ * @description items
+ * @param src
+ * @param len
+ * @return {Array[T]}
+ =#
+function items(this::ListItem, len::Integer)
+	T = typeof(this).parameters[1]
+	data = T[];
+	function append!(o::Item, i::Integer)
+	 	push!(data, o.data);
+	end
+	walk(this, len, append!);
+	return data;
+end
+items(this::LinkList,len::Integer) = items(this.head, len)
+items(this::LinkList) = items(this.head, this.length)
+
+
+#=
+ * @description slice
+ * @param n
+ * @param m
+ * @return {Array[T]}
+ =#
+function slice(this::LinkList, n::Integer=1, m::Integer=0)
+	T = typeof(this).parameters[1]
+	(m ==0) && (m =  this.length)
+	(m < 0) && (m += this.length + 1)
+	(n < 0) && (n += this.length + 1)
+	h = walk(this.head, n-1)
+	len = (m - n) + 1
+	return items(h, len)
+end
+
+#=
+ * @description  each
+ * @param fn
+ * @param thisp
+ =#
+function each(this::LinkList, fn::Function)
+  walk(this.head, this.length, fn)
+end
+
+#=
+ * @description map
+ * @param fn
+ * @param thisp
+ * @return {LinkList}
+ =#
+function map(fn::Function, this::LinkList)
+  T = typeof(this).parameters[1]
+  lst = LinkList{T}()
+  _fn(o::Item, i::Integer) = push!(lst, fn(o.data))
+  walk(this.head, this.length, _fn)
+  return lst
+end
+
+#=
+ * @description map
+ * @param fn
+ * @param thisp
+ * @return {LinkList}
+ =#
+function filter(fn::Function, this::LinkList)
+  T = typeof(this).parameters[1]
+  lst = LinkList{T}()
+  _fn(o::Item, i::Integer) = fn(o.data) && push!(lst, o.data)
+  walk(this.head, this.length, _fn)
+  return lst
+end
+
+#=
+ * @description reduce
+ * @param fn
+ * @param val
+ * @param thisp
+ * @return {*}
+ =#
+function reduce(fn::Function, this::LinkList)
+  val =  0.0
+  function _fn(o::Item, i::Integer)
+    val += fn(o.data)
+  end
+  walk(this.head, this.length, _fn)
+  return val
+end
+reduce(this::LinkList) = reduce(identity, this)
+
+end #List module
+
+

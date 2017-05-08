@@ -1,0 +1,29 @@
+
+A = UpdateMatrix([2 3;4 5], [5,8])
+B = UpdateMatrix([4 2;6 1], [5,9])
+A1 = copy(A)
+
+@test size(A) == (2,2)
+C = A+B
+@test size(C) == (3,3)
+@test C.data == [6 3 2; 4 5 0; 6 0 1]
+
+D = UpdateMatrix([1 2 3; 4 5 6; 7 8 9], [4,5,8])
+D1 = copy(D)
+F = C+D
+@test size(F) == (4,4)
+@test F.rowval == [4,5,8,9]
+@test F.data == [1 2 3 0; 4 11 9 2; 7 12 14 0; 0 6 0 1]
+
+A = FrontalMatrix(A)
+@test typeof(A) <: FrontalMatrix
+
+B = slice(F, [8,9])
+C = slice(F, [5,8,10])
+@test B.data == [14 0; 0 1]
+@test B.rowval == [8,9]
+@test C.data == [11 9; 12 14]
+
+add!(FrontalMatrix(D1), A1)
+@test D1.data == [1 2 3; 4 7 9; 7 12 14]
+@test D1.rowval == [4, 5, 8]

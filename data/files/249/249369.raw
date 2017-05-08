@@ -1,0 +1,98 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+
+type ClusterWorker <: Executor
+    worker::Task
+    port::UInt16
+end
+
+# global WorkerPort = -1
+# function start_worker()
+#     (port, srvr) = listenany(UInt16(Mesos.Manager.ExecutorPort))
+#     WorkerPort = port
+#     while true
+#         sock = accept(srvr)
+#         Base.process_messages(sock, sock)
+#     end
+# end
+
+# Define executor callback functions
+function cme_registered(driver::ExecutorDriver, executorInfo::Proto.ExecutorInfo,
+                        frameworkInfo::Proto.FrameworkInfo, slaveInfo::Proto.SlaveInfo)
+    info("Julia: Registered executor on $(slaveInfo.hostname)")
+end
+
+function cme_launchTask(driver::ExecutorDriver, taskInfo::Proto.TaskInfo)
+    info("CME: Starting task $(taskInfo.task_id.value)")
+
+    # Send status update
+    taskStatus = @proto Proto.TaskStatus (
+        :task_id => @proto(Proto.TaskID, :value => taskInfo.task_id.value),
+        :state => Proto.TaskState.TASK_RUNNING
+    )
+    if driver.executor.worker.state == :failed
+        set_field!(taskStatus, :state, Proto.TaskState.TASK_FAILED)
+        set_field!(taskStatus, :message, string(driver.executor.worker.exception))
+    elseif driver.executor.worker.state == :done
+        set_field!(taskStatus, :state, Proto.TaskState.TASK_FINISHED)
+    else
+        # Start server on scpecifed port
+        (init_port, _) = getRangeResourse(taskInfo.resources, Mesos.PORTS_RESOURSE)[1]
+        (port, srvr) = listenany(UInt16(init_port))
+        set_field!(taskStatus, :data, "$(string(getipaddr())):$(string(port))".data)
+        sendStatusUpdate(driver, taskStatus)
+
+        # # Start receiving messages
+        # while true
+        #     sock = accept_handler(srvr)
+        #     Base.process_messages(sock, sock)
+        # end
+
+        srvr.ccb = Base.accept_handler
+        Base.disable_nagle(srvr)
+        try
+            while true; wait(); end
+        catch err
+            set_field!(taskStatus, :state, Proto.TaskState.TASK_FAILED)
+            set_field!(taskStatus, :message, string(err))
+            sendStatusUpdate(driver, taskStatus)
+        end
+
+    end
+end
+
+function cme_error(driver::ExecutorDriver, err::String)
+    info("CME: Got error message: $err")
+end
+
+# # Start IO server
+# Base.init_worker()
+# (wkr_port, srvr) = listenany(UInt16(Mesos.Manager.ExecutorPort))
+# worker = @schedule begin
+#     while true
+#         sock = accept(srvr)
+#         Base.process_messages(sock, sock)
+#     end
+# end
+
+
+
+# worker = Task(start_worker)
+# schedule(worker)
+
+(port, srvr) = listenany(UInt16(Mesos.Manager.ExecutorPort))
+worker = @task begin
+    while true
+        sock = accept(srvr)
+        Base.process_messages(sock, sock)
+    end
+end
+schedule(worker)
+# sleep(1)
+
+executor_cb = ExecutorCallback(ClusterWorker(worker, port),
+                    registered = cme_registered,
+                    launchTask = cme_launchTask,
+                    error = cme_error)
+run(executor_cb)

@@ -1,0 +1,2 @@
+{"business_profile": {"city": "Dra\u00dfmarkt", "street_number": "66", "phone": "26172238", "url": "http://www.bernie.at", "email": "wirtshaus@bernie.at", "mobile": "", "address": "Hauptstr", "business_name": "Bernie - Das Wirtshaus", "geo": [], "id": "7", "zip_code": "7372"}}
+{"business_profile": {"city": "Dra\u00dfmarkt", "street_number": "21", "phone": "26172231", "url": "http://www.pfneiszl-bau.at", "email": "office@pfneiszl-bau.at", "mobile": "", "address": "Zeilg", "business_name": "Pfneiszl - Bau GmbH - Zimmerei", "geo": [], "id": "13", "zip_code": "7372"}}

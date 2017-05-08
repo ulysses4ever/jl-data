@@ -1,0 +1,94 @@
+import Base.AsyncStream
+
+# Stolen from graphics.jl
+macro mustimplement(sig)
+  fname = sig.args[1]
+  arg1 = sig.args[2]
+  if isa(arg1,Expr)
+    arg1 = arg1.args[1]
+  end
+  :($(esc(sig)) = error(typeof($(esc(arg1))),
+                        " must implement ", $(Expr(:quote,fname))))
+end
+
+#####################
+###   Constants   ###
+#####################
+
+INDEX_ADDR = "localhost:9001"
+KEYSERVER_ADDR = "localhost:9002"
+
+######################
+###   Interfaces   ###
+######################
+
+abstract Mailbox
+@mustimplement read(::Mailbox, _)
+
+abstract Endpoint
+@mustimplement write(::Endpoint, _)
+
+abstract Connection
+@mustimplement read(::Mailbox, _)
+@mustimplement write(::Endpoint, _)
+@mustimplement in(::Connection)#::Mailbox
+@mustimplement out(::Connection)#::Endpoint
+
+#####################
+###   Endpoints   ###
+#####################
+
+type Identity1 <: Endpoint end
+type PrivateKey1 <: Endpoint end
+
+write(i::Identity1, m) = write(lookup(i), m)
+write(k::PrivateKey1, m) = write(lookup(k), m)
+
+lookup(i::Identity1) = "look up private key in index"
+lookup(k::PrivateKey1) = "look up next hop in routing table"
+
+#############################
+###   Connection Basics   ###
+#############################
+
+type ConnIn <: Mailbox
+  c::Connection
+end
+type ConnOut <: Endpoint
+  c::Connection
+end
+
+in(c::Connection) = ConnIn(c)
+out(c::Connection) = ConnOut(c)
+read(i::ConnIn, t::Type) = read(i.c, t)
+write(o::ConnOut, message) = write(o.c, message)
+
+##############################
+###   Stream Connections   ###
+##############################
+
+type StreamConnection <: Connection
+  s::AsyncStream
+end
+
+connection(s::AsyncStream) = StreamConnection(s)
+read(c::Connection, t::Type) = read(c.s, t)
+write(c::Connection, message) = write(c.s, message)
+
+###############################
+###   Wrapped Connections   ###
+###############################
+
+type WrappedConnection <: Connection
+  c::Connection
+  reader::Function
+  writer::Function
+end
+
+connection(c::Connection, reader::Function, writer::Function) = WrappedConnection(c, reader, writer)
+read(c::WrappedConnection, t::Type) = c.reader(c.c, t)
+write(c::WrappedConnection, message) = c.writer(c.c, message)
+
+#################
+###   Tests   ###
+#################

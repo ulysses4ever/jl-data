@@ -1,0 +1,33 @@
+function Lorentz(i::Int64, j::Int64, a::Float32)
+	return a/(i^2 + j^2 + a);
+end
+
+function LorentzConvolve!(A::Array{Float32, 2}, a::Float32)
+	(n1, n2) = size(A);
+	(m1, m2) = (int(n1/2) + 1, int(n2/2) + 1);
+	A = rfft(A);
+	gc();
+	B = zeros(Float32, m1, m2);
+	for j in [1:m2]
+		for i in [1:m1]
+			B[i, j] = Lorentz(i - 1, j - 1, a);
+		end
+	end
+	FFTW.r2r!(B, FFTW.REDFT00);
+	gc();
+	for j in [1:m2]
+		for i in [1:m1]
+			A[i, j] *= B[i, j];
+		end
+	end
+	for j in [(m2 + 1):n2]
+		for i in [1:m1]
+			A[i, j] *= B[i, n2 - j + 2];
+		end
+	end
+	B = 0;
+	gc();
+	A = irfft(A, n1);
+	gc();
+	return A;
+end

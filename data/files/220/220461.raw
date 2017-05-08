@@ -1,0 +1,168 @@
+#Library to with handle with solution and to search parameters
+#Copyright(c) 2015: Kally Chung
+
+#01...searchDelivSol( prob, sol )
+#02...searchPickupSol( prob, sol )
+#03...searchDelivSol( prob, sol, indD )
+#04...searchPickupSol( prob, sol, indP )
+
+include( "MCITW-1P.jl" )
+
+function searchDelivSol( prob, sol )
+#searchDelivSol
+#==============#
+#find respective crossdock and time for all deliveries assigned
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#
+#   output: array(int) ansArray --> array contain de corresponding answer of 
+#                                   the searching process
+  
+  #initializing variables
+  ansArray = [ 0 0 0 ]
+  ansArray2 = Array{ Int, 2 }
+  aux = 1
+  
+  #searching process
+  for i in 1:(prob.cardD)
+    ansArray2 = searchDelivSol( prob, sol, i )
+    if ( aux == 1 )
+      if ( ansArray2[1,1] != 0 )
+        ansArray[aux,1] = i
+        ansArray[aux,2] = ansArray2[1]
+        ansArray[aux,3] = ansArray2[2]
+        aux += 1
+      else
+        continue
+      end  
+    elseif ( ansArray2[1,1] == 0 )
+      continue
+    else
+      ansArray = [ ansArray; i ansArray2 ]
+    end
+  end
+  
+  return ansArray
+end
+
+function searchPickupSol( prob, sol )
+#searchPickupSol
+#===============#
+#find respective crossdock and time for all pickups assigned
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#
+#   output: array(int) ansArray --> array contain de corresponding answer of 
+#                                   the searching process
+
+  #initializing variables
+  ansArray = [ 0 0 0 ]
+  ansArray2 = Array{ Int, 2 }
+  aux = 1
+
+  #searching process
+  for j in 1:(prob.cardP)
+    ansArray2 = searchPickupSol( prob, sol, j )
+    if ( aux == 1 )
+      if ( ansArray2[1,1] != 0 )
+        ansArray[aux,1] = j
+        ansArray[aux,2] = ansArray2[1]
+        ansArray[aux,3] = ansArray2[2]
+        aux += 1
+      else
+        continue
+      end
+    elseif ( ansArray2[1,1] == 0 )
+      continue
+    else
+      ansArray = [ ansArray; j ansArray2 ]
+    end
+  end
+  
+  return ansArray
+end
+
+function searchDelivSol( prob, sol, indD )
+#searchDelivSol
+#==============#
+#find respective crossdock and time for delivery D_indD assigned
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#           int indD -------------> delivery index
+#
+#   output: array(int) ansArray --> array contain de corresponding answer of 
+#                                   the searching process
+
+  #initializing variables
+  ansArray = [0 0]
+  aux = 1
+  
+  #searching process
+  for k in 1:(prob.cardC)
+    for t in 1:(prob.cardT)
+      if ( sol.solX[ indD, k, t ] == 1 )
+        ansArray[ aux, 1] = k
+        ansArray[ aux, 2] = t
+        aux += 1
+      end
+    end
+  end
+  
+  return ansArray
+end
+
+function searchPickupSol( prob, sol, indP )
+#searchPickupSol
+#===============#
+#find respective crossdock and time for all pickups assigned
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#
+#   output: array(int) ansArray --> array contain de corresponding answer of 
+#                                   the searching process
+
+  #initializing variables
+  ansArray = [0 0]
+  aux = 1
+  
+  #searching process
+  for k in 1:(prob.cardC)
+    for t in 1:(prob.cardT)
+      if ( sol.solY[ indP, k, t ] == 1 )
+        if ( aux > 1 )
+          println("double Pickup: P$indP-C$k-T$t")
+          println("$ansArray")
+          printSol(prob, sol)
+          error("double Pickup")
+        end
+        ansArray[ aux, 1] = k
+        ansArray[ aux, 2] = t
+        aux += 1
+      end
+    end
+  end
+  
+  return ansArray
+end
+
+function searchUnfDelivSol( prob, sol )
+  
+  fulfDeliv = searchDelivSol( prob, sol )[:,1]
+  unfDeliv = setdiff( [1:prob.cardD], unique(fulfDeliv) )
+  
+  return unfDeliv
+  
+end
+
+function searchUnasPickupSol( prob, sol )
+  
+  assigPickup = searchPickupSol( prob, sol )[:,1]
+  unasPickup = setdiff( [1:prob.cardP], unique(assigPickup) )
+  
+  return unasPickup
+  
+end

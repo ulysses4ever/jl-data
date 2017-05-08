@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:02:19 GMT
+Date: Wed, 03 May 2017 21:02:32 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5372
+Content-Length: 5295
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2675
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3861
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "7c7dbf8c97932f290564f786c7e44789"
-Last-Modified: Tue, 15 Dec 2015 19:29:27 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "4a028ff1d16c1669e8ac9148b486796f"
+Last-Modified: Tue, 03 Jun 2014 07:17:28 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
-X-GitHub-Request-Id: 6652:6634:134964E:18EE20C:5902322B
+X-Served-By: 88531cdcf1929112ec480e1806d44a33
+X-GitHub-Request-Id: 87BA:5CA3:FFD1ED:148F0BD:590A4568
 
 {
-  "id": 47669268,
-  "name": "FlexFloat.jl",
-  "full_name": "J-Sarnoff/FlexFloat.jl",
+  "id": 20222768,
+  "name": "RosalindJulia",
+  "full_name": "binnisb/RosalindJulia",
   "owner": {
-    "login": "J-Sarnoff",
-    "id": 13563390,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/13563390?v=3",
+    "login": "binnisb",
+    "id": 1642748,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/1642748?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/J-Sarnoff",
-    "html_url": "https://github.com/J-Sarnoff",
-    "followers_url": "https://api.github.com/users/J-Sarnoff/followers",
-    "following_url": "https://api.github.com/users/J-Sarnoff/following{/other_user}",
-    "gists_url": "https://api.github.com/users/J-Sarnoff/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/J-Sarnoff/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/J-Sarnoff/subscriptions",
-    "organizations_url": "https://api.github.com/users/J-Sarnoff/orgs",
-    "repos_url": "https://api.github.com/users/J-Sarnoff/repos",
-    "events_url": "https://api.github.com/users/J-Sarnoff/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/J-Sarnoff/received_events",
+    "url": "https://api.github.com/users/binnisb",
+    "html_url": "https://github.com/binnisb",
+    "followers_url": "https://api.github.com/users/binnisb/followers",
+    "following_url": "https://api.github.com/users/binnisb/following{/other_user}",
+    "gists_url": "https://api.github.com/users/binnisb/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/binnisb/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/binnisb/subscriptions",
+    "organizations_url": "https://api.github.com/users/binnisb/orgs",
+    "repos_url": "https://api.github.com/users/binnisb/repos",
+    "events_url": "https://api.github.com/users/binnisb/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/binnisb/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/J-Sarnoff/FlexFloat.jl",
-  "description": "These floating point values stretch to maintain accuracy.",
+  "html_url": "https://github.com/binnisb/RosalindJulia",
+  "description": "Learning Julia by doing some Rosalind problems",
   "fork": false,
-  "url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl",
-  "forks_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/forks",
-  "keys_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/teams",
-  "hooks_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/events",
-  "assignees_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/tags",
-  "blobs_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/subscription",
-  "commits_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/merges",
-  "archive_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/downloads",
-  "issues_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/J-Sarnoff/FlexFloat.jl/deployments",
-  "created_at": "2015-12-09T04:51:27Z",
-  "updated_at": "2015-12-15T19:29:27Z",
-  "pushed_at": "2015-12-30T14:22:51Z",
-  "git_url": "git://github.com/J-Sarnoff/FlexFloat.jl.git",
-  "ssh_url": "git@github.com:J-Sarnoff/FlexFloat.jl.git",
-  "clone_url": "https://github.com/J-Sarnoff/FlexFloat.jl.git",
-  "svn_url": "https://github.com/J-Sarnoff/FlexFloat.jl",
-  "homepage": "",
-  "size": 200,
-  "stargazers_count": 3,
-  "watchers_count": 3,
+  "url": "https://api.github.com/repos/binnisb/RosalindJulia",
+  "forks_url": "https://api.github.com/repos/binnisb/RosalindJulia/forks",
+  "keys_url": "https://api.github.com/repos/binnisb/RosalindJulia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/binnisb/RosalindJulia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/binnisb/RosalindJulia/teams",
+  "hooks_url": "https://api.github.com/repos/binnisb/RosalindJulia/hooks",
+  "issue_events_url": "https://api.github.com/repos/binnisb/RosalindJulia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/binnisb/RosalindJulia/events",
+  "assignees_url": "https://api.github.com/repos/binnisb/RosalindJulia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/binnisb/RosalindJulia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/binnisb/RosalindJulia/tags",
+  "blobs_url": "https://api.github.com/repos/binnisb/RosalindJulia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/binnisb/RosalindJulia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/binnisb/RosalindJulia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/binnisb/RosalindJulia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/binnisb/RosalindJulia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/binnisb/RosalindJulia/languages",
+  "stargazers_url": "https://api.github.com/repos/binnisb/RosalindJulia/stargazers",
+  "contributors_url": "https://api.github.com/repos/binnisb/RosalindJulia/contributors",
+  "subscribers_url": "https://api.github.com/repos/binnisb/RosalindJulia/subscribers",
+  "subscription_url": "https://api.github.com/repos/binnisb/RosalindJulia/subscription",
+  "commits_url": "https://api.github.com/repos/binnisb/RosalindJulia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/binnisb/RosalindJulia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/binnisb/RosalindJulia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/binnisb/RosalindJulia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/binnisb/RosalindJulia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/binnisb/RosalindJulia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/binnisb/RosalindJulia/merges",
+  "archive_url": "https://api.github.com/repos/binnisb/RosalindJulia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/binnisb/RosalindJulia/downloads",
+  "issues_url": "https://api.github.com/repos/binnisb/RosalindJulia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/binnisb/RosalindJulia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/binnisb/RosalindJulia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/binnisb/RosalindJulia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/binnisb/RosalindJulia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/binnisb/RosalindJulia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/binnisb/RosalindJulia/deployments",
+  "created_at": "2014-05-27T14:25:14Z",
+  "updated_at": "2014-06-03T07:17:28Z",
+  "pushed_at": "2014-06-03T07:17:28Z",
+  "git_url": "git://github.com/binnisb/RosalindJulia.git",
+  "ssh_url": "git@github.com:binnisb/RosalindJulia.git",
+  "clone_url": "https://github.com/binnisb/RosalindJulia.git",
+  "svn_url": "https://github.com/binnisb/RosalindJulia",
+  "homepage": null,
+  "size": 160,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 2,
+  "forks_count": 0,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 2,
+  "forks": 0,
   "open_issues": 0,
-  "watchers": 3,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 2,
-  "subscribers_count": 3
+  "network_count": 0,
+  "subscribers_count": 1
 }

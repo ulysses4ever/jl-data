@@ -1,0 +1,52 @@
+#extract_spectrograms.jl
+#This script takes audio recordings and dumps the corresponding spectrograms
+#into trainpath, defined in the config file.
+#author: Timothy Evans
+#date: 30/07/14
+
+push!(LOAD_PATH, pwd())
+using DSP, WAV, Winston, DataFrames, Images
+using config, signalprocessing
+
+# Define all relative paths from config.jl. Changes should only be made
+# to config.jl
+if path_rel
+  projdir = pwd()[1:end-3]; #remove src directory
+  specpath = string(projdir,specdir)
+  labelledpath = string(projdir,labelleddir)
+  trainpath = string(projdir,traindir)
+  modelpath = string(projdir,modeldir)
+else
+  specpath = specdir
+  labelledpath = labelleddir
+  trainpath = traindir
+  modelpath = modeldir
+end
+
+
+#= loop through the levels of recording directories. i.e. BSR01/140107/concat/
+ NOTE: this is as per the file structure received from Eric Watson with the
+ Ark in the Park. If structure is different the following nested loop needs to
+ be adapted. =#
+
+fss = Uint[]
+
+for recorder in readdir(wavpath)
+  recdatepath = string(wavpath,recorder,"/")
+  for day in readdir(recdatepath)
+    recpath = string(recdatepath,day,"/concat/")
+    for file in readdir(recpath)
+      filepath = string(recpath,file)
+      rec,fs = wavread(filepath)
+      frec = filterwav(rec,fs)
+      #spectrogram segments will be spaced as per defined speclength
+      segments = 1:fs*speclength:length(frec)
+      specname = string(recorder,"_",day,"_",file[1],"_")
+      dumpspectrograms(frec,segments,trainpath,specname,specwidth)
+    end
+  end
+  push!(fss,fs)
+end
+
+recorderdata = DataFrame(recorders=readdir(wavpath),fsample=fss)
+writetable(string(trainpath,"recorderdata.csv"),recorderdata)

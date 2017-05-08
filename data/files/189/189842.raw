@@ -1,0 +1,123 @@
+module lexer
+include("tools.jl")
+include("numbers.jl")
+
+legacy_regexes = Dict{AbstractString, Regex}(
+    "string" => r"'(^'|'')*'",
+    "item" => r".+[\.:]+|[^\w][\.:]+",
+    "name" => r"[A-Za-z][\w\d]*",
+    "number" => r"[\d_]([\w\d]*(\s*[\d_])?)+",
+    "paren" => r"[()]",
+)
+
+regexes = Dict{AbstractString, Regex}(
+    "string" => r"'([^']|\.)*'",
+    "multistring" => r"'''.*?'''", # The ? is lazy matching
+    "item" => r"[^()']+[\.:]+|[^\w()'][\.:]*",
+    "name" => r"[^!-@\[-`{-~\s][^!-/:-@\[-`{-~]", #Supports unicode
+    "number" => r"[\d_]([\w\d]*(\s*[\d_])?)+",
+    "paren" => r"[()]",
+)
+
+regex_meta_dict = Dict{Bool, Dict{AbstractString, Regex}}(
+    true => legacy_regexes,
+    false => regexes
+)
+
+escape_chars = Dict{Bool, Char}(
+    true => '\'',
+    false => '\\'
+)
+
+legacy_escapes = Dict{Char, Char}(
+    '\'' => '\''
+)
+
+escapes = Dict{Char, Char}(
+    '\\' => '\\',
+    'n' => '\n',
+    '\'' => '\'',
+    '0' => '\0'
+)
+
+escape_dicts = Dict{Bool, Dict{Char, Char}}(
+    true => legacy_escapes,
+    false => escapes
+)
+
+function stripped_string_parser(to_parse::AbstractString, legacy::Bool=false)
+    quote_char = '\''
+
+    return_vector = Vector{Char}()
+    escaped = false
+    escape_char = escape_chars[legacy]
+    escape_dict = escape_dicts[legacy]
+
+    for i in to_parse
+        if !escaped
+            if i == escape_char
+                escaped = true
+            elseif i == quote_char
+                raise("Unescaped quote found in string $to_parse", 0)
+            else
+                push!(return_vector, i)
+            end
+        else
+            push!(return_vector, escape_dict[i])
+            escaped = false
+        end
+    end
+
+    if escaped
+        raise("Escape char at last place of string. $to_parse", 0)
+    end
+
+    return_vector
+end
+
+function generic_string_parser(to_parse::AbstractString,
+    number_of_quotes::Integer, parser_name::AbstractString, legacy::Bool=false)
+    if match(regex_meta_dict[legacy][parser_name], to_parse) === nothing
+        raise(
+            "Trying to parse invalid string: " *
+            "$to_parse (does not match regex)", 0
+        )
+    end
+
+    inner_string = to_parse[1 + number_of_quotes:end - number_of_quotes]
+    stripped_string_parser(inner_string, legacy)
+end
+
+function string_parser(to_parse::AbstractString, legacy::Bool=false)
+    generic_string_parser(to_parse, 1, "string", legacy)
+end
+
+function multistring_parser(to_parse::AbstractString, legacy::Bool=false)
+    if legacy
+        raise("You did not intend to use multistring_parser in legacy mode." *
+              "(If you think otherwise, you are wrong; plain wrong.)", 0)
+    end
+    generic_string_parser(to_parse, 3, "multistring", legacy)
+end
+
+parsers = Dict{AbstractString, Function}(
+    "string" => string_parser,
+    "multistring" => multistring_parser,
+    "number" => numbers.number_parser
+)
+
+function get_tokens(line::AbstractString, legacy::Bool=false)
+    regex_dict = regex_meta_dict[legacy]
+    tokens = []
+    idx = 1
+    while idx <= length(line)
+        for regex in regex_dict
+            if m
+                idx = m.offset
+                new_idx = idx + length(m.match)
+                parse_string(m[idx:idx + length(m.match)])
+            end
+        end
+    end
+end
+end

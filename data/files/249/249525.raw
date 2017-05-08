@@ -1,0 +1,73 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+
+# Internal state of the executor
+immutable TestExecutor <: Executor
+    value::Int
+end
+
+# Define executor callback functions
+function executor_registered(driver::ExecutorDriver, executorInfo::Proto.ExecutorInfo,
+                             frameworkInfo::Proto.FrameworkInfo, slaveInfo::Proto.SlaveInfo)
+    info("Julia: Registered executor on $(slaveInfo.hostname)")
+    info("Julia: Executor value: $(driver.executor.value)")
+end
+
+function executor_reregistered(driver::ExecutorDriver, slaveInfo::Proto.SlaveInfo)
+    info("Julia: Re-registered executor on $(slaveInfo.hostname)")
+end
+
+function executor_disconnected(driver::ExecutorDriver)
+    info("Julia: Executor disconnected")
+end
+
+function executor_launchTask(driver::ExecutorDriver, taskInfo::Proto.TaskInfo)
+    info("Julia: Starting task $(taskInfo.task_id.value)")
+
+    # Send status update
+    taskStatus = @proto Proto.TaskStatus (
+        :task_id => @proto(Proto.TaskID, :value => taskInfo.task_id.value),
+        :state => Proto.TaskState.TASK_RUNNING,
+        :data => "data with a \0 byte".data,
+        :message => "this is a task state"
+    )
+    sendStatusUpdate(driver, taskStatus)
+
+    # This is where one would perform the requested task.
+
+    info("Julia: Finishing task $(taskInfo.task_id.value)")
+    set_field!(taskStatus, :state, Proto.TaskState.TASK_FINISHED)
+    sendStatusUpdate(driver, taskStatus)
+end
+
+function executor_killTask(driver::ExecutorDriver, taskId::Proto.TaskID)
+    info("Julia: Kill task $(taskId.value)")
+end
+
+function executor_frameworkMessage(driver::ExecutorDriver, data::String)
+    info("Julia: Got message: $data")
+    # Send it back to the scheduler.
+    sendFrameworkMessage(driver, data)
+end
+
+function executor_shutdown(driver::ExecutorDriver)
+    info("Julia: Shutting down the executor")
+end
+
+function executor_error(driver::ExecutorDriver, err::String)
+    info("Julia: Got error message: $err")
+end
+
+# Create and start executor
+info("Julia: Start executor")
+executor_cb = ExecutorCallback(TestExecutor(5050),
+                    registered = executor_registered,
+                    reregistered = executor_reregistered,
+                    disconnected = executor_disconnected,
+                    launchTask = executor_launchTask,
+                    killTask = executor_killTask,
+                    frameworkMessage = executor_frameworkMessage,
+                    shutdown = executor_shutdown,
+                    error = executor_error)
+run(executor_cb)

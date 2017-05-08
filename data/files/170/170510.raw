@@ -1,0 +1,32 @@
+#!/usr/bin/julia
+
+using SimpleStats
+using SimpleStats.Comandline
+
+function main()
+  args = Comandline.parse_commandline(["--column", "-c"],
+                           Dict(
+                             :help => "Column to describe.",
+                             :default => "1"
+                             ),
+                           ["--bins", "-b"],
+                           Dict(
+                             :help => "The approximate number of bins that should be used on the histogram",
+                             :default => "10"
+                             ))
+
+  file = args["FILE"]
+
+  data = read_data(file !== nothing ? file : STDIN,
+                   delimiter=args["delimiter"],
+                   missing=args["missing"],
+                   skip=args["skip"])
+
+  col = data[:, parse(Int, args["column"])]
+
+  println("#\t", Base.now(), "\t", file !== nothing ? file : "STDIN", "\n")
+
+  describe_univariate(col, bins=args["bins"], label="X")
+end
+
+main()

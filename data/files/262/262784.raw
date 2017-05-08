@@ -1,0 +1,18 @@
+# Find Pythagorean triplet for which a + b + c = 1000.
+
+function findpythtriplet()
+    for a in 1:998
+        for b in 1:(999 - a)
+            c = 1000 - (a + b)
+            if a^2 + b^2 == c^2
+                return a, b, c
+            end
+        end
+    end
+end
+
+@time res = prod(findpythtriplet())
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

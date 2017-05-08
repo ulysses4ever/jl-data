@@ -1,0 +1,274 @@
+include("Task_algo.jl")
+include("util.jl")
+
+n_x = 2048
+nfreq = 1; 
+
+
+waveletList = [WT.db1,WT.db2,WT.db3,WT.db4,WT.db5,WT.db6,WT.db7,WT.db8,WT.db9] ;
+nWavelet = length(waveletList)
+
+Nnodes =1	 ; 
+
+node_2 = [Nodes(2) for i in 1:Nnodes] ; 
+node_sync = Nodes(40) ; 
+node_dct = Nodes(40) ;
+node = Array(Nodes, 1) ; resize!(node,nfreq) ;
+for i_freq in 1:nfreq
+	index = i_freq%Nnodes +1
+	node[i_freq] = node_2[ index ]  ; 
+end
+#create a canal connection of 10 Gbits/s
+canal = Canal(10.0*1024) 
+
+
+
+#acces the time to compute for each elementary operation :
+nrep = 2
+timeToCompute_B = mean([ ComputeTime_B(n_x) for i in [1:nrep]])
+timeToCompute_X = mean( [ComputeTime_X(n_x) for i in [1:nrep]])
+timeToCompute_Wavelet_compute =  [mean( [Wavelet_compute(n_x,wt ) for i in [1:nrep]]) for wt in waveletList ]
+timeToCOmpute_update = mean([ update_multiplier(n_x) for i in [1:nrep]]) 
+timeToCOmpute_Wavelet_sum = mean([ Wavelet_sum(n_x,nWavelet) for i in [1:nrep]]) 
+timeToCompute_P =  mean([ ComputeTime_P(n_x) for i in [1:nrep]])  ;
+timeToCompute_T  =  mean([ ComputeTime_T(n_x) for i in [1:nrep]]) ;
+timeToCompute_Multiplier = mean([ update_multiplier(n_x) for i in [1:nrep]]) ;
+
+
+
+listTask = {}
+#X term 
+
+
+
+	
+Dependency_X = Dict() ;
+X = Array(ASCIIString,1) ;resize!(X,nfreq) ;
+
+for i_freq in 1:nfreq
+	X = string("X_",i_freq) 
+	Dependency_X = TaskDependancy([( string("B_",i_freq) ,0 )]) ;
+	timeToCompute = timeToCompute_X
+	temp =  Task_algo(X,Dependency_X,1,timeToCompute,node[i_freq]) 
+	push!(listTask,temp)
+
+	B = string("B_",i_freq) 
+	Dependency_B = TaskDependancy([( string("Wavelet_sum_",i_freq) ,0 ),(string("Gamma_P_",i_freq),-1),(string("Gamma_S_",i_freq),-1)  ]) ;
+	timeToCompute =timeToCompute_B
+	temp =  Task_algo(B,Dependency_B,1,timeToCompute,node[i_freq])
+	push!(listTask,temp)
+	
+end
+
+Dependency_Wavelet_sum= Dict() ;
+
+for i_freq in 1:nfreq
+	Wavelet_sum_str = string("Wavelet_sum_",i_freq)  ; 
+	dependency_string=Array((ASCIIString,Int64),1) ; resize!(dependency_string,nWavelet) ;
+	for i_wavelet in [1:nWavelet] 
+		dependency_string[i_wavelet] =( string("Wavelet_compute_transpose_",i_wavelet,"_",i_freq),0 )  ; 
+	end
+	
+	Dependency_Wavelet_sum = TaskDependancy(dependency_string) ;
+	timeToCompute =timeToCOmpute_Wavelet_sum ;
+	temp =  Task_algo(Wavelet_sum_str,Dependency_Wavelet_sum,1,timeToCompute,node[i_freq]) 
+	push!(listTask,temp)	
+end
+
+
+for i_freq in 1:nfreq , i_wavelet in [1:nWavelet]
+	Wavelet_compute_transpose=string("Wavelet_compute_transpose_",i_wavelet,"_",i_freq)  ; 
+	Dependency_Wavelet_compute_transpose = TaskDependancy( [( string("Gamma_T_",i_wavelet,"_",i_freq),-1 ) ] );
+	timeToCompute = timeToCompute_Wavelet_compute[i_wavelet]
+	temp =  Task_algo(Wavelet_compute_transpose,Dependency_Wavelet_compute_transpose,1,timeToCompute,node[i_freq]) 
+	push!(listTask,temp)
+end
+
+
+
+##on ajoute les taches 
+
+
+
+#P term 
+
+
+
+Dependency_P = Dict() ;
+P = [string("P_",i_freq) for i_freq in [1:nfreq] ]
+for i_freq in 1:nfreq
+	P = string("P_",i_freq)  ; 
+	Dependency_P[i_freq] = TaskDependancy( [( string("X_",i_freq) ,0 ),(string("Gamma_P_",i_freq),-1)  ] );
+	timeToCompute = timeToCompute_P ;
+	temp =  Task_algo(P,Dependency_P[i_freq],1,timeToCompute,node[i_freq])  ;
+	push!(listTask,temp) 	;
+end
+
+Dependency_Gamma_P = Dict() ;
+for i_freq in 1:nfreq
+	taskName = string("Gamma_P_",i_freq)
+	Dependency_Gamma_P = TaskDependancy( [( string("X_",i_freq) ,0 ),(string("P_",i_freq),0)  ] ); 	
+	timeToCompute = timeToCompute_Multiplier ;
+	temp =  Task_algo(taskName,Dependency_Gamma_P,1,timeToCompute,node[i_freq]) 
+	push!(listTask,temp) 
+end
+
+
+
+
+
+
+#S term 
+for i_freq in 1:nfreq
+	taskName = string("S_",i_freq) ;
+	Dependency_S = TaskDependancy( [( string("X_",i_freq) ,0 ),(string("transfer_idct_V_Gamma_V"),0)  ] );
+	temp =  Task_algo(taskName,Dependency_S,1,0.01,node[i_freq])  ###A changer
+	push!(listTask,temp) 
+
+	taskName = string("Gamma_S_",i_freq) ;
+	Dependency_Gamma_S_ = TaskDependancy( [( string("S_",i_freq) ,0 ) ] );
+	temp =  Task_algo(taskName,Dependency_S,1,timeToCompute_Multiplier,node[i_freq]) 
+	push!(listTask,temp) 
+
+
+	transfer_S  =  string("transfer_S_",i_freq) ;
+	Dependency_transfer_S_ = TaskDependancy( [( string("S_",i_freq) ,0 ) ] );
+	temp =  DataTransfer(transfer_S,Dependency_transfer_S_,1,n_x*n_x*64.0/(1024*1024),canal) ; 
+	push!(listTask,temp) 
+
+
+
+end
+
+#tout les transfert de S doivent être effectué :
+transfer_S  =  string("transfer_S") ;
+Dependency_transfer_S= Array((ASCIIString,Int64),1) ; resize!(Dependency_transfer_S,nfreq) ;
+for i_freq in [1:nfreq]
+	Dependency_transfer_S[i_freq] = ( string("transfer_S_",i_freq) ,0 ) ;
+end
+Dependency_transfer_S = TaskDependancy(Dependency_transfer_S) ;
+temp =  Task_algo(transfer_S,Dependency_transfer_S,1,0.001,node_sync) ; 
+push!(listTask,temp)
+
+
+
+#V term 
+
+
+taskName = "transfer_idct_V_Gamma_V" ;
+dependency_string=Array((ASCIIString,Int64),1) ; resize!(dependency_string,nfreq) ;
+for i_freq in 1:nfreq
+	dependency_string[i_freq] = ( string("transfer_idct_V_Gamma_V_",i_freq) ,0) ; 
+end
+Dependency_transfer_V=TaskDependancy(dependency_string);
+temp =  Task_algo(taskName,Dependency_transfer_V,1,0.001,node_sync) ; 
+push!(listTask,temp) ;
+
+
+
+dependency_string=Array((ASCIIString,Int64),1) ; resize!(dependency_string,nfreq) ;
+for i_freq in 1:nfreq
+	taskName = string("transfer_idct_V_Gamma_V_",i_freq) ;
+	dependency_string[i_freq] = ( string("Gamma_V_",i_freq) ,-1) ;
+	Dependency_transfer_V=TaskDependancy(dependency_string);
+	temp =  DataTransfer(taskName,Dependency_transfer_V,1,n_x*n_x*64.0/(1024*1024),canal) ; 
+	push!(listTask,temp)
+ 
+end
+
+
+dependency_string=Array((ASCIIString,Int64),1) ; resize!(dependency_string,nfreq) ;
+for i_freq in 1:nfreq
+dependency_string[i_freq] = ( string("Gamma_V_",i_freq) ,-1) ;
+end 
+
+for i_freq in 1:nfreq
+	taskName = string("compute_idct_V_Gamma_V_",i_freq) ;	
+	Dependency_transfer_V=TaskDependancy(dependency_string);
+	temp =  Task_algo(taskName,Dependency_transfer_V,1,0.01,node_dct) ;
+	push!(listTask,temp)
+ 
+end
+
+
+
+#Gamma_V
+for i_freq in 1:nfreq
+	taskName = string("Gamma_V_",i_freq) ;
+	dependency_string= [( string("compute_dct_S") ,0) ];
+	Dependency_compute_Gamma_V=TaskDependancy(dependency_string);
+	temp =  Task_algo(taskName,Dependency_compute_Gamma_V,1,timeToCompute_Multiplier,node_dct) ; 
+	push!(listTask,temp) ;
+ 
+end
+
+
+
+#compute_dct_S
+for i_freq in 1:nfreq
+	taskName = string("compute_dct_S_",i_freq) ;
+	dependency_string= [( string("transfer_S_",i_freq) ,0) ];
+	Dependency_compute_Gamma_V=TaskDependancy(dependency_string);
+	temp =  Task_algo(taskName,Dependency_compute_Gamma_V,1,timeToCompute_Multiplier,node_dct) ; 
+	push!(listTask,temp) ;
+ 
+end
+
+
+#compute_dct_S
+
+	taskName = string("compute_dct_S") ;
+	dependency_string=Array((ASCIIString,Int64),1) ; resize!(dependency_string,nfreq) ;
+
+	for i_freq in 1:nfreq
+	dependency_string[i_freq]= ( string("compute_dct_S_",i_freq) ,0) ;
+	end
+	Dependency_compute_Gamma_V=TaskDependancy(dependency_string);
+	temp =  Task_algo(taskName,Dependency_compute_Gamma_V,1,0.001,node_sync) ; 
+	push!(listTask,temp) ;
+ 
+
+
+
+#T term 
+
+for i_wavelet in [1:nWavelet] , i_freq in [1:nfreq]
+
+	Gamma_T =  string("Gamma_T_",i_wavelet,"_",i_freq)  ;
+	Dependency_Gamma_T = TaskDependancy( [(string("T_",i_wavelet,"_",i_freq) ,0 ) ] );
+	temp =  Task_algo(Gamma_T,Dependency_Gamma_T,1,timeToCompute_Multiplier,node[i_freq])  ;  
+	push!(listTask,temp) 
+
+	T = string("T_",i_wavelet,"_",i_freq)   ; 
+	Dependency_T  = TaskDependancy( [ (string("Wavelet_compute_",i_wavelet,"_",i_freq),0 ) ] );
+	temp =  Task_algo(T,Dependency_T,1,timeToCompute_T,node[i_freq])  ;  
+	push!(listTask,temp)
+
+	Wavelet_compute_str=string("Wavelet_compute_",i_wavelet,"_",i_freq)  ; 
+	Dependency_Wavelet_compute  = TaskDependancy( [ ( string("X_",i_freq) ,0 ) ] );
+	temp =  Task_algo(Wavelet_compute_str,Dependency_Wavelet_compute,1,timeToCompute_Wavelet_compute[i_wavelet],node[i_freq])  ;  
+	push!(listTask,temp)
+
+end
+
+
+
+shuffle!(listTask) ;
+
+etat = State() ;
+for a in  listTask
+	i = a.taskName ; 
+    etat.states[i] = DictChannel() 
+    put!(etat.states[i],0,true) ; 
+end
+
+
+
+
+N_max= 6
+for t in listTask
+	@async begin 
+		eventloop(t,etat,N_max);
+	end 
+end
+

@@ -1,0 +1,27 @@
+
+export enable_debug_show, disable_debug_show, can_debug_show
+export @debug_show
+
+b_debug_show = true
+
+function enable_debug_show(flag::Bool = true)
+  global b_debug_show = flag
+end
+disable_debug_show(flag::Bool = true) = enable_debug_show(!flag)
+can_debug_show() = b_debug_show
+
+## modified version of Base.@show in base/show.jl
+macro debug_show(exs...)
+  if can_debug_show()
+    blk = Expr(:block)
+    for ex in exs
+        push!(blk.args, :(println(debug_output(), $(sprint(Base.show_unquoted,ex)*" => "),
+                                  repr(begin value=$(esc(ex)) end))))
+    end
+    if !isempty(exs); push!(blk.args, :value); end
+    return blk
+  else
+    :nothing
+  end
+end
+

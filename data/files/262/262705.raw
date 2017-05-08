@@ -1,0 +1,16 @@
+# Sum of digits of 2^1000
+
+function sumofdigits(x::BigInt)
+    sum = 0
+    while x != 0
+        sum += x % 10
+        x = div(x, 10)
+    end
+    return sum
+end
+
+@time res = sumofdigits(BigInt(2)^1000)
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

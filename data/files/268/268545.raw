@@ -1,0 +1,27 @@
+###################################################
+## Imports the system data
+###################################################
+
+using DataFrames
+
+function import_compatibility_matrix()
+  compatibility_matrix = readdlm("../data/compatibility_matrix.txt")
+  n = size(compatibility_matrix)[1]
+  return compatibility_matrix, n
+end
+
+function import_types()
+  types_data = readtable("../data/types.txt");
+  agents = [agent_from_df(df, i) for i in 1:size(df)[1]]
+end
+
+function import_node_types()
+  node_types::Array{AbstractString,1} = readdlm("../data/node_types.txt")[:,1]
+  return node_types
+end
+
+function import_data()
+  matrix, n = import_compatibility_matrix()
+  nodeTypes = import_node_types()
+  return TypeGraph(matrix, nodeTypes)
+end

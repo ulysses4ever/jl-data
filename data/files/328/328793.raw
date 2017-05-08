@@ -1,0 +1,57 @@
+export Request
+
+# exported
+
+type Request
+    method::String
+    path::String
+    headers::Dict{String, String}
+    data::String
+
+    Request() = new("", "", (String=>String)[], "")
+end
+
+Request(socket::TcpSocket) = create(socket)
+
+# NOT exported
+
+function create(socket::TcpSocket)
+    local request   = Request(),
+          re_header = r"^(.+?):(.+)$",
+          re_trim   = r"^\s+|\s+$"
+
+    # parse incoming request
+    local data = readavailable(socket),
+          m    = match(r"^((?i)^.+?http.+?)\r\n(.+)\r\n\r\n(.*)$"ms, data)
+
+    if RegexMatch != typeof(m)
+        log(ERROR, "failed to parse request (data len: " * string(length(data)) * ")")
+        return
+    end
+
+    local start   = m.captures[1],
+          headers = split(m.captures[2], "\r\n")
+          body    = m.captures[3]
+
+    # parse method / path
+    local s = match(r"^(.+?) (.+?) .+?$", start)
+
+    request.method = uppercase(s.captures[1])
+    request.path   = s.captures[2]
+
+    # parse headers
+    for header = headers
+        if -1 == search(header, ":")
+            continue
+        end
+
+        local h = match(re_header, header)
+
+        local hname  = lowercase(replace(h.captures[1], re_trim, "")),
+              hvalue = replace(h.captures[2], re_trim, "")
+
+        request.headers[hname] = hvalue
+    end
+
+    request
+end

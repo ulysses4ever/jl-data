@@ -1,0 +1,40 @@
+DATADIR = "../../../data"
+OUTDIR = "../../output"
+
+DATAFILE = joinpath(DATADIR, "experiment01.txt")
+OUTFILE01 = joinpath(OUTDIR, "experiment01/r_strata_given_x.txt")
+OUTFILE02 = joinpath(OUTDIR, "experiment01/s_strata_given_x.txt")
+
+data = readdlm(DATAFILE, has_header=true)
+npoints, nsignals = size(data[1])
+
+xextrema = extrema(data[1][:,1])
+nxsteps = 30
+xstep = (xextrema[2]-xextrema[1])/nxsteps
+xrange = xextrema[1]:xstep:xextrema[2]
+
+for j = 2:nsignals
+  stream = open(joinpath(OUTDIR, @sprintf("experiment01/column%02d_strata_given_column01.txt", j)), "w+")
+
+  for i = 1:npoints
+    stratifying, k = true, 1
+
+    while stratifying
+      if 1 <= k < nxsteps
+        if xrange[k] <= data[1][i, j] < xrange[k+1]
+          @printf(stream, "%d\n", k)
+          stratifying = false
+        else
+          k += 1
+        end
+      elseif k == nxsteps
+        if xrange[k] <= data[1][i, j] <= xrange[k+1]
+          @printf(stream, "%d\n", k)
+          stratifying = false
+        end
+      end
+    end
+  end
+
+  close(stream)
+end

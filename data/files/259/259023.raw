@@ -1,0 +1,110 @@
+
+#=
+    converts string into an array of characters to enable
+    easy extraction of characters between positions
+    =#
+
+function string2chars(string)
+    chars = Char[]
+
+    for i = 1:endof(string)
+        try
+            s = string[i]
+            push!(chars, s)
+        catch
+            # nothing here, move along please
+        end
+    end
+    return chars
+end
+
+#=
+    extracts a field value from a string and converts it to
+    the required datatype.  A date format can be supplied
+    that describes the position of each component.
+    =#
+
+function extractasstring(row::Array{Char,1},col::FixedWidthColumn)
+    value = match(r"^\s*(.*)\s*$",bytestring(wstring(row[col.start:col.finish]))).captures[1]
+    "NA" == value ? NA : value
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn,::Type{String},callfunc=true)
+    value = extractasstring(row,col)
+    callfunc ? col.func(value) : value
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn,::Type{Integer})
+    value = extractasstring(row,col)
+    value = "" == value ? NA : int(value)
+    isna(value) ? NA : col.func(value)
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn,::Type{Float64})
+    value = extractasstring(row,col)
+    value = "" == value ? NA : parse(Float64,value)
+    isna(value) ? value : col.func(value)
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn)
+    (col.start==0 || col.finish == 0) ? NA :  extractfield(row,col,col.datatype)
+end
+
+
+function readdictfile(dct_name::String)
+
+    typemap = Dict{String,DataType}([("byte",Integer),("int",Integer),("long",Integer),("float", Float64),("double", Float64)])
+    varinfo = (String => FixedWidthColumn)[]
+    
+   
+    for line in eachline(open(dct_name))
+        m = match(r"_column\(([^)]*)\)",line)
+        if m == nothing
+        else
+            start = "" == m.captures[1] ? NA : int(m.captures[1])
+            t = split(line)
+            strvtype, name, fstring = t[2:4]
+            name = lowercase(name)
+            vtype = haskey(typemap,strvtype) ? typemap[strvtype] : String
+            finish = start + int(match(r"%(\d+)\w",fstring).captures[1]) - 1
+            longdesc = join(t[5:end]," ")
+            varinfo[name] = FixedWidthColumn(start, vtype, name, fstring, longdesc, finish)
+        end
+    end
+    return varinfo
+end
+
+function readdatafile(dct_name::String, dat_name::String,func::Function)
+    
+    # create an array of FixedWidthColumn from dictionary file
+    columns = readdictfile(dct_name)
+
+    # create a DataFrame from the zip file using dct
+    datatypes=DataType[]
+    colnames=Symbol[]
+
+    for column in columns
+        push!(datatypes, column[2].datatype)
+        push!(colnames, symbol(column[2].name))
+    end
+
+    df = DataFrame(datatypes, colnames,0)
+
+    iter=eachline(GZip.gzopen(dat_name))
+    state=start(iter)
+
+    while true
+        (row,state) = next(iter,state)
+        done(iter,state) && break
+
+        rowchars = string2chars(row)
+        data=Any[]
+        for column in columns
+            push!(data,extractfield(rowchars,column[2]))
+        end
+        push!(df,data)
+
+    end
+    return df
+end
+

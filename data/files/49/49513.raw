@@ -1,0 +1,32 @@
+# Convex Hulls
+
+"""
+Implements Graham's method for the convex hull of points in the plane.
+"""
+function graham_scan{T}(pts::Array{T,2})
+    # todo: at least 3 distinct points are required
+    pts = pts[sortperm(pts[:,1]),:];
+    n = size(pts,1);
+    # upper hull
+    U = Array(Int,0);
+    sizehint!(U,round(Int,length(pts)/2));
+    push!(U,1);
+    push!(U,2);
+    for i = 3:n
+        while size(U,1)>=2 && orient(pts[[i,U[end],U[end-1]],:]) <= 0
+            pop!(U);
+        end
+        push!(U,i);
+    end
+    L = Array(Int,0);
+    sizehint!(L, round(Int, length(pts)/2));
+    push!(L,1);
+    push!(L,2);
+    for i = 3:n
+        while size(L,1)>=2 && orient(pts[[L[end-1],L[end],i],:]) <= 0.0
+            pop!(L)
+        end
+        push!(L,i);
+    end
+    return vcat(L[1:(end-1)],flipdim(U,1)[1:(end-1)]);
+end

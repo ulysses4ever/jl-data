@@ -1,0 +1,101 @@
+path = "Projects/Julia_SVM_Spam_Classifier"
+email_example = "$(path)/emailSample5.txt"
+vocab_file = "$(path)/vocab.txt"
+
+email_features = processEmail(email_example, vocab_file, false)
+pred, deci = svmpredict(model, email_features)
+
+println("Processed: $(email_example)")
+println("Spam Classification: $(pred)")
+println("(1 indicates spam, 0 indicates not spam)")
+
+
+
+# ---------------------------------------------------------
+raw_training_data = matread("$(path)/spamTrain.mat")
+
+X = raw_training_data["X"]
+y = raw_training_data["y"]
+
+# Getting own data
+raw_non_spam_path = "$(path)/raw_data/easy_ham/"
+raw_spam_path = "$(path)/raw_data/spam/"
+
+vocab_file = "$(path)/vocab.txt"
+vocab = readtable(vocab_file, separator = '\t')
+
+X_spam, y_spam = get_data(raw_spam_path, 1, vocab)
+X_non_spam, y_non_spam = get_data(raw_non_spam_path, 0, vocab)
+
+# combine spam and non-spam data
+X_ordered = [X_spam; X_non_spam]
+y_ordered = [y_spam; y_non_spam]
+
+# mix data
+rand_idx = randperm(size(y_ordered, 1))
+
+X = X_ordered[rand_idx, :]
+y = y_ordered[rand_idx, :]
+
+# split data - 70/30
+train_end = floor(size(y, 1) * 0.7)
+X_train = X[1:train_end, :]
+y_train = y[1:train_end, :]
+
+X_test = X[train_end + 1:end, :]
+y_test = y[train_end + 1:end, :]
+
+# run modelling......
+# prepare the data for LIBSVM
+instances = X_train[:, 1:end]'
+instances_test = X_test[:, 1:end]'
+labels = y_train[1:end]
+labels_test = y_test[1:end]
+
+# train the SVM
+# kernel_type --> Linear - 0, Sigmoid - 3, RBF(default) - 2
+model = svmtrain(labels, instances, C = 0.1, kernel_type = int32(0))
+
+# check the trained model against the training data
+(pred, deci) = svmpredict(model, instances)
+println("Training - Accuracy: $(mean((pred .== labels))*100)")
+
+# check the trained model against the testing data
+(pred_test, deci_test) = svmpredict(model, instances_test)
+println("Testing - Accuracy: $(mean((pred_test .== labels_test))*100)")
+
+
+# classify a bunch of emails and sort them apart
+testing_path = "$(path)/testing_20_15/"
+
+testing_files = readdir(testing_path)
+
+vocab_file = "$(path)/vocab.txt"
+
+# process each email.
+counter_spam = 0
+counter_non_spam = 0
+
+path_spam = "$(testing_path)/spam/"
+path_non_spam = "$(testing_path)/non-spam/"
+
+for f = 1:size(testing_files, 1)
+
+  file = "$(testing_path)/$(testing_files[f])"
+
+  email_features = processEmail("$(testing_path)/$(testing_files[f])", vocab_file, true)
+  pred, deci = svmpredict(model, email_features)
+
+  #println("Spam Classification: $(pred == [1.0] ? "spam" : "non-spam")")
+  pred == [1.0] ? counter_spam += 1 : counter_non_spam += 1
+
+  new_file = "$(pred == [1.0] ? path_spam : path_non_spam)/$(testing_files[f])"
+
+  mv(file, new_file)
+
+end
+
+println("Spam:\t\t$(counter_spam)[15]\nNon-Spam:\t$(counter_non_spam)[20]")
+
+
+

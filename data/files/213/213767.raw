@@ -1,0 +1,142 @@
+## ====================================================================
+## nelder_mead.jl - julia tokyo #5 hands-on code
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## ====================================================================
+"""
+Nelder-Mead algorithm
+
+    nelder_mead(f, x0, n)
+
+Arguments
+---------
+
+*  `f`: target function to optimize
+* `x0`: initial value
+*  `n`: number of iterations
+
+See http://www.scholarpedia.org/article/Nelder-Mead_algorithm for the details.
+"""
+function nelder_mead(f, x0, n)
+    # initialize simplex
+    d = length(x0)
+    simplex = Vector{Float64}[x0]
+#    fvalues = [f(x0)]
+    fvalues::Vector{Float64} = [f(x0)]
+    
+    for j in 1:d
+        dx = zeros(x0)
+        dx[j] = 1
+        x = x0 + dx
+        push!(simplex, x)
+        push!(fvalues, f(x))
+    end
+
+    # sort vertices
+    order = sortperm(fvalues)
+    simplex = simplex[order]
+    fvalues = fvalues[order]
+
+    # start "amoeba optimization"
+    for i in 1:n
+        # l: lowest vertex
+        # s: second highest vertex
+        # h: highest vertex
+        f_l = fvalues[1]
+        f_s = fvalues[end-1]
+        x_h = simplex[end]
+        f_h = fvalues[end]
+        c = centroid(simplex)
+        x_r = c + alpha * (c - x_h)
+        f_r = f(x_r)
+        if f_l <= f_r < f_s
+            # Reflect
+            simplex[end] = x_r
+        elseif f_r < f_l
+            # Expand
+            x_e = c + gamma * (x_r - c)
+            f_e = f(x_e)
+            if f_e < f_r
+                simplex[end] = x_e
+            else
+                simplex[end] = x_r
+            end
+        elseif f_r >= f_s
+            # Contract
+            if f_s <= f_r < f_h
+                x_c = c + beta * (x_r - c)
+                f_c = f(x_c)
+                if f_c <= f_r
+                    simplex[end] = x_c
+                else
+                    simplex = shrink(simplex)
+                end
+            elseif f_r >= f_h
+                x_c = c + beta * (x_h - c)
+                f_c = f(x_c)
+                if f_c < f_h
+                    simplex[end] = x_c
+                else
+                    simplex = shrink(simplex)
+                end
+            else
+                simplex = shrink(simplex)
+            end
+        else
+            simplex = shrink(simplex)
+        end
+        # sort vertices
+        fvalues = [f(x) for x in simplex]
+        order = sortperm(fvalues)
+        simplex = simplex[order]
+        fvalues = fvalues[order]
+    end
+
+    # return the location of the lowest vertex
+    return simplex[1]
+end
+
+# the parameters of transformations
+alpha = 1
+beta  = 1/2
+gamma = 2
+delta = 1/2
+
+# the centroid of the best side
+function centroid(simplex)
+    c = zeros(simplex[1])
+    for x in simplex[1:end-1]
+        c += x
+    end
+    return c / (length(simplex) - 1)
+end
+
+# shrink all vertices except the lowest one
+function shrink(simplex)
+    x_l = simplex[1]
+    for j in 2:endof(simplex)
+        x_j = simplex[j]
+        simplex[j] = x_l + delta * (x_j - x_l)
+    end
+    return simplex
+end
+
+# Rosenblock function
+function rosenblock(x)
+    a = 1
+    b = 100
+    fval = 0.0
+    for i in 1:div(length(x), 2)
+        fval += (a - x[2i-1])^2 + b * (x[2i] - x[2i-1]^2)^2
+    end
+    return fval
+end
+
+
+if !isinteractive()
+    srand(12345)
+    x0 = randn(20)
+    @show nelder_mead(rosenblock, x0, 100000)
+    @time nelder_mead(rosenblock, x0, 100000)
+    @time nelder_mead(rosenblock, x0, 100000)
+    @time nelder_mead(rosenblock, x0, 100000)
+end

@@ -1,0 +1,57 @@
+include("jb2048.jl")
+include("dag2048.jl")
+# julia set working module
+ifrozen,ifree=[],1:9
+itarget,ixtarget=1,[1,2,4]
+targetmin,targetmax=5,7
+b=[1 1 0; 0 0 0; 0 0 0]
+@time db=newdag(b)
+λ,μ=length(maxdag),length(meandag)
+exp(log(λ)/8)
+db.proba
+
+g=Game(b);play!(g,display=true)
+jb2048.play!(g,display=true,moves=1)
+    MaxNode(g.board)
+play!(g,display=true,moves=1)
+    MaxNode(g.board)
+
+node=MaxNode(g.board)
+node.child
+
+play!(g,display=true)
+jb2048.play!(g,display=true)
+g.board=phase3
+
+ifrozen,ifree=1,2:9
+itarget,ixtarget=4,[2,4,5,7]
+@time db2=MaxNode(g.board)
+
+ifrozen,ifree=[1,4],[2:3;5:9]
+itarget,ixtarget=[2,5,7,8],[2,5,7,8]
+@time db3=MaxNode(g.board)
+
+phase3=copy(g.hist[i][1])
+i=-24
+i-=1;plot(g.hist[i]...)
+i+=1;plot(g.hist[i]...)
+jb2048.back!(g,i)
+jb2048.force!(g,2)
+h=MaxNode(g.hist[i][1])
+h.child
+
+r=repartition(b,1000)
+mean(r[2])
+
+state=start(maxdag)
+(key,node),state=next(maxdag,state);state,node
+begin
+    while !done(maxdag,state)
+        (key,node),state=next(maxdag,state)
+        b=node.board
+        maximum(b[ifree])==3 && break
+    end
+    plot(node.board,0,node.height)
+    state,node
+end
+node.child

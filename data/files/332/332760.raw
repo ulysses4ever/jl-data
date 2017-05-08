@@ -1,0 +1,391 @@
+module Config
+
+type Type_Config_Values
+
+    logic_network::Bool
+
+    num_generations::Int32
+    population_size::Int32
+    generations_per_target_switch::Int32
+    births_and_deaths_per_generation::Int32
+    breeding_tournament_size::Int32
+
+    max_threshold::Int32
+    min_threshold::Int32
+    max_weight::Int32
+    min_weight::Int32
+    max_num_connections::Int32
+    min_num_connections::Int32
+    network_timesteps::Int32
+    initial_max_num_connections::Int32
+    initial_min_num_connections::Int32
+    initial_num_nodes::Int32
+    max_num_nodes::Int32
+    min_num_nodes::Int32
+
+    use_global_mutation_rate::Bool
+
+    mutate_dup_del_prob::Float32
+    max_num_dups_or_dels::Float32
+    min_num_dups_or_dels::Int32
+    mutate_conn_prob::Float32
+    max_num_conn_muts::Int32
+    min_num_conn_muts::Int32
+    mutate_activation_prob::Float32
+    max_num_activation_muts::Int32
+    min_num_activation_muts::Int32
+    mutate_truth_table_prob::Float32
+    max_num_tt_muts::Int32
+    min_num_tt_muts::Int32
+    delete_conn_prob::Float32
+    max_num_conn_dels::Int32
+    min_num_conn_dels::Int32
+    add_conn_prob::Float32
+    max_num_conn_adds::Int32
+    min_num_conn_adds::Int32
+    mutate_threshold_prob::Float32
+    max_num_thresh_muts::Int32
+    min_num_thresh_muts::Int32
+    mutate_weight_prob::Float32
+    max_num_weight_muts::Int32
+    min_num_weight_muts::Int32
+
+    global_weight_mutation_rate::Float32
+    global_mutation_rate::Float32
+
+    use_sim::Bool
+    wall_avoidance_objective::Bool
+    waypoint_collection_walls::Array{Float32, 1}
+    single_island_walls::Array{Float32, 1} 
+    double_island_walls::Array{Float32, 1}     
+    waypoints_1::Array{Float32, 1}
+    waypoints_2::Array{Float32, 1}
+    num_hidden_nn_nodes::Int32
+    num_input_nn_nodes::Int32
+    num_output_nn_nodes::Int32
+    simulation_iterations::Int32
+    bits_per_weight::Int32
+
+    enforce_point_attractors::Bool
+    GRN_target_expressions::Array{Float32, 2}
+
+    logic_network_inputs::Array{Bool, 2}
+    logic_network_outputs::Array{Bool, 2}
+    transitions::Array{Int32, 2}
+    stop_condition_target::Int32
+    use_stop_condition_target::Bool
+
+    scikit_writing::Bool
+    scikit_data_filename::String
+    scikit_fitnesses_filename::String
+    scikit_labels_filename::String
+
+    density_sampling::Bool
+    num_samples::Int32
+
+    feed_forward::Bool
+    nodes_per_level::Int32
+
+    print_times::Array{Int32, 1}
+    num_experiment_repetitions::Int32
+    experiment_printing::Bool
+    print_on_target_switch::Bool
+    interval_printing::Bool
+    fixed_interval_printing::Bool
+    fixed_interval_printing_interval::Int32
+    randomize_targets::Bool
+
+    Type_Config_Values() = new(
+
+    #=If not a logic network, then a GRN=#
+    #=logic_network=# true,
+                               
+    #=GA parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=num_generations=# 50000,
+    #=population_size=# 1000,                               
+    #=generations_per_target_switch=# 10,
+    #=births_and_deaths_per_generation=# 1000,
+    #=breeding_tournament_size=# 10,
+
+    #=network parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=max_threshold=# -2,
+    #=min_threshold=# -2,
+    #=max_weight=# -1,
+    #=min_weight=# -1,
+    #=max_num_connections=# 2,
+    #=min_num_connections=# 2,
+    #=network_timesteps=# 6,
+    #=initial_max_num_connections=# 2,
+    #=initial_min_num_connections=# 2,
+    #=initial_num_nodes=# 20,
+    #=max_num_nodes=# 20,
+    #=min_num_nodes=# 20,
+    #=use_global_mutation_rate=# true,
+
+    #=Varied Mutation Rate Parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=mutate_dup_del_prob=# 0.0,
+    #=max_num_dups_or_dels=# 1,
+    #=min_num_dups_or_dels=# 1,
+    #=mutate_conn_prob=# 0.0,
+    #=max_num_conn_muts=# 1,
+    #=min_num_conn_muts=# 1,
+    #=mutate_activation_prob=# 0.2,
+    #=max_num_activation_muts=# 2,
+    #=min_num_activation_muts=# 1,
+    #=mutate_truth_table_prob=# 0.3,
+    #=max_num_tt_muts=# 1,
+    #=min_num_tt_muts=# 1,
+    #=delete_conn_prob=# 0.2,
+    #=max_num_conn_dels=# 2,
+    #=min_num_conn_dels=# 1,
+    #=add_conn_prob=# 0.2,
+    #=max_num_conn_adds=# 2,
+    #=min_num_conn_adds=# 1,
+    #=mutate_threshold_prob=# 0.2,
+    #=max_num_thresh_muts=# 2,
+    #=min_num_thresh_muts=# 1,
+    #=mutate_weight_prob=# 0.2,
+    #=max_num_weight_muts=# 2,
+    #=min_num_weight_muts=# 1,
+    
+    #=Global Mutation Rate Parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=global_weight_mutation_rate=# 0.05,
+    #=global_mutation_rate=# 0.05,
+
+
+    #=Simulation parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=use_sim=# false,
+    #=If not wall avoidance, then waypoint collection is performed=# 
+    #=wall_avoidance_objective=# false,
+    #=waypoint_collection_walls=# [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 0), convert(Float32, 0), convert(Float32, 200),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 200), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 200), convert(Float32, 200),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 400), 
+               convert(Float32, 400), convert(Float32, 400), convert(Float32, 0), convert(Float32, 200),],
+    #=single_island_walls=#  [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 0), convert(Float32, 0), convert(Float32, 200),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 200), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 200), convert(Float32, 200),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 400), 
+               convert(Float32, 400), convert(Float32, 400), convert(Float32, 0), convert(Float32, 200),
+    
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 100), 
+               convert(Float32, 100), convert(Float32, 100), convert(Float32, 50), convert(Float32, 150),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 300), 
+               convert(Float32, 300), convert(Float32, 300), convert(Float32, 50), convert(Float32, 150),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 50), 
+               convert(Float32, 100), convert(Float32, 300), convert(Float32, 50), convert(Float32, 50),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 150), 
+               convert(Float32, 100), convert(Float32, 300), convert(Float32, 150), convert(Float32, 150),],
+    #=double_island_walls=# [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 0), convert(Float32, 0), convert(Float32, 200),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 200), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 200), convert(Float32, 200),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 400), 
+               convert(Float32, 400), convert(Float32, 400), convert(Float32, 0), convert(Float32, 200),
+
+               convert(Float32, 200), convert(Float32, -200), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 200), convert(Float32, 0), convert(Float32, 200),],
+    
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 50), 
+               # convert(Float32, 50), convert(Float32, 50), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 150), 
+               # convert(Float32, 150), convert(Float32, 150), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 50), 
+               # convert(Float32, 50), convert(Float32, 150), convert(Float32, 50), convert(Float32, 50),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 150), 
+               # convert(Float32, 50), convert(Float32, 150), convert(Float32, 150), convert(Float32, 150),],
+
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 250), 
+               # convert(Float32, 250), convert(Float32, 250), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 350), 
+               # convert(Float32, 350), convert(Float32, 350), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 50), 
+               # convert(Float32, 250), convert(Float32, 350), convert(Float32, 50), convert(Float32, 50),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 150), 
+               # convert(Float32, 250), convert(Float32, 350), convert(Float32, 150), convert(Float32, 150),],
+    #=waypoints_1=# [250, 10,  
+                          300, 10,
+                          350, 10,
+                          390, 10,
+                          390, 50,
+                          390, 100,
+                          390, 150, 
+                          390, 190,],
+    #=waypoints_2=# [150, 10,  
+                          100, 10,
+                          50, 10,
+                          10, 10,
+                          10, 50,
+                          10, 100,
+                          10, 150, 
+                          10, 190,],
+    #=num_hidden_nn_nodes=# 3,
+    #=num_input_nn_nodes=# 2,
+    #=num_output_nn_nodes=# 2,
+    #=simulation_iterations=# 250,
+    #=bits_per_weight=# 5,
+
+                           
+    #=GRN parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=enforce_point_attractors=# false,
+    #=GRN_target_expressions=# [0 1 1 1 0 0 1 0 0 1 1 1 0 0 1 0 1 1 0 1;
+                                0 0 1 1 0 1 1 1 0 0 1 1 0 1 1 1 0 1 0 0],
+
+    #=Logic Network Parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=#=logic_network_inputs=# [0 0 0 0 0 0; 
+                              0 0 0 0 0 1; 
+                              0 0 0 0 1 0; 
+                              0 0 0 0 1 1; 
+                              0 0 0 1 0 0; 
+                              0 0 0 1 0 1; 
+                              0 0 0 1 1 0; 
+                              0 0 0 1 1 1;
+                              0 0 1 0 0 0;
+                              0 0 1 0 0 1; 
+                              0 0 1 0 1 0; 
+                              0 0 1 0 1 1; 
+                              0 0 1 1 0 0; 
+                              0 0 1 1 0 1; 
+                              0 0 1 1 1 0; 
+                              0 0 1 1 1 1;
+                              0 1 0 0 0 0; 
+                              0 1 0 0 0 1; 
+                              0 1 0 0 1 0; 
+                              0 1 0 0 1 1; 
+                              0 1 0 1 0 0; 
+                              0 1 0 1 0 1; 
+                              0 1 0 1 1 0; 
+                              0 1 0 1 1 1;
+                              0 1 1 0 0 0;
+                              0 1 1 0 0 1; 
+                              0 1 1 0 1 0; 
+                              0 1 1 0 1 1; 
+                              0 1 1 1 0 0; 
+                              0 1 1 1 0 1; 
+                              0 1 1 1 1 0; 
+                              0 1 1 1 1 1;
+                              1 0 0 0 0 0; 
+                              1 0 0 0 0 1; 
+                              1 0 0 0 1 0; 
+                              1 0 0 0 1 1; 
+                              1 0 0 1 0 0; 
+                              1 0 0 1 0 1; 
+                              1 0 0 1 1 0; 
+                              1 0 0 1 1 1;
+                              1 0 1 0 0 0;
+                              1 0 1 0 0 1; 
+                              1 0 1 0 1 0; 
+                              1 0 1 0 1 1; 
+                              1 0 1 1 0 0; 
+                              1 0 1 1 0 1; 
+                              1 0 1 1 1 0; 
+                              1 0 1 1 1 1;
+                              1 1 0 0 0 0; 
+                              1 1 0 0 0 1; 
+                              1 1 0 0 1 0; 
+                              1 1 0 0 1 1; 
+                              1 1 0 1 0 0; 
+                              1 1 0 1 0 1; 
+                              1 1 0 1 1 0; 
+                              1 1 0 1 1 1;
+                              1 1 1 0 0 0;
+                              1 1 1 0 0 1; 
+                              1 1 1 0 1 0; 
+                              1 1 1 0 1 1; 
+                              1 1 1 1 0 0; 
+                              1 1 1 1 0 1; 
+                              1 1 1 1 1 0; 
+                              1 1 1 1 1 1;],=#
+
+                             [0 0 0 0; 
+                              0 0 0 1; 
+                              0 0 1 0; 
+                              0 0 1 1; 
+                              0 1 0 0; 
+                              0 1 0 1; 
+                              0 1 1 0; 
+                              0 1 1 1;
+                              1 0 0 0;
+                              1 0 0 1; 
+                              1 0 1 0; 
+                              1 0 1 1; 
+                              1 1 0 0; 
+                              1 1 0 1; 
+                              1 1 1 0; 
+                              1 1 1 1;],
+                              
+     #=#=logic_network_outputs=# [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+                                0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0; 
+                                0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0; 
+                                0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0; 
+                                0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 
+                                0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0; 
+                                0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0; 
+                                0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0;], =#
+                                [0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0;
+                                0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0; 
+                                0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0; 
+                                1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1;
+                                0 0 0 0 1 0 0 1 1 0 0 1 0 0 0 0; 
+                                1 0 0 1 1 1 1 1 1 1 1 1 1 0 0 1; 
+                                1 1 1 1 1 0 0 1 1 0 0 1 1 1 1 1; 
+                                1 0 0 1 0 0 0 0 0 0 0 0 1 0 0 1;], 
+                                
+    #=transitions=# [2 3 5;
+                    1 4 6;
+                    1 4 7;
+                    2 3 8;
+                    1 6 7;
+                    2 5 8;
+                    3 5 8;
+                    4 6 7;],
+    #=stop_condition_target=# 1,
+    #=use_stop_condition_target=# true,
+                               
+    #=scikit file writing parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=scikit_writing=# false,
+    #=scikit_data_filename=# "scikit_data",
+    #=scikit_fitnesses_filename=# "scikit_fitnesses",
+    #=scikit_labels_filename=# "scikit_labels",
+
+    #=density sampling parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=density_sampling=# false,
+    #=num_samples=# 1000,
+
+    #=feed-forward parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=feed_forward=# false,
+    #=nodes_per_level=# 5,
+
+    #=Other parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=print_times=# [1, 4, 9, 14, 19, 29, 39, 49, 59, 79, 99, 149, 199, 249, 299, 349, 399, 499, 749, 999, 1999, 2999, 4000, 5000, 9999, 50000, 99999],
+    #=num_experiment_repetitions=# 1,
+    #=experiment_printing=# false,
+    #=print_on_target_switch=# true,
+    #=interval_printing=# true,
+    #=fixed_interval_printing=# false,
+    #=fixed_interval_printing_interval=# 1,
+    #=randomize_targets=# false,
+   )
+    end
+
+
+end

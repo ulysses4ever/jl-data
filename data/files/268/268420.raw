@@ -1,0 +1,40 @@
+###################################################
+## Main
+###################################################
+
+include("typegraph.jl")
+include("instancegraph.jl")
+include("import_data.jl")
+include("params.jl")
+include("runsim.jl")
+include("match.jl")
+
+
+using JuMP
+using Mosek
+using Gurobi
+using DataFrames
+using LightGraphs
+
+techno = ARGS[1]
+# can be "2_cycles" or "23_cycles"
+
+prio = ARGS[2]
+# can be "greedy"
+
+steps = parse(Int, ARGS[3])
+# solve time is about steps/10 seconds
+
+batch = parse(Int, ARGS[4])
+# can be any Int64
+
+solver = ARGS[5]
+# Can be "gurobi" or "mosek"
+
+job_id = ARGS[6]
+# identifier to save the results
+
+g = import_data()
+p = Params(batch = batch, techno = techno, prio = prio, solver = solver)
+summary = run_dynamic(g, steps, p);
+writetable("../results/$techno/$prio/batch=$batch/$job_id.csv", summary)

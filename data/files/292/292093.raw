@@ -1,0 +1,33 @@
+function coi2nan(f,waveIn,dt=1.0,coi = gencoi(size(waveIn,2),dt))
+    ##COI2NAN Set data outside coi to NaN
+    # waveOut=coi2nan(f,waveIn,coi)
+    #
+    #   IN: 
+    #       f:      frequency vector
+    #       waveIn: Wavelet coefficient Matrix
+    #       coi:    cone of influence vector
+    #   OUT:
+    #       waveOut: Wavelet coefficient Matrix with NaNs
+    #
+    #   Author: Michael von Papen, Date: 13.10.15
+    #                Felix Gerick, Date: 01.12.15
+
+    a, b = size( waveIn );
+
+    b2 = length( coi );
+
+    if b != b2
+            error("Number of data points don't match!")
+    end
+    
+    waveOut = waveIn;
+    for i=1:a
+        for j=1:b
+            if 1/f[i]>coi[j]
+                @inbounds  waveOut[i,j]=NaN;
+            end
+        end
+    end
+    
+    return waveOut;
+end 

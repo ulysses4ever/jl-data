@@ -1,0 +1,156 @@
+#Caterpillar Tube Pricing Benchmark
+#Julia Ver. 0.0.3 # xgboost model functional + dates included
+
+#Install Needed Libraries
+#Pkg.add("BinDeps")
+#Pkg.add("JSON")
+#Pkg.add("DataFrames")
+#Pkg.add("Gadfly")
+#Pkg.add("XGBoost")
+
+#Libraries, directories, options and extra functions----------------------
+Pkg.update()
+
+using BinDeps
+using JSON
+using DataFrames
+using Dates
+using Gadfly
+using XGBoost
+
+#Read Settings file
+cd(dirname(@__FILE__()))
+directories = JSON.parsefile("SETTINGS.json")
+
+dataDirectory = directories["dataDirectory"]
+edaDirectory = directories["EDALoc"]
+
+#Load data
+train = readtable(dataDirectory * "train_set.csv")
+test = readtable(dataDirectory * "test_set.csv")
+test = test[:, 2:size(test, 2)]
+test[:cost] = 0
+train[:idx] = -[1:size(train, 1)]
+test[:idx] = [1:size(test, 1)]
+dataFull = vcat(train, test)
+
+#Data Transformations
+#Quote Dates to numeric columns
+dataFull[:quote_date] = Date(dataFull[:quote_date], "y-m-d")
+
+#New Columns with date information
+dataFull[:year] = year(dataFull[:quote_date])
+dataFull[:month] = month(dataFull[:quote_date])
+dataFull[:day] = day(dataFull[:quote_date])
+dataFull[:dayWeek] = dayofweek(dataFull[:quote_date])
+dataFull[:quarter] = quarterofyear(dataFull[:quote_date])
+dataFull[:dayQuarter] = dayofquarter(dataFull[:quote_date])
+dataFull[:dayYear] = dayofyear(dataFull[:quote_date])
+dataFull[:weekInMonth] = dayofweekofmonth(dataFull[:quote_date])
+
+#Merge all dataframes
+dataFull = join(dataFull, readtable(dataDirectory * "bill_of_materials.csv"),
+                on = :tube_assembly_id, kind = :inner)
+dataFull = join(dataFull, readtable(dataDirectory * "specs.csv"),
+                on = :tube_assembly_id, kind = :inner)
+dataFull = join(dataFull, readtable(dataDirectory * "tube.csv"),
+                on = :tube_assembly_id, kind = :inner)
+
+print("Current index order. First 6 elements: " * string(head(test[:idx])))
+print("The size of the merged dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+#Reduce Data Size; NA Removal from data frames
+#Original Data
+accumulatedNAInfo = colwise(isna, dataFull)
+numberOfNAsPerColumn = map((x) -> sum(x) / length(x), accumulatedNAInfo)
+namesAndTypes = hcat(names(dataFull), eltypes(dataFull), numberOfNAsPerColumn)
+
+#Remove data with more than 75% NAs in columns
+naThreshold = 0.75
+validColumnsIdxs = bool(map(x -> x < naThreshold, numberOfNAsPerColumn))
+dataFull = dataFull[:, [validColumnsIdxs]]
+
+print("The size of the reduced dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+namesAndTypesReduced = hcat(names(dataFull),
+                            eltypes(dataFull),
+                            numberOfNAsPerColumnReduced)
+
+#Define Categorical and Numeric Columns
+namesAndTypesReduced[:, 2] = map(x -> string(x), namesAndTypesReduced[:, 2])
+categoricalColumns = names(dataFull)[namesAndTypesReduced[:, 2] .== "UTF8String"]
+numericalColumns = names(dataFull)[namesAndTypesReduced[:, 2] .≠ "UTF8String"]
+
+#Clean Idx, cost and idx values from training features
+cleanNumeric = !bool([bool(string(colSymbol) == "cost") | bool(string(colSymbol) == "quote_date") | bool(string(colSymbol) == "idx")
+                      for colSymbol in numericalColumns])
+
+numericalColumns = numericalColumns[cleanNumeric]
+
+#Helper Function
+function categorical2frequency(dataVector)
+  #This functions counts the occurences of a category and maps it back to the data provided
+  #countmap is similar to the function "table()" in R, the only difference is that countmap() returns a dictionary
+  vectorDict = countmap(dataVector)
+  newVector = [vectorDict[dataPoint] for dataPoint in dataVector]
+  return newVector
+end
+
+#Categorical Columns to Frequency (Counts)
+for singleCol in categoricalColumns
+  dataFull[singleCol] = categorical2frequency(dataFull[singleCol])
+  #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+#Remove NAs from numerical data
+for singleCol in numericalColumns
+  dataFull[isna(dataFull[singleCol]) .== true, singleCol] = -999
+    #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+dataFullArraySparse = convert(Array{Float32}, dataFull[:, vcat(numericalColumns, categoricalColumns)])
+
+#Remap the data to the original partitions, SPARSE
+trainIdx = dataFull[:idx].< 0
+testIdx = dataFull[:idx].> 0
+
+train = dataFullArraySparse[trainIdx, :]
+test = dataFullArraySparse[testIdx, :]
+testIds = dataFull[:idx][testIdx]
+print("Current index order. First 6 elements of test:" * string(head(testIds)))
+
+#Shuffle training data
+shuffledIdxs = shuffle([1:size(train, 1)])
+train = train[shuffledIdxs, :]
+
+costTraining = convert(Array{Float32}, dataFull[:cost][trainIdx][shuffledIdxs])
+costTrainingLog = log1p(costTraining)
+
+#XGBOOST
+#Create Binary Matrices from Array{Float32}
+dtrain = DMatrix(train, label = costTrainingLog)
+dtest = DMatrix(test)
+
+num_round = 500
+param = ["eta" => 10/num_round, "max_depth" => 20, "objective" => "reg:linear",
+         "silent" => 1, "subsample" => 0.75, "colsample_bytree" => 0.8]
+
+#Model Training
+#with RMSLE Evaluation
+#XGBoostModel = xgboost(dtrain, num_round, param = param, feval = evalRMSLE)
+#without RMSLE Evaluation
+XGBoostModel = xgboost(dtrain, num_round, param = param)
+
+#Predictions using test data
+preds = exp(predict(XGBoostModel, dtest)) - 1
+
+#Write Results
+sampleSubmission = DataFrame(id = testIds, cost = preds)
+writetable("juliaBenchmark.csv", sampleSubmission)
+

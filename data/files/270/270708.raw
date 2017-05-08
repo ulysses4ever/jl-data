@@ -1,0 +1,36 @@
+import EulerUtil
+
+squares = collect(1:10000)
+primes = EulerUtil.eratosthenes(10000)
+composites = collect(2:10000)
+
+# Remove even numbers
+filter!(isodd, composites)
+
+# Remove primes
+composites = setdiff(composites, primes)
+
+for composite in composites
+	tmp_result = 0
+	found_one = false
+	#println("Trying: ", composite)
+	for prime in primes
+		for square in squares
+			tmp_result = prime + 2 * square^2
+			if tmp_result == composite
+ 				#println(tmp_result, " = ", prime, " + 2 * ", square, "^2")
+				found_one = true
+				break
+			end
+			if square > composite
+				break
+			end
+		end
+		if found_one == true
+			break
+		end
+	end
+	if found_one == false
+		println(composite)
+	end
+end

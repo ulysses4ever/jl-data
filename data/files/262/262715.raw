@@ -1,0 +1,22 @@
+# How many Sundays fell on the first of the month during the twentieth century?
+
+using Datetime
+
+function countfirstsundays(start::Date, stop::Date)
+    d = start
+    c = 0
+    while (d <= stop)
+        if dayofweek(d) == 7 && day(d) == 1
+            c += 1
+        end
+        d += day(1)
+    end
+
+    return c
+end
+
+@time res = countfirstsundays(date(1901, 01, 01), date(2000, 12, 31))
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

@@ -1,0 +1,73 @@
+using TimeIt
+# Instale o TimeIt com
+# Pkg.clone("git://github.com/kbarbary/TimeIt.jl.git")
+
+# Quero maximizar dot(c,solution) com a restrição sum(solution) <= amount
+#
+# O método é feito em branching por componente, e para evitar problemas com
+# ponteiros, eu faço várias cópias.
+function coiso (amount::Int, weight::Array{Int,1}, c::Array{Int,1},
+    solution=[], comp = 1, cost = 0.0)
+  n = length(weight)
+  if length(solution) == 0
+    solution = zeros(Int,n)
+  end
+  if amount < 0
+    return -Inf, []
+  elseif comp > n
+    return cost, copy(solution)
+  end
+  (f1, sol1) = coiso(amount, weight, c, copy(solution), comp+1, cost)
+  solution[comp] = 1
+  (f2, sol2) = coiso(amount-weight[comp], weight, c, copy(solution), comp+1,
+    cost+c[comp])
+  if f1 < f2
+    return f2, copy(sol2)
+  else
+    return f1, copy(sol1)
+  end
+end
+
+# Gera tudo faz a matriz de tudo e calcula as possibilidades. Sem alocar matriz
+# deve ser muito melhor.
+function geratudo (amount::Int, weight::Array{Int,1}, c::Array{Int,1})
+  n = length(weight)
+  # Calcula os binários de 0 a 2^(n-1): 0, 1, 10, 11, ...
+  bins = [parseint(bin(x)) for x = 0:2^n-1]
+  # Pra imprimir %010d
+  fmt = @sprintf("%%0%dd", n)
+  # @eval é substitui $(fmt) pelo valor de fmt porque o @sprint é um macro e não
+  # funciona muito inteligente.
+  # O resto só é feio porque está em uma linha, mas a ideia é básica.
+  # Escreve o binário com n zeros
+  bins = [@eval @sprintf($(fmt), $(x)) for x = bins]
+  # Transforma em vetor de n posições
+  bins = [[parseint(y) for y = split(x,"")] for x = bins]
+  m = 2^n;
+  f = zeros(m);
+  for i = 1:m
+    f[i] = (sum(weight.*bins[i]) <= amount ?  dot(c,bins[i]) : 0)
+  end
+  k = indmax(f)
+  return f[k], bins[k]
+end
+
+n = 4;
+c = rand(1:20, n);
+weight = rand(1:20, n);
+
+amount = int(sum(weight)*0.7)
+
+println("weight = ", weight)
+println("c = ", c)
+println("amount = ", amount)
+
+@timeit cost, solution = coiso(amount, weight, c)
+@time cost, solution = coiso(amount, weight, c)
+println("cost = ", cost)
+println("solution = ", solution)
+
+@timeit cost, solution = geratudo(amount, weight, c)
+@time cost, solution = geratudo(amount, weight, c)
+println("cost = ", cost)
+println("solution = ", solution)

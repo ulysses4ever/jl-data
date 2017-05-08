@@ -1,0 +1,57 @@
+function displayData(X)
+  m, n = size(X)
+
+  example_width = iround(round(sqrt(n)))
+  example_height = iround(n / example_width)
+
+  display_rows = ifloor(sqrt(m))
+  display_cols = iceil(m / display_rows)
+
+  height_range = 1:example_height
+  width_range = 1:example_width
+
+  # define image padding
+  pad = 1
+
+  # setup blank display
+  display_rows_size = pad + display_rows * (example_height + pad)
+  display_cols_size = pad + display_cols * (example_width + pad)
+  display_array = - ones(display_rows_size, display_cols_size)
+
+
+  # copy each example into a patch on the display array
+  current_example_id = 1
+  for j = 1:display_rows
+    for i = 1:display_cols
+      if current_example_id > m
+        break
+      end # check if we have gone to far
+
+      # copy the patch
+      # get the max value of the patch
+      current_example_values = X[current_example_id, :]
+      reshaped_example_values = reshape(current_example_values, example_height, example_width)
+
+      max_val = maxabs(current_example_values) # --> octave --> max(abs(X[current_example, :]))
+
+      display_array[pad + (j - 1) * (example_height + pad) + height_range,
+                    pad + (i - 1) * (example_width + pad) + width_range ] =
+        reshaped_example_values / max_val
+
+      current_example_id = current_example_id + 1
+    end
+    if current_example_id > m
+      break
+    end # check if we have gone to far
+  end
+
+  # display image
+  img = grayim(display_array)
+
+  # doesnt work. Might be something to do with the way the image data is formatted.
+  # Strangly enough Juno (IDE) can show a nice preview of the image.
+  # See Notes Section ERRORS
+  # view(img)
+
+end
+

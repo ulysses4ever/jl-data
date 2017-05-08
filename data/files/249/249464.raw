@@ -1,0 +1,33 @@
+function Base.start(driver::ExecutorDriver)
+    return ccall((:start_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function stop(driver::ExecutorDriver)
+    return ccall((:stop_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function abort(driver::ExecutorDriver)
+    return ccall((:abort_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function Base.join(driver::ExecutorDriver)
+    return ccall((:join_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function Base.run(driver::ExecutorDriver)
+    return ccall((:run_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function sendStatusUpdate(driver::ExecutorDriver, status::Proto.TaskStatus)
+    iob = IOBuffer()
+    tsBufferSize = writeproto(iob, status)
+    tsBuffer = takebuf_array(iob)
+    return ccall((:sendStatusUpdate_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, Ptr{Uint8}, Cint),
+            driver.handle, tsBuffer, tsBufferSize)
+end
+
+function sendFrameworkMessage(driver::ExecutorDriver, data::String)
+    dataSize = length(data)
+    return ccall((:sendFrameworkMessage_exec_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, Ptr{Uint8}, Cint),
+            driver.handle, data, dataSize)
+end

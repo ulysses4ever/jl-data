@@ -1,0 +1,44 @@
+module BuzsakiAnalysis
+
+using MAT
+using DataFrames
+using Distributions
+using JFacets
+using DimensionalityReduction
+using GLM
+
+const TRACK_BOUNDS = (15,85)
+
+include("debug.jl")
+include("dataset.jl")
+include("field.jl")
+include("model_spec.jl")
+
+export
+  #colnames,
+  Dataset,
+  field,  # Field
+  colpattern,
+  get_colnames,
+  ModelSpec,  # ModelSpec
+  model_fn,
+  pred_columns,
+  pred_abbreviations,
+  colname
+
+function average_across_bins_and_trials(df, cols...)
+  vals = [ (t,posb) for t in 1:maximum(df["t"]), posb in minimum(df["posb"]):maximum(df["posb"]) ]
+  vals = reshape(vals, *(size(vals)...))
+  #avg_colnames = map(cols) do c "$(c)_avg" end
+  println("Averaging across bins and trials...")
+  data = mapreduce(hcat, vals) do v
+    #print(v); print("\n")
+    rows = select( :( (t .== $(v[1])) & (posb .== $(v[2])) ), df)
+    avgs = [ size(rows,1) == 0 ? 0 : mean(rows[col]) for col in cols ]
+    [v..., avgs...]
+  end
+  #DataFrame(data', ["t","posb",avg_colnames...])
+  DataFrame(data', ["t","posb",cols...])
+end
+
+end

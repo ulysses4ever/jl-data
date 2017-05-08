@@ -1,0 +1,12 @@
+#=
+@author titus 
+=#
+using   Base.Test
+include("../twiddle.jl")
+
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_twiddle"] = function test_twiddle()
+
+end

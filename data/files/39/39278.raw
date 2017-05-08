@@ -1,0 +1,43 @@
+import Graphs
+
+""" bct_graph(Labels, C)
+Constructs a GenericGraph based on a vector, Names, of vertex labels, and an incidence or weight matrix, C.
+Labels, a vector of length n representing vertex labels
+C, an n by n matrix of type <: Real representing vertex connectivity.
+is_directed, true or false; if false C must be symmetric
+"""
+function bct_graph{L <: Any, T <: Real}(Labels::Array{L,1}, C::Array{T,2}, is_directed=true)
+    n = size(Labels,1);
+    if size(C) != (n,n)
+        error("C matrix size, "*size(C)*
+              ", incompatible with Labels size, "*n*".");
+    end
+    if !is_directed && C != C'
+        error("C is not symmetric, hence not the connection matrix of an undirected graph");
+    end
+    v = map(Graphs.KeyVertex, 1:size(Labels,1), Labels);
+    eg = Array{Graphs.Edge{typeof(v[1])},1}(sum(C .> 0));
+    k = 0;
+    for i in 1:n, j in 1:n
+        if C[i,j] > 0
+            k += 1;
+            eg[k] = Graphs.Edge(k, v[i], v[j]);
+        end
+    end
+    return bct_graph(v, eg, is_directed);
+end
+
+function bct_graph{V<:Graphs.KeyVertex}(v::Array{V,1},
+                                        eg::Array{Graphs.Edge{V},1},
+                                        is_directed=true)
+    E = Graphs.Edge{V};
+    gindexof = Dict{V,Int}();
+    gfinclist = Array{Array{E,1},1}();
+    gbinclist = Array{Array{E,1},1}();
+    gedges = Array{E,1}();
+    gvertices = Array{V,1}();
+    g = Graphs.Graph{V,E}(is_directed, gvertices, gedges, gfinclist, gbinclist, gindexof);
+    for vertex in v add_vertex!(g,vertex) end;
+    for edge in eg add_edge!(g, edge) end;
+    return g;
+end

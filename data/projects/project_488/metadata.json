@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:27 GMT
+Date: Wed, 03 May 2017 21:00:32 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5264
+Content-Length: 5746
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3087
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4082
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "3cb5d05c06d1a3b293d3d612c2275942"
-Last-Modified: Wed, 22 Jun 2016 13:18:00 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "28d7b2cdfe13be9c1a350d8661c59874"
+Last-Modified: Sun, 23 Nov 2014 11:32:24 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,84 +22,84 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: a7f8a126c9ed3f1c4715a34c0ddc7290
-X-GitHub-Request-Id: 680F:6634:1344504:18E7854:590231BB
+X-Served-By: 7f48e2f7761567e923121f17538d7a6d
+X-GitHub-Request-Id: F201:5CA5:FD0F39:14588B1:590A44F0
 
 {
-  "id": 53994319,
-  "name": "ScholarSpider",
-  "full_name": "Shaofa/ScholarSpider",
+  "id": 27029280,
+  "name": "julia_example",
+  "full_name": "nataliagavrilova/julia_example",
   "owner": {
-    "login": "Shaofa",
-    "id": 9604664,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/9604664?v=3",
+    "login": "nataliagavrilova",
+    "id": 7816595,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/7816595?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/Shaofa",
-    "html_url": "https://github.com/Shaofa",
-    "followers_url": "https://api.github.com/users/Shaofa/followers",
-    "following_url": "https://api.github.com/users/Shaofa/following{/other_user}",
-    "gists_url": "https://api.github.com/users/Shaofa/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/Shaofa/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/Shaofa/subscriptions",
-    "organizations_url": "https://api.github.com/users/Shaofa/orgs",
-    "repos_url": "https://api.github.com/users/Shaofa/repos",
-    "events_url": "https://api.github.com/users/Shaofa/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/Shaofa/received_events",
+    "url": "https://api.github.com/users/nataliagavrilova",
+    "html_url": "https://github.com/nataliagavrilova",
+    "followers_url": "https://api.github.com/users/nataliagavrilova/followers",
+    "following_url": "https://api.github.com/users/nataliagavrilova/following{/other_user}",
+    "gists_url": "https://api.github.com/users/nataliagavrilova/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/nataliagavrilova/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/nataliagavrilova/subscriptions",
+    "organizations_url": "https://api.github.com/users/nataliagavrilova/orgs",
+    "repos_url": "https://api.github.com/users/nataliagavrilova/repos",
+    "events_url": "https://api.github.com/users/nataliagavrilova/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/nataliagavrilova/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/Shaofa/ScholarSpider",
-  "description": "python spiders for crawling academic paper.Scrapy 1.0.5 framework is used.",
+  "html_url": "https://github.com/nataliagavrilova/julia_example",
+  "description": null,
   "fork": false,
-  "url": "https://api.github.com/repos/Shaofa/ScholarSpider",
-  "forks_url": "https://api.github.com/repos/Shaofa/ScholarSpider/forks",
-  "keys_url": "https://api.github.com/repos/Shaofa/ScholarSpider/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/Shaofa/ScholarSpider/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/Shaofa/ScholarSpider/teams",
-  "hooks_url": "https://api.github.com/repos/Shaofa/ScholarSpider/hooks",
-  "issue_events_url": "https://api.github.com/repos/Shaofa/ScholarSpider/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/Shaofa/ScholarSpider/events",
-  "assignees_url": "https://api.github.com/repos/Shaofa/ScholarSpider/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/Shaofa/ScholarSpider/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/Shaofa/ScholarSpider/tags",
-  "blobs_url": "https://api.github.com/repos/Shaofa/ScholarSpider/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/Shaofa/ScholarSpider/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/Shaofa/ScholarSpider/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/Shaofa/ScholarSpider/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/Shaofa/ScholarSpider/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/Shaofa/ScholarSpider/languages",
-  "stargazers_url": "https://api.github.com/repos/Shaofa/ScholarSpider/stargazers",
-  "contributors_url": "https://api.github.com/repos/Shaofa/ScholarSpider/contributors",
-  "subscribers_url": "https://api.github.com/repos/Shaofa/ScholarSpider/subscribers",
-  "subscription_url": "https://api.github.com/repos/Shaofa/ScholarSpider/subscription",
-  "commits_url": "https://api.github.com/repos/Shaofa/ScholarSpider/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/Shaofa/ScholarSpider/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/Shaofa/ScholarSpider/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/Shaofa/ScholarSpider/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/Shaofa/ScholarSpider/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/Shaofa/ScholarSpider/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/Shaofa/ScholarSpider/merges",
-  "archive_url": "https://api.github.com/repos/Shaofa/ScholarSpider/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/Shaofa/ScholarSpider/downloads",
-  "issues_url": "https://api.github.com/repos/Shaofa/ScholarSpider/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/Shaofa/ScholarSpider/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/Shaofa/ScholarSpider/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/Shaofa/ScholarSpider/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/Shaofa/ScholarSpider/labels{/name}",
-  "releases_url": "https://api.github.com/repos/Shaofa/ScholarSpider/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/Shaofa/ScholarSpider/deployments",
-  "created_at": "2016-03-16T02:26:24Z",
-  "updated_at": "2016-06-22T13:18:00Z",
-  "pushed_at": "2016-03-16T03:30:29Z",
-  "git_url": "git://github.com/Shaofa/ScholarSpider.git",
-  "ssh_url": "git@github.com:Shaofa/ScholarSpider.git",
-  "clone_url": "https://github.com/Shaofa/ScholarSpider.git",
-  "svn_url": "https://github.com/Shaofa/ScholarSpider",
-  "homepage": "",
-  "size": 8,
-  "stargazers_count": 2,
-  "watchers_count": 2,
+  "url": "https://api.github.com/repos/nataliagavrilova/julia_example",
+  "forks_url": "https://api.github.com/repos/nataliagavrilova/julia_example/forks",
+  "keys_url": "https://api.github.com/repos/nataliagavrilova/julia_example/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/nataliagavrilova/julia_example/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/nataliagavrilova/julia_example/teams",
+  "hooks_url": "https://api.github.com/repos/nataliagavrilova/julia_example/hooks",
+  "issue_events_url": "https://api.github.com/repos/nataliagavrilova/julia_example/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/nataliagavrilova/julia_example/events",
+  "assignees_url": "https://api.github.com/repos/nataliagavrilova/julia_example/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/nataliagavrilova/julia_example/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/nataliagavrilova/julia_example/tags",
+  "blobs_url": "https://api.github.com/repos/nataliagavrilova/julia_example/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/nataliagavrilova/julia_example/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/nataliagavrilova/julia_example/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/nataliagavrilova/julia_example/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/nataliagavrilova/julia_example/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/nataliagavrilova/julia_example/languages",
+  "stargazers_url": "https://api.github.com/repos/nataliagavrilova/julia_example/stargazers",
+  "contributors_url": "https://api.github.com/repos/nataliagavrilova/julia_example/contributors",
+  "subscribers_url": "https://api.github.com/repos/nataliagavrilova/julia_example/subscribers",
+  "subscription_url": "https://api.github.com/repos/nataliagavrilova/julia_example/subscription",
+  "commits_url": "https://api.github.com/repos/nataliagavrilova/julia_example/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/nataliagavrilova/julia_example/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/nataliagavrilova/julia_example/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/nataliagavrilova/julia_example/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/nataliagavrilova/julia_example/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/nataliagavrilova/julia_example/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/nataliagavrilova/julia_example/merges",
+  "archive_url": "https://api.github.com/repos/nataliagavrilova/julia_example/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/nataliagavrilova/julia_example/downloads",
+  "issues_url": "https://api.github.com/repos/nataliagavrilova/julia_example/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/nataliagavrilova/julia_example/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/nataliagavrilova/julia_example/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/nataliagavrilova/julia_example/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/nataliagavrilova/julia_example/labels{/name}",
+  "releases_url": "https://api.github.com/repos/nataliagavrilova/julia_example/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/nataliagavrilova/julia_example/deployments",
+  "created_at": "2014-11-23T10:43:44Z",
+  "updated_at": "2014-11-23T11:32:24Z",
+  "pushed_at": "2014-11-23T11:32:24Z",
+  "git_url": "git://github.com/nataliagavrilova/julia_example.git",
+  "ssh_url": "git@github.com:nataliagavrilova/julia_example.git",
+  "clone_url": "https://github.com/nataliagavrilova/julia_example.git",
+  "svn_url": "https://github.com/nataliagavrilova/julia_example",
+  "homepage": null,
+  "size": 132,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
@@ -111,7 +111,7 @@ X-GitHub-Request-Id: 680F:6634:1344504:18E7854:590231BB
   "open_issues_count": 0,
   "forks": 0,
   "open_issues": 0,
-  "watchers": 2,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,
@@ -119,5 +119,5 @@ X-GitHub-Request-Id: 680F:6634:1344504:18E7854:590231BB
     "pull": true
   },
   "network_count": 0,
-  "subscribers_count": 0
+  "subscribers_count": 1
 }

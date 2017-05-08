@@ -1,0 +1,28 @@
+#(ugly) tests
+using sevengoldenrules
+#TODO : using Base.Test
+
+dict = findstoichio("CH3NO2")
+#dict = completeStoichio(dict)
+println(dict)
+println("e- :  ", eminusCalc(dict))
+println("sum :  ", AtomSum(dict))
+println("lewissum : ",LewisSum(dict))
+println("ratioHC : ",rat(dict["H"], dict["C"]))
+println("ratioNC : ",rat(dict["N"], dict["C"]))
+println("ratioPC : ",rat(dict["P"], dict["C"]))
+println("ratioCP : ",rat(dict["C"], dict["P"]))
+println("ratioZeros : ",rat(0, 0))
+println("LewisTest : ",LewisCheck(dict) ? "TRUE" : "FALSE")
+println("NOPSTest : ",NOPSCheck(dict) ? "TRUE" : "FALSE")
+println("HNOPSTest : ",HNOPSCheck(dict) ? "TRUE" : "FALSE")
+println("SeniorMaxTest : ",SeniorMaxCheck(dict) ? "TRUE" : "FALSE")
+println("ExistTestRelax : ",FormulaExist(dict) ? "TRUE" : "FALSE")
+println("ExistTestStrict : ",FormulaExist(dict, true) ? "TRUE" : "FALSE")
+
+testlistelement = MaxElements7GR(200.0)
+println("200Da : ", testlistelement)
+testlistelement = MaxElements7GR(2500.0)
+println("2500Da : ", testlistelement)
+testlistelement = MaxElements7GR(4000.0)
+println("4000Da : ", testlistelement)

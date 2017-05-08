@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:18 GMT
+Date: Wed, 03 May 2017 21:01:30 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 6274
+Content-Length: 5335
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2861
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3944
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "5e016fc32d6acff5e2027bb47194e9f8"
-Last-Modified: Thu, 07 Jan 2016 03:44:49 GMT
+ETag: "d629e18db8f09d2f9b867be95a3b63a9"
+Last-Modified: Sat, 01 Oct 2016 17:10:30 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,82 +22,82 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 13d09b732ebe76f892093130dc088652
-X-GitHub-Request-Id: 38FF:6637:1335848:18CB8AD:590231EE
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: BE60:5C87:662A32:832980:590A452A
 
 {
-  "id": 39646300,
-  "name": "OptimizationCourse",
-  "full_name": "sisl/OptimizationCourse",
+  "id": 25895936,
+  "name": "FastArrayOps.jl",
+  "full_name": "gummif/FastArrayOps.jl",
   "owner": {
-    "login": "sisl",
-    "id": 6294054,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/6294054?v=3",
+    "login": "gummif",
+    "id": 7014479,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/7014479?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/sisl",
-    "html_url": "https://github.com/sisl",
-    "followers_url": "https://api.github.com/users/sisl/followers",
-    "following_url": "https://api.github.com/users/sisl/following{/other_user}",
-    "gists_url": "https://api.github.com/users/sisl/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/sisl/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/sisl/subscriptions",
-    "organizations_url": "https://api.github.com/users/sisl/orgs",
-    "repos_url": "https://api.github.com/users/sisl/repos",
-    "events_url": "https://api.github.com/users/sisl/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/sisl/received_events",
-    "type": "Organization",
+    "url": "https://api.github.com/users/gummif",
+    "html_url": "https://github.com/gummif",
+    "followers_url": "https://api.github.com/users/gummif/followers",
+    "following_url": "https://api.github.com/users/gummif/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gummif/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gummif/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gummif/subscriptions",
+    "organizations_url": "https://api.github.com/users/gummif/orgs",
+    "repos_url": "https://api.github.com/users/gummif/repos",
+    "events_url": "https://api.github.com/users/gummif/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gummif/received_events",
+    "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/sisl/OptimizationCourse",
-  "description": null,
+  "html_url": "https://github.com/gummif/FastArrayOps.jl",
+  "description": "Fast inplace Array floating point operations for Julia",
   "fork": false,
-  "url": "https://api.github.com/repos/sisl/OptimizationCourse",
-  "forks_url": "https://api.github.com/repos/sisl/OptimizationCourse/forks",
-  "keys_url": "https://api.github.com/repos/sisl/OptimizationCourse/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/sisl/OptimizationCourse/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/sisl/OptimizationCourse/teams",
-  "hooks_url": "https://api.github.com/repos/sisl/OptimizationCourse/hooks",
-  "issue_events_url": "https://api.github.com/repos/sisl/OptimizationCourse/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/sisl/OptimizationCourse/events",
-  "assignees_url": "https://api.github.com/repos/sisl/OptimizationCourse/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/sisl/OptimizationCourse/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/sisl/OptimizationCourse/tags",
-  "blobs_url": "https://api.github.com/repos/sisl/OptimizationCourse/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/sisl/OptimizationCourse/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/sisl/OptimizationCourse/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/sisl/OptimizationCourse/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/sisl/OptimizationCourse/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/sisl/OptimizationCourse/languages",
-  "stargazers_url": "https://api.github.com/repos/sisl/OptimizationCourse/stargazers",
-  "contributors_url": "https://api.github.com/repos/sisl/OptimizationCourse/contributors",
-  "subscribers_url": "https://api.github.com/repos/sisl/OptimizationCourse/subscribers",
-  "subscription_url": "https://api.github.com/repos/sisl/OptimizationCourse/subscription",
-  "commits_url": "https://api.github.com/repos/sisl/OptimizationCourse/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/sisl/OptimizationCourse/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/sisl/OptimizationCourse/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/sisl/OptimizationCourse/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/sisl/OptimizationCourse/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/sisl/OptimizationCourse/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/sisl/OptimizationCourse/merges",
-  "archive_url": "https://api.github.com/repos/sisl/OptimizationCourse/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/sisl/OptimizationCourse/downloads",
-  "issues_url": "https://api.github.com/repos/sisl/OptimizationCourse/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/sisl/OptimizationCourse/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/sisl/OptimizationCourse/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/sisl/OptimizationCourse/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/sisl/OptimizationCourse/labels{/name}",
-  "releases_url": "https://api.github.com/repos/sisl/OptimizationCourse/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/sisl/OptimizationCourse/deployments",
-  "created_at": "2015-07-24T16:59:05Z",
-  "updated_at": "2016-01-07T03:44:49Z",
-  "pushed_at": "2015-08-07T21:51:07Z",
-  "git_url": "git://github.com/sisl/OptimizationCourse.git",
-  "ssh_url": "git@github.com:sisl/OptimizationCourse.git",
-  "clone_url": "https://github.com/sisl/OptimizationCourse.git",
-  "svn_url": "https://github.com/sisl/OptimizationCourse",
-  "homepage": null,
-  "size": 6076,
+  "url": "https://api.github.com/repos/gummif/FastArrayOps.jl",
+  "forks_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/forks",
+  "keys_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/teams",
+  "hooks_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/events",
+  "assignees_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/tags",
+  "blobs_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/subscription",
+  "commits_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/merges",
+  "archive_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/downloads",
+  "issues_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/gummif/FastArrayOps.jl/deployments",
+  "created_at": "2014-10-29T00:07:09Z",
+  "updated_at": "2016-10-01T17:10:30Z",
+  "pushed_at": "2016-10-01T17:10:28Z",
+  "git_url": "git://github.com/gummif/FastArrayOps.jl.git",
+  "ssh_url": "git@github.com:gummif/FastArrayOps.jl.git",
+  "clone_url": "https://github.com/gummif/FastArrayOps.jl.git",
+  "svn_url": "https://github.com/gummif/FastArrayOps.jl",
+  "homepage": "",
+  "size": 1679,
   "stargazers_count": 1,
   "watchers_count": 1,
   "language": "Julia",
@@ -106,11 +106,11 @@ X-GitHub-Request-Id: 38FF:6637:1335848:18CB8AD:590231EE
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 2,
+  "forks_count": 1,
   "mirror_url": null,
-  "open_issues_count": 0,
-  "forks": 2,
-  "open_issues": 0,
+  "open_issues_count": 2,
+  "forks": 1,
+  "open_issues": 2,
   "watchers": 1,
   "default_branch": "master",
   "permissions": {
@@ -118,25 +118,6 @@ X-GitHub-Request-Id: 38FF:6637:1335848:18CB8AD:590231EE
     "push": false,
     "pull": true
   },
-  "organization": {
-    "login": "sisl",
-    "id": 6294054,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/6294054?v=3",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/sisl",
-    "html_url": "https://github.com/sisl",
-    "followers_url": "https://api.github.com/users/sisl/followers",
-    "following_url": "https://api.github.com/users/sisl/following{/other_user}",
-    "gists_url": "https://api.github.com/users/sisl/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/sisl/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/sisl/subscriptions",
-    "organizations_url": "https://api.github.com/users/sisl/orgs",
-    "repos_url": "https://api.github.com/users/sisl/repos",
-    "events_url": "https://api.github.com/users/sisl/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/sisl/received_events",
-    "type": "Organization",
-    "site_admin": false
-  },
-  "network_count": 2,
-  "subscribers_count": 52
+  "network_count": 1,
+  "subscribers_count": 1
 }

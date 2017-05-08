@@ -1,0 +1,99 @@
+function Base.writecsv(filename::String, e::Benchmarks.Environment,
+                       append::Bool = false, delim::Char = '\t')
+    if append
+        io = open(filename, "a")
+    else
+        io = open(filename, "w")
+    end
+    println(
+        io,
+        join(
+            [
+                "uuid",
+                "timestamp",
+                "julia_sha1",
+                "package_sha1",
+                "os",
+                "cpu_cores",
+                "arch",
+                "machine",
+                "use_blas64",
+                "word_size",
+            ],
+            delim
+        )
+    )
+    println(
+        io,
+        join(
+            [
+                e.uuid,
+                e.timestamp,
+                e.julia_sha1,
+                get(e.package_sha1, "NULL"),
+                e.os,
+                string(e.cpu_cores),
+                e.arch,
+                e.machine,
+                string(e.use_blas64),
+                string(e.word_size),
+            ],
+            delim
+        )
+    )
+    close(io)
+end
+
+function Base.writecsv(filename::String, s::Benchmarks.Samples,
+                  e::Benchmarks.Environment, issue_name::String,
+                  append::Bool = false, delim::Char = '\t')
+    if append
+        io = open(filename, "a")
+    else
+        io = open(filename, "w")
+    end
+    println(
+        io,
+        join(
+            [
+                "env_uuid",
+                "issue_name",
+                "n_evals",
+                "elapsed_times",
+                "bytes_allocated",
+                "gc_times",
+                "num_allocations",
+            ],
+            delim
+        )
+    )
+    for i in 1:length(s.n_evals)
+        println(
+            io,
+            join(
+                [
+                    string(e.uuid)
+                    issue_name
+                    string(s.n_evals[i])
+                    string(s.elapsed_times[i])
+                    string(s.bytes_allocated[i])
+                    string(s.gc_times[i])
+                    string(s.num_allocations[i])
+                ],
+                delim
+            )
+        )
+    end
+    close(io)
+end
+
+function profile(benchmarker, n_samples, n_evals)
+    samples = Benchmarks.Samples()
+    env = Benchmarks.Environment()
+    benchmarker(samples, n_samples, n_evals)
+    pkg_dir = Pkg.dir("BasePerfTests")
+    envres = joinpath(pkg_dir, "res/env.csv")
+    benchres = joinpath(pkg_dir, "res/$(benchmarker).csv")
+    writecsv(envres, env, false, ',')
+    writecsv(benchres, samples, env, string(benchmarker), false, ',')
+end

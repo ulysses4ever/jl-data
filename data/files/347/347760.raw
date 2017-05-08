@@ -1,0 +1,68 @@
+type TypeNode
+    cmd::String
+    action::Int64
+    depth::Int64
+    children::Vector{TypeNode}
+end
+TypeNode() = TypeNode("emptystring", 0, 1, TypeNode[]) 
+
+type TypeTree
+    root::TypeNode
+end
+TypeTree() = TypeTree(TypeNode())
+
+immutable ImmutNode
+    cmd::String
+    action::Int64
+    depth::Int64
+    children::Tuple{Vararg{ImmutNode}}
+end
+ImmutNode() = ImmutNode("emptystring", 0, 1, ())
+
+immutable ImmutTree
+    root::ImmutNode
+end
+
+
+function test1()
+    tree = TypeTree()
+    node1 = TypeNode()
+    node2 = TypeNode()
+    node3 = TypeNode()
+    node4 = TypeNode()
+    node5 = TypeNode()
+    node6 = TypeNode()
+    push!(tree.root.children, node1)
+    push!(tree.root.children, node2)
+    push!(tree.root.children[1].children, node3)
+    push!(tree.root.children[1].children, node4)
+    push!(tree.root.children[2].children, node5)
+    push!(tree.root.children[2].children, node6)
+    tree
+end
+
+function test2()
+    tree = TypeTree(TypeNode("emptystring",0,1,TypeNode[
+        TypeNode("emptystring",0,1,[
+            TypeNode("emptystring",0,1,TypeNode[]),
+            TypeNode("emptystring",0,1,TypeNode[])]),
+        TypeNode("emptystring",0,1,[
+            TypeNode("emptystring",0,1,TypeNode[]),
+            TypeNode("emptystring",0,1,TypeNode[])])
+            ]))
+end
+
+function test3()
+    tree = ImmutTree(ImmutNode("emptystring",0,1,(
+        ImmutNode("emptystring",0,1,(
+            ImmutNode("emptystring",0,1,()),
+            ImmutNode("emptystring",0,1,()))),
+        ImmutNode("emptystring",0,1,(
+            ImmutNode("emptystring",0,1,()),
+            ImmutNode("emptystring",0,1,())))
+            )))
+end
+
+
+
+

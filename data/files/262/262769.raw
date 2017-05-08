@@ -1,0 +1,22 @@
+function findnconsecutivewndistinctprimefactors(n::Int)
+
+    nfound = 0
+    x = 1
+    while true
+        if length(factor(x)) == n
+            nfound += 1
+            if nfound == n
+                return x - n + 1
+            end
+        else
+            nfound = 0
+        end
+        x += 1
+    end
+end
+
+@time res = findnconsecutivewndistinctprimefactors(4)
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

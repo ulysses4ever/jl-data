@@ -1,0 +1,20 @@
+#!/usr/bin/env julia4
+using Mesos
+using Mesos.Proto
+
+# Define executor callback functions
+function executor_frameworkMessage(data::String)
+    info("Got message: $data")
+end
+
+function executor_error(err::String)
+    warn("Julia: Got error message: $err")
+end
+
+function executor_shutdown()
+    info("Shutting down the executor")
+end
+
+# Create and start executor
+executor = Executor(executor_frameworkMessage, executor_shutdown, executor_error)
+run(executor)

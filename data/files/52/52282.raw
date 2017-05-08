@@ -1,0 +1,51 @@
+export geogebra
+
+"""
+`geogebra(X,file_name)` takes a `SimpleGraphDrawing` and writes out a
+script to produce a drawing of this graph in GeoGebra.
+
+Here is the secret sauce to make this work.
+
+* Run `geogebra(X,file_name)` to save the script to `file_name`. By
+  default, the file name is `geogebra.txt`.
+* Copy the contents of `file_name` to the clipboard.
+* Create a new GeoGebra document.
+* In the **Input** zone at the bottom, enter `Button[]` to create a new
+  button.
+* Right click the button and select the **Object Properties...** menu option.
+* Go to the **Scripting** tab and paste in the copied commands.
+* Save and close the properties window.
+* Press the newly created button.
+
+The vertices can be dragged around the drawing and the incident edges
+will follow.
+"""
+function geogebra(X::SimpleGraphDrawing, file_name::ASCIIString="geogebra.txt")
+    VV = vlist(X.G)
+    n = NV(X.G)
+    F = open(file_name,"w")
+
+    for i=1:n
+        v = VV[i]
+        (x,y) = X.xy[v]
+        x = round(x,3)
+        y = round(y,3)
+        println(F,"v_{$i} = CopyFreeObject[Point[{$x,$y}]]")
+        println(F,"ShowLabel[v_{$i}, false]")
+    end
+
+    for i=1:n-1
+        u = VV[i]
+        for j=i+1:n
+            v = VV[j]
+            if has(X.G,u,v)
+                println(F,"e_{$i,$j} = Segment[v_{$i},v_{$j}]")
+                println(F,"ShowLabel[e_{$i,$j}, false]")
+            end
+        end
+    end
+    println(F, "ShowAxes[false]")
+    println(F, "ShowGrid[false]")
+    println(F, "Execute[{\"Delete[button1]\"}]")
+    close(F)
+end

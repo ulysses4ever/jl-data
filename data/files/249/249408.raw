@@ -1,0 +1,148 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+# using Logging
+# Logging.configure(level=DEBUG)
+# Logging.configure(output=open("ClusterManager.log", "a"))
+
+const TASK_CPUS =  0.5
+const TASK_MEM = 256.0
+const EXECUTOR = joinpath(Pkg.dir("Mesos"),"src","clustermanager","worker.jl")
+const FINISHED_STATES = Set(Proto.TaskState.TASK_FINISHED, Proto.TaskState.TASK_FAILED,
+                            Proto.TaskState.TASK_KILLED, Proto.TaskState.TASK_LOST)
+
+#-------------------------------------------------------------------------------
+# Configuration
+#-------------------------------------------------------------------------------
+type CMScheduler <: Scheduler
+    executor::Proto.ExecutorInfo
+    manager::IO
+    manager_addr::String
+
+    max_cpus::Int
+    cpus_acquired::Int
+    tasks::Dict{String, Tuple{Proto.SlaveID, Proto.ExecutorID}}
+
+    function CMScheduler(io::IO, addr::String, maxcpus::Int)
+        task_data = Dict{String, Tuple{Proto.SlaveID, Proto.ExecutorID}}()
+
+        # Setup executor
+        exec_info = @proto Proto.ExecutorInfo (
+            :name => "Cluster Manager Executor (Julia)",
+            :source => "mesos_cm",
+            :executor_id => @proto(Proto.ExecutorID, :value => "default"),
+            :command => @proto(Proto.CommandInfo, :value => "julia4 $EXECUTOR"),
+            :resources => [
+                 createScalarResourse(Mesos.CPU_RESOURSE, TASK_CPUS),
+                 createScalarResourse(Mesos.MEM_RESOURSE, TASK_MEM)
+            ]
+        )
+
+        return new(exec_info, io, addr, maxcpus, 0, task_data)
+    end
+end
+
+#-------------------------------------------------------------------------------
+# Callbacks
+#-------------------------------------------------------------------------------
+function cm_registered(driver::SchedulerDriver,
+                       frameworkId::Proto.FrameworkID, masterInfo::Proto.MasterInfo)
+    serialize(driver.scheduler.manager, "Registering ClusterManager...")
+end
+
+function cm_resourceOffers(driver::SchedulerDriver, offers::Vector{Proto.Offer})
+    for offer in offers
+        cpus = getScalarResourse(offer.resources, Mesos.CPU_RESOURSE)
+        serialize(driver.scheduler.manager, "Received offer $(offer.id.value) with cpus: $cpus")
+
+        # Create and launch tasks
+        tasks = Proto.TaskInfo[]
+        while driver.scheduler.cpus_acquired < driver.scheduler.max_cpus && cpus >= 1
+            driver.scheduler.cpus_acquired += 1
+            tid = "TID$(time_ns())"
+
+            serialize(driver.scheduler.manager, "Launching task $tid using offer $(offer.id.value)")
+            task = @proto Proto.TaskInfo (
+                :task_id => @proto(Proto.TaskID, :value => tid),
+                :slave_id => @proto(Proto.SlaveID, :value => offer.slave_id.value),
+                :name => "CM Executor: $tid",
+                :executor => driver.scheduler.executor,
+                :data => driver.scheduler.manager_addr.data,
+                :resources => [
+                    createScalarResourse(Mesos.CPU_RESOURSE, TASK_CPUS),
+                    createScalarResourse(Mesos.MEM_RESOURSE, TASK_MEM)
+                ]
+            )
+            push!(tasks, task)
+            driver.scheduler.tasks[tid] = (offer.slave_id, task.executor.executor_id)
+            serialize(driver.scheduler.manager, task)
+
+            cpus -= 1
+        end
+        launchTasks(driver, [offer.id], tasks)
+    end
+end
+
+function cm_statusUpdate(driver::SchedulerDriver, status::Proto.TaskStatus)
+    tid = status.task_id.value
+    state = status.state
+    serialize(driver.scheduler.manager, "Task $tid is in state $state")
+
+    if state == Proto.TaskState.TASK_RUNNING
+        # Send a task status to CM to establish connection with a new worker
+        serialize(driver.scheduler.manager, status)
+
+    elseif state in FINISHED_STATES
+        if haskey(driver.scheduler.tasks, tid)
+            (sid, eid) = pop!(driver.scheduler.tasks, tid)
+        else
+            serialize(driver.scheduler.manager, "Could not find task $tid in 'driver.scheduler.tasks'")
+        end
+        # Remove the cores we have remembered for this task
+        driver.scheduler.cpus_acquired -= 1
+        # If it was a failure, mark the slave as failed for blacklisting purposes
+        if (Proto.TaskState.TASK_LOST == state) || (Proto.TaskState.TASK_FAILED == state)
+            serialize(driver.scheduler.manager, "Task $tid failed: $(status.message)")
+            abort(driver)
+        end
+
+        # Send a task status to CM to remove a finished worker
+        serialize(driver.scheduler.manager, status)
+
+        if driver.scheduler.cpus_acquired == 0
+            stop(driver)
+        end
+
+        # In case we'd rejected everything before but have now lost a node
+        reviveOffers(driver)
+    end
+end
+
+#-------------------------------------------------------------------------------
+# Launch framework
+#-------------------------------------------------------------------------------
+function launch(master::String, cm_addr::String, maxcpus::Int)
+
+    # Connect to CM
+    c = connect(cm_addr, Mesos.Manager.SchedulerPort)
+    serialize(c, "Launch SchedulerDriver")
+
+    # Create configuration
+    scheduler = CMScheduler(c, cm_addr, maxcpus)
+
+    # Create & setup scheduler
+    scheduler_cb = SchedulerCallback(scheduler,
+                                     registered = cm_registered,
+                                     resourceOffers = cm_resourceOffers,
+                                     statusUpdate = cm_statusUpdate)
+
+    #run(scheduler_cb, Mesos.createFramework("Mesos Cluster Manager"), ARGS[1])
+
+    sd = Mesos.init(scheduler_cb, Mesos.createFramework("Mesos Cluster Manager"), master)
+    status = run(sd)
+    println("SchedulerDriver status: $status")
+    Mesos.release(sd)
+    exit(status == Proto.Status.DRIVER_STOPPED ? 0 : 1)
+end
+
+launch("127.0.0.1:5050", "127.0.0.1", 3)

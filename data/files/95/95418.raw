@@ -1,0 +1,25 @@
+### Simulate 10^7 points from the AR(2) process
+### Yt = φ_1*Y_{t-1}+φ_2*Y_{t-2}+ε_t, φ_1 = 1.0, φ_2 = -0.6,  ε_t ~ Normal(0, 1)
+
+include("common.jl")
+
+φ = Any[[1.0, -0.6], [1.5, -0.75]]
+
+for i = 1:length(φ)
+  OUTFILE = joinpath(DATADIR, "signal"*@sprintf("%02d", i)*".txt")
+
+  n = 10^7
+  a = 10.0
+  b = 7.0
+
+  outstream = open(OUTFILE, "w+")
+
+  for j = 1:n
+    c = φ[i][1]*b+φ[i][2]*a+randn()
+    @printf(outstream, "%f\n", c)
+    a = b
+    b = c
+  end
+
+  close(outstream)
+end

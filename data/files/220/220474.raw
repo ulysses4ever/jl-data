@@ -1,0 +1,103 @@
+#Library containing functions related to IO, e.g., readProblem, print, initialize structs
+#Copyright(c) 2015: Kally Chung
+
+#01...readProblem( fData )
+#02...initializeSol( cardC, cardD, cardP, cardT )
+#03...printSol( prob, sol )
+
+include( "MCITW-1P.jl" )
+
+function readProblem( fData )
+#readProblem
+#===========#
+#given a input data file, convert it in a problem type
+#
+#    input: file fData -----------> input data file
+#
+#   output: type problem ---------> parameters of the problem to be considered
+
+  include( fData )
+  
+  prob = Problem( cardC, cardD, cardP, cardT, CCap, CCost, DA, DS, DE, DD, PA, PS, PE, PD )
+  
+  return prob
+end
+
+function initializeSol( cardC, cardD, cardP, cardT )
+#initializeSol
+#=============#
+#given some inputs cardinalitys, initialize solution type
+#
+#    input: int cardC ------------> number of crossdocks
+#           int cardD ------------> number of deliveries
+#           int cardP ------------> number of pickups
+#           int cardT ------------> number of periods
+#
+#   output: type solution --------> solution of the problem
+
+  sol = Solution( 0, 0, 0, 0, zeros( Int, cardD, cardC, cardT), zeros( Int, cardP, cardC, cardT ), zeros( Int, cardC, cardT ) )
+
+  return sol
+end
+
+function printSol( prob, sol )
+#printSol
+#========#
+#short print f the solution
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#
+#   output: 
+
+  println( "feasible: $(sol.feas) ... transpCost: $(sol.trspCost) ... invCost: $(sol.invCost) ... penCost: $(sol.penCost)" )
+    
+  println( "" )
+  #print variable X, related to deliveries
+#   println( "solX" )
+  for i in 1:(prob.cardD)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solX[ i,k,t ] == 1 )
+          println( "...D", i, " - C", k, " - T", t )
+        end
+      end
+    end
+  end
+  println( "" )
+  
+  #print variable Y, related to pickups
+#   println( "solY" )
+  for j in 1:(prob.cardP)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          println( "...P", j, " - C", k, " - T", t )
+        end
+      end
+    end
+  end
+  println( "" )
+  
+  #print variable Z, related to inventory
+#   println( "solZ" )
+  aux = sol.solZ
+  println( "$aux" )
+  
+end
+
+function printSolList( prob, sol )
+#printSol
+#========#
+#short print f the solution
+#
+#    input: type problem ---------> parameters of the problem considered
+#           type solution --------> current solution of the problem
+#
+#   output: 
+
+  println( "feasible: $(sol.feas) ... transpCost: $(sol.trspCost) ... invCost: $(sol.invCost) ... penCost: $(sol.penCost)" )
+  
+end
+
+

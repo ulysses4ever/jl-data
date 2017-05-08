@@ -1,0 +1,3 @@
+for op in (:+, :*)
+  @eval ($op)(x::Expr...) = Expr(:call, :($op), x...)
+end

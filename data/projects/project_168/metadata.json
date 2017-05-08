@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:59:35 GMT
+Date: Wed, 03 May 2017 20:59:25 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5165
+Content-Length: 7074
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3307
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4234
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "7b405a2dc2dbe7f4fb1a74c0c5f54203"
-Last-Modified: Mon, 20 Feb 2017 21:09:19 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "114f1f6b4ecb576d01cfe974704d6e9b"
+Last-Modified: Sun, 11 Oct 2015 10:54:49 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,121 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
-X-GitHub-Request-Id: 60E5:6637:1330A00:18C51E1:59023187
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: FF3E:5CA5:FCDA63:14543B6:590A44AC
 
 {
-  "id": 63650110,
-  "name": "ArchGDAL.jl",
-  "full_name": "yeesian/ArchGDAL.jl",
+  "id": 43563943,
+  "name": "OpenSlide.jl",
+  "full_name": "JuliaPackageMirrors/OpenSlide.jl",
   "owner": {
-    "login": "yeesian",
-    "id": 1231079,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/1231079?v=3",
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/yeesian",
-    "html_url": "https://github.com/yeesian",
-    "followers_url": "https://api.github.com/users/yeesian/followers",
-    "following_url": "https://api.github.com/users/yeesian/following{/other_user}",
-    "gists_url": "https://api.github.com/users/yeesian/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/yeesian/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/yeesian/subscriptions",
-    "organizations_url": "https://api.github.com/users/yeesian/orgs",
-    "repos_url": "https://api.github.com/users/yeesian/repos",
-    "events_url": "https://api.github.com/users/yeesian/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/yeesian/received_events",
-    "type": "User",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/yeesian/ArchGDAL.jl",
-  "description": null,
+  "html_url": "https://github.com/JuliaPackageMirrors/OpenSlide.jl",
+  "description": "Julia package mirror.",
   "fork": false,
-  "url": "https://api.github.com/repos/yeesian/ArchGDAL.jl",
-  "forks_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/forks",
-  "keys_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/teams",
-  "hooks_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/events",
-  "assignees_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/tags",
-  "blobs_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/subscription",
-  "commits_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/merges",
-  "archive_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/downloads",
-  "issues_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/yeesian/ArchGDAL.jl/deployments",
-  "created_at": "2016-07-19T01:43:16Z",
-  "updated_at": "2017-02-20T21:09:19Z",
-  "pushed_at": "2016-09-29T14:07:49Z",
-  "git_url": "git://github.com/yeesian/ArchGDAL.jl.git",
-  "ssh_url": "git@github.com:yeesian/ArchGDAL.jl.git",
-  "clone_url": "https://github.com/yeesian/ArchGDAL.jl.git",
-  "svn_url": "https://github.com/yeesian/ArchGDAL.jl",
-  "homepage": null,
-  "size": 68752,
-  "stargazers_count": 3,
-  "watchers_count": 3,
+  "url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPackageMirrors/OpenSlide.jl/deployments",
+  "created_at": "2015-10-02T16:31:09Z",
+  "updated_at": "2015-10-11T10:54:49Z",
+  "pushed_at": "2015-10-11T13:40:13Z",
+  "git_url": "git://github.com/JuliaPackageMirrors/OpenSlide.jl.git",
+  "ssh_url": "git@github.com:JuliaPackageMirrors/OpenSlide.jl.git",
+  "clone_url": "https://github.com/JuliaPackageMirrors/OpenSlide.jl.git",
+  "svn_url": "https://github.com/JuliaPackageMirrors/OpenSlide.jl",
+  "homepage": "https://github.com/ihnorton/OpenSlide.jl",
+  "size": 368,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 2,
+  "forks_count": 0,
   "mirror_url": null,
-  "open_issues_count": 1,
-  "forks": 2,
-  "open_issues": 1,
-  "watchers": 3,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 2,
-  "subscribers_count": 2
+  "organization": {
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

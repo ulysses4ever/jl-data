@@ -1,0 +1,24 @@
+function scenario_risk_postprocess(asset_losses::Dict{ASCIIString, Vector{Float64}},
+                                   portfolio_losses::Vector{Float64})
+  asset_loss_moments = Dict{ASCIIString, LossMoments}()
+
+  for (ref, losses) in asset_losses
+    asset_loss_moments[ref] = LossMoments(mean(losses), std(losses))
+  end
+  portfolio_loss_moments = LossMoments(mean(portfolio_losses), std(portfolio_losses))
+
+  output = ScenarioRiskOutput(asset_loss_moments, portfolio_loss_moments)
+  return output
+end
+
+function scenario_damage_postprocess(states::Vector{ASCIIString},
+                                     asset_damages::Dict{ASCIIString, Vector{Vector{Float64}}})
+  asset_dmg_moments = Dict{ASCIIString, DamageMoments}()
+
+  for (ref, damages) in asset_damages
+    asset_dmg_moments[ref] = DamageMoments(mean(damages), std(damages))
+  end
+
+  output = ScenarioDamageOutput(states, asset_dmg_moments)
+  return output
+end

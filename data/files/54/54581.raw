@@ -1,0 +1,143 @@
+module KMeansJulia
+
+using Images, Colors, FixedPointNumbers
+
+
+# Note that older versions of ImageMagick have both critical vulnerabilities and slower support for multiple large .tiff files
+
+# Custom types
+immutable Pixel
+	coords::Vector{AbstractFloat}
+	id::Integer
+
+	Pixel() = new([],0)
+end
+
+immutable Cluster
+	pixels::Vector{Pixel}
+	centroid::Pixel
+	k::Integer
+
+	Cluster() = new(Vector{Pixel}(),Pixel(),0)
+end
+
+# Run non-interactively, accept either an image or a directory
+# If directory, iterate through image filetypes
+# Enter filepath and number of dominant colors wanted, k.
+function dominant_colors(filename, k)
+	if isfile(filename)
+		image = load(filename)
+		init(image, filename, k)
+	elseif isdir(filename)
+		files = filter!(abspath(r"\.(?:jpe?g|gif|png|tiff)$")), readdir()) #creates an array of filenames by filtering out only files that in file extensions.
+		for i in files
+			dominant_colors(i, k)
+		end
+	else
+		error("No image found.")
+	end
+end
+
+function init(image, filename, k::Integer)
+	# run(`convert $filename -thumbnail 200x200 $filename`) # convert to thumbnail via ImageMagick CLI
+	imagec = convert(Image{LAB}, float32(image)) # convert from sRGB to L*A*B* colorspace
+	raw_image = raw(imagec) # Image Array of Lab{Float32}. 1st field encodes luminance, color the last two. See ColorTypes.jl for more info
+	width = size(raw_image,1)
+	height = size(raw_image, 2)
+	pixels = getpixels(raw_image, width, height)
+	initialclusters(pixels, width*height, k)
+	kmeans(pixels, k)
+end
+
+function getpixels(raw_image::Array, width::Integer, height::Integer)
+	pixels = Vector{Pixel}()
+	count = 0
+ 	for m=1:height, n=1:width
+			@inbounds newpixel = Pixel()
+		  push!(newpixel.coords, raw_image[m,n].a, raw_image[m,n].b) # Adds color information a*b* of each pixel to an array
+			count += 1
+			newpixel.id = count
+			push!(pixels, newpixel)
+	end
+	return pixels
+end
+
+# Sq. euclidean (2 norm) distance
+function distance(px1::AbstractArray, px2::AbstractArray)
+	return sum((abs2(px1-px2))
+end
+
+# Pick initial centroids using Bahmani et. al. Scalable k-means++ (kmeans||) method with l=2k, r=8
+function initialclusters(pixels::Array, totalpixels::Integer, k::Integer)
+	x_c = (totalpixels)/k # pixels per cluster
+	l = 2 # oversampling factor
+	centroids = Vector{Pixel}()
+	clusters = Vector{Cluster}()
+	push!(centroids, rand(pixels))
+	psi = min_distance(pixels, clusters, centroids) # dict
+	phi = sum(sum(values(psi)) # psi, initial cost of clustering
+	for i in 1:log(psi),
+		p_x = l*
+
+#=
+function min_distance(pixels::AbstractArray, clusters::AbstractArray, centroids::AbstractArray)
+	min_dist = Vector{Float64}(length(pixels))
+	psi = Dict{Integer,Vector{Float64}}() # distances from pixel x, to the closest centroid, C
+	fill!(min_dist, inf)
+	if isempty(clusters) # for kmeans|| initilization
+		for (cluster, c) in enumerate(centroids)
+			for (px, p) in enumerate(pixels)
+				@inbounds dist = []
+				push!(dist, distance(pixels[p].coords,centroids[c].coords))
+				#isempty(min_dist) ? min_dist = dist : (min_dist[px] > dist[px] &&  min_dist[px] = dist[px])
+				min_dist[px] > dist[px] &&  min_dist[px] = dist[px]
+			end
+			psi[cluster] = min_dist
+		end
+		return psi
+	end
+	else
+		break # TODO implement portion of this function to apply to Lloyd's algorithm
+	end
+end
+=#
+
+function min_distance(pixels::AbstractArray, centroid::Pixel)
+	min_dist = Vector{Float64}(length(pixels))
+	psi = Dict{Integer,Vector{Float64}}[]
+	fill!(min_dist, inf)
+	for (px, p) in enumerate(pixels)
+		@inbounds dist = []
+		push!(dist, distance(pixels[p].coords,centroid.coords))
+		min_dist[px] > dist[px] && min_dist[px] = dist[px]
+		psi[pixels[p].id] = min_dist[px]
+	end
+	return psi
+end
+
+#= function kmeanspp(pixels::Array, totalpixels::Integer, k::Integer)
+	x_c = totalpixels/k
+	centroids = Vector{Pixel}()
+	clusters = Vector{Cluster}()
+	dist = min_distance(pixels, rand(pixels))
+	totaldist = map(x->sum(x),values(dist))
+	p_x = []
+	for each in totaldist
+		p_x = cumdist/sum(sum(distances))
+	cumprob = prob
+=#
+
+# Recalculate Centroid
+function center(cluster)
+	centroid = []
+	pixels = cluster.pixels
+	for n = 1:length(pixels)
+		pixels.coords[n]
+
+
+# K-Means Algorithm (alternate between resigning pixels to a cluster based on similarity and cluster centroid based on the pixels assigned)
+function kmeans()
+
+# Repeat n number of times
+
+# Convert returned clusters back to sRGB

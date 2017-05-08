@@ -1,0 +1,99 @@
+using HttpServer
+using WebSockets
+
+include("game.jl")
+include("PJ.jl")
+include("PNJ.jl")
+
+arrPj = Array{PJ}(1)
+arrPnj = Array{PNJ}(10)
+
+function generateArray()
+    srand()
+    arrPj[1] = getPJFromFile("Guerrero.txt")
+    for i in 1:5
+        arrPnj[i] = getPNJFromFile("goblin.txt")
+        arrPnj[i].name = arrPnj[i].name * "$i"
+    end
+    for i in 6:10
+        arrPnj[i] = getPNJFromFile("orco.txt")
+        arrPnj[i].name = arrPnj[i].name * "$(i-5)"
+    end
+end
+
+function lucha()
+    # PJs fight
+    for i in arrPj
+        if length(arrPnj) > 0
+            at = Int8(rand(1:20) + i.at + getB(i.str))            # at = tirada de ataque del héroe
+            rndNMonster = rand(1:length(arrPnj))            # rndNMonster número de monstruo del array
+            m = arrPnj[rndNMonster]                         # m = monster
+            print(i.name,".AT:$at contra ",m.name,".CA:",m.ac," ")
+            if at > m.ac + getB(m.dex)
+                dmg = rand(i.dmg1:i.dmg2)+i.dmg3
+                print("Daño:$dmg. Monstruo PG ",m.hp-dmg," ")
+                m.hp = m.hp - dmg
+                if m.hp <= 0
+                    print(m.name," derrotado 👍")
+                    deleteat!(arrPnj, rndNMonster)
+                end
+            end
+            println("")
+        else
+            global state = STATE_STOP
+            return
+        end
+    end
+    # PNJs fight
+    for i in arrPnj
+        if length(arrPj) > 0
+            rndNPj = rand(1:length(arrPj))                  # rndNPj número de PJ del array
+            p = arrPj[rndNPj]                               # p = pj or hero
+            at = Int8(rand(1:20) + i.at + getB(i.str))      # at = tirada de ataque del héroe
+            print(i.name, ".AT:$at contra ", p.name ,".CA:",p.ac," ")
+            if at > p.ac+getB(p.dex)
+                dmg = rand(i.dmg1:i.dmg2)+i.dmg3
+                print("Daño:$dmg. ",p.name,".PG:",p.hp-dmg," ")
+                p.hp = p.hp - dmg
+                if p.hp <= 0
+                    print(p.name," derrotado 💀")
+                    deleteat!(arrPj, rndNPj)
+                end
+            end
+            println("")
+        else
+            global state = STATE_STOP
+            return
+        end
+    end
+end
+
+function launchServer()
+    global sock
+    global server
+    sock = WebSocketHandler() do req,client
+        println("Conexión establecida")
+        write(client, "Hola mundo ñ\n")
+    end
+
+    server = Server(sock)
+    run(server,2007)
+end
+
+function main()
+    global sock, client
+    generateArray()
+    launchServer()
+    while state == STATE_PLAY
+        #lucha()
+        strInput = strip(readline(STDIN))
+        if strInput == "salir"
+            global state = STATE_STOP
+            close(sock)
+        else
+            write(client, "m:Segundo mensaje")
+        end
+    end
+end
+
+main()

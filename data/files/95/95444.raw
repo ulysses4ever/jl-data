@@ -1,0 +1,5 @@
+include("common.jl")
+
+OUTFILE = joinpath(OUTDIR, "mean_spectrum_synchronous_driver.txt")
+
+mean_spectrum(XDATAFILE, OUTFILE)

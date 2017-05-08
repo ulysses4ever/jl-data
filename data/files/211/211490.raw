@@ -1,0 +1,60 @@
+
+
+# The built-in function is fastest except for a small (~8) size, 
+# and always uses less memory
+function AtimesB(A::Array{Float64,2}, b::Array{Float64,1})
+	return(A*b)
+end
+
+# Slower than v.3, or similar for small arrays
+function AtimesB2(A::Array{Float64,2}, b::Array{Float64,1})
+	x=zeros(size(A)[2])
+	for i in 1:size(A)[1]
+		for j in 1:size(A)[2]
+			x[i]=x[i]+A[i,j]*b[j]
+		end
+	end
+	return(x)
+end
+
+# Faster than v.2, especially for large arrays
+function AtimesB3(A::Array{Float64,2}, b::Array{Float64,1})
+	x=zeros(size(A)[2])
+	for j in 1:size(A)[2]
+		for i in 1:size(A)[1]
+			x[i]=x[i]+A[i,j]*b[j]
+		end
+	end
+	return(x)
+end
+
+function Compare(size::Integer)
+	A=rand((size,size))
+	b=rand(size)
+	t=zeros(3)
+	AtimesB(A,b)
+	AtimesB2(A,b)
+	AtimesB3(A,b)
+	t[1]=@elapsed AtimesB(A,b)
+	t[2]=@elapsed AtimesB2(A,b)
+	t[3]=@elapsed AtimesB3(A,b)
+	return(t)
+end
+
+
+###############################################################################
+# script to try it all
+
+times=zeros((6,3))
+times[1,:]=Compare(8)
+times[2,:]=Compare(64)
+times[3,:]=Compare(128)
+times[4,:]=Compare(256)
+times[5,:]=Compare(512)
+times[6,:]=Compare(1024)
+
+using PyPlot
+plot([i for i=1:6],log10(times[:,1]),color="red")
+plot([i for i=1:6],log10(times[:,2]),color="green")
+plot([i for i=1:6],log10(times[:,3]),color="blue")
+

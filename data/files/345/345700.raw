@@ -1,0 +1,365 @@
+using SortedVectors
+using StatsBase
+
+function simSV(N::Int, r::UnitRange, T::DataType=Int)
+	if T == Int
+		x = rand(r, N)
+		sort!(x)
+		y = deepcopy(x)
+		return(y, SortedVector(x, alreadySorted=true))
+	elseif T == Float64
+		x = randn(N)
+		sort!(x)
+		y = deepcopy(x)
+		return(y, SortedVector(x, alreadySorted=true))
+	else
+		error("Cannot simulate on that type")
+	end
+end
+function simSUV(N::Int, r::UnitRange, T::DataType=Int)
+	if T == Int
+		x = unique(rand(r, N))
+		sort!(x)
+		y = deepcopy(x)
+		return(y, SortedUniqueVector(x, alreadySorted=true, alreadyUnique=true))
+	elseif T == Float64
+		x = unique(randn(N))
+		sort!(x)
+		y = deepcopy(x)
+		return(y, SortedUniqueVector(x, alreadySorted=true, alreadyUnique=true))
+	else
+		error("Cannot simulate on that type")
+	end
+end
+
+
+function testbasic()
+	(x1, s) = simSV(rand(1:10), 1:10)
+	(x2, v) = simSUV(rand(1:10), 1:10)
+	string(s)
+	string(v)
+	#show(s)
+	#show(v)
+	s[1]
+	v[1]
+	length(s)
+	length(v)
+	size(s)
+	size(v)
+	size(s, 1)
+	size(v, 1)
+	sizeof(s)
+	sizeof(v)
+	first(s)
+	first(v)
+	last(s)
+	last(v)
+	endof(s)
+	endof(v)
+	eltype(s)
+	eltype(v)
+	copy(s)
+	copy(v)
+	deepcopy(s)
+	deepcopy(v)
+	issorted(s)
+	issorted(v)
+	searchsorted(s, 1)
+	searchsortedfirst(s, 1)
+	searchsortedlast(s, 1)
+	search(s, 1)
+	searchfirst(s, 1)
+	searchlast(s, 1)
+	searchsorted(v, 1)
+	searchsortedfirst(v, 1)
+	searchsortedlast(v, 1)
+	search(v, 1)
+	searchfirst(v, 1)
+	searchlast(v, 1)
+	empty!(s)
+	empty!(v)
+	length(s) != 0 && error("empty fail 1")
+	length(v) != 0 && error("empty fail 2")
+	return(true)
+end
+
+
+function testin(KK::Int)
+	for kk = 1:KK
+		(x, s) = simSV(rand(1:10), 1:10)
+		a = rand(1:10)
+		in(a, x) != in(a, s) && error("in fail 1")
+		(x, s) = simSUV(rand(1:10), 1:10)
+		a = rand(1:10)
+		in(a, x) != in(a, s) && error("in fail 2")
+	end
+	return(true)
+end
+
+
+function testdeleteat(KK::Int)
+	for kk = 1:KK
+		(x, s) = simSV(rand(1:10), 1:10, Float64)
+		length(x) != length(s) && error("logic fail 1")
+		i = rand(1:length(x))
+		a = x[i]
+		for n = length(x):-1:1
+			x[n] == a && deleteat!(x, n)
+		end
+		deleteat!(s, a)
+		x != s.x && error("deleteat fail 1")
+		in(a, s) && error("deleteat fail 2")
+		(x, s) = simSUV(rand(1:10), 1:10, Float64)
+		i = rand(1:length(x))
+		a = x[i]
+		deleteat!(x, i)
+		deleteat!(s, a)
+		x != s.x && error("deleteat fail 3")
+		in(a, s) && error("deleteat fail 4")
+	end
+	return(true)
+end
+
+
+function testinsert(KK::Int)
+	for kk = 1:KK
+		(x, s) = simSV(rand(1:10), 1:10, Float64)
+		a = randn()
+		insert!(s, a)
+		length(s) != length(x)+1 && error("insert fail 1")
+		!(in(a, s)) && error("insert fail 2")
+		!(issorted(s.x)) && error("insert fail 3")
+		(x, s) = simSUV(rand(1:10), 1:10, Float64)
+		a = randn()
+		while in(a, s)
+			a = randn()
+		end
+		insert!(s, a)
+		length(s) != length(x)+1 && error("insert fail 1")
+		!(in(a, s)) && error("insert fail 2")
+		!(issorted(s)) && error("insert fail 3")
+		SortedUniqueVector(unique(s.x), alreadySorted=true, alreadyUnique=true) != s && error("insert fail 4")
+	end
+	return(true)
+end
+
+
+
+function testintersect(KK::Int)
+	for kk = 1:KK
+		(x1, s1) = simSV(rand(1:10), 1:10)
+		(x2, s2) = simSV(rand(1:10), 1:10)
+		(i1, i2) = intersectIndex(s1, s2)
+		sInt = intersect(s1, s2)
+		xInt = intersect(x1, x2)
+		sIntComp = Array(Int, 0)
+		for n = 1:length(s1)
+			in(s1[n], xInt) && push!(sIntComp, s1[n])
+		end
+		for n = 1:length(s2)
+			in(s2[n], xInt) && push!(sIntComp, s2[n])
+		end
+		sort!(sIntComp)
+		if sInt.x != sIntComp
+			show(s1)
+			show(s2)
+			show(sInt.x)
+			show(sIntComp)
+			show(xInt)
+			error("intersect fail 1")
+		end
+
+		s1Comp = s1[i1]
+		for n = 1:length(s1Comp)
+			!(in(s1Comp[n], sIntComp)) && error("intersect fail 2")
+		end
+		s2Comp = s2[i2]
+		for n = 1:length(s2Comp)
+			!(in(s2Comp[n], sIntComp)) && error("intersect fail 3")
+		end
+		(x1, s1) = simSUV(6, 1:10)
+		(x2, s2) = simSUV(6, 1:10)
+		(i1, i2) = intersectIndex(s1, s2)
+		sI = intersect(s1, s2)
+		sI.x != intersect(x1, x2) && error("intersect fail 4")
+		s1[i1] != sI.x && error("intersect fail 5")
+		s2Comp = s2[i2]
+		for n = 1:length(s2Comp)
+			!(in(s2Comp[n], sI)) && error("intersect fail 6")
+		end
+	end
+	return(true)
+end
+
+
+
+function testunion(KK::Int)
+	for kk = 1:KK
+		(x1, s1) = simSV(rand(1:10), 1:10)
+		(x2, s2) = simSV(rand(1:10), 1:10)
+		(inds1, inds2) = unionIndex(s1, s2)
+		sU = union(s1, s2)
+		!(issorted(sU)) && error("union fail 1")
+		xU = sort([x1, x2])
+		xU != sU.x && error("union fail 2")
+		sU[inds1] != s1.x && error("union fail 3")
+		sU[inds2] != s2.x && error("union fail 4")
+		(x1, s1) = simSUV(rand(1:10), 1:10)
+		(x2, s2) = simSUV(rand(1:10), 1:10)
+		(inds1, inds2) = unionIndex(s1, s2)
+		sU = union(s1, s2)
+		unique(sU.x) != sU.x && error("union fail 5")
+		!(issorted(sU)) && error("union fail 6")
+		sU.x != sort(unique([x1, x2])) && error("union fail 7")
+		sU[inds1] != s1.x && error("union fail 8")
+		sU[inds2] != s2.x && error("union fail 9")
+	end
+end
+
+function testsetdiff(KK::Int)
+	for kk = 1:KK
+		(x1, s1) = simSV(rand(1:10), 1:10)
+		(x2, s2) = simSV(rand(1:10), 1:10)
+		sD = setdiff(s1, s2)
+		xD = setdiff(x1, x2)
+		unique(sD).x != xD && error("setdiff fail 1")
+		for n = 1:length(xD)
+			counts(sD.x, xD[n]:xD[n]) != counts(s1.x, xD[n]:xD[n]) && error("setdiff fail 2")
+		end
+		(x1, s1) = simSUV(rand(1:10), 1:10)
+		(x2, s2) = simSUV(rand(1:10), 1:10)
+		sD = setdiff(s1, s2)
+		xD = setdiff(x1, x2)
+		sD.x != xD && error("setdiff fail 3")
+		(x1, s1) = simSV(rand(1:10), 1:10)
+		(x2, s2) = simSV(rand(1:10), 1:10)
+		sD = setdiff(s1, s2)
+		setdiff!(s1, s2)
+		s1 != sD && error("setdiff fail 4")
+		(x1, s1) = simSUV(rand(1:10), 1:10)
+		(x2, s2) = simSUV(rand(1:10), 1:10)
+		sD = setdiff(s1, s2)
+		setdiff!(s1, s2)
+		s1 != sD && error("setdiff fail 5")
+	end
+end
+
+
+function testunique(KK::Int)
+	for kk = 1:KK
+		(x1, s1) = simSV(rand(1:6), 1:3)
+		sU = unique(s1)
+		sort(unique(x1)) != sU.x && error("unique fail 1")
+		unique!(s1)
+		s1 != sU && error("unique fail 2")
+		!(isunique(sU)) && error("unique fail 3")
+	end
+end
+function testtrim(KK::Int)
+	for kk = 1:KK
+		(x1, s1) = simSV(rand(1:10), 1:10)
+		if rand() < 0.5
+			LB = rand(-5:4)
+			UB = LB + rand(1:10)
+		else
+			LB = rand(1:10)
+			UB = LB + rand(1:10)
+		end
+		sT = trim(s1, LB, UB)
+		for n = 1:length(sT)
+			sT[n] < LB && error("trim fail 1")
+			sT[n] > UB && error("trim fail 2")
+		end
+		for n = 1:length(s1)
+			if (s1[n] >= LB && s1[n] <= UB)
+				!(in(s1[n], sT)) && error("trim fail 3")
+			end
+		end
+		sSpace = SortedVector([[-10:LB-1], [UB+1:21]], alreadySorted=true)
+		sComp = setdiff(s1, sSpace)
+		sComp != sT && error("trim fail 4")
+		trim!(s1, LB, UB)
+		s1 != sT && error("trim fail 5")
+	end
+end
+
+function testmesh(KK::Int)
+	for kk = 1:KK
+		#testing constructMesh
+		mSt = rand(1:5)
+		mEnd = rand(6:50)
+		mLength = rand(1:10)
+		m = constructMesh(mSt, mEnd, mLength)
+		m[1] != mSt && error("constructMesh fail 1")
+		m[end] != mEnd && error("constructMesh fail 2")
+		if length(m) > 2
+			m[2] != mSt + mLength && error("constructMesh fail 3")
+			if length(m) > 3
+				mod(m[end-1] - mSt, mLength) != 0 && error("constructMesh fail 4")
+				m[3] != mSt + 2*mLength && error("constructMesh fail 5")
+			end
+		end
+		#testing meshIndex
+		sN = rand(1:10)
+		mN = rand(1:10)
+		(xs, s) = simSV(sN, 1:10)
+		(xm, m) = simSUV(mN, 1:10)
+		inds = meshIndex(s, m, allowForwardLooking=false)
+		length(inds) != length(m) && error("meshIndex fail 1")
+		for n = 1:length(inds)
+			if inds[n] == 0
+				m[n] >= s[1] && error("meshIndex fail 2")
+			elseif inds[n] == 1
+				m[n] < s[1] && error("meshIndex fail 3")
+				if length(s) > 1
+					m[n] >= s[2] && error("meshIndex fail 4")
+				end
+			elseif inds[n] == length(s)
+				m[n] < s[end] && error("meshIndex fail 5")
+			else
+				m[n] < s[inds[n]] && error("meshIndex fail 6")
+				if length(s) > inds[n]
+					m[n] >= s[inds[n]+1] && error("meshIndex fail 7")
+				end
+			end
+		end
+		indsf = meshIndex(s, m, allowForwardLooking=true)
+		length(inds) != length(indsf) && error("meshIndex fail 8")
+		for n = 1:length(inds)
+			if inds[n] != indsf[n]
+				if inds[n] == 0 && indsf[n] == 1
+					m[n] >= s[1] && error("meshIndex fail 9")
+				else
+					error("meshIndex fail 10")
+				end
+			end
+		end
+	end
+end
+
+
+
+
+
+
+
+
+function testall(KK::Int)
+	testbasic()
+	testin(KK)
+	testdeleteat(KK)
+	testinsert(KK)
+	testintersect(KK)
+	testunion(KK)
+	testsetdiff(KK)
+	testunique(KK)
+	testtrim(KK)
+	testmesh(KK)
+	println("Test passed")
+	return(true)
+end
+
+
+testall(2)
+testall(10000)
+

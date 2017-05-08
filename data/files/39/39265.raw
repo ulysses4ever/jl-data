@@ -1,0 +1,7 @@
+#=
+Reads the Coactivation dataset from BCT.
+TODO: Paths may need fixing if and when the repo becomes a raeal package.
+=#
+Coactivation_Matrix = readdlm("src/Coactivation_Matrix.txt");
+Coactivation_Coord = readdlm("src/Coactivation_Coord.txt");
+

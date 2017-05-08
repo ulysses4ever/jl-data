@@ -1,0 +1,51 @@
+immutable SchedulerDriver
+    handle::Ptr{Void}
+    SchedulerDriver(handle::Ptr{Void}) = new(handle)
+end
+
+function Base.start(driver::SchedulerDriver)
+    return ccall((:start_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function stop(driver::SchedulerDriver, failover::Bool = false)
+    ifo = Int(failover)
+    return ccall((:stop_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, Cint), driver.handle, ifo)
+end
+
+function abort(driver::SchedulerDriver)
+    return ccall((:abort_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function Base.join(driver::SchedulerDriver)
+    return ccall((:join_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function Base.run(driver::SchedulerDriver)
+    return ccall((:run_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function reviveOffers(driver::SchedulerDriver)
+    return ccall((:reviveOffers_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+end
+
+function acknowledgeStatusUpdate(driver::SchedulerDriver, status::Proto.TaskStatus)
+    iob = IOBuffer()
+    tsBufferSize = writeproto(iob, status)
+    tsBuffer = takebuf_array(iob)
+    return ccall((:acknowledgeStatusUpdate_schd_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, Ptr{Uint8}, Cint),
+            driver.handle, tsBuffer, tsBufferSize)
+end
+
+function sendFrameworkMessage(driver::SchedulerDriver, executorId::Proto.ExecutorID,
+                              slaveId::Proto.SlaveID, data::String)
+    iob = IOBuffer()
+    eiBufSize = writeproto(iob, executorId)
+    eiBuf = takebuf_array(iob)
+    iob = IOBuffer()
+    siBufSize = writeproto(iob, slaveId)
+    siBuf = takebuf_array(iob)
+    dataSize = length(data)
+    return ccall((:sendFrameworkMessage_schd_driver, Mesos.libmesosjl), Cint,
+            (Ptr{Void}, Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Uint8}, Cint,),
+            driver.handle, eiBuf, eiBufSize, siBuf, siBufSize, data, dataSize)
+end

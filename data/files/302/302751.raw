@@ -1,0 +1,39 @@
+function Base.writecsv(filename::String, s::Benchmarks.Samples,
+                  e::Benchmarks.Environment, append::Bool = false, delim::Char = '\t')
+    if append
+        io = open(filename, "a")
+    else
+        io = open(filename, "w")
+    end
+    println(
+        io,
+        join(
+            [
+                "env_uuid",
+                "n_evals",
+                "elapsed_times",
+                "bytes_allocated",
+                "gc_times",
+                "num_allocations",
+            ],
+            delim
+        )
+    )
+    for i in 1:length(s.n_evals)
+        println(
+            io,
+            join(
+                [
+                    string(e.uuid)
+                    string(s.n_evals[i])
+                    string(s.elapsed_times[i])
+                    string(s.bytes_allocated[i])
+                    string(s.gc_times[i])
+                    string(s.num_allocations[i])
+                ],
+                delim
+            )
+        )
+    end
+    close(io)
+end

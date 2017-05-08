@@ -1,0 +1,19 @@
+# 2015-03-19: Added utf8 check flag because the sample emails from the ML course dont seam to be UTF8 compatible but they dont produce errors.
+function process_email(email_example, vocab_file, utf8_check::Bool = true)
+
+  # load text from a file.
+  email_file = open(email_example, "r")
+  email_content = readall(email_file)
+
+  # load vocab file. Added column headers(id, word) to the original vocab.txt file from ex6.
+  vocab = readtable(vocab_file, separator = '\t')
+
+  stemed_words = clean_email(email_content, utf8_check)
+  feature_words = featureize_email(stemed_words, vocab)
+
+  #println("Length of feature vector: $(size(feature_words))")
+  #println("Number of non-zero entries: $(sum(feature_words .> 0))")
+
+  return feature_words
+end
+

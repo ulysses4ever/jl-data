@@ -1,0 +1,117 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function evolve()
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+
+    can_move_one = true
+    
+    for repetition = 1:config_vals.num_experiment_repetitions
+        population::Population.Type_Population = Population.make_population(config_vals)    
+        population.target_number = 1
+        generation = 0
+        for generation = 1:config_vals.num_generations
+            if (generation % config_vals.generations_per_target_switch) == 0
+                Population.switch_target(population, config_vals, repetition, generation)
+            end
+            Population.breed_and_exterminate(population, config_vals, generation)
+            Population.print_stats(population, config_vals, repetition, generation)
+        end
+        Genotype.write_to_file(population.best, config_vals)
+        if (generation in [193, 203]) & (population.best.fitness != 16.0)
+            can_move_on = false
+        end
+    end
+    return can_move_on
+end
+
+function enumerate()
+
+    max_num_genotypes::Int64 = 5000000
+    end_condition = 300
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    #config_vals.global_weight_mutation_rate = 0.1
+    config_vals.global_weight_mutation_rate = 0.01
+    config_vals.global_mutation_rate = 0.04
+    population = Population.make_population(config_vals)
+
+    data_file = open("scikit_enumeration_data", "w")
+    fitness_file = open("scikit_enumeration_fitness", "w")
+
+    start_genotype::Genotype.Type_Genotype = Genotype.read_from_file(config_vals)
+    Genotype.evaluate(start_genotype, config_vals, 1, 1, population.preallocation) 
+    println(start_genotype.all_targets_fitnesses)
+    #Genotype.write_for_scikit(start_genotype, config_vals, data_file)
+    #write(fitness_file, string(start_genotype.fitness), "\n")
+
+    dictionary::Dict{Array{Int32, 1}, Int64} = Dict{Array{Int32, 1}, Int64}()
+    #dictionary[vcat(start_genotype.connections, start_genotype.activations, start_genotype.weights, start_genotype.thresholds)] = 0
+
+    temp::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    println("foo")
+    num_ones = 0
+    num_twos = 0
+    for i = 1:max_num_genotypes
+        Genotype.copy_into(temp, start_genotype)
+        Genotype.mutate_at_global_rate(temp, config_vals)
+        #Genotype.point_mutate(temp, config_vals)
+        Genotype.evaluate(temp, config_vals, 1, 1, population.preallocation)
+        target = 1
+        if temp.all_targets_fitnesses[2] > temp.fitness
+            temp.fitness = temp.all_targets_fitnesses[2]
+            target = 2
+        end
+        if (temp.fitness >= 16.0) & (((target == 1) & (num_ones < end_condition)) | ((target == 2) & (num_twos < end_condition)))
+            index = get(dictionary, vcat(temp.connections, temp.activations, temp.weights, temp.thresholds), -1)
+            if index == -1
+                if target == 2
+                    temp.fitness = 16 - temp.fitness
+                    num_twos += 1
+                else
+                    num_ones += 1
+                end
+                dictionary[vcat(temp.connections, temp.activations, temp.weights, temp.thresholds)] = i
+                Genotype.write_for_scikit(temp, config_vals, data_file)
+                write(fitness_file, string(temp.fitness), "\n")
+            end
+        end
+        if (num_ones >= end_condition) & (num_twos >= end_condition)
+        #if ((num_ones + num_twos) >= end_condition)
+            println("Huzzah")
+            exit()
+        end
+        if ((i % 10000) == 0)
+            println(num_ones, " ", num_twos)
+        end
+    end
+    println(num_ones, " ", num_twos)
+    close(data_file)
+    close(fitness_file)
+
+end
+
+
+RUNS = 1
+runs = 0
+while runs < RUNS
+    if evolve()
+        if enumerate()
+            `python dimensionality_reduction.py`
+            runs += 1
+        else
+            println("canceled")
+        end
+    end
+end
+

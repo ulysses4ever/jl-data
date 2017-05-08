@@ -1,0 +1,227 @@
+# Create global variables, arrays and constants
+BLANK = 0
+ONES = 0x3fe
+
+# Probably don't have to create all these here. Refactor when sure.
+InBlock = Array(Int64,81)
+InRow = Array(Int64,81)
+InCol = Array(Int64,81)
+
+Entry = Array(Int64,81)
+
+Row = Array(Int64, 9)
+Col = Array(Int64, 9)
+Block = Array(Int64, 9)
+
+SeqPtr = 1
+Sequence = Array(Int64,81)
+
+Count = 0
+LevelCount = Array(Int64,81)
+
+function SwapSeqEntries(S1, S2)
+  Sequence[S1], Sequence[S2] = Sequence[S2], Sequence[S1]
+end
+
+function InitEntry(i,j,val)
+  global SeqPtr
+  Square = 9 * i + j + 1
+  valbit = 1 << val
+  SeqPtr2 = 1
+
+  Entry[Square] = valbit
+  Block[InBlock[Square]] &= ~valbit
+  Col[InCol[Square]] &= ~valbit
+  Row[InRow[Square]] &= ~valbit
+  SeqPtr2 = SeqPtr
+  while SeqPtr2 < 81 && Sequence[SeqPtr2] != Square
+    SeqPtr2 += 1
+  end
+  SwapSeqEntries(SeqPtr, SeqPtr2);
+
+  if SeqPtr < 81
+    SeqPtr += 1
+  end
+end
+
+function PrintArray()
+  valbit, val, Square = 1, 1, 1
+  ch = ""
+
+  for i = 0:8
+    if i % 3 == 0
+      print("\n")
+    end
+    for j = 0:8
+      if j % 3 == 0
+        print(" ")
+      end
+      valbit = Entry[Square]
+      Square += 1
+      if valbit == 0
+        ch = "-"
+      else
+        for val = 1:9
+          if valbit == (1 << val)
+            ch = '0' + val
+            break
+          end
+        end
+      end
+      print(ch)
+    end
+    print("\n")
+  end
+end
+
+# TODO fill trailing empty spaces with 0 to avoid error with user input
+function ConsoleInput()
+  for i = 0:8
+    @printf("Row %d : ", i+1)
+    InputString = readline(STDIN)
+    for j = 0:8
+      ch = InputString[j+1]
+      if ch >= '1' && ch <= '9'
+        InitEntry(i, j, ch - '0')
+#         Entry[9 * i + j + 1] = ch
+      end
+    end
+  end
+  PrintArray()
+end
+
+function PrintStats()
+  print("\nLevel Counts:\n\n")
+
+  S = 1
+  while LevelCount[S] == 0
+    S += 1
+  end
+
+  i = 0
+
+  while S <= 81
+    Seq = Sequence[S]
+    @printf("(%d, %d):%4d ", Seq / 9 + 1, Seq % 9 + 1, LevelCount[S])
+    if i > 4
+      print("\n")
+      i = 0
+    else
+      i += 1
+    end
+    S += 1
+  end
+
+  @printf("\n\nCount = %d\n", Count)
+end
+
+function Succeed()
+  PrintArray()
+  PrintStats()
+end
+
+function NextSeq(S)
+  T, S2, Square, Possibles, BitCount = 1, 1, 1, 1, 1
+  MinBitCount = 100
+
+  for T = S:81
+    Square = Sequence[T]
+#     println("S : $Square")
+    Possibles = Block[InBlock[Square]] & Row[InRow[Square]] & Col[InCol[Square]]
+    BitCount = 0
+    while bool(Possibles)
+      Possibles &= ~(Possibles & -Possibles)
+      BitCount += 1
+    end
+
+    if BitCount < MinBitCount
+      MinBitCount = BitCount
+      S2 = T
+    end
+  end
+  return S2
+end
+
+function Place(S)
+  global Count
+#   println(S)
+  LevelCount[S] += 1
+  Count += 1
+
+  if S > 81
+    Succeed()
+    return
+  end
+
+  S2 = NextSeq(S)
+  SwapSeqEntries(S, S2)
+
+  Square = Sequence[S]
+
+  BlockIndex = InBlock[Square]
+  RowIndex = InRow[Square]
+  ColIndex = InCol[Square]
+
+  Possibles = Block[BlockIndex] & Row[RowIndex] & Col[ColIndex]
+  while bool(Possibles)
+    valbit = Possibles & (-Possibles)
+    Possibles &= ~valbit
+    Entry[Square] = valbit
+    Block[BlockIndex] &= ~valbit
+    Row[RowIndex] &= ~valbit
+    Col[ColIndex] &= ~valbit
+
+    Place(S + 1)
+
+    Entry[Square] = BLANK
+    Block[BlockIndex] |= valbit
+    Row[RowIndex] |= valbit
+    Col[ColIndex] |= valbit
+  end
+
+  SwapSeqEntries(S, S2)
+end
+
+function main()
+#   println("SEQ1: $SeqPtr")
+  i, j, Square = 1, 1, 1
+
+  for i = 1:9
+    for j = 1:9
+      Square = 9 * (i-1) + (j-1) + 1
+      InRow[Square] = i
+      InCol[Square] = j
+      InBlock[Square] = floor((i-1)/3) * 3 + floor((j-1)/3 + 1)
+    end
+  end
+#     println("SEQ2: $SeqPtr")
+  for Square = 1:81
+    Sequence[Square] = 1
+    Entry[Square] = BLANK
+    LevelCount[Square] = 0
+  end
+# println("SEQ3: $SeqPtr")
+  for i = 1:9
+    Block[i] = Row[i] = Col[i] = ONES
+  end
+
+  ConsoleInput()
+
+  Place(SeqPtr)
+  @printf("\n\nTotal Count = %d\n", Count)
+  return 0
+end
+
+main()
+
+#=
+111111111
+222222222
+333333333
+444444444
+555555555
+666666666
+777777777
+888888888
+999999999
+=#

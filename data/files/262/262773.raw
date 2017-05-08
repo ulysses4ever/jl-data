@@ -1,0 +1,31 @@
+function findmaxsumofconsecutiveprimes(limit::Int)
+    bestprime = 0
+    sumsize = 0
+    sums = primes(limit)
+    lastvalid = length(sums)
+    P = primes(limit)
+
+    sumidx = 2
+    while !isempty(sums)
+        sums = sums[1:min(length(sums), length(P) - sumidx + 1)]
+        for i in 1:min(length(sums), length(P) - sumidx + 1)
+            sums[i] += P[i + sumidx - 1]
+        end
+        filter!(x -> x <= limit, sums)
+        Psum = filter(isprime, sums)
+        if !isempty(Psum)
+            bestprime = Psum[1]
+            sumsize = sumidx
+            #println("new prime: $bestprime ($sumidx terms)")
+        end
+        sumidx += 1
+    end
+
+    return bestprime
+end
+
+@time res = findmaxsumofconsecutiveprimes(1_000_000)
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

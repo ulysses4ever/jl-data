@@ -1,0 +1,33 @@
+
+using AssemblyModule
+
+A=AssemblyModule.SysmatAssemblerSparse()
+
+elem_mat_nrows=3
+elem_mat_ncols=3
+elem_mat_nmatrices=2
+ndofs_row=5
+ndofs_col=5
+AssemblyModule.startassembly!(A, elem_mat_nrows, elem_mat_ncols, elem_mat_nmatrices, ndofs_row, ndofs_col)
+
+M=rand(elem_mat_nrows, elem_mat_ncols)
+dofnums_row=[1 2 5]
+dofnums_col=[1 2 5]
+AssemblyModule.assemble!(A, M, dofnums_row, dofnums_col)
+
+S=AssemblyModule.make_matrix!(A)
+
+t0 = time()
+elem_mat_nmatrices=1000000
+A=AssemblyModule.SysmatAssemblerSparse()
+AssemblyModule.startassembly!(A, elem_mat_nrows, elem_mat_ncols, elem_mat_nmatrices, ndofs_row, ndofs_col)
+for m=1:elem_mat_nmatrices
+    AssemblyModule.assemble!(A, M, dofnums_row, dofnums_col)
+end
+S=AssemblyModule.make_matrix!(A)
+println("Total time elapsed = ",time() - t0,"s")
+
+
+a=cell(3)
+a[1]=[2 3]
+

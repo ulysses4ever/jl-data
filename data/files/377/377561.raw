@@ -1,0 +1,20 @@
+if haskey(ENV, "TRAVIS_JULIA_VERSION")
+    Pkg.clone("https://github.com/MichaelHatherly/Documenter.jl")
+    Pkg.checkout("Documenter", "mh/doctests-no-color")
+    # Pkg.add("Documenter")
+end
+
+using Documenter
+
+makedocs(
+    format = :html,
+    sitename = "Documenter Tests",
+)
+
+deploydocs(
+    target = "build",
+    deps = nothing,
+    make = nothing,
+    repo = "github.com/MichaelHatherly/DocumenterTests.jl.git",
+    dirname = "en",
+)

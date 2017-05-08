@@ -1,0 +1,62 @@
+include("C:\\Users\\prichter\\Dropbox\\Julia Programs\\IPM.jl")
+import Base.Math.@horner
+function SchroderFifth(a0::Float64, a1::Float64, a2::Float64, a3::Float64, a4::Float64, a5::Float64, c::Complex{Float64})
+	x = c
+	M = 100
+	d = 10.0^-6
+	a = 0.1
+	for j in 1:M
+		xP = x
+		f = @horner(x,a0,a1,a2,a3,a4,a5)
+		fP = @horner(x,a1,2*a2,3*a3,4*a4,5*a5)
+		fPP = @horner(x,2*a2,6*a3,12*a4,20*a5)
+		x -= f*fP/(fP^2 - f*fPP)
+		if abs(x - xP) < d
+			return exp(-a*(j - (log(abs(x - xP)) - log(d))/log(d)) + angle(x)im)
+		end
+	end
+	return 0.0im
+end
+function FourDigitName(n::Int64)
+	if 0 <= n <= 9
+		return string("000", n)
+	elseif 10 <= n <= 99
+		return string("00", n)
+	elseif 100 <= n <= 999
+		return string("0", n)
+	else 
+		return string(n)
+	end
+end
+function SchroderFifthPlot(a0::Float64, a1::Float64, a2::Float64, a3::Float64, a4::Float64, a5::Float64, n::Int64)
+	IPM.ExportImage([SchroderFifth(a0,a1,a2,a3,a4,a5,x+y*im) for y in linspace(-0.72,0.72,720), x in linspace(-1.28,1.28,1280)], string("fractal", FourDigitName(n), ".PNG"))
+end
+function SchroderFifthMovie(A1, A2, numSteps::Int64, startIndex::Int64, nonlinearity::Float64)
+	for j in 1:numSteps
+		a = (j^nonlinearity*A2 + (numSteps^nonlinearity - j^nonlinearity)*A1)/numSteps^nonlinearity
+		SchroderFifthPlot(a[1], a[2], a[3], a[4], a[5], a[6], j + startIndex)
+	end
+end
+SchroderFifthMovie([1,0,0,0,0,1],[1,-1,1,-1,1,-1],20,0,1.0)
+SchroderFifthMovie([1,-1,1,-1,1,-1],[1,1,1,-1,-1,-1],20,20,1.0)
+SchroderFifthMovie([1,1,1,-1,-1,-1],[1,2,4,8,16,32],20,40,1.0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

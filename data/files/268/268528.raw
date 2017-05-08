@@ -1,0 +1,55 @@
+###################################################
+## Defines the 'InstanceGraph' type
+###################################################
+
+type InstanceNode
+  node_type::Node
+  arrival::Int64
+  departed::Bool
+  matched::Bool
+
+  "Constructor: reference to the node type"
+  function InstanceNode(typeNode::Node, arr::Int64)
+    obj = new()
+    obj.node_type = typeNode
+    obj.departed = false
+    obj.matched = false
+    obj.arrival = arr
+    return obj
+  end
+end
+
+type InstanceGraph
+  type_graph::TypeGraph
+  nodes::Array{InstanceNode,1}
+  n::Int64
+
+  "Constructor: reference to the underlying type graph.
+  returns an empty InstanceGraph"
+  function InstanceGraph(tg::TypeGraph)
+    obj = new()
+    obj.type_graph = tg
+    obj.nodes = Array(Node,0)
+    return obj
+  end
+end
+
+function arrival!(g::InstanceGraph, node::Node, arr_time::Int64)
+  new_node = InstanceNode(node, arr_time)
+  push!(g.nodes, new_node)
+  g.n = length(g.nodes)
+end
+
+function departure!(g::InstanceGraph, node::InstanceNode)
+  if node in g.nodes
+    if node.departed
+      println("Trying to remove an already departed node")
+    elseif node.matched
+      println("Trying to removed a matched node")
+    else
+      node.departed = true
+    end
+  else
+    println("Trying to remove node that is not in the Pool")
+  end
+end

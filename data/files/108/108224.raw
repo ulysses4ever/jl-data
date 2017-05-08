@@ -1,0 +1,27 @@
+export CONNECT,
+       DELETE,
+       GET,
+       HEAD,
+       OPTIONS,
+       PATCH,
+       POST,
+       PUT,
+       TRACE
+
+#exported
+
+CONNECT(handle::Function, app::App, path::String) = create_route(app, "CONNECT", path, handle)
+DELETE(handle::Function, app::App, path::String)  = create_route(app, "DELETE", path, handle)
+GET(handle::Function, app::App, path::String)     = create_route(app, "GET", path, handle)
+HEAD(handle::Function, app::App, path::String)    = create_route(app, "HEAD", path, handle)
+OPTIONS(handle::Function, app::App, path::String) = create_route(app, "OPTIONS", path, handle)
+PATCH(handle::Function, app::App, path::String)   = create_route(app, "PATCH", path, handle)
+POST(handle::Function, app::App, path::String)    = create_route(app, "POST", path, handle)
+PUT(handle::Function, app::App, path::String)     = create_route(app, "PUT", path, handle)
+TRACE(handle::Function, app::App, path::String)   = create_route(app, "TRACE", path, handle)
+
+# NOT exported
+
+function create_route(app::App, method::String, path::String, handle::Function)
+    app.routes[method * "_" * path] = Route(handle, method, path)
+end

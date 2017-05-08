@@ -1,0 +1,138 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+abstract IState
+
+type State <: IState
+    _id::Int64
+    _transitions::Dict{Any,Any}
+end
+
+abstract IStateKey;
+
+# State A is the first character considered in a repetitive seq. eg: A in AAA
+type StateKeyA <: IStateKey
+end
+
+# State B is the second unique character considered in a repetitive seq. eg: B in ABABABAB
+type StateKeyB <: IStateKey
+end
+
+# State C is the third unique character considered in a repetitive seq. eg: C in BACBACBACBAC
+type StateKeyC <: IStateKey
+end
+
+# organized with entries containing (repitionLength,currentPlace,"AB"}
+type RecognitionStack
+end
+
+##################################################################################
+
+
+##################################################################################
+
+function printState(A::StateKeyA)
+    return "StateKey:A"
+end
+
+function printState(B::StateKeyB)
+    return "StateKey:B"
+end
+
+function printState(C::StateKeyC)
+    return "StateKey:C"
+end
+
+abstract PushDownAutomata
+
+type RecognitionPDA <: PushDownAutomata
+    _stack::RecognitionStack
+    _startState::IState
+    _currentState::IState
+end
+
+##################################################################################
+
+##################################################################################
+
+function createState(id::Int64)
+    return State(id, Dict())
+end
+
+function init(state::State,transitions::Array{Dict{Any,Any}})
+    del_all(state._transitions)
+
+    for transition in transitions
+        merge(state._transitions,transition)
+    end
+end
+
+function createRecognitionStack()
+    return RecognitionStack()
+end
+
+function createRecognitionPDA(stack::RecognitionStack,startState::IState)
+    return RecognitionPDA(stack, startState, startState)
+end
+
+##################################################################################
+##################################################################################
+
+# creates push down automata for pattern recognition 
+function createRecognitionPDA()
+    s0 = createState(0)
+    s1 = createState(1)
+    s2 = createState(2)
+    s3 = createState(3)
+    s4 = createState(4)
+    s5 = createState(5)
+    s6 = createState(6)
+    s7 = createState(7)
+    s8 = createState(8)
+    s9 = createState(9)
+    s10 = createState(10)
+    s11= createState(11)
+    s12 = createState(12)
+
+#    init(s0, [{"a"=>s4},{"b"=>s4}])
+    init(s0, [{StateKeyA()=>s4}])
+
+    recognitionStack = createRecognitionStack()
+
+    return createRecognitionPDA(recognitionStack, s0)
+end
+
+function tickGivenInput(input::Char)
+    print("Ticking '")
+    print(input)
+    println("'")
+end
+
+##################################################################################
+
+println("Naive-Needleman-Wunsch")
+
+createRecognitionPDA()
+tickGivenInput('c')
+
+

@@ -1,0 +1,33 @@
+DataPool0 = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+DataPool1 = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+DataPool2 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+DataPool3 = ['/', '=']
+DataSet = vcat(DataPool0, DataPool1, DataPool2, DataPool3)
+
+function DataWipe()
+	DataLength = length(DataSet)
+	byteSet = Any[]
+	while length(byteSet) != fileSize
+		for i in rand(1:DataLength)
+			for x in DataSet[i]
+				push!(byteSet, x)
+			end
+		end
+	end
+wipeD = join(byteSet)
+openFile = open(file, "w")
+write(openFile, wipeD)
+close(openFile)
+end
+file = ARGS[1]
+fileSize = filesize(file)
+passes = ARGS[2]
+passed = 0
+println("File: ", file)
+println("Size: ",fileSize)
+while passed != parse(Int, passes)
+	DataWipe()
+	passed = passed + 1
+	println("Pass: ", passed, " out of ", passes, " complete")
+end
+println("Done")

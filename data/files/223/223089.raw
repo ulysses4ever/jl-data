@@ -1,0 +1,171 @@
+########################################################
+##                 Multiple Dispatch                  ##
+########################################################
+
+# In Julia, all named functions are generic functions
+# This means that they are built up from many small methods
+# Each constructor for Lion is a method of the generic function Lion.
+
+# For a non-constructor example, let's make a function meow:
+
+# Definitions for Lion, Panther, Tiger
+function meow(animal::Lion)
+    animal.roar # access type properties using dot notation
+end
+
+function meow(animal::Panther)
+    "grrr"
+end
+
+function meow(animal::Tiger)
+    "rawwwr"
+end
+
+# Testing the meow function
+tigger = Tiger(3.5, "orange")
+meow(tigger) # => "rawwr"
+meow(Lion("bown", "ROAAR")) #=> "ROAAR"
+meow(Panther()) # => "grrr"
+
+# Review the local type hierarchy
+issubtype(Tiger, Cat) # => false
+issubtype(Lion, Cat) # => true
+issubtype(Panther, Cat) # => true
+
+# Defining a function that takes Cats
+function pet_cat(cat::Cat)
+  println("The cat says $(meow(cat))")
+end
+
+pet_cat(Lion("42")) # => prints "The cat says 42"
+try
+    pet_cat(tigger) # => ERROR: no method pet_cat(Tiger,)
+catch e
+    println(e)
+end
+
+# In OO languages, single dispatch is common;
+# this means that the method is picked based on the type of the first argument.
+# In Julia, all of the argument types contribute to selecting the best method.
+
+# Let's define a function with more arguments, so we can see the difference
+function fight(t::Tiger,c::Cat)
+  println("The $(t.coatcolor) tiger wins!")
+end
+# => fight (generic function with 1 method)
+
+fight(tigger,Panther()) # => prints The orange tiger wins!
+fight(tigger,Lion("ROAR")) # => prints The orange tiger wins!
+
+# Let's change the behavior when the Cat is specifically a Lion
+fight(t::Tiger,l::Lion) = println("The $(l.mane_color)-maned lion wins!")
+# => fight (generic function with 2 methods)
+
+fight(tigger,Panther()) # => prints The orange tiger wins!
+fight(tigger,Lion("ROAR")) # => prints The green-maned lion wins!
+
+# We don't need a Tiger in order to fight
+fight(l::Lion,c::Cat) = println("The victorious cat says $(meow(c))")
+# => fight (generic function with 3 methods)
+
+fight(Lion("balooga!"),Panther()) # => prints The victorious cat says grrr
+try
+  fight(Panther(),Lion("RAWR")) # => ERROR: no method fight(Panther,Lion)
+catch
+end
+
+# Also let the cat go first
+fight(c::Cat,l::Lion) = println("The cat beats the Lion")
+# => Warning: New definition
+#    fight(Cat,Lion) at none:1
+# is ambiguous with
+#    fight(Lion,Cat) at none:2.
+# Make sure
+#    fight(Lion,Lion)
+# is defined first.
+#fight (generic function with 4 methods)
+
+# This warning is because it's unclear which fight will be called in:
+fight(Lion("RAR"),Lion("brown","rarrr")) # => prints The victorious cat says rarrr
+# The result may be different in other versions of Julia
+
+fight(l::Lion,l2::Lion) = println("The lions come to a tie")
+fight(Lion("RAR"),Lion("brown","rarrr")) # => prints The lions come to a tie
+
+
+# Under the hood
+# You can take a look at the llvm  and the assembly code generated.
+
+square_area(l) = l * l      # square_area (generic function with 1 method)
+
+square_area(5) #25
+
+# What happens when we feed square_area an integer?
+code_native(square_area, (Int32,))
+    #       .section    __TEXT,__text,regular,pure_instructions
+    #   Filename: none
+    #   Source line: 1              # Prologue
+    #       push    RBP
+    #       mov RBP, RSP
+    #   Source line: 1
+    #       movsxd  RAX, EDI        # Fetch l from memory?
+    #       imul    RAX, RAX        # Square l and store the result in RAX
+    #       pop RBP                 # Restore old base pointer
+    #       ret                     # Result will still be in RAX
+
+code_native(square_area, (Float32,))
+    #       .section    __TEXT,__text,regular,pure_instructions
+    #   Filename: none
+    #   Source line: 1
+    #       push    RBP
+    #       mov RBP, RSP
+    #   Source line: 1
+    #       vmulss  XMM0, XMM0, XMM0  # Scalar single precision multiply (AVX)
+    #       pop RBP
+    #       ret
+
+code_native(square_area, (Float64,))
+    #       .section    __TEXT,__text,regular,pure_instructions
+    #   Filename: none
+    #   Source line: 1
+    #       push    RBP
+    #       mov RBP, RSP
+    #   Source line: 1
+    #       vmulsd  XMM0, XMM0, XMM0 # Scalar double precision multiply (AVX)
+    #       pop RBP
+    #       ret
+    #
+# Note that julia will use floating point instructions if any of the
+# arguments are floats.
+# Let's calculate the area of a circle
+circle_area(r) = pi * r * r     # circle_area (generic function with 1 method)
+circle_area(5)                  # 78.53981633974483
+
+code_native(circle_area, (Int32,))
+    #       .section    __TEXT,__text,regular,pure_instructions
+    #   Filename: none
+    #   Source line: 1
+    #       push    RBP
+    #       mov RBP, RSP
+    #   Source line: 1
+    #       vcvtsi2sd   XMM0, XMM0, EDI          # Load integer (r) from memory
+    #       movabs  RAX, 4593140240              # Load pi
+    #       vmulsd  XMM1, XMM0, QWORD PTR [RAX]  # pi * r
+    #       vmulsd  XMM0, XMM0, XMM1             # (pi * r) * r
+    #       pop RBP
+    #       ret
+    #
+
+code_native(circle_area, (Float64,))
+    #       .section    __TEXT,__text,regular,pure_instructions
+    #   Filename: none
+    #   Source line: 1
+    #       push    RBP
+    #       mov RBP, RSP
+    #       movabs  RAX, 4593140496
+    #   Source line: 1
+    #       vmulsd  XMM1, XMM0, QWORD PTR [RAX]
+    #       vmulsd  XMM0, XMM1, XMM0
+    #       pop RBP
+    #       ret
+    #

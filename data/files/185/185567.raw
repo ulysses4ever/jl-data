@@ -1,0 +1,41 @@
+export imageMode, loadImage, noTint, save
+
+## Loading & Displaying
+
+function imageMode(mode)
+	state.imageMode = mode
+end
+
+# this really needs to be improved...
+function loadImage(filename::String)
+    image = Images.imread(filename)
+    imagesep = reinterpret(Float32, float32(data(separate(image))))
+
+    w = size(imagesep,2)
+	h = size(imagesep,1)
+	img1D = Array(Float32, w*h*3)
+	for k=1:h
+		for j=1:w
+	        for i=1:3
+	            img1D[3*w*(j-1)+3*(k-1)+i] = imagesep[k,w-j+1,i]
+	        end
+	    end
+	end
+
+	return image, img1D, w, h
+end
+
+function noTint()
+    state.tintStuff = false
+end
+
+function save(filename::String)
+	data = Array{GLfloat}(3, state.width*2, state.height*2)
+	glReadPixels(0, 0, state.width*2, state.height*2, GL_RGB, GL_FLOAT, data)
+	img = Image(data, colorspace = "RGB", spatialorder = ["x", "y"], colordim = 1)
+	Images.imwrite(img, filename)
+end
+
+# function tint()
+#
+# end

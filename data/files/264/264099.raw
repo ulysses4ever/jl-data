@@ -1,0 +1,149 @@
+# 1D derivatives by fft, Julia test script
+# Bryan Kaiser 
+# 12/28/15
+
+using DataArrays
+using PyPlot
+using PyCall
+
+## ============================================================================
+# domain
+
+Lx = 3000.0 # km, domain size
+Lxcenter = 0.0 # x value @ the center of the grid
+N = 2^8 # series length (must be at least even)
+dx = Lx/float(N) # km, uniform longitudinal grid spacing
+x = collect(0.5*dx:dx:dx*N)-(Lx/2.0-Lxcenter) # km, centered uniform grid 
+ 
+
+## ============================================================================
+# test signals
+
+ifield = 3
+# 1 for cos(kx), 2 for sin(kx), 3 for Gaussian
+
+if ifield == 1 # cos(kx) 
+A = 3.0 # m/s, velocity signal amplitude
+lambda = Lx/10.0 # km, wavelength of signal (smallest possible)
+ks = 2.0*pi/lambda # rad/km
+u = A*cos(ks*x) # km/s (not physical...)
+du = -A*ks*sin(ks*x) 
+d2u = -A*ks^2.0*cos(ks*x) 
+
+elseif ifield == 2 # sin(kx)
+A = 3.0 # m/s, velocity signal amplitude
+lambda = Lx/10.0 # km, wavelength of signal (smallest possible)
+ks = 2.0*pi/lambda # rad/km
+u = A*sin(ks*x) # km/s
+du = A*ks*cos(ks*x) 
+d2u = -A*ks^2.0*sin(ks*x)
+
+elseif ifield == 3 # Gaussian
+sigma = Lx/20.0
+u = exp(-x.^2.0/(2.0*sigma^2.0)) # test signal equivalent to gaussmf(x,[L/10 0]);
+du = x.*u.*(-sigma^(-2.0)) # test signal derivative (Gaussian)
+d2u = u.*(x.^2.0-sigma^2.0)./sigma^4.0;
+
+end # ifield choice
+
+# signal plot 
+plot(x,u,"k") 
+xlabel("x (km)")
+#ylabel("u (km/s)")
+title("signal")
+show()
+#readline()
+
+
+## ============================================================================
+# Fourier transform
+
+U = fft(u)
+#FFTW.set_num_threads(4) # multi-threading for higher performance
+
+# wavenumbers
+k = zeros(N)
+k[2:Int32(N/2)+1] = collect(1:Int32(N/2)).*(2*pi/Lx) # rad/km
+k[Int32(N/2)+2:N] = -collect(Int32(N/2)-1:-1:1).*(2*pi/Lx) # rad/km
+
+hz = k./(2*pi) # 1/length, equivalent to Hz for time
+
+# full spectrum plot
+plot(hz, 2.0/float(N).*abs(U),"k")
+xlabel("spatial frequency (1/km)")
+ylabel("|U|")
+title("Full spectrum")
+show()
+#readline()
+
+# single-sided spectrum plot
+semilogx(hz,2.0/float(N)*abs(U),"k")
+xlabel("spatial frequency (1/km)")
+ylabel("|U|")
+title("Single sided spectrum")
+show()
+#readline()
+
+## ============================================================================
+# inverse Fourier transform
+
+uinv = real(ifft(U))
+
+# comparison of time series and reconstructed time series plot
+plot(x,u,"k",label="signal")
+plot(x,uinv,"b",label="ifft")
+xlabel("x (km)")
+title("inverse Fourier transform")
+legend()
+show()
+#readline()
+
+# error plot
+semilogy(x,abs(u-uinv),"k")
+xlabel("x (km)")
+title("inverse Fourier transform error")
+legend()
+show()
+#readline()
+
+## ============================================================================
+# first derivative
+
+# signal derivative via Fourier transform
+dudx = ifft(U.*k.*im)
+
+# comparison of analytical du/dx and computed du/dx plot
+plot(x,du,"k",label="signal")
+plot(x,real(dudx),"b",label="real ifft")
+plot(x,imag(dudx),"--b",label="imag ifft")
+xlabel("x (km)")
+title("first derivative by fft")
+show()
+#readline()
+
+## error plot
+semilogy(x,abs(du-real(dudx)),"k")
+xlabel("x (km)")
+title("first derivative error")
+show()
+#readline()
+
+## ============================================================================
+# second derivative
+
+d2udx2 = ifft(-U.*k.^2.0)
+
+## comparison with analytical d^2u/dx^2
+plot(x,d2u,"b",x,real(d2udx2),"r")
+plot(x,real(d2udx2),"b",label="real ifft")
+plot(x,imag(d2udx2),"--b",label="imag ifft")
+xlabel("x (km)")
+title("second derivative by fft")
+show()
+#readline()
+
+## error plot
+semilogy(x,abs(d2u-real(d2udx2)),"k")
+xlabel("x (km)")
+title("second derivative error")
+show()

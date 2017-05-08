@@ -1,0 +1,100 @@
+include("dictchannel.jl")
+
+type Nodes
+    availabeWorker::Array{Bool, 1} ;  #True if the worker is not busy
+    cond_take::Condition  ; 
+    Nodes(numberWorker::Int64) = new(fill(true,numberWorker),Condition()) ;
+end
+
+type State
+    states::Dict{ASCIIString,DictChannel}
+    State() = new(Dict{ASCIIString,DictChannel}())
+end
+
+
+
+type TaskDependancy
+    dependency::Array{(ASCIIString,Int64),1} ;
+    TaskDependancy(X::Array{(ASCIIString,Int64),1}) = new(X) ;
+    TaskDependancy() = new(Array((ASCIIString,Int64),1)) ;     
+end
+
+
+type Task_algo
+    taskName::ASCIIString
+    taskdependancy::TaskDependancy ;
+    iterationNumber::Int64  ; 
+    timeToCompute::Float64 ; 
+    nodeToExecute::Nodes ; 
+    Task_algo(_taskName::ASCIIString,_taskdependancy::TaskDependancy,_iterationNumber::Int64,_timeToCompute::Float64,node::Nodes) = new(_taskName,_taskdependancy,_iterationNumber,_timeToCompute,node) ; 
+end
+
+type Canal 
+    speed::Float64 ; #in Mbit/s
+    cond_take::Condition  ; 
+    availabe::Bool
+    Canal(_speed::Float64) = new(_speed,Condition(),true) ; 
+end
+
+type DataTransfer
+    taskName::ASCIIString
+    taskdependancy::TaskDependancy ;
+    iterationNumber::Int64  ; 
+    dataSize::Float64 ; #in Mbit
+    canalToTransfer::Canal ;  
+    DataTransfer(_taskName::ASCIIString,_taskdependancy::TaskDependancy,_iterationNumber::Int64,_dataSize::Float64,_canalToTransfer::Canal) = new(_taskName,_taskdependancy,_iterationNumber,_dataSize,_canalToTransfer) ; 
+end
+
+
+
+
+
+function +(task_algo::Task_algo,k::Int64)
+    temp = Task_algo(task_algo.taskName,task_algo.taskdependancy,task_algo.iterationNumber+k,task_algo.timeToCompute,task_algo.nodeToExecute) ; 
+end
+
+
+function +(task_transfer::DataTransfer,k::Int64)
+    temp = DataTransfer(task_transfer.taskName,task_transfer.taskdependancy,task_transfer.iterationNumber+k,task_transfer.dataSize,task_transfer.canalToTransfer) ; 
+end
+
+
+
+function isReady(task_algo::Task_algo,etat::State)
+    #wait until the task is executable 
+    iterationNumber = task_algo.iterationNumber; 
+    taskdependancy = task_algo.taskdependancy.dependency
+    for dependency  in  taskdependancy
+        wait(etat.states[dependency[1]],iterationNumber+dependency[2]) 
+    end
+end
+
+
+
+function isReady(task_transfer::DataTransfer,etat::State)
+    #wait until the task is executable 
+    iterationNumber = task_transfer.iterationNumber; 
+    taskdependancy = task_transfer.taskdependancy.dependency
+    for dependency  in  taskdependancy
+        wait(etat.states[dependency[1]],iterationNumber+dependency[2]) 
+    end
+end
+
+
+
+
+function getOneProc(node::Nodes)
+    #1er cas il y a un processeur de disponible :
+    if(any(node.availabeWorker))
+
+        indexProc = findmax(node.availabeWorker)[2]
+        node.availabeWorker[indexProc] = false ; 
+        return(indexProc) ; 
+    else 
+        #on attend qu'un processeur soit dispononible 
+        wait(node.cond_take) ; 
+        indexProc = findmax(node.availabeWorker)[2]
+        node.availabeWorker[indexProc] = false ; 
+        return(indexProc) ; 
+    end
+end

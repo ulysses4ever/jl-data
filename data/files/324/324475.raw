@@ -1,0 +1,207 @@
+#
+# syntax trees
+#
+## include("tree_utils.jl")
+## using TreeUtils
+
+l_delim = "("
+r_delim = ")"
+
+###########################################################################
+## TreeNode type
+###########################################################################
+type TreeNode
+    label::String
+    leaf::Bool
+    children::Array{TreeNode}
+end
+
+#########################
+## TreeNode constructors
+#########################
+function TreeNode(s::String)
+    # only one argument creates a leaf node
+    return TreeNode(s, true, TreeNode[])
+end
+
+function TreeNode(s::String, children::Array{TreeNode})
+    return TreeNode(s, false, children)
+end
+
+##################
+# end of TreeNode
+##################
+
+######################################
+## tree utility functions
+######################################
+function tidy_tree(t::String)
+    return replace(t, r"[ \n\t]+", " ")
+end
+
+function extract_trees(s::String; tidy=true)
+    depth = 0
+    begin_index = 0
+    trees = String[]
+    for (i, c) in enumerate(s)
+        if string(c) == l_delim
+            depth += 1
+            if depth == 1 # start of a tree
+                begin_index = i
+            end
+        elseif string(c) == r_delim
+            depth -= 1
+            if depth == 0 # end of a tree
+                if tidy
+                    tree = tidy_tree(s[begin_index:i])
+                else
+                    tree = s[begin_index:i]
+                end
+                push!(trees, tree)
+                begin_index = 0
+            elseif depth == -1
+                depth = 0
+            end
+        end
+    end
+    return trees
+end
+
+function extract_trees(f::IOStream; tidy=true)
+    return extract_trees(readall(f), tidy=tidy)
+end
+
+function verify_tree_string(t::String)
+    if length(t) == 0
+        error("empty string is not a valid tree")
+    end
+    if string(t[1]) != l_delim
+        error("first character of '$t' does not open the tree")
+    end
+    if string(t[end]) != r_delim
+        error("last chararacter of '$t' does not close the tree")
+    end
+    trees = extract_trees(t)
+    if length(trees) != 1
+        error("there are $(length(trees)) trees in '$t'")
+    end
+    return true
+end
+
+function token_pattern(delims="()")
+    if length(delims) != 2
+        throw(ArgumentError, "delimiters must be a string of length 2")
+    end
+    ws_class = "[ \t\n]"
+    ws_str = " \t\n"
+    open_pattern = Regex("\\" * string(delims[1]))
+    close_pattern = Regex("\\" * string(delims[2]))
+    # node pattern: not space or open or close
+    node_pattern = Regex("[^ \t\n" * open_pattern.pattern * close_pattern.pattern * "]+")
+    # leaf pattern: not space or open or close
+    leaf_pattern = Regex("[^ \t\n" * open_pattern.pattern * close_pattern.pattern * "]+")
+    # token pattern:
+    #     open spc* (node)?|close|(leaf)
+    tkn_pattern = Regex(open_pattern.pattern * ws_class*"*" * "(" * node_pattern.pattern * ")?|" * close_pattern.pattern * "|(" * leaf_pattern.pattern * ")")
+    # walk through each token, updating a stack of trees
+    return tkn_pattern
+end
+
+
+###########################################################################
+## ParseTree type
+###########################################################################
+type ParseTree
+    top_label::String
+    leaves::Array{String}
+    productions::Array{(String, Array{String})}
+    tree::TreeNode
+end
+
+##########################
+## ParseTree constructors
+##########################
+function ParseTree(s::String)
+    verify_tree_string(s)
+    token_p = token_pattern(l_delim*r_delim)
+    tokens = String[]
+    productions = Array((String, Array{String}), 0)
+    stack = Array((Union(String, Nothing), Array{TreeNode}), 0)
+    skip_closing_bracket = false
+    push!(stack, (nothing, TreeNode[]))
+    for mtch in eachmatch(token_p, s)
+        token = mtch.match
+
+        # skip past an empty top-level node,
+        # e.g. ( (S (NP ...) (VP ...) ) )
+        if string(token[1]) == l_delim && mtch.captures[1] == nothing
+            skip_closing_bracket = true
+            continue
+        end
+        
+        if string(token[1]) == l_delim
+            # beginning of a tree
+            node = mtch.captures[1]
+            if length(stack) == 1 && length(stack[1][2]) > 0
+                error("oh no, parse error at $token, stack is $stack")
+            end
+            push!(stack, (node, TreeNode[]))
+            
+        elseif mtch.captures[2] != nothing
+            # leaf node
+            if length(stack) == 1
+                error("oh no, parse error at $token, stack is $stack")
+            end
+            push!(tokens, token)
+            push!(stack[end][2], TreeNode(token))
+        
+        else 
+            # end of a (sub)tree
+            if length(stack) == 1
+                if skip_closing_bracket
+                    continue
+                else
+                    error("oh no, parse error at $token, stack is $stack")
+                end
+            end
+            (node, children) = pop!(stack)
+            push!(stack[end][end], TreeNode(node, children))
+            push!(productions, (node, [ch.label for ch in children]))
+        end
+    end
+    tree = stack[1][2][1]    
+    return ParseTree(tree.label, tokens, productions, tree)
+end    
+
+#############################
+## ParseTree pretty-printing
+#############################
+
+function formattree(t::ParseTree;
+                    ## keyword arguments
+                    delimiters = (l_delim, r_delim),
+                    indent=2)
+    tree = t.tree
+    _formattree("", tree, 1, delimiters, indent)
+end
+
+function _formattree(s::String, node::TreeNode, depth::Int,
+                     delimiters = (l_delim, r_delim),
+                     indent::Int=1)
+    l, r = delimiters
+    if node.leaf
+        return s * " " * node.label
+    else
+        s *= l * node.label
+        for child in node.children
+            if ! child.leaf
+                s *= "\n" * repeat(" ", indent * depth)
+            end
+            s = _formattree(s, child, depth+1, delimiters, indent)
+        end
+        return s * r
+    end
+end
+
+## show the formatted tree in the REPL
+show(io::IO, t::ParseTree) = print(io, "ParseTree:\n$(formattree(t))")

@@ -1,0 +1,19 @@
+### Usage: julia signal_simulation.jl (signal)+,
+### where (.)+ denotes Kleene plus, i.e. one or more space-separated signals.
+### Example: julia signal_simulation.jl curved_binary logistic
+
+include("common.jl")
+
+nargs = length(ARGS)
+
+for arg in ARGS
+  @assert in(arg, signals) "$arg not a valid signal."
+end
+
+print_with_color(:white, "Simulating signals:\n")
+
+for i = 1:nargs
+  print_with_color(:white, "  * signal $i of $nargs...")
+  include("signal_simulation_"*ARGS[i]*".jl")
+  print_with_color(:green, " done\n")
+end

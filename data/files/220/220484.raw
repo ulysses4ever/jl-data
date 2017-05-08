@@ -1,0 +1,330 @@
+#Library related to verification functions
+#Copyright(c) 2015: Kally Chung
+
+#01...checkFeas( sol )
+#02...checkFeasDelivTW( prob, sol, indD )
+#03...checkFeasPickupTW( prob, sol, indP )
+#04...checkFeasInventory( prob, sol, indC )
+#05...checkInventoryLevel( prob, sol )
+#06...checkCostsGIS( prob, sol )
+#
+
+include( "IO_MCITW-1P.jl" )
+
+function checkFeas( prob, sol )
+#checkFeasDelivTW
+#================#
+#given a solution, check feasibility verifying deliveries, pickups and inventory
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#
+#   output: bool feas ------------> 0 if infeasible, 1 otherwise
+
+  #initializing auxiliar variables
+  auxFeas = 1
+  
+  #check deliveries
+  for i in 1:(prob.cardD)
+    auxFeas = auxFeas * checkFeasDelivTW( prob, sol, i )
+  end
+  if ( auxFeas <= 0 )
+    println("checkFeasDelivTW")
+    return 0
+  end
+  
+  #check pickups
+  for j in 1:(prob.cardP)
+    auxFeas = auxFeas * checkFeasPickupTW( prob, sol, j )
+  end
+  if ( auxFeas <= 0 )
+    println("checkFeasPickupTW")
+    return 0
+  end
+  
+  #check inventory level
+  for k in 1:(prob.cardC)
+    auxFeas = auxFeas * checkFeasInventory( prob, sol, k )
+  end
+  if ( auxFeas == 0 )
+    println("checkFeasInventory - inventory limits exceeds capacity")
+    return 0
+  elseif ( auxFeas == -1 )
+    println("checkFeasInventory - inventory limits negative")
+  else
+    return 1
+  end
+  
+end
+
+function checkFeasDelivTW( prob, sol, indD )
+#checkFeasDelivTW
+#================#
+#given a delivery index, check feasibility related to your time window
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#           int indD -------------> delivery index
+#
+#   output: bool feas ------------> 0 if infeasible, 1 otherwise
+# 
+
+  #initializing auxiliar variables
+  auxWithin = 0
+  auxOut = 0
+  
+  #check out of the time window
+  auxTime = prob.DS[ indD ]-1
+  for t in 1:auxTime
+    for k in 1:(prob.cardC)
+      auxOut += sol.solX[ indD, k, t ]
+    end
+  end
+  if ( auxOut > 0 )
+    return 0
+  end
+  
+  #check within time window
+  for t in (prob.DS[ indD ]):(prob.DE[ indD ])
+    for k in 1:(prob.cardC)
+      auxWithin += sol.solX[ indD, k, t ]
+    end
+  end
+  if ( auxWithin > 1 )
+    return 0
+  end
+
+  #check out of the time window
+  auxTime = prob.DE[ indD ]+1
+  for t in auxTime:(prob.cardT)
+    for k in 1:(prob.cardC)
+      auxOut += sol.solX[ indD, k, t ]
+    end
+  end
+  if ( auxOut > 0 )
+    return 0
+  end
+  
+  return 1
+end
+
+function checkFeasPickupTW( prob, sol, indP )
+#checkFeasPickupTW
+#=================#
+#given a pickup index, check feasibility related to your time window
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#           int indP -------------> pickup index
+#
+#   output: bool feas ------------> 0 if infeasible, 1 otherwise
+# 
+
+  #initializing auxiliar variables
+  auxWithin = 0
+  auxOut = 0
+  
+  #check out of the time window
+  auxTime = prob.PS[ indP ]-1
+  for t in 1:auxTime
+    for k in 1:(prob.cardC)
+      auxOut += sol.solY[ indP, k, t ]
+    end
+  end
+  if ( auxOut > 0 )
+    return 0
+  end
+  
+  #check within time window
+  for t in (prob.PS[ indP ]):(prob.PE[ indP ])
+    for k in 1:(prob.cardC)
+      auxWithin += sol.solY[ indP, k, t ]
+    end
+  end
+  if ( auxWithin != 1 )
+    return 0
+  end
+
+  #check out of the time window
+  auxTime = prob.PE[ indP ]+1
+  for t in auxTime:(prob.cardT)
+    for k in 1:(prob.cardC)
+      auxOut += sol.solY[ indP, k, t ]
+    end
+  end
+  if ( auxOut > 0 )
+    return 0
+  end
+  
+  return 1
+end
+
+function checkFeasInventory( prob, sol, indC )
+#checkFeasInventory
+#==================#
+#given a cdock index, check feasibility related to your inventory limits
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#           int indC -------------> crossdock index
+#
+#   output: bool feas ------------> 0 if infeasible, 1 otherwise
+
+  #initializing auxiliar variables
+  auxCap = prob.CCap[ indC ]
+  auxFeas = 0
+  
+  #check inventory limits
+  for t in 1:(prob.cardT)
+    if ( sol.solZ[ indC, t ] > auxCap )
+      return 0
+    end
+    if  ( sol.solZ[ indC, t ] < 0 )
+      return -1 #-1#
+    end
+  end
+  
+  return 1
+end
+
+function checkInventoryLevel( prob, sol )
+#checkInventoryLevel
+#===================#
+#check if solZ is accurate
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#
+#   output: bool accur ------------> 0 if is incorrect, 1 otherwise
+
+  #initializing auxiliar variables
+  auxArray = zeros( Int, prob.cardC, prob.cardT )
+  auxC = 0
+  auxT = 0
+  
+  #delivery
+  for i in 1:(prob.cardD)
+    auxC = 0
+    auxT = 0  
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solX[ i,k,t ] == 1 )
+          auxC = k
+          auxT = t
+        end
+      end
+    end
+    
+    if ( auxC != 0 )
+      for t in auxT:(prob.cardT)
+        auxArray[ auxC, t ] += prob.DA[i]
+      end
+    end
+  end
+  
+  #pickup
+  for j in 1:(prob.cardP)
+    auxC = 0
+    auxT = 0  
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          auxC = k
+          auxT = t
+        end
+      end
+    end
+    
+    if ( auxC != 0 )
+      for t in auxT:(prob.cardT)
+        auxArray[ auxC, t ] -= prob.PA[j]
+      end
+    end
+  end
+  
+  #compare auxArray with solZ
+  for k in 1:cardC
+    for t = 1:cardT
+      if ( auxArray[ k,t ] != sol.solZ[ k,t ] )
+        return 0
+      end
+    end
+  end
+  return 1
+  
+end
+
+function checkCostsGIS( prob, sol )
+#checkCostsGIS
+#=============#
+#check if all the costs are accurate
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#
+#   output: bool accur -----------> 0 if is incorrect, 1 otherwise
+
+  #initializing variables
+  trspCost = 0
+  invCost = 0
+  penCost = 0
+  
+  #transportation cost
+  for i in 1:(prob.cardD)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solX[ i,k,t ] == 1 )
+          trspCost += prob.DD[ i, k ]
+        end
+      end
+    end
+  end
+  for j in 1:(prob.cardP)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          trspCost += prob.PD[ j, k ]
+        end
+      end
+    end
+  end
+  if ( trspCost != sol.trspCost )
+    println( "trspCost is not accurate." )
+    return 0
+  end
+  
+  #inventory cost
+  for k in 1:(prob.cardC)
+    for t in 1:prob.cardT
+      invCost += prob.CCost[k] * sol.solZ[ k, t ]
+    end
+  end
+  if ( invCost != sol.invCost )
+    println( "invCost is not accurate." )
+    return 0
+  end
+
+  #penalty cost
+  auxBin = 0
+  for j in 1:(prob.cardP)
+    auxBin = 0
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          auxBin = 1
+        end
+      end
+    end
+    if ( auxBin == 0 )
+      penCost += 1
+    end
+  end
+  if ( penCost != sol.penCost )
+    println( "penCost is not accurate." )
+    return 0
+  end
+
+  #if all costs are accurate
+  return 1
+  
+end

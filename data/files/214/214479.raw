@@ -1,0 +1,164 @@
+#|
+
+HSV Sawfish Module.  Version 1.2.
+
+Copyright (c) 2004 Ewan Mellor <sawfish@ewanmellor.org.uk>.
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+
+
+The HSV<->RGB translations implemented here are based upon the descriptions in
+Computer Graphics: Principles and Practice by Foley, van Dam, Feiner, and
+Hughes.
+
+Install this file by placing it inside your ~/.sawfish/lisp/ directory.
+
+|#
+
+(define-structure hsv
+  (export hsv-to-rgb
+          hsv-to-color
+          rgb-to-hsv
+          color-to-hsv)
+
+  (open rep
+        sawfish.wm
+        )
+
+
+(define (scale-rgb v)
+  (inexact->exact (round (* v 65535))))
+
+
+(define (hsv-to-rgb-fractions h s v)
+  (when (or (not (numberp h))
+            (not (numberp s))
+            (not (numberp v))
+            (<  h 0)
+            (>= h 360)
+            (<  s 0)
+            (>  s 1)
+            (<  v 0)
+            (>  v 1))
+    (error (concat "Bad parameters given to hsv-to-rgb: "
+                   (prin1-to-string h) " "
+                   (prin1-to-string s) " "
+                   (prin1-to-string v))))
+
+  (if (= s 0)
+      (list v v v)
+    (let*
+	((j (/ h 60))
+	 (i (floor j))
+	 (f (- j i))
+	 (p (* v (- 1 s)))
+	 (q (* v (- 1 (* s f ))))
+	 (u (* v (- 1 (* s (- 1 f))))))
+
+      (case i
+        ((0) (list v u p))
+        ((1) (list q v p))
+        ((2) (list p v u))
+        ((3) (list p q v))
+        ((4) (list u p v))
+        ((5) (list v p q)))
+      )
+    )
+  )
+
+
+(define (hsv-to-rgb h s v)
+  "Take the given hue, saturation, and value and return the corresponding red,
+green, and blue values.
+
+  0 <= h < 360 (degrees around the HSV cone);
+  0 <= s,v <= 1.
+
+  0 <= r,g,b < 65536."
+  (mapcar scale-rgb (hsv-to-rgb-fractions h s v))
+  )
+
+
+(define (rgb-to-hsv r g b)
+  "Take the given red, green, and blue values and return the corresponding
+hue, saturation, and value.
+
+  0 <= r,g,b < 65536.
+
+  0 <= h < 360 (degrees around the HSV cone);
+  0 <= s,v <= 1."
+
+  (when (or (not (numberp r))
+            (not (numberp g))
+            (not (numberp b))
+            (<  r 0)
+            (>= r 65536)
+            (<  g 0)
+            (>= g 65536)
+            (<  b 0)
+            (>= b 65536))
+    (error "Bad parameters given to rgb-to-hsv"))
+
+  (let* ((mi (min r g b))
+         (ma (max r g b))
+         (d (- ma mi))
+         (s (if (= ma 0)
+                0
+              (/ d ma)))
+         (j (if (= s 0)
+                0
+              (cond
+               ((= r ma)        (/ (* 60 (- g b)) d) )
+               ((= g ma) (+ 120 (/ (* 60 (- b r)) d)))
+               (t        (+ 240 (/ (* 60 (- r g)) d)))
+               )))
+         (h (if (< j 0)
+                (+ j 360)
+              j))
+         (v (/ ma 65535))
+         )
+    (list h s v)
+    )
+  )
+
+
+(define (hsv-to-color h s v)
+  "Take the given hue, saturation, and value and return the corresponding
+Sawfish color.
+
+  0 <= h < 360 (degrees around the HSV cone);
+  0 <= s,v <= 1."
+  (let ((rgb (hsv-to-rgb h s v)))
+    (get-color-rgb (nth 0 rgb) (nth 1 rgb) (nth 2 rgb))
+    )
+  )
+
+
+(define (color-to-hsv c)
+  "Take the given Sawfish color and return the corresponding hue, saturation,
+and value.
+
+  0 <= h < 360 (degrees around the HSV cone);
+  0 <= s,v <= 1."
+  (let ((rgb (color-rgb c)))
+    (rgb-to-hsv (nth 0 rgb) (nth 1 rgb) (nth 2 rgb))
+    )
+  )
+)

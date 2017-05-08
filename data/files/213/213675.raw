@@ -1,0 +1,13 @@
+## =============================================================================
+## 09_line.jl - line sample
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+## 1.
+plot(dataset("lattice", "melanoma"), x="Year", y="Incidence", Geom.line)
+
+## 2.
+plot(dataset("Zelig", "approval"), x="Month",  y="Approve", color="Year",
+     Geom.line)

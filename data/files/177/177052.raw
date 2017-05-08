@@ -1,0 +1,60 @@
+#predict.jl
+#This script takes spectrograms and computes the corresponding predictions
+#author: Timothy Evans
+#date: 30/07/15
+
+push!(LOAD_PATH, pwd())
+importall signalprocessing, config
+using Images, DataFrames, DecisionTree, JLD, BoundingBoxes
+
+#load paths from config.jl
+(specpath,labelledpath,trainpath,modelpath) = loadpaths();
+
+#add in extract spectrograms here
+
+#load in Random Forest classifier
+println("loading in Random Forest classifier...")
+model = jldopen(string(modelpath,"model.jld"),"r") do file
+  read(file,"model")
+end
+
+#normalise features using saved mean and standard dev
+normvalues = readcsv(string(modelpath,"musigma.csv"));
+mu = normvalues[1,:];
+sigma = normvalues[2,:];
+nsyllables = 0;
+
+for spec in readdir(specpath)
+
+  println("loading image $spec");
+  img = imread(string(trainpath,spec));
+  recorderdata = readtable(string(modelpath,"recorderdata.csv"));
+  (pixels,freq,boxmu,boxvar) = imgfeature_predict(img,spec,recorderdata);
+  featuredata = hcat(pixels,freq,boxmu,boxvar);
+  (m,n) = size(featuredata);
+  X = (featuredata - ones(m)*mu) ./ (ones(m)*sigma);
+  y = apply_forest(model,X);
+  predimg = convert(Array{Float64,2},reshapepred(y,height(img),width(img)));
+  predimg = convthresh(predimg);
+
+  #extract all syllables with area greater than minarea as defined in config.jl
+  (mask,area,boxes) = segmentimg(predimg);
+  nsyllables += length(area)
+
+  # if the spectrogram had segments then save the bounding boxes to file
+  if ~isempty(boxes)
+    println("Saving $(length(area)) segments to file...");
+    (nrows,ncols) = size(mask)
+    dumpsyllables(boxes,modelpath,spec,recorderdata,nrows,ncols)
+  end
+
+
+
+  # -----------------------------------------------------------------------------------
+  # extent of this project was to segment bird calls from recordings but next step
+  # will be to continue from this point. e.g. perform trilateration for individual recognition
+  # -----------------------------------------------------------------------------------
+
+end
+
+println("Found $nsyllables syllables")

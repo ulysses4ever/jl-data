@@ -1,0 +1,17 @@
+function predict(Theta1, Theta2, X)
+  m = size(X, 1)
+  num_labels = size(Theta2, 1)
+
+  p = zeros(m, 1)
+
+  h1 = sigmoid([ones(m, 1) X] * Theta1')
+  h2 = sigmoid([ones(m, 1) h1] * Theta2')
+
+  maxidx = zeros(size(h2, 1))
+  for i=1:size(h2, 1)
+    maxidx[i] = indmax(h2[i,:])
+  end
+
+  return maxidx
+end
+

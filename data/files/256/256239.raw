@@ -1,0 +1,70 @@
+
+##############################################
+### Metodo de Newton para encontrar raices ###
+##############################################
+
+using Derivadas
+
+function newton(f::Function, df::Function x0, eps)
+	while abs(f(x0)) > eps
+		x1 = x0 - f(x0)/df(x0)
+		x0 = x1
+	end
+	return x0
+end
+
+## Algoritmo de Newton con derivada automatica extraida del modulo Derivadas.jl	
+	
+function newton(f::Function, x0, eps)	
+	x0 = Derivada(x0, 1)
+	while abs(f(x0).fun) > eps
+		x1 = x0 - f(x0).fun/f(x0).der
+		x0 = x1
+	end
+	return x0
+end
+
+
+###########################
+### Newton Multivariado ###
+###########################
+
+## El gradiente de una funcion f_i es la i-esima fila de la matriz Jacobiana
+
+function Array2Derivada(x, j)
+	n = length(x)
+	Dx = [Derivada(x[i], 0) for i = 1:n]
+	for i = 1:n
+		if i == j
+			Dx[i] = Derivada(x[i], 1)
+		end
+	end
+	return Dx
+end
+
+
+## Funcion que me devuelce la matriz Jacobiana dados una función y un punto
+
+function Jacobiano(f::Function, x0)
+	n = length(x0)
+	D = zeros(n,n)
+	for i = 1:n
+		Xi = Array2Derivada(x0,i)
+		Fi = f(Xi) 
+		for j = 1:n
+			D[i,j] = Fi[j].dif
+		end
+	end
+	return transpose(D)
+end
+
+## Algoritmo de Newton para el caso multivariable
+
+function multinewton(F::Function, x0, eps)
+	while norm(F(x0)) > eps
+		x1 = x0 - inv(Jacobiano(F,x0))*F(x0)
+		x0 = x1
+	end
+	return x0
+end
+	

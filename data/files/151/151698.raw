@@ -1,0 +1,12 @@
+import MPI
+include("03_send_real_impl.jl")
+
+function main()
+    MPI.Init()
+
+    do_send_real()
+
+    MPI.Finalize()
+end
+
+main()

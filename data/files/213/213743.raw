@@ -1,0 +1,38 @@
+## ====================================================================
+## neural_ntwk.jl - yhat's example
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## ====================================================================
+using DataFrames
+using Gadfly
+
+train_df = readtable("./winequality-red.csv", separator=';')
+
+# Get value counts of "quality" classes
+_, count = hist(train_df[:quality])
+class = sort(unique(train_df[:quality]))
+value_counts = DataFrame(count=count, class=class)
+value_counts
+
+set_default_plot_size(14cm, 10cm)
+plot(value_counts, x="class", y="count",
+     Geom.bar(), Guide.title("Class distributions (\"quality\")"))
+
+
+## -------------------------------------------------------------------
+## good way to split data into training and test data sets.
+## -------------------------------------------------------------------
+
+y = train_df[:quality]
+x = train_df[[names(train_df) .!= :quality]]
+
+n = length(y)
+
+is_train = shuffle(collect(1:n) .> floor(n * 0.25))
+
+x_train, x_test = x[is_train, :], x[!is_train, :]
+y_train, y_test = y[is_train, :], y[!is_train, :]
+
+##
+println("Total number of observations: ",n)
+println("Training set size: ", sum(is_train))
+println("Test set size: ", sum(!is_train))

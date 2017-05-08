@@ -1,0 +1,21 @@
+using Quaternions
+using Base.Test
+
+q1 = Quaternion(1,0,0,0)
+qi = Quaternion(0,1,0,0)
+qj = Quaternion(0,0,1,0)
+qk = Quaternion(0,0,0,1)
+
+@test q1^2 == 1
+@test qi^2 == -1
+@test qj^2 == -1
+@test qk^2 == -1
+@test qi*qj*qk == -1
+@test qi'qj === conj(qi)*qj
+@test qi*qj' === qi*conj(qj)
+
+q1 = Quaternion(randn(4)...)
+q2 = Quaternion(randn(4)...)
+
+@test q1'q2  == conj(q1)*q2
+@test q1*q2' == q1*conj(q2)

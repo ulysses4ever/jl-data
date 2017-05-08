@@ -1,0 +1,21 @@
+include("jb2048.jl")
+# julia set working module
+g=initgame()
+play!(g,display=true)
+@time play!(g,moves=1000)
+plot(g)
+
+play!(g,moves=1,display=true)
+
+i=0
+i-=1;plot(g.hist[i]...)
+i+=1;plot(g.hist[i]...)
+evals(g.hist[i][1],4)
+back!(g,i)
+force!(g,4)
+g[16]=1
+
+@time r=repartition(100,verbose=10:16)
+
+versioninfo()
+Pkg.status()

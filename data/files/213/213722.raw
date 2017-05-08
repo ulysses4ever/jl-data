@@ -1,0 +1,21 @@
+# =============================================================================
+# 01_logistic_regression.jl - logstic regression sample by julia
+# Copyright(C). masaru.charlie 2015. All rights reserved.
+# =============================================================================
+using Regression
+
+d = 3      # sample dimension
+n = 1000   # number of samples
+
+# prepare data
+w = randn(d+1)    # generate the weight vector
+X = randn(d, n)   # generate input features
+y = sign(X'w[1:d] + w[d+1] + 0.2 * randn(n))  # generate (noisy) response
+
+# perform estimation
+ret = Regression.solve(logisticreg(X, y; bias = 1.0),   # construct a logistic regression problem
+                       reg = SqrL2Reg(1.0e-2),          # apply squared L2 regularization
+                       options = Regression.Options(verbosity=:iter, grtol = 1.0e-6 * n))  # set options
+
+# extract results
+w_e = ret.sol

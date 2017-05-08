@@ -1,0 +1,83 @@
+function <(a::SequentialPattern,b::SequentialPattern)
+  return a!=b  && a<=b
+end
+
+function <=(a::SequentialPattern,b::SequentialPattern)
+  m1,n1=size(a)
+  m2,n2=size(b)
+  #println("m1 $m1 m2 $m2 n1 $n1 n2 $n2")
+  assert(m1==m2)
+
+  if n1>n2
+      return false
+  end
+
+  i=1
+  j=1
+  included=true
+  while (i<=n1 && j<=n2)
+      included=all(a[:,i].<=b[:,j])
+      while (j<n2 && !included)
+          #println("i=$i,j=$j")
+          j=j+1
+          included=all(a[:,i].<=b[:,j])
+      end
+      #println("Finished frame: i=$i,j=$j, included= $included")
+      j=j+1
+      i=i+1
+  end
+  included=included && i>n1
+  included
+end
+
+
+function sequence_extend(sp::SequentialPattern,frame::Frame)
+  n,m=size(sp)
+  p=length(frame)
+  assert(p==n)
+  [sp frame]
+end
+
+
+function sequence_extend(sp::SequentialPattern,indices_frame::IndicesFrame)
+  features,frames=size(sp)
+  sequence_extend(sp,indices_frame_to_frame(indices_frame,features))
+end
+
+sequence_extend(sp::SequentialPattern,feature::Int)=sequence_extend(sp,[feature])
+
+feature_extend(sp::SequentialPattern,feature::Int)=feature_extend(sp,[feature])
+
+function feature_extend(sp::SequentialPattern,indices_frame::IndicesFrame)
+  features,frames=size(sp)
+  feature_extend(sp, indices_frame_to_frame(indices_frame,features))
+end
+
+function feature_extend(sp::SequentialPattern,frame::Frame)
+  n,m=size(sp)
+  p=length(frame)
+  assert(p==n)
+  new_sp=copy(sp)
+  new_sp[:,end]|=frame
+  new_sp
+end
+
+function predict(model::SequentialPattern,x::Vector{SequentialPattern})
+  n=length(x);
+  y=ones(1,n);
+  predict_model(sp::SequentialPattern)= model<=sp ? 1:-1
+  y=map(predict_model,x)
+end
+
+function print(io::IO,sp::SequentialPattern)
+  features,frames=size(sp)
+  iobuffer = IOBuffer()
+  print(iobuffer,"Sequential Pattern: ($features features, $frames frames)\n")
+  for i=1:features
+    for j=1:frames
+      print(iobuffer,sp[i,j]?"1":"0")
+    end
+    println(iobuffer,"");
+  end
+  print(io,takebuf_string(iobuffer))
+end

@@ -1,0 +1,169 @@
+
+(require 'sawfish.wm.menus)
+(defvar apps-menu nil)
+(setq apps-menu
+    '(("终端 Terminal"      (system "gnome-terminal &"))
+      ("浏览 Chrome"    (system "google-chrome &"))
+      ("邮件 Thunderbird" (system "thunderbird &"))
+      ("编辑 Emacs"      (system "emacs  -bg rgb:16/48/64   -fg white &"))
+      ("字典 Goldendict"   (system "goldendict &"))
+      ("文本 Gedit"    (system "gedit &"))
+      ("阅读 PDF"        (system "evince &"))
+))
+
+(defun popup-apps-menu ()
+  (interactive)
+  (popup-menu apps-menu))
+
+(bind-keys global-keymap "Button1-Click1" 'popup-apps-menu)
+(bind-keys global-keymap "Super-F1" 'popup-apps-menu)
+
+;; jump-or-exec 
+(require 'jump-or-exec)
+(bind-keys global-keymap
+           "Super-e" `(jump-or-exec "@xhyang$"
+                     ,(lambda ()
+                        (system "emacs &"))
+                     ,(lambda (wind)
+                        (display-window wind))))
+(bind-keys global-keymap
+           "Super-t" `(jump-or-exec "~"
+                     ,(lambda ()
+            (system "gnome-terminal &"))
+             ,(lambda (wind)
+            (display-window wind))))
+(bind-keys global-keymap
+       "Super-i" `(jump-or-exec "Chrome"
+             ,(lambda ()
+            (system "google-chrome &"))
+             ,(lambda (wind)
+            (display-window wind))))
+(bind-keys global-keymap
+           "Hyper-r" `(jump-or-exec "Rox"
+             ,(lambda ()
+            (system "rox &"))
+             ,(lambda ()
+            (display-window wind))))
+(bind-keys global-keymap
+       "Super-p" `(jump-or-exec "网络工具"
+             ,(lambda ()
+            (system "gnome-nettool &"))
+             ,(lambda (wind)
+            (display-window wind))))
+
+(require 'rep.io.timers)
+
+(defun kid-display-message (message &optional seconds)
+  "display MESSAGE for SECONDS seconds and make the message disappeared.
+The default display-message don't close the message window automatically"
+  (interactive)
+  (display-message message)
+  (make-timer
+   (lambda ()
+     (display-message))                 ; close message window
+   (or seconds 2)))
+
+(bind-keys window-keymap "Super-x" '(delete-window (current-event-window)))
+
+(bind-keys window-keymap "Super-l"
+       '(move-window-to (current-event-window) 0 0))
+
+(bind-keys window-keymap "Super-n"
+       '(kid-display-message (window-name (current-event-window))))
+
+(bind-keys window-keymap "Super-m"
+       '(move-resize-window-to (current-event-window) 0 0 1024 768))
+
+(bind-keys window-keymap "Super-r"
+       '(move-resize-window-to (current-event-window) 512 0 512 768))
+
+(require 'iswitch-window)
+(bind-keys global-keymap "Super-s" 'iswitch-window)
+
+;;; switch to last workspace or window
+(define window-or-workspace? 'window)
+(add-hook 'leave-workspace-hook
+          (lambda (current)
+            (setq workspace-last current)
+            (setq window-or-workspace? 'workspace)))
+
+(add-hook 'focus-out-hook
+          (lambda (current)
+            (setq window-last current)
+            (setq window-or-workspace? 'window)))
+
+(bind-keys global-keymap
+    "Super-`"
+    (lambda ()
+      (if (eq window-or-workspace? 'workspace)
+          (select-workspace workspace-last)
+        (display-window window-last))))
+
+(bind-keys window-keymap "Super-Insert" 'insert-workspace-after)
+
+(defun kid-show-key ()
+  (interactive)
+  (require 'keymap)
+  (kid-display-message (concat "You input \""
+                               (event-name (read-event "Please input the key: "))
+                               "\"")))
+
+(defun string-split (string regex #!optional (align 0) (n 0))
+  (if (string-match regex string n)
+      (append (list (substring string n (+ align (match-start))))
+              (string-split string regex align (match-end)))
+    (list (substring string n))))
+
+(define kid-keymap-alist ())
+
+(defun kid-bind-keys (keymap key action)
+  (do ((last-keymap keymap)
+       (keys (string-split key " ") (cdr keys)))
+      ((null keys))
+    (bind-keys last-keymap
+               (car keys)
+               (if (null (cdr keys))
+                   action
+                   (let ((current-keymap (assoc key kid-keymap-alist)))
+                     (setq last-keymap (or current-keymap
+                                           (cdar (setq kid-keymap-alist
+                                                       (cons (cons key (make-keymap))
+                                                             kid-keymap-alist))))))))))
+
+(kid-bind-keys global-keymap "Super-h k" 'kid-show-key)
+
+(bind-keys global-keymap "C-M-l"
+    '(system "gnome-screensaver-command -l &"))
+
+(defun wy-shade-window (win)
+  (interactive "%w")
+  (shade-window win))
+
+(defun wy-unshade-window (win)
+  (interactive "%w")
+  (unshade-window win))
+
+(defun wy-iconify-window (win)
+  (interactive "%w")
+  (iconify-window win)
+  (setq last-iconified-window win))
+
+(defun wy-uniconify-window ()
+  (interactive)
+  (uniconify-window last-iconified-window)
+  (display-window last-iconified-window))
+
+(bind-keys window-keymap "Super-Up" 'wy-shade-window)
+(bind-keys window-keymap "Super-Down" 'wy-unshade-window)
+(bind-keys window-keymap "C-Super-Down" 'wy-iconify-window)
+(bind-keys window-keymap "C-Super-Up" 'wy-uniconify-window)
+
+(defun show-desktop-toggle ()
+  "Show or hide the desktop."
+  (if (showing-desktop-p)
+      (hide-desktop)
+    (show-desktop)))
+(bind-keys global-keymap "Super-k"
+       '(show-desktop-toggle))
+
+(bind-keys global-keymap "Super-L" 'popup-workspace-list)

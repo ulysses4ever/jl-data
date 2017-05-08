@@ -1,0 +1,46 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+# convert a GraphML graph into a serialized Julia graph
+using PyCall, Graphs
+
+rg = pyimport(:igraph)["Graph"]["Read_GraphML"]
+frg = convert(Function,rg) 
+# GraphML file
+g1 = frg(ARGS[1])
+
+vs = g1["vs"]
+es = g1["es"]
+
+nv = length(vs[:indices])
+
+g2 = adjlist(Uint32, is_directed=true)
+
+for v in vs
+	iv = uint32(v[:index]+1)
+	add_vertex!(g2,iv)
+end
+
+for edge in es
+	is = edge[:source]+1
+	it = edge[:target]+1
+	add_edge!(g2,uint32(is),uint32(it))
+end
+
+# serialize directed adjacency list
+open("graph.jld", "w") do file
+	serialize(file, g2)
+end
+

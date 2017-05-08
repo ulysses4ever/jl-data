@@ -1,0 +1,224 @@
+using DataFrames
+
+type Dataset
+
+  num_electrodes::Integer
+  num_time_points::Integer
+  num_neurons::Integer
+  num_positions::Integer
+  frame::DataFrame
+
+  function Dataset(num_electrodes::Integer, num_time_points::Integer, num_neurons::Integer, num_positions::Integer, frame::DataFrame)
+    new(num_electrodes, num_time_points, num_neurons, num_positions, frame)
+  end
+
+end
+
+Dataset(data::Dict) = Dataset(values_at(data, names(Dataset)...)...)
+
+#function Dataset(df::DataFrame; kws...)
+#  kwdict = { k[1] => k[2] for k in kws }
+#  expr = :( !((pos1 .== -1) | (pos2 .== -1) | (pos3 .== -1) | (pos4 .== -1)) )
+#  # TODO temp hack to deal with bad positions at beginning
+#  df = DataFrame(select(expr, df))  # drop bad position rows
+#  df["pos"] = get_pc1_pos(df)
+#  df["posb"] = get_position_bin(df["pos"])
+#  vec = get_position_vector(df["pos"], length(get_colnames("electrodes",df)), kwdict[:pos_type])
+#  for i in 1:size(vec)[2]; df["pos$i"] = vec[:,i]; end
+#  #for f in ["electrodes", "electrodes_transformed"]
+#  for f in ["electrodes"]
+#    lfpcolname = field(f).abbreviation * "pc"
+#    camellfpcolname = string(uppercase(lfpcolname[1])) * lfpcolname[2:end]
+#    df[lfpcolname] = get_pc1_lfp(df, f)
+#    #poscolname = "p_times_" * lfpcolname
+#    poscolname = "posX" * camellfpcolname
+#    df[poscolname] = get_pc1_lfp_times_pos(df,f)
+#    vec = get_position_vector(df[poscolname], length(get_colnames(f,df)), kwdict[:pos_type])
+#    for i in 1:size(vec)[2]; df["$poscolname$i"] = vec[:,i]; end
+#  end
+#  #get_position(df, num_electrodes=number_fields[:num_electrodes]; kws...)
+#  number_fields = get_number_fields(df; kws...)
+#  df["d"] = get_directions(df["pos"])
+#  df["da"] = get_average_direction(df["d"])
+#  df = drop_intertrial_periods(df, TRACK_BOUNDS)
+#  df["t"] = get_trials(df, TRACK_BOUNDS)
+#  Dataset(merge(number_fields, {:frame => df}))
+#end
+
+function Dataset(df::DataFrame; kws...)
+  kwdict = { k[1] => k[2] for k in kws }
+  expr = :( !((pos1 .== -1) | (pos2 .== -1) | (pos3 .== -1) | (pos4 .== -1)) )
+  # TODO temp hack to deal with bad positions at beginning
+  df = DataFrame(select(expr, df))  # drop bad position rows
+  df["pos"] = get_pc1_pos(df)
+  df["posb"] = get_position_bin(df["pos"])
+  df["d"] = get_directions(df["pos"])
+  df["da"] = get_average_direction(df["d"])
+  df = drop_intertrial_periods(df, TRACK_BOUNDS)
+  df["t"] = get_trials(df, TRACK_BOUNDS)
+  vec = get_position_vector(df["pos"], df["da"], length(get_colnames("electrodes",df)), kwdict[:pos_type])
+  for i in 1:size(vec)[2]; df["pos$i"] = vec[:,i]; end
+  #for f in ["electrodes", "electrodes_transformed"]
+  for f in ["electrodes"]
+    lfpcolname = field(f).abbreviation * "pc"
+    camellfpcolname = string(uppercase(lfpcolname[1])) * lfpcolname[2:end]
+    df[lfpcolname] = get_pc1_lfp(df, f)
+    #poscolname = "p_times_" * lfpcolname
+    poscolname = "posX" * camellfpcolname
+    df[poscolname] = get_pc1_lfp_times_pos(df,f)
+    vec = get_position_vector(df[poscolname], df["da"], length(get_colnames(f,df)), kwdict[:pos_type])
+    for i in 1:size(vec)[2]; df["$poscolname$i"] = vec[:,i]; end
+  end
+  #get_position(df, num_electrodes=number_fields[:num_electrodes]; kws...)
+  number_fields = get_number_fields(df; kws...)
+  Dataset(merge(number_fields, {:frame => df}))
+end
+
+function get_number_fields(df; kws...)
+  number_fields = graph(FIELDS) do f
+    field_name = symbol("num_" * f.meaning)
+    num_cols = count(colnames(df)) do n
+      thematch = match(r"^(\w+?)(\d|$)", n)
+      firstpart = length(thematch.captures) > 0 ? thematch.captures[1] : nothing
+      firstpart == f.abbreviation
+    end
+    [field_name, num_cols]
+  end
+  merge(number_fields, {:num_time_points => size(df,1)})
+end
+
+#function get_position(df; kws...)
+#  kws = { k[1] => k[2] for k in kws }
+#  #df["p"] = get_position_1d(df)
+#  #df["pb"] = get_position_bin(df["p"])
+#  if haskey(kws, :pos_type)
+#    vec = get_position_vector(df["pos"], values_at(kws, :num_electrodes, :pos_type)...)
+#    for i in 1:size(vec)[2]; df["pos$i"] = vec[:,i]; end
+#  end
+#end
+
+# return a dataframe containing the data, keyed by e$i for electrodes and n$i
+# for neurons, where i is an index
+
+function Dataset(path::String; kws...)
+  data = matread(path)
+  data["pos"] = data["pos"]'
+  if haskey(data, "v"); data["v"] = data["v"]'; end
+  num_time_points = get_minimum_time_points(data)
+  input_fields = filter(FIELDS) do f length(f.code) > 0 end
+  data_dict = mapreduce(merge, input_fields) do f
+    graph(1:size(data[f.code],1)) do i
+      (f.abbreviation*"$i", reshape(data[f.code][i,1:num_time_points], num_time_points))
+    end
+  end
+  Dataset( DataFrame(data_dict); kws... )
+end
+
+function get_minimum_time_points(dict)
+  time_fields = [ "X", "Xf", "sp", "spf", "pos", "v" ]
+  minimum( map(x->size(dict[x],2), time_fields) )
+end
+
+### HELPERS
+
+function DataFrames.colnames(ds::Dataset)
+  colnames(ds.frame)
+end
+
+function drop_intertrial_periods(df, track_bounds::(Int,Int))
+  df = df[640:size(df,1),:]  # temp hack to get rid of bad initial period
+  expr = :( (posb .>= $(track_bounds[1])) & (posb .<= $(track_bounds[2])) )
+  df = DataFrame(select( expr, df ))
+end
+
+function get_pc1_lfp(df, lfp_type)
+  colregex = Regex(colpattern(field(lfp_type)))
+  cols = filter(colnames(df)) do c ismatch(colregex, c) end
+  pca(matrix(df[cols])).scores[:,1]
+end
+
+function get_pc1_lfp_times_pos(df, lfp_field)
+  col = field(lfp_field).abbreviation * "pc"
+  df[col] .* df["pos"]
+end
+
+### position
+
+# commented out is pre-separation of direction
+
+function get_pc1_pos(df)
+  pca(matrix(df[["pos1","pos2","pos3","pos4"]])).scores[:,1]
+end
+
+#function get_basis(pos, num_bins; dist_gen=Distributions.Normal)
+#  means = linspace(0, maximum(pos), num_bins)
+#  stds = fill!(similar(means), mean(diff(means)))
+#  map(zip(means,stds)) do x dist_gen(x...) end
+#end
+
+function get_basis(pos, num_bins; dist_gen=Distributions.Normal)
+  means = linspace(0, maximum(pos), int(num_bins/2))
+  stds = fill!(similar(means), mean(diff(means)))
+  one_dir = map(zip(means,stds)) do x dist_gen(x...) end
+  vcat(one_dir, copy(one_dir))
+end
+
+#function get_position_vector(pos, num_bins, dist_gen)
+#  basis = get_basis(pos, num_bins, dist_gen=dist_gen)
+#  #[ pdf(dist,pos[i]) for i in 1:length(pos), dist in basis ]
+#  round([ pdf(dist,pos[i]) for i in 1:length(pos), dist in basis ], 5)
+#end
+
+function get_position_vector(pos, dir, num_bins, dist_gen)
+  basis = get_basis(pos, num_bins, dist_gen=dist_gen)
+  #[ pdf(dist,pos[i]) for i in 1:length(pos), dist in basis ]
+  posmat = round([ pdf(dist,pos[i]) for i in 1:length(pos), dist in basis ], 5)
+  filtmat = get_direction_filter(dir, num_bins)
+  posmat .* filtmat
+end
+
+function get_direction_filter(dir, num_bins)
+  halflen = int(num_bins/2)
+  left = vcat(fill(1.0, halflen), fill(0, halflen))
+  right = vcat(fill(0, halflen), fill(1.0, halflen))
+  (mapreduce(hcat,dir) do x x == 1 ? left : right end)'
+end
+
+function get_position_bin(positions; num_bins=100)
+  bin_size = range(convert(Array{Float64,1}, positions)) / num_bins
+  floor((positions - minimum(positions)) / bin_size)
+end
+
+### direction
+
+function get_directions(positions)
+  dirs = map(2:length(positions)) do i
+    (positions[i] - positions[i-1]) > 0 ? 1 : -1 end
+  unshift!(dirs, dirs[1])
+end
+
+function get_average_direction(direction)
+  window_size = 20  # must be even
+  buffer = convert(Int, window_size / 2)
+  avg = map(buffer:length(direction)-buffer) do i
+    mean(direction[i-buffer+1:i+buffer]) > 0 ? 1 : -1
+  end
+  append!( fill(0,buffer-1), append!(avg, fill(0,buffer)) )
+end
+
+### trials
+
+function get_trials(df, track_bounds::(Int,Int))
+  dir = df[1,"da"]
+  starts = Int[1]
+  breakpoints = { 1 => [ track_bounds[2] 1 ; track_bounds[2] -1 ], -1 => [ track_bounds[1] -1 ; track_bounds[1] 1 ] }
+  for i in 1:size(df,1)-1
+    if matrix( df[i:i+1, ["posb", "d"]] ) == breakpoints[dir]
+      push!(starts, i+1); dir *= -1
+    end
+  end
+  mapreduce(vcat, 1:length(starts)) do i
+    len = (i == length(starts) ? size(df,1)+1 : starts[i+1]) - starts[i]
+    fill( i, len )
+  end
+end

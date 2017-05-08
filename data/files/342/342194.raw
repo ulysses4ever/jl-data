@@ -1,0 +1,54 @@
+#1-argument functions
+#d_assign_call must return an array of Exprs/symbols/numbers
+
+@eval function d_assign_call(ops,ex,state,::CallExpr{:exp})
+    lhs = ex.args[1]::Active
+    rhs = ex.args[2].args[2]::Active
+    [Expr(ops[1], dsym(rhs), :($(dsym(lhs)).*$(sym(lhs))) )]
+end
+
+#########################################
+## two-(or more)-argument functions below
+function d_assign_call(ops,ex,state,c::CallExpr{:+})
+    newargs = {}
+    lhs = ex.args[1]::Active
+    for (ix,rhsArg) in enumerate(ex.args[2].args)
+        if isa(rhsArg,Active)
+            push!(newargs,Expr(ops[ix],dsym(rhsArg),dsym(lhs)))
+        end
+    end
+    newargs
+end
+
+function d_assign_call(ops,ex,state,c::CallExpr{:*})
+    newargs = {}
+    lhs = ex.args[1]::Active
+    rhs = ex.args[2].args[2:end]
+    if length(rhs) > 2
+        error("grad can't (yet) accept *(a,b,...) with >2 args")
+    end
+    if isa(rhs[1],Active)
+        push!(newargs,Expr(ops[1],dsym(rhs[1]),:($(dsym(lhs))*$(sym(rhs[2])))))
+    end
+    if isa(rhs[2],Active)
+        push!(newargs,Expr(ops[2],dsym(rhs[2]),:($(sym(rhs[1]))'*$(dsym(lhs))) ))
+    end
+    newargs
+end
+
+
+#for (fsym,ex) in Calculus.derivative_rules[1:2]
+#    #assume all f in derivative_rules take a single variable
+#    subs = [:($(fsym)(x))=>:($(:sym_lhs)),
+#            :xp =>:($(:dsym_lhs)),
+#            :/ => :(./), :* => :(.*), :(^)=>:(.^),
+#            :(square(x))=>:(x.*x), :(x.^2)=>:(x.*x)]
+#    cExpr = CallExpr{fsym}
+#    @eval function d_assign_call!(new_args,ops,ex,state,::$cExpr)
+#        lhs=ex.args[1]::Active
+#        rhs=ex.args[2].args[2]::Active
+#        @assert length(ex.args[2].args)==2 #fail if d_fsym gets a function with multiple args
+#        dex = walk(x->get(subs,x,x),ex)
+#        push!(new_args,Expr(ops[1],dsym(rhs),dex))
+#    end
+#end

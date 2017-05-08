@@ -1,0 +1,36 @@
+#!/usr/bin/env julia
+using Debian
+using Docker
+using Convenience
+
+const workspace = "workspace"
+const machine = Machine("bempp-machine"; create=false, start=false)
+
+
+create_or_use_directory(workspace)
+
+const build_dir = joinpath(workspace, "build")
+create_or_use_directory(build_dir)
+
+activate!(machine) do machine
+    const packaging = ["dh-make", "build-essential", "devscripts", "cdbs"]
+    image(machine, "packaging", packaging; user="") |> run
+end
+
+macro add_package(name)
+  quote
+    include(string($name) * ".jl")
+    activate!(machine) do machine
+      eval($name).prepare()
+      eval($name).make(machine)[end] |> run
+      #= eval($name).test(machine) |> run =#
+      eval($name).publish(machine) |> run
+    end
+  end
+end
+
+
+@add_package :Cookoff
+@add_package :TBB
+# @add_package :Bempp
+

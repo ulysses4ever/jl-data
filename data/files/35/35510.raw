@@ -1,0 +1,160 @@
+using Debug
+include("oct2bin.jl");
+include("bin2dec.jl");
+# (op,ns) = convPolyToTrellis([5;4]',[23 35 0;0 5 13],[]');
+
+@debug function getOutput(nOutputs,nInputs, maxConstr, bin,bitVec)
+op = zeros(Bool,nOutputs,1);
+
+for k = 1:nOutputs
+    res = false;
+    for l = 1:nInputs # for every LFSR
+        thisBin = reshape(bin[l,k,:],maxConstr,1);
+        for m = 1:maxConstr
+            if(thisBin[m] == true)
+                res = res $ bitVec[l,m];
+            end
+        end
+     end
+     op[k] = res;
+end
+return(op);
+end
+
+
+@debug function convPolyToTrellis(constrLen::Array{Int64,2},
+                    B::Array{Int64,2},A)
+#    convPolyToTrellis(constrLen::Array{Int64,2},
+#                   B::Array{Int64,2},A)
+# Converts the given octal representation of the encoder to a trellis object 
+# that can be used by the encoder matrix.
+# constrLen: row vector of size 1 x nInputs, where nInputs is the number of 
+# input bits. Constraint Length is the number of memory elements used for 
+# encoding the bit plus one (for the input bit itself). nInputs also represents
+# the number of LFSRs. This is because each input bit feeds one LFSR.
+# B : matrix of size nInputs x nOutputs. Octal representation of the connections
+# required to generate output bits. The (i,j)-th element is the octal 
+# representation of how the i-th LFSR is connected to give the j-th output bit.
+# A : matrix of size ? x nInputs. Represents the feedback in octal form. 
+# (i,j)-th element represents the feedback from the i-th LFSR to the j-th input 
+# chain. If feedback is present the first output has to be the systematic bits 
+# .So B(K,1) = 1 for all K.
+
+    (nRows,nInputs) = size(constrLen);                 
+    if(nRows != 1)
+        error("size of constrLen should be 1 x nInputs");
+    end
+    
+    (nRows,nOutputs) = size(B);
+    if(nRows != nInputs)
+        error("number of rows in B should be equal to vInputs");
+    end
+    
+    for k = 1:nInputs
+        if(B[k,1] != 1)
+            error("Trellises for LFSRs with feedback which are not systematic cannot be created with this function");
+        end
+    end
+    
+    if(!isempty(A))
+        (rowA,colA) = size(A);
+        if(colA != nInputs)
+            error("length(A) should be equal to number of inputs");
+        end
+    end 
+    
+    
+    nMem       = sum(constrLen) - nInputs; # total number of memory elements 
+    nStates    = 2^nMem; # total number of LFSR states (memory combinations)
+    nInpStates = 2^nInputs; # total number of input combinations
+    
+    #maximum  constraint length, extended to be divisible by 3
+    maxConstr = convert(Int64,ceil(maximum(constrLen)/3)*3);
+    
+    #bin will hold the binary representations of matrix B
+    bin = zeros(Bool,nInputs,nOutputs,maxConstr);
+    for i = 1:nInputs
+        for j = 1:nOutputs
+            vector = zeros(Bool,maxConstr,1);
+            out = oct2bin(B[i,j])';
+            vector[maxConstr-length(out)+1:maxConstr,1] = out;
+            bin[i,j,:] =vector';
+        end
+    end
+    # at this point bin contains LFSR connection info.
+    #binA will hold the binary representations of matrix A
+    binA = zeros(Bool,rowA,nInputs,maxConstr);
+    for i = 1:rowA
+        for j = 1:nInputs
+            vector = zeros(Bool,maxConstr,1);
+            out = oct2bin(A[i,j])';
+            vector[maxConstr-length(out)+1:maxConstr,1] = out;
+            binA[i,j,:] =vector';
+        end
+    end
+    
+    
+    # currState holds the current state of the LFSRs.nInputs for the number of
+    # LFSRs and maxConstr for the maximum number of memory elements for each 
+    # LFSR
+    currState  = zeros(Bool,nInputs,maxConstr);
+    # nextStates(i,j) will hold the state (in decimal form) when the encoder 
+    # is in the i-th state and the j-th input combination is provided.
+    nextStates = zeros(Int64,nStates,nInpStates);
+    # outputs(i,j,k) holds the k-th output bit when the j-th input combination 
+    # is provided to the encoder which is in the i-th state.
+    outputs    = zeros(Bool,nStates,nInpStates,nOutputs);
+    
+    for i = 1:nStates
+        # binState will hold the states for all memory elements
+        binState = dec2bin(i-1,nMem);
+        curr = 0;
+        # rearrange binState into currState, so that we have a per-LFSR picture. 
+        for j = nInputs:-1:1  #for every LFSR
+            thisC = constrLen[j];
+            currState[j,maxConstr-(thisC-1)+1:maxConstr] = 
+                                        binState[curr+1:curr+thisC-1]';
+            curr = curr + thisC-1;
+        end
+        # now for this encoder state we will loop over all input combinations
+        for j = 1:nInpStates
+            binInp = dec2bin(j-1,nInputs);
+            bitVec = zeros(Bool,nInputs,maxConstr);
+            for k = 1:nInputs #for every LFSR
+                bitVec[k,:] = currState[k,:];
+                bitVec[k,maxConstr - constrLen[k]+1] = binInp[k];
+            end
+            # at this point we have LFSRs loaded in bitVec with the right state
+            # and inputs for all cases.
+            if(isempty(A))
+                op = getOutput(nOutputs,nInputs, maxConstr, bin,bitVec);
+                outputs[i,j,:] = reshape(op,1,1,nOutputs);
+            else  # if we have a feedback path
+                opA = getOutput(rowA, nInputs, maxConstr, binA,bitVec);
+                for k = 1:nInputs
+                    bitVec[k,maxConstr - constrLen[k]+1] = opA[k];
+                end
+                op = getOutput(nOutputs,nInputs, maxConstr, bin,bitVec);
+                outputs[i,j,1] = binInp[1];
+                outputs[i,j,2:end] = reshape(op[2:end],1,1,nOutputs-1);
+            end   
+            bitVec[:,2:maxConstr] = bitVec[:,1:maxConstr-1];
+            nxSt = zeros(Bool,nMem,1);
+            
+            curr = 0;
+            for k = nInputs:-1:1
+                thisC = constrLen[k];
+                nxSt[curr+1:curr+thisC-1] = 
+                        bitVec[k,maxConstr-(thisC-1)+1:maxConstr];
+                curr = curr + thisC-1;
+            end
+            nextStates[i,j] = bin2dec(nxSt);
+        end
+    end    
+    return(outputs,nextStates);
+end                    
+
+
+
+
+

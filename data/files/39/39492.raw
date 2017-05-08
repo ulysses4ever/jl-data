@@ -1,0 +1,37 @@
+push!(LOAD_PATH, pwd())
+using Zobrist
+
+testseed = 12
+
+a        = ZobristHash()
+b        = ZobristHash(convert(UInt16,1),convert(UInt16,3))
+c        = ZobristHash(convert(UInt32, testseed),convert(UInt16,2),convert(UInt16,4))
+
+println("A:", typeof(a.H), "\t", a)
+println("\n----------")
+println("B:", typeof(b.H), "\t", b)
+println("\n----------")
+println("C:", typeof(c.H), "\t", c)
+
+C1        = ZobristHash(convert(UInt32, testseed),convert(UInt16,2),convert(UInt16,4))
+C2        = ZobristHash(convert(UInt32, testseed),convert(UInt16,2),convert(UInt16,4))
+C3        = ZobristHash(convert(UInt32, testseed+1),convert(UInt16,2),convert(UInt16,4))
+C4        = ZobristHash()
+
+
+println("Same(C1,C2-true?):\t", same_zobrist(C1,C2))
+println("Same(C1,C3-false?):\t", same_zobrist(C1,C3))
+println("Same(C1,C4-false?):\t", same_zobrist(C1,C4))
+
+d = ZobristHash()
+if(!copy_zobrist(d,a)) 
+   println("Copy failed")
+end
+
+if(!same_zobrist(d,a))
+   println("Copy validation failed")
+else
+	println("Pass validation. d==a")
+	println("D is (",d.pieces,",", d.positions,")")
+end
+

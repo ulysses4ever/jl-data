@@ -1,0 +1,23 @@
+
+export enable_debug_logging, disable_debug_logging, can_debug_logging
+export @debug_logging
+
+b_debug_logging = true
+
+function enable_debug_logging(flag::Bool = true)
+  global b_debug_logging = flag
+end
+disable_debug_logging(flag::Bool = true) = enable_debug_logging(!flag)
+can_debug_logging() = b_debug_logging
+
+macro debug_logging(xs...)
+  if can_debug_logging()
+    msg = ""
+    for x in xs
+      msg *= string(eval(x))
+    end
+    :( println( debug_output(), $msg))
+  else
+    :nothing
+  end
+end

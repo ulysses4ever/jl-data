@@ -1,0 +1,26 @@
+type Problem( cardC, cardD, cardP, cardT, CCap, CCost, DA, DS, DE, DD, PA, PS, PE, PD )
+  cardC::Int
+  cardD::Int
+  cardP::Int
+  cardT::Int
+  CCap::Array{Int,1}
+  CCost::Array{Int,1}
+  DA::Array{Int,1}
+  DS::Array{Int,1}
+  DE::Array{Int,1}
+  DD::Array{Int,2}
+  PA::Array{Int,1}
+  PS::Array{Int,1}
+  PE::Array{Int,1}
+  PD::Array{Int,2}
+end
+
+type Solution( feas, trspCost, invCost, penCost, solX, solY, solZ )
+  feas::Bool
+  trspCost::Int
+  invCost::Int
+  penCost::Int
+  solX::Array{Int,3}
+  solY::Array{Int,3}
+  solZ::Array{Int,2}
+end

@@ -1,0 +1,36 @@
+function checkNNGradients(lambda)
+
+  # create a small neural network to check the backprop. gradients
+  in_size = 3
+  hidden_size = 5
+  num_labels = 3
+  m = 5
+
+  # generate some 'random' test data
+  Theta1 = debugInitializeWeights(in_size, hidden_size)
+  Theta2 = debugInitializeWeights(hidden_size, num_labels)
+
+  # reusing debugInitializeWeights to generate X
+  X = debugInitializeWeights(in_size - 1, m)
+  y = 1 + ([1:m] .% num_labels)
+
+  # unroll parameters
+  params = [Theta1[:], Theta2[:]]
+  costF = (x) -> costFunction(x, in_size, hidden_size, num_labels, X, y, lambda)
+  gradF = (x, s) -> gradientFunction(x, s, in_size, hidden_size, num_labels, X, y, lambda)
+
+  grad = zeros(size(params))
+
+  J = costF(params)
+  gradF(params, grad)
+
+  numgrad = computeNumericalGradient(costF, params)
+
+  display([numgrad grad])
+  println("The above 2 columns should be very similar. [Numerical Grad. | Analytical Grad.]")
+
+  diff = norm(numgrad - grad) / norm(numgrad + grad)
+  println("Relative difference (should be small. Less than 1e-9): $(diff)")
+  println("Lambda: $(lambda)")
+end
+

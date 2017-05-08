@@ -1,0 +1,177 @@
+"""
+est_prob_allc(filename; start=0, stop=nothing)
+
+Reads through an .allc file and estimates the methylation profile
+as a vector of probabilities 'p'. Cytosine positions before 'start'
+and after 'stop' are discarded (by default stop=Inf, meaning read
+the whole chromosome).
+"""
+function est_prob_allc(filename; start=0, stop=Inf)
+    # Estimate methylation probabilities at each cytosine
+    f = open(filename)
+    readline(f) # skip header line
+
+    # Construct p, array of methylation probabilities
+    p = (Float64)[]
+    done = false
+    while !eof(f) && !done
+        data = split(readline(f),'\t')
+        pos = int(data[2])
+        if pos >= start && data[3] == "+"
+            if pos <= stop
+                push!(p,float(data[end])/float(data[end-1]))
+            else
+                close(f); done = true;
+            end
+        end
+    end
+
+    return p
+end
+
+"""
+est_prob_allc(filename, positions)
+
+Reads through an .allc file and estimates the methylation profile
+as a vector of probabilities 'p'. Cytosine positions not in the
+array 'positions' are ignored; 'positions' is expected to be sorted
+in ascending order. This is useful if there are two .allc files from
+different samples; use the 'find_common_positions' function to
+enumerate the common positions of the two files.
+"""
+function est_prob_allc(filename, Vector{Int64}::positions)
+    # Estimate methylation probabilities at each cytosine
+    f = open(filename)
+    readline(f) # skip header line
+
+    # Construct p, array of methylation probabilities
+    p = (Float64)[]
+    done = false
+    i = 1 # counter for positions 
+    while !eof(f) && i < length(positions) && !done
+        # read next cytosine
+        data = split(readline(f),'\t')
+        pos = int(data[2])
+        
+        # search for pos incrementally through positions vector
+        while pos > positions[i]
+            if i == length(positions)
+                # data has gone beyond 'positions'
+                done = true
+                break
+            else
+                i += 1 # move to next element in 'positions'
+            end
+        end
+
+        # pos is either < or == to positions[i] (or > if
+        # i == length(positions))
+        
+        # include this cytosine if it is in 'positions'.
+        if pos == positions[i]
+            push!(p,float(data[end])/float(data[end-1]))
+        end
+    end
+
+    return p
+end
+
+"""
+find_common_positions(file1, file1; start=0, stop=nothing)
+
+Reads through two .allc files and returns a list of common
+cytosine positions Cytosine positions before 'start' and
+after 'stop' are discarded (by default stop=Inf, meaning read
+the whole chromosome).
+"""
+function find_common_positions(file1, file2; start=0, stop=Inf, strand="+")
+    # File handles
+    f1,f2 = open(file1), open(file2)
+    readline(f1); readline(f2) # skip header lines
+
+    # Initial cytosine positions
+    pos1 = int(split(readline(f1),'\t')[2])
+    pos2 = int(split(readline(f2),'\t')[2])
+
+    # Find common positions
+    positions = (Int64)[]
+    done = false
+    while !done
+        if pos1 == pos2
+            # add this position
+            push!(positions,pos1)
+            # move to the next positions
+            pos1 = get_position_on_strand(f1,strand)
+            pos2 = get_position_on_strand(f2,strand)
+            # check for end of file
+            if isnan(pos1) || isnan(pos2)
+                done = true
+            end
+        elseif pos1 < pos2
+            # increment position for first file
+            pos1 = get_position_on_strand(f1,strand)
+            if isnan(pos1) # reached end of f1
+                done = true
+            end
+        else # pos2 < pos1
+            pos2 = get_position_on_strand(f2,strand)
+            if isnan(pos2) # reached end of f2
+                done = true
+            end
+        end
+    end
+
+    close(f1)
+    close(f2)
+    return positions
+end
+
+"""
+get_position_and_strand(filestream)
+
+Reads lines from .allc file until a cytosine position 
+on a specified strand is found ('strand' is either '+'
+or '-'). If the end of file is reached
+returns NaN
+"""
+function get_position_on_strand(filestream, strand)
+    data = split(readline(filestream),'\t')
+    position = int(data[2])
+    strand = data[3]
+    return position
+end
+
+"""
+draw_reads(p, n, len)
+
+Generate 'n' reads of length 'len' from methylation probability
+vector 'p'
+"""
+function draw_reads(p, n, len)
+    # Draw reads from the probability vector, save them in a
+    # sparse matrix, with observed indices I,J and binary values V
+    len_p = length(p)
+    I,J,V = (Int64)[], (Int64)[], (Int64)[]
+    js = int(ceil(len/2))
+    je = int(floor(len/2)-1)
+    for i = 1:n
+        mid = rand(1:len_p)
+        a = max(1,mid-js)
+        b = min(len_p,mid+je)
+        read_p = p[a:b] # read methylation probabilities
+
+        # read_p[j] is the probability of being methylated
+        for j = 1:length(read_p)
+            push!(I,i)      # row index
+            push!(J,a+j-1)  # column index
+            if rand() < read_p[j]
+                push!(V,1) # methylated 
+            else
+                push!(V,-1) # unmethylated
+            end
+        end
+    end
+
+    # Sparse matrix dataset
+    return sparse(I,J,V)
+end

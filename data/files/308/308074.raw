@@ -1,0 +1,73 @@
+module StreamPlotMethods
+
+function return_direction(theta::Float64)
+	x = cos(theta)
+	y = sin(theta)
+	return (int(sign(x))*(rand() < abs(x)), int(sign(y))*(rand() < abs(y)))
+end
+
+function StreamPlot(danceGrid::Array{Float64,2}, danceDuration::Int64, numDancers::Int64)
+	(n1, n2) = size(danceGrid)
+	x::Int64 = 0
+	y::Int64 = 0
+	temp1::Int64 = 0
+	temp2::Int64 = 0
+	B = zeros(Int64, n1, n2)
+	println("Beginning computation.")
+	for i in 1:10
+		for j in 1:int(numDancers/10)
+			x = rand(1:n1)
+			y = rand(1:n2)
+			for k in 1:danceDuration
+				B[x, y] += 1
+				(temp1, temp2) = return_direction(danceGrid[x, y])
+				x = mod1(x + temp1, n1)
+				y = mod1(y + temp2, n2)
+			end
+		end
+		println(string("Process ", myid(), " at ", 10*i, " percent completion."))
+	end
+	return B
+end
+
+function HelicityStreamPlot(danceGrid::Array{Float64,2}, danceDuration::Int64, numDancers::Int64)
+	(n1, n2) = size(danceGrid)
+	x::Int64 = 0
+	y::Int64 = 0
+	lastTheta::Float64 = 0.0
+	helicity::Float64 = 0.0
+	temp::Float64 = 0.0
+	temp1::Int64 = 0
+	temp2::Int64 = 0
+	B = zeros(Float64, n1, 2*n2)
+	println("Beginning computation.")
+	for i in 1:10
+		for j in 1:int(numDancers/10)
+			x = rand(1:n1)
+			y = rand(1:n2)
+			helicity = 0.0
+			for k in 1:danceDuration
+				temp = danceGrid[x, y]
+				if temp > 3.1 && lastTheta < -3.1
+					helicity = helicity*0.995 + 0.005*(temp - lastTheta - 2*pi)
+				elseif temp < -3.1 && lastTheta > 3.1
+					helicity = helicity*0.995 + 0.005*(temp - lastTheta + 2*pi)
+				else
+					helicity = helicity*0.995 + 0.005*(temp - lastTheta)
+				end
+				lastTheta = temp
+				B[x, y] += 1.0
+				B[x, y + n2] += helicity
+				(temp1, temp2) = return_direction(temp)
+				x = mod1(x + temp1, n1)
+				y = mod1(y + temp2, n2)
+
+			end
+		end
+		println(string("Process ", myid(), " at ", 10*i, " percent completion."))
+	end
+	return B
+end
+
+
+end

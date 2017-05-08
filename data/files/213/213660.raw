@@ -1,0 +1,20 @@
+## =============================================================================
+## 06_histogram2d.jl - histogram 2D
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+##
+plot(dataset("car", "Womenlf"), x="HIncome", y="Region", Geom.histogram2d)
+##
+plot(dataset("car", "UN"), x="GDP", y="InfantMortality",
+     Scale.x_log10, Scale.y_log10, Geom.histogram2d)
+
+##
+plot(dataset("car", "UN"), x="GDP", y="InfantMortality",
+     Scale.x_log10, Scale.y_log10, Geom.histogram2d(xbincount=30, ybincount=30))
+
+##
+plot(dataset("car", "UN"), x="GDP", y="InfantMortality",
+     Scale.x_log10, Scale.y_log10, Geom.histogram2d(xbincount=10, ybincount=10))

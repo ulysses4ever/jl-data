@@ -1,0 +1,154 @@
+# N=20000000
+
+# function doit1(N)
+#     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=-6.0;    Jac=1.0;
+#     for i=1:N
+#         Fe += Ns *  (f * Jac); 
+#     end
+#     Fe
+# end
+
+# # function doit2(N)
+# #     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=-6.0;    Jac=1.0;
+# #     for i=1:N
+# #         Fe += Ns .*  ([f] * Jac); 
+# #     end
+# #     Fe
+# # end
+
+# # function doit3(N)
+# #     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=-6.0;    Jac=1.0;
+# #     fs=[1.0]
+# #     for i=1:N
+# #         fs= ([f] * Jac );   Fe += Ns .*  fs; 
+# #     end
+# #     Fe
+# # end
+
+# # function doit4(N)
+# #     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=-6.0;    Jac=1.0;
+# #     fs=[1.0]
+# #     for i=1:N                   # 
+# #         fs= [f]; fs *= Jac;   Fe += Ns .*  fs; 
+# #     end
+# #     Fe
+# # end
+
+# # function doit5(N)
+# #     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=-6.0;    Jac=1.0;
+# #     fs=[1.0]
+# #     for i=1:N                   # 
+# #         fs[1]= f; fs *= Jac;   Fe += Ns .*  fs; 
+# #     end
+# #     Fe
+# # end
+
+# # function doit6(N)
+# #     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=-6.0;    Jac=1.0;
+# #     for i=1:N
+# #         for k=1:length(Fe)
+# #             Fe[k]+=Ns[k]*(f * Jac);
+# #         end
+# #     end
+# #     Fe
+# # end
+
+# # function doit7(N)
+# #     Fe=zeros(3,1);    Ns=zeros(3,1)+1.0;    f=[-6.0];    Jac=1.0;
+# #     for i=1:N
+# #         for k=1:length(Fe)
+# #             Fe[k]=Fe[k]+Ns[k]*(f[1] * Jac);
+# #         end
+# #     end
+# #     Fe
+# # end
+
+# # @time doit1(N)
+# # # @time doit2(N)
+# # # @time doit3(N)
+# # # @time doit4(N)
+# # # @time doit5(N)
+# # # @time doit6(N)
+# # @time doit7(N)
+
+
+# # # @time show(doit1(N))
+# # # @time show(doit2(N))
+# # # @time show(doit3(N))
+# # # @time show(doit4(N))
+
+# N=2000000
+# # Kedim=3; sdim=2; 
+# #     kappa_bar=rand(Float64,sdim,sdim); kappa_bar=kappa_bar+kappa_bar'; Jac=1.0; w=1.0/2.0;
+# # gradN=rand(Float64,Kedim,sdim);
+
+# function Ke1(N)
+#     Kedim=3; sdim=2; 
+#     Ke =zeros(Float64,Kedim,Kedim);
+#     kappa_bar=rand(Float64,sdim,sdim); kappa_bar=kappa_bar+kappa_bar'; Jac=1.0; w=1.0/2.0;
+#     gradN=rand(Float64,Kedim,sdim);
+#     for i=1:N
+#         fill!(Ke, 0.0);                             # Initialize elements matrix
+#         Ke += gradN*(kappa_bar*(Jac*w))*gradN'
+#     end
+#     Ke
+# end
+
+# function Ke2(N)
+#     Kedim=3; sdim=2; 
+#     Ke =zeros(Float64,Kedim,Kedim); 
+#     kappa_bar=rand(Float64,sdim,sdim); kappa_bar=kappa_bar+kappa_bar'; Jac=1.0; w=1.0/2.0;
+#     gradN=rand(Float64,Kedim,sdim);
+#     kappa_bar_s=zeros(Float64,sdim,sdim);     gradN_kappa_bar_s=zeros(Float64,Kedim,sdim);
+#     for i=1:N
+#         fill!(Ke, 0.0);                             # Initialize elements matrix
+#         for nx=1:sdim
+#             for mx= 1:sdim
+#                 kappa_bar_s[mx,nx]=(Jac*w)*kappa_bar[mx,nx]
+#             end
+#         end
+#         for nx=1:sdim
+#             for mx=1:Kedim
+#                 gradN_kappa_bar_s[mx,nx]=0.0
+#                 for kx=1:sdim
+#                     gradN_kappa_bar_s[mx,nx]+=gradN[mx,kx]*kappa_bar_s[kx,nx]
+#                 end
+#             end
+#         end
+#         for nx=1:Kedim
+#             for mx=1:Kedim
+#                 for kx=1:sdim
+#                     Ke[mx,nx] += gradN_kappa_bar_s[mx,kx]*gradN[nx,kx]
+#                 end
+#             end
+#         end
+#     end
+#     Ke
+# end
+
+
+
+# # show(Ke1(N))
+# # show(Ke2(N))
+# @time Ke1(N)
+# @time Ke2(N)
+
+const Rm2=[-0.668742918086684  -0.743493718540316;  -0.743493718540316   0.668742918086684];
+const Rm3=[1.0 0.0; 0.0 1.0]
+const A=rand(2,2)
+N=100000000
+
+function d1(N,M1,M2)
+    for i=1:N
+        C=M1*M2
+    end
+end
+@time d1(N,Rm1,A)
+@time d1(N,Rm2,A)
+
+include("IntegRuleModule.jl")
+using IntegRuleModule
+r=IntegRuleModule.GaussRule (order=1,dim=2)
+
+
+

@@ -1,0 +1,48 @@
+letters = ['a':'z',
+		'A':'Z',
+		'1':'9',
+		' ',
+		'	',
+		'.',
+		'"',
+		'!',
+		'?',
+		'/',
+		'\n',
+		'(',
+		')',
+		'[',
+		']',
+		'{',
+		'}',
+		'\\']
+
+function setupFontCharacters()
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+
+	for c in letters
+		img, metric = renderface(fontState.face, c)
+
+		w = size(img, 1)
+		h = size(img, 2)
+
+		tex = GLuint[0]
+		glGenTextures(1, tex)
+		glActiveTexture(GL_TEXTURE1)
+		glBindTexture(GL_TEXTURE_2D, tex[1])
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, img)
+		glGenerateMipmap(GL_TEXTURE_2D)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+        character = textCharacter(tex[1], [w, h], [metric.horizontal_bearing[1], metric.horizontal_bearing[2]], metric.advance[1])
+        fontState.characters[c] = character
+	end
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 0)
+    FT_Done_Face(fontState.face[1])
+end

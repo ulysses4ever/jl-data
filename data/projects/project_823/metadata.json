@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:34 GMT
+Date: Wed, 03 May 2017 21:01:46 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5221
+Content-Length: 5088
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2795
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3922
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "c91ec210631885b6f7bc31a4563ab19d"
-Last-Modified: Thu, 24 Dec 2015 23:41:49 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "01f78a3bce67ba7a23bf3fff444acac4"
+Last-Modified: Sun, 03 May 2015 21:24:29 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,90 +22,90 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 8166eb1845e56d99ba68a6b1065016c1
-X-GitHub-Request-Id: D5A0:6631:866257:AD93DA:590231FE
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: F3BA:5C90:AC013E:DD012B:590A453A
 
 {
-  "id": 48559567,
-  "name": "NewPkg.jl",
-  "full_name": "peter1000/NewPkg.jl",
+  "id": 35001260,
+  "name": "euGENE",
+  "full_name": "minimac93/euGENE",
   "owner": {
-    "login": "peter1000",
-    "id": 6168860,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/6168860?v=3",
+    "login": "minimac93",
+    "id": 9171240,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/9171240?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/peter1000",
-    "html_url": "https://github.com/peter1000",
-    "followers_url": "https://api.github.com/users/peter1000/followers",
-    "following_url": "https://api.github.com/users/peter1000/following{/other_user}",
-    "gists_url": "https://api.github.com/users/peter1000/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/peter1000/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/peter1000/subscriptions",
-    "organizations_url": "https://api.github.com/users/peter1000/orgs",
-    "repos_url": "https://api.github.com/users/peter1000/repos",
-    "events_url": "https://api.github.com/users/peter1000/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/peter1000/received_events",
+    "url": "https://api.github.com/users/minimac93",
+    "html_url": "https://github.com/minimac93",
+    "followers_url": "https://api.github.com/users/minimac93/followers",
+    "following_url": "https://api.github.com/users/minimac93/following{/other_user}",
+    "gists_url": "https://api.github.com/users/minimac93/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/minimac93/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/minimac93/subscriptions",
+    "organizations_url": "https://api.github.com/users/minimac93/orgs",
+    "repos_url": "https://api.github.com/users/minimac93/repos",
+    "events_url": "https://api.github.com/users/minimac93/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/minimac93/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/peter1000/NewPkg.jl",
-  "description": "Helper to generate new julia packages.",
+  "html_url": "https://github.com/minimac93/euGENE",
+  "description": "euGENE nucleotide and protein analysis",
   "fork": false,
-  "url": "https://api.github.com/repos/peter1000/NewPkg.jl",
-  "forks_url": "https://api.github.com/repos/peter1000/NewPkg.jl/forks",
-  "keys_url": "https://api.github.com/repos/peter1000/NewPkg.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/peter1000/NewPkg.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/peter1000/NewPkg.jl/teams",
-  "hooks_url": "https://api.github.com/repos/peter1000/NewPkg.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/peter1000/NewPkg.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/peter1000/NewPkg.jl/events",
-  "assignees_url": "https://api.github.com/repos/peter1000/NewPkg.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/peter1000/NewPkg.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/peter1000/NewPkg.jl/tags",
-  "blobs_url": "https://api.github.com/repos/peter1000/NewPkg.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/peter1000/NewPkg.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/peter1000/NewPkg.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/peter1000/NewPkg.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/peter1000/NewPkg.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/peter1000/NewPkg.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/peter1000/NewPkg.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/peter1000/NewPkg.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/peter1000/NewPkg.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/peter1000/NewPkg.jl/subscription",
-  "commits_url": "https://api.github.com/repos/peter1000/NewPkg.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/peter1000/NewPkg.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/peter1000/NewPkg.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/peter1000/NewPkg.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/peter1000/NewPkg.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/peter1000/NewPkg.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/peter1000/NewPkg.jl/merges",
-  "archive_url": "https://api.github.com/repos/peter1000/NewPkg.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/peter1000/NewPkg.jl/downloads",
-  "issues_url": "https://api.github.com/repos/peter1000/NewPkg.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/peter1000/NewPkg.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/peter1000/NewPkg.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/peter1000/NewPkg.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/peter1000/NewPkg.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/peter1000/NewPkg.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/peter1000/NewPkg.jl/deployments",
-  "created_at": "2015-12-24T23:40:20Z",
-  "updated_at": "2015-12-24T23:41:49Z",
-  "pushed_at": "2015-12-29T13:35:42Z",
-  "git_url": "git://github.com/peter1000/NewPkg.jl.git",
-  "ssh_url": "git@github.com:peter1000/NewPkg.jl.git",
-  "clone_url": "https://github.com/peter1000/NewPkg.jl.git",
-  "svn_url": "https://github.com/peter1000/NewPkg.jl",
+  "url": "https://api.github.com/repos/minimac93/euGENE",
+  "forks_url": "https://api.github.com/repos/minimac93/euGENE/forks",
+  "keys_url": "https://api.github.com/repos/minimac93/euGENE/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/minimac93/euGENE/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/minimac93/euGENE/teams",
+  "hooks_url": "https://api.github.com/repos/minimac93/euGENE/hooks",
+  "issue_events_url": "https://api.github.com/repos/minimac93/euGENE/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/minimac93/euGENE/events",
+  "assignees_url": "https://api.github.com/repos/minimac93/euGENE/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/minimac93/euGENE/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/minimac93/euGENE/tags",
+  "blobs_url": "https://api.github.com/repos/minimac93/euGENE/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/minimac93/euGENE/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/minimac93/euGENE/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/minimac93/euGENE/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/minimac93/euGENE/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/minimac93/euGENE/languages",
+  "stargazers_url": "https://api.github.com/repos/minimac93/euGENE/stargazers",
+  "contributors_url": "https://api.github.com/repos/minimac93/euGENE/contributors",
+  "subscribers_url": "https://api.github.com/repos/minimac93/euGENE/subscribers",
+  "subscription_url": "https://api.github.com/repos/minimac93/euGENE/subscription",
+  "commits_url": "https://api.github.com/repos/minimac93/euGENE/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/minimac93/euGENE/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/minimac93/euGENE/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/minimac93/euGENE/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/minimac93/euGENE/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/minimac93/euGENE/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/minimac93/euGENE/merges",
+  "archive_url": "https://api.github.com/repos/minimac93/euGENE/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/minimac93/euGENE/downloads",
+  "issues_url": "https://api.github.com/repos/minimac93/euGENE/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/minimac93/euGENE/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/minimac93/euGENE/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/minimac93/euGENE/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/minimac93/euGENE/labels{/name}",
+  "releases_url": "https://api.github.com/repos/minimac93/euGENE/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/minimac93/euGENE/deployments",
+  "created_at": "2015-05-03T21:23:21Z",
+  "updated_at": "2015-05-03T21:24:29Z",
+  "pushed_at": "2015-05-03T21:24:29Z",
+  "git_url": "git://github.com/minimac93/euGENE.git",
+  "ssh_url": "git@github.com:minimac93/euGENE.git",
+  "clone_url": "https://github.com/minimac93/euGENE.git",
+  "svn_url": "https://github.com/minimac93/euGENE",
   "homepage": null,
-  "size": 398,
+  "size": 96,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
-  "has_wiki": false,
-  "has_pages": true,
+  "has_wiki": true,
+  "has_pages": false,
   "forks_count": 0,
   "mirror_url": null,
   "open_issues_count": 0,

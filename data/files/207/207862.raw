@@ -1,0 +1,145 @@
+"""
+    AbstractInitializer
+
+The abstract base class for all initializers.
+
+To define a new initializer, it is
+enough to derive a new type, and implement one or more of the following methods:
+
+    _init_weight(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+    _init_bias(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+    _init_gamma(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+    _init_beta(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+
+Or, if full behavior customization is needed, override the following function
+
+    init(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+"""
+abstract AbstractInitializer
+
+function init{T<:AbstractInitializer}(self :: T, name :: Base.Symbol, array :: NDArray)
+  strname = string(name)
+  if endswith(strname, "bias")
+    _init_bias(self, name, array)
+  elseif endswith(strname, "gamma")
+    _init_gamma(self, name, array)
+  elseif endswith(strname, "beta")
+    _init_beta(self, name, array)
+  elseif endswith(strname, "weight")
+    _init_weight(self, name, array)
+  elseif endswith(strname, "moving_mean")
+    _init_zero(self, name, array)
+  elseif endswith(strname, "moving_var")
+    _init_zero(self, name, array)
+  else
+    _init_default(self, name, array)
+  end
+end
+
+function _init_bias(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+  array[:] = 0
+end
+function _init_gamma(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+  array[:] = 1
+end
+function _init_beta(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+  array[:] = 0
+end
+function _init_zero(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+  array[:] = 0
+end
+
+function _init_default(self :: AbstractInitializer, name :: Base.Symbol, array :: NDArray)
+  error("Do not know how to init $name")
+end
+
+"""
+    UniformInitializer
+
+Initialize weights according to a uniform distribution within the provided scale.
+"""
+immutable UniformInitializer <: AbstractInitializer
+  scale :: AbstractFloat
+end
+"""
+    UniformInitializer(scale=0.07)
+
+Construct a :class:`UniformInitializer` with the specified scale.
+"""
+UniformInitializer() = UniformInitializer(0.07)
+
+function _init_weight(self :: UniformInitializer, name :: Base.Symbol, array :: NDArray)
+  rand!(-self.scale, self.scale, array)
+end
+
+"""
+    NormalInitializer
+
+Initialize weights according to a univariate Gaussian distribution.
+"""
+immutable NormalInitializer <: AbstractInitializer
+  μ :: AbstractFloat
+  σ :: AbstractFloat
+end
+"""
+    NormalIninitializer(; mu=0, sigma=0.01)
+
+Construct a :class:`NormalInitializer` with mean ``mu`` and variance ``sigma``.
+"""
+NormalInitializer(; mu=0, sigma=0.01) = NormalInitializer(mu, sigma)
+
+function _init_weight(self :: NormalInitializer, name :: Base.Symbol, array :: NDArray)
+  randn!(self.μ, self.σ, array)
+end
+
+"""
+    XavierInitializer
+
+The initializer documented in the paper [Bengio and Glorot 2010]: *Understanding
+the difficulty of training deep feedforward neuralnetworks*.
+
+There are several different version of the XavierInitializer used in the wild.
+The general idea is that the variance of the initialization distribution is controlled
+by the dimensionality of the input and output. As a distribution one can either choose
+a normal distribution with μ = 0 and σ² or a uniform distribution from -σ to σ.
+
+Several different ways of calculating the variance are given in the literature or are
+used by various libraries.
+
+* [Bengio and Glorot 2010]: ``mx.XavierInitializer(distribution = mx.xv_uniform, regularization = mx.xv_avg, magnitude = 1)``
+* [K. He, X. Zhang, S. Ren, and J. Sun 2015]: ``mx.XavierInitializer(distribution = mx.xv_gaussian, regularization = mx.xv_in, magnitude = 2)``
+* caffe_avg: ``mx.XavierInitializer(distribution = mx.xv_uniform, regularization = mx.xv_avg, magnitude = 3)``
+"""
+
+@enum XavierDistribution xv_uniform xv_normal
+@enum XavierRegularization xv_avg xv_in xv_out
+
+immutable XavierInitializer <: AbstractInitializer
+  distribution :: XavierDistribution
+  regularization :: XavierRegularization
+  magnitude :: Float64
+end
+
+XavierInitializer(; distribution = xv_uniform, regularization = xv_avg, magnitude = 3.0) = XavierInitializer(distribution, regularization, magnitude)
+
+function _init_weight(self :: XavierInitializer, name :: Base.Symbol, array :: NDArray)
+  dims    = size(array)
+  fan_in  = prod(dims[2:end])
+  fan_out = dims[1]
+
+  if self.regularization == xv_avg
+    factor = (fan_in + fan_out) / 2
+  elseif self.regularization == xv_in
+    factor = fan_in
+  elseif self.regularization == xv_out
+    factor = fan_out
+  end
+
+  σ = √(self.magnitude / factor)
+
+  if self.distribution == xv_uniform
+    rand!(-σ, σ, array)
+  elseif self.distribution == xv_normal
+    randn!(0.0, σ, array)
+  end
+end

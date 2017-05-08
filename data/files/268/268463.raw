@@ -1,0 +1,88 @@
+###################################################
+## Find maximum matching in the graph
+###################################################
+
+function match(pool::InstanceGraph, p::Params; verbose::Int64 = 0)
+  edges = Edges(pool, p)
+  w = generate_weights(pool, p)
+  m = init_model(p)
+  n = edges.n_nodes
+  @variable(m, 1 >= y[1:n] >= 0, Int)
+  @variable(m, 1 >= x[edges.list] >= 0, Int)
+
+  @objective(m, Max, sum(y[j] * w[j] for j in 1:n))
+  @constraint(m, c2[k=1:n], sum(x[(i,k)] for i=edges.ingoing[k]) == y[k])
+  @constraint(m, c1[k=1:n], sum(x[(k,j)] for j=edges.outgoing[k]) == y[k])
+  if p.techno == "23_cycles"
+    am = am_generator(pool)
+    two_three_cycles_constraint(m, n, am, edges, y, x)
+  elseif p.techno == "2_cycles"
+    two_cycles_constraint(m, n, edges, y, x)
+  else
+    println("techno not implemented")
+  end
+  status = solve(m)
+  match_edges = getvalue(x)
+  match_vertices = getvalue(y)
+  value = getobjectivevalue(m)
+  solve_time = getsolvetime(m)
+  ret = find(match_vertices .>= 1e-6)
+  return  (ret, solve_time)
+end
+
+function init_model(p::Params)
+  if p.solver == "gurobi"
+    m = Model(solver=GurobiSolver(OutputFlag = 0))
+  elseif p.solver == "mosek"
+    m = Model(solver=MosekSolver(LOG = 0))
+  else
+    println("Solver not supported")
+  end
+  return m
+end
+
+function two_three_cycles_constraint(m::JuMP.Model, n::Int64 ,am::Array{Int64,2},
+          edges::Edges, y::Array{JuMP.Variable,1},
+          x::JuMP.JuMPArray{JuMP.Variable,1,Tuple{Array{Tuple{Int64,Int64},1}}})
+
+  # If there is a path of length 2, it has to be closed as a 3-cycle
+  # 2-cycles are not impacted because i is not in ingoing[i]
+  @constraint(m, c4[i=1:n, j=edges.outgoing[i],
+      k=intersect(edges.outgoing[j],(edges.ingoing[i]))],
+      x[(k,i)] >= x[(i,j)] + x[(j,k)] - 1)
+  @constraint(m, c5[i=1:n, j=edges.outgoing[i],
+      k=setdiff(edges.outgoing[j],[i])],
+      am[k,i] >= x[(i,j)] + x[(j,k)] - 1)
+end
+
+function two_cycles_constraint(m::JuMP.Model, n::Int64, edges::Edges,
+  y::Array{JuMP.Variable,1},
+  x::JuMP.JuMPArray{JuMP.Variable,1,Tuple{Array{Tuple{Int64,Int64},1}}})
+
+  # For 2-cycles, edges.list only contains pairs for which both ways exist
+  # this enables faster model creation.
+  @constraint(m, c4[i=1:n, j=intersect(edges.outgoing[i], edges.ingoing[i])],
+      x[(i,j)] == x[(j,i)])
+end
+
+function generate_weights(pool::InstanceGraph, p::Params)
+  w = Array(Float64, pool.n_present)
+  for i in 1:length(pool.present_nodes)
+    # TODO move the decision of weights to the typegraph.jl
+    if p.priorities == "greedy"
+      w[i] = 1
+    elseif p.priorities == "prio"
+      if contains(pool.present_nodes[i].node_type.name, "H")
+        w[i] = 1.1
+      else
+        w[i] = 1
+      end
+    elseif p.priorities == "auto" # weights are automatically adjusted for each type
+      # give the weight decided by the node's type
+      w[i] = pool.present_nodes[i].node_type.weight
+    else
+      println("prio not supported")
+    end
+  end
+  return w
+end

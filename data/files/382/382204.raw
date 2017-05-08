@@ -1,0 +1,66 @@
+using DataFrames
+
+function Lives(FixedLives::Float64, t::Integer, h::Integer)
+
+#    board = fill(0.0, 1200)
+
+    df = readtable("assumption.txt")
+    
+    qmo::Float64 = 0
+    wmo::Float64 = 0
+    sQmo::Float64 = 0
+    sWmo::Float64 = 0
+    Death::Float64 = 0
+    Lapse::Float64 = 0
+    Live::Float64 = FixedLives
+    Livet1::Float64 = Live
+    th::Integer = (t-1) * 12 + h
+    yr::Integer = 0
+    mo::Integer = 0
+    i::Integer = 0
+    
+    if t == 1 && h == 1
+        return FixedLives
+    end
+    
+    
+    for i=1:th
+        yr = div(i-1,12) + 1
+        mo = mod(i-1,12) + 1
+
+        if mo == 1
+            if yr > 10
+                wmo = df[10,1] / 12
+                qmo = df[10,2] / 12
+            else
+                wmo = df[yr,1] / 12
+                qmo = df[yr,2] / 12
+            end
+            sWmo = 0
+            sQmo = qmo
+        else
+            sWmo += wmo
+            sQmo += qmo
+        end
+        
+        if i != 1
+            Live = Live - Death - Lapse
+            if mo == 1
+                Livet1 = Live
+            end
+        end
+        Death = Livet1 * (1 - sWmo) * qmo
+        Lapse = Livet1 * (1 - sQmo) * wmo
+#        println(i, "\t\t", Live, "\t\t", qmo, "\t\t", wmo, "\t\t", Livet1)
+#        board[i] = Live
+    end
+    
+    return Live
+    
+end
+
+@time for i in 1:100000
+	a = rand(1)*100
+	result = Lives(a[1], 100, 12)
+end
+#plot(x=1:1200, y=board, Geom.line)

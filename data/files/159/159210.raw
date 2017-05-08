@@ -1,0 +1,23 @@
+#http://www.bmva.org/bmvc/2011/proceedings/paper55/paper55.pdf
+
+module SequentialPatterns
+export SequentialPattern,Frame,IndicesSequentialPattern,IndicesFrame,<=,<,print,fit,predict,feature_extend,sequence_extend,mean_loss,SequentialPatternConfig,SequentialPatternClassifier
+
+import Base.<=,Base.<,Base.show,Base.print
+
+typealias IndicesFrame Vector{Int}
+typealias IndicesSequentialPattern Vector{IndicesFrame}
+
+typealias SequentialPattern Array{Bool,2}
+typealias Frame Vector{Bool}
+
+
+
+
+
+include("SequentialPattern.jl")
+include("SequentialPatternOperations.jl")
+include("SequentialPatternFit.jl")
+
+
+end

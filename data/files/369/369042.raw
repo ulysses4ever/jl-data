@@ -1,0 +1,284 @@
+@everywhere require("custom_types.jl")
+
+#Return productions in style of nltk.grammar.productions (Python)
+function productions(grammar, rhs)
+    possibilities = Rule[]
+    for rule in grammar
+        if rule.left_child == rhs
+            push!(possibilities, rule)
+        end
+    end
+    return possibilities
+end
+
+#Parse grammar in Rule array
+function parse_grammar(grammar_file)
+    #Create array of Rules for grammar
+    cfg = Rule[]            
+
+    #Open grammar file
+    f = open(grammar_file)
+
+    #Iterate over all lines in grammar file
+    for line in eachline(f)
+        #Parse line
+        new_parsed = split(replace(line, "\n", ""), " ")
+
+        #Create new Rule from parts of parsed line
+        new_rule = Rule(new_parsed[1], new_parsed[2], new_parsed[3], float64(new_parsed[4]))
+
+        #Add new rule to cfg
+        push!(cfg, new_rule)
+    end
+    return cfg
+end
+
+function share_grammar(grammar, stoi_table)
+    #Turn grammar into shared array
+    size = length(grammar)
+    proc_list = [x for x=1:nprocs()]
+    shared_grammar = SharedArray(Int64, (3*size, 1), pids=proc_list)
+    shared_probs = SharedArray(Float64, (size, 1), pids=proc_list)
+    current_i = 0
+    while current_i < size
+        shared_grammar[3*current_i + 1] = stoi_table[grammar[current_i + 1].nonterminal]
+        shared_grammar[3*current_i + 2] = stoi_table[grammar[current_i + 1].left_child]
+        shared_grammar[3*current_i + 3] = grammar[current_i + 1].right_child == "None" ? false : stoi_table[grammar[current_i + 1].right_child]
+        shared_probs[current_i + 1] = grammar[current_i + 1].prob
+        current_i += 1
+    end
+    return (shared_grammar, shared_probs)
+end
+
+#Check if grammar can parse all tokens in sentence
+function check_coverage(tokens, grammar)
+    #Trim grammar to just terminals
+    terminals = ASCIIString[]
+    for rule in grammar
+        #Check if right child is None
+        if rule.right_child == "None"
+            push!(terminals, rule.left_child)
+        end
+    end
+
+    #Check what tokens the grammar does not cover
+    uncovered = ASCIIString[]
+    for token in tokens
+        if !(token in terminals)
+            push!(uncovered, token)
+        end
+    end
+
+    #Raise error if any tokens are not covered and display them; else exit function
+    if length(uncovered) != 0
+        for terminal in uncovered
+            println(terminal)
+        end
+        error("Grammar does not cover the terminals listed above.")
+    end
+end
+
+#Pretty printing of parse table
+function print_table(table_ints, itos_table, n)
+    lookup_size = length(itos_table)
+    offset_int = 2 + (3*n*(lookup_size^2))
+    for j = 1:n+1
+        for i = 0:n-1
+            x_int = 1 + (i*offset_int)
+            empty = true
+            for k in keys(itos_table)
+                if table_ints[x_int,j,k] == 1
+                    empty = false
+                    print(itos_table[k])
+                    print(" ")
+                end
+            end
+            if empty
+                print(".")
+            end
+            print("\t")
+        end
+        println()
+    end
+    println()
+end
+
+function build_lookup_tables(grammar, tokens)
+    #Initialize string-to-integer conversion table
+    stoi_table = Dict{ASCIIString, Int64}()
+    count = 1
+
+    #Generate string-to-integer conversion table
+    for rule in grammar
+        #Check if nonterminal is repeated
+        try
+            temp = stoi_table[rule.nonterminal]
+        catch KeyError
+            stoi_table[rule.nonterminal] = count
+            count += 1
+        end
+
+        #Add terminal if applicable
+        if rule.right_child == "None"
+            try
+                temp = stoi_table[rule.left_child]
+            catch KeyError
+                stoi_table[rule.left_child] = count
+                count += 1
+            end
+        end
+    end
+
+    #Generate integer-to-string conversion table from string-to-integer conversion table
+    itos_table = [stoi_table[x] => x for x in keys(stoi_table)]
+
+    return (stoi_table, itos_table)
+end
+
+#Fill entry for given i and j
+function fill_entry(i, j, offset_int, offset_float, n, grammar_size, lookup_size, table_ints::SharedArray, table_floats::SharedArray, shared_grammar::SharedArray, shared_probs::SharedArray)
+    #Cover all span splits between first and second child
+    for x=1:j-2
+        #Check all filled nonterminals for first
+        for a=1:lookup_size
+            #Check if filled
+            if table_ints[(i-j+x)*offset_int + 1,x+1,a] == 1
+                #Check all filled nonterminals for second
+                for b=1:lookup_size
+                    #Check if filled
+                    if table_ints[(i-1)*offset_int + 1,j-x,b] == 1
+                        #Find all rules
+                        for g=0:(grammar_size-1)
+                            offset_grammar = 1 + 3*g 
+                            offset_probs = 1 + g
+                            nonterminal = shared_grammar[offset_grammar]
+                            left_child = shared_grammar[offset_grammar + 1]
+                            right_child = shared_grammar[offset_grammar + 2]
+                            prob = shared_probs[offset_probs]
+
+                            #Verify if it is nonterminal 
+                            if right_child != "None"
+                                if left_child == a && right_child == b
+                                    #Find probability of children
+                                    prob1 = table_floats[(i-j+x)*offset_float + 1,x+1,a]
+                                    prob2 = table_floats[(i-1)*offset_float + 1,j-x,b]
+
+                                    #Create new probability
+                                    new_prob = prob * prob1 * prob2
+
+                                    #Check if filled and update probability
+                                    if table_ints[(i-1)*offset_int + 1,j,nonterminal] == 1
+                                        table_floats[(i-1)*offset_float + 1,j,nonterminal] += new_prob
+                                    else
+                                        table_floats[(i-1)*offset_float + 1,j,nonterminal] *= new_prob
+                                        table_ints[(i-1)*offset_int + 1,j,nonterminal] = 1     #mark as filled
+                                    end
+
+                                    current_index = table_ints[(i-1)*offset_int + 2, j, nonterminal]
+                                    table_ints[(i-1)*offset_int + 3 + (3*current_index), j, nonterminal] = a    #x
+                                    table_ints[(i-1)*offset_int + 3 + (3*current_index) + 1, j, nonterminal] = b    #y
+                                    table_ints[(i-1)*offset_int + 3 + (3*current_index) + 2, j, nonterminal] = x    #z
+                                    table_floats[(i-1)*offset_float + 1 + current_index, j, nonterminal] = new_prob  #possibility prob
+
+                                    table_ints[(i-1)*offset_int+2,j,nonterminal] += 1   #update current index
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+#Probabilistic CKY Parse
+function parse(grammar, shared_grammar, shared_probs, tokens, n, stoi_table)
+    #Initialize table
+    lookup_size = length(stoi_table)
+    grammar_size = length(shared_probs)
+    proc_list = [x for x=1:nprocs()]
+    offset = n*(lookup_size^2)
+    offset_int = 2 + (3*offset)
+    offset_float = 1 + offset
+    table_ints = SharedArray(Int64, (n*offset_int,n+1,lookup_size), pids=proc_list)
+    table_floats = SharedArray(Float64, (n*offset_float, n+1, lookup_size), pids=proc_list)
+
+    #Preallocate entries to be marked as non-filled, prob 1.0 Entry types with
+    #unfilled possibility arrays
+    for x=0:n-1
+        for y=1:n+1
+            for z=1:lookup_size
+                x_int = 1 + (x*offset_int)
+                x_float = 1 + (x*offset_float)
+                table_ints[x_int,y,z] = 0    #mark as not filled
+                table_floats[x_float,y,z] = 1.0    #entry prob of 1.0
+                table_ints[x_int + 1,y,z] = 0    #current index is 0
+            end
+        end
+    end
+
+    #Initial setup
+    for x = 0:n-1
+        #Fill terminals - mark as filled, add possibility, increment index
+        x_int = 1 + (x*offset_int)
+        x_float = 1 + (x*offset_float)
+        z = stoi_table[tokens[x + 1]]
+        table_ints[x_int, 1, z] = 1  #mark as filled
+        table_floats[x_float, 1, z] = 1.0  #entry prob of 1.0
+
+        #Add possibility
+        current_index = table_ints[x_int + 1, 1, z]
+        table_ints[x_int + 2 + (3*current_index), 1, z] = 0   #x
+        table_ints[x_int + 2 + (3*current_index) + 1, 1, z] = 0   #y
+        table_ints[x_int + 2 + (3*current_index) + 2, 1, z] = 0   #z
+        table_floats[x_float + 1 + current_index, 1, z] = 1.0   #possibility prob
+
+        table_ints[x_int + 1, 1, z] += 1 #increment current index
+
+        #Fill initial tags
+        rules = productions(grammar, tokens[x+1])
+        for rule in rules
+            z = stoi_table[rule.nonterminal]
+            table_ints[x_int,2,z] = 1 #mark as filled
+            table_floats[x_float,2,z] *= rule.prob  #update prob
+
+            #Add possibility
+            current_index = table_ints[x_int + 1, 2, z]
+            table_ints[x_int + 2 + (3*current_index), 2, z] = stoi_table[tokens[x+1]]    #x
+            table_ints[x_int + 2 + (3*current_index) + 1, 2, z] = 0    #y
+            table_ints[x_int + 2 + (3*current_index) + 2, 2, z] = 1    #z
+            table_floats[x_float + 1 + current_index, 2, z] = rule.prob  #possibility prob
+
+            table_ints[x_int + 1, 2, z] += 1 #increment current index
+        end
+    end
+
+    #Move across columns
+    if nprocs() < 2
+        for j=3:n+1
+            for i=j-1:n
+                fill_entry(i, j, offset_int, offset_float, n, grammar_size, lookup_size, table_ints, table_floats, shared_grammar, shared_probs)                
+            end
+        end
+    else
+        @sync begin
+            for j=3:n+1
+                proc = 2
+                total = nprocs()
+                refs = Array(RemoteRef, n-j+2)
+
+                #Set up remote calls
+                for i=j-1:n
+                    refs[i-j+2] = remotecall(proc, fill_entry, i, j, offset_int, offset_float, n, grammar_size, lookup_size, table_ints, table_floats, shared_grammar, shared_probs)
+                    proc = (proc == total) ? 2 : proc + 1
+                end
+
+                #Fetch remote references
+                for i=1:n-j+2
+                    fetch(refs[i])
+                end
+            end
+        end
+    end
+    return (table_ints, table_floats)
+end

@@ -1,0 +1,48 @@
+export MCD
+
+function MCD{T<:Number}(data_set::AbstractArray{T,2},k=500)
+    #generate indices for random subset. h = 0.75N where N is the 
+    n = length(data_set[:,1])
+    h = round(Int64,n*0.75)
+    randindices = randperm(n)
+    randindices = sort(randindices[1:h])
+    
+    #1. choose random subset H_0 of X with size h
+    randsubset = data_set[randindices,:]
+    
+    #determinants = cell(k)
+    
+    resultMCD = 0
+    
+    for i in 1:k
+        #2.
+        H_cov = cov(randsubset)
+        H_cov_inv = pinv(H_cov)
+        H_mean = (mean(randsubset,1))'
+
+        #2.1. compute relative Mahalanobis distances for all x_i to current H
+        relative_distances = cell(length(data_set[:,1]))
+        for i in 1:length(relative_distances)
+            relative_distances[i] = (sqrt( ((data_set[i,:]' - H_mean)' * H_cov_inv * (data_set[i,:]' - H_mean))[1] ), i)
+        end
+        relative_distances = sort(relative_distances)
+
+        new_indices = [relative_distances[j][2] for j in 1:h]
+
+        randsubset_new = data_set[new_indices,:]
+        
+        if(randsubset == randsubset_new)
+            return H_cov
+        end
+        
+        #determinants[i] = (randsubset_new,det(cov(randsubset_new)))
+        
+        if(det(cov(randsubset_new)) <= det(H_cov))
+            resultMCD = cov(randsubset_new) 
+        end
+        
+        randsubset = randsubset_new
+    end
+     
+    return resultMCD
+end

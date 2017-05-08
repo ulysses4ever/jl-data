@@ -1,0 +1,18 @@
+include("config.jl")
+include("fixed_genotype.jl")
+
+import Fixed_Genotype
+import Config
+
+function enumerate()
+    dictionary = Dict{Fixed_Genotype.Type_Genotype, Int64}()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    genotype::Fixed_Genotype.Type_Genotype = Fixed_Genotype.make_random_genotype(config_vals)
+    dictionary[genotype] = 7
+    temp = Fixed_Genotype.make_random_genotype(config_vals)
+    Fixed_Genotype.copy_into(temp, genotype)
+    Fixed_Genotype.mutate(temp, config_vals)
+    println(temp in keys(dictionary))
+end
+
+enumerate()

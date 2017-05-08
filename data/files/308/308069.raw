@@ -1,0 +1,69 @@
+const Cr = 2.0*pi
+const n = 9
+const c = tan(2*pi/(4*n))
+const z = 600/n
+const a1x = Cr*cos(2*pi/n)
+const a1y = Cr*sin(2*pi/n)
+const a2x = Cr*cos(4*pi/n)
+const a2y = Cr*sin(4*pi/n)
+const a3x = Cr*cos(6*pi/n)
+const a3y = Cr*sin(6*pi/n)
+const a4x = Cr*cos(8*pi/n)
+const a4y = Cr*sin(8*pi/n)
+const a5x = Cr*cos(10*pi/n)
+const a5y = Cr*sin(10*pi/n)
+const a6x = Cr*cos(12*pi/n)
+const a6y = Cr*sin(12*pi/n)
+const a7x = Cr*cos(14*pi/n)
+const a7y = Cr*sin(14*pi/n)
+const a8x = Cr*cos(16*pi/n)
+const a8y = Cr*sin(16*pi/n)
+
+function f(x::Float64, y::Float64)
+	t1 = x*a1x + y*a1y
+	t2 = x*a2x + y*a2y
+	t3 = x*a3x + y*a3y
+	t4 = x*a4x + y*a4y
+	t5 = x*a5x + y*a5y
+	t6 = x*a6x + y*a6y
+	t7 = x*a7x + y*a7y
+	t8 = x*a8x + y*a8y
+	t9 = Cr*x
+	return (cos(t1) + cos(t2) + cos(t3) + cos(t4) + cos(t5) + cos(t6) + cos(t7) + cos(t8) + cos(t9), sin(t1) + sin(t2) + sin(t3) + sin(t4) + sin(t5) + sin(t6) + sin(t7) + sin(t8) + sin(t9))
+end
+
+function map(L::Float64, d::Float64)
+	arr = zeros(Int64, 1210, 1210)
+	t1 = 0.0
+	t2 = 0.0
+	a1::Int64 = 0
+	a2::Int64 = 0
+	for i in 0:d:L
+		for j in 0:d:(i*c)
+			(t1, t2) = f(i, j)
+			a1 = 1 + iround(z*(t1 + n))		
+			a2 = 1 + iround(z*(t2 + n))
+			arr[a1, a2] += 1
+			arr[a1, 1202 - a2] += 1
+		end
+	end
+	return arr
+end
+function mapfull(L::Float64, d::Float64)
+	arr = zeros(Int64, 1210, 1210)
+	t1 = 0.0
+	t2 = 0.0
+	for i in -L:d:L
+		for j in 0:d:L
+			(t1, t2) = f(i, j)
+			arr[1 + iround(z*(t1 + n)), 1 + iround(z*(t2 + n))] += 1
+		end
+	end
+	return arr
+end
+
+
+# @time arr = map(5.0, 0.001);
+# typeof([f(x,y) for x in 0.0:1.0:0.1, y in 0.0:0.1:1.0])
+# IPM.ExportImage(arr/(80), "s1.png", ColorFunction = "Orangescale")
+# IPM.ExportImage(arr/(12), "9_10_0.001.png", ColorFunction = "Orangescale")

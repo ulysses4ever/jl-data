@@ -1,0 +1,21 @@
+import pe
+
+function abundant(n)
+    return sum(pe.divisors(n)) - n  > n
+end
+
+
+a = filter(f-> abundant(f), [1:28123])
+n = length(a)
+nums = [1:28123]
+
+for i in a
+    for k in a
+        sm = i + k
+        if sm <= 28123
+            nums[sm] = 0
+        end
+    end
+end
+
+println(sum(nums))

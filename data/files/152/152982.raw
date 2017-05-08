@@ -1,0 +1,178 @@
+# Sqlite3 result codes
+#######################
+
+const SQLITE_OK = 0   # Successful result */
+const SQLITE_ERROR = 1   # SQL error or missing database */
+const SQLITE_INTERNAL = 2   # Internal logic error in SQLite */
+const SQLITE_PERM = 3   # Access permission denied */
+const SQLITE_ABORT = 4   # Callback routine requested an abort */
+const SQLITE_BUSY = 5   # The database file is locked */
+const SQLITE_LOCKED = 6   # A table in the database is locked */
+const SQLITE_NOMEM = 7   # A malloc() failed */
+const SQLITE_READONLY = 8   # Attempt to write a readonly database */
+const SQLITE_INTERRUPT = 9   # Operation terminated by sqlite3_interrupt()*/
+const SQLITE_IOERR = 10   # Some kind of disk I/O error occurred */
+const SQLITE_CORRUPT = 11   # The database disk image is malformed */
+const SQLITE_NOTFOUND = 12   # Unknown opcode in sqlite3_file_control() */
+const SQLITE_FULL = 13   # Insertion failed because database is full */
+const SQLITE_CANTOPEN = 14   # Unable to open the database file */
+const SQLITE_PROTOCOL = 15   # Database lock protocol error */
+const SQLITE_EMPTY = 16   # Database is empty */
+const SQLITE_SCHEMA = 17   # The database schema changed */
+const SQLITE_TOOBIG = 18   # String or BLOB exceeds size limit */
+const SQLITE_CONSTRAINT = 19   # Abort due to constraint violation */
+const SQLITE_MISMATCH = 20   # Data type mismatch */
+const SQLITE_MISUSE = 21   # Library used incorrectly */
+const SQLITE_NOLFS = 22   # Uses OS features not supported on host */
+const SQLITE_AUTH = 23   # Authorization denied */
+const SQLITE_FORMAT = 24   # Auxiliary database format error */
+const SQLITE_RANGE = 25   # 2nd parameter to sqlite3_bind out of range */
+const SQLITE_NOTADB = 26   # File opened that is not a database file */
+const SQLITE_ROW = 100  # sqlite3_step() has another row ready */
+const SQLITE_DONE = 101  # sqlite3_step() has finished executing */
+
+#dictionary for lookup of sqlite3 result codes
+################################################
+
+sqlcode = {
+1 => "SQLITE_ERROR",
+2 => "SQLITE_INTERNAL",
+3 => "SQLITE_PERM",
+4 => "SQLITE_ABORT",
+5 => "SQLITE_BUSY",
+6 => "SQLITE_LOCKED",
+7 => "SQLITE_NOMEM",
+8 => "SQLITE_READONLY",
+9 => "SQLITE_INTERRUPT",
+10 => "SQLITE_IOERR",
+11 => "SQLITE_CORRUPT",
+12 => "SQLITE_NOTFOUND",
+13 => "SQLITE_FULL",
+14 => "SQLITE_CANTOPEN",
+15 => "SQLITE_PROTOCOL",
+16 => "SQLITE_EMPTY",
+17 => "SQLITE_SCHEMA",
+18 => "SQLITE_TOOBIG",
+19 => "SQLITE_CONSTRAINT",
+20 => "SQLITE_MISMATCH",
+21 => "SQLITE_MISUSE",
+22 => "SQLITE_NOLFS",
+23 => "SQLITE_AUTH",
+24 => "SQLITE_FORMAT",
+25 => "SQLITE_RANGE",
+26 => "SQLITE_NOTADB",
+100 => "SQLITE_ROW",
+101 => "SQLITE_DONE"}
+
+
+#sqlite c interface functions
+#############################
+
+#input: name of a valid sqlite3 database in string format
+#output: an integer sqlite3 result code and a pointer to an sqlite3 database handle
+function sqlite3_open(filename::String)
+    sqldb_handle = Array(Ptr{Void},1)
+    result = ccall((:sqlite3_open, "libsqlite3"), Int32, (Ptr{Uint8}, Ptr{Ptr{Void}}), filename, sqldb_handle)
+    return result, sqldb_handle[1]
+end
+
+#input: a pointer to a valid sqlite3 database handle from a call to open
+#output: an sqlite3 result code
+function sqlite3_close(sqldb::Ptr{Void})
+    result = ccall((:sqlite3_close, "libsqlite3"), Int32, (Ptr{Void},), sqldb)
+    return result
+end
+
+#input: a valid sqlite3 database handle from a call to open, a valid sql statement in string format
+#output: an sqlite3 result code, a pointer to a statement handle that can be passed to step
+function sqlite3_prepare(sqldb_handle::Ptr{Void}, statement::String)
+    unused = Array(Ptr{Uint8}, 128)
+    stmt_handle = Array(Ptr{Void}, 1)
+    result = ccall((:sqlite3_prepare, "libsqlite3"), Int32, (Ptr{Void}, Ptr{Uint8}, Int32, Ptr{Ptr{Void}}, Ptr{Ptr{Uint8}}), sqldb_handle, statement, int(length(statement)), stmt_handle, unused)
+    return result, stmt_handle[1]
+end
+
+#input: a valid sqlite3 statement handle from a call to prepare
+#output: an sqlite3 eresult code
+function sqlite3_finalize(stmt_handle::Ptr{Void})
+    ccall((:sqlite3_finalize, "libsqlite3"), Int, (Ptr{Void},), stmt_handle)
+end
+
+#input: a valid sqlite3 statement handle returned from prepare
+#output: an sqlite3 result code
+function sqlite3_step(stmt_handle::Ptr{Void})
+    result = ccall((:sqlite3_step, "libsqlite3"), Int32, (Ptr{Void},), stmt_handle)
+end
+
+
+#input: a valid sqlite3 statement handle returned from prepare
+#putput: an integer representing the number of columns in the result of an sql statement exectution 
+function sqlite3_column_count(stmt_handle::Ptr{Void})
+    ccall((:sqlite3_column_count, "libsqlite3"), Int, (Ptr{Void},), stmt_handle)
+end
+
+
+#input: a valid sqlite3 statement handle returned from prepare, the column number of the result tuple
+#output: a string representation of the data in the current row for column col_num
+function sqlite3_column_text(stmt_handle, col_num)
+    result = ccall((:sqlite3_column_text, "libsqlite3"), Ptr{Uint8}, (Ptr{Void}, Int), stmt_handle, col_num)
+    (result == C_NULL) ? "NULL" : bytestring(result) 
+end
+
+#convenience functions
+######################
+
+#input: a valid sqlite3 statement handle returned from prepare, the column number of the result tuple
+#output: an array of strings representing a row of the result set from execution of an sql statment
+function sqlGetRow(stmt_handle)
+    result = Array(String, 0)
+    for i in 0:sqlite3_column_count(stmt_handle) - 1
+       push!(result, sqlite3_column_text(stmt_handle, i))
+    end
+    return result
+end
+
+
+#input: a valid sqlite3 statement handle returned from prepare, the column number of the result tuple
+#output: an array of an array of strings representing all rows resulting from the execution of an sql statement
+function sqlGetRows(stmt_handle)
+    result = Array(Array{String},0) 
+    while sqlite3_step(stmt_handle) != SQLITE_DONE
+        push!(result, sqlGetRow(stmt_handle))
+    end
+    result
+end 
+
+#input: a valid sqlite3 database handle from a call to open, a valid array of strings representing a set of sql statements
+#output: the result of the last sql statement in the array that returns a non-empty set of rows
+function sqlExec(db_handle::Ptr{Void}, sql_statements::Array{String})
+    result = Array(Array{String},0)
+    for s in sql_statements
+        res, stmt = sqlite3_prepare(db_handle, s)
+        if res != 0 
+            error(sqlcode[res])
+        end
+        new_result = sqlGetRows(stmt)
+        if(length(new_result) != 0 )
+            result = new_result
+        end
+        res = sqlite3_finalize(stmt)
+        if(res != 0) 
+            error(sqlcode[res])
+        end
+    end
+    return result
+end
+
+#input: a valid sqlite3 database handle from a call to open, a string representing a semi-colon-separated list set of valid sql statements
+#output: the result of the last sql statement in the array that returns a non-empty set of rows
+function sqlExec(db_handle::Ptr{Void}, sql_str::String)
+    println(" called sqlExec with type: ", typeof(split(sql_str, ';', false)))
+    sqlExec(db_handle, split(sql_str, ';', false))
+end
+
+
+
+
+
+

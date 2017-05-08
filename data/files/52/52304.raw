@@ -1,0 +1,112 @@
+using Optim
+export distxy!, distxy_demo
+
+# Grab the 2n coordinates as a single vector
+function vector_out(X::SimpleGraphDrawing)
+    vv = vlist(X.G)
+    n = length(vv)
+
+    x = zeros(2*n)
+    for k=1:n
+        v = X.xy[vv[k]]
+        x[2*k-1] = v[1]
+        x[2*k]   = v[2]
+    end
+
+    return x
+end
+
+# Inverse of vector_out
+function vector_in!(X::SimpleGraphDrawing, x::Vector)
+    vv = vlist(X.G)
+    n = length(vv)
+
+    for k=1:n
+        v = vv[k]
+        X.xy[v] = x[2*k-1 : 2*k]
+    end
+
+    return
+end
+
+"""
+`distxy!(X)` gives `X` an embedding in which we try to match the
+Euclidean distance between points with the graph distance between the
+vertices they represent. It gives nice results for small graphs, but
+may be intolerably slow for large graphs.
+
+Repeated calls to `distxy!` can improve the drawing. The number of function evaluations used can be specified using `distxy!(X,nits)`. Set this to `0` for the default.
+
+`distxy!` reports on iterations and a penalty score that it is trying
+to minimize. To suppress that report use `distxy!(X,nits,false)`.
+"""
+function distxy!(X::SimpleGraphDrawing,
+                 nits::Integer=0, verbose::Bool=true)
+    D = dist_matrix(X.G)
+    x0 = vector_out(X)
+
+    function score(x::Vector)
+        nn = length(x)
+        n = NV(X.G)
+        s = 0.
+
+        for u=1:(n-1)
+            pu = x[2*u-1 : 2*u]
+            for v = (u+1):n
+                pv = x[2*v-1 : 2*v]
+                duv = D[u,v]
+                term = (duv - norm(pu-pv))^2 / duv^(1.5)
+                s += term
+            end
+        end
+        return s
+    end
+    if verbose
+        println("initial score = ", score(x0))
+    end
+
+    if nits > 0
+        res = optimize(score,x0,iterations=nits)
+    else
+        res = optimize(score,x0)
+    end
+
+
+    x1 = res.minimum
+    vector_in!(X,x1)
+
+    if verbose
+        println("  final score = ", score(x1))
+        println(res.f_calls, " function evaluations")
+    end
+
+    return score(x1)
+end
+
+"""
+`distxy_demo(G,tol=1e-3)` presents an animation showing the evolving
+drawing found by `distxy!`.
+"""
+
+function distxy_demo(G::SimpleGraph=BuckyBall(), tol=1e-3)
+    return distxy_demo(SimpleGraphDrawing(G), tol)
+end
+
+function distxy_demo(X::SimpleGraphDrawing,tol::Real=1e-3)
+    tic()
+    x0 = 1.e10
+    figure(1)
+    while true
+        clf()
+        draw(X)
+        title("Drawing with distxy!")
+        x1 = distxy!(X,0)
+        if abs(x1-x0)/x0 < tol
+            break
+        end
+        x0 = x1
+    end
+    title("Finished")
+    toc()
+    return X
+end

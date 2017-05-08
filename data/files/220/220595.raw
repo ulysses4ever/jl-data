@@ -1,0 +1,17 @@
+#another sketch
+
+# using JuMP
+using MathProgBase
+using Cbc
+
+# include ( "mpsmodel.mps" )
+
+m_internal = MathProgBase.model( CbcSolver() )
+
+MathProgBase.loadproblem!( m_internal, "mpsmodel.mps" )
+
+MathProgBase.setsense!( m_internal, Min )
+
+optimize!( m_internal )
+
+status( m_internal )

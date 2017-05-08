@@ -1,0 +1,28 @@
+type Asset
+  loc::Int
+  num::Int
+  tax::String
+  val::Dict{String, Float64}
+  occ::Dict{String, Int}
+end
+
+numAssets = 1
+assets = Dict{Int, Asset}[]
+locs = Vector{Int}[numAssets]
+nums = Vector{Int}
+taxs = Vector{String}
+vals = Vector{Dict{String, Float64}}
+occs = Vector{Dict{String, Int}}
+
+
+length(locs)
+
+ = 1
+nums[1] = 1
+taxs[1] = "Wood"
+vals[1] = ["structural" => 1, "nonstructural" => 0, "contents" => 0, "downtime" => 0]
+occs[1] = ["day" => 1, "night" => 1, "transit" => 1]
+
+for assetID = 1:numAssets
+  assets[assetID] = Asset(locs[assetID], nums[assetID], taxs[assetID], vals[assetID], occs[assetID])
+end

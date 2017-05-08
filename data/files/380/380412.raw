@@ -1,0 +1,62 @@
+include("../src/lm/ngrams.jl")
+
+function test_ngrams()
+    tkns = ["the", "man", "loves", "the", "cat"]
+    @assert(bigrams(tkns)[1] == ["the", "man"])
+    @assert(bigrams(tkns)[end] == ["the", "cat"])
+    @assert(trigrams(tkns)[1] == ["the", "man", "loves"])
+    @assert(trigrams(tkns)[end] == ["loves", "the", "cat"])
+    @assert(trigrams(tkns) == ngrams(3, tkns))
+end
+
+function test_skipgrams()
+    # these tests are from the paper
+    # "A Closer Look at Skip-gram Modeling"
+    # Guthrie et al., 2006
+    # http://homepages.inf.ed.ac.uk/ballison/pdf/lrec_skipgrams.pdf
+    wds = ["insurgents", "killed", "in", "ongoing", "fighting"]
+
+    # bigrams (skip 0 grams)
+    bgs = skipgrams(2, 0, wds)
+    @assert(bgs[1] == ["insurgents", "killed"])
+    @assert(bgs[2] == ["killed", "in"])
+    @assert(bgs[3] == ["in", "ongoing"])
+    @assert(bgs[4] == ["ongoing", "fighting"])
+
+    # 2-skip-bi-grams
+    bgs = skipgrams(2, 1, wds)
+    @assert(bgs[1] == ["insurgents","killed"])
+    @assert(bgs[2] == ["insurgents","in"])
+    @assert(bgs[3] == ["killed","in"])
+    @assert(bgs[4] == ["killed","ongoing"])
+    @assert(bgs[5] == ["in","ongoing"])
+    @assert(bgs[6] == ["in","fighting"])
+    @assert(bgs[7] == ["ongoing","fighting"])
+
+    # trigrams (0-skip-3-grams)
+    tgs = skipgrams(3, 0, wds)
+    @assert(tgs == trigrams(wds))
+    @assert(tgs[1] == ["insurgents","killed","in"])
+    @assert(tgs[2] == ["killed","in","ongoing"])   
+    @assert(tgs[3] == ["in","ongoing","fighting"]) 
+
+    # 2-skip-tri-grams
+    tgs = skipgrams(3, 2, wds)
+    @assert(tgs[1] == ["insurgents","killed","in"])       
+    @assert(tgs[2] == ["insurgents","killed","ongoing"])
+    @assert(tgs[3] == ["insurgents","killed","fighting"]) 
+    @assert(tgs[4] == ["insurgents","in","ongoing"])      
+    @assert(tgs[5] == ["insurgents","in","fighting"])     
+    @assert(tgs[6] == ["insurgents","ongoing","fighting"])
+    @assert(tgs[7] == ["killed","in","ongoing"])          
+    @assert(tgs[8] == ["killed","in","fighting"])         
+    @assert(tgs[9] == ["killed","ongoing","fighting"])    
+    @assert(tgs[10] == ["in","ongoing","fighting"])        
+
+end
+
+
+# run the tests
+test_ngrams()
+test_skipgrams()
+info("Tests pass [ngrams]")

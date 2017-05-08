@@ -1,0 +1,51 @@
+using Distributions
+
+#
+# Cluster parameterized by the number of dimensions n.
+#
+
+immutable Cluster{n}
+  gen::MultivariateNormal  # cluster generator
+  spread::Int              # how spread out should the centrioids be
+  max::Int                 # upper bound on number of samples
+
+  # TODO: add random correlation. http://goo.gl/EPH9P
+  function Cluster(spread, max)
+    new(MultivariateNormal(rand(n) * spread, diagm(rand(n))), spread, max)
+  end
+end
+
+centroid(c::Cluster) = mean(c.gen)
+
+#
+# Sample from Cluster{n} into a data frame.
+#
+
+immutable Sample{n}
+  cluster::Cluster{n}  # generating clusters
+  points::Matrix       # generated examples
+
+  function Sample(spread, max, m = integer(rand() * max))
+    cluster = Cluster{n}(spread, max)
+    points = zeros(n, m)
+    rand!(cluster.gen, points)
+    new(cluster, points)
+  end
+end
+
+#
+# Sample from a mixture of K clusters with n dimensions
+#
+
+immutable Mixture{n}
+  samples::Vector{Sample{n}}
+
+  function Mixture(K = 2, spread = 24, max = 500)
+    new(map(k -> Sample{n}(spread, max), [1:K]))
+  end
+end
+
+centroids(m::Mixture) = map(s -> centroid(s.cluster), m.samples)
+points(m::Mixture) = reduce(hcat, map(s -> s.points, m.samples))
+length(m::Mixture) = size(points(m), 2)
+

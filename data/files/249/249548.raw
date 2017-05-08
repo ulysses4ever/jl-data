@@ -1,0 +1,18 @@
+abstract ExecutorDriver
+@mustimplement start(driver::ExecutorDriver) # => return Status::Int32
+@mustimplement stop(driver::ExecutorDriver) # => return Status::Int32
+@mustimplement abort(driver::ExecutorDriver) # => return Status::Int32
+@mustimplement join(driver::ExecutorDriver) # => return Status::Int32
+@mustimplement run(driver::ExecutorDriver) # => return Status::Int32
+@mustimplement sendStatusUpdate(driver::ExecutorDriver, status::TaskStatus) # => return Status::Int32
+@mustimplement sendFrameworkMessage(driver::ExecutorDriver, data::String) # => return Status::Int32
+
+abstract Executor
+@mustimplement registered(exec::Executor, driver::ExecutorDriver, execInfo::ExecutorInfo, frwkInfo::FrameworkInfo, slvInfo::SlaveInfo)
+@mustimplement reregistered(exec::Executor, driver::ExecutorDriver, slvInfo::SlaveInfo)
+@mustimplement disconnected(exec::Executor, driver::ExecutorDriver)
+@mustimplement launchTask(exec::Executor, driver::ExecutorDriver, taskInfo::TaskInfo)
+@mustimplement killTask(exec::Executor, driver::ExecutorDriver, taskInfo::TaskInfo)
+@mustimplement frameworkMessage(exec::Executor, driver::ExecutorDriver, msg::String)
+@mustimplement shutdown(exec::Executor, driver::ExecutorDriver)
+@mustimplement error(exec::Executor, driver::ExecutorDriver, err::String)

@@ -1,0 +1,229 @@
+module MethylHMM
+
+export HMM, generate, forward, backward, viterbi, baum_welch!
+
+include("stat_funcs.jl") # statistics helper functions
+include("fit.jl")
+
+type HMM
+    # Model Parameters
+    n_states::Int       # Number of hidden states
+    A::Matrix{Float64}  # Estimated state-transition matrix A[i,j] = Pr[i->j]
+    B::Array{Float64,3} # Beta-Binomial parameters 
+    context_map::Vector{ASCIIString} # list of the nucleotide contexts
+    n_ctxt::Int        # Number of nucleotide contexts, i.e. length(context_map)
+    p::Vector{Float64} # Estimated initial state probabilities
+
+    # Notes:
+    #   'A' is a NxN matrix, rows sum to one
+    #       N = the number of hidden states
+    #   'B' is a NxMx2 array, specifying the beta-binomial distributions
+    #       M = number of nucleotide contexts (CG, CA, CC, etc.)
+    #       B[i,j,1] is the 'alpha' parameter of the beta-binomial distribution for state i, context j
+    #       B[i,j,2] is the 'beta' parameter of the beta-binomial distribution for state i, context j
+
+    # Data associated with the model
+    k::Vector{Int}     # number of reads covering each site
+    o::Vector{Int}     # number of methylation events at each site
+    c::Vector{Int}     # nucleotide context at each site
+    n_sites::Int       # number of cytosine sites in the dataset
+
+    # Notes:
+    #   {'k', 'o', 'c'} are all length 'n_sites'
+    #   k[t] total number of reads covering site t
+    #   o[t] number of reads with methylation at site t
+    #   c[t] nucleotide context at site t is given by context_map[c[t]]
+end
+
+function read_file(filename; strand="+")
+    f = open(filename)
+    readline(f) # skip header line
+    row = split(strip(readline(f)),'\t')
+    # row[3] == strand
+    # row[4] == context
+    # row[5] == mc_count?
+    # row[6] == k
+    # row[7] == o
+    close(f)
+end
+
+
+function HMM(n::Int, filename::ASCIIString; context_map=["CG","CA","CT","CC"])
+    # Create a (randomized) HMM model with 'n' hidden states, loading data
+    # from the file specified by 'filename'
+
+    # Randomize state-transition matrix
+    A = rand(n,n)
+    A ./= repmat(sum(A,1),n,1) # normalize rows
+    
+    # Randomize beta-binomial parameters
+    B = rand(n,length(context_map),2)
+    
+    # Randomize initial state probabilities
+    p = rand(n)
+    p ./= sum(p)
+
+    return HMM(n,A,B,context_map,p)
+end
+
+function HMM(n::Int, hmm::HMM)
+    # Create a new HMM model given an existing model. This is useful if you
+    # want to re-fit the same data with a different number of hidden states,
+    # or from different initial parameters. Specifically, this circumvents
+    # re-loading data from a file and storing redundant copies of the same
+    # dataset in memory.
+end
+
+function generate(hmm::HMM, k::Vector{Int}, c::Vector{Int})
+    # Generate a sequence of observations (methylation events) given current HMM params
+    #   'k' -- coverage, k[t] provides number of reads that include site t
+    #   'c' -- nucleotide context, c[t] provides integer key for hmm.context_map for site t
+    # Returns:
+    #   'o' -- observations, o[t] provides number of methylation events at site t
+    n_obs = length(c)
+
+    # Sequence of states and observations
+    s = zeros(Int,n_obs) # states
+    o = zeros(Int,n_obs) # observations
+
+    # Choose initial state with probabilities weighted by 'hmm.p'
+    s[1] = sample(hmm.p)               # hmm.p are the initial state probabilities
+    o[1] = rand() <= hmm.B[s[1],c[1]]  # draw obs given initial state, s[1], and context, c[1]
+
+    # Iterate drawing observations and updating state
+    for t = 2:n_obs
+        # sample from appropriate row of state-transition matrix
+        s[t] = sample(hmm.A[s[t-1],:])
+
+        # B[s,c] is probability of being methylated in state 's' and context 'c' 
+        o[t] = rand_binomial(hmm.B[s[t],c[t]], k[t])
+    end
+
+    # return sequence of states and observations
+    return (s,o)
+end
+
+function forward(hmm::HMM, k::Vector{Int}, c::Vector{Int}, o::Vector{Int}; scaling=true)
+    # Calculate forward variables, alpha:
+    #   'k' -- coverage, k[t] provides number of reads that include site t
+    #   'c' -- nucleotide context, c[t] provides integer key for hmm.context_map for site t
+    #   'o' -- observations, o[t] provides number of methylation events at site t
+    #   'scaling' -- scales forward variables to prevent underflow, see Rabiner (1989)
+    n_obs = length(o)
+
+    # alpha[t,i] = (scaled) probability of being in state 'i' given o[1:t] and c[1:t]
+    alpha = zeros(n_obs, hmm.n_states) 
+
+    # base case (initialize at start)
+    for i = 1:hmm.n_states
+        alpha[1,i] = hmm.p[i] * binomial_pmf(hmm.B[i,c[1]], k[1], o[1])
+    end
+
+    if scaling
+        coeff = (Float64)[] # scaling coefficients
+        push!(coeff, 1./sum(alpha[1,:]))
+        alpha[1,:] *= coeff[end] 
+    end
+
+    # induction step
+    for t = 2:n_obs
+        for j = 1:hmm.n_states
+            for i = 1:hmm.n_states
+                alpha[t,j] += hmm.A[i,j] * alpha[t-1,i]
+            end
+            alpha[t,j] *= binomial_pmf(hmm.B[j,c[t]], k[t], o[t])
+            if isnan(alpha[t,j])
+                println(hmm.B[j,c[t]],"\t",k[t],"\t",o[t])
+                break
+            end
+        end
+        if scaling
+            push!(coeff, 1./sum(alpha[t,:]))
+            alpha[t,:] *= coeff[end]
+        end
+    end
+
+    # Calculate likelihood (or log-likelihood) of observed sequence
+    if scaling
+        log_p_obs = -sum(log(coeff)) # see Rabiner (1989), eqn 103
+        return (alpha,log_p_obs,coeff)
+    else
+        p_obs = sum(alpha[end,:]) 
+        return (alpha,p_obs)
+    end
+end
+
+function backward(hmm::HMM, k::Vector{Int}, c::Vector{Int}, o::Vector{Int}; scale_coeff=None)
+    # Calculate backward variables, beta:
+    #   'k' -- coverage, k[t] provides number of reads that include site t
+    #   'c' -- nucleotide context, c[t] provides integer key for hmm.context_map for site t
+    #   'o' -- observations, o[t] provides number of methylation events at site t
+    #   'scale_coeff' -- Scaling coefficients from the forward algorithm, 1/sum(alpha[t,:]).
+    #                    If provided, each beta[t,:] is scaled so as to match alpha scaling.
+    n_obs = length(o)
+
+    # beta[t,i] = probability of being in state 'i' and then obseverving o[t+1:end]
+    beta = zeros(n_obs, hmm.n_states)
+
+    # base case (initialize at end)
+    if scale_coeff == None
+        beta[end,:] += 1
+    else
+        if length(scale_coeff) != n_obs
+            error("scale_coeff is improperly defined (wrong length)")
+        end
+        beta[end,:] += scale_coeff[end]
+    end
+
+    # induction step
+    for t = reverse(1:n_obs-1)
+        for i = 1:hmm.n_states
+            for j = 1:hmm.n_states
+                beta[t,i] += hmm.A[i,j] * beta[t+1,j] * binomial_pmf(hmm.B[j,c[t+1]], k[t+1], o[t+1])
+            end
+        end
+        if scale_coeff != None
+            beta[t,:] *= scale_coeff[t]
+        end
+    end
+
+    return beta
+end
+
+function viterbi(hmm::HMM, k::Vector{Int}, c::Vector{Int}, o::Vector{Int})
+    # Estimate most likely sequence of hidden states, given HMM current params:
+    #   'k' -- coverage, k[t] provides number of reads that include site t
+    #   'c' -- nucleotide context, c[t] provides integer key for hmm.context_map for site t
+    #   'o' -- observations, o[t] provides number of methylation events at site t
+    n_obs = length(o)
+
+    # delta[i,j] = highest probability of state sequence ending in state j on step i
+    # psi[i,j] = most likely state on step i-1 given state j on step i (argmax of deltas)
+    delta = zeros(n_obs, hmm.n_states)
+    psi = ones(Int, n_obs, hmm.n_states)
+
+    # base case, psi[:,1] is ignored so don't initialize
+    for i = 1:hmm.n_states
+        delta[1,i] = hmm.p[i] .* binomial_pmf(hmm.B[i,c[1]], k[1], o[1])
+    end
+
+    # induction step
+    for t = 2:n_obs
+        for j = 1:hmm.n_states
+            delta[t,j],psi[t,j] = findmax(hmm.A[:,j].*delta[t-1,:]')
+            delta[t,j] *= binomial_pmf(hmm.B[j,c[t]], k[t], o[t])
+        end
+    end
+
+    # backtrack to uncover the most likely path / state sequence
+    q = zeros(Int,n_obs) # vector holding state sequence
+    q[end] = indmax(delta[end,:])
+
+    # backtrack recursively
+    for t = reverse(1:n_obs-1)
+        q[t] = psi[t+1,q[t+1]]
+    end
+    return q
+end
+
+end

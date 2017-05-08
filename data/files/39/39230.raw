@@ -1,0 +1,17 @@
+import Graphs
+import Base.Test
+
+#= Some of the following tests compare hashes of Matlab results with hashes of Julia results. The general procedure was to apply a Matlab function to data, port the result to Julia in binary *.mat format (using Julia's MAT package,) and to compute the hash in Julia. The hash was then hard-coded into the test for comparison with the result of a similar procedure using the equivalent Julia function and data.
+=#
+
+function test_clustering_coefficient()
+    # Hash of Matlab `clustering_coef_wd` applied to fve30;
+    mathash = 0x173a26ddf4f29951;
+    Base.Test.@test hash(clustering_coefficient(fve30())) == mathash;
+    # Matlab `clustering_coef_wd` applied to Group Average data matches
+    # corresponding Julia run to 15 decimal places. Hash of Julia
+    # run is used below.
+    Base.Test.@test hash(clustering_coefficient(groupaverage(), "weight")) == 0xe001c1255a3f86d8;
+end
+
+test_clustering_coefficient();

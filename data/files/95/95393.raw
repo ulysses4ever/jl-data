@@ -1,0 +1,5 @@
+iterator = SignalIterator(curved_binary, 0.2)
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_curved_binary.txt")
+
+simulate_signal(iterator, OUTFILE, 10^7)

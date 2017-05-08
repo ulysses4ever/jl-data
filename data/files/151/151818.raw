@@ -1,0 +1,66 @@
+### Population MCMC using Friel's method based on power posteriors
+
+immutable FrielMCRunner <: Lora.ParrallelMCRunner
+  burnin::Int
+  thinning::Int
+  nsteps::Int
+  r::Range{Int}
+  storegradlogtarget::Bool # Indicates whether to save the gradient of the log-target in the cases it is available
+  temperatureladder::Vector{Float64}
+  swapproposal::Function
+
+  # Note that swapproposal has been temporarily set by default to identity until a temperature density is implemented
+  function FrielMCRunner(
+    r::Range{Int},
+    storegradlogtarget::Bool=false,
+    temperatureladder::Vector{Float64}=map(t->t^4, 0:1/10:1),
+    swapproposal::Function=identity)
+    burnin = first(r)-1
+    thinning = r.step
+    nsteps = last(r)
+    @assert burnin >= 0 "Number of burn-in iterations should be non-negative."
+    @assert thinning >= 1 "Thinning should be >= 1."
+    @assert nsteps > burnin "Total number of MCMC iterations should be greater than number of burn-in iterations."
+    @assert length(temperatureladder) >= 2 "Temperature ladder must contain at least two temperatures."
+    @assert temperatureladder[1] == 0.0 "Temperature ladder must start at 0."
+    @assert temperatureladder[end] == 1.0 "Temperature ladder must end at 1."
+    new(burnin, thinning, nsteps, r, storegradlogtarget, temperatureladder, swapproposal)
+  end
+end
+
+FrielMCRunner(
+  r::Range1{Int},
+  storegradlogtarget::Bool=false,
+  temperatureladder::Vector{Float64}=map(t->t^4, 0:1/10:1),
+  swapproposal::Function=identity) =
+  FrielMCRunner(first(r):1:last(r), storegradlogtarget, temperatureladder, swapproposal)
+
+FrielMCRunner(;
+  burnin::Int=0,
+  thinning::Int=1,
+  nsteps::Int=100,
+  storegradlogtarget::Bool=false,
+  temperatureladder::Vector{Float64}=map(t->t^4, 0:1/10:1),
+  swapproposal::Function=identity) =
+  FrielMCRunner((burnin+1):thinning:nsteps, storegradlogtarget, temperatureladder, swapproposal)
+
+typealias FrielMC FrielMCRunner
+
+function run(
+  mpistate::MPIState,
+  m::MCLikelihoodPatch,
+  s::Vector{Lora.MCSampler},
+  r::FrielMC,
+  t::Vector{Lora.MCTuner})
+
+  if MPIState.procid == MPIState.rootproc
+    tic()
+  end
+
+  # mcmodel = MCLikelihood(x->)
+
+  # mcjob = MCJob(mcmodel, s[MPIState.procid], r; tuner=t[MPIState.procid], job=:plain)
+
+  # mcchain = MCChain(m.size, length(r.r); storegradlogtarget=r.storegradlogtarget)
+  # ds = Dict{Any, Any}("step" => collect(r.r))
+end

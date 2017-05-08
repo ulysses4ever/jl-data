@@ -1,0 +1,9 @@
+using Multifrontal
+using Base.Test
+
+include("UpdateMatrix.jl")
+include("FrontalMatrix.jl")
+include("symbolic.jl")
+include("cholesky.jl")
+
+println("Success!")

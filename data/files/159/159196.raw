@@ -1,0 +1,76 @@
+module Boosting
+
+using Distributions
+
+import Classifiers.fit,Classifiers.predict,Classifiers.ClassifierConfig,Classifiers.Classifier
+
+export predict,fit,AdaBoostConfig,AdaBoost
+
+type AdaBoostConfig <: ClassifierConfig
+  # fit_function::Function
+  # predict_function::Function
+  weak_config::ClassifierConfig
+  max_weak_classifiers::Int
+end
+
+type AdaBoost <: Classifier
+    models::Vector{Classifier}
+    weights::Vector{Float64}
+    config::AdaBoostConfig
+end
+
+function subsample(probabilities::Vector{Float64})
+  c=Categorical(probabilities)
+  a = sampler(c)
+  sampled=0
+  n=length(probabilities)
+  selected=falses(n)
+  while (sampled<0.5)
+    index=rand(a)
+    while (selected[index])
+      index=rand(a)
+    end
+    selected[index]=true
+    sampled+=probabilities[index]
+  end
+
+  return selected
+end
+
+
+function fit(c::AdaBoostConfig,x,y)
+models=Classifier[]
+weights=Float64[]
+n=length(x)
+probabilities=ones(n)/n
+i=1
+average_error=1
+while i<=c.max_weak_classifiers && average_error>0.001
+    indices=subsample(probabilities)
+    #model=c.fit_function(x[indices],y[indices])
+    #predicted=c.predict_function(model,x)
+    model=fit(c.weak_config,x[indices],y[indices])
+    #predicted=c.predict_function(model,x)
+    predicted=predict(model,x)
+    errors=predicted.!=y
+    average_error=mean(errors)
+    println("Weak model $i error: $average_error")
+    weight=0.5*log((1-average_error)/average_error)
+    probabilities=probabilities.*exp(-weight.*predicted.*y)
+    probabilities=probabilities./sum(probabilities)
+    push!(models,model)
+    push!(weights,weight)
+    i=i+1
+end
+
+return AdaBoost(models,weights,c)
+end
+
+function predict_one(m::AdaBoost,x)
+  sign(dot(map(weak_model->predict(weak_model,x),m.models),m.weights))
+end
+function predict(m::AdaBoost,xs)
+  map(x -> predict_one(m,x),xs)
+end
+
+end

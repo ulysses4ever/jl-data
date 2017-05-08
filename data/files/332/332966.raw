@@ -1,0 +1,43 @@
+#function initialize_network(connections::Array{Int32, 2}, connections_pointer::Array{Ptr{Int32},1}, truth_table::Array{Int32, 1}, activations::Array{Int32, 1})
+function initialize_network(used_connections::Array{Int32, 1}, connections::Array{Int32, 1},
+                            connections_pointer::Array{Ptr{Int32},1}, truth_table::Array{Int32, 1}, activations::Array{Int32, 1})
+  max_num_connections::Int32 = 2
+  num_nodes::Int32 = 2000
+  num_iterations::Int32 = 2000
+  rand!(1:num_nodes, connections)
+  rand!(1:max_num_connections, used_connections)
+  #for i in 1:(length(connections) / 2)
+   #   connections[rand(1:length(connections))] = 0
+  #end
+  #connections_pointer = [pointer(connections[i, :], 1) for i in 1:num_nodes]
+  rand!(0:1, truth_table)
+  rand!(0:1, activations[1:num_nodes])
+  #ccall((:run_network, "/home/david/TehzCodes/GRNEvolution/libboolnet"), Void, (Int32, Int32, Ptr{Int32}, Ptr{Ptr{Int32}}, Ptr{Int32}),
+   #     num_iterations, num_nodes, activations, connections_pointer, truth_table)
+  ccall((:run_network_flat, "/home/david/TehzCodes/GRNEvolution/libboolnet"), Void, (Int32, Int32, Int32, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}),
+        num_iterations, num_nodes, max_num_connections, activations, connections, truth_table)
+  #ccall((:run_network_flat_arrays, "/home/david/TehzCodes/GRNEvolution/libboolnet"), Void, (Int32, Int32, Int32, Array{Int32, 1},
+   #                                                                                         Array{Int32, 1}, Array{Int32, 1}, Array{Int32, 1}),
+    #    num_iterations, num_nodes, max_num_connections, used_connections, activations, connections, truth_table)
+end
+
+function test_net()
+  num_nodes = 2000
+  max_num_connections = 2
+  num_iterations::Int32 = 2000
+  #connections = zeros(Int32, num_nodes, max_num_connections)
+  connections = zeros(Int32, num_nodes * max_num_connections)
+  used_connections = zeros(Int32, num_nodes)
+  connections_pointer::Array{Ptr{Int32},1} = [pointer(connections[i, :], 1) for i in 1:num_nodes]
+  truth_table = zeros(Int32, num_nodes * 2 ^ max_num_connections)
+  activations = zeros(Int32, num_nodes * (num_iterations + 1) )
+  dlopen("/home/david/TehzCodes/GRNEvolution/libboolnet")
+  for i in 1:100
+    initialize_network(used_connections, connections, connections_pointer, truth_table, activations)
+  end
+end
+@time test_net()
+Profile.print()
+
+
+

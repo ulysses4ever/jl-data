@@ -1,0 +1,6 @@
+
+function randexp(rng, rate)
+  r = rand(rng)
+  x = -log(1 - r) ./ rate
+  return x
+end

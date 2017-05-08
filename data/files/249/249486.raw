@@ -1,0 +1,205 @@
+# Scheduler callback wrappers
+function registered_schd(fiBuf::Ptr{Uint8}, fiBufSize::Cint,
+                         miBuf::Ptr{Uint8}, miBufSize::Cint,
+                         callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    frameworkId = makeproto(fiBuf, fiBufSize, Proto.FrameworkID)
+    masterInfo = makeproto(miBuf, miBufSize, Proto.MasterInfo)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), frameworkId, masterInfo)
+    return
+end
+
+function reregistered_schd(masterBuf::Ptr{Uint8}, masterBufSize::Cint,
+                           callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    masterInfo = makeproto(masterBuf, masterBufSize, Proto.MasterInfo)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), masterInfo)
+    return
+end
+
+function disconnected_schd(callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler))
+    return
+end
+
+function resourceOffers_schd(oBuf::Ptr{Uint8}, oSizes::Ptr{Cint}, offersCount::Cint,
+                             callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    # Decode sizes of offers
+    offerSizes = unsafe_load(oSizes, offersCount)
+    offers = Proto.Offer[]
+
+    # Loop through buffer and decode Offer objetcs
+    offset = 0
+    iob = pointer_to_iob(oBuf, sum(offerSizes))
+    for offerSize in offerSizes
+        seek(iob, offset)
+        push!(offers, readproto(iob, Proto.Offer()))
+        offset += offerSize
+    end
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), offers)
+    return
+end
+
+function offerRescinded_schd(oiBuf::Ptr{Uint8}, oiBufSize::Cint,
+                             callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    offerId = makeproto(oiBuf, oiBufSize, Proto.OfferID)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), offerId)
+    return
+end
+
+function statusUpdate_schd(tsBuf::Ptr{Uint8}, tsBufSize::Cint,
+                           callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    status = makeproto(tsBuf, tsBufSize, Proto.TaskStatus)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), status)
+    return
+end
+
+function frameworkMessage_schd(eiBuf::Ptr{Uint8}, eiBufSize::Cint,
+                               siBuf::Ptr{Uint8}, siBufSize::Cint,
+                               msg::Ptr{Uint8}, msgSize::Cint,
+                               callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    executorId = makeproto(eiBuf, eiBufSize, Proto.ExecutorID)
+    slaveId = makeproto(siBuf, siBufSize, Proto.SlaveID)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), executorId, slaveId, bytestring(msg, msgSize))
+    return
+end
+
+function slaveLost_schd(siBuf::Ptr{Uint8}, siBufSize::Cint,
+                        callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    slaveId = makeproto(siBuf, siBufSize, Proto.SlaveID)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), slaveId)
+    return
+end
+
+function executorLost_schd(eiBuf::Ptr{Uint8}, eiBufSize::Cint,
+                           siBuf::Ptr{Uint8}, siBufSize::Cint, status::Cint,
+                           callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    executorId = makeproto(eiBuf, eiBufSize, Proto.ExecutorID)
+    slaveId = makeproto(siBuf, siBufSize, Proto.SlaveID)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), executorId, slaveId, status)
+    return
+end
+
+function error_schd(msg::Ptr{Uint8}, msgSize::Cint,
+                    callbackPtr::Ptr{Void}, schedulerPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    scheduler = unsafe_pointer_to_objref(schedulerPtr)::Scheduler
+    callback(SchedulerDriver(driverPtr, scheduler), bytestring(msg, msgSize))
+    return
+end
+
+
+# Callback C handles
+const registered_schd_c = cfunction(registered_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const reregistered_schd_c = cfunction(reregistered_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const disconnected_schd_c = cfunction(disconnected_schd, Void,
+    (Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const resourceOffers_schd_c = cfunction(resourceOffers_schd, Void,
+    (Ptr{Uint8}, Ptr{Cint}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const offerRescinded_schd_c = cfunction(offerRescinded_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const statusUpdate_schd_c = cfunction(statusUpdate_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const frameworkMessage_schd_c = cfunction(frameworkMessage_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const slaveLost_schd_c = cfunction(slaveLost_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const executorLost_schd_c = cfunction(executorLost_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const error_schd_c = cfunction(error_schd, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+
+# Scheduler (callback container)
+type SchedulerCallback
+    registered_cf::Ptr{Void}
+    registered_callback::Any
+    reregistered_cf::Ptr{Void}
+    reregistered_callback::Any
+    disconnected_cf::Ptr{Void}
+    disconnected_callback::Any
+    resourceOffers_cf::Ptr{Void}
+    resourceOffers_callback::Any
+    offerRescinded_cf::Ptr{Void}
+    offerRescinded_callback::Any
+    statusUpdate_cf::Ptr{Void}
+    statusUpdate_callback::Any
+    frameworkMessage_cf::Ptr{Void}
+    frameworkMessage_callback::Any
+    slaveLost_cf::Ptr{Void}
+    slaveLost_callback::Any
+    executorLost_cf::Ptr{Void}
+    executorLost_callback::Any
+    error_cf::Ptr{Void}
+    error_callback::Any
+
+    scheduler::Scheduler
+
+    function SchedulerCallback(scheduler = EmptyScheduler(); callbacks...)
+        callbacks = Dict{Symbol,Any}(callbacks)
+        registered = get(callbacks, :registered, nothing)
+        reregistered = get(callbacks, :reregistered, nothing)
+        disconnected = get(callbacks, :disconnected, nothing)
+        resourceOffers = get(callbacks, :resourceOffers, nothing)
+        offerRescinded = get(callbacks, :offerRescinded, nothing)
+        statusUpdate = get(callbacks, :statusUpdate, nothing)
+        frameworkMessage = get(callbacks, :frameworkMessage, nothing)
+        slaveLost = get(callbacks, :slaveLost, nothing)
+        executorLost = get(callbacks, :executorLost, nothing)
+        error = get(callbacks, :error, nothing)
+
+        return new(
+            (registered == nothing ? C_NULL : registered_schd_c), registered,
+            (reregistered == nothing ? C_NULL : reregistered_schd_c), reregistered,
+            (disconnected == nothing ? C_NULL : disconnected_schd_c), disconnected,
+            (resourceOffers == nothing ? C_NULL : resourceOffers_schd_c), resourceOffers,
+            (offerRescinded == nothing ? C_NULL : offerRescinded_schd_c), offerRescinded,
+            (statusUpdate == nothing ? C_NULL : statusUpdate_schd_c), statusUpdate,
+            (frameworkMessage == nothing ? C_NULL : frameworkMessage_schd_c), frameworkMessage,
+            (slaveLost == nothing ? C_NULL : slaveLost_schd_c), slaveLost,
+            (executorLost == nothing ? C_NULL : executorLost_schd_c), executorLost,
+            (error == nothing ? C_NULL : error_schd_c), error,
+            scheduler
+        )
+    end
+end
+
+function Base.run(scheduler_cb::SchedulerCallback, framework::Proto.FrameworkInfo, master::String)
+    masterSize = length(master)
+    iob = IOBuffer()
+    fwBufSize = writeproto(iob, framework)
+    fwBuf = takebuf_array(iob)
+    status = ccall((:run_scheduler, Mesos.libmesosjl), Cint,
+                    (Ptr{SchedulerCallback}, Ptr{Uint8}, Cint, Ptr{Uint8}, Cint),
+                    &scheduler_cb, fwBuf, fwBufSize, master, masterSize)
+    println("SchedulerDriver status: $status")
+    exit(status == Proto.Status.DRIVER_STOPPED ? 0 : 1)
+end
+
+function init(scheduler_cb::SchedulerCallback, framework::Proto.FrameworkInfo, master::String)
+    masterSize = length(master)
+    iob = IOBuffer()
+    fwBufSize = writeproto(iob, framework)
+    fwBuf = takebuf_array(iob)
+    schDriver = ccall((:init_schd_driver, Mesos.libmesosjl), Ptr{Void},
+                    (Ptr{SchedulerCallback}, Ptr{Uint8}, Cint, Ptr{Uint8}, Cint),
+                    &scheduler_cb, fwBuf, fwBufSize, master, masterSize)
+    return SchedulerDriver(schDriver, scheduler_cb.scheduler)
+end

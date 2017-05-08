@@ -1,0 +1,11 @@
+module eos
+
+immutable IdealGas{T}
+  gamma::T
+end
+
+  energy{T}(eos::IdealGas{T}, v::T, p::T) = p*v/(eos.gamma - 1)
+pressure{T}(eos::IdealGas{T}, v::T, e::T) = e*(eos.gamma - 1)/v
+soundspd{T}(eos::IdealGas{T}, v::T, p::T) = sqrt(v*p*eos.gamma)
+
+end

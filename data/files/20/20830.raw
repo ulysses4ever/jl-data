@@ -1,0 +1,41 @@
+module Regression
+
+using Compat
+using Reexport
+using ArrayViews
+@reexport using EmpiricalRisks
+
+import Base.LinAlg: BlasReal
+import Base.LinAlg.LAPACK: gels!, gelsy!, gelsd!
+import EmpiricalRisks: value, value_and_grad!
+
+export
+	# linearreg
+	llsq,
+	ridgereg,
+
+	# regproblems
+	UnivariateRegression,
+	MultivariateRegression,
+
+	linearreg,
+	logisticreg,
+	mlogisticreg,
+
+	# solve
+	RiskMinSolver,
+	GDSolver,
+	BFGSSolver
+
+
+# source files
+
+include("common.jl")
+include("linearreg.jl")
+include("regproblems.jl")
+include("optimbase.jl")
+include("solvers.jl")
+include("solve.jl")
+include("print.jl")
+
+end # module

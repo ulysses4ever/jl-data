@@ -1,0 +1,20 @@
+include("../src/utils/CompLingUtils.jl")
+
+module CompLingUtilsTest
+using CompLingUtils
+
+function test_counter()
+    sentence = ["the", "man", "loves", "the", "cat"]
+    ctr = counter(sentence)
+    @assert(ctr.total == 5)
+    @assert(ctr["the"] == 2)
+    @assert(ctr["cat"] == 1)
+    @assert(ctr["dog"] == 0)
+end
+
+# run the tests
+test_counter()
+
+println("Utils: all tests pass.")
+
+end # module

@@ -1,0 +1,55 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+# convert a GraphML graph into a serialized Julia graph
+using PyCall, Graphs
+
+rg = pyimport(:igraph)["Graph"]["Read_GraphML"]
+frg = convert(Function,rg) 
+# GraphML file
+g1 = frg(ARGS[1])
+
+vs = g1["vs"]
+es = g1["es"]
+
+nv = length(vs[:indices])
+
+# ExVertex: index, name
+vertices = ExVertex[]
+edges = ExEdge{ExVertex}[]
+
+# index -> ExVertex instance
+dv = Dict{Int,ExVertex}()
+
+for v in vs
+	i = v[:index]+1
+	vertex = ExVertex(i, get(v, "id"))
+	dv[i] = vertex
+	push!(vertices, vertex)
+end
+
+for edge in es
+	i = edge[:index]+1
+	ne = ExEdge(i, dv[edge[:source]+1], dv[edge[:target]+1])
+	push!(edges, ne)
+end
+
+g2 = graph(vertices,edges,is_directed=true)
+
+# serialize directed incidence list
+open("graph.jld", "w") do file
+	serialize(file, g2)
+end
+

@@ -1,0 +1,17 @@
+#Library containing functions related to IO, e.g., readProblem, print, initialize structs
+
+include( "MCITW-1P.jl" )
+
+function readProblem( fData )
+  include( fData )
+  
+  prob = Problem( cardC, cardD, cardP, cardT, CCap, CCost, DA, DS, DE, DD, PA, PS, PE, PD )
+  
+  return prob
+end
+
+function initializeSol( cardC, cardD, cardP, cardT )
+  sol = Solution( 0, 0, 0, 0, zeros( Int, cardD, cardC, cardT), zeros( Int, cardP, cardC, cardT ), zeros( Int, cardC, cardT ) )
+
+  return sol
+end

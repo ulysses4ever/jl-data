@@ -1,0 +1,308 @@
+using SortedVectors, SortedStructures
+
+
+const letterVec = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]::Vector{ASCIIString}
+randletter() = letterVec[rand(1:10)]
+randletter(N::Int) = [ randletter() for n = 1:N ]
+function simSV(N::Int)
+	x = sort(randletter(N))
+	y = deepcopy(x)
+	return(x, SortedVector(y, alreadySorted=true))
+end
+function simSUV(N::Int)
+	N > 10 && error("Only sim max vec length of 10")
+	x = sort(letterVec[randperm(10)[1:N]])
+	y == deepcopy(x)
+	return(x, SortedUniqueVector(y, alreadySorted=true, alreadyUnique=true))
+end
+function simSDV(N::Int)
+	(temp, s) = simSV(N)
+	x = randn(N)
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedDataVector(ds, dx))
+end
+function simSUDV(N::Int)
+	(temp, s) = simSUV(N)
+	x = randn(N)
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedUniqueDataVector(ds, dx))
+end
+function simSDM(N::Int)
+	(temp, s) = simSV(N)
+	x = randn(N, rand(1:2))
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedDataMatrix(ds, dx))
+end
+function simSUDM(N::Int)
+	(temp, s) = simSUV(N)
+	x = randn(N, rand(1:2))
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedUniqueDataMatrix(ds, dx))
+end
+
+
+function testbasic(KK::Int)
+	for kk = 1:KK
+		N = rand(0:5)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		(s3, x3, d3) = simSDM(N)
+		(s4, x4, d4) = simSUDM(N)
+		string(d1)
+		string(d2)
+		string(d3)
+		string(d4)
+		show(d1)
+		show(d2)
+		show(d3)
+		show(d4)
+		if N > 0
+			Nrnd = rand(1:N)
+			d1[Nrnd] != x1[Nrnd] && error("blah")
+			d2[Nrnd] != x1[Nrnd] && error("blah")
+			d3[Nrnd] != x1[Nrnd, :] && error("blah")
+			d4[Nrnd] != x1[Nrnd, :] && error("blah")
+			Nrnd = IntSet([rand(1:N)])
+			d1[Nrnd] != x1[Nrnd] && error("blah")
+			d2[Nrnd] != x1[Nrnd] && error("blah")
+			d3[Nrnd] != x1[Nrnd, :] && error("blah")
+			d4[Nrnd] != x1[Nrnd, :] && error("blah")
+			getlist(d1, Nrnd) != s1[Nrnd] && error("blah")
+			getlist(d2, Nrnd) != s1[Nrnd] && error("blah")
+			getlist(d3, Nrnd) != s1[Nrnd] && error("blah")
+			getlist(d4, Nrnd) != s1[Nrnd] && error("blah")
+			getx(d1, Nrnd) != x1[Nrnd] && error("blah")
+			getx(d2, Nrnd) != x1[Nrnd] && error("blah")
+			getx(d3, Nrnd) != x1[Nrnd, :] && error("blah")
+			getx(d4, Nrnd) != x1[Nrnd, :] && error("blah")
+			getheader(d3, 1) != "" && error("blah")
+			getheader(d4, 1) != "" && error("blah")
+			first(d1)
+			first(d2)
+			first(d3)
+			first(d4)
+			last(d1)
+			last(d2)
+			last(d3)
+			last(d4)
+			endof(d1)
+			endof(d2)
+			endof(d3)
+			endof(d4)
+		end
+		copy(d1)
+		copy(d2)
+		copy(d3)
+		copy(d4)
+		d1 != deepcopy(d1) && error("basic fail 1")
+		d2 != deepcopy(d2) && error("basic fail 2")
+		d3 != deepcopy(d3) && error("basic fail 3")
+		d4 != deepcopy(d4) && error("basic fail 4")
+		!(issorted(d1)) && error("basic fail 5")
+		!(issorted(d2)) && error("basic fail 6")
+		!(issorted(d3)) && error("basic fail 7")
+		!(issorted(d4)) && error("basic fail 8")
+		a = letterVec[rand(1:10)]
+		search(d1, a) != search(d1.list, a) && error("basic fail 9")
+		search(d2, a) != search(d2.list, a) && error("basic fail 10")
+		search(d3, a) != search(d3.list, a) && error("basic fail 11")
+		search(d4, a) != search(d4.list, a) && error("basic fail 12")
+		searchfirst(d1, a) != searchfirst(d1.list, a) && error("basic fail 13")
+		searchfirst(d2, a) != searchfirst(d2.list, a) && error("basic fail 14")
+		searchfirst(d3, a) != searchfirst(d3.list, a) && error("basic fail 15")
+		searchfirst(d4, a) != searchfirst(d4.list, a) && error("basic fail 16")
+		searchlast(d1, a) != searchlast(d1.list, a) && error("basic fail 17")
+		searchlast(d2, a) != searchlast(d2.list, a) && error("basic fail 18")
+		searchlast(d3, a) != searchlast(d3.list, a) && error("basic fail 19")
+		searchlast(d4, a) != searchlast(d4.list, a) && error("basic fail 20")
+		in(d1, a) != in(d1.list, a) && error("basic fail 21")
+		in(d2, a) != in(d2.list, a) && error("basic fail 22")
+		in(d3, a) != in(d3.list, a) && error("basic fail 23")
+		in(d4, a) != in(d4.list, a) && error("basic fail 24")
+		length(d1) != N && error("basic fail 25")
+		length(d2) != N && error("basic fail 26")
+		length(d3) != N && error("basic fail 27")
+		length(d4) != N && error("basic fail 28")
+		size(d1, 1) != N && error("basic fail 29")
+		size(d2, 1) != N && error("basic fail 30")
+		size(d3, 1) != N && error("basic fail 31")
+		size(d4, 1) != N && error("basic fail 32")
+		size(d3, 2) != size(d3.x, 2) && error("basic fail 33")
+		size(d4, 2) != size(d4.x, 2) && error("basic fail 34")
+		eltype(d1, 1) != ASCIIString && error("basic fail 35")
+		eltype(d2, 1) != ASCIIString && error("basic fail 36")
+		eltype(d3, 1) != ASCIIString && error("basic fail 37")
+		eltype(d4, 1) != ASCIIString && error("basic fail 38")
+		eltype(d1, 2) != Float64 && error("basic fail 39")
+		eltype(d2, 2) != Float64 && error("basic fail 40")
+		eltype(d3, 2) != Float64 && error("basic fail 41")
+		eltype(d4, 2) != Float64 && error("basic fail 42")
+		eltype(d3, 3) != ASCIIString && error("basic fail 43")
+		eltype(d4, 3) != ASCIIString && error("basic fail 44")
+		!(d1 == d1) && error("basic fail 45")
+		!(d2 == d2) && error("basic fail 46")
+		!(d3 == d3) && error("basic fail 47")
+		!(d4 == d4) && error("basic fail 48")
+		!(d1.list == s1) && error("logic fail")
+		!(d2.list == s2) && error("logic fail")
+		!(d3.list == s3) && error("logic fail")
+		!(d4.list == s4) && error("logic fail")
+		!(d1.x == x1) && error("logic fail")
+		!(d2.x == x2) && error("logic fail")
+		!(d3.x == x3) && error("logic fail")
+		!(d4.x == x4) && error("logic fail")
+		if N >= 2
+			pop!(d1)
+			pop!(d2)
+			length(d1) != N-1 error("basic fail 49")
+			length(d2) != N-1 error("basic fail 50")
+			length(d1.x) != N-1 error("basic fail 51")
+			length(d2.x) != N-1 error("basic fail 52")
+			shift!(d1)
+			shift!(d2)
+			length(d1) != N-2 error("basic fail 53")
+			length(d2) != N-2 error("basic fail 54")
+			length(d1.x) != N-2 error("basic fail 55")
+			length(d2.x) != N-2 error("basic fail 56")
+		end
+	end
+	return(true)
+end
+
+
+function testdelete(KK::Int)
+	for kk = 1:KK
+		#deleteat!
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		indsRnd = [rand(1:N)]
+		a1 = d1.list[indsRnd][1]
+		a2 = d2.list[indsRnd][1]
+		deleteat!(d1, a1)
+		deleteat!(d2, a2)
+		for n = length(s1):-1:1
+			if s1[n] == a1
+				deleteat!(s1, n)
+				deleteat!(x1, n)
+			end
+		end
+		deleteat!(s2, indsRnd)
+		deleteat!(x2, indsRnd)
+		d1.list != s1 && error("deleteat fail 1")
+		d1.x != x1 && error("deleteat fail 2")
+		d2.list != s2 && error("deleteat fail 3")
+		d2.x != x2 && error("deleteat fail 4")
+		#empty!
+		empty!(d1)
+		empty!(d2)
+		length(d1) != 0 && error("empty fail 1")
+		length(d2) != 0 && error("empty fail 2")
+		#deleteat
+		(s1, x1, d1) = simSDM(N)
+		(s2, x2, d2) = simSUDM(N)
+		indsRnd = [rand(1:N)]
+		a1 = d1.list[indsRnd][1]
+		a2 = d2.list[indsRnd][1]
+		d1Del = deleteat(d1, a1)
+		d2Del = deleteat(d2, a2)
+		indsKeep = Array(Int, 0)
+		for n = 1:length(s1)
+			s1[n] != a1 && push!(indsKeep, n)
+		end
+		s1 = SortedVector(s1[indsKeep], alreadySorted=true)
+		x1 = x1[indsKeep, :]
+		rDel = search(s2, a2)
+		indsKeep = setdiff(IntSet(1:N), IntSet([rDel.start]))
+		s2 = SortedUniqueVector(s2[indsKeep], alreadySorted=true)
+		x2 = x2[indsKeep, :]
+		d1Del.list != s1 && error("deleteat fail 5")
+		d1Del.x != x1 && error("deleteat fail 6")
+		d2Del.list != s2 && error("deleteat fail 7")
+		d2Del.x != x2 && error("deleteat fail 8")
+		#deletenotat
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		indsRnd = [rand(1:N)]
+		deletenotat!(d1, indsRnd)
+		deletenotat!(d2, indsRnd)
+		d1.list[1] != s1[indsRnd][1] && error("deletenotat fail 1")
+		d1.x[1] != x1[indsRnd][1] && error("deletenotat fail 2")
+		d2.list[1] != s2[indsRnd][1] && error("deletenotat fail 3")
+		d2.x[1] != x2[indsRnd][1] && error("deletenotat fail 4")
+		(s1, x1, d1) = simSDM(N)
+		(s2, x2, d2) = simSUDM(N)
+		indsRnd = [rand(1:N)]
+		d1Del = deletenotat(d1, indsRnd)
+		d2Del = deletenotat(d2, indsRnd)
+		d1Del.list[1] != s1[indsRnd][1] && error("deletenotat fail 5")
+		d1Del.x[1, :] != x1[indsRnd, :] && error("deletenotat fail 6")
+		d2Del.list[1] != s2[indsRnd][1] && error("deletenotat fail 7")
+		d2Del.x[1, :] != x2[indsRnd, :] && error("deletenotat fail 8")
+	end
+	return(true)
+end
+
+
+
+
+function testinsert(KK::Int)
+	for kk = 1:KK
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		a = letterVec[rand(1:10)]
+		x = randn()
+		insert!(d1, a, x)
+		!(in(a, d1)) && error("insert fail 1")
+		!(issorted(d1.list)) && error("insert fail 2")
+		r = search(d1, a)
+		matchFound = false
+		for n = r.start:r.stop
+			if d1.x[n] == x
+				matchFound = true
+			end
+		end
+		matchFound == false && error("insert fail 3")
+		(s1, x1, d1) = simSDV(N)
+		a = letterVec[rand(1:10)]
+		while in(a, s1)
+			a = letterVec[rand(1:10)]
+		end
+		x = randn()
+		insert!(d1, a, x)
+		!(in(a, d1)) && error("insert fail 4")
+		!(issorted(d1.list)) && error("insert fail 5")
+		r = search(d1, a)
+		d1.x[r] != x && error("insert fail 6")
+	end
+	return(true)
+end
+
+
+
+
+
+function testreplace(KK::Int)
+	for kk = 1:KK
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		(s3, x3, d3) = simSDM(N)
+		(s4, x4, d4) = simSUDM(N)
+		a1 = s1[rand(1:N)]
+		a2 = s2[rand(1:N)]
+		a3 = s3[rand(1:N)]
+		a4 = s4[rand(1:N)]
+
+		#treat unique and not unique differently
+
+		#UP TO HERE
+
+
+
+
+

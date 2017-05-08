@@ -1,0 +1,5 @@
+function debugInitializeWeights(L_in_size, L_out_size)
+  W = zeros(L_out_size, L_in_size + 1)
+  W = reshape(sin(1:length(W)), size(W)) / 10
+end
+

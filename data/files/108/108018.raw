@@ -1,0 +1,17 @@
+function is_prime(n::Int64)
+    i = 2
+    while i <= sqrt(n)
+        if n % i == 0
+            return false
+        end
+        i += 2
+    end
+
+    return true
+end
+
+println(is_prime(100))
+println(is_prime(101))
+println(is_prime(10012))
+println(is_prime(377))
+println(is_prime(123))

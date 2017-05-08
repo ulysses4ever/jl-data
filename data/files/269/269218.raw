@@ -1,0 +1,107 @@
+module DCI
+
+using TrustNLS
+using QuadProg
+
+const phi1 = 1.0
+const eta1 = 0.1
+const eta2 = 0.2
+
+function solve(f::Function, g::Function, W::Function, c::Function,
+    J::Function, x0::Vector, ncon; kmax = 100, verbose = false)
+
+  x = copy(x0)
+  xc = copy(x)
+  nvar = length(x)
+
+  normgp = 1.0;
+  normc = 1.0;
+  rhomax = 1.0;
+  Delta = 100.0;
+  gx = zeros(nvar)
+  gp = zeros(nvar)
+  Wx = zeros(nvar, nvar)
+  λ = zeros(ncon)
+  cx = c(xc)
+  Jx = J(xc)
+  normc = norm(cx);
+  Lref = Inf
+  DLH = Inf
+  DLV = 0.0
+  Ln = f(xc)
+
+  k = 0
+  while normgp >= 1e-6 || normc >= 1e-6
+    # Normal step
+    xc = copy(x)
+    gx = g(xc)
+    λ = -Jx'\gx
+    gp = gx + Jx'*λ;
+    normgp = norm(gp)
+    rho = max(min(phi1*rhomax*normgp, 0.75*rhomax), 1e-6)
+    println("ρ = $rho")
+    while normc > rho
+      (xc,kn,cx,Jx) = TrustNLS.solve(ncon, c, J, xc, normheps = rho,
+          inplace=false)
+      gx = g(xc)
+      λ = -Jx'\gx
+      gp = gx + Jx'*λ;
+      normgp = norm(gp)
+      rho = max(min(phi1*rhomax*normgp, 0.75*rhomax), 1e-6)
+      println("ρ = $rho")
+      normc = norm(cx);
+    end
+
+    # Update rhomax
+    Lc = f(xc) + dot(λ,cx);
+    DLV = Lc - Ln;
+
+    if DLV >= 0.5*(Lref - Ln)
+      rhomax /= 2.0;
+    end
+    if DLV > -0.5*DLH
+      Lref = Lc;
+    end
+
+    verbose && println("Cond: (|gp|, |c|) = ", (normgp,normc))
+    # Tangent step
+    if normgp < 1e-6 && normc < 1e-6
+      break
+    end
+    (Q,R) = qr(Jx', thin=false)
+    Z = Q[:,ncon+1:nvar]
+    normcplus = 2*rho+1
+    cplus = copy(cx)
+    Wx = W(x, λ)
+    while normcplus > 2*rho || DLH > eta1*qd
+      d, qd, kt = QuadProg.solve(Wx, gp, Z, Delta; null_matrix = true, ortho_null = true)
+      x = xc + d;
+      cplus = c(x)
+      Ln = f(x) + dot(λ,cplus)
+      DLH = Ln - Lc;
+      normcplus = norm(cplus)
+      if normcplus > 2*rho || DLH > eta1*qd
+        Delta = 0.25*Delta
+      elseif DLH <= eta2*qd
+        Delta *= 1.5
+      end
+      if Delta < 1e-12
+        println("Delta too small")
+        break
+      end
+    end
+    normc = normcplus
+    if Delta < 1e-4
+      Delta = 1e-4
+    end
+    k += 1
+    if k > kmax
+      break
+    end
+  end
+
+  return xc, k
+
+end
+
+end

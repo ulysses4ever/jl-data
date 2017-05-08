@@ -1,0 +1,10 @@
+module Symbolic
+  importall Base
+  
+  include("expression_algebraic_operators.jl")
+  include("structure_based_operators.jl")
+  include("expression_expansion.jl")
+  
+  export
+    fullexpand
+end

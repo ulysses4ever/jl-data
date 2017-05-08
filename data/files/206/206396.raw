@@ -1,0 +1,78 @@
+using LIBLINEAR
+
+typealias LibLinClassifier LIBLINEAR.LINEARModel{Int}
+
+type Learner{M}
+    dim::Int
+    X::Vector{Float64}
+    y::Vector{Int}
+    num_examples::Int
+    max_examples::Int
+    model::Nullable{M}
+end
+
+function Learner{M}(dim, max_examples, ::Type{M} = LibLinClassifier)
+    # X_path = tempname()
+    # y_path = tempname()
+    # X = Mmap.mmap(X_path, Vector{Float64}, (dim*max_examples,), shared = false)
+    # y = Mmap.mmap(y_path, Vector{Int}, (max_examples,), shared = false)
+    # l = Learner(dim, X, y, 0, max_examples, Nullable{M}())
+    # # Arrange to delete the mmaped arrays after the learner is finalized.
+    # function cleanup(l)
+    #     rm(X_path)
+    #     rm(y_path)
+    # end
+    # finalizer(l, cleanup)
+    # return l
+    return Learner(dim, Array(Float64, 0), Array(Int, 0), 0, max_examples,
+                   Nullable{M}())
+end
+
+function get_data(l::Learner)
+    # X = l.X[1:l.dim*l.num_examples]
+    # y = l.y[1:l.num_examples]
+    #return reshape(X, l.dim, l.num_examples), y
+    return reshape(l.X, l.dim, l.num_examples), l.y
+end
+
+function add_example!(l::Learner, x, y)
+    # if l.num_examples > l.max_examples
+    #     error("Learner has exceeded max_examples!")
+    # end
+    # X_start = (l.num_examples) * l.dim + 1
+    # y_start = l.num_examples + 1
+    # l.X[X_start:X_start+length(x) - 1] = x
+    # l.y[y_start] = y
+    append!(l.X, x)
+    push!(l.y, y)
+    l.num_examples += 1
+end
+
+function add_examples!(l::Learner, Xs, ys)
+    # if l.num_examples + length(ys) > l.max_examples
+    #     error("Learner has exceeded max_examples!")
+    # end
+    # X_start = (l.num_examples) * l.dim + 1
+    # y_start = l.num_examples + 1
+    # l.X[X_start:X_start + length(Xs) - 1] = Xs
+    # l.y[y_start:y_start + length(ys) - 1] = ys
+    append!(l.X, Xs)
+    append!(l.y, ys)
+    l.num_examples += length(ys)
+end
+
+function train!(l::Learner{LibLinClassifier})
+    try
+        X, y = get_data(l)
+        l.model = Nullable(linear_train(y, X, solver_type = Int32(2)))
+    catch e
+        println(e)
+    end
+end
+
+function predict(l::Learner{LibLinClassifier}, x)
+    if isnull(l.model)
+        error("Learner hasn't learned a model yet!")
+    end
+    return linear_predict(get(l.model), reshape(x, l.dim, 1))[1][1]
+end

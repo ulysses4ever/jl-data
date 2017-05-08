@@ -1,0 +1,877 @@
+defaultTableHelpText = """
+PgUp/PgDn,
+Arrow keys : standard navigation
+<spc>,<rtn>: toggle leaf expansion
+Home       : jump to the start
+End        : jump to the end
+ctrl_left/right arrow: paginate to left/right
+[, ]       : make current column narrower/wider
+ctrl_up    : move up to the start of the current branch or previous branch
+ctrl_down  : move down to the next branch
++, -       : Expand or collapse 1 level everywhere
+p          : Change pivot
+c          : Change columns/order
+v          : Switch preset views
+F6         : popup window for value
+"""
+defaultTableBottomText = "F1:help  p:Pivot  c:ColOrder  v:Views ][:ColWidth"
+
+type TwTableColInfo
+    name::Symbol
+    displayname::UTF8String
+    format::FormatHints
+    aggr::Any
+end
+
+type TwDfTableNode
+    parent::WeakRef
+    context::WeakRef
+    pivotcols::Array{ Symbol, 1 }
+    pivotvals::Tuple
+    isOpen::Bool
+    children::Array{ Any, 1} # only root node can have empty children
+    subdataframe::Any
+    subdataframesorted::Any
+    colvalcache::Dict{ Symbol, Any } # order indep aggregated values
+    function TwDfTableNode()
+        new( WeakRef(), WeakRef(), Symbol[], (), false, Any[], nothing, nothing, Dict{Symbol,Any}() )
+    end
+    function TwDfTableNode( p::TwDfTableNode )
+        x = TwDfTableNode()
+        x.parent = WeakRef( p )
+        x.context = p.context
+        x
+    end
+end
+
+function getindex( n::TwDfTableNode, c::Symbol )
+    if haskey( n.colvalcache, c )
+        return n.colvalcache[ c ]
+    else
+        context = n.context.value
+        aggr = context.allcolInfo[ c ].aggr
+        f = liftAggrSpecToFunc( c, aggr )
+        ret = f( n.subdataframe )
+        if typeof( ret ) <: AbstractDataFrame
+            ret = ret[1][1] # first col, first row
+        end
+
+        n.colvalcache[c] = ret
+        return ret
+    end
+end
+
+type TwTableView
+    name::UTF8String
+    pivots::Array{Symbol,1}
+    sortorder::Array{ (Symbol, Symbol), 1 } # [ (:col1, :asc ), (:col2, :desc), ... ]
+    columns::Array{ Symbol, 1 }
+    initdepth::Int
+end
+
+# convenient functions to construct views
+function TwTableView( df::AbstractDataFrame, name::String;
+    pivots = Symbol[], initdepth=1,
+    colorder = Any[ "*" ],
+    hidecols = Any[], sortorder = (Symbol,Symbol)[] )
+
+    # construct visible columns in the right order
+    function move_columns( targetarray::Array{ Symbol,1 }, sourcearray::Array, remaincols::Array{Symbol,1} )
+        local i = 1
+        local n = length( sourcearray )
+        while !isempty( remaincols ) && i <= n
+            local s = sourcearray[i]
+            if s == "*"
+                error( "illegal extra *")
+            elseif typeof( s ) == Regex
+                j = 1
+                while j <= length( remaincols )
+                    if match( s, string( remaincols[j] ) ) != nothing
+                        push!( targetarray, remaincols[j] )
+                        deleteat!( remaincols, j )
+                        continue
+                    end
+                    j += 1
+                end
+            elseif typeof( s ) == Symbol
+                if !in( s, remaincols )
+                    error( "Column " * string( s ) * " not in " * string( remaincols )  * " src:" * string( sourcearray ) )
+                end
+                push!( targetarray, s )
+                local idx = findfirst( remaincols, s )
+                deleteat!( remaincols, idx )
+            else
+                error( "illegal " * string( s ) * " found" )
+            end
+
+            i += 1
+        end
+    end
+
+    remaincols = names( df )
+    if in( "*", colorder )
+        colspreast = Symbol[]
+        colspostast = Symbol[]
+        local idx = findfirst( colorder, "*" )
+        move_columns( colspreast, colorder[ 1:(idx-1) ], remaincols )
+        finalcolorder = colspreast
+        move_columns( colspostast, colorder[ (idx+1):length( colorder ) ], remaincols )
+        append!( finalcolorder, remaincols )
+        append!( finalcolorder, colspostast )
+    else
+        finalcolorder = Symbol[]
+        move_columns( finalcolorder, colorder, remaincols )
+    end
+
+    # remove anything in hidecols
+    removed = Symbol[]
+    move_columns( removed, hidecols, finalcolorder )
+
+    TwTableView( utf8(name), pivots, sortorder, finalcolorder, initdepth )
+end
+
+# this is the widget data. all subnodes hold a weakref back to this to
+# facilitate aggregation, ordering and output
+type TwDfTableData
+    rootnode::TwDfTableNode
+    pivots::Array{ Symbol, 1 }
+    sortorder::Array{ (Symbol, Symbol), 1 } # [ (:col1, :asc ), (:col2, :desc), ... ]
+    datalist::Array{Any, 1} # (tuple{symbol}, 0) -> node, (tuple{symbol},#) -> row within that sub-df
+    datalistlen::Int
+    datatreewidth::Int
+    headerlines::Int # how many lines does the header occupy, usually just 1
+    currentTop::Int
+    currentLine::Int
+    currentCol::Int
+    currentLeft::Int # left most on-screen column
+    currentRight::Int # right most on-screen column
+    colInfo::Array{ TwTableColInfo, 1 } # only the visible ones, maybe off-screen
+    allcolInfo::Dict{ Symbol, TwTableColInfo } # including invisible ones
+    bottomText::String
+    helpText::String
+    searchText::String
+    initdepth::Int
+    views::Array{ TwTableView, 1 }
+    # calculated dimension
+    TwDfTableData() = new( TwDfTableNode(),
+        Symbol[], (Symbol,Symbol)[], Any[], 0, 10, 1, 1, 1, 1, 1, 1, TwTableColInfo[],
+        Dict{Symbol,TwTableColInfo}(), "", defaultTableHelpText, "", 1, TwTableView[] )
+end
+
+#TODO: allow Regex in formatHints and aggrHints
+function newTwDfTable( scr::TwScreen, df::DataFrame, h::Real,w::Real,y::Any,x::Any;
+        pivots = Symbol[],
+        initdepth = 1,
+        colorder = Any[ "*" ], # mix of symbol, regex, and "*" (the rest), "*" can be in the middle
+        hidecols = Any[], # anything here trumps colorder, Symbol, or Regex
+        sortorder = (Symbol,Symbol)[],
+        title = "DataFrame",
+        formatHints = Dict{Any,FormatHints}(), # Symbol/Type -> FormatHints
+        aggrHints = Dict{Any,Any}(), # Symbol/Type -> string/symbol/expr/function
+        widthHints = Dict{Symbol,Int}(),
+        headerHints = Dict{Symbol,UTF8String}(),
+        bottomText = defaultTableBottomText,
+        views = Dict{Symbol,Any}[] )
+    obj = TwObj( twFuncFactory( :DfTable ) )
+    registerTwObj( scr, obj )
+    obj.value = df
+    obj.title = title
+    obj.box = true
+    obj.borderSizeV= 1
+    obj.borderSizeH= 2
+    obj.data = TwDfTableData()
+    obj.data.rootnode.subdataframe = df
+    obj.data.rootnode.context = WeakRef( obj.data )
+
+    mainV = TwTableView( df, utf8( "#Main"), pivots = pivots,
+        initdepth=initdepth, sortorder=sortorder, colorder=colorder, hidecols=hidecols )
+
+    obj.data.pivots = mainV.pivots
+    obj.data.initdepth = mainV.initdepth
+    obj.data.sortorder = mainV.sortorder
+    finalcolorder = mainV.columns
+
+    push!( obj.data.views, mainV )
+    for (i,d) in enumerate( views )
+        if isempty( d )
+            error( "nothing in view #" * string( i ) )
+        end
+        vname = get( d, :name, string( "v#" * string( i ) ) )
+        vpivots = get( d, :pivots, pivots )
+        vinitdepth = get( d, :initdepth, initdepth )
+        vcolorder = get( d, :colorder, colorder )
+        vhidecols = get( d, :hidecols, hidecols )
+        vsortorder = get( d, :sortorder, sortorder )
+        v = TwTableView( df, utf8( vname ), pivots = vpivots, initdepth = vinitdepth,
+            sortorder=vsortorder, colorder = vcolorder, hidecols = vhidecols )
+        push!( obj.data.views, v )
+    end
+
+    expandnode( obj.data.rootnode, initdepth )
+    ordernode( obj.data.rootnode )
+    builddatalist( obj.data )
+
+    # construct colInfo for each col in finalcolorder
+    allcols = names( df )
+    for c in allcols
+        if VERSION < v"0.4.0-dev+1930"
+            @lintpragma( "DataFrame is a container type" )
+        else
+            @lintpragma( "DataFrames.DataFrame is a container type" )
+        end
+
+        t = eltype( df[ c ] )
+
+        hdr = get( headerHints, c, string( c ) )
+        fmt = get( formatHints, c,
+                get( formatHints, t, deepcopy( FormatHints( t ) ) ) )
+        if haskey( widthHints, c )
+            fmt.width = widthHints[c]
+        end
+        agr = get( aggrHints, c,
+                get( aggrHints, t, defaultAggr( t ) ) )
+        ci = TwTableColInfo( c, hdr, fmt, agr )
+        obj.data.allcolInfo[c] = ci
+    end
+
+    for c in finalcolorder
+        ci = obj.data.allcolInfo[c]
+        push!( obj.data.colInfo, ci )
+    end
+
+    updateTableDimensions( obj )
+    obj.data.bottomText = bottomText
+    alignxy!( obj, h, w, x, y )
+    configure_newwinpanel!( obj )
+    obj
+end
+
+function expandnode( n::TwDfTableNode, depth::Int=1 )
+    if n.isOpen # nothing to do
+        if depth > 1
+            for r in n.children
+                expandnode( r, depth-1 )
+            end
+        end
+        return
+    end
+    pivots = n.context.value.pivots
+    npivots = n.pivotcols # this is the node's pivot. length <= length( pivots )
+    if length( npivots ) < length( pivots ) # populate children nodes
+        if isempty( n.children )
+            nextpivots = deepcopy( npivots )
+            push!( nextpivots, pivots[ length( npivots )+1 ] )
+            gd = groupby( n.subdataframe, nextpivots )
+            for g in gd
+                dfr = DataFrameRow( g[ gd.cols ], 1 )
+                valtuple = tuple( [ x[2] for x in dfr ]... )
+                r = TwDfTableNode( n )
+                r.pivotcols = nextpivots
+                r.pivotvals = valtuple
+                r.subdataframe = g
+                push!( n.children, r )
+            end
+        end
+        if depth > 1
+            for r in n.children
+                expandnode( r, depth-1 )
+            end
+        end
+    end
+    n.isOpen = true
+end
+
+# order the children, or if the terminal node, order the subdataframe
+# also order opened children (recursive)
+function ordernode( n::TwDfTableNode )
+    pivots = n.context.value.pivots
+    npivots = n.pivotcols # this is the node's pivot. length <= length( pivots )
+    sortorder = n.context.value.sortorder
+    if length( npivots ) < length( pivots ) # populate children nodes
+        sort!( n.children, lt = (x,y) -> begin
+            for sc in sortorder
+                if x[sc[1]] == y[sc[1]]
+                    continue
+                end
+
+                if sc[2] == :desc
+                    return y[sc[1]] < x[sc[1]]
+                else
+                    return x[sc[1]] < y[sc[1]]
+                end
+            end
+            return false
+        end )
+        for c in n.children
+            if c.isOpen
+                ordernode( c )
+            end
+        end
+    else
+        if length( sortorder ) == 0
+            n.subdataframesorted = n.subdataframe
+        else
+            n.subdataframesorted = sort(n.subdataframe,
+                cols=( map( _->_[1], sortorder)...),
+                rev=( map(_->_[2]==:desc, sortorder )... ) )
+        end
+    end
+end
+
+function builddatalist( o::TwDfTableData )
+    o.datalist = Any[]
+    pivots = o.pivots
+
+    function presublist( subn::TwDfTableNode, substack::Array{Int,1}, skiplines::Array{Int,1}, islast::Bool )
+        if islast
+            newskip = copy(skiplines)
+            push!( newskip, length(substack))
+            sublist( subn, substack, newskip )
+        else
+            sublist( subn, substack, skiplines )
+        end
+    end
+
+    function sublist( n::TwDfTableNode, stack::Array{Int,1}, skiplines::Array{Int,1} )
+        if isempty( n.pivotvals )
+            name = "Root"
+        else
+            name = string( n.pivotvals[end] )
+        end
+
+        push!( o.datalist, ( name, stack, n.isOpen ? :open : :close, skiplines, n ) )
+        if n.isOpen
+            if length( n.pivotcols ) < length( pivots )
+                len = length( n.children )
+                for (i,c) in enumerate( n.children )
+                    substack = copy( stack )
+                    push!( substack, i )
+                    presublist( c, substack, skiplines, i==len )
+                end
+            else
+                for i in 1:size( n.subdataframe,1 )
+                    substack = copy( stack )
+                    push!( substack, i )
+                    push!( o.datalist, ( string(i), substack, :single, skiplines, n ) )
+                end
+            end
+        end
+    end
+
+    sublist( o.rootnode, Int[], Int[] )
+    o.currentLine = min( o.currentLine, length( o.datalist ) )
+end
+
+function updateTableDimensions( o::TwObj )
+    o.data.datalistlen = length( o.data.datalist )
+    o.data.headerlines = maximum( map( x->length( split( x.displayname, "\n" ) ), o.data.colInfo ) )
+    # reminder: (name, stack, exphints, skiplines, node )
+    o.data.datatreewidth = maximum( map( d -> 2*(length(d[2])+1) + length(d[1])+1,
+        o.data.datalist ) )
+end
+
+function drawTwDfTable( o::TwObj )
+    updateTableDimensions( o )
+    viewContentHeight = o.height - 2 * o.borderSizeV - o.data.headerlines
+    viewContentWidth  = o.width - 2 * o.borderSizeH
+
+    box( o.window, 0,0 )
+    if !isempty( o.title )
+        titlestr = o.title
+        mvwprintw( o.window, 0, int( ( o.width - length(titlestr) )/2 ), "%s", titlestr )
+    end
+    if o.data.datalistlen <= viewContentHeight
+        msg = "ALL"
+    else
+        msg = @sprintf( "%d/%d %5.1f%%", o.data.currentLine, o.data.datalistlen,
+            o.data.currentLine / o.data.datalistlen * 100 )
+    end
+    mvwprintw( o.window, 0, o.width - length(msg)-3, "%s", msg )
+    updateTableDimensions( o )
+
+    # header row(s)
+    wattron( o.window, COLOR_PAIR(3) )
+    startx = 1+o.data.datatreewidth
+    lastcol = 1
+    lastwidth = 8
+    for col = o.data.currentLeft:length( o.data.colInfo )
+        if startx > viewContentWidth
+            break
+        end
+        ci = o.data.colInfo[col]
+        lines = split( ci.displayname, "\n" )
+        nlines= length(lines)
+        width = ci.format.width
+
+        islastcol = ( startx+width+6 > viewContentWidth ) || col == length( o.data.colInfo )
+        if islastcol
+            width = min( width, viewContentWidth-startx+2 )
+        end
+        o.data.currentRight = lastcol = col
+        lastwidth = width
+
+        if o.data.currentCol == col
+            wattron( o.window, A_REVERSE )
+        end
+        for (i,line) in enumerate( lines )
+            s = ensure_length( line, width )
+            if i == nlines
+                wattron( o.window, A_UNDERLINE )
+            end
+            mvwprintw( o.window, i+o.data.headerlines-nlines, startx, "%s", s )
+            if i == nlines
+                wattroff( o.window, A_UNDERLINE )
+            end
+        end
+        if o.data.currentCol == col
+            wattroff( o.window, A_REVERSE )
+        end
+        if !islastcol
+            for i = 1:o.data.headerlines
+                mvwaddch( o.window, i, startx+width, get_acs_val( 'x' ) )
+            end
+        end
+        startx += width + 1
+    end
+    wattroff( o.window, COLOR_PAIR(3) )
+    # reminder: (name, stack, exphints, skiplines, node )
+    for r in o.data.currentTop:min( o.data.currentTop + viewContentHeight - 1, o.data.datalistlen )
+        stacklen = length( o.data.datalist[r][2])
+
+        # treecolume is always shown
+        s = ensure_length( repeat( " ", 2*stacklen + 1) * o.data.datalist[r][1], o.data.datatreewidth-2 )
+
+        if r == o.data.currentLine
+            wattron( o.window, A_BOLD | COLOR_PAIR(15) )
+        end
+        mvwprintw( o.window, o.data.headerlines + 1+r-o.data.currentTop, 2, "%s", s )
+        for i in 1:stacklen - 1
+            if !in( i, o.data.datalist[r][4] ) # skiplines
+                mvwaddch( o.window, o.data.headerlines + 1+r-o.data.currentTop, 2*i, get_acs_val( 'x' ) ) # vertical line
+            end
+        end
+        if stacklen != 0
+            contchar = get_acs_val('t') # tee pointing right
+            if r == o.data.datalistlen ||  # end of the whole thing
+                length(o.data.datalist[r+1][2]) < stacklen || # next one is going back in level
+                ( length(o.data.datalist[r+1][2]) > stacklen && in( stacklen, o.data.datalist[r+1][4] ) ) # going deeper in level
+                contchar = get_acs_val( 'm' ) # LL corner
+            end
+            mvwaddch( o.window, o.data.headerlines + 1+r-o.data.currentTop, 2*stacklen, contchar )
+            mvwaddch( o.window, o.data.headerlines + 1+r-o.data.currentTop, 2*stacklen+1, get_acs_val('q') ) # horizontal line
+        end
+        if o.data.datalist[r][3] == :close
+            mvwprintw( o.window, o.data.headerlines + 1+r-o.data.currentTop, 2*stacklen+2, "%s", string( char( 0x25b8 ) ) ) # right-pointing small triangle
+        elseif o.data.datalist[r][3] == :open
+            mvwprintw( o.window, o.data.headerlines + 1+r-o.data.currentTop, 2*stacklen+2, "%s", string( char( 0x25be ) ) ) # down-pointing small triangle
+        end
+
+        if r == o.data.currentLine
+            wattroff( o.window, A_BOLD | COLOR_PAIR(15) )
+        end
+        mvwaddch( o.window, o.data.headerlines+1+r-o.data.currentTop, o.data.datatreewidth, get_acs_val( 'x' ) )
+
+        # other columns
+        # get the node or DataFrameRow first
+        node = o.data.datalist[r][5]
+        isnode = (o.data.datalist[r][3] != :single)
+        startx = 1+o.data.datatreewidth
+        underline =  r < o.data.datalistlen && length( o.data.datalist[r+1][2] ) < stacklen
+        for col = o.data.currentLeft:lastcol
+            cn = o.data.colInfo[ col ].name
+            if isnode
+                v = node[ cn ]
+            else
+                v = node.subdataframesorted[ cn ][ o.data.datalist[r][2][end] ]
+            end
+            width = ( col == lastcol ? lastwidth : o.data.colInfo[ col ].format.width )
+            isred = false
+            if typeof( v ) == NAtype
+                str = ensure_length( "", width )
+            elseif typeof( v ) <: Real
+                str = applyformat( v, o.data.colInfo[col].format )
+                if length(str) > width # all ####
+                    str = repeat( "#", width )
+                elseif length(str) < width
+                    str = repeat( " ", width - length(str) ) * str
+                end
+                isred =  v < 0
+            else
+                str = applyformat( v, o.data.colInfo[col].format )
+                str = ensure_length( str, width )
+            end
+            flags = underline ? A_UNDERLINE : 0
+            if col == o.data.currentCol && r == o.data.currentLine
+                flags |= A_BOLD
+                if isred
+                    flags |= COLOR_PAIR(9)
+                else
+                    flags |= COLOR_PAIR(15)
+                end
+            elseif isnode
+                flags |= A_BOLD
+                if  mod( length( o.data.datalist[r][2] ), 2 ) == 0
+                    if isred
+                        flags |= COLOR_PAIR(1)
+                    else
+                        flags |= COLOR_PAIR(7)
+                    end
+                else
+                    if isred
+                        flags |= COLOR_PAIR(29)
+                    else
+                        flags |= COLOR_PAIR(13)
+                    end
+                end
+            else
+                if isred
+                    flags |= COLOR_PAIR(1)
+                else
+                    flags |= COLOR_PAIR(7)
+                end
+            end
+            wattron( o.window, flags )
+            mvwprintw( o.window, o.data.headerlines + 1+r-o.data.currentTop, startx, "%s", str )
+            wattroff( o.window, flags )
+            if col != lastcol
+                mvwaddch( o.window, o.data.headerlines + 1+ r-o.data.currentTop, startx+width, get_acs_val( 'x' ) )
+            end
+            startx += width + 1
+        end
+    end
+    if length( o.data.bottomText ) != 0
+        mvwprintw( o.window, o.height-1, 3, "%s", o.data.bottomText )
+    end
+    if !isempty( o.data.pivots )
+        s = " Pvt:"*join( o.data.pivots, "▹" )
+        s = ensure_length( s, 35, false )
+        mvwprintw( o.window, o.height-1, o.width - 37, "%s", s )
+    end
+end
+
+function injectTwDfTable( o::TwObj, token::Any )
+    dorefresh = false
+    retcode = :got_it # default behavior is that we know what to do with it
+    viewContentHeight = o.height - 2 * o.borderSizeV - o.data.headerlines
+    viewContentWidth = o.width - 2* o.borderSizeH - o.data.datatreewidth
+    widths = map( x->x.format.width, o.data.colInfo )
+
+    update_tree_data = ()->begin
+        builddatalist( o.data )
+    end
+
+    checkTop = () -> begin
+        if o.data.currentLine > length( o.data.datalist )
+            o.data.currentLine = length( o.data.datalist )
+        end
+        if o.data.currentTop < 1
+            o.data.currentTop = 1
+        elseif o.data.currentTop > o.data.datalistlen - viewContentHeight + 1
+            o.data.currentTop = max(1,o.data.datalistlen - viewContentHeight + 1)
+        end
+        if o.data.currentTop > o.data.currentLine
+            o.data.currentTop = o.data.currentLine
+        elseif o.data.currentLine - o.data.currentTop > viewContentHeight-1
+            o.data.currentTop = o.data.currentLine - viewContentHeight+1
+        end
+    end
+    checkLeft = () -> begin
+        if o.data.currentLeft < 1
+            o.data.currentLeft = 1
+        else # check if we have enough width to show from currentLeft to currentCol
+            revcumwidths = cumsum( map( x->x+1, reverse( widths ) ) ) # with boundary
+            widthrng = searchsorted( revcumwidths, viewContentWidth )
+            if o.data.currentLeft > length( o.data.colInfo ) - widthrng.stop +1
+                o.data.currentLeft = length( o.data.colInfo ) - widthrng.stop +1
+            end
+        end
+        if o.data.currentLeft > o.data.currentCol
+            o.data.currentLeft = o.data.currentCol
+        else
+            revcumwidths = cumsum( map( x->x+1, reverse( widths[o.data.currentLeft:o.data.currentCol] ) ) ) # with boundary
+            widthrng = searchsorted( revcumwidths, viewContentWidth )
+            if o.data.currentLeft < o.data.currentCol - widthrng.stop +1
+                o.data.currentLeft = o.data.currentCol - widthrng.stop +1
+            end
+        end
+    end
+    movevertical = n -> begin
+        oldline = o.data.currentLine
+        o.data.currentLine = max(1, min( o.data.datalistlen, o.data.currentLine + n) )
+        if oldline != o.data.currentLine
+            checkTop()
+            return true
+        else
+            beep()
+            return false
+        end
+    end
+    movehorizontal = n -> begin
+        oldcol = o.data.currentCol
+        o.data.currentCol = max(1, min( length( o.data.colInfo ), o.data.currentCol + n) )
+        if oldcol != o.data.currentCol
+            checkLeft()
+            return true
+        else
+            beep()
+            return false
+        end
+    end
+
+    # reminder: (name, stack, exphints, skiplines, node )
+    if token == :esc
+        retcode = :exit_nothing
+    elseif ( token == " " || token == symbol( "return" ) || token == :enter ) && o.data.datalist[ o.data.currentLine ][3] != :single
+        expandhint = o.data.datalist[ o.data.currentLine ][3]
+        node = o.data.datalist[ o.data.currentLine][5]
+        if node.isOpen
+            node.isOpen = false
+        else
+            expandnode( node )
+            ordernode( node )
+        end
+        update_tree_data()
+        checkTop()
+        dorefresh = true
+    elseif token == "+"
+        somethingchanged=false
+        for r in 1:length( o.data.datalist )
+            if o.data.datalist[r][3] == :close
+                node = o.data.datalist[r][5]
+                expandnode( node )
+                ordernode( node )
+                somethingchanged=true
+            end
+        end
+        if somethingchanged
+            update_tree_data()
+            checkTop()
+            dorefresh = true
+        else
+            beep()
+        end
+    elseif token == "-"
+        somethingchanged=false
+        for r in 1:length( o.data.datalist )
+            if o.data.datalist[r][3] == :open
+                node = o.data.datalist[r][5]
+                if !isempty( node.children )
+                    if all( x->!x.isOpen, node.children )
+                        node.isOpen = false
+                        somethingchanged=true
+                    end
+                else
+                    node.isOpen = false
+                    somethingchanged=true
+                end
+            end
+        end
+        if somethingchanged
+            update_tree_data()
+            checkTop()
+            dorefresh = true
+        else
+            beep()
+        end
+    elseif token == :up
+        dorefresh = movevertical(-1)
+    elseif token == :down
+        dorefresh = movevertical(1)
+    elseif token == :left
+        dorefresh = movehorizontal(-1)
+    elseif token == :ctrl_left
+        if o.data.currentCol != o.data.currentLeft
+            o.data.currentCol = o.data.currentLeft
+            dorefresh = true
+        elseif o.data.currentLeft == 1
+            beep()
+        else
+            # page left
+            revcumwidths = cumsum( map( x->x+1, reverse( widths[1:o.data.currentLeft] ) ) ) # with boundary
+            widthrng = searchsorted( revcumwidths, viewContentWidth )
+            o.data.currentLeft = o.data.currentCol = max( 1, o.data.currentLeft - widthrng.start + 1 )
+            checkLeft()
+            dorefresh=true
+        end
+    elseif token == :right
+        dorefresh = movehorizontal(1)
+    elseif token == :ctrl_right
+        if o.data.currentCol != o.data.currentRight
+            o.data.currentCol = o.data.currentRight
+            dorefresh = true
+        elseif o.data.currentRight == length( o.data.colInfo )
+            beep()
+        else
+            cumwidths = cumsum( map( x->x+1, reverse( widths[o.data.currentRight:end] ) ) ) # with boundary
+            widthrng = searchsorted( cumwidths, viewContentWidth )
+            o.data.currentRight = o.data.currentCol = min( o.data.currentRight + widthrng.stop, length( o.data.colInfo ) )
+            checkLeft()
+            dorefresh=true
+        end
+    elseif token == :pageup
+        dorefresh = movevertical( -viewContentHeight + o.data.headerlines)
+    elseif token == :pagedown
+        dorefresh = movevertical( viewContentHeight - o.data.headerlines )
+    elseif  token == :home
+        if o.data.currentTop != 1 || o.data.currentLeft != 1 || o.data.currentLine != 1 || o.data.currentCol != 1
+            o.data.currentTop = 1
+            o.data.currentLeft = 1
+            o.data.currentLine = 1
+            o.data.currentCol = 1
+            dorefresh = true
+        else
+            beep()
+        end
+    elseif in( token, Any[ symbol("end") ] )
+        if o.data.currentTop + viewContentHeight -1 < o.data.datalistlen
+            o.data.currentTop = o.data.datalistlen - viewContentHeight + 1
+            o.data.currentLine = o.data.datalistlen
+            dorefresh = true
+        else
+            beep()
+        end
+    elseif token == "["
+        width = o.data.colInfo[ o.data.currentCol ].format.width
+        if width > 4
+            width -=1
+            o.data.colInfo[ o.data.currentCol ].format.width = width
+            dorefresh = true
+        else
+            beep()
+        end
+    elseif token == "]"
+        width = o.data.colInfo[ o.data.currentCol ].format.width
+        if width < viewContentWidth-1
+            width +=1
+            o.data.colInfo[ o.data.currentCol ].format.width = width
+            dorefresh = true
+        else
+            beep()
+        end
+    elseif token == :ctrl_down
+        curr = o.data.currentLine
+        stck = o.data.datalist[curr][2]
+        if isempty( stck )
+            beep()
+        else
+            if o.data.datalist[curr][3] == :single
+                tmpstack = copy( stck )
+                pop!( tmpstack )
+            else
+                tmpstack = stck
+            end
+            for r in curr+1:length(o.data.datalist )
+                rstack = o.data.datalist[r][2]
+                if o.data.datalist[r][3] != :single && ( length(rstack) <= length( tmpstack) || rstack[ 1:length( tmpstack ) ] == tmpstack )
+                    if r != curr
+                        o.data.currentLine = r
+                        checkTop()
+                        dorefresh = true
+                    end
+                    break
+                end
+            end
+        end
+    elseif token == :ctrl_up
+        curr = o.data.currentLine
+        stck = o.data.datalist[curr][2]
+        if isempty( stck )
+            beep()
+        else
+            tmpstack = copy( stck )
+            pop!( tmpstack )
+            for r in curr-1:-1:1
+                rstack = o.data.datalist[r][2]
+                if o.data.datalist[r][3] != :single && length(rstack) <= length( tmpstack)
+                    if r != curr
+                        o.data.currentLine = r
+                        checkTop()
+                        dorefresh = true
+                    end
+                    break
+                end
+            end
+        end
+    elseif token == "p"
+        allcols = map(x->utf8(string(x)), names( o.value ) )
+        pvts = map( x->utf8(string(x)), o.data.pivots )
+        helper = newTwMultiSelect( o.screen.value, allcols, :center, :center, selected = pvts, title="Pivot order", orderable=true, substrsearch=true )
+        newpivots = activateTwObj( helper )
+        unregisterTwObj( o.screen.value, helper )
+        if newpivots != nothing && newpivots != pvts
+            o.data.pivots = map( x->symbol(x), newpivots )
+            o.data.rootnode.children = Any[]
+            o.data.rootnode.isOpen = false
+            expandnode( o.data.rootnode, o.data.initdepth )
+            ordernode( o.data.rootnode )
+            update_tree_data()
+            o.data.currentLine = 1
+            checkTop()
+        end
+        dorefresh = true
+    elseif token == "c"
+        allcols = map(x->utf8(string(x)), names( o.value ) )
+        visiblecols = map( x->utf8(string(x.name)), o.data.colInfo )
+        helper = newTwMultiSelect( o.screen.value, allcols, :center, :center, selected = visiblecols, title="Visible columns & their order", orderable=true, substrsearch=true )
+        newcols = activateTwObj( helper )
+        unregisterTwObj( o.screen.value, helper )
+        if newcols != nothing && newcols != visiblecols
+            o.data.colInfo = TwTableColInfo[]
+            for c in newcols
+                push!( o.data.colInfo, o.data.allcolInfo[ symbol( c ) ] )
+            end
+        end
+        dorefresh = true
+    elseif token == "v"
+        allviews = map( x->x.name, o.data.views )
+        helper = newTwPopup( o.screen.value, allviews, :center, :center, substrsearch=true, title = "Views" )
+        vname = activateTwObj( helper )
+        unregisterTwObj( o.screen.value, helper )
+        if vname != nothing
+            idx = findfirst( _->_.name == vname, o.data.views )
+            v = o.data.views[idx]
+            o.data.colInfo = TwTableColInfo[]
+            o.data.pivots = v.pivots
+            o.data.sortorder = v.sortorder
+            o.data.initdepth = v.initdepth
+            for c in v.columns
+                push!( o.data.colInfo, o.data.allcolInfo[ symbol( c ) ] )
+            end
+            o.data.rootnode.children = Any[]
+            o.data.rootnode.isOpen = false
+            expandnode( o.data.rootnode, o.data.initdepth )
+            ordernode( o.data.rootnode )
+            update_tree_data()
+            o.data.currentLine = 1
+            checkTop()
+            dorefresh=true
+        end
+    elseif token == :F6
+        colsym = o.data.colInfo[ o.data.currentCol ].name
+        node = o.data.datalist[o.data.currentLine][5]
+        isnode = (o.data.datalist[o.data.currentLine][3] != :single)
+        if isnode
+            v = node[ colsym ]
+        else
+            v = node.subdataframesorted[ colsym ][ o.data.datalist[o.data.currentLine][2][end] ]
+        end
+        if typeof( v ) != NAtype && !in( v, [ nothing, None, Any ] )
+            tshow( v, title = string( colsym ) )
+            dorefresh = true
+        end
+    elseif token == :F1
+        helper = newTwViewer( o.screen.value, o.data.helpText, :center, :center, showHelp=false, showLineInfo=false, bottomText = "Esc to continue" )
+        activateTwObj( helper )
+        unregisterTwObj( o.screen.value, helper )
+        dorefresh = true
+        #TODO search, jump to line, etc.
+    else
+        retcode = :pass # I don't know what to do with it
+    end
+
+    if dorefresh
+        refresh(o)
+    end
+
+    return retcode
+end

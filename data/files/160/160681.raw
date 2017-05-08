@@ -1,0 +1,138 @@
+function calc_stats(hmm,scaling)
+    # Calculate forward/backward probabilities
+    if scaling
+        alpha, log_p_obs, coeff = forward(hmm,o; scaling=true)
+        beta = backward(hmm,o; scale_coeff=coeff)
+    else
+        alpha, p_obs = forward(hmm,o; scaling=false)
+        log_p_obs = log(p_obs)
+        beta = backward(hmm,o)
+    end
+
+    # x[t,i,j] = probability of being in state 'i' at 't' and then in state 'j' at 't+1'
+    x = zeros(hmm.n_sites-1, hmm.n_states, hmm.n_states)
+    for t = 1:(hmm.n_sites-1)
+        for i = 1:hmm.n_states
+            for j = 1:hmm.n_states
+                p_next = hmm.pmf(hmm.B[j,c[t+1],:],hmm.k[t+1],hmm.o[t+1])
+                x[t,i,j] = alpha[t,i] * hmm.A[i,j] * p_next * beta[t+1,j]
+            end
+        end
+        x[t,:,:] ./= sum(x[t,:,:]) # normalize to achieve probabilities
+    end
+
+    # g[t,i] = probability of being in state 'i' at step 't' given all observations
+    g = alpha .* beta
+    g ./= sum(g,2)   # normalize across states
+
+    return log_p_obs, x, g
+end
+
+function forward(hmm; scaling=true)
+    # Calculate forward variables, alpha:
+    #   'scaling' -- scales forward variables to prevent underflow, see Rabiner (1989)
+
+    # alpha[t,i] = (scaled) probability of being in state 'i' given o[1:t] and c[1:t]
+    alpha = zeros(hmm.n_sites, hmm.n_states) 
+
+    # base case (initialize at start)
+    for i = 1:hmm.n_states
+        alpha[1,i] = hmm.p[i] * hmm.pmf(hmm.B[i,hmm.c[1],:], hmm.k[1], hmm.o[1])
+    end
+
+    if scaling
+        coeff = (Float64)[] # scaling coefficients
+        push!(coeff, 1./sum(alpha[1,:]))
+        alpha[1,:] *= coeff[end] 
+    end
+
+    # induction step
+    for t = 2:hmm.n_sites
+        for j = 1:hmm.n_states
+            for i = 1:hmm.n_states
+                alpha[t,j] += hmm.A[i,j] * alpha[t-1,i]
+            end
+            println(t)
+            println(hmm.B[j,hmm.c[t],:])
+            alpha[t,j] *= hmm.pmf(hmm.B[j,hmm.c[t],:], hmm.k[t], hmm.o[t])
+        end
+        if scaling
+            push!(coeff, 1./sum(alpha[t,:]))
+            alpha[t,:] *= coeff[end]
+        end
+    end
+
+    # Calculate likelihood (or log-likelihood) of observed sequence
+    if scaling
+        log_p_obs = -sum(log(coeff)) # see Rabiner (1989), eqn 103
+        return (alpha,log_p_obs,coeff)
+    else
+        p_obs = sum(alpha[end,:]) 
+        return (alpha,p_obs)
+    end
+end
+
+function backward(hmm; scale_coeff=None)
+    # Calculate backward variables, beta:
+    #   'scale_coeff' -- Scaling coefficients from the forward algorithm, 1/sum(alpha[t,:]).
+    #                    If provided, each beta[t,:] is scaled so as to match alpha scaling.
+
+    # beta[t,i] = probability of being in state 'i' and then obseverving o[t+1:end]
+    beta = zeros(hmm.n_sites, hmm.n_states)
+
+    # base case (initialize at end)
+    if scale_coeff == None
+        beta[end,:] += 1
+    else
+        if length(scale_coeff) != hmm.n_sites
+            error("scale_coeff is improperly defined (wrong length)")
+        end
+        beta[end,:] += scale_coeff[end]
+    end
+
+    # induction step
+    for t = reverse(1:hmm.n_sites-1)
+        for i = 1:hmm.n_states
+            for j = 1:hmm.n_states
+                beta[t,i] += hmm.A[i,j] * beta[t+1,j] * hmm.pmf(hmm.B[j,hmm.c[t+1],:], hmm.k[t+1], hmm.o[t+1])
+            end
+        end
+        if scale_coeff != None
+            beta[t,:] *= scale_coeff[t]
+        end
+    end
+
+    return beta
+end
+
+function viterbi(hmm)
+    # Estimate most likely sequence of hidden states, given HMM current params:
+
+    # delta[i,j] = highest probability of state sequence ending in state j on step i
+    # psi[i,j] = most likely state on step i-1 given state j on step i (argmax of deltas)
+    delta = zeros(hmm.n_sites, hmm.n_states)
+    psi = ones(Int, hmm.n_sites, hmm.n_states)
+
+    # base case, psi[:,1] is ignored so don't initialize
+    for i = 1:hmm.n_states
+        delta[1,i] = hmm.p[i] .* hmm.pmf(hmm.B[i,hmm.c[1],:], hmm.k[1], hmm.o[1])
+    end
+
+    # induction step
+    for t = 2:hmm.n_sites
+        for j = 1:hmm.n_states
+            delta[t,j],psi[t,j] = findmax(hmm.A[:,j].*delta[t-1,:]')
+            delta[t,j] *= hmm.pmf(hmm.B[j,hmm.c[t],:], hmm.k[t], hmm.o[t])
+        end
+    end
+
+    # backtrack to uncover the most likely path / state sequence
+    q = zeros(Int,hmm.n_sites) # vector holding state sequence
+    q[end] = indmax(delta[end,:])
+
+    # backtrack recursively
+    for t = reverse(1:hmm.n_sites-1)
+        q[t] = psi[t+1,q[t+1]]
+    end
+    return q
+end

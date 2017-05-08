@@ -1,0 +1,192 @@
+module SeparableNMF
+
+using Convex, SCS
+export separable_data,separable_NMF
+
+"""
+separable_data(m,n,k)
+
+Generate a (m x n) matrix X of nonnegative, separable data
+with nonnegative rank k. The rows of X correspond to
+observations and the columns of X correspond to features.
+The separability condition implies that the columns of H
+can be permuted to form a (k x k) diagonal block. Thus, the
+(scaled) columns of W appear in A.
+"""
+function separable_data(m,n,k)
+	# nonnegative factorization
+	W = rand(m,k)
+	H = rand(k,n)
+
+	# impose separability
+	for i = 1:k
+		H[i,i] = 0.0
+	end
+
+	# permute columns of H
+	H = H[:,randperm(n)]
+
+	return W*H
+end
+
+"""
+separable_NMF(X,k)
+
+Given nonnegative data matrix X, compute the nonnegative
+matrix factorization (X ≈ W * H) with inner dimension k,
+using the separable NMF algorithm outlined by Arora et al.
+(2013). X is an (m x n) matrix with each row of X is a
+datapoint (m observations, n features). The algorithm 
+assumes that the rows of H are separable, meaning that
+the columns of H can be permuted to form a (k x k) diagonal
+block. However, the results may still be useful even when
+the separability condition only approximately holds.
+
+Input:
+	M, data matrix with dimensions (m x n)
+    k, inner dimension of NMF
+    ε, error tolerance
+
+Output:
+	W, matrix with dimensions (m x k)
+	H, matrix with dimensions (k x n)
+
+Reference:
+	Arora et al. (2013) A Practical Algorithm for Topic
+	Modeling with Provable Guarantees. ICML 2013 Proceedings.
+"""
+function separable_NMF(
+	X::Matrix{Float64},
+	k::Int;
+	ε::Float64 = 0.00001,
+	projection_method::Symbol = :gaussian
+	)
+
+	# data dimensions
+	m,n = X
+
+	# Identify approximate anchor columns of X as W
+	W = fast_anchors(X,k,ε,projection_method)
+
+	# Use convex programming to solve for H
+	# minimize ||X - W*H|| s.t. Hᵢⱼ >= 0
+	H = solve_convex(X,W)
+	# H = solve_JuMP(X,W)
+
+	return W,H
+end
+
+"""
+fast_anchors(X,k,ε,projection_method)
+
+Given nonnegative data matrix with separable columns, X,
+compute an estimate of the matrix W in the non-negative
+matrix factorization (X ≈ W * H) with inner dimension k,
+using the FastAnchorWords algorithm outlined in 
+Arora et al. (2013)
+
+Input:
+	M, data matrix with dimensions (m x n)
+    k, inner dimension of NMF
+    ε, error tolerance
+    projection_method, {:gaussian,:sparse}
+
+Output:
+	W, matrix with dimensions (m x k)
+
+Reference:
+	Arora et al. (2013) A Practical Algorithm for Topic
+	Modeling with Provable Guarantees. ICML 2013 Proceedings.
+"""
+function fast_anchors(
+	X::Matrix{Float64},
+	k::Int,
+	ε::Float64,
+	projection_method::Symbol
+	)
+	
+	# Project the data onto 4*log(n/ε) dimensions
+	m,n = size(X)
+	new_dim = minimum([n,ceil(Int,4*log(n/ε))])
+	P = rand_right_projection(projection_method,n,new_dim)
+	Xp = X*P # projected X
+	
+	# Normalize data so that columns of Xp sum to one
+	Xp ./= sum(Xp,1)
+
+	# W = Xp[:,ai], where ai are the "anchor indices"
+	# (ai forms the convex hull of columns in Xp)
+	ai = (Int64)[]
+
+	# Initialize with column of Xp furthest from the origin
+	push!(ai, indmax(sum(Xp.^2,1)))
+	
+	# add columns of Xp that are furthest from span(W)
+	Xp_proj_W = projection_matrix(Xp[:,ai])*Xp
+	for j = 1:(k-1)
+		# Calculate projection residuals
+		resids = Xp - Xp_proj
+		# Add point with largest residual to W
+		push!(ai, indmax(sum(resids.^2,1)))
+		# Update projection of Xp onto W
+		Xp_proj *= projection_matrix(Xp[:,ai[1]])
+	end
+
+	# Return W, columns of original data X, not projected Xp
+	return X[:,ai]
+end
+
+# TO DO: Iterative updates to projection matrix??
+# TO DO: Remove columns from Xp as j increases?
+# TO DO: Worry about normalizing the random projection?
+
+"""
+projection_matrix(A)
+
+Produces a normalized projection matrix that spans the
+columns of A.
+"""
+projection_matrix(A::Matrix{Float64}) = A*inv(A'*A)*A' 
+projection_matrix(x::Vector{Float64}) = (x*x')./(x'*x)
+
+function rand_right_projection(
+	method::Symbol,
+	old_dim::Int,
+	new_dim::Int,
+	)
+	
+	if method == :gaussian
+		P = projection_matrix(randn(old_dim,new_dim))
+	elseif method == :sparse
+		# Achlioptas (2002). "Database-friendly random projections"
+		# https://users.soe.ucsc.edu/~optas/papers/jl.pdf
+		# P contains ~1/3 entries ±sqrt(3)
+		# P contains ~2/3 entries zero
+		P = rand(Categorical([1/6,2/3,1/6]),(old_dim,new_dim))
+		P = sqrt(3)*(P-2)
+	else
+		error("projection method \"$method\" undefined")
+	end
+	return P
+end
+
+function solve_convex(X,W)
+	# dimensions
+	m,n = size(X)
+	k = size(W,2)
+
+	# solve problem
+	Hv = Variable(k,n)
+	problem  = minimize(vecnorm(X - (W*Hv)), [Hv >= 0])
+	solve!(problem,SCSSolver(verbose=false))
+
+	if problem.status != :Optimal
+		warn("Solving for H problem status is :",problem.status)
+	end
+
+	# return optimal value of H
+	return Hv.value
+end
+
+end
+

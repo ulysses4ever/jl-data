@@ -1,0 +1,130 @@
+# -*- coding: utf-8 -*-
+
+#=
+Created on Mon Oct 26 26 20:25:12 2015
+@author: William Herrera
+
+IMPORTANT: run as administrator
+
+Color coded clock for G20 series
+=#
+
+module LightClock
+
+include("LightACPI.jl")
+using .LightACPI
+
+
+function make60colors()
+    #=
+    60 colors in RGB
+    =#
+    reds = [255, 242, 229, 216, 203, 190, 177, 164, 151, 138,
+            126, 113, 100, 87, 74, 61, 48, 35, 21, 8,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 13, 26, 39, 52, 65, 78, 91, 104, 117,
+            130, 143, 156, 169, 181, 194, 207, 220, 233, 246]
+
+    greens = [0, 13, 26, 39, 52, 65, 78, 91, 104, 117,
+              130, 143, 156, 169, 181, 194, 207, 220, 233, 246,
+              255, 242, 229, 216, 203, 190, 177, 164, 151, 138,
+              126, 113, 100, 87, 74, 61, 48, 35, 21, 8,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    blues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 13, 26, 39, 52, 65, 78, 91, 104, 117,
+             130, 143, 156, 169, 181, 194, 207, 220, 233, 246,
+             255, 242, 229, 216, 203, 190, 177, 164, 151, 138,
+             126, 113, 100, 87, 74, 61, 48, 35, 21, 8]
+
+    colors = zeros(UInt32, 60)
+    for idx in 1:60
+        colors[idx] = UInt32(blues[idx] + 
+                             greens[idx] * 0x100 + 
+                             reds[idx] * 0x10000)
+    end
+    return colors
+end
+
+
+function make24colors()
+    #=
+    24 colors in RGB
+    =#
+    reds = [255, 224, 192, 160, 128, 96, 64, 32,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            32, 64, 96, 128, 160, 192, 224, 255]
+
+    greens = [0, 32, 64, 96, 128, 160, 192, 224,
+              255, 224, 192, 160, 128, 96, 64, 32,
+              0, 0, 0, 0, 0, 0, 0, 0]
+
+    blues = [0, 0, 0, 0, 0, 0, 0, 0,
+             32, 64, 96, 128, 160, 192, 224, 255,
+             224, 192, 160, 128, 96, 64, 32, 0]
+
+    colors = zeros(UInt32, 24)
+    for idx in 1:24
+        colors[idx] = UInt32(blues[idx] + 
+                             greens[idx] * 0x100 + 
+                             reds[idx] * 0x10000)
+    end
+    return colors
+end
+
+
+function hrminsec_colors()
+    #=
+    return intervals for hours, minutes, seconds in 24h time
+    =#
+    hours = make24colors()
+    minutes = make60colors()
+    seconds = minutes
+    return hours, minutes, seconds
+end
+
+
+function nowcolors(chrs, cmins, csecs)
+    #=
+    time now is coded as colors
+    =#
+    nowtime = now()
+    hrs = Dates.hour(nowtime)
+    mins = Dates.minute(nowtime)
+    secs = Dates.second(nowtime)
+    if secs > 59
+        secs = 59
+    end
+    return chrs[hrs + 1], pulsatehour(cmins[mins + 1], hrs, secs), 
+           csecs[secs + 1]
+end
+
+OFFSECS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23]
+function pulsatehour(colr, hrs, secs)
+    #=
+    modulate color every 30 sec of the minute based on 12 hr cycle clock
+    =#
+    retval = colr
+    if in(secs % 30, OFFSECS) && hrs % 12 * 2 > secs % 30
+        red = UInt32((colr & 0xff) * 0x10000)
+        green = UInt32((colr & 0xff0000) / 0x100)
+        blue = UInt32((colr & 0xff00) / 0x100)
+        retval = red + green + blue
+    end
+    retval
+end
+
+
+CHRS, CMINS, CSECS = hrminsec_colors()
+
+while true
+    CBASE, CLEFT, CRIGHT = nowcolors(CHRS, CMINS, CSECS)
+    setcolor(LLIGHT, CLEFT)
+    setcolor(RLIGHT, CRIGHT)
+    setcolor(BLIGHT, CBASE)
+    sleep(0.25)
+end
+
+
+end # of file module
+

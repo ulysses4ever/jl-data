@@ -1,0 +1,23 @@
+
+module EvoNet
+
+# Basic integration step for the network dynamic
+const dt = 0.1
+
+include("types.jl")
+include("interface.jl")
+
+include("network.jl")
+include("force_rule.jl")
+include("reward_rule.jl")
+include("task.jl")
+include("teacher.jl")
+include("generator.jl")
+include("evaluator.jl")
+include("fitness.jl")
+
+# extra convenience stuff
+include("recorder.jl")
+
+
+end # module EvoNet

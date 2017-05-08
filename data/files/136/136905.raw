@@ -1,0 +1,18 @@
+immutable DState
+  a::Int64
+  b::Int64
+end
+
+const willNotChange = DState(101,202)
+
+const numeroQuiNeChangePas = 1.625
+
+println("willNotChange = $willNotChange")
+println("numerQuiNeChangePas = $numeroQuiNeChangePas")
+
+willNotChange.a = 99
+
+numeroQuiNeChangePas = -1
+
+println("willNotChange = $willNotChange")
+println("numerQuiNeChangePas = $numeroQuiNeChangePas")

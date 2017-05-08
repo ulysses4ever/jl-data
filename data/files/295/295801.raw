@@ -1,0 +1,45 @@
+g = 9.81
+
+Ic = 0.006
+mc = 0.2
+mb = 0.5
+d = 0.3
+
+Fb = 0
+
+theta = .01
+x = 0
+u1 = 0
+u2 = 0
+
+ts = linspace(0,10,1001)
+thetas = zeros(length(ts), 1)
+xs = zeros(length(ts), 1)
+u1s = zeros(length(ts), 1)
+u2s = zeros(length(ts), 1)
+h = ts[2]-ts[1]
+for (i, t) in enumerate(ts)
+  thetas[i] = theta
+  xs[i] = x
+  u1s[i] = u1
+  u2s[i] = u2
+
+  theta_dot = u1
+  x_dot = u2
+  u1_dot = d*g*sin(theta)/(Ic/mc + d^2) + d*cos(theta)*(Fb/mc + d^2*g*cos(theta)*sin(theta)/(Ic/mc + d^2) - d*u1^2*sin(theta))/(mb/mc*(Ic/mc + d^2) + (Ic/mc + d^2) - d^2*cos(theta)^2)
+  u2_dot = (Fb/mc*(Ic/mc + d^2) + d^2*g*cos(theta)*sin(theta) - d*u1^2*sin(theta)*(Ic/mc + d^2))/(mb/mc*(Ic/mc + d^2) + (Ic/mc + d^2) - d^2*cos(theta)^2)
+
+  theta += h*theta_dot
+  x += h*x_dot
+  u1 += h*u1_dot
+  u2 += h*u2_dot
+
+  print(theta, ' ', x, ' ', u1, ' ', u2, '\n')
+end
+
+using Gadfly
+draw(SVG("theta.svg", 6inch, 3inch), plot(x=ts, y=thetas))
+draw(SVG("x.svg", 6inch, 3inch), plot(x=ts, y=xs))
+draw(SVG("phase_x.svg", 6inch, 3inch), plot(x=xs, y=u2s))
+draw(SVG("phase_theta.svg", 6inch, 3inch), plot(x=thetas, y=u1s))
+

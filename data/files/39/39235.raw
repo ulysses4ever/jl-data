@@ -1,0 +1,19 @@
+import Graphs
+
+function has_edge_attribute{G<:Graphs.GenericGraph}(g::G, key::AbstractString)
+    if num_edges(g) == 0 return false end
+    if findfirst(fieldnames(g.edges[1]),:attributes) == 0 return false end
+    for edge in edges(g)
+        if findfirst(collect(keys(edge.attributes))) == 0 return false end
+    end
+    return true;
+end
+
+function has_vertex_attribute{G<:Graphs.GenericGraph}(g::G, key::AbstractString)
+    if Graphs.num_vertices(g) == 0 return false end
+    if findfirst(fieldnames(g.vertices[1]),:attributes) == 0 return false end
+    for v in Graphs.vertices(g)
+        if findfirst(collect(keys(v.attributes)),key) == 0 return false end
+    end
+    return true;
+end

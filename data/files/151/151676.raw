@@ -1,0 +1,18 @@
+function write(c::MCChain;
+  storegradlogtarget::Bool=false,
+  diagnostics::Vector{ASCIIString}=["accept"],
+  rootname::AbstractString="mcchain",
+  dlm::Char='\t')
+  writedlm(join([rootname, "samples", "txt"], "_", "."), c.samples, dlm)
+  writedlm(join([rootname, "logtargets", "txt"], "_", "."), c.logtargets, dlm)
+
+  if storegradlogtarget
+    writedlm(join([rootname, "gradlogtargets", "txt"], "_", "."), c.gradlogtargets, dlm)
+  end
+
+  for k in keys(c.diagnostics)
+    if k in diagnostics
+      writedlm(join([rootname, "diagnostic", k, "txt"], "_", "."), c.diagnostics[k], dlm)
+    end
+  end
+end

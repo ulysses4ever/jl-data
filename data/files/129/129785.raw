@@ -1,0 +1,19 @@
+using Symbolic
+
+testexprn01 = quote
+  u = x+y-2
+  v = y^2+u
+  z = exp(v)
+  w = f(u, v, z)
+end
+
+println("Example of expression wih local variables:\n")
+println(testexprn01)
+
+# println("\nExpanding expression by providing vector of local variables:\n")
+# testout01 = fullexpand(testexprn01, [:u, :v, :z, :w])
+# println(testout01)
+
+println("\nExpanding expression without the argument of local variables:\n")
+testout01 = fullexpand(testexprn01)
+println(testout01)

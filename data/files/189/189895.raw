@@ -1,0 +1,19 @@
+VERBOSITY = 10
+
+function raise(message, severity::Integer)
+    # Errors are always raised
+    if severity == 0
+        print_with_color(:red, "[E] ")
+        println(message)
+        throw(message)
+    elseif severity > VERBOSITY
+        return
+    elseif severity == 1
+        print_with_color(:yellow, "[W] ")
+        println(message)
+        warn(message)
+    elseif severity == 2
+        print_with_color(:green, "[i] ")
+        println(message)
+    end
+end

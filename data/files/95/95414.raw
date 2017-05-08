@@ -1,0 +1,11 @@
+include("common.jl")
+
+print_with_color(:white, "Computing mean spectrum for simulated signals:\n")
+
+for i = 1:4
+  print_with_color(:white, "  * signal $i...")
+  SIGNALFILE = joinpath(DATADIR, "signal"*@sprintf("%02d", i)*".txt")
+  OUTFILE = joinpath(OUTDIR, "mean_spectrum_signal"*@sprintf("%02d", i)*".txt")
+  mean_spectrum(SIGNALFILE, OUTFILE)
+  print_with_color(:green, " done\n")
+end

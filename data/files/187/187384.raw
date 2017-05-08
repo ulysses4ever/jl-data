@@ -1,0 +1,14 @@
+function sum_manhattan(prefs,person1,person2)
+    """Calculates the Manhattan distance between two critics"""
+    total = 0
+    ##assume person1 is the x axes and person 2 is the y axes
+x = prefs[person1]
+y = prefs[person2]
+
+for movie in x
+    if movie in y
+        total = abs(x[movie]-y[movie])
+return total
+end
+end
+end

@@ -1,0 +1,41 @@
+immutable Asset
+  ref::Int
+  loc::Int
+  num::Int
+  tax::String
+  val::Dict{String, Float64}
+  occ::Dict{String, Int}
+end
+
+immutable HazardCurve
+  time::Float64
+  imls::Vector{Float64}
+  poes::Vector{Float64}
+end
+
+immutable FragilityFunction
+  imt::String
+  imls::Vector{Float64}
+  states::Vector{String}
+  poes::Matrix{Float64}
+end
+
+immutable VulnerabilityFunction
+  imt::String
+  dist::String
+  imls::Vector{Float64}
+  means::Vector{Float64}
+  stds::Vector{Float64}
+end
+
+immutable LossCurve
+  time::Float64
+  lrs::Vector{Float64}
+  poes::Vector{Float64}
+end
+
+immutable DamageDist
+  time::Float64
+  states::Vector{String}
+  poos::Vector{Float64}
+end

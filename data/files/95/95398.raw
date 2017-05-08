@@ -1,0 +1,9 @@
+# include("common.jl")
+
+logistic(x::Float64) = 4*x*(1-x)
+
+iterator = SignalIterator(logistic, 0.5637262997475273) # seed was obtained via rand(Beta(0.5, 0.5))
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_logistic.txt")
+
+simulate_signal(iterator, OUTFILE, 10^7)

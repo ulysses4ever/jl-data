@@ -1,0 +1,42 @@
+export Request
+
+# exported
+
+type Request
+    method::String
+    headers::Dict{String, String}
+    data::String
+
+    Request() = new("", (String=>String)[], "")
+end
+
+Request(socket::TcpSocket) = create(socket)
+
+# NOT exported
+
+function create(socket::TcpSocket)
+    local request   = Request(),
+          re_header = r"^(.+?):(.+)$",
+          re_trim   = r"^\s+|\s+$"
+
+    m = match(r"^((?i)^.+?http.+?)\r\n(.+)\r\n\r\n(.*)$"ms, readavailable(socket))
+
+    local start   = m.captures[1],
+          headers = split(m.captures[2], "\r\n")
+          body    = m.captures[3]
+
+    for header = headers
+        if -1 == search(header, ":")
+            continue
+        end
+
+        h = match(re_header, header)
+
+        local hname  = lowercase(replace(h.captures[1], re_trim, "")),
+              hvalue = replace(h.captures[2], re_trim, "")
+
+        request.headers[hname] = hvalue
+    end
+
+    request
+end

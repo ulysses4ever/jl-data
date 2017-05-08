@@ -1,0 +1,36 @@
+using Distributions
+using Optim
+
+# this is the kernel density estimator for SMIL
+function kde(Zn, Zs, ww)
+    dimZ = size(Zn,1) 
+    distrib = MvNormal(zeros(dimZ),cov(Zs'))
+    z = (Zn .- Zs)/ww;
+    dens = mean(pdf(distrib, z))
+end 
+
+# estimation procedure, objective is inside as a closure,
+# so that there is only one argument, to use Optim
+function smil_or_cuii_estimate(Zn, randdraws, S, smil=true)
+    function objective_function(theta)
+        dimZ = size(Zn,1) 
+        Zs = zeros(dimZ, S)
+        @inbounds for s = 1:S
+            Zs[:,s] = aux_stat(theta, randdraws[:,:,s])
+        end    
+        if smil
+            objvalue = -log(kde(Zn, Zs, 0.5))  # the ww=0.5 was found by experimentation
+        else
+            z = Zn .- Zs
+            m = mean(z,2)
+            W = inv(cov(z'))
+            d = m'*W*m
+            objvalue = d[1,1] # in Julia, a 1X1 array is not a scalar (!)
+        end
+        return objvalue
+    end
+    thetastart = [0.5, 0.5]
+    results = optimize(objective_function, thetastart, method = :nelder_mead, show_trace=false, xtol=1e-3, ftol=1e-4)
+    return results.minimum
+end   
+

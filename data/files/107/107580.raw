@@ -1,0 +1,52 @@
+
+abstract Algorithm
+
+type Direct <: Algorithm
+    rng::AbstractRNG
+end
+
+function srand(d::Direct, n)
+#    println("seed $n")
+    d.rng = MersenneTwister(n)
+end
+
+function play(a::Vector{UInt8}, b::Vector{UInt8}, board_size, max_moves, lazy, d::Direct, display)
+    passed, t, h = 0, black, [Position{board_size}()]
+    while passed < 2 && h[end].score.moves < max_moves
+        m = moves(a, h, t, lazy, d.rng)
+        if length(m) == 0
+            passed += 1
+        else
+            push!(h, Position(h[end]))
+            move!(h[end], t, m[1]...)
+            display(h[end], m[1]...)
+            passed = 0
+        end
+        a, b, t = b, a, other(t)
+    end
+    h[end]
+end
+
+null_display(p, x, y) = nothing
+
+function board_display(p, x, y)
+    t = point(p, x, y)
+    @printf("\n\n%s at (%d,%d)\n", t == black ? "black" : "white", x, y)
+    println(join(fmtpoint(p.board), "\n"))
+end
+
+
+# for replay, pick a game from the log.  perhaps
+# 1000/1000   6/20   ceaa93b88f34d14f:1   bt fb9b4e8b26cd7702:3    9 sc   81 mv   4 sp  70 st
+# and calculate the seed.  in this case (1000-1)*20+6
+# the read in the population and replay:
+# > d = undump("evol-1.dump");
+# > replay_direct(d["ceaa93b88f34d14f"], d["fb9b4e8b26cd7702"], 9, 81, 20*999+6)
+# note that the higher ranked net plays first (as black), so if the result is a surprise
+# (with a !) then the order of the nets must be reversed from the log.
+
+function replay_direct(a::Vector{UInt8}, b::Vector{UInt8}, board_size, max_moves, lazy, seed)
+    p = play(a, b, board_size, max_moves, lazy, Direct(MersenneTwister(seed)), board_display)
+    println("\n\nfinal position:")
+    println(p)
+end

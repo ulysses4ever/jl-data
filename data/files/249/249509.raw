@@ -1,0 +1,72 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+
+# Define executor callback functions
+function executor_registered(salaveInfo::Proto.SlaveInfo)
+    println("Julia: Registered executor on $(salaveInfo.hostname)")
+end
+
+function executor_reregistered(salaveInfo::Proto.SlaveInfo)
+    println("Julia: Re-registered executor on $(salaveInfo.hostname)")
+end
+
+function executor_disconnected()
+    println("Julia: Executor disconnected")
+end
+
+function executor_launchTask(driver::ExecutorDriver, taskInfo::Proto.TaskInfo)
+    println("Julia: Starting task $(taskInfo.task_id.value)")
+
+    taskId = protobuild(Proto.TaskID , Dict(:value => taskInfo.task_id.value))
+
+    status = protobuild(Proto.TaskStatus,
+        Dict(
+            :task_id => taskId,
+            :state => Proto.TaskState.TASK_RUNNING,
+            :data => "data with a \0 byte"
+        )
+    )
+    sendStatusUpdate(driver, status)
+
+    # This is where one would perform the requested task.
+
+    println("Julia: Finishing task $(taskInfo.task_id.value)")
+    status = protobuild(Proto.TaskStatus,
+        Dict(
+            :task_id => taskId,
+            :state => Proto.TaskState.TASK_FINISHED,
+            :data => "data with a \0 byte"
+        )
+    )
+    sendStatusUpdate(driver, status)
+end
+
+function executor_killTask(taskId::Proto.TaskID)
+    println("Julia: Kill task $(taskId.value)")
+end
+
+function executor_frameworkMessage(driver::ExecutorDriver, data::String)
+    println("Julia: Got message: $data")
+    # Send it back to the scheduler.
+    sendFrameworkMessage(driver, data)
+end
+
+function executor_error(err::String)
+    println("Julia: Got error message: $err")
+end
+
+function executor_shutdown()
+    println("Julia: Shutting down the executor")
+end
+
+# Create and start executor
+executor = Executor(executor_registered,
+                    executor_reregistered,
+                    executor_disconnected,
+                    executor_launchTask,
+                    executor_killTask,
+                    executor_frameworkMessage,
+                    executor_shutdown,
+                    executor_error)
+run(executor)

@@ -1,0 +1,50 @@
+include("../src/stem/porter.jl")
+
+function test_stemmer_word_pair(word, ref_stem)
+    stm = stem(strip(word))
+    ref_stem = strip(ref_stem)
+    ## println("got $stm, ref stem $ref_stem...")
+    @assert(stm == ref_stem)
+end
+
+function test_stemmer_helpers()
+    s = "reading"
+    w = Word(s, length(s), 1, 0)
+    @assert(   is_cons(w, 1) ) # r
+    @assert( ! is_cons(w, 2) ) # e
+    @assert( ! is_cons(w, 3) ) # a
+    @assert(   is_cons(w, 4) ) # d
+    @assert( ! is_cons(w, 5) ) # i
+    @assert(   is_cons(w, 6) ) # n
+    @assert(   is_cons(w, 7) ) # g
+end
+
+function test_stemmer_sanity()
+    @assert( stem("reading") == "read" )
+    @assert( stem("connected") ==  "connect")
+    @assert( stem("connecting") ==  "connect")
+    @assert( stem("connection") ==  "connect")
+    @assert( stem("connections") ==  "connect")
+end
+
+function test_stemmer()
+    wd_file = "data/voc.txt"
+    ref_file = "data/OUTPUT_nltk.txt"
+    input_wds = String[]
+    output_wds = String[]
+    for line in readlines(open(wd_file))
+        push!(input_wds, line)
+    end
+    for line in readlines(open(ref_file))
+        push!(output_wds, line)
+    end
+    for i in 1:length(input_wds)
+        test_stemmer_word_pair(input_wds[i], output_wds[i])
+    end
+end
+
+test_stemmer_helpers()
+test_stemmer_sanity()
+test_stemmer()
+
+println("Stemmer: all tests pass.")

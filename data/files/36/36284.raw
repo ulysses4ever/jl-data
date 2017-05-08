@@ -1,0 +1,51 @@
+include("NodalFieldModule.jl")
+using NodalFieldModule
+
+a=reshape([1.0, 2.0, 3.0,  4.0],4,1)
+f  = NodalFieldModule.NodalField("data=",a,0*similar(a,Int64,size(a)),false*similar(a,Bool,size(a)),zeros(4,1),0)
+
+x = rand(7,2)
+g = NodalFieldModule.NodalField(data=reshape(x,size(x)...))
+
+g.values
+dest=zeros(3,2)
+NodalFieldModule.gathervalues!(g,dest,[1 3 5])
+show(dest)
+dest=zeros(6,1)
+NodalFieldModule.gathervalues!(g,dest,[1 3 5])
+show(dest)
+
+include("NodalFieldModule.jl")
+using NodalFieldModule
+d=zeros(7,2)+[1:7 8:14]
+ geom  = NodalFieldModule.NodalField(data=d)
+ dest=zeros(3,2)
+NodalFieldModule.gathervalues!(geom,dest,[1 2 6]');
+show(dest)
+ dest=zeros(6,1)
+NodalFieldModule.gathervalues!(geom,dest,[1 2 6]');
+show(dest)
+
+nfens(g)
+
+g.dofnums
+numberdofs!(g)
+g.dofnums
+
+setebc!  (g,1:nfens(g),[false],[1],[0.0])
+setebc!  (g,1:nfens(g),[false],[2],[0.0])
+setebc!  (g,[7],[true],[1,2],[1.0])
+numberdofs!(g)
+g.dofnums
+
+apply_ebc! (g)
+g.values
+
+sv=squeeze(rand(g.nfreedofs,1),2)
+scatter_sysvec!(g, sv)
+g.dofnums
+g.values
+#methods(scatter_sysvec!)
+
+dest=
+gathervalues!(self::NodalField,dest::JFFltMat,conn::JFIntMat)

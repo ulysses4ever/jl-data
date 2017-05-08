@@ -1,0 +1,120 @@
+using Images
+
+function PeriodicWalk(k1, k2, n; f = x -> sin(2*pi*x) + sin(8*pi*x)^3)
+xCoords = [0]
+yCoords = [0]
+xMin = 0
+xMax = 0
+yMin = 0
+yMax = 0
+temp = 0
+xLast = 0
+yLast = 0
+xDir = 0
+yDir = 0
+r = 5
+maxDim = 6000
+for i in 1:n
+	temp = mod(iround(k1*f(i/k2)), 4)
+	if temp == 0
+		xDir = 1
+		yDir = 0
+	elseif temp == 1
+		xDir = 0
+		yDir = 1
+	elseif temp == 2
+		xDir = -1
+		yDir = 0
+	else
+		xDir = 0 
+		yDir = -1
+	end
+	for j in 1:r
+		xLast += xDir
+		yLast += yDir
+		push!(xCoords, xLast)
+		push!(yCoords, yLast)
+	end
+	xMax = max(xMax, xLast)
+	yMax = max(yMax, yLast)
+	xMin = min(xMin, xLast)
+	yMin = min(yMin, yLast)
+	if (xMax - xMin + 2*r)*(yMax - yMin + 2*r) > maxDim^2 || (xMax - xMin + 2*r) > maxDim || (yMax - yMin + 2*r) > maxDim
+		break
+	end
+end
+A = zeros(Float32, yMax - yMin + 2*r, xMax - xMin + 2*r)
+for i in 1:length(xCoords)
+	A[yCoords[i] - yMin + r, xCoords[i] - xMin + r] += 0.35f0
+end
+#imfilter_gaussian(A, [0.5,0.5])
+IPM.ExportImage(A, string("P", k1, "_", k2, ".PNG"), ColorFunction = "Orangescale")
+end
+
+function PeriodicWalkDense(k1, k2, n; f = x -> sin(2*pi*x)^5 + sin(2*pi*x))
+	xCoords = [0]
+	yCoords = [0]
+	xMin = 0
+	xMax = 0
+	yMin = 0
+	yMax = 0
+	temp = 0
+	xLast = 0
+	yLast = 0
+	maxDim = 6000
+	r = 10
+	for i in 1:n
+		temp = mod(iround(k1*f(i/k2)), 4)
+		if temp == 0
+			xLast += 1
+		elseif temp == 1
+			yLast += 1
+		elseif temp == 2
+			xLast -= 1
+		else
+			yLast -= 1
+		end
+		push!(xCoords, xLast)
+		push!(yCoords, yLast)
+		xMax = max(xMax, xLast)
+		yMax = max(yMax, yLast)
+		xMin = min(xMin, xLast)
+		yMin = min(yMin, yLast)
+		if xMax - xMin + 2*r > maxDim || yMax - yMin + 2*r > maxDim
+			temp = i
+			break
+		end
+	end
+	A = zeros(Float32, yMax - yMin + 2*r, xMax - xMin + 2*r)
+	for i in 1:length(xCoords)
+		A[yCoords[i] - yMin + r, xCoords[i] - xMin + r] += 0.35f0
+	end
+	IPM.ExportImage(A, string("P", k1, "_", k2, ".PNG"), ColorFunction = "Orangescale")
+	A = 0
+	gc()
+	return temp
+end
+
+
+function BoundedTest(k1, k2)
+	temp = 0
+	xLast = 0
+	yLast = 0
+	for i in 1:k2
+		temp = mod(iround(k1*sin(2*pi*i/k2)), 4)
+		if temp == 0
+			xLast += 1
+		elseif temp == 1
+			yLast += 1
+		elseif temp == 2
+			xLast -= 1
+		else
+			yLast -= 1
+		end
+	end
+	if xLast == 0 && yLast == 0
+		return 1
+	else
+	return 0
+	end
+end

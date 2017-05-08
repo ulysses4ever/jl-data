@@ -1,0 +1,18 @@
+# if (length(ARGS) == 0 )
+#   println("length(ARGS) == 0")
+#   exit(1)
+# end
+
+# include( "allLibraries.jl" )
+# include( ARGS[1] )
+# prob = readProblem( ARGS[1] )
+# include( "optProblem.jl" )
+
+
+
+include( "allLibraries.jl" )
+prob = readProblem( ARGS[1] )
+include( "heuristics.jl" )
+s = tabuSearch( prob, 6 )
+# s = VND( prob )
+printSol( prob, s )

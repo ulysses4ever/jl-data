@@ -1,0 +1,1210 @@
+
+##############################################
+## Non-causal time-domain modeling in Julia ##
+##############################################
+
+# Tom Short, tshort@epri.com
+#
+#
+# Copyright (c) 2012, Electric Power Research Institute 
+# BSD license - see the LICENSE file
+ 
+# 
+# This file is an experiment in doing non-causal modeling in Julia.
+# The idea behind non-causal modeling is that the user develops models
+# based on components which are described by a set of equations. A
+# tool can then transform the equations and solve the differential
+# algebraic equations. Non-causal models tend to match their physical
+# counterparts in terms of their specification and implementation.
+#
+# Causal modeling is where all signals have an input and an output,
+# and the flow of information is clear. Simulink is the
+# highest-profile example.
+# 
+# The highest profile noncausal modeling tools are in the Modelica
+# (www.modelica.org) family. The MathWorks also has Simscape that uses
+# Matlab notation. Modelica is an object-oriented, open language with
+# multiple implementations. It is a large, complex, powerful language
+# with an extensive standard library of components.
+#
+# This implementation follows the work of David Broman and his MKL
+# simulator and the work of George Giorgidze and Henrik Nilsson and
+# their functional hybrid modeling.
+#
+# A nodal formulation is used based on David's work. His thesis
+# documents this nicely:
+# 
+#   David Broman. Meta-Languages and Semantics for Equation-Based
+#   Modeling and Simulation. PhD thesis, Thesis No 1333. Department of
+#   Computer and Information Science, Linköping University, Sweden,
+#   2010.
+#   http://www.bromans.com/david/publ/thesis-2010-david-broman.pdf
+#
+# Here is David's code and home page:
+# 
+#   http://www.bromans.com/software/mkl/mkl-source-1.0.0.zip
+#   http://www.ida.liu.se/~davbr/
+#   
+# Modeling of dynamically varying systems is handled similarly to
+# functional hybrid modelling (FHM), specifically the Hydra
+# implementation by George. See here for links:
+# 
+#   https://github.com/giorgidze/Hydra
+#   http://db.inf.uni-tuebingen.de/team/giorgidze
+#   http://www.cs.nott.ac.uk/~nhn/
+# 
+# FHM is also a functional approach. Hydra is implemented as a domain
+# specific language embedded in Haskell. Their implementation handles
+# dynamically changing systems with JIT-compiled code from an
+# amazingly small amount of code.
+# 
+# As stated, this file implements something like David's approach. A
+# model constructor returns a list of equations. Models are made of
+# models, so this builds up a hierarchical structure of equations that
+# then need to be flattened. David's approach is nodal; nodes are
+# passed in as parameters to models to perform connections between
+# devices.
+#
+# What can it do:
+#   - Index-1 DAE's using the DASSL solver
+#   - Arrays of unknown variables
+#   - Complex valued unknowns
+#   - Hybrid modeling
+#   - Discrete systems
+#   - Structurally variable systems
+#   
+# What's missing:
+#   - Initial equations
+#   - Causal relationships or input/outputs (?)
+#   - Metadata like variable name, units, and annotations (hard?)
+#   - Symbolic processing like index reduction
+#   - Error checking
+#   - Tests
+#
+# Downsides of this approach:
+#   - No connect-like capability. Must be nodal.
+#   - Tough to do model introspection.
+#   - Tough to map to a GUI. This is probably true with most
+#     functional approaches. Tough to add annotations.
+#
+# For an implementation point of view, Julia works well for this. The
+# biggest headache was coding up the callback to the residual
+# function. For this, I used a kludgy approach with several global
+# variables. This should improve in the future with a better C api. I
+# also tried interfacing with the Sundials IDA solver, but that was
+# even more difficult to interface. 
+# 
+
+########################################
+## Utilities                          ##
+########################################
+
+compile_daskr() = cd(julia_pkgdir() * "/Sims/lib") do
+    run(`gfortran -fPIC -O2 -ggdb -shared -o daskr.so DASKR/ddaskr.f DASKR/dlinpk.f DASKR/daux.f`) 
+end
+
+########################################
+## Type definitions                   ##
+########################################
+
+#
+# This includes a few symbolic types of abstracted type ModelType.
+# This includes symbols, expressions, and other objects that reduce to
+# expressions.
+#
+# Expressions (of type MExpr) are built up based on Unknown's. Unknown
+# is a symbol with a uniquely generated symbol name. If you have
+#   a = 1
+#   b = Unknown()
+#   a * b + b^2
+# evaluation produces the following:
+#   MExpr(+(*(1,##1029),*(##1029,##1029)))
+#   
+# This is an expression tree where ##1029 is the symbol name for b.
+# 
+# The idea is that you can set up a set of hierarchical equations that
+# will be later flattened.
+#
+# Other types or method definitions can be used to assign behavior
+# during flattening (like the Branch type) or during instantiation
+# (like the der method).
+# 
+
+abstract ModelType
+abstract UnknownCategory
+abstract UnknownVariable <: ModelType
+
+type DefaultUnknown <: UnknownCategory
+end
+
+type Unknown{T<:UnknownCategory} <: UnknownVariable
+    sym::Symbol
+    value         # holds initial values (and type info)
+    label::String
+    save_history::Bool
+    t::Array{Any,1}
+    x::Array{Any,1}
+    Unknown() = new(gensym(), 0.0, "", false, {}, {})
+    Unknown(sym::Symbol, label::String) = new(sym, 0.0, label, true, {0.0}, {0.0})
+    Unknown(sym::Symbol, value) = new(sym, value, "", false, {}, {})
+    Unknown(value) = new(gensym(), value, "", false, {}, {})
+    Unknown(label::String) = new(gensym(), 0.0, label, true, {0.0}, {0.0})
+    Unknown(value, label::String) = new(gensym(), value, label, true, {0.0}, {0.0})
+    Unknown(sym::Symbol, value, label::String) = new(sym, value, label, true, {0.0}, {value})
+    Unknown(sym::Symbol, value, label::String, save_history::Bool, t::Array{Any,1}, x::Array{Any,1}) = new(sym, value, label, save_history, t, x)
+end
+Unknown() = Unknown{DefaultUnknown}(gensym(), 0.0, "", false, {}, {})
+Unknown(x) = Unknown{DefaultUnknown}(gensym(), x, "", false, {}, {})
+Unknown(s::Symbol, label::String) = Unknown{DefaultUnknown}(s, 0.0, label, true, {0.0}, {0.0})
+Unknown(x, label::String) = Unknown{DefaultUnknown}(gensym(), x, label, true, {0.0}, {0.0})
+Unknown(label::String) = Unknown{DefaultUnknown}(gensym(), 0.0, label, true, {0.0}, {0.0})
+Unknown(s::Symbol, x) = Unknown{DefaultUnknown}(s, x, "", false, {}, {})
+
+
+is_unknown(x) = isa(x, UnknownVariable)
+    
+type DerUnknown <: UnknownVariable
+    sym::Symbol
+    value        # holds initial values
+    parent::Unknown
+    # label::String    # Do we want this? 
+end
+DerUnknown(u::Unknown) = DerUnknown(u.sym, 0.0, u)
+der(x::Unknown) = DerUnknown(x.sym, compatible_values(x), x)
+der(x::Unknown, val) = DerUnknown(x.sym, val, x)
+
+# show(a::Unknown) = show(a.sym)
+
+type MExpr <: ModelType
+    ex::Expr
+end
+mexpr(hd::Symbol, args::ANY...) = MExpr(expr(hd, args...))
+
+# Set up defaults for operations on ModelType's for many common
+# methods.
+
+
+unary_functions = [:(+), :(-), :(!),
+                   :abs, :sign, :acos, :acosh, :asin,
+                   :asinh, :atan, :atanh, :sin, :sinh,
+                   :cos, :cosh, :tan, :tanh, :ceil, :floor,
+                   :round, :trunc, :exp, :exp2, :expm1, :log, :log10, :log1p,
+                   :log2, :logb, :sqrt, :gamma, :lgamma, :digamma,
+                   :erf, :erfc, :square,
+                   :min, :max, :prod, :sum, :mean, :median, :std,
+                   :var, :norm,
+                   :diff, :reldiff, :percent_change,
+                   :cumprod, :cumsum, :cumsum_kbn, :cummin, :cummax,
+                   :fft,
+                   :rowmins, :rowmaxs, :rowprods, :rowsums,
+                   :rowmeans, :rowmedians, :rowstds, :rowvars,
+                   :rowffts, :rownorms,
+                   :colmins, :colmaxs, :colprods, :colsums,
+                   :colmeans, :colmedians, :colstds, :colvars,
+                   :colffts, :colnorms,
+                   :any, :all,
+                   :iceil,  :ifloor, :itrunc, :iround,
+                   :angle,
+                   :sin,    :cos,    :tan,    :cot,    :sec,   :csc,
+                   :sinh,   :cosh,   :tanh,   :coth,   :sech,  :csch,
+                   :asin,   :acos,   :atan,   :acot,   :asec,  :acsc,
+                   :acoth,  :asech,  :acsch,  :sinc,   :cosc]
+
+binary_functions = [:(==), :(.==), :(!=), :(.!=), :isless,
+                    :(>), :(.>), :(>=), :(.>=), :(<), :(.<),
+                    :(<=), :(.<=),
+                    :(==), :(!=), :isless, :(>), :(>=),
+                    :(<), :(<=),
+                    :(+), :(.+), :(-), :(.-), :(*), :(.*), :(/), :(./),
+                    :(.^), :(^), :(div), :(mod), :(fld), :(rem),
+                    :(&), :(|), :($),
+                    :atan2,
+                    :dot, :cor_pearson, :cov_pearson,
+                    :cor_spearman, :cov_spearman]
+
+_expr(x) = x
+_expr(x::MExpr) = x.ex
+
+macro doimport(name)
+  expr(:toplevel, Any[expr(:import, Any[:Base, esc($name)])])
+end
+
+for f in binary_functions
+    @doimport f
+    @eval ($f)(x::ModelType, y::ModelType) = mexpr(:call, ($f), _expr(x), _expr(y))
+    @eval ($f)(x::ModelType, y::Any) = mexpr(:call, ($f), _expr(x), y)
+    @eval ($f)(x::Any, y::ModelType) = mexpr(:call, ($f), x, _expr(y))
+end 
+
+for f in unary functions
+    ## @eval import Base.(f)
+    @doimport f
+    @eval ($f)(x::ModelType, args...) = mexpr(:call, ($f), _expr(x), args...)
+end
+
+# Non-Base functions:
+for f in [:der]
+    @eval ($f)(x::ModelType, args...) = mexpr(:call, ($f), _expr(x), args...)
+end
+
+# For now, a model is just a vector that anything, but probably it
+# should include just ModelType's.
+const Model = Vector{Any}
+
+
+# Add array access capability for Unknowns:
+
+type RefUnknown{T<:UnknownCategory} <: UnknownVariable
+    u::Unknown{T}
+    idx
+end
+ref(x::Unknown, args...) = RefUnknown(x, args)
+ref(x::MExpr, args...) = mexpr(:call, :ref, args...)
+length(u::UnknownVariable) = length(value(u))
+size(u::UnknownVariable, i) = size(value(u), i)
+hcat(x::ModelType...) = mexpr(:call, :hcat, x...)
+vcat(x::ModelType...) = mexpr(:call, :vcat, x...)
+
+value(x) = x
+value(x::Model) = map(value, x)
+value(x::UnknownVariable) = x.value
+value(x::RefUnknown) = x.u.value[x.idx...]
+value(a::MExpr) = value(a.ex)
+value(e::Expr) = eval(Expr(e.head, isempty(e.args) ? e.args : map(value, e.args), e.typ))
+                       
+# The following helper functions are to return the base value from an
+# unknown to use when creating other unknowns. An example would be:
+#   a = Unknown(45.0 + 10im)
+#   b = Unknown(base_value(a))   # This one gets initialized to 0.0 + 0.0im.
+#
+compatible_values(u::UnknownVariable) = value(u) .* 0.0
+# The value from the unknown determines the base value returned:
+compatible_values(u1::UnknownVariable, u2::UnknownVariable) = length(value(u1)) > length(value(u2)) ? value(u1) .* 0.0 : value(u2) .* 0.0  
+compatible_values(u::UnknownVariable, num::Number) = length(value(u)) > length(num) ? value(u) .* 0.0 : num .* 0.0 
+compatible_values(num::Number, u::UnknownVariable) = length(value(u)) > length(num) ? value(u) .* 0.0 : num .* 0.0 
+# This should work for real and complex valued unknowns, including
+# arrays. For something more complicated, it may not.
+
+
+
+# System time - a special unknown variable
+const MTime = Unknown(:time, 0.0)
+
+
+#  The type RefBranch and the helper Branch are used to indicate the
+#  potential between nodes and the flow between nodes.
+
+type RefBranch <: ModelType
+    n     # This is the reference node.
+    i     # This is the flow variable that goes with this reference.
+end
+
+function Branch(n1, n2, v, i)
+    {
+     RefBranch(n1, i)
+     RefBranch(n2, -i)
+     n1 - n2 - v
+     }
+end
+
+
+
+########################################
+## delay                              ##
+########################################
+
+
+# Identity unknown: don't replace with a ref to the y array
+type PassedUnknown <: UnknownVariable
+    ref
+end
+
+
+function _interp(x, t)
+    # assumes that tvec is sorted from low to high
+    if length(x.t) == 0 || t < 0.0 return zero(x.value) end
+    idx = search_sorted_first(x.t, t)
+    if idx == 1
+        return x.x[1]
+    elseif idx > length(x.t) 
+        return x.x[end]
+    else
+        return (t - x.t[idx-1]) / (x.t[idx] - x.t[idx-1]) .* (x.x[idx] - x.x[idx-1]) + x.x[idx-1]
+    end
+end
+# version vectorized on t:
+function _interp(x, t)
+    res = zero(t)
+    for i in 1:length(res)
+        if t[i] < 0.0 continue end
+        idx = search_sorted_first(x.t, t[i])
+        if idx > length(res) continue end
+        if idx == 1
+            res[i] = x.x[1][i]
+        elseif idx > length(x.t) 
+            res[i] = x.x[end][i]
+        else
+            res[i] = (t[i] - x.t[idx-1]) / (x.t[idx] - x.t[idx-1]) .* (x.x[idx][i] - x.x[idx-1][i]) + x.x[idx-1][i]
+        end
+    end
+    res
+end
+
+
+function delay(x::Unknown, val)
+    x.save_history = true
+    x.t = {0.0}
+    x.x = {x.value}
+    MExpr(:(Sims._interp($(PassedUnknown(x)), t[1] - $(val))))
+end
+
+
+########################################
+## Utilities for Hybrid Modeling      ##
+########################################
+
+
+
+#
+# Discrete is a type for discrete variables. These are only changed
+# during events. They are not used by the integrator.
+#
+type Discrete <: UnknownVariable
+    sym::Symbol
+    value
+    label::String
+    ## hooks::Vector{Function}
+    hookex::Vector{Expr}
+end
+Discrete() = Discrete(gensym(), 0.0, "")
+Discrete(x) = Discrete(gensym(), x, "")
+Discrete(s::Symbol, label::String) = Discrete(s, 0.0, label)
+Discrete(x, label::String) = Discrete(gensym(), x, label)
+Discrete(label::String) = Discrete(gensym(), 0.0, label)
+Discrete(s::Symbol, x) = Discrete(s, x, "")
+Discrete(s::Symbol, x, label::String) = Discrete(s, x, label, Expr[])
+
+## function Discrete(s::Symbol, x, ex::MExpr, label::String)
+##     res = Discrete(s, x, label)
+##     x.value = value(ex)
+##     x.ex = ex
+## end
+
+type RefDiscrete <: UnknownVariable
+    u::Discrete
+    idx
+end
+ref(x::Discrete, args...) = RefDiscrete(x, args)
+
+## DiscreteVar is used inside of the residual function.
+type DiscreteVar
+    value
+    pre
+    hooks::Vector{Function}
+end
+DiscreteVar(d::Discrete, funs::Vector{Function}) = DiscreteVar(d.value, d.value, funs)
+DiscreteVar(d::Discrete) = DiscreteVar(d.value, d.value, Function[])
+
+# Add hooks to a discrete variable.
+addhook!(d::Discrete, ex::ModelType) = push(d.hookex, strip_mexpr(ex))
+
+value(x::RefDiscrete) = x.u.value[x.idx...]
+value(x::DiscreteVar) = x.value
+
+#
+# Event is the main type used for hybrid modeling. It contains a
+# condition for root finding and model expressions to process after
+# positive and negative root crossings are detected.
+#
+
+type Event <: ModelType
+    condition::ModelType   # An expression used for the event detection. 
+    pos_response::Model    # An expression indicating what to do when
+                           # the condition crosses zero positively.
+    neg_response::Model    # An expression indicating what to do when
+                           # the condition crosses zero in the
+                           # negative direction.
+end
+Event(condition::ModelType, p::MExpr, n::MExpr) = Event(condition, {p}, {n})
+Event(condition::ModelType, p::Model, n::MExpr) = Event(condition, p, {n})
+Event(condition::ModelType, p::MExpr, n::Model) = Event(condition, {p}, n)
+Event(condition::ModelType, p::MExpr) = Event(condition, {p}, {})
+Event(condition::ModelType, p::Expr) = Event(condition, p, {})
+
+#
+# reinit is used in Event responses to redefine variables. LeftVar is
+# needed to mark unknowns as left-side variables in assignments during
+# event responses.
+# 
+type LeftVar <: ModelType
+    var
+end
+function reinit(x, y)
+    println("reinit: ", x[], " to ", y)
+    x[:] = y
+end
+function reinit(x::DiscreteVar, y)
+    println("reinit discrete: ", x.value, " to ", y)
+    x.pre = x.value
+    x.value = y
+    for fun in x.hooks
+        fun()
+    end
+end
+reinit(x::LeftVar, y) = mexpr(:call, :(Sims.reinit), x, y)
+reinit(x::LeftVar, y::MExpr) = mexpr(:call, :(Sims.reinit), x, y.ex)
+reinit(x::Unknown, y) = reinit(LeftVar(x), y)
+reinit(x::RefUnknown, y) = reinit(LeftVar(x), y)
+reinit(x::DerUnknown, y) = reinit(LeftVar(x), y)
+reinit(x::Discrete, y) = reinit(LeftVar(x), y)
+reinit(x::RefDiscrete, y) = reinit(LeftVar(x), y)
+## reinit(x::Discrete, y) = mexpr(:call, :reinit, x, y)
+## reinit(x::RefDiscrete, y) = mexpr(:call, :reinit, x, y)
+assign(x::DiscreteVar, y, idx) = x.value = y
+
+#
+# BoolEvent is a helper for attaching an event to a boolean variable.
+# In conjunction with ifelse, this allows constructs like Modelica's
+# if blocks.
+#
+function BoolEvent(d::Union(Discrete, RefDiscrete), condition::ModelType)
+    lend = length(value(d))
+    lencond = length(value(condition))
+    if lend > 1 && lencond == lend
+        convert(Vector{Any},
+                map((idx) -> BoolEvent(d[idx], condition[idx]), [1:lend]))
+    elseif lend == 1 && lencond == 1
+        Event(condition,       
+              {reinit(d, true)},
+              {reinit(d, false)})
+    else
+        error("Mismatched lengths for BoolEvent")
+    end
+end
+
+#
+# ifelse is like an if-then-else block, but for ModelTypes.
+#
+ifelse(x::Bool, y, z) = x ? y : z
+ifelse(x::Bool, y) = x ? y : nothing
+ifelse(x::Array{Bool}, y, z) = map((x) -> ifelse(x,y,z), x)
+ifelse(x::Array{Bool}, y) = map((x) -> ifelse(x,y), x)
+ifelse(x::ModelType, y, z) = mexpr(:call, :ifelse, x, y, z)
+ifelse(x::ModelType, y) = mexpr(:call, :ifelse, x, y)
+ifelse(x::MExpr, y, z) = mexpr(:call, :ifelse, x.ex, y, z)
+ifelse(x::MExpr, y) = mexpr(:call, :ifelse, x.ex, y)
+ifelse(x::MExpr, y::MExpr, z::MExpr) = mexpr(:call, :ifelse, x.ex, y.ex, z.ex)
+ifelse(x::MExpr, y::MExpr) = mexpr(:call, :ifelse, x.ex, y.ex)
+
+
+
+
+########################################
+## Types for Structural Dynamics      ##
+########################################
+
+#
+# StructuralEvent defines a type for elements that change the
+# structure of the model. An event is created (condition is the zero
+# crossing). When the event is triggered, the model is re-flattened
+# after replacing default with new_relation in the model. 
+type StructuralEvent <: ModelType
+    condition::ModelType  # Expression indicating a zero crossing for event detection.
+    default
+    new_relation::Function
+    activated::Bool       # Indicates whether the event condition has fired
+end
+StructuralEvent(condition::MExpr, default, new_relation::Function) = StructuralEvent(condition, default, new_relation, false)
+
+
+
+########################################
+## Elaboration / flattening           ##
+########################################
+
+#
+# This converts a hierarchical model into a flat set of equations.
+# 
+# After elaboration, the following structure is returned. This sort-of
+# follows Hydra's SymTab structure.
+#
+
+#
+type EquationSet
+    model           # The active model, a hierachichal set of equations.
+    equations       # A flat list of equations.
+    events
+    pos_responses
+    neg_responses
+    nodeMap::Dict
+end
+# In EquationSet, model contains equations and StructuralEvents. When
+# a StructuralEvent triggers, the entire model is elaborated again.
+# The first step is to replace StructuralEvents that have activated
+# with their new_relation in model. Then, the rest of the EquationSet
+# is reflattened using model as the starting point.
+
+
+# 
+# elaborate is the main elaboration function. There is no real symbolic
+# processing (sorting, index reduction, or any of the other stuff a
+# fancy modeling tool would do).
+# 
+elaborate(a::Model) = elaborate(EquationSet(a, {}, {}, {}, {}, Dict()))
+
+function elaborate(x::EquationSet)
+    eq = EquationSet({}, {}, {}, {}, {}, Dict())
+    eq.model = handle_events(x.model)
+    eq.equations = elaborate_unit(eq.model, eq) # This will also modify eq.
+
+    # Add in equations for each node to sum flows to zero:
+    for (key, nodeset) in eq.nodeMap
+        push(eq.equations, nodeset)
+    end
+    # last fixups: 
+    eq.equations = remove_empties(strip_mexpr(eq.equations))
+    eq
+end
+
+# Generic model traversing helper.
+# Applies a function to each element of the model tree.
+function traverse_mod(f::Function, a::Model)
+    emodel = {}
+    for el in a
+        el1 = f(el)
+        if isa(el1, Array)
+            append!(emodel, el1)
+        else  # this handles symbols
+            push(emodel, el1)
+        end
+    end
+    emodel
+end
+
+#
+# handle_events traverses the model tree and replaces
+# StructuralEvent's that have activated.
+#
+handle_events(a::Model) = traverse_mod(handle_events, a)
+handle_events(x) = x
+handle_events(ev::StructuralEvent) = ev.activated ? ev.new_relation() : ev
+
+#
+# elaborate_unit flattens the set of equations while building up
+# events, event responses, and a Dict of nodes.
+#
+elaborate_unit(a::Any, eq::EquationSet) = Expr[] # The default is to ignore undefined types.
+elaborate_unit(a::ModelType, eq::EquationSet) = a
+elaborate_unit(a::Model, eq::EquationSet) = traverse_mod((x) -> elaborate_unit(x, eq), a)
+
+function elaborate_unit(b::RefBranch, eq::EquationSet)
+    if (isa(b.n, Unknown))
+        eq.nodeMap[b.n] = get(eq.nodeMap, b.n, 0.0) + b.i
+    elseif (isa(b.n, RefUnknown))
+        vec = compatible_values(b.n.u)
+        vec[b.n.idx...] = 1.0
+        eq.nodeMap[b.n.u] = get(eq.nodeMap, b.n.u, 0.0) + b.i .* vec 
+    end
+    {}
+end
+
+function elaborate_unit(ev::Event, eq::EquationSet)
+    push(eq.events, strip_mexpr(elaborate_unit(ev.condition, eq)))
+    push(eq.pos_responses, strip_mexpr(elaborate_unit(ev.pos_response, eq)))
+    push(eq.neg_responses, strip_mexpr(elaborate_unit(ev.neg_response, eq)))
+    {}
+end
+
+function elaborate_unit(ev::StructuralEvent, eq::EquationSet)
+    # Set up the event:
+    push(eq.events, strip_mexpr(elaborate_unit(ev.condition, eq)))
+    # A positive zero crossing initiates a change:
+    push(eq.pos_responses, (t,y,yp) -> begin global __sim_structural_change = true; ev.activated = true; end)
+    # Dummy negative zero crossing
+    push(eq.neg_responses, (t,y,yp) -> return)
+    strip_mexpr(elaborate_unit(ev.default, eq))
+end
+
+
+# These methods strip the MExpr's from expressions.
+strip_mexpr(a) = a
+strip_mexpr{T}(a::Vector{T}) = map(strip_mexpr, a)
+strip_mexpr(a::MExpr) = strip_mexpr(a.ex)
+## strip_mexpr(a::MSymbol) = a.sym 
+strip_mexpr(e::Expr) = Expr(e.head, isempty(e.args) ? e.args : map(strip_mexpr, e.args), e.typ)
+
+# Other utilities:
+remove_empties(l::Vector{Any}) = filter(x -> !isequal(x, {}), l)
+eval_all(x) = eval(x)
+eval_all{T}(x::Array{T,1}) = map(eval_all, x)
+
+
+
+
+
+########################################
+## Residual function and Sim creation ##
+########################################
+
+#
+# From the flattened equations, generate a set of functions for use by
+# the simulation. The residual function has arguments (t,y,yp) that
+# returns the residual of type Float64 of length N, the number of
+# equations in the system. The vectors y and yp are also of length N
+# and type Float64. As part of finding the residual function, we use
+# several Dicts to map unknown variables to indexes into y and yp.
+# 
+# SimFunctions is the set of functions used during simulation. All
+# functions take (t,y,yp) as arguments.
+#
+type SimFunctions
+    resid::Function           
+    event_at::Function          # Returns a Vector of root-crossing values. 
+    event_pos::Vector{Function} # Each function is to be run when a
+                                #   positive root crossing is detected.
+    event_neg::Vector{Function} # Each function is to be run when a
+                                #   negative root crossing is detected.
+    get_discretes::Function     # Placeholder for a function to return
+                                #   discrete values.
+end
+SimFunctions(resid::Function, event_at::Function, event_pos::Vector{None}, event_neg::Vector{None}, get_discretes::Function) = 
+    SimFunctions(resid, event_at, Function[], Function[], get_discretes)
+
+type Sim
+    eq::EquationSet           # the input
+    F::SimFunctions
+    y0::Array{Float64, 1}     # initial values
+    yp0::Array{Float64, 1}    # initial values of derivatives
+    id::Array{Int, 1}         # indicates whether a variable is algebraic or differential
+    outputs::Array{ASCIIString, 1} # output labels
+    unknown_idx_map::Dict     # symbol => index into y (or yp)
+    discrete_map::Dict        # sym => Discrete variable 
+    y_map::Dict               # sym => Unknown variable 
+    yp_map::Dict              # sym => DerUnknown variable 
+    varnum::Int               # variable indicator position that's incremented
+    
+    Sim(eq::EquationSet) = new(eq)
+end
+
+#
+# This is the main function for creating Sim's.
+#
+function create_sim(eq::EquationSet)
+    sm = Sim(eq)
+    global _sm = sm
+    sm.varnum = 1
+    sm.unknown_idx_map = Dict()
+    sm.discrete_map = Dict()
+    sm.y_map = Dict()
+    sm.yp_map = Dict()
+    sm.F = setup_functions(sm)  # Most of the work's done here.
+    N_unknowns = sm.varnum - 1
+    sm.y0 = fill_from_map(0.0, N_unknowns, sm.y_map, x -> to_real(x.value))
+    sm.yp0 = fill_from_map(0.0, N_unknowns, sm.yp_map, x -> to_real(x.value))
+    sm.id = fill_from_map(-1, N_unknowns, sm.yp_map, x -> 1)
+    sm.outputs = fill_from_map("", N_unknowns, sm.y_map, x -> x.label)
+    sm
+end
+
+# Utility to vectors based on values in Dict's. The key in the Dict
+# gives the indexes in the vector.
+function fill_from_map(default_val,# Default value for the vector.
+                       N,          # Length of the resulting vector.
+                       the_map,    # The Dict.
+                       f)          # A function applied to each value.
+    x = fill(default_val, N)
+    for (k,v) in the_map
+        x[ [k] ] = f(v)
+    end
+    x
+end
+
+cmb(x, args...) = expr(x, args...)
+
+#
+# setup_functions sets up several functions in a closure setup to
+# share common variables. This allows model components to access
+# Discrete variables during integration steps and during event
+# responses.
+#
+# Unknowns are also replaced by references to y and yp. As part of
+# replacing unknowns, several of the Dicts in sm are populated.
+#
+function setup_functions(sm::Sim)
+    # eq_block should be just expressions suitable for eval'ing.
+    eq_block = replace_unknowns(sm.eq.equations, sm)
+    ev_block = replace_unknowns(sm.eq.events, sm)
+    
+    # Set up a master function with variable declarations and 
+    # functions that have access to those variables.
+    #
+    # The following is a code block (thunk) for insertion into
+    # the residual calculation function.
+    resid_thunk = Expr(:call, Base.append_any({:(Sims.vcat_real)}, eq_block), Any)
+    # Same but for the root crossing function:
+    event_thunk = Expr(:call, Base.append_any({:(Sims.vcat_real)}, ev_block), Any)
+
+    # Helpers to convert an array of expressions into a single expression.
+    to_thunk{T}(ex::Vector{T}) = reduce((x,y) -> :($x;$y), :(), ex)
+    to_thunk(ex::Expr) = ex
+    to_thunk(ex::Function) = ex
+
+    #
+    # The event responses are more work. We need one "thunk" for each
+    # event, and one set for positive and one set for negative
+    # crossings.
+    #
+    ev_pos_array = Expr[]
+    ev_neg_array = Expr[]
+    for idx in 1:length(sm.eq.events)
+        ex = to_thunk(replace_unknowns(sm.eq.pos_responses[idx], sm))
+        push(ev_pos_array, 
+             quote
+                 (t, y, yp) -> begin $ex; return; end
+             end)
+        ex = to_thunk(replace_unknowns(sm.eq.neg_responses[idx], sm))
+        push(ev_neg_array, 
+             quote
+                 (t, y, yp) -> begin $ex; return; end
+             end)
+    end
+    ev_pos_thunk = length(ev_pos_array) > 0 ? Expr(:call, Base.append_any({:vcat}, ev_pos_array), Any) : Function[]
+    ev_neg_thunk = length(ev_neg_array) > 0 ? Expr(:call, Base.append_any({:vcat}, ev_neg_array), Any) : Function[]
+    
+    get_discretes_thunk = :(() -> 1)   # dummy function for now
+
+    # Variable declarations are for Discrete variables. Each is stored
+    # in its own array, so it can be overwritten by reinit. From the
+    # discrete_map Dict, y[1] is the key (symbol name), and y[2] is
+    # the value (type Discrete).
+    discrete_defs = :()
+    for (k, v) in sm.discrete_map
+        # println("k", k)
+        if length(v.hookex) == 0
+            ex = :($k = Sims.DiscreteVar($v))
+        else
+            funs = map(x -> :(() -> $(replace_unknowns(x, sm))), v.hookex)
+            funs = cmb(:vcat, funs...)
+            global _funs = funs
+            ex = :($k = Sims.DiscreteVar($v, $funs))
+        end
+        discrete_defs = :($discrete_defs; $ex)
+        global _dis = discrete_defs
+    end
+    
+    #
+    # The framework for the master function defined. Each "thunk" gets
+    # plugged into a function which is evaluated.
+    #
+    expr = quote
+            # Note: this was originally a closure, but it was converted
+            # to eval globally for two reasons: (1) performance and (2) so
+            # cfunction could be used to set up Julia callbacks. This does
+            # mean that the _sim_* functions are seen globally.
+            $discrete_defs
+            function _sim_resid(t_in, y_in, yp_in, cj, delta_out, ires, rpar, ipar)
+                 n = int(unsafe_ref(ipar))
+                 t = pointer_to_array(t_in, (1,))
+                 y = pointer_to_array(y_in, (n,))
+                 yp = pointer_to_array(yp_in, (n,))
+                 delta = pointer_to_array(delta_out, (n,))
+                 ## println("t: ",t)
+                 ## println("y: ",y)
+                 ## println("yp: ",yp)
+                 delta[1:end] = $resid_thunk
+                 ## println("res: ",res)
+                 nothing
+            end
+            function _sim_event_at(neq, t_in, y_in, yp_in, nrt, rval_out, rpar, ipar)
+                 n = int(pointer_to_array(ipar, (2,)))
+                 t = pointer_to_array(t_in, (1,))
+                 y = pointer_to_array(y_in, (n[1],))
+                 yp = pointer_to_array(yp_in, (n[1],))
+                 rval = pointer_to_array(rval_out, (n[2],))
+                 rval[1:end] = $event_thunk
+                 nothing
+            end
+            _sim_event_pos_array = $ev_pos_thunk
+            _sim_event_neg_array = $ev_neg_thunk
+            function _sim_get_discretes()
+                 $get_discretes_thunk
+                 nothing
+            end
+        () -> begin
+            Sims.SimFunctions(_sim_resid, _sim_event_at, _sim_event_pos_array, _sim_event_neg_array, _sim_get_discretes)
+        end
+    end
+    global _ex = expr
+    F = eval(expr)()
+
+    # For event responses that were actual functions, insert those into
+    # the F structure.
+    for idx in 1:length(sm.eq.events)
+        if isa(sm.eq.pos_responses[idx], Function)
+            F.event_pos[idx] = sm.eq.pos_responses[idx]
+        end
+        if isa(sm.eq.neg_responses[idx], Function)
+            F.event_neg[idx] = sm.eq.neg_responses[idx]
+        end
+    end
+    F
+end
+
+# add_var add's a variable to the unknown_idx_map if it isn't already
+# there. 
+function add_var(v, sm) 
+    if !has(sm.unknown_idx_map, v.sym)
+        # Account for the length and fundamental size of the object
+        len = length(v.value) * int(sizeof([v.value][1]) / 8)  
+        idx = len == 1 ? sm.varnum : (sm.varnum:(sm.varnum + len - 1))
+        sm.unknown_idx_map[v.sym] = idx
+        sm.varnum = sm.varnum + len
+    end
+end
+
+# The replace_unknowns method replaces Unknown types with
+# references to the positions in the y or yp vectors.
+replace_unknowns(a, sm::Sim) = a
+replace_unknowns{T}(a::Array{T,1}, sm::Sim) = map(x -> replace_unknowns(x, sm), a)
+replace_unknowns(e::Expr, sm::Sim) = Expr(e.head, replace_unknowns(e.args, sm), e.typ)
+function replace_unknowns(a::Unknown, sm::Sim)
+    if isequal(a.sym, :time)
+        return :(t[1])
+    end
+    add_var(a, sm)
+    sm.y_map[sm.unknown_idx_map[a.sym]] = a
+    if isreal(a.value) && ndims(a.value) < 2
+        :(ref(y, ($(sm.unknown_idx_map[a.sym]))))
+    else
+        :(from_real(ref(y, ($(sm.unknown_idx_map[a.sym]))), $(basetypeof(a.value)), $(size(a.value))))
+    end
+end
+function replace_unknowns(a::RefUnknown, sm::Sim) # handle array referencing
+    add_var(a.u, sm)
+    sm.y_map[sm.unknown_idx_map[a.u.sym]] = a.u
+    if isreal(a.u.value) && ndims(a.u.value) < 2
+        :(ref(y, ($(sm.unknown_idx_map[a.u.sym][a.idx...]))))
+    else
+        :(from_real(ref(y, ($(sm.unknown_idx_map[a.u.sym]))), $(basetypeof(a.u.value)), $(size(a.u.value)))[$(a.idx...)])
+    end
+end
+function replace_unknowns(a::DerUnknown, sm::Sim) 
+    add_var(a, sm)
+    sm.y_map[sm.unknown_idx_map[a.parent.sym]] = a.parent
+    sm.yp_map[sm.unknown_idx_map[a.sym]] = a
+    if isreal(a.value) && ndims(a.value) < 2
+        :(ref(yp, ($(sm.unknown_idx_map[a.sym]))))
+    else
+        :(from_real(ref(yp, ($(sm.unknown_idx_map[a.sym]))), $(basetypeof(a.value)), $(size(a.value))))
+    end
+end
+function replace_unknowns(a::PassedUnknown, sm::Sim)
+    a.ref
+end
+function replace_unknowns(a::Discrete, sm::Sim)
+    # println(a.sym)
+    sm.discrete_map[a.sym] = a
+    :(($(a.sym)).value)
+end
+function replace_unknowns(a::RefDiscrete, sm::Sim) # handle array referencing
+    sm.discrete_map[a.u.sym] = a.u
+    :(ref(($(a.u.sym)).value, a.idx))
+end
+# In assigned variables (LeftVar), use SubArrays (sub), instead of ref.
+# This allows assignment.
+function replace_unknowns(a::LeftVar, sm::Sim)
+    if isa(a.var, Discrete)
+        # println("D",a.var.sym)
+        sm.discrete_map[a.var.sym] = a.var
+        :($(a.var.sym))
+    else
+        var = replace_unknowns(a.var, sm)
+        :(sub($(var.args[2]), $(var.args[3])))
+    end
+end
+
+#
+# vcat_real is like vcat, but each element is converted to real with
+# to_real.
+#
+vcat_real(X::Any...) = [ to_real(X[i]) for i=1:length(X) ]
+function vcat_real(X::Any...)
+    ## println(X[1])
+    res = map(to_real, X)
+    vcat(res...)
+end
+
+
+
+########################################
+## Simulation                         ##
+########################################
+
+#
+# This uses an interface to the DASSL library to solve a DAE using the
+# residual function from above.
+# 
+# This is quite kludgy and should get better when Julia's C interface
+# improves. I use global variables for the callback function and for
+# the main variables used in the residual function callback.
+#
+
+dllname = julia_pkgdir() * "/Sims/lib/daskr.so"
+if !isfile(dllname)
+    println("*********************************************")
+    println("Can't find daskr.so; attempting to compile...")
+    println("*********************************************")
+    compile_daskr() 
+end    
+const lib = dlopen(dllname)
+
+type SimResult
+    y::Array{Float64, 2}
+    colnames::Array{ASCIIString, 1}
+end
+ref(x::SimResult, idx...) = SimResult(x.y[:,idx...], x.colnames[idx...])
+
+function sim(sm::Sim, tstop::Float64, Nsteps::Int)
+    # tstop & Nsteps should be in options
+println("starting sim()")
+
+    yidx = sm.outputs .!= ""
+    ## yidx = map((s) -> s != "", sm.outputs)
+    Noutputs = sum(yidx)
+    Ncol = Noutputs
+    tstep = tstop / Nsteps
+    tout = [tstep]
+    idid = [int32(0)]
+    info = fill(int32(0), 20)
+    info[11] = 1    # calc initial conditions (1 or 2) / don't calc (0)
+    info[18] = 2    # more initialization info
+    
+    function setup_sim(sm::Sim, tstart::Float64, tstop::Float64, Nsteps::Int)
+        global __sim_structural_change = false
+        N = [int32(length(sm.y0))]
+        t = [tstart]
+        y = copy(sm.y0)
+        yp = copy(sm.yp0)
+        nrt = [int32(length(sm.F.event_pos))]
+        rpar = [0.0]
+        rtol = [1e-5]
+        atol = [1e-3]
+        lrw = [int32(N[1]^2 + 9 * N[1] + 60 + 3 * nrt[1])] 
+        rwork = fill(0.0, lrw[1])
+        liw = [int32(2*N[1] + 40)] 
+        iwork = fill(int32(0), liw[1])
+        iwork[40 + (1:N[1])] = sm.id
+        ipar = [int32(length(sm.y0)), nrt[1]]
+        jac = [int32(0)]
+        psol = [int32(0)]
+        jroot = fill(int32(0), max(nrt[1], 1))
+         
+        # Set up the callback.
+        callback = cfunction(sm.F.resid, Nothing,
+                             (Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64},
+                              Ptr{Int32}, Ptr{Float64}, Ptr{Int32}))
+        rt = cfunction(sm.F.event_at, Nothing,
+                             (Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, Ptr{Int32},
+                              Ptr{Float64}, Ptr{Float64}, Ptr{Int32}))
+        (tout) -> begin
+            ccall(dlsym(lib, :ddaskr_), Void,
+                  (Ptr{Void}, Ptr{Int32}, Ptr{Float64}, Ptr{Float64}, Ptr{Float64}, # RES, NEQ, T, Y, YPRIME
+                   Ptr{Float64}, Ptr{Int32}, Ptr{Float64}, Ptr{Float64},            # TOUT, INFO, RTOL, ATOL
+                   Ptr{Int32}, Ptr{Float64}, Ptr{Int32}, Ptr{Int32},                # IDID, RWORK, LRW, IWORK
+                   Ptr{Int32}, Ptr{Float64}, Ptr{Int32}, Ptr{Void}, Ptr{Void},      # LIW, RPAR, IPAR, JAC, PSOL
+                   Ptr{Void}, Ptr{Int32}, Ptr{Int32}),                              # RT, NRT, JROOT
+                  callback, N, t, y, yp, tout, info, rtol, atol,
+                  idid, rwork, lrw, iwork, liw, rpar, ipar, jac, psol,
+                  rt, nrt, jroot)
+             (t,y,yp,jroot)
+         end
+    end
+
+    simulate = setup_sim(sm, 0.0, tstop, Nsteps)
+    yout = zeros(Nsteps, Ncol + 1)
+
+    for idx in 1:Nsteps
+
+        (t,y,yp,jroot) = simulate(tout)
+
+        ## if t[1] * 1.01 > tstop
+        ##     break
+        ## end
+        ## if t[1] > 0.005     #### DEBUG
+        ##     break
+        ## end
+        ## println(y)
+        if idid[1] >= 0 && idid[1] <= 5 
+            yout[idx, 1] = t[1]
+            yout[idx, 2:(Noutputs + 1)] = y[yidx]
+            tout = t + tstep
+            for (k,v) in sm.y_map
+                if v.save_history
+                    push(v.t, t[1])
+                    push(v.x, y[k])
+                end
+            end
+            if idid[1] == 5 # Event found
+                for ridx in 1:length(jroot)
+                    if jroot[ridx] == 1
+                        sm.F.event_pos[ridx](t, y, yp)
+                    elseif jroot[ridx] == -1
+                        sm.F.event_neg[ridx](t, y, yp)
+                    end
+                end
+                if __sim_structural_change
+                    println("")
+                    println("Structural change event found at t = $(t[1]), restarting")
+                    # Put t, y, and yp values back into original equations:
+                    for (k,v) in sm.y_map
+                        v.value = y[k]
+                    end
+                    for (k,v) in sm.yp_map
+                        v.value = yp[k]
+                    end
+                    MTime.value = t[1]
+                    # Reflatten equations
+                    sm = create_sim(elaborate(sm.eq))
+                    global _sm = sm
+                    # Restart the simulation:
+                    info[1] = 0
+                    info[11] = 1    # do/don't calc initial conditions
+                    simulate = setup_sim(sm, t[1], tstop, int(Nsteps * (tstop - t[1]) / tstop))
+                    yidx = sm.outputs .!= ""
+                elseif any(jroot .!= 0)
+                    println("event found at t = $(t[1]), restarting")
+                    info[1] = 0
+                    info[11] = 1    # do/don't calc initial conditions
+                end
+            end
+        elseif idid[1] < 0 && idid[1] > -11
+            println("RESTARTING")
+            info[1] = 0
+        else
+            println("DASKR failed prematurely")
+            break
+        end
+    end
+    SimResult(yout, [sm.outputs[yidx]])
+end
+sim(sm::Sim) = sim(sm, 1.0, 500)
+sim(sm::Sim, tstop::Float64) = sim(sm, tstop, 500)
+sim(m::Model, tstop::Float64, Nsteps::Int)  = sim(create_sim(elaborate(m)), tstop, Nsteps)
+sim(m::Model) = sim(m, 1.0, 500)
+sim(m::Model, tstop::Float64) = sim(m, tstop, 500)
+
+
+
+
+########################################
+## Complex number support             ##
+########################################
+
+#
+# To support objects other than Float64, the methods to_real and
+# from_real need to be defined.
+#
+# When complex quantities are output, the y array will contain the
+# real and imaginary parts. These will not be labeled as such.
+#
+
+## from_real(x::Array{Float64, 1}, ref::Complex) = complex(x[1:2:length(x)], x[2:2:length(x)])
+basetypeof{T}(x::Array{T}) = T
+basetypeof(x) = typeof(x)
+from_real(x::Array{Float64, 1}, basetype, sz) = reinterpret(basetype, x, sz)
+
+to_real(x::Float64) = x
+to_real(x::Array{Float64, 1}) = x
+to_real(x::Array{Float64}) = x[:]
+## to_real(x::Complex) = Float64[real(x), imag(x)]
+## function to_real(x::Array{Complex128, 1}) # I tried reinterpret for this, but it seemed broken.
+##     res = fill(0., 2*length(x))
+##     for idx = 1:length(x)
+##         res[2 * idx - 1] = real(x[idx])
+##         res[2 * idx] = imag(x[idx])
+##     end
+##     res
+## end
+to_real(x) = reinterpret(Float64, [x][:])
+
+
+
+
+########################################
+## Basic plotting with Gaston         ##
+########################################
+
+# Note: Gaston hasn't been "modularized", yet.
+function gplot(sm::SimResult)
+    N = length(sm.colnames)
+    figure()
+    c = CurveConf()
+    a = AxesConf()
+    a.title = ""
+    a.xlabel = "Time (s)"
+    a.ylabel = ""
+    addconf(a)
+    for plotnum = 1:N
+        c.legend = sm.colnames[plotnum]
+        addcoords(sm.y[:,1],sm.y[:, plotnum + 1],c)
+    end
+    llplot()
+end
+function gplot(sm::SimResult, filename::ASCIIString)
+    set_filename(filename)
+    plot(sm)
+    printfigure("pdf")
+end
+
+
+########################################
+## Basic plotting with Winston        ##
+########################################
+
+
+# the following is needed:
+# load("winston.jl")
+
+## function wplot( sm::SimResult, filename::String, args... )
+##     N = length( sm.colnames )
+##     a = FramedArray( N, 1, "", "" )
+##     setattr( a, "xlabel", "Time (s)" )
+##     setattr( a, "ylabel", " Y " )
+##     ## setattr(a, "tickdir", +1)
+##     ## setattr(a, "draw_spine", false)
+##     for plotnum = 1:N
+##         add( a[plotnum,1], Curve(sm.y[:,1],sm.y[:, plotnum + 1]) )
+##         setattr( a[plotnum,1], "ylabel", sm.colnames[plotnum] )
+##     end
+##     file( a, filename, args... )
+##     a
+## end
+
+function wplot( sm::SimResult, filename::String, args... )
+    N = length( sm.colnames )
+    a = Winston.Table( N, 1 )
+    for plotnum = 1:N
+        p = Winston.FramedPlot()
+        add( p, Winston.Curve(sm.y[:,1],sm.y[:, plotnum + 1]) )
+        Winston.setattr( p, "ylabel", sm.colnames[plotnum] )
+        a[plotnum,1] = p
+    end
+    Winston.file( a, filename, args... )
+    a
+end
+
+function wplot( sm::SimResult )
+    N = length( sm.colnames )
+    a = Winston.Table( N, 1 )
+    for plotnum = 1:N
+        p = Winston.FramedPlot()
+        add( p, Winston.Curve(sm.y[:,1],sm.y[:, plotnum + 1]) )
+        Winston.setattr( p, "ylabel", sm.colnames[plotnum] )
+        a[plotnum,1] = p
+    end
+    dev = Tk.TkRenderer("plot", w, h)
+    Winston.page_compose(self, dev, false)
+    dev.on_close()
+    Tk.tk( a, 800, 600 )
+end
+

@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+
+#=
+Created on Mon Oct 26 26 20:25:12 2015
+@author: William Herrera
+
+IMPORTANT: run as administrator
+
+Test Julia 0.40 LightACPI hyperventilate.jl light breathing
+Should breathe left light
+
+=#
+
+module TestLightACPI
+
+include("LightACPI.jl")
+using .LightACPI
+
+println("Changing left vertical LED's to red")
+    setrgb(LLIGHT, 255, 0, 0)
+    sleep(2)
+
+    println("Changing right vertical LED's to white")
+    setrgb(RLIGHT, 255, 255, 255)
+    sleep(2)
+
+    println("Changing base horizontal LED's to blue")
+    setrgb(BLIGHT, 0, 0, 255)
+
+end

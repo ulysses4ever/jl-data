@@ -1,0 +1,33 @@
+module Classifiers
+export Classifier,ClassifierConfig,loss
+
+abstract Classifier
+abstract ClassifierConfig
+
+macro mustimplement(sig)
+    fname = sig.args[1]
+    arg1 = sig.args[2]
+    if isa(arg1,Expr)
+        arg1 = arg1.args[1]
+    end
+    :($(esc(sig)) = error(typeof($(esc(arg1))),
+                          " must implement ", $(Expr(:quote,fname))))
+end
+
+@mustimplement fit(c::ClassifierConfig,x,y::Vector)
+@mustimplement predict(c::Classifier,x)
+
+# function fit(c::ClassifierConfig,x,y::Vector)
+#   error("fit() not implemented for $c")
+# end
+
+# function predict(c::Classifier,x)
+#   error("predict() not implemented for $c")
+# end
+
+function loss(c::Classifier,x,y::Vector{Int})
+  predicted=predict(c,x)#::Vector{Int}
+  return sum(y.!=predicted)/length(y)
+end
+
+end

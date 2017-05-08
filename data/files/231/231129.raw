@@ -1,0 +1,15 @@
+module MethylClust
+
+using LowRankModels, Distributions
+
+if VERSION < v"0.4.0-dev"
+    using Docile
+end
+
+include("synthetic_data.jl") # generates synthetic reads from bernoulli statistics
+include("semi_synthetic_data.jl") # pulls synthetic reads from .allc tables
+include("fit.jl") # runs the algorithm to identify cell types
+include("makefigs.jl") # makes all final figures for reproducible analysis
+include("stats.jl") # calculate statistics, e.g. JS divergence between methylomes
+
+end

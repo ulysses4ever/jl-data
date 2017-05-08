@@ -1,0 +1,36 @@
+## =============================================================================
+## xxxxx.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+type LSD
+    pounds::Int
+    shillings::Int
+    pence::Int
+
+    ## constructor 
+    function LSD(a,b,c)
+        if a < 0 || b < 0
+            error("no negative numbers")
+        end
+        if c > 12 || b > 20
+            error("too many pence or shillings")
+        end
+        new(a, b, c)
+    end
+
+end
+
+## + operator
+function +(a::LSD, b::LSD)
+    newpounds = a.pounds + b.pounds
+    newshillings = a.shillings + b.shillings
+    newpence = a.pence + b.pence
+    subtotal = newpounds * 240 + newshillings * 12 + newpence
+    
+    (pounds, balance) = divrem(subtotal, 240)
+    (shillings, pence) = divrem(balance, 12)
+
+    LSD(pounds, shillings, pence)
+end
+
+

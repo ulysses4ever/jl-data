@@ -1,0 +1,58 @@
+### Functions for expanding expressions that contain local variables
+
+function fullexpand(exprn::Expr, dict::Dict{Symbol, Expr})
+  queue = Array(Union(Number, Symbol, Expr), 0)
+  unshift!(queue, exprn)
+      
+  while length(queue)!=0
+    node = shift!(queue)
+        
+    for i in 2:length(node.args)
+      if isa(node.args[i], Expr)
+        unshift!(queue, node.args[i])
+      elseif isa(node.args[i], Symbol) && get(dict, node.args[i], :()) != :()
+        node.args[i] = dict[node.args[i]]
+      end
+    end
+  end
+end
+
+# Next step to include cases of .head == :tuple, such as
+# z = x+2, y^2
+# and
+# return z, w
+function fullexpand(exprn::Expr, vars::Array{Symbol, 1})
+  if exprn.head == :block
+    dict = Dict{Symbol, Expr}(vars, fill(:(), length(vars)))
+
+    for arg in exprn.args
+      if arg.head == :(=)
+        fullexpand(arg.args[2], dict)
+        dict[arg.args[1]] = arg.args[2]
+      end
+    end
+    
+    if exprn.args[end].head == :(=)
+      return exprn.args[end].args[2]
+    elseif exprn.args[end].head == :(call)
+      fullexpand(exprn.args[end].args[2], dict)
+      return exprn.args[end].args[2]
+    elseif exprn.args[end].head == :(return)
+      return exprn.args[end].args[1]
+    end
+  else
+    error("The given expression can not be handled.")
+  end
+end
+
+function fullexpand(exprn::Expr)
+  vars = Array(Symbol, 0)
+
+  for arg in exprn.args
+    if arg.head == :(=)
+      unshift!(vars, arg.args[1])
+    end
+  end
+  
+  fullexpand(exprn, vars)
+end

@@ -1,0 +1,386 @@
+###
+#  Perform binary Ideal Adsorbed Solution Theory
+#  Author: CoryMSimon@gmail.om
+###
+
+using Optim
+using Gadfly
+using DataFrames
+using Roots
+using Grid
+include("trapz.jl")  # for trapezoid rule
+
+###
+#   Isotherm models
+###
+type LangmuirIsotherm
+    """
+    Langmuir isotherm object
+    """
+    M::Float64  # saturation loading (units: same as in input isotherm loading units)
+    K::Float64  # Langmuir constant (units: 1 / pressure)
+    residualsumofsquares::Float64  # residual of fit
+
+    # original isotherm data to which we fit the Langmuir isotherm
+    data::DataFrame  
+    loading_key::Symbol
+    pressure_key::Symbol
+
+    # functions
+    loading::Function  # get loading at a pressure(s)
+    Π::Function  # spreading pressure
+    _loading::Function  # loading at a given K, M, P.
+
+    function _loading(K::Float64, M::Float64, P::Union(DataArray{Float64}, Array{Float64}, Float64))
+        """
+        Compute loading of Langmuir adsorption isotherm at pressure P
+        K : Langmuir constant (units: 1 / P)
+        M : Saturation loading
+        """
+        return M .* K .* P ./ (1.0 + K .* P)
+    end
+
+    # constructor
+    function LangmuirIsotherm(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+        """
+        Constructor
+
+        df: DataFrame of pure component isotherm
+        loading_key: name of loading column in df
+        pressure_key: name of pressure column in df
+        """
+        langmuirisotherm = new()
+        langmuirisotherm.data = df
+        langmuirisotherm.loading_key = loading_key
+        langmuirisotherm.pressure_key = pressure_key
+        
+        # define residual sum of squares (RSS) to minimize
+        # x := [K, M]
+        RSS(x) = sum((df[loading_key] - _loading(x[1], x[2], df[pressure_key])) .^ 2)
+        
+        # initial guesses for parameters
+        M_guess = df[loading_key][end]  # guess saturation loading to be highest loading
+        K_guess = df[loading_key][1] / df[pressure_key][1] / (M_guess - df[pressure_key][1])  # guess K using M_guess and first point
+
+        # use optimization routine to find best fit params
+        res = optimize(RSS, [K_guess, M_guess], method = :l_bfgs)
+        langmuirisotherm.K = res.minimum[1]
+        langmuirisotherm.M = res.minimum[2]
+
+        langmuirisotherm.residualsumofsquares = RSS(res.minimum)
+        
+        # define function to compute loading, given this object's params
+        langmuirisotherm.loading  = function(P::Union(DataArray{Float64}, Array{Float64}, Float64))
+            """
+            Compute loading at pressure P
+            """
+            return langmuirisotherm.M .* langmuirisotherm.K .* P ./ (1.0 + langmuirisotherm.K .* P)
+        end
+        
+        langmuirisotherm.Π = function(p::Float64)
+            """
+            Spreading pressure
+            \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+            eqn 13 of Tarafder
+
+            p: pressure of component
+            """
+            return langmuirisotherm.M * log(1 + langmuirisotherm.K * p)
+        end
+       
+        return langmuirisotherm 
+    end  # end constructor
+end  # end LangmuirIsotherm type
+
+type QuadraticIsotherm
+    """
+    Langmuir isotherm object
+    """
+    M::Float64  # 1/2 of the saturation loading (units: same as in input isotherm loading units)
+    Ka::Float64  # constant (units: 1 / pressure)
+    Kb::Float64  # constant (units: 1 / pressure^2)
+    residualsumofsquares::Float64  # residual of fit
+
+    # original isotherm data to which we fit the Langmuir isotherm
+    data::DataFrame  
+    loading_key::Symbol
+    pressure_key::Symbol
+
+    # functions
+    loading::Function  # get loading at a pressure(s)
+    Π::Function  # spreading pressure
+    _loading::Function  # loading at a given Ka, Kb, M, P.
+
+    function _loading(Ka::Float64, 
+                      Kb::Float64,
+                      M::Float64, 
+                      P::Union(DataArray{Float64}, Array{Float64}, Float64))
+        """
+        Compute loading of Quadratic adsorption isotherm at pressure P 
+        eqn (8) of Tarafder
+        """
+        return M .* (Ka + 2 * Kb * P) .* P ./ (1.0 + Ka * P + Kb * P .^ 2)
+    end
+
+    # constructor
+    function QuadraticIsotherm(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+        """
+        Constructor
+
+        df: DataFrame of pure component isotherm
+        loading_key: name of loading column in df
+        pressure_key: name of pressure column in df
+        """
+        quadraticisotherm = new()
+        quadraticisotherm.data = df
+        quadraticisotherm.loading_key = loading_key
+        quadraticisotherm.pressure_key = pressure_key
+        
+        # define residual sum of squares to minimize
+        # x := [Ka, Kb, M]
+        RSS(x) = sum((df[loading_key] - _loading(x[1], x[2], x[3], df[pressure_key])) .^ 2)
+        
+        # initial guesses for parameters
+        M_guess = df[loading_key][end] / 2.0  # guess 1/2 loading to be 1/2 loading at last point
+        Ka_guess = df[loading_key][1] / df[pressure_key][1] / (M_guess - df[pressure_key][1])  # assume Langmuir
+        Kb_guess = 0.0001 # start with Langmuir assumption (Kb \approx 0)
+        
+        # use optimization routine to find best fit params
+        res = optimize(RSS, [Ka_guess, Kb_guess, M_guess], method = :l_bfgs)
+        quadraticisotherm.Ka = res.minimum[1]
+        quadraticisotherm.Kb = res.minimum[2]
+        quadraticisotherm.M = res.minimum[3]
+
+        quadraticisotherm.residualsumofsquares = RSS(res.minimum)
+    
+        # define function to compute loading, given this object's params
+        quadraticisotherm.loading  = function(P::Union(DataArray{Float64}, Array{Float64}, Float64))
+            """
+            Compute loading at pressure P
+            """
+            return quadraticisotherm.M .* (quadraticisotherm.Ka + 2 * quadraticisotherm.Kb * P) .* P ./ 
+                        (1.0 + quadraticisotherm.Ka * P + quadraticisotherm.Kb * P .^ 2)
+        end
+        
+        quadraticisotherm.Π = function(p::Float64)
+            """
+            Spreading pressure
+            \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+            eqn 15 of Tarafder
+
+            p: pressure of component
+            """
+            return quadraticisotherm.M * log(1 + quadraticisotherm.Ka * p + quadraticisotherm.Kb * p ^ 2)
+        end
+       
+        return quadraticisotherm 
+    end  # end constructor
+end  # end QuadraticIsotherm type
+
+type InterpolatorIsotherm   
+    """
+    Isotherm type where we linearly interpolate the pure component isotherm data
+    """
+    interpolator::InterpIrregular # from Grid package
+    
+    # original isotherm data to which we fit the Langmuir isotherm
+    data::DataFrame  
+    loading_key::Symbol
+    pressure_key::Symbol
+
+    # functions
+    loading::Function  # get loading at a pressure(s)
+    Π::Function  # spreading pressure
+    
+    # constructor
+    function InterpolatorIsotherm(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+        """
+        Constructor
+
+        df: DataFrame of pure component isotherm
+        loading_key: name of loading column in df
+        pressure_key: name of pressure column in df
+        """
+        interpolatorisotherm = new()
+
+        # needs sorted
+        df = sort(df, cols=pressure_key)
+        
+        interpolatorisotherm.data = df
+        interpolatorisotherm.loading_key = loading_key
+        interpolatorisotherm.pressure_key = pressure_key
+        
+        interpolatorisotherm.interpolator = Grid.InterpIrregular(convert(Array, df[pressure_key]), convert(Array, df[loading_key]), Grid.BCnearest, Grid.InterpLinear)
+
+        interpolatorisotherm.loading = function(P::Union(DataArray{Float64}, Array{Float64}, Float64))
+            return interpolatorisotherm.interpolator[P]
+        end
+
+        interpolatorisotherm.Π = function(p)
+            """
+            Spreading pressure, calculated from trapezoid rule on isotherm
+            \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+            eqn 4 of Tarafder
+
+            p: pressure of component
+            """
+            # area of first triangle in integral, from 0 to first pressure point
+            # (1/2 * p1 * [height=loading/p1]
+            first_triangle = interpolatorisotherm.data[loading_key][1] / 2.0  
+            
+            # get all data points less than this p
+            idx = interpolatorisotherm.data[pressure_key] .< p
+            p_array = [interpolatorisotherm.data[idx, :][pressure_key], p]  # array of pressures
+            l_array = [interpolatorisotherm.data[idx, :][loading_key] , interpolatorisotherm.interpolator[p]] # array of loadings 
+            return trapz(l_array ./ p_array, p_array) + first_triangle
+        end
+
+        return interpolatorisotherm
+    end  # end constructor
+end  # end InterpolatorIsotherm type
+    
+###
+#   Perform IAST
+###
+function IAST(p::Array{Float64}, 
+              isotherm1::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm), 
+              isotherm2::Union(LangmuirIsotherm,QuadraticIsotherm, InterpolatorIsotherm); 
+              verboseflag::Bool=false)
+    """
+    Perform IAST for a mixture at partial fugacties p[1] and p[2].
+
+    returns array of component loadings
+    """
+    @assert length(p) == 2  # only supports single mixture at a time.
+
+    # solve for mole fractions in adsorbed phase s.t. spreading pressures are equal
+    f(x1) = isotherm1.Π(p[1] / x1) - isotherm2.Π(p[2] / (1 - x1))  # want to be zero
+    x1 = fzero(f, [0.00001,0.9999])
+ #     x1 = fzero(f, 0.5)
+    if (x1 <= 0.00001) | (x1 >= 0.9999)
+        error(@sprintf("x1 = %f, too close to pure component in material\n", x1))
+    end
+
+    # mole fraction in adsorbed phase
+    x = [x1, 1 - x1] 
+
+    p0 = p ./ x
+
+    # solve for the total gas adsorbed
+    q_total = 1.0 / (x[1] / isotherm1.loading(p0[1]) + x[2] / isotherm2.loading(p0[2]))
+    
+    # get loading of each component by multiplying by mole fractions
+    q = x * q_total
+    if (verboseflag == true) 
+        # print off loadings according to IAST and corresponding pure component loadings
+        for i = 1:2
+            @printf("IAST loading of component %d at p_%d = %f: %f\n", i, i, p[i], q[i])
+            @printf("\tx_%d = %f\n", i, x[i])
+            if i == 1
+                @printf("\tSpreading pressure = %f\n", isotherm1.Π(p0[i]))
+                @printf("\tPure component loading at p_%s = %f: %f\n", i, p[i], 
+                                        isotherm1.loading(p[i]))
+            end
+            if i == 2
+                @printf("\tSpreading pressure = %f\n", isotherm2.Π(p0[i]))
+                @printf("\tPure component loading at p_%s = %f: %f\n", i, p[i], 
+                                        isotherm2.loading(p[i]))
+            end
+        end
+    end
+
+    return q  # loadings [component 1, component 2]. same units as in data
+end
+
+function plot_pure_component_isotherms_and_fits(
+                                 isotherm1::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm),
+                                 isotherm2::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm);
+                                 component_names=["Component 1", "Component 2"],
+                                 plot_title::String="Pure component isotherms",
+                                 pressure_units::String="",
+                                 loading_units::String="")
+    """
+    Plot both pure component isotherms and their fits (log scale)
+    """
+    # plot prediction over range P
+    min_P = min(minimum(isotherm1.data[isotherm1.pressure_key]), 
+                minimum(isotherm2.data[isotherm2.pressure_key]))
+    max_P = max(maximum(isotherm1.data[isotherm1.pressure_key]), 
+                maximum(isotherm2.data[isotherm2.pressure_key]))
+    P  = logspace(log(min_P), log(max_P))
+    
+    # get predicted loadings
+    predictedloading1 = isotherm1.loading(P)
+    predictedloading2 = isotherm2.loading(P)
+    
+    fit = plot(
+        layer(x=P, y=predictedloading1, Geom.line, Theme(default_color=color("red"))),  
+        layer(x=isotherm1.data[isotherm1.pressure_key], y=isotherm1.data[isotherm1.loading_key], Geom.point, Theme(default_color=color("red"))), 
+        layer(x=P, y=predictedloading2, Geom.line, Theme(default_color=color("blue"))),  
+        layer(x=isotherm2.data[isotherm2.pressure_key], y=isotherm2.data[isotherm2.loading_key], Geom.point, Theme(default_color=color("blue"))), 
+        Scale.x_log10,
+        Guide.xlabel(@sprintf("Pressure (%s)", pressure_units)),
+        Guide.ylabel(@sprintf("Loading (%s)", loading_units)),
+        Guide.title(plot_title),
+        Guide.manual_color_key("Component", 
+            component_names,
+            ["red", "blue"])
+    )
+    draw(PNG(6inch, 3inch), fit) 
+end
+
+function plot_selectivity_vs_molfraction(P_total::Float64,
+                                 isotherm1::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm),
+                                 isotherm2::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm);
+                                 y1_range::Array{Float64}=[0.01,0.99],
+                                 component_names=["Component 1", "Component 2"],
+                                 pressure_units::String="")
+    """
+    Plot selectivity against mole fraction of first component at total pressure P_total using IAST
+    """
+    y1 = linspace(y1_range[1], y1_range[2], 20)  # mole fraction component 1 in gas phase
+    selectivity = zeros(length(y1))
+    for i = 1:length(y1)
+        # compute IAST loading at this condition
+        q = IAST(P_total * [y1[i], 1 - y1[i]], isotherm1, isotherm2)
+        selectivity[i] = (q[1] / q[2]) / (y1[i] / (1 - y1[i]))
+    end
+
+    # plot selectivity against mole fraction in gas phase
+    fit = plot(x=y1, y=selectivity, Geom.point, Geom.line,
+                Guide.xlabel(@sprintf("Mole fraction %s", component_names[1])),
+                Guide.ylabel(@sprintf("Selectivity %s/%s", component_names[1], component_names[2])),
+                Guide.title(@sprintf("Total pressure %f %s", P_total, pressure_units))
+          )
+    draw(PNG(6inch, 3inch), fit)
+end
+
+function plot_component_loadings_vs_total_pressure(total_pressures::Array{Float64},
+                                 isotherm1::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm),
+                                 isotherm2::Union(LangmuirIsotherm, QuadraticIsotherm, InterpolatorIsotherm),
+                                 y::Array{Float64};
+                                 component_names=["Component 1", "Component 2"],
+                                 pressure_units::String="",
+                                 loading_units::String="")
+    """
+    Plot component loadings vs. total pressure for a fixed mole fraction in the gas phase (y)
+    """
+    np = length(total_pressures)
+    q = zeros(2, np)
+    for i = 1:np
+        q[:, i] = IAST(total_pressures[i] * y, isotherm1, isotherm2)
+    end
+    
+    # plot 
+    fit = plot(
+                layer(x=total_pressures, y=q[1,:], Geom.line, Geom.point, Theme(default_color=color("red"))),  
+                layer(x=total_pressures, y=q[2,:], Geom.line, Geom.point, Theme(default_color=color("blue"))),  
+                Guide.xlabel(@sprintf("Total pressure (%s)", pressure_units)),
+                Guide.ylabel(@sprintf("Component loading (%s)", loading_units)),
+                Guide.title(@sprintf("y_%s = %f, y_%s = %f", component_names[1], y[1], component_names[2], y[2])),
+                Guide.manual_color_key("Component", 
+                    component_names,
+                    ["red", "blue"])
+          )
+    draw(PNG(6inch, 3inch), fit)
+end

@@ -1,0 +1,50 @@
+export dd_plot, edd_plot, loodd_plot
+
+#Following functions construct DD-plots with help of sorted data: these are vectors of sub-matrices X_1, X_2, ..., X_l where l is the count of classes
+#refer to sortData method in common.jl
+
+
+
+#Returns the DD-plot of all data points in data_set
+function dd_plot{T<:Number}(data_set::AbstractArray{T,2}, classlabels::AbstractVector, depth_function::Function, mcd:Bool=false)
+	sortedData = sortData(data_set,classlabels)
+	q = length(sortedData) #count of classes 
+	
+	dd = res(length(complete_data[:,1]),q)
+	
+	if(depth_function == (depth_mahalanobis || depth_L2 || depth_spatial))
+		scatter = cov(data_set)
+		inv_scatter = pinv(scatter)
+	elseif(depth_function == depth_halfspace_bisectors)
+		w = generateWeightVectors(data_set)
+		proj = preCalculateWeightProjections(data_set,w)
+	else 
+	
+	end
+
+	#TODO: Change i and j
+	
+	for j in q
+		for i in 1:length(data_set[:,1])
+			if(depth_function == (depth_mahalanobis || depth_L2 || depth_spatial))
+				dd[i,j] = depth_function(vec(data_set[i,:]),sortedData[j],mcd,inv_scatter)
+			elseif(depth_function == depth_halfspace_bisectors)
+				dd[i,j] = depth_halfspace_bisectors(vec(data_set[i,:]),sortedData[j],w,proj)
+			else
+				dd[i,j] = depth_function(vec(data_set[i,:]),sortedData[j])
+			end
+		end
+	end
+	
+	return dd
+end
+
+#Returns the extended DD-Plot of all data points in sortedData
+function edd_plot{T<:Number}(sortedData::AbstractArray{AbstractArray{T,2},1}, depth_function::Function; p::Int8 = 2)
+
+end 
+
+#Returns the leave one out DD-Plot of all data points in sortedData
+function loodd_plot{T<:Number}(sortedData::AbstractArray{AbstractArray{T,2},1}, depth_function::Function)
+
+end

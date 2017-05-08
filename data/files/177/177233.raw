@@ -1,0 +1,38 @@
+module config
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# paths and constants pertaining to extracting features
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+export wavdir, traindir, speclength, path_rel, test_size, specwidth, labelleddir,datafile,
+ntrees, ratio, subsampleratio, modeldir, specdir
+
+#the following paths are all relative to the project directory and will be concatenated
+#To use absolute paths sets path_rel = false
+path_rel = true
+wavdir = "data/wavs/"
+traindir = "data/training/"
+specdir = "data/spectrograms/"
+labelleddir = "data/labelled/"
+datafile = "data.csv"
+speclength = 10 #seconds
+test_size = 0.3 #percentage of data to be used for the test set
+specwidth = 930 #setting the width of spectrograms produced
+# This determines how much we will subsample the noise and labelled noise in our
+# dataset. E.g. if we have 30 observations of bird call pixels, and subsampleratio = 0.5
+# then we will add 15 labelled noise, and 15 unlabelled noise to the dataset
+subsampleratio = 0.5
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# paths and constants pertaining to training the Random Forest
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+modeldir = "data/model/"
+ntrees = 10;
+ratio = 0.2;
+
+end

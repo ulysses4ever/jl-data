@@ -1,0 +1,36 @@
+#push!(LOAD_PATH,"/home/facuq/dev/Boosting.jl/src")
+module TestAdaBoosts
+
+using Classifiers
+using AdaBoosts
+
+import RandomHyperplaneClassifiers
+using TestUtils
+x,y,labels=iris_dataset_binary()
+
+c=RandomHyperplaneClassifiers.RandomHyperplaneConfig()
+
+max_classifiers=20
+subsample_cumulative_distribution=0.5
+min_samples=5
+repetitions=10
+errors=zeros(repetitions)
+for i=1:10
+  bc=AdaBoostConfig(c,max_classifiers,subsample_cumulative_distribution,min_samples)
+  m=fit(bc,x,y)
+  errors[i]=loss(m,x,y)
+end
+assert(mean(errors)<=0.2)
+
+function print_models(m::AdaBoost)
+  l=length(m.models)
+  println("Weak models trained: $l")
+  for i=1:l
+    print(m.models[i])
+    print(", w=")
+    println(m.weights)
+  end
+
+end
+
+end

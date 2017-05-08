@@ -1,0 +1,41 @@
+module Include
+
+export @inc
+
+macro inc(ex...)
+	as = '>'
+	mod = ex[1]
+	lit = Symbol[]
+	fig = (Symbol,Symbol)[]
+	for i in 2:length(ex)
+		sym = ex[i]
+		if search(string(sym), as) > 0
+			sym = split(string(sym), as)
+			syml = symbol(strip(sym[1]))
+			symf = symbol(strip(sym[2]))
+			append!(fig, [(syml, symf)])
+		else
+			append!(lit, [sym])
+		end
+	end
+
+	args = Any[:toplevel]
+	append!(args, [Expr(:import, mod)])
+	if length(lit) > 0
+		for sym in lit
+			append!(args, [Expr(:import, mod, sym)])
+		end
+	end
+
+	for (syml,symf) in fig
+		temp = quote
+			const $symf = $mod.$syml
+		end
+		append!(args, [temp])
+	end
+
+	expr = apply(Expr, args)
+	esc(expr)
+end
+
+end

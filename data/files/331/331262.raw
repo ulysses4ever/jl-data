@@ -1,0 +1,34 @@
+###################################################
+## Brain type
+###################################################
+
+ """ Most basic implementation of a neural network,
+ maps node_types into learned weights.
+ """
+type Brain
+  input_size::Array{Float64}
+  learned_weights::Array{Float64}
+  discount::Float64
+  step_size::Float64
+
+  function Brain(weights::Array{Float64}; input_size::Int64 = 1)
+    obj = new()
+    obj.input_size = input_size
+    obj.learned_weights = weights
+  end
+
+end
+
+function update_weights(brain::Brain, prev_state::Array{Int64}, reward::Float64, new_state::Array{Int64})
+  delta = reward + brain.discount * dot(new_state, brain.learned_weights) - dot(prev_state, brain.learned_weights)
+  learned_weights += delta * brain.step_size * prev_state
+  update_step_size(brain)
+end
+
+function update_step_size(brain::Brain)
+  pass
+end
+
+function weight(brain::Brain, type_node_id)
+  return brain.learned_weights[type_node_id]
+end

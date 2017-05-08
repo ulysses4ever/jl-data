@@ -1,0 +1,230 @@
+module EventWindows
+
+using DataFrames
+
+
+function intervals(
+    table::DataFrame,
+    index_col::Symbol,
+    label_col::Symbol
+    )
+  sort!(table, cols=[index_col])
+
+  out = DataFrame(
+    [ eltype( table[label_col] ), Int, Int, Int ],
+    [ label_col, :start, :stop, :center ],
+    0
+    )
+
+  by(table, label_col) do df
+    label = df[1, label_col]
+    push!(out, [ label, df[1, index_col], df[1, index_col], df[1, index_col] ])
+    for row in 2:size(df, 1)
+      index = df[row, index_col]
+      if index - 1 > out[end, :stop]
+        push!(out, [label, index, index, index])
+      else
+        out[end, :stop  ] = index
+        out[end, :center] = out[end, :start] + iround( 0.5 * ( out[end, :stop] - out[end, :start] ) )
+      end
+    end
+  end
+
+  return out
+end
+
+
+function peaks!(
+    intervals::DataFrame,
+    table::DataFrame,
+    index_col::Symbol,
+    value_col::Symbol,
+    label=[]
+    ;
+    out_col::Symbol=:peak
+    )
+  if !haskey(intervals, out_col)
+    intervals[out_col] = Array( eltype(table[1, index_col]), size(intervals, 1) )
+    fill!(intervals[out_col], NA)
+  end
+
+  for row in 1:size(intervals, 1)
+    if isempty(label) || label == intervals[row, :label]
+      iv = table[ intervals[row, :start] .<= table[index_col] .<= intervals[row, :stop], :]
+      peakidx = iv[ indmax( iv[value_col] ), index_col ]
+      intervals[row, out_col] = peakidx
+    end
+  end
+end
+
+
+function windows!(
+    intervals::DataFrame,
+    first_index::Integer,
+    last_index::Integer,
+    num_indices_before::Integer,
+    num_indices_after::Integer
+    ;
+    num_indices_mindistance::Integer=0,
+    include_interval::Bool=true,
+    center_col::Symbol=:center
+    )
+  if include_interval
+    intervals[:window_start] = [ i - num_indices_before for i in intervals[center_col] ]
+    intervals[:window_stop ] = [ i + num_indices_after  for i in intervals[center_col] ]
+  else
+    intervals[:window_start] = [ i - num_indices_before for i in intervals[:start] ]
+    intervals[:window_stop ] = [ i + num_indices_after  for i in intervals[:stop ] ]
+  end
+
+  intervals[:window_outofbounds] = [
+    intervals[i, :window_start] < first_index ||
+    intervals[i, :window_stop ] > last_index
+    for i in 1:size(intervals, 1)
+  ]
+
+  intervals[:window_overlaps] = [
+    if size(intervals, 1) == 1
+      false
+    elseif i == 1
+      intervals[i, :window_stop ] >= intervals[i + 1, :window_start]
+    elseif i == size(intervals, 1)
+      intervals[i, :window_start] <= intervals[i - 1, :window_stop ]
+    else
+      intervals[i, :window_start] <= intervals[i - 1, :window_stop ] ||
+      intervals[i, :window_stop ] >= intervals[i + 1, :window_start]
+    end
+    for i in 1:size(intervals, 1)
+  ]
+
+  if num_indices_mindistance > 0
+    intervals[:window_tooclose] = [
+      if i == 1
+        intervals[i, :window_stop ] > intervals[i + 1, :window_start] - num_indices_mindistance
+      elseif i == size(intervals, 1)
+        intervals[i, :window_start] < intervals[i - 1, :window_stop ] + num_indices_mindistance
+      else
+        intervals[i, :window_start] < intervals[i - 1, :window_stop ] + num_indices_mindistance ||
+        intervals[i, :window_stop ] > intervals[i + 1, :window_start] - num_indices_mindistance
+      end
+      for i in 1:size(intervals, 1)
+      ]
+
+    intervals[:window_isvalid] = [
+      !( intervals[i, :window_outofbounds] ||
+         intervals[i, :window_overlaps   ] ||
+         intervals[i, :window_tooclose   ] )
+      for i in 1:size(intervals, 1)
+      ]
+
+  else
+    intervals[:window_isvalid] = [
+      !( intervals[i, :window_outofbounds] ||
+         intervals[i, :window_overlaps   ] )
+      for i in 1:size(intervals, 1)
+      ]
+  end
+end
+
+
+function windows!(
+    intervals::DataFrame,
+    first_timepoint_index::Integer,
+    last_timepoint_index::Integer,
+    num_seconds_before::Real,
+    num_seconds_after::Real,
+    sampling_sec::Real
+    ;
+    num_seconds_mindistance::Real=0,
+    include_interval::Bool=true,
+    center_col::Symbol=:peak
+    )
+  tps_before      = iround(num_seconds_before      / sampling_sec)
+  tps_after       = iround(num_seconds_after       / sampling_sec)
+  tps_mindistance = iround(num_seconds_mindistance / sampling_sec)
+  windows!(
+    intervals,
+    first_timepoint_index,
+    last_timepoint_index,
+    tps_before,
+    tps_after,
+    num_indices_mindistance=tps_mindistance,
+    include_interval=include_interval,
+    center_col=center_col)
+end
+
+
+function random_windows(
+    intervals::DataFrame,
+    first_index::Integer,
+    last_index::Integer,
+    ;
+    num_indices_mindistance::Integer=0,
+    max_attempts::Integer=666
+    )
+  valid_windows = intervals[ intervals[:window_isvalid] .== true, :]
+
+  out = DataFrame(
+    window_start = Array(Int, size(valid_windows, 1)),
+    window_stop  = Array(Int, size(valid_windows, 1))
+    )
+  fill!(out[:window_start], NA)
+  fill!(out[:window_stop ], NA)
+
+  for row in 1:size(valid_windows, 1)
+    windowsize = 1 + valid_windows[row, :window_stop] - valid_windows[row, :window_start]
+    validrange = first_index:(last_index - windowsize)
+
+    attempt = 1
+    while attempt <= max_attempts
+      start = rand(validrange)
+      stop  = start + windowsize
+
+      isvalid = true
+      for i in 1:size(intervals, 1)
+        if start <= intervals[i, :window_stop ] + num_indices_mindistance &&
+            stop >= intervals[i, :window_start] - num_indices_mindistance
+          isvalid = false
+          break
+        end
+        if i < row &&
+            start <= out[i, :window_stop ] + num_indices_mindistance &&
+             stop >= out[i, :window_start] - num_indices_mindistance
+          isvalid = false
+          break
+        end
+      end
+
+      if isvalid
+        out[row, :window_start] = start
+        out[row, :window_stop ] = stop
+      end
+
+      attempt += 1
+    end
+  end
+
+  sort!(out)
+  return out
+end
+
+
+function random_windows(
+    intervals::DataFrame,
+    first_timepoint_index::Integer,
+    last_timepoint_index::Integer,
+    sampling_sec::Real
+    ;
+    num_seconds_mindistance::Real=0,
+    max_attempts::Integer=666
+    )
+  tps_mindistance = iround(num_seconds_mindistance / sampling_sec)
+  random_windows(
+    intervals,
+    first_timepoint_index,
+    last_timepoint_index,
+    num_indices_mindistance=tps_mindistance,
+    max_attempts=max_attempts)
+end
+
+end # module

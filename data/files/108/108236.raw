@@ -1,0 +1,15 @@
+module Laurence
+
+using Romeo
+
+include("App.jl")
+
+export run
+
+# exported
+
+function run(app::App)
+    Romeo.run(app.server)
+end
+
+end # module Laurence

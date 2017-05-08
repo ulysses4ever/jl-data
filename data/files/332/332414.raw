@@ -1,0 +1,32 @@
+num_inputs = convert(Int32, 5)
+num_hidden = convert(Int32, 7)
+num_outputs = convert(Int32, 2)
+
+layer_1_weights = rand(convert(Float32, -1):convert(Float32, 0.1):convert(Float32, 1), num_inputs * num_hidden)
+layer_2_weights = rand(convert(Float32, -1):convert(Float32, 0.1):convert(Float32, 1), num_outputs * num_hidden)
+inputs = rand(convert(Float32, 0):convert(Float32, 0.1):convert(Float32, 1), num_inputs)
+hidden_activations = zeros(Float32, num_hidden)
+outputs = zeros(Float32, num_outputs)
+walls = [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+         convert(Float32, 1), convert(Float32, 0), convert(Float32, 0),
+         convert(Float32, 0), convert(Float32, 1), convert(Float32, 200),
+         convert(Float32, 1), convert(Float32, 0), convert(Float32, 400),]
+
+num_goals = convert(Int32, 10)
+goals = zeros(Float32, num_goals * 2)
+
+bit_string = rand(convert(Int32, 0):convert(Int32, 1), (num_inputs * num_hidden + num_hidden * num_outputs) * 6)
+
+fitness = [convert(Int32, 0)]
+
+for i = 1:1
+Libdl.dlopen("/home/david/TehzCodes/GRNEvolution/librobosim")
+ccall((:simulate, "/home/david/TehzCodes/GRNEvolution/librobosim"), Void,
+      (Int32, Ptr{Float32}, Ptr{Float32}, Int32, Ptr{Int32}, Int32, Int32, Int32, 
+       Int32, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Int32}, Int32),
+      convert(Int32, 1000), walls, goals, num_goals, bit_string, convert(Int32, 6), num_inputs, num_hidden, 
+      num_outputs, layer_1_weights, layer_2_weights, inputs, hidden_activations, 
+      outputs, fitness, convert(Int32, 1))
+end
+
+println(fitness)

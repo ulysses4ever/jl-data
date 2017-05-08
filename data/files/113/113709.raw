@@ -1,0 +1,97 @@
+# Metropolis algorithm
+module Metropolis
+export model, mcmc_sample
+
+using Distributions
+
+abstract ProbModel
+
+# One-parameter probability model
+immutable UniProbModel <: ProbModel
+    prior::Distribution
+    proposal::Distribution
+    loglik::Function
+    observed
+end
+
+# Multiparameter probability model
+immutable MultiProbModel <: ProbModel
+    params::Vector{Symbol}
+    proposals::Vector{Distribution}
+    priors::Vector{Distribution}
+    loglik::Function
+    observed
+end
+
+model(prior::Distribution, proposal::Distribution,
+      loglik::Function, obs) = UniProbModel(prior, proposal, loglik, obs)
+
+model(params::Vector{Symbol}, priors::Vector{Distribution},
+      proposals::Vector{Distribution}, loglik::Function, obs) =
+    MultiProbModel(params, priors, proposals, loglik, obs)
+
+# Propose parameter values by drawing from the
+# proposal distribution(s). For multiparameter processes
+# the proposals are indedepent of each other.
+propose(m::UniProbModel) = rand(m.proposal)
+propose(m::MultiProbModel) = [rand(d) for d in m.proposals]
+
+# Log of joint prior probability
+# Always returns a scalar
+logp(f, x) = isa(f, DiscreteDistribution) ? logpmf(f, x) : logpdf(f, x)
+
+function logprior(pm::UniProbModel, x)
+    logp(pm.prior, x)
+end
+
+logprior(pm::MultiProbModel, xs) =
+    sum([logp(f, x) for (f,x) in zip(pm.priors, xs)])
+
+# The acceptance rule for the Metropolis algorithm.
+# Given a proposed value for parameter(s) `p`, compare
+# the log value of the posterior at the proposal value
+# to that of the current value(s), `c`. If the proposal has
+# a higher probability, we accept it for sure. if not,
+# we accept it with probability f(p|D) / f(c|D) < 1.
+function accept(m::ProbModel, c, p)
+    logp_current = m.loglik(m.observed, c) + logprior(m, c)
+    logp_proposed = m.loglik(m.observed, p) + logprior(m, p)
+    dlogp = min(0, logp_proposed - logp_current)
+    accepted = rand(Bernoulli(exp(dlogp))) == 1 ? true: false
+end
+
+
+# MCMC sampling with Metropolis-Hastings.
+# 1. Generate proposal values for the paramter(s).
+# 2. Accept or reject the proposal.
+# 3. Repeat.
+
+# One-parameter version
+function mcmc_sample(m::UniProbModel, n::Int, burnin::Int)
+    c = propose(m)
+    samples = fill(NaN, n)
+    for i = 1:n
+        p = propose(m)
+        c = accept(m, c, p) ? p : c
+        samples[i] = c
+    end
+    samples[(burnin + 1):end]
+end
+
+# Multiparameter version
+function mcmc_sample(m::MultiProbModel, n::Int, burnin::Int)
+    c = propose(m)
+    samples = fill(NaN, n, length(m.params))
+    for i = 1:n
+        p = propose(m)
+        c = accept(m, c, p) ? p : c
+        samples[i, :] = c
+    end
+    samples
+end
+
+end # module
+
+
+
+

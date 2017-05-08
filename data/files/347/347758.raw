@@ -1,0 +1,247 @@
+# *****************************************************************************
+# Written by Ritchie Lee, ritchie.lee@sv.cmu.edu
+# *****************************************************************************
+# Copyright ã ``2015, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration. All
+# rights reserved.  The Reinforcement Learning Encounter Simulator (RLES)
+# platform is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License. You
+# may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0. Unless required by applicable
+# law or agreed to in writing, software distributed under the License is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+# _____________________________________________________________________________
+# Reinforcement Learning Encounter Simulator (RLES) includes the following
+# third party software. The SISLES.jl package is licensed under the MIT Expat
+# License: Copyright (c) 2014: Youngjun Kim.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED
+# "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+# NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+# PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# *****************************************************************************
+
+"""
+Linearized Derivation tree (aka parse tree or syntax tree).  Wraps DerivationTrees.
+Default is DFS order.
+"""
+module FastLinearDerivTrees 
+
+export Grammar
+export FLDTParams, FLDTActions, FastLinearDerivTree, AbstractTreeOrder, DepthFirst, BreadthFirst  
+export initialize!, step!, play!, actionspace, isdone, iscomplete, get_derivtree, get_expr
+export rand_with_retry!, maxlength
+
+using Reexport
+using ExprSearch 
+using GrammaticalEvolution
+using DataStructures
+
+using Compat
+import Compat.ASCIIString
+import GrammaticalEvolution.Grammar
+import ExprSearch: get_derivtree, get_expr
+import Base: length, push!, convert, rand!, getindex, empty!, copy!
+
+abstract AbstractTreeOrder
+
+immutable DepthFirst <: AbstractTreeOrder end
+immutable BreadthFirst <: AbstractTreeOrder end
+
+immutable FLDTParams
+    grammar::Grammar
+    maxsteps::Int64
+    order::AbstractTreeOrder
+end
+FLDTParams(grammar::Grammar, maxsteps::Int64) = FLDTParams(grammar, maxsteps, DepthFirst())
+
+type FLDTActions
+    actions::Vector{Int64}
+end
+FLDTActions() = FLDTActions(Int64[])
+FLDTActions(ind::ExampleIndividual) = FLDTActions(ind.genome+1)
+push!(actions::FLDTActions, a::Int64) = push!(actions.actions, a)
+length(actions::FLDTActions) = length(actions.actions)
+empty!(actions::FLDTActions) = empty!(actions.actions)
+getindex(actions::FLDTActions, ids) = getindex(actions.actions, ids)
+convert(::Type{Array}, a::FLDTActions) = copy(a.actions)
+
+immutable FastNode
+    cmd::ASCIIString
+    rule::Rule
+    action::Int64
+    depth::Int64
+    children::Tuple{Vararg{FastNode}}
+end
+
+type FastLinearDerivTree 
+    params::FLDTParams
+    main_task::Task
+    derive_task::Task
+    root::FastNode
+    actions::FLDTActions
+    actionspace::Int64
+    FastLinearDerivTree() = new()
+end
+
+function FastLinearDerivTree(params::FLDTParams) 
+    tree = FastLinearDerivTree()
+    tree.params = params
+    tree.main_task = current_task()
+    tree.actions = FLDTActions()
+    tree.actionspace = 1
+    tree
+end
+
+#consume actions and derive tree
+function derive(tree::FastLinearDerivTree)
+    tree.root = expand_node(tree, tree.params.grammar.rules[:start], 0) 
+    schedule(tree.main_task, 0) #fall back onto the main task when this task exits
+end
+
+function expand_node(tree::FastLinearDerivTree, rule::ReferencedRule, d::Int64)
+    #println("referencedrule")
+    expand_node(tree, tree.params.grammar.rules[rule.symbol], d)
+end
+function expand_node(tree::FastLinearDerivTree, rule::OrRule, d::Int64)
+    #println("orrule")
+    a = yieldto(tree.main_task, length(rule))
+    FastNode(rule.name, rule, a, d, 
+        (expand_node(tree, rule.values[a], d+1),))
+end
+#function expand_node(tree::FastLinearDerivTree, sym::Symbol, rule::Any, d::Int64) 
+    #println("any")
+    #FastNode("", sym, -1, d+1, ())
+#end
+
+function expand_node(tree::FastLinearDerivTree, rule::RangeRule, d::Int64)
+    #println("rangerule")
+    a = yieldto(tree.main_task, length(rule))
+    FastNode(rule.name, rule, a, d, ())
+end
+function expand_node(tree::FastLinearDerivTree, rule::ExprRule, d::Int64)
+    #println("exprrule")
+    args = filter(x->isa(x, Rule), rule.args)
+    FastNode(rule.name, rule, -1, d, ntuple(i->expand_node(tree, args[i], d+1), 
+    length(args)))
+end
+function expand_node(tree::FastLinearDerivTree, rule::Terminal, d::Int64)
+    #println("terminal")
+    FastNode(rule.name, rule, -1, d, ())
+end
+#TODO: repeatedrule, andrule
+
+function initialize!(tree::FastLinearDerivTree)
+    empty!(tree.actions)
+    grammar = tree.params.grammar
+    tree.actionspace = actionspace(grammar, grammar.rules[:start])
+    tree.derive_task = Task(()->derive(tree))
+end
+
+
+function actionspace(grammar::Grammar, rule::ReferencedRule) 
+    actionspace(grammar, grammar.rules[rule.symbol])
+end
+actionspace(grammar::Grammar, rule::OrRule) = length(rule.values)
+actionspace(grammar::Grammar, rule::RangeRule) = length(rule.range)
+actionspace(grammar::Grammar, rule::RepeatedRule) = length(rule.range)
+
+function step!(tree::FastLinearDerivTree, a::Int64)
+    push!(tree.actions, a)
+    tree.actionspace = yieldto(tree.derive_task, a)
+end
+
+function isdone(tree::FastLinearDerivTree)
+    #println("iscomplete: ", iscomplete(tree))
+    iscomplete(tree) || length(tree.actions) > tree.params.maxsteps 
+end
+
+iscomplete(tree::FastLinearDerivTree) = istaskdone(tree.derive_task)
+
+function rand!(tree::FastLinearDerivTree)
+    initialize!(tree)
+    while !isdone(tree)
+        step!(tree, rand(1:tree.actionspace))
+    end
+    iscomplete(tree)
+end
+
+immutable IncompleteException <: Exception end
+function get_expr(tree::FastLinearDerivTree) 
+    iscomplete(tree) ? get_expr(tree.root) : throw(IncompleteException()) 
+end
+get_expr(node::FastNode) = get_expr(node, node.rule)
+
+get_expr(node::FastNode, rule::Terminal) = rule.value
+function get_expr(node::FastNode, rule::RangeRule)
+    value = ((node.action - 1) % length(rule.range)) + rule.range.start
+    if rule.action != nothing
+        value = rule.action(value)
+    end
+    value
+end
+
+function get_expr(node::FastNode, rule::OrRule)
+    child = node.children[1]
+    value = get_expr(child)
+    if rule.action != nothing
+        value = rule.action(value)
+    end
+    value
+end
+function get_expr(node::FastNode, rule::ExprRule)
+    xs = Any[]
+    child_i = 1
+    for arg in rule.args
+        if isa(arg, Rule)
+            child = node.children[child_i]
+            push!(xs, get_expr(child))
+            child_i += 1
+        else
+            push!(xs, arg)
+        end
+    end
+    Expr(xs...)
+end
+
+"""
+Generate a random tree up to a maximum number of retries to get a complete tree. 
+"""
+function rand_with_retry!(tree::FastLinearDerivTree, retries::Int64=5)
+    while retries > 0
+        compl = rand!(tree) 
+        if compl
+            return true
+        end
+        retries -= 1
+    end
+    return false
+end
+
+function play!(tree::FastLinearDerivTree, actions::FLDTActions)
+  initialize!(tree)
+  n = 0
+  while !isdone(tree) && n < length(actions)
+    n += 1
+    step!(tree, actions[n])
+  end
+  return n #number of actions actually used
+end
+
+function copy!(dst::FastLinearDerivTree, src::FastLinearDerivTree)
+    dst.params = src.params
+    play!(dst, src.actions)
+end
+
+end #module

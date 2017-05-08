@@ -1,0 +1,31 @@
+export Event
+
+# exported
+
+immutable Event
+    event::String
+    listener::Function
+    server::HttpServer
+end
+
+Event(listener::Function, server::HttpServer, event::ASCIIString) = add_listener(server, event, listener)
+
+# NOT exported
+
+function add_listener(server::HttpServer, event::ASCIIString, listener::Function)
+    if !haskey(server.events, event)
+        server.events[event] = Function[]
+    end
+
+    append!(server.events[event], [listener])
+end
+
+function emit_event(server::HttpServer, event::ASCIIString, args...)
+    if !haskey(server.events, event)
+        return
+    end
+
+    for listener in server.events[event]
+        listener(server, args...)
+    end
+end

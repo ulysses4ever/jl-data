@@ -1,0 +1,27 @@
+import Base: convert
+
+export convert
+
+sexpr(io::IO, ex) = show(io, ex)
+
+function sexpr(io::IO, ex::Expr)
+    print(io, '(')
+    show(io, ex.head)
+    for arg in ex.args
+        if ex.head == :block
+            error("Block expressions not supported!")
+        else
+            print(io, " ")
+            sexpr(io, arg)
+        end
+    end
+    if isempty(ex.args); print(io, ")")
+    else print(io, ")")
+    end
+end
+
+function convert(::Type{String}, expr::Expr)
+    str = IOBuffer()
+    sexpr(str, expr)
+    return String(str)
+end

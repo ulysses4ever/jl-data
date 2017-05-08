@@ -1,0 +1,13 @@
+include("../src/contextwindow.jl")
+
+function test_contextwindow()
+    tokens = ["the" "cow" "jumped" "over" "the" "moon"]
+    wdw = context_window(tokens, 1, 1)
+    @assert( context_window(tokens, 1, 1) == [nothing, "cow"] )
+    @assert( context_window(tokens, 1, 2) == [nothing, nothing, "cow", "jumped"] )
+    @assert( context_window(tokens, 5, 2) == ["jumped", "over", "moon", nothing] )
+end
+
+test_contextwindow()
+
+info("Tests pass [context windows]")

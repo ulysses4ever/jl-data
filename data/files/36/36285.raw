@@ -1,0 +1,10 @@
+using PyPlot
+pygui(true)
+x = linspace(0,2*pi,1000); y = sin(3*x + 4*cos(2*x));
+PyPlot.plot(x, y, color="red", linewidth=2.0, linestyle="--")
+PyPlot.title("A sinusoidally modulated sinusoid")
+PyPlot.show()
+
+@pyimport mayavi.mlab as Mlab
+ mesh=Mlab.test_triangulation_mesh()
+ 

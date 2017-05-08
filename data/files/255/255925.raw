@@ -1,0 +1,32 @@
+using HTTPClient.HTTPC
+using ZipFile
+
+function downloadBhavFile()
+	ostream=open("/tmp/bhav.zip", "w+")
+	r=HTTPClient.get("http://www.bseindia.com/download/BhavCopy/Equity/EQ210515_CSV.ZIP", RequestOptions(ostream=ostream))
+	r.http_code == 200
+	close(ostream)
+end
+
+function extractZip( )
+	r = ZipFile.Reader("/tmp/EQ210515_CSV.ZIP");
+	for f in r.files
+		println("Filename: $(f.name)")
+		ostream = open("/tmp/$(f.name)","w+")
+		write (ostream,readall(f))
+		close (ostream)
+	end
+	close(r)
+end
+
+function downloadAndExtract()
+	httpData = HTTPClient.get("http://www.bseindia.com/download/BhavCopy/Equity/EQ210515_CSV.ZIP", RequestOptions(ostream=ostream))
+	zipData  = ZipFile.Reader("/tmp/EQ210515_CSV.ZIP")
+	for f in zipData.files
+		ostream = open("$(f.name)","w+")
+		write (ostream,readall(f))
+		close (ostream)
+	end
+	close(zipData)
+end
+

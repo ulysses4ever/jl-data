@@ -1,0 +1,383 @@
+module model
+
+using Distributions
+using Distances
+
+### Scalar Valued kernel
+
+abstract ScalarKernel
+
+immutable RFF
+    kernel::ScalarKernel
+    D::Int64
+    Z::Matrix{Float64}
+end # type RFF
+
+immutable GaussianKernel <: ScalarKernel
+    sigma::Float64
+    gamma::Float64
+    d::Int64
+end # type GaussianKernel
+
+@doc """
+Map x to the FF RKHS.
+""" ->
+function map!(phi::RFF, x::Matrix{Float64}, phi_x::Matrix{Float64})
+    BLAS.gemm!('T', 'N', 1., phi.Z, x, 0., slice( phi_x, 1:phi.D, :));
+    N = size(x, 2);
+    sqrtD = sqrt(phi.D);
+    @fastmath @inbounds @simd for i = 1:N
+        @fastmath @inbounds @simd for j = 1:phi.D
+            temp = phi_x[j, i]
+            phi_x[j        , i] = cos(temp) / sqrtD
+            phi_x[j + phi.D, i] = sin(temp) / sqrtD
+        end
+    end
+end # function map!
+
+@doc """
+Map x to the FF RKHS.
+""" ->
+function map!(phi::RFF, x::Vector{Float64}, phi_x::Vector{Float64})
+    BLAS.gemv!('T', 1., phi.Z, x, 0., slice( phi_x, 1:phi.D));
+    N = size(x, 2);
+    sqrtD = sqrt(phi.D);
+    @fastmath @inbounds @simd for i = 1:N
+        @fastmath @inbounds @simd for j = 1:phi.D
+            temp = phi_x[j, i]
+            phi_x[j        , i] = cos(temp) / sqrtD
+            phi_x[j + phi.D, i] = sin(temp) / sqrtD
+        end
+    end
+end # function map!
+
+function map(phi::RFF, x::Matrix{Float64})
+    N = size(x, 2)
+    phi_x = Matrix{Float64}(2 * phi.D, N)
+    map!(phi, x, phi_x)
+    phi_x
+end
+
+function map(phi::RFF, x::Vector{Float64})
+    N = size(x, 2)
+    phi_x = Vector{Float64}(2 * phi.D, N)
+    map!(phi, x, phi_x)
+    phi_x
+end
+
+function predict(phi::RFF, phi_x::Vector{Float64}, ff_coefs::Vector{Float64})
+    dot(phi_x, ff_coefs)
+end
+
+function predict!(
+    phi::RFF, phi_x::Matrix{Float64}, ff_coefs::Vector{Float64},
+    preds::Vector{Float64})
+
+    Blas.gemm!('T', 'N', 1., phi_x, ff_coefs, 0., preds)
+end
+
+function predict(phi::RFF, phi_x::Matrix{Float64}, ff_coefs::Vector{Float64})
+    N = size(phi_x, 2)
+    preds = Vector{Float64}(N)
+    predict!(phi, phi_x, ff_coefs, preds)
+    preds
+end
+
+## Gaussian kernel
+
+function GaussianKernel(sigma::Float64, d::Int64)
+    gamma = 1. / ( 2. * sigma ^2 )
+    GaussianKernel(sigma, gamma, d)
+end
+
+function RFF(kernel::GaussianKernel, D::Int64)
+    RFF(kernel, D, Distributions.rand(ff_sampler(kernel), D))
+end # constructor RFF
+
+function ff_sampler(kernel::GaussianKernel)
+    Distributions.MvNormal(kernel.d, 1 / kernel.sigma)
+end
+
+function Gram(kernel::GaussianKernel, x::Matrix{Float64})
+    exp(-kernel.gamma * Distances.pairwise(Distances.SqEuclidean(), x))
+end # function Gram
+
+function Gram(kernel::GaussianKernel, x::Vector{Float64})
+    1
+end # function Gram
+
+function Gram(kernel::GaussianKernel, x::Vector{Float64}, z::Vector{Float64})
+    exp(-kernel.gamma * Distances.sqeuclidean(x, z))
+end # function Gram
+
+function Gram(kernel::GaussianKernel, x::Matrix{Float64}, z::Matrix{Float64})
+    exp(-kernel.gamma * Distances.pairwise(Distances.SqEuclidean(), x, z))
+end # function Gram
+
+
+
+
+### Operator Valued kernel
+
+abstract OVKernel
+
+immutable OVRFF
+    kernel::OVKernel
+    D::Int64
+    Z::Matrix{Float64}
+end
+
+immutable DecomposableKernel <: OVKernel
+    scalar_kernel_base::ScalarKernel
+    A::Symmetric{Float64}
+    B::Matrix{Float64}
+    p::Int64
+    r::Int64
+end # type DecomposableKernel
+
+@doc """
+Incomplete map x for multiple data (x is a Matrix).
+""" ->
+function map!(phi::OVRFF, x::StridedMatrix{Float64}, phi_x::StridedMatrix{Float64})
+    BLAS.gemm!('T', 'N', 1., phi.Z, x, 0., slice( phi_x, 1:phi.D, :));
+    N = size(x, 2);
+    sqrtD::Float64 = sqrt(phi.D);
+    @fastmath @inbounds @simd for i = 1:N
+        @fastmath @inbounds @simd for j = 1:phi.D
+            temp = phi_x[j, i]
+            phi_x[j        , i] = cos(temp) / sqrtD
+            phi_x[j + phi.D, i] = sin(temp) / sqrtD
+        end
+    end
+end # function map!
+
+@doc """
+Incomplete map x for one data (x is a vector).
+""" ->
+function map!(phi::OVRFF, x::StridedVector{Float64}, phi_x::StridedVector{Float64})
+    BLAS.gemv!('T', 1., phi.Z, x, 0., slice( phi_x, 1:phi.D));
+    N = size(x, 2);
+    sqrtD::Float64 = sqrt(phi.D);
+    @fastmath @inbounds @simd for i = 1:N
+        @fastmath @inbounds @simd for j = 1:phi.D
+            temp = phi_x[j, i]
+            phi_x[j        , i] = cos(temp) / sqrtD
+            phi_x[j + phi.D, i] = sin(temp) / sqrtD
+        end
+    end
+end # function map!
+
+function map(phi::OVRFF, x::StridedMatrix{Float64})
+    N = size(x, 2)
+    phi_x = Matrix{Float64}(2 * phi.D, N)
+    map!(phi, x, phi_x)
+    phi_x
+end
+
+function map(phi::OVRFF, x::StridedVector{Float64})
+    N = size(x, 2)
+    phi_x = Vector{Float64}(2 * phi.D, N)
+    map!(phi, x, phi_x)
+    phi_x
+end
+
+@doc """
+Prediction from x for one data (x is a vector) -- general case.
+""" ->
+function predict!(kernel::OVKernel,
+    phi_x::StridedVector{Float64}, ff_coefs::Matrix{Float64},
+    pred::StridedVector{Float64})
+
+    N = size(phi_x, 2)
+    fill!( pred, 0 )
+    @fastmath @inbounds @simd for idx_N in 1:N
+        @fastmath @inbounds @simd for idx_D in 1:phi.D
+            Blas.gemv!('T', phi_x[idx_D],
+                ff_B(kernel, phi.Z, idx_D), slice(ff_coefs, idx_D, :),
+                1., slice(pred, :, idx_N))
+        end
+    end
+end
+
+function predict!(phi::OVRFF,
+    phi_x::StridedVecOrMat{Float64}, ff_coefs::Matrix{Float64},
+    preds::StridedVecOrMat{Float64}, buffer::StridedVecOrMat{Float64})
+
+    predict!(phi.kernel, phi_x, ff_coefs, preds, buffer)
+end
+
+function predict!(phi::OVRFF,
+    phi_x::StridedMatrix{Float64}, ff_coefs::Matrix{Float64},
+    preds::StridedMatrix{Float64})
+
+    N = size(phi_x, 2)
+    buffer = Matrix{Float64}(phi.kernel.r, N)
+    predict!(phi.kernel, phi_x, ff_coefs, preds, buffer)
+end
+
+function predict!(phi::OVRFF,
+    phi_x::StridedVector{Float64}, ff_coefs::Matrix{Float64},
+    preds::StridedVector{Float64})
+
+    buffer = Vector{Float64}(phi.kernel.r)
+    predict!(phi.kernel, phi_x, ff_coefs, preds, buffer)
+end
+
+function predict(phi::OVRFF,
+    phi_x::StridedMatrix{Float64}, ff_coefs::Matrix{Float64})
+
+    N = size(phi_x, 2)
+    preds = Matrix{Float64}(phi.kernel.p, N)
+    buffer = Matrix{Float64}(phi.kernel.r, N)
+    predict!(phi.kernel, phi_x, ff_coefs, preds, buffer)
+    preds
+end
+
+function predict(phi::OVRFF,
+    phi_x::StridedVector{Float64}, ff_coefs::Matrix{Float64})
+
+    N = size(phi_x, 2)
+    preds = Vector{Float64}(phi.kernel.p, N)
+    buffer = Vector{Float64}(phi.kernel.r, N)
+    predict!(phi.kernel, phi_x, ff_coefs, preds, buffer)
+    preds
+end
+
+# function predict!(phi::OVRFF, phi_x::Array{Float64}, ff_coefs::Array{Float64}, pred::Array{Float64})
+#     N = size(phi_x, 2)
+#     p = size(pred, 1)
+
+#     # pred_temp = Array(Float64, p, N)
+#     # BLAS.gemm!('T', 'N', 1., ff_coefs, phi_x, 0., pred_temp )
+#     # BLAS.gemm!('N', 'N', 1., ff_B(phi.kernel, phi.Z, 0), pred_temp, 0., pred)
+
+#     fill!( pred, 0 )
+#     @fastmath @inbounds @simd for idx_N in 1:N
+#         @fastmath @inbounds @simd for idx_D in 1:phi.D
+#             BLAS.gemm!( 'N', 'N',
+#                 phi_x[idx_D, idx_N],
+#                 ff_B(phi.kernel, phi.Z, idx_D), slice(ff_coefs, idx_D, :),
+#                 1., slice(pred, :, idx_N) )
+#             BLAS.gemm!( 'N', 'N',
+#                 phi_x[phi.D + idx_D, idx_N],
+#                 ff_B(phi.kernel, phi.Z, idx_D), slice(ff_coefs, phi.D + idx_D, :),
+#                 1., slice(pred, :, idx_N) )
+#         end
+#     end
+# end
+
+# function predict(phi::OVRFF, phi_x::Array{Float64}, ff_coefs::Array{Float64})
+#     N = size(phi_x, 2)
+#     preds = Array(Float64, phi.kernel.p, N)
+#     predict!(phi, phi_x, ff_coefs, preds)
+#     preds
+# end
+
+
+
+## Decomposable kernel
+
+function DecomposableKernel(scalar_kernel_base::ScalarKernel, A::Symmetric{Float64, Matrix{Float64}})
+    F = eigfact(A)
+    B = transpose(F[:vectors] * diagm(sqrt(F[:values])))
+    DecomposableKernel(scalar_kernel_base, A, B, size(B, 2), size(B, 1))
+end # constructor DecomposableKernel
+
+function DecomposableKernel(scalar_kernel_base::ScalarKernel, A::Symmetric{Float64, Matrix{Float64}}, r::Int64)
+    p = size(A, 1)
+    F = eigfact(A, p - r + 1:p)
+    B = transpose(F[:vectors] * diagm(sqrt(F[:values])))
+    DecomposableKernel(scalar_kernel_base, A, B, size(B, 2), size(B, 1))
+end # constructor DecomposableKernel
+
+function OVRFF(kernel::DecomposableKernel, D::Int64)
+    OVRFF(kernel, D, Distributions.rand(ff_sampler(kernel), D))
+end # constructor RFF
+
+function ff_sampler(kernel::DecomposableKernel)
+    ff_sampler(kernel.scalar_kernel_base)
+end
+
+function ff_B(kernel::DecomposableKernel, Z::Matrix{Float64}, idx::Int64)
+    return kernel.B
+end
+
+function Gram(kernel::DecomposableKernel, x::Matrix{Float64})
+    kron(Gram(kernel.scalar_kernel_base, x), kernel.A)
+end # function Gram
+
+function Gram(kernel::DecomposableKernel, x::Vector{Float64})
+    kernel.A
+end # function Gram
+
+function Gram{T, U}(kernel::DecomposableKernel, x::T, z::U)
+    kron(Gram(kernel.scalar_kernel_base, x, z), kernel.A.data)
+end # function Gram
+
+@doc """
+Prediction from x for one data (x is a vector) -- decomposable case.
+buffer must be the size of pred.
+""" ->
+function predict!(kernel::DecomposableKernel,
+    phi_x::StridedVector{Float64}, ff_coefs::Matrix{Float64},
+    preds::StridedVector{Float64}, buffer::StridedVector{Float64})
+
+    BLAS.gemv!('T', 1., ff_coefs, phi_x, 0., buffer)
+    BLAS.gemv!('T', 1., kernel.B, buffer, 0., preds)
+end
+
+@doc """
+Prediction from x for multiple data (x is a matrix) -- decomposable case.
+buffer must be the size of preds.
+""" ->
+function predict!(kernel::DecomposableKernel,
+    phi_x::StridedMatrix{Float64}, ff_coefs::Matrix{Float64},
+    preds::StridedMatrix{Float64}, buffer::StridedMatrix{Float64})
+
+    BLAS.gemm!('T', 'N', 1., ff_coefs, phi_x, 0., buffer)
+    BLAS.gemm!('T', 'N', 1., kernel.B, buffer, 0., preds)
+end
+
+
+
+
+# Model
+
+type Linear
+    phi::OVRFF
+    ff_coefs::Matrix{Float64}
+end
+
+function Linear(phi::OVRFF)
+    Linear(phi, zeros(Float64, 2 * phi.D, phi.kernel.r))
+end
+
+function reset(h::Linear)
+    h.ff_coefs = zeros(Float64, size(h.ff_coefs))
+end
+
+function predict!(h::Linear, phi_x::StridedVecOrMat{Float64},
+    preds::StridedVecOrMat{Float64}, buffer::StridedVecOrMat{Float64})
+
+    predict!(h.phi, phi_x, h.ff_coefs, preds, buffer)
+end
+
+function predict!(h::Linear, phi_x::StridedVecOrMat{Float64},
+    preds::StridedVecOrMat{Float64})
+
+    predict!(h.phi, phi_x, h.ff_coefs, preds)
+end
+
+function predict(h::Linear,
+    phi_x::StridedVecOrMat{Float64})
+
+    predict(h.phi, phi_x, h.ff_coefs)
+end
+
+function call(h::Linear,
+    x::StridedVecOrMat{Float64})
+
+    predict(h.phi, map(h.phi, x), h.ff_coefs)
+end
+
+end # module Model

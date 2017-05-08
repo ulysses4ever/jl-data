@@ -1,0 +1,102 @@
+#segseg.jl
+include("../pt2seg.jl/pt2seg.jl")
+#=
+  @description determine the minimum distance between
+ 		two line segments
+ 	@param p1{Array} - first vertex for line 1
+ 	@param p2{Array} - second vertex for line 1
+ 	@param p3{Array} - first vertex for line 2
+ 	@param p4{Array} - second vertex for line 2
+ 	@return {*}
+=#
+function seg2seg(p1, p2, p3, p4)
+  x,y  = 1, 2;
+
+  x1, y1 = p1[x], p1[y];
+  x2, y2 = p2[x], p2[y];
+  x3, y3 = p3[x], p3[y];
+  x4, y4 = p4[x], p4[y];
+
+  eps = 1e-10;
+
+  denom  = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+  numera = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
+  numerb = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3);
+
+  if (Math.abs(denom) < eps)
+    # are the lines parallel
+    aminx = (x1 < x2) ? x1 : x2;
+    amaxx = (x1 > x2) ? x1 : x2;
+    aminy = (y1 < y2) ? y1 : y2;
+    amaxy = (y1 > y2) ? y1 : y2;
+
+    bminx = (x3 < x4) ? x3 : x4;
+    bmaxx = (x3 > x4) ? x3 : x4;
+    bminy = (y3 < y4) ? y3 : y4;
+    bmaxy = (y3 > y4) ? y3 : y4;
+
+    if (amaxx < bminx)
+      dx = bminx - amaxx;
+    elseif (aminx > bmaxx)
+      dx = aminx - bmaxx;
+    end
+
+    dx, dy = NaN, NaN
+
+    if (amaxy < bminy)
+      dy = bminy - amaxy;
+    elseif (aminy > bmaxy)
+      dy = aminy - bmaxy;
+    end
+
+    if isequal(dx, NaN) && isequal(dy, NaN)
+      #calculate the perpendicular distance*/
+      m = (y2 - y1) / (x2 - x1);
+      dc = (y1 - m * x1) - (y3 - m * x3);
+
+      if (dc == 0.0) 
+        dist = 0.0;
+      else
+        dist = Math.abs(dc) / Math.sqrt(m * m + 1);
+      end
+    else 
+     	isequal(dx, NaN) && (dx = 0.0) ;
+     	isequal(dy, NaN) && (dy = 0.0) ;
+    	dist = math.hypot(dx, dy);
+    end
+  else
+    # the is intersection along the the segments */
+    mua = numera / denom;
+    mub = numerb / denom;
+    pta, ptb = (),()
+    if (mua < 0 || mua > 1 || mub < 0 || mub > 1)
+      if (mua < 0) 
+        pta = p1;
+      elseif (mua > 1)
+        pta = p2;
+      end
+
+      if (mub < 0)
+        ptb = p3;
+      elseif (mub > 1)
+        ptb = p4;
+      end
+
+      if length(pta)>0 && length(ptb)>0
+        dist = min(
+        	pt2seg(p3, p4, pta), 
+        	pt2seg(p1, p2, ptb) 
+        )
+      elseif length(pta)>0
+        dist = pt2seg(p3, p4, pta);
+      else
+        dist = pt2seg(p1, p2, ptb)
+      end
+
+    else
+      dist = 0.0;
+    end
+	end
+
+	return dist;
+end

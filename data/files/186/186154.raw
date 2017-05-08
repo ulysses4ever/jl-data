@@ -1,0 +1,134 @@
+#=
+sprand(m,n,p)
+=#
+
+"""
+Verbatim copy of Base.spmatmul, except that it omits sorting row indices within a column. Column indices are sorted.
+
+"""
+function base_spmatmul{Tv,Ti}(A::SparseMatrixCSC{Tv,Ti}, B::SparseMatrixCSC{Tv,Ti}; sortindices::Symbol = :sortcols)
+    mA, nA = size(A)
+    mB, nB = size(B)
+    nA==mB || throw(DimensionMismatch())
+
+    colptrA = A.colptr; rowvalA = A.rowval; nzvalA = A.nzval
+    colptrB = B.colptr; rowvalB = B.rowval; nzvalB = B.nzval
+    # TODO: Need better estimation of result space
+    nnzC = min(mA*nB, length(nzvalA) + length(nzvalB))
+    colptrC = Array{Ti}(nB+1)
+    rowvalC = Array{Ti}(nnzC)
+    nzvalC = Array{Tv}(nnzC)
+
+    @inbounds begin
+        ip = 1
+        xb = zeros(Ti, mA)
+        x  = zeros(Tv, mA)
+        for i in 1:nB
+            if ip + mA - 1 > nnzC
+                resize!(rowvalC, nnzC + max(nnzC,mA))
+                resize!(nzvalC, nnzC + max(nnzC,mA))
+                nnzC = length(nzvalC)
+            end
+            colptrC[i] = ip
+            for jp in colptrB[i]:(colptrB[i+1] - 1)
+                nzB = nzvalB[jp]
+                j = rowvalB[jp]
+                for kp in colptrA[j]:(colptrA[j+1] - 1)
+                    nzC = nzvalA[kp] * nzB
+                    k = rowvalA[kp]
+                    if xb[k] != i
+                        rowvalC[ip] = k
+                        ip += 1
+                        xb[k] = i
+                        x[k] = nzC
+                    else
+                        x[k] += nzC
+                    end
+                end
+            end
+            for vp in colptrC[i]:(ip - 1)
+                nzvalC[vp] = x[rowvalC[vp]]
+            end
+        end
+        colptrC[nB+1] = ip
+    end
+
+    deleteat!(rowvalC, colptrC[end]:length(rowvalC))
+    deleteat!(nzvalC, colptrC[end]:length(nzvalC))
+
+    # The Gustavson algorithm does not guarantee the product to have sorted row indices.
+    Cunsorted = SparseMatrixCSC(mA, nB, colptrC, rowvalC, nzvalC)
+    # C = sortSparseMatrixCSC!(Cunsorted, sortindices=sortindices)
+    # return C
+end
+
+function nzs_col{Tv, Ti}(A::SparseMatrixCSC{Tv,Ti}, k::Ti)
+    # list the nz entries of col k
+    k0 = A.colptr[k]
+    while k0 < A.colptr[k+1]
+        println("[",A.rowval[k0],",",k,"] = ", A.nzval[k0])
+        k0 += 1
+    end
+end
+
+function nzs_row{Tv, Ti}(A::SparseMatrixCSC{Tv,Ti}, k::Ti)
+    # list the nz entries of row k
+    for k0 in eachindex(A.rowval)
+        if A.rowval[k0] != k continue end
+        println("[",A.rowval[k0],",",k0,"] = ", A.nzval[k0])
+    end
+end
+
+#= TODO:
+
+Given a i,j such that A[i,j] != 0, find the next NZ pair.
+
+=#
+
+"""
+The array A.colptr is always of length n+1 where n is the number of columns. A.colptr[j] is an index into the two other arrays, A.rowval and A.nzval. The last two arrays will each be of length equal to the number of nonzero elements of A.
+
+Given i,j such that A[i,j] != 0, this function returns an index l such that A.rowval[l] == i, and A.nzval[l] is the value of A[i,j].
+
+"""
+function find_idx{Tv, Ti}(A::SparseMatrixCSC{Tv,Ti}, i::Ti, j::Ti)
+    l0 = A.colptr[j] # start NZ elements of col j
+    while l0 < A.colptr[j+1] && A.rowval[l0] != i
+        l0 += 1
+    end
+    A.rowval[l0] == i || error("bad indices i,j")
+    return l0
+end
+
+"""
+Given an index, l, into the array A.rowval, corresponding to a nonzero entry of column j, find the row and column corresponding to l+1.
+"""
+function find_col{Tv, Ti}(A::SparseMatrixCSC{Tv,Ti}, l::Ti, j::Ti)
+    if l+1 < A.colptr[j+1] return j end
+    jr = j+1
+    while jr < length(A.colptr) && A.colptr[jr] == A.colptr[jr+1]
+        jr += 1
+    end
+    jr < length(A.colptr) || error("no more nonzero entries")
+    return jr
+end
+
+function j_spmatmul{Tv,Ti}(A::SparseMatrixCSC{Tv,Ti}, B::SparseMatrixCSC{Tv,Ti}; sortindices::Symbol = :sortcols)
+    # C[i,j] += A[i,k]*B[k,j]
+    # Iterate on j, which will determine k via B[k,j] != 0.
+    # k will then determine i via A[i,k] != 0, will a likely cache-miss
+    # empty product
+    C = sparse(Array(Ti,0), Array(Ti,0), Array(Tv,0))
+    # TODO: allocations    
+    for j in 1:B.n
+        for b in B.colptr[j]:B.colptr[j+1] # short stride (usually)
+            k = B.rowval[b]
+            for a in A.colptr[k]:A.colptr[j+1] # long stride
+                i = A.rowval[a]
+                # TODO: replace following stub line
+                C[i,j] += A.nzval[a]*B.nzval[b]
+            end
+        end
+    end
+    # TODO: sort C
+end

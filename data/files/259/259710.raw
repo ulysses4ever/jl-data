@@ -1,0 +1,33 @@
+test_case = "case_1d"
+calculation_mode = "scenario_damage"
+case_file = "test/$(calculation_mode)/data/$(test_case).jld"
+
+number_of_ground_motion_fields = 10000
+
+gm_means = {"b1"=>[-0.64757464]}
+gm_stds  = {"b1"=>[0.564]}
+branches = keys(gm_means)
+
+a_ref = ["a1"]
+a_loc = [1]
+a_tax = ["tax1"]
+a_num = [1]
+a_occ = [1]
+a_val = [10000]
+a_ded = [NaN]
+a_lim = [NaN]
+num_assets = length(a_ref)
+
+ff_states = ["ds1", "ds2", "ds3", "ds4"]
+ff_type = {"ff1"=>"continuous"}
+ff_ids = keys(ff_type)
+ff1_mean_imls = [0.500, 1.000, 1.500, 2.000]
+ff1_std_imls = [0.400, 0.800, 1.200, 1.600]
+ff1_poes = transpose(ff1_poes)
+ff_mean_imls = {"ff1"=>ff1_mean_imls}
+ff_std_imls = {"ff1"=>ff1_std_imls}
+
+tax_ff_map = {"tax1"=>["ff1"]}
+taxonomies = keys(tax_ff_map)
+
+include("write_jld.jl")

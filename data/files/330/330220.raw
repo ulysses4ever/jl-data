@@ -1,0 +1,12 @@
+# - remove header information --> currently very crud
+function remove_header(mail_content)
+  header_pattern = r"Content-Type:"
+  pos = search(mail_content, header_pattern)
+
+  if pos == 0:-1
+    return mail_content
+  else
+    return mail_content[pos[end] : end]
+  end
+
+end

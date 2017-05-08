@@ -1,0 +1,125 @@
+export eval_model
+
+# Compare estimates X and Y, to ground truth (cluster assignments, c, methylation profiles, P)
+function eval_model(A,X_in,Y_in,c,P;make_plots=false,save_plots=false,save_prefix="01",variant=:soft)
+    # get dimensions
+    X,Y = deepcopy(X_in),deepcopy(Y_in)
+    k,m = size(X)
+    n = size(Y,2)
+
+    # Normalize cols of X to have unit length
+    for i = 1:m
+        if sum(X[:,i]) > eps()
+            X[:,i] /= sum(X[:,i])
+        else
+            X[:,i] = 0.5*ones(k)
+        end
+    end
+
+    # compare Y to P across all permutations of rows
+    y0 = minimum(Y)
+    y1 = maximum(Y)
+    Y = (Y-y0)/(y1-y0)  # scale Y to probabilities
+    Ydist = Inf
+    best_perm = 0
+    Yresid = 0
+    for perm in permutations(1:k)
+        Yresid = vec(Y - P[perm,:])
+        yd = sum(abs(Yresid)) # L1 error
+        if yd < Ydist
+            Ydist = yd
+            best_perm = perm
+        end
+    end
+    Ydist /= length(P) # mean L1 error
+
+    # Calculate Xdist
+    if variant == :soft
+        # X_real are the true posterior proabilities
+        X_real = zeros(size(X))
+        priors = (1/m) * [sum(c .== ik) for ik=1:k]
+        
+        for i = 1:m
+            # Restrict computations to range of the read
+            ind = find(!isnan(A[i,:]))
+
+            # Compute likelihoods for each cell type
+            lkhs = ones(k)
+            for kk = 1:k
+                for j = ind
+                    assert(!isnan(A[i,j]))
+                    #lkhs[kk] += (A[i,j]==1.0) ? log(P[kk,j]) : log(1-P[kk,j])
+                    lkhs[kk] *= (A[i,j]==1.0) ? P[kk,j] : 1-P[kk,j]
+                    #lkhs[kk] += A[i,j]*log(Y[kk,j])
+                    #lkhs[kk] += (1-A[i,j])*log(1-Y[kk,j])
+                end
+            end
+
+            # normalize posterior probabilities so they sum to one
+            X_real[:,i] = (lkhs.*priors) / sum(lkhs.*priors)
+        end
+        X_real = X_real[best_perm,:] # use best permutation based on Ydist
+
+        # calculate error
+        Xdist = mean(abs(X_real - X))
+    elseif variant == :hard
+        # X_real is the ground truth
+        X_real = zeros(size(X))
+        for i = 1:m
+            X_real[c[i],i] = 1
+        end
+        X_real = X_real[best_perm,:] # use best permutation based on Ydist
+
+        # Scale Xdist so that it can be interpretated as the proportion of misclassified reads
+        Xdist = sum(abs(X_real - X)) 
+        Xdist /= m*2
+    else
+        error("variant argument incorrect")
+    end
+
+    ## Recalculate Ydist based on observed methylation frequencies
+    #   --> this is the best case scenario for performance
+    if variant == :soft
+        Y_real = zeros(size(P))
+        for kk = 1:k
+            ic = (c.==k)
+            Ak = A[ic,:]
+            for j = 1:n
+                ind = find(!isnan(Ak[:,j]))
+                count = sum(Ak[ind,j] .== 1.0)
+                total = length(ind)
+                Y_real[kk,j] = count / total
+            end
+        end
+    end
+
+    if make_plots
+        figure()
+        imshow(X,cmap=ColorMap("Greys"),interpolation="none")
+        xlabel("Inferred Cluster Assignments")
+        yticks([]),xticks([])
+        if save_plots; savefig(string("./figs/",save_prefix,"_02.png"),dpi=500); close(); end
+        
+        figure()
+        imshow(X_real,cmap=ColorMap("Greys"),interpolation="none")
+        xlabel("true posterior probabilities for reads\n(best soft estimate of X)")
+        yticks([]),xticks([])
+        if save_plots; savefig(string("./figs/",save_prefix,"_03.png"),dpi=500); close(); end
+
+        # Compare true and inferred methylation probabilities
+        figure(), imshow(Y,cmap=ColorMap("Greys"),interpolation="none")
+        xlabel("Estimated methylation profiles"), yticks([]), xticks([])
+        if save_plots; savefig(string("./figs/",save_prefix,"_04.png"),dpi=500); close(); end
+
+        figure()
+        imshow(P,cmap=ColorMap("Greys"),interpolation="none")
+        xlabel("Reconstructed methylation profiles"), yticks([]), xticks([])
+        if save_plots; savefig(string("./figs/",save_prefix,"_05.png"),dpi=500); close(); end
+
+        figure(figsize=(8,3)),PyPlot.hist(Yresid,50),xlim([-0.5,0.5])
+        xlabel("Residuals (for methylation profiles)",fontweight="bold")
+        if save_plots; savefig(string("./figs/",save_prefix,"_06.svg")); close(); end
+    end
+
+    return Xdist,Ydist,X_real
+end

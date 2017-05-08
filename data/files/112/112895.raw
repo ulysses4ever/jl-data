@@ -1,0 +1,16 @@
+# wtok 2015-01-10
+# euler problem 003
+#   The prime factors of 13195 are 5, 7, 13 and 29.
+#   What is the largest prime factor of the number 600851475143 ?
+
+n = 600851475143;
+eul003(n::Int) = maximum(collect(keys(factor(n))))
+
+eul003(n)
+
+# good god, julia just has functions for all this stuff
+
+# Congratulations, the answer you gave to problem 3 is correct.
+# You are the 254770th person to have solved this problem.
+# You have earned 1 new award:
+# Baby Steps: Solve three problems

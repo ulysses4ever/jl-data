@@ -1,0 +1,51 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function generate()
+
+    NUM_GENOTYPES = 200000000
+    NUM_MUTANTS = 10000
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    population = Population.make_population(config_vals)
+    genotype = Genotype.make_random_genotype(config_vals)
+
+    for i = 1:NUM_GENOTYPES
+
+        Genotype.randomize_genotype(genotype, config_vals)
+        Genotype.evaluate(genotype, config_vals, 1, 1, population.preallocation)
+        dummy_genotype = Genotype.make_random_genotype(config_vals)
+        
+        for j = 1:length(genotype.all_targets_fitnesses)
+            if genotype.all_targets_fitnesses[j] >= 14.0
+               println(i, " ", j, " ", genotype.all_targets_fitnesses[j])
+
+                for k = 1:NUM_MUTANTS
+                    Genotype.copy_into(dummy_genotype, genotype)
+                    Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+                    Genotype.evaluate(dummy_genotype, config_vals, 1, 1, population.preallocation)
+                    
+                    for l = 1:length(genotype.all_targets_fitnesses)
+                        if dummy_genotype.all_targets_fitnesses[l] >= 15.0
+                            println("   ", k, " ", l, " ", dummy_genotype.all_targets_fitnesses[l])
+                        end
+                    end
+                    
+                end
+                
+            end
+        end
+        
+    end
+end
+
+generate()

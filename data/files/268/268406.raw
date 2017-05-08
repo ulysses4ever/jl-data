@@ -1,0 +1,25 @@
+###################################################
+## Tests
+###################################################
+
+include("../src/KidneyMatching.jl")
+using KidneyMatching
+using Base.Test
+if length(ARGS) > 0
+  verbose = parse(ARGS[1])
+else
+  verbose = -1
+end
+
+testdir = dirname(@__FILE__)
+
+tests = [
+    "match"
+    "sim"
+]
+
+for t in tests
+    tp = joinpath(testdir, t, "run_tests.jl")
+    println("running $(tp) ...")
+    include(tp)
+end

@@ -1,0 +1,26 @@
+function x(m, n, k)
+    return k * m * (m + n)
+end
+function y(m, n, k)
+    return k * n * (m + n)
+end
+function z(m, n, k)
+    return k * m * n 
+end
+
+L = 1000
+sm = 0
+for m in 1:L
+    for n in 1:L
+        for k in 1:L
+            m,n,k = BigInt(m),BigInt(n),BigInt(k)
+            xx, yy, zz = x(m, n, k), y(m, n, k), z(m, n, k)
+            if yy < xx && xx <= L && xx !=yy
+                sm += 1
+            else
+                break
+            end
+        end
+    end
+end
+println(sm)

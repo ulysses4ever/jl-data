@@ -1,0 +1,27 @@
+"""
+`laplace!(X::SimpleGraphDrawing)` gives the graph held in `X` an
+embedding based on the eigenvectors of the Laplacian matrix of the
+graph. Specifically, the `x`-coordinates come from the eigenvector
+associated with the second smallest eigenvalue, and the
+`y`-coordinates come from the eigenveector associated with the third
+smallest.
+"""
+
+export laplace!
+
+function laplace!(X::SimpleGraphDrawing)
+    L = laplace(X.G)
+    EV = eigvecs(L)
+    x = EV[:,2]
+    y = EV[:,3]
+
+    VV = vlist(X.G)
+    n = length(VV)
+
+    for k=1:n
+        v = VV[k]
+        X.xy[v] = [x[k],y[k]]
+    end
+    scale!(X)
+    return X
+end

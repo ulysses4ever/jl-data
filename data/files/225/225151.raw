@@ -1,0 +1,19 @@
+function Run()
+	sides = 20
+	p = [1]
+	d = [p]
+	for i in 2:2*sides+1
+		pr = [1]
+		for j in 2:i
+			if j == i
+				pr = [pr, 1]
+			else
+				pr = [pr, p[j] + p[j-1]]
+			end
+		end
+		p = pr
+		d = [d, p] 
+	end
+	return p[sides+1]
+end
+

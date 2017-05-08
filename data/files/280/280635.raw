@@ -1,0 +1,48 @@
+module Spike
+
+import GLFW
+using ModernGL
+
+# Initialize OpenGL library
+GLFW.Init()
+
+# Hints for OS X to use proper version of OpenGL
+@osx_only begin
+    GLFW.WindowHint(GLFW.CONTEXT_VERSION_MAJOR, 3)
+    GLFW.WindowHint(GLFW.CONTEXT_VERSION_MINOR, 2)
+    GLFW.WindowHint(GLFW.OPENGL_PROFILE, GLFW.OPENGL_CORE_PROFILE)
+    GLFW.WindowHint(GLFW.OPENGL_FORWARD_COMPAT, GL_TRUE)
+end
+
+
+export WindowInstance, update
+
+type WindowInstance
+	width::Int
+	height::Int
+	title::String
+	xposition::Int
+	yposition::Int
+	# framerate::Int
+	windowObject
+
+	function WindowInstance(width::Int, height::Int, title::String, xposition::Int, yposition::Int)
+		windowObject = GLFW.CreateWindow(width, height, title)
+		GLFW.MakeContextCurrent(windowObject)
+		GLFW.SetWindowPos(windowObject, xposition, yposition)
+		new(width::Int, height::Int, title::String, xposition::Int, yposition::Int, windowObject)
+
+	end
+end
+
+function update(window::WindowInstance)
+	# Swap front and back buffers
+	GLFW.SwapBuffers(window.windowObject)
+
+	# Poll for and process events
+	GLFW.PollEvents()
+
+end
+
+end # module
+

@@ -1,0 +1,10 @@
+using SeparableNMF
+
+print("Running example... ")
+
+m,n,k = 50,50,2 # data dimensions
+X = separable_data(m,n,k); # example data with rank k
+W,H = separable_NMF(X,k); # matrix factorization
+
+println("Done.")
+println("Norm of residuals: ",norm(X - W*H))

@@ -1,0 +1,13 @@
+using Distributions
+
+include("utils.jl")
+include("calculator.jl")
+include("test.jl")
+
+test_cases = ["case1a", "case1b", "case1c",
+              "case2a", "case2b",
+              "case3a",
+              "case4a", "case4b", "case4c"]
+for tc in test_cases
+  run_test(tc)
+end

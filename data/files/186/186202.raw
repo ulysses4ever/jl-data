@@ -1,0 +1,7 @@
+using Base.Test
+using Sandbox
+
+M = Sandbox
+
+@test M.OD(M.fig1()) == M.fig1_OD()
+

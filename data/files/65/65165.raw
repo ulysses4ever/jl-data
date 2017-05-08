@@ -1,0 +1,31 @@
+import Base: +, size
+export FrontalMatrix, UpdateMatrix
+
+
+immutable FrontalMatrix{T, S<:Integer} <: DenseArray{T,2}
+    data::Matrix{T}     # dense matrix data
+    colptr::Vector{S}   # column i is in colptr[i]:(colptr[i+1]-1)
+end
+
+size(F::FrontalMatrix) = size(F.data)
+
+
+immutable UpdateMatrix{T, S<:Integer} <: DenseArray{T,2}
+    data::Matrix{T}
+    colptr::Vector{S}
+end
+
+size(U::UpdateMatrix) = size(U.data)
+
+
+function +{T}(U1::UpdateMatrix{T}, U2::UpdateMatrix{T})
+    colptr = union(U1.colptr, U2.colptr)
+    n = length(colptr)
+    A = zeros(T, n, n)
+    u1in = findin(colptr, U1.colptr)
+    u2in = findin(colptr, U2.colptr)
+    A[u1in,u1in] = U1.data
+    A[u2in,u2in] = A[u2in,u2in] + U2.data
+    UpdateMatrix(A, colptr)
+end
+

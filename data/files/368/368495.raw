@@ -1,0 +1,54 @@
+"""
+    Approximate message-passing (AMP) for CS-like problems. See Donoho,
+        Maleki and Montanari (2009), Rangan (2010), and Krzakala et al.
+        (2011).
+"""
+function iterate_amp(y, F, opts)
+    # Parameters
+    x = get(opts, "x", nothing)
+    prior_prmts = get(opts, "prior_prmts", nothing)
+    channel_prmts = get(opts, "channel_prmts", nothing)
+    t_max = get(opts, "t_max", 100)
+    disp = get(opts, "disp", 1)
+
+    if prior_prmts == nothing
+        error()
+    end
+
+    # Init vars, arrays and other structures
+    m, n = size(F)
+    sqrF = F.^2
+
+    a, c = zeros(n), ones(n)
+    w, v = zeros(m), ones(m)
+    g, dg = zeros(m), ones(m)
+    d = channel_prmts != nothing ? channel_prmts[1] : 1.
+
+    mses = zeros(t_max)
+
+    # Run algorithm
+    tic()
+    for t = 1:t_max
+        w = F * a - (sqrF * c) .* g
+        v = sqrF * c
+        g, dg = channel_probit(y, w, v, [d])
+        A = -sqrF' * dg
+        B = a .* A + F' * g
+
+        a_old = copy(a)
+        a, c = prior_gbc(A, B, prior_prmts)
+
+        if channel_prmts == nothing
+            d *= sum(g.^2) / sum(-dg)
+        end
+
+        if x != nothing; mses[t] = norm(x / norm(x) - a / norm(a))^2; end
+        if disp == 1
+            @printf("t = %d; delta = %.4e, MSE = %.2f, RSS = %.4e\n", 
+                t, d, 10 * log10(mses[t]), norm(y - F * a)^2 / m)
+        end
+    end
+    elapsed = toq()
+
+    return a, mses, elapsed
+end

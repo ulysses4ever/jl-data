@@ -1,0 +1,117 @@
+typealias Interval UnitRange{Int}
+union(x::Interval, y::Interval) = min(first(x), first(y)):max(last(x), last(y))
+
+
+abstract Operation{T}
+evaluate{T}(::Operation{T}, t::T) = t
+compose{T}(::Operation{T}, op::Operation{T}) = op
+
+
+immutable SegTree{T}
+    data::Vector{T}
+    len::Int
+
+    merge::Function
+
+    domain::Vector{Interval}
+    delay::BitVector
+    update::Vector{Operation{T}}
+
+    function SegTree(v::AbstractVector{T}, merge::Function)
+        len = length(v)
+        ispow2(len) || error("length not a power of 2")
+
+        data = Array(T, 2*len - 1)
+        data[len:end] = v
+
+        domain = Array(Interval, 2*len - 1)
+        domain[len:end] = [i:i for i in 1:len]
+
+        for i in len-1:-1:1
+            data[i] = merge(data[2i], data[2i + 1])
+            domain[i] = union(domain[2i], domain[2i + 1])
+        end
+
+        return new(data, len, merge, domain, falses(2*len - 1), Array(Operation{T}, 2*len - 1))
+    end
+end
+SegTree{T}(v::AbstractVector{T}, merge::Function) = SegTree{T}(v, merge)
+SegTree(T::Type, size::Int, merge::Function) = SegTree([T(i) for i in 1:size], merge)
+SegTree(f::Function, size::Int, merge::Function) = SegTree([f(i) for i in 1:size], merge)
+
+
+function update!{T}(t::SegTree{T}, i::Int, x::Interval, op::Operation{T})
+    x = intersect(x, t.domain[i])
+    length(x) == 0 && return
+
+    if x == t.domain[i]
+        updatenode!(t, i, op)
+    else
+        propagate!(t, i)
+        update!(t, 2i, x, op)
+        update!(t, 2i + 1, x, op)
+        t.data[i] = t.merge(t.data[2i], t.data[2i + 1])
+    end
+    return
+end
+update!{T}(t::SegTree{T}, x::Interval, op::Operation{T}) = update!(t, 1, x, op)
+update!{T}(t::SegTree{T}, i::Int, op::Operation{T}) = update!(t, i:i, op)
+
+
+function updatenode!{T}(t::SegTree{T}, i::Int, op::Operation{T})
+    t.data[i] = evaluate(op, t.data[i])
+    t.update[i] = t.delay[i] ? compose(t.update[i], op) : op
+    t.delay[i] = true
+end
+
+
+function propagate!(t::SegTree, i::Int)
+    t.delay[i] || return
+
+    op = t.update[i]
+    updatenode!(t, 2i, op)
+    updatenode!(t, 2i + 1, op)
+
+    t.delay[i] = false
+    return
+end
+
+
+function query!(t::SegTree, i::Int, x::Interval)
+    x = intersect(x, t.domain[i])
+    if x == t.domain[i]
+        return t.data[i]
+    else
+        propagate!(t, i)
+        lbranch = length(intersect(x, t.domain[2i])) != 0
+        rbranch = length(intersect(x, t.domain[2i + 1])) != 0
+
+        lbranch && rbranch && return t.merge(query!(t, 2i, x), query!(t, 2i + 1, x))
+        lbranch && return query!(t, 2i, x)
+        rbranch && return query!(t, 2i + 1, x)
+    end
+end
+function query!(t::SegTree, x::Interval)
+    x = intersect(x, t.domain[1])
+    length(x) == 0 && error("interval does not intersect domain")
+    return query!(t, 1, x)
+end
+query!(t::SegTree, i::Int) = query!(t, i:i)
+
+
+immutable SearchDir dir::Bool end
+const searchleft = SearchDir(false)
+const searchright = SearchDir(true)
+
+
+function search!(t::SegTree, i::Int, cmp::Function, leaf::Function)
+    i >= t.len && return leaf(t.data[i])
+
+    propagate!(t, i)
+    x = cmp(t.data[i], t.data[2i], t.data[2i + 1])
+
+    x == searchleft && return search!(t, 2i, cmp, leaf)
+    x == searchright && return search!(t, 2i + 1, cmp, leaf)
+    return x
+end
+search!(t::SegTree, cmp::Function, leaf::Function) = search!(t, 1, cmp, leaf)

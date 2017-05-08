@@ -1,0 +1,35 @@
+import PyPlot
+plt=PyPlot
+
+function threshold(obs)
+    sup=16
+    xmax=1000*sup
+    sourceth=[k*1024 for k=1:2*sup]
+    th=[10*div(t,11) for t in sourceth]
+    plt.clf()
+    plt.subplots_adjust(left=0.02, right=0.98, bottom=0.02, top=0.98)
+    plt.axis([0,xmax,0,2])
+    plt.xticks([])
+    plt.yticks([])
+    plt.plot([0,xmax],[1,1])
+    for k=1:2:sup
+        plt.plot([th[k],th[k]],[1,1.05],color="black")
+        plt.text(th[k],0.9,ha="center","$(th[k])")
+    end
+    for k=2:2:sup
+        plt.plot([th[k],th[k]],[0.9,1],color="black")
+        plt.text(th[k],0.8,ha="center","$(th[k])")
+    end
+    for k in [1,2,4,8,16]
+        t=th[k]
+        st=sourceth[2k]
+        plt.text(t,0.7,ha="center",color="green","$st")
+    end
+    n=length(obs)
+    y=1+0.2*rand(n)
+    plt.plot(obs,y,"ro")
+end
+
+u=[7421,3409,7445,6697,6524,3001,7452,6584,6935,3746,3209,5258,7463,7452,    1880,4653,7450,5620,2867,3740,3759,11197,6559,6496,7333,6238,5623,3720,7356,6393,11064,3028,709,11200,3642,6728,6976,3622,7004,11142,10147,7467,7399,9276,4615,7385,5962,7190,8000,6403]
+
+threshold(u)

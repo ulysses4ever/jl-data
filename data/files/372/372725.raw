@@ -1,0 +1,385 @@
+module dag2048
+
+using jb2048
+import Base.show
+export MeanNode, MaxNode, meandag, maxdag
+
+function pack(b::Board)
+    p = UInt128(0)
+    for x in b
+        p = p<<5 + x
+    end
+    for x in size(b)
+        p = p<<4 + x
+    end
+    p
+end
+
+function unpack(x::UInt128)
+    m::Int
+    n::Int
+    n = x & 15
+    x = x>>4
+    m = x & 15
+    x = x>>4
+    b = zeros(Int, m, n)
+    for i in m*n:-1:1
+        b[i] = x & 31
+        x = x>>5
+    end
+    b
+end
+
+abstract DagNode
+
+board(node::DagNode) = unpack(node.packed)
+nutrange(p::Vector{Float64}) = findfirst(p):findlast(p)
+const pal = 10  # probability array length
+tal = collect(Float64, [1<<i for i=1:pal])  # tiles array list
+
+meandag = Dict{UInt64,DagNode}()
+"""
+    MeanNode(b::Board)
+
+Compute (or retrieve if cached in the dictionary `meandag`) a node with
+essentially 2 fields:
+* `proba` is a vector, where `proba[i]` is the probability
+  to reach the tile `2^i`; it's computed as the weighted mean
+  of `proba` for nodes associated to boards resulting from
+  insertion of tiles in any free cell of `b`;
+* `height` is the maximum number of moves that may be performed
+  starting from the board `b`.
+
+Computation is performed using a near-optimal strategy,
+using global variables `ifrozen,itarget,goal,restricted`.
+"""
+type MeanNode <: DagNode
+    packed::UInt128
+    proba::Vector{Float64}
+    height::Int
+
+    function MeanNode(b::Board)
+        global meandag::Dict{UInt64,DagNode}
+        bfree = b[ifree]
+        key = hash((ifrozen,itarget,goal,restricted,bfree))
+        node = get(meandag, key, nothing)
+        node == nothing || return node
+        proba = zeros(pal)
+        height = 0
+        izero = find(b .== 0)  # empty cells (indices)
+        nz = length(izero)
+        p1 = 0.9/nz
+        p2 = 0.1/nz
+        for i in izero
+            b[i] = 1
+            node = MaxNode(b)
+            proba += node.proba * p1
+            h = node.height + 1
+            h > height && (height = h)
+            b[i] = 2
+            node = MaxNode(b)
+            proba += node.proba * p2
+            h = node.height + 1
+            h > height && (height = h)
+            b[i] = 0
+        end
+        # get rid of tiny probabilities
+        proba = round(proba, 6)
+        meandag[key] = new(pack(b), proba, height)
+    end
+end
+
+maxdag = Dict{UInt64,DagNode}()
+"""
+    MaxNode(b::Board)
+
+Compute (or retrieve if cached in the dictionary `maxdag`) a node with
+essentially 4 fields:
+* `child` is a vector of at most 4 nodes of type `MeanNode`,
+  corresponding to legal moves from the board `b`;
+* `proba` is a vector, where `proba[i]` is the probability
+  to reach the tile `2^i`;
+* `best` is a couple `(i,j)`, where `i` is the index of the
+  best move inside the vector `child`, and `j` is the direction
+  of this move (1=left,2=right,3=up,4=down);
+* `height` is the maximum number of moves that may be performed
+  starting from the board `b`.
+
+Computation is performed using a near-optimal strategy,
+using global variables `ifrozen,itarget,goal,restricted`.
+"""
+type MaxNode <: DagNode
+    packed::UInt128
+    child::Vector{DagNode}
+    proba::Vector{Float64}
+    best::Tuple{Int,Int}
+    height::Int
+
+    function MaxNode(b::Board)
+        global maxdag::Dict{UInt64,DagNode}
+        bfree = b[ifree]
+        key = hash((ifrozen,itarget,goal,restricted,bfree))
+        node = get(maxdag, key, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        proba = zeros(pal)
+        best = (0,0)
+        height = 0
+        n = 0
+        sup = maximum(bfree)
+        local p::Float64
+        if sup < goal
+            for d = 1:4
+                bs, score, moved = slide(b, d)
+                if moved
+                    bs[ifrozen] == b[ifrozen] || continue
+                    sups = maximum(bs[ifree])
+                    if restricted ≤ sups
+                        ok = false
+                        for i in ifree
+                            bs[i] == sups || continue
+                            i in itarget && (ok = true)
+                            i in ixtarget || (ok = false; break)
+                        end
+                        ok || continue
+                    end
+                    n += 1
+                    c = MeanNode(bs)
+                    push!(child, c)
+                    if n < 2
+                        best = (n,d)
+                        proba = c.proba
+                        p = sum(tal .* proba)
+                    else
+                        cp = sum(tal .* c.proba)
+                        cp > p && (p = cp; proba = c.proba; best = (n,d))
+                    end
+                    h = c.height
+                    h > height && (height=h)
+                end
+            end # for d = 1:4
+        end # if sup < goal
+        sup > 0 && n == 0 && (proba[sup] = 1.0)
+
+        # subtle: make a leaf if subsequent moves
+        # *as given by the dag* are not significant
+        if height > 0
+            k = nutrange(proba)
+            if length(k) == 1
+                leaf = true
+                for c in child
+                    proba == c.proba || (leaf = false; break)
+                end
+                leaf && (height = 0)
+            end
+        end
+        maxdag[key] = new(pack(b), child, proba, best, height)
+    end
+end
+
+isleaf(d::DagNode) = (d.height == 0)
+
+function show(io::IO, d::DagNode)
+    b = board(d)
+    m, n = size(b)
+    print(io, "[")
+    for i in 1:m
+        for j in 1:n
+            print(io, " ", b[i,j])
+        end
+        if i < m
+            print(io, ";")
+        else
+            print(io, "]")
+        end
+    end
+    k = nutrange(d.proba)
+    p = d.proba[k]
+    p = round(100*p,2)
+    if isa(d, MeanNode)
+        println(io, " -> proba $k$p height $(d.height)")
+    else
+        println(io, " -> proba $k$p best $(d.best) height $(d.height)")
+    end
+end
+
+function near(k, dims)
+    m, n = dims
+    i, j = ind2sub(dims,k)
+    u = [0, 0, 0, 0]
+    if j > 1
+        p = k-m
+        u[1] = p
+        i % m > 0 && (u[3] = p+1)
+    end
+    if i > 1
+        u[2] = k-1
+        j < n && (u[4] = k+m-1)
+    end
+    u
+end
+
+function compact(b::Board, area)
+    dims = size(b)
+    for k in area
+        x = b[k]
+        u = near(k, dims)
+        for i in u[1:2]
+            i > 0 && b[i] ≤ x && return false
+        end
+        i, j = u[3:4]
+        if i == 0    # k in col 1
+            j > 0 && b[j] == x && return false
+        else
+            if j == 0   # k in row 1
+                b[i] == x && return false
+            else
+                row, col = ind2sub(dims, i)
+                col == 1 && b[i] == x && return false
+                row, col = ind2sub(dims, j)
+                row == 1 && b[j] == x && return false
+            end
+        end
+    end
+    true
+end
+
+function corners(u, dims)
+    # u = collect(Int, u)
+    v = Vector{Int}()
+    m, n = dims
+    a, b = 1, 0
+    for c in u
+        b += 1
+        if b < c    # new col
+            if b < a + m
+                push!(v, b)
+                a = b
+            end
+            b = c
+        end
+        a+m ≤ b && (a += m)
+    end
+    b += 1
+    b < a + m && push!(v, b)
+    b -= 1
+    if b > 0
+        b += m - (b-1)%m
+        b < m*n && push!(v, b)
+    end
+    v
+end
+
+initgoal = 6
+restricted = 5
+
+function target(b::Board; upgoal=false)
+    dims = size(b)
+    global ifrozen = find(b .≥ initgoal)
+    global ifree = setdiff(1:prod(dims), ifrozen)
+    global itarget, ixtarget, goal
+    bound = 16 - length(ifree)
+    wish = minimum(b[ifrozen])
+    upgoal && !isempty(ifrozen) && (goal = min(wish, bound))
+    itarget = Vector{Int}()
+    cif = corners(ifrozen, dims)
+    for k in cif
+        for i in near(k, dims)
+            if i > 0 && b[i] == goal
+                push!(itarget, k)
+                break
+            end
+        end
+    end
+    isempty(itarget) && (itarget = cif)
+    ixtarget = copy(itarget)
+    cif = setdiff(ifree,itarget)
+    for k in cif
+        for i in near(k, dims)
+            if i in itarget
+                push!(ixtarget, k)
+                break
+            end
+        end
+    end
+    goal,ifrozen,itarget,ixtarget
+end
+
+function play!(g::Game; moves=32768, display=false, upgoal=false, verbose=false)
+    n = g.length
+    if n < 2
+        g.hist = History(128)
+        record(g.hist, g.board, 0, 0)
+    end
+    t=target(g.board, upgoal=upgoal)
+    gf = g[ifrozen]
+    initnode = MaxNode(g.board)
+    if verbose && !isleaf(initnode)
+        println(g.length,":",t)
+        println(gf,initnode)
+    end
+    while g.length < n + moves
+        node = MaxNode(g.board)
+        isleaf(node) && break
+        c = node.child[node.best[1]]
+        g.board = board(c)
+        g.board[ifrozen] = gf
+        g.newtile = tileinsert!(g.board)
+        g.length += 1
+        g.depth = node.height
+        display && plot(g)
+        record(g)
+    end
+    g.length
+end
+
+function xplay!(g::Game; minfrozen=0, display=false, upgoal=false, spot=16, verbose=false)
+    m, n = size(g.board)
+    minfrozen ≤ 0 && (minfrozen = m*n - 8)
+    while g[1] < spot
+        u = find(g.board .≥ initgoal)
+        length(u) ≥ minfrozen && compact(g.board, u) &&
+            play!(g, display=display, upgoal=upgoal, verbose=verbose)
+        λ = g.length
+        jb2048.play!(g, moves=1, display=display)
+        λ == g.length && break
+    end
+    g.length
+end
+
+function xrepartition(n::Int; minfrozen=0, upgoal=false, verbose=1:0)
+    hsup = zeros(Int, 16)
+    hmoves = zeros(Int, n)
+    for i=1:n
+        g = jb2048.initgame()
+        xplay!(g, minfrozen=minfrozen, upgoal=upgoal)
+        sup = maximum(g.board)
+        hsup[sup] += 1
+        hmoves[i] = g.length
+        if length(verbose) > 1
+            v = hsup[verbose]
+            println(i,": ",(g.length, 1<<sup), " -> $v")
+        end
+    end
+    round(Int, mean(hmoves)), hsup, hmoves
+end
+
+function setparameters(b::Board;Pgoal=nothing,Prestricted=4,
+    Pfrozen=nothing,Ptarget=nothing)
+    dims = size(b)
+    is(Pgoal,nothing) && (Pgoal = prod(dims) + 1)
+    global goal = Pgoal
+    global restricted = Prestricted
+    global ifrozen = Pfrozen
+    global ifree = 1:prod(dims)
+    !is(ifrozen,nothing) && (ifree = setdiff(ifree,ifrozen))
+    global itarget = Ptarget
+    global ixtarget = copy(itarget)
+    if !is(ifrozen,nothing) && !is(itarget,nothing)
+        u = sort([ifrozen;itarget])
+        append!(ixtarget, corners(u, dims))
+    end
+    goal,restricted,ifrozen,ifree,itarget,ixtarget
+end
+
+end

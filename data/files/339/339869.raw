@@ -1,0 +1,2 @@
+using GLPlot
+GLPlot.init()

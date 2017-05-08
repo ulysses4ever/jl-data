@@ -1,0 +1,37 @@
+
+module Chapter1
+##
+# Dependencies
+##
+using Reexport
+@reexport using DataFrames
+@reexport using GZip
+
+##
+# Exported methods and types in addition to @reexport above
+##
+
+export @~,
+FixedWidthColumn,
+
+extractfield,
+readdictfile,
+readdatafile,
+valuecounts
+
+
+
+
+##
+# included files
+##
+
+for (dir, filename) in [
+                        ("","FixedWidthColumn.jl"),
+                        ("","ReadDataFile.jl")
+    ]
+
+    include(joinpath(dir,filename))
+end
+
+end

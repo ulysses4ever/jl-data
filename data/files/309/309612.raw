@@ -1,0 +1,25 @@
+using DataFrames, DecisionTree, kaggle
+
+data = readtable("../data/training.csv")
+
+N = size(data,1)
+#M = ceil(1*N)
+#rind = randperm(N)
+#trainind = rind[1:M]
+#testind = rind[M+1:end]
+
+xtrain = array(data[:,2:47])
+ytrain = float(data[:,:signal])
+#xtest = array(data[testind,1:47])
+#ytest = array(data[testind,:signal])
+
+xtrain,mu,sigma = featnorm(xtrain)
+
+testdata = readcsv("../data/test.csv")[2:end,2:end]
+xtest = apply_featnorm(xtest,mu,sigma)
+
+model = build_forest(ytrain, xtrain, 7, 250, 0.2)
+pred = apply_forest(model, xtest)
+
+submission = DataFrame(id=int(testdata[:,1]), prediction=float(pred))
+writetable("submission_rf2.csv",submission)

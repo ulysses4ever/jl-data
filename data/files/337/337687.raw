@@ -1,0 +1,221 @@
+function cursor(; m::MonetDBConnection = monetdbconn)
+
+    return 	MonetDBCursor(
+
+        m,             # connection::MonetDBConnection
+    	"",            # operation::AbstractString
+        100,           # arraysize::Int
+    	-1,            # rowcount::Int
+    	nothing,       # description::Any
+    	-1,            # rownumber::Int
+    	nothing,       # __executed::Any
+    	0,             # __offset::Int
+    	[],            # __rows::AbstractArray
+    	-1,            # __query_id::Int
+    	[],            # messages::AbstractArray
+    	nothing        # lastrowid::Union{Int, Void}
+        )
+
+end
+
+function __check_executed(c::MonetDBCursor)
+    c.__executed == nothing ? error("Do an execute() command first"): nothing
+end
+
+function close!(c::MonetDBCursor)
+    c.connection = nothing
+    return println("Cursor closed")
+end
+
+function execute!(c::MonetDBCursor; operation::AbstractString = "", parameters::Any = nothing)
+
+    if c.connection == nothing
+        error("Cursor is closed")
+    end
+
+    #Reset message history
+    c.messages = []
+
+    #Convert to utf-8, seems redundant
+    #operation = String(operation)
+
+    if c.arraysize != c.connection.replysize
+        c.arraysize = c.connection.replysize
+    end
+
+    #In python code, not sure why it needs to be saved in cursor
+    c.operation = operation
+
+    #query building code here
+    # if parameters:
+    #     if isinstance(parameters, dict):
+    #         query = operation % dict([(k, monetize.convert(v))
+    #                                  for (k, v) in parameters.items()])
+    #     elif type(parameters) == list or type(parameters) == tuple:
+    #         query = operation % tuple([monetize.convert(item) for item
+    #                                    in parameters])
+    #     elif isinstance(parameters, str):
+    #         query = operation % monetize.convert(parameters)
+    #     else:
+    #         msg = "Parameters should be None, dict or list, now it is %s"
+    #         self.__exception_handler(ValueError, msg % type(parameters))
+    # else:
+        query = operation
+
+    block = cmd(query)
+    __store_result(c; block = block)
+    c.rownumber = 1
+    c.__executed = query
+    return c.rowcount
+
+end
+
+function executemany()
+
+end
+
+function fetchone()
+
+end
+
+function fetchmany()
+
+end
+
+function fetchall()
+
+end
+
+function nextset()
+
+end
+
+# function __iter__()
+#
+# end
+
+function next()
+
+end
+
+function __store_result(c::MonetDBCursor; block::AbstractString = "")
+    """ parses the mapi result into a resultset"""
+
+    column_name = ""
+    scale = display_size = internal_size = precision = 0
+    null_ok = false
+    type_ = []
+
+    for line in split(block, "\n")
+        if startswith(line, c.connection.MSG_INFO)
+            error(line[2:end])
+
+        elseif startswith(line, c.connection.MSG_QTABLE)
+            __query_id, rowcount, columns, tuples = split(line[4:end], " ")
+
+            c.__query_id = parse(Int, __query_id)
+            columns = parse(Int, columns)   # number of columns in result
+            c.rowcount = parse(Int, rowcount)  # total number of rows
+            c.__rows = []
+
+            # set up fields for description
+            column_name = Array(AbstractString, columns)
+            type_ = Array(Any, columns) #modify Any types once better understood
+            display_size = Array(Any, columns)
+            internal_size = Array(Any, columns)
+            precision = Array(Any, columns)
+            scale = Array(Any, columns)
+            null_ok = Array(Any, columns)
+            c.__offset = 1 #Should this actually be zero like in Python code?
+            c.lastrowid = nothing
+
+        elseif startswith(line, c.connection.MSG_HEADER)
+            data, identity = split(line[2:end], "#")
+            values = [strip(x) for x in split(data, ",")]
+            identity = strip(identity)
+
+            if identity == "name"
+                column_name = values
+            elseif identity == "type"
+                type_ = values
+            elseif identity == "typesizes"
+                typesizes = [[parse(Int, j) for j in split(i, " ")] for i in values]
+                internal_size = [x[1] for x in typesizes]
+                for (num, typeelem) in enumerate(type_)
+                    if typeelem in ["decimal"]
+                        precision[num] = typesizes[num][1]
+                        scale[num] = typesizes[num][2]
+                    end
+                end
+
+            c.description = zip(column_name, type_, display_size,
+                                        internal_size, precision, scale,
+                                        null_ok)
+            c.__offset = 1 #Should this actually be zero like in Python code?
+            c.lastrowid = nothing
+
+            end
+
+        elseif startswith(line, c.connection.MSG_TUPLE)
+            values = __parse_tuple(c, line)
+            push!(c.__rows, values)
+
+        elseif startswith(line, c.connection.MSG_TUPLE_NOSLICE)
+            push!(c.__rows, line[1:end])
+
+        elseif startswith(line, c.connection.MSG_QBLOCK)
+            c.__rows = []
+
+        elseif startswith(line, c.connection.MSG_QSCHEMA)
+            c.__offset = 1 #Should this actually be zero like in Python code?
+            c.lastrowid = nothing
+            c.__rows = []
+            c.description = nothing
+            c.rowcount = -1
+
+        elseif startswith(line, c.connection.MSG_QUPDATE)
+            affected, identity = split(line[2:end], " ")
+            self.__offset = 1 #Should this actually be zero like in Python code?
+            self.__rows = []
+            self.description = nothing
+            self.rowcount = int(affected)
+            self.lastrowid = int(identity)
+            self.__query_id = -1
+
+        elseif startswith(line, c.connection.MSG_QTRANS)
+            self.__offset = 1 #Should this actually be zero like in Python code?
+            self.lastrowid = nothing
+            self.__rows = []
+            self.description = nothing
+            self.rowcount = -1
+
+        elseif line == c.connection.MSG_PROMPT
+            return
+    #
+    #     elif line.startswith(mapi.MSG_ERROR):
+    #         self.__exception_handler(ProgrammingError, line[1:])
+        end
+    end
+
+end
+
+function __parse_tuple(c::MonetDBCursor, line::AbstractString)
+    """ parses a mapi data tuple, and returns a list of python types"""
+    elements = tuple(split(line[3:end-2], ",\t")...)
+    #if length(elements) == length(c.column_name)
+        return elements  #Parse into proper data types here?
+    # else
+    #     error("Length of row doesn't match header")
+    #     return tuple([pythonize.convert(element.strip(), description[1])
+    #                   for (element, description) in zip(elements,
+    #                                                     self.description)])
+    # else:
+    #     self.__exception_handler(InterfaceError,
+    #                              "length of row doesn't match header")
+    # end
+
+end
+
+function scroll()
+
+end

@@ -1,0 +1,76 @@
+module RAD
+
+using Calculus, Debug
+import Base.Meta.isexpr
+
+##### run-time types
+immutable WRT{T}
+    val::T
+end
+
+abstract AbstractSeed{T}
+immutable SeedWithVal{T} <: AbstractSeed{T}
+    val::T
+    dval::T
+end
+immutable Seed{T} <: AbstractSeed{T}
+    dval::T
+end
+
+include("compiletimetypes.jl")
+include("flatten.jl")           #replace deeply nested Exprs with blocks of shorter Exprs
+include("encode.jl")            #mark up AST and return dict of active symbols
+include("grad.jl")              #all reverse sweep except d_assign_call(*) functions
+include("gradient_rules.jl")    #d_assign_call(*)
+include("decode.jl")            #generate "function evaluation" code, saving values of overwritten vars appropriately
+include("cleanup.jl")           #anything we want to do to the generated gradient code goes here
+
+export WRT, Seed, SeedWithVal, @autodiff, autodiff, fungrad, SymDict,
+       storeIntermediate!, unstoreIntermediate!
+       #flatten, encode!, decode!, grad,
+       #sym, dsym, SymDict,
+       #ASymbol, ARef, ATrans
+
+
+storeIntermediate!{T}(s1::Array{T,1},s2::Array{Any,1},x::T) = push!(s1,x)
+storeIntermediate!{T,S}(s1::Array{T,1},s2::Array{Any,1},x::S) = push!(s2,x)
+unstoreIntermediate!{T}(s1::Array{T,1},s2::Array{Any,1},x::Type{T}) = pop!(s1)
+unstoreIntermediate!{T,S}(s1::Array{T,1},s2::Array{Any,1},x::Type{S}) = pop!(s2)
+
+### main functions and macro
+@debug function fungrad(wrtList::Array, f::Expr)
+    #fungrad: return Expr for method of f which returns
+    #function value and derivatives w/r/t symbols in WRTlist
+    #e.g. given (x,), f(x,y) create a method f(s::Seed,x,y) returning (val,dval/dx)
+    s = ["active"=>SymDict(),"inactive"=>SymDict(),"overwriting"=>Dict(),
+         "tape1"=>gensym("tape1"),"tape2"=>gensym("tape2")]
+    for arg in wrtList; activate!(s,arg); end
+    f_flat = flatten(f)
+    f_encoded=encode!(f_flat,s)
+    @bp
+    fg = gradient(f_encoded,s)[1]
+    @bp
+    fg_clean = cleanup(fg)
+    @bp
+    fg_clean
+end
+
+
+function autodiff(wrts::Expr, f::Expr)
+    @assert wrts.head == :tuple
+    @assert all(x->isa(x,Symbol),wrts.args)
+    b_out = Expr(:block)
+    push!(b_out.args,f)
+    for nn=length(wrts.args):-1:1
+        for wrtList in combinations(wrts.args,nn)
+            push!(b_out.args,fungrad(wrtList,f))
+        end
+    end
+    b_out
+end
+
+macro autodiff(wrts::Expr,f::Expr)
+    esc(autodiff(wrts,f))
+end
+
+end # module

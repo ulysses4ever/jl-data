@@ -1,0 +1,15 @@
+# =============================================================================
+# 03_kmeans_samp.jl - simple sample kmeans
+# kmeans clustering by julia
+# Copyright(C). masaru.nakagawa 2017. All rights reserved.
+# =============================================================================
+using DataFrames
+using Clustering
+
+x = rand(100, 10000)
+k = 50
+# result = kmeans(x, k; max_iter=50, display=:iter)
+result = kmeans(x, k)
+
+# Show Cluster ID
+print(result.assignments)

@@ -1,0 +1,18 @@
+module tests
+
+	using FactCheck
+
+	context("Tests on the value of the portfolio for specific parameters") do
+
+		facts("Are the results similar to the ones in the paper for similar parameters?") do
+			para = Dict("teta"=> 0.7,"rho"=>0.99, "sigma"=>0.05, "alpha" => 0.8, "lambda" => 2,"gamma"=>10, "beta"=>1, "psi" => 0.05, "tau" => 0.00419)
+			@fact Opt_portfolio_choices.solver(para,0.70,100000,0.0001)["k0"] --> roughly(0.8; atol=0.01)
+		end
+
+		facts("Is the portfolio fully diversify without asset trade cost and without consumption home bias? Implied by the theory") do
+			para = Dict("teta"=> 0.7,"rho"=>0.99, "sigma"=>0.05, "alpha" => 0.5, "lambda" => 2,"gamma"=>10, "beta"=>1, "psi" => 0.05, "tau" => 0.000)
+			@fact Opt_portfolio_choices.solver(para,0.2,100000,0.0001)["k0"] --> roughly(0.5; atol=0.01)
+		end
+
+	end
+end

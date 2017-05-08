@@ -1,0 +1,104 @@
+module Typeset
+
+export Typesettable, typeset, @typeset
+
+type Typesettable{T}
+  value::Any
+end
+
+typeset(n::Number) = string(n)
+
+function isAdditive(ex::Expr)
+  ex.head === :call && (ex.args[1] === :+ || ex.args[1] === :-)
+end
+
+isAdditive(fallthru) = false
+
+function isMultiplicativeOrLess(ex::Expr)
+  ex.head === :call && (ex.args[1] === :* || ex.args[1] === :/ || isAdditive(ex))
+end
+
+isMultiplicativeOrLess(fallthru) = false
+
+function parenthesize(ex)
+  string("\\left(", typeset(ex), "\\right)")
+end
+
+function parenthesizeIfAdditive(ex)
+  if isAdditive(ex)
+    parenthesize(ex)
+  else
+    typeset(ex)
+  end
+end
+
+function typesetUnknownExpr(name::String, args::Array)
+  string("\\mathrm{", name, "}", parenthesize(args))
+end
+
+function typeset{T}(t::Typesettable{T})
+  typesetUnknownExpr(string(T), t.value)
+end
+
+function typeset(s::Symbol)
+  string("SYM", s)
+end
+
+function typeset(arr::Array)
+  out = typeset(arr[1])
+  for i = 2:length(arr)
+    out = string(out, ", \\,", typeset(arr[i]))
+  end
+  out
+end
+
+function typeset(ex::Expr)
+  if ex.head === :call
+    methodSymbol = ex.args[1]
+    methodParams = ex.args[2:length(ex.args)]
+    return typeset(Typesettable{methodSymbol}(methodParams))
+  elseif ex.head === :comparison
+    methodSymbol = ex.args[2]
+    return typeset(Typesettable{methodSymbol}([ex.args[1], ex.args[3]]))
+  else
+    return string(ex.head, typeset(ex.args))
+  end
+end
+
+function typeset(t::Typesettable{:+})
+  out = typeset(t.value[1])
+  for i = 2:length(t.value)
+    out = string(out, " + ", typeset(t.value[i]))
+  end
+  out
+end
+
+function typeset(t::Typesettable{:-})
+  out = typeset(t.value[1])
+  for i = 2:length(t.value)
+    out = string(out, " + ", typeset(t.value[i]))
+  end
+  out
+end
+
+function typeset(t::Typesettable{:*})
+  out = parenthesizeIfAdditive(t.value[1])
+  for i = 2:length(t.value)
+    out = string(out, " \\times ", parenthesizeIfAdditive(t.value[i]))
+  end
+  out
+end
+
+function typeset(t::Typesettable{:/})
+  string("\\frac{", typeset(t.value[1]), "}{", typeset(t.value[2]), "}")
+end
+
+macro typeset(expr)
+  texCode = typeset(expr)
+  return quote
+    local val = $(esc(expr))
+    val, $texCode
+  end
+end
+
+end # module

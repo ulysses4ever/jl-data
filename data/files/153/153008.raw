@@ -1,0 +1,76 @@
+module Utility
+
+#array functions
+
+#merges two arrays and returns it
+function mergearrays{T}(arr1::AbstractArray{T},
+                        arr2::AbstractArray{T},
+                        comp::Function = leq)
+  l1 = length(arr1)
+  l2 = length(arr2)
+
+  arr3 = Array(T, l1 + l2)
+
+  i = 1
+  j = 1
+
+  for k = 1:(l1+l2)
+    if i > l1
+      @inbounds arr3[k] = arr2[j]
+      j += 1
+      continue
+    end
+
+    if j > l2
+      @inbounds arr3[k] = arr1[i]
+      i += 1
+      continue
+    end
+
+    @inbounds if comp(arr1[i], arr2[j])
+      @inbounds arr3[k] = arr1[i]
+      i += 1
+    else
+      @inbounds arr3[k] = arr2[j]
+      j += 1
+    end
+  end
+
+  arr3
+end
+
+#returns the partitioning value index
+function partition!(array::AbstractVector,
+                   comp::Function = leq,
+                   left = 1,
+                   right = length(array), randpiv = false)
+  if randpiv
+    p = rand(left:right)
+    x = array[p]
+    (array[p], array[right]) =
+      (array[right], array[p])
+  else
+    x = array[right]
+  end
+
+  wall = left-1
+  for j = left:(right-1)
+    if comp(array[j], x)
+      wall += 1
+      (array[wall], array[j]) =
+        (array[j], array[wall])
+    end
+  end
+  wall += 1
+  (array[wall], array[right]) =
+    (array[right], array[wall])
+  wall
+end
+
+#compare functions
+lesser(x,y) = x < y
+greater(x,y) = x > y
+leq(x,y) = x <= y
+geq(x,y) = x >= y
+
+end

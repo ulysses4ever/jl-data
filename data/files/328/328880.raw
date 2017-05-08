@@ -1,0 +1,35 @@
+function newton(f,fd,x0)
+  x = x0
+  inic=x0
+  xn=0
+  fx=f(x)
+  i = 0
+  err = 0.00001
+  dif = 1
+  while(dif>err)
+    if fd(x) == 0
+      return "Não convergiu: fd(x)=0"
+      break
+    end
+    xn = x - f(x)/fd(x)
+    dif = abs(xn-x)
+    x=xn
+    i=i+1
+  end
+  println ("Aproximação da raíz: ",xn,)
+  println ("x0 = ",inic)
+  println ("Valor da f(x): ",fx)
+  println ("Número de iterações: ",i)
+  println ("Convergiu")
+end
+
+function f(x)
+  return x^2-2
+end
+
+function fd(x)
+  return 2*x
+end
+
+x0=10
+newton(f,fd,x0)

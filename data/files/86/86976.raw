@@ -1,0 +1,30 @@
+using SplineDesignMatrix
+using Base.Test
+using DataFrames
+using GLM
+
+function test_show(x)
+    io = IOBuffer()
+    show(io, x)
+end
+
+
+## Formaldehyde data from the R Datasets package
+form = DataFrame(Carb=[0.1,0.3,0.5,0.6,0.7,0.9],OptDen=[0.086,0.269,0.446,0.538,0.626,0.782])
+
+println(" ** ", "degree 1 polynomial")
+
+lm1 = fit(LinearModel, Poly(:OptDen,:Carb,1), form)
+lm1form = fit(LinearModel, OptDen ~ Carb, form)
+test_show(lm1)
+@test_approx_eq coef(lm1) coef(lm1form)
+
+
+
+
+println(" ** ", "degree 2 polynomial")
+
+# compare to result of coef(summary(lm(optden ~ poly(carb,2, raw=TRUE), Formaldehyde))) in R
+lm2 = fit(LinearModel, Poly(:OptDen,:Carb,2), form) 
+
+@test_approx_eq_eps coef(lm2) [-0.01168268, 0.97112338,  -0.09621212] 10.0^(-8)

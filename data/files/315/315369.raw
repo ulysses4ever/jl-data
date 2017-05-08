@@ -1,0 +1,45 @@
+import PyPlot
+plt=PyPlot
+plt.ion()
+"""
+    threshold(obs)
+
+Plot the array of n *observations* returned by `repartition(n)`,
+i.e. the array of lengths of n games played with the same settings.
+When a game reaches, say, 8192, the number of moves is around
+3720=8192/2.2 That's why powers of 2, between 2^11 and 2^15, are
+displayed in green below the x-axis. Values on the y-axis are random, to
+separate close results.
+"""
+function threshold(obs)
+    sup=16
+    xmax=1000*sup
+    sourceth=[k*1024 for k=1:2*sup]
+    th=[10*div(t,11) for t in sourceth]
+    plt.clf()
+    plt.subplots_adjust(left=0.02, right=0.98, bottom=0.02, top=0.98)
+    plt.axis([0,xmax,0.7,1.7])
+    plt.xticks([])
+    plt.yticks([])
+    plt.plot([0,xmax],[1,1])
+    for k=1:2:sup
+        plt.plot([th[k],th[k]],[1,1.05],color="black")
+        plt.text(th[k],0.95,ha="center","$(th[k])")
+    end
+    for k=2:2:sup
+        plt.plot([th[k],th[k]],[0.94,1],color="black")
+        plt.text(th[k],0.9,ha="center","$(th[k])")
+    end
+    for k in [1,2,4,8,16]
+        t=th[k]
+        st=sourceth[2k]
+        plt.text(t,0.85,ha="center",color="green","$st")
+    end
+    n=length(obs)
+    y=1+0.5*rand(n)
+    plt.plot(obs,y,"ro")
+end
+
+r100=[8389,6489,6578,3097,3872,3741,892,6734,6025,5580,11178,10992,4913,5582,6339,6972,7006,12598,12941,3704,7053,5169,6834,7356,6538,7333,3164,6551,5205,7390,5256,7196,7430,5596,7419,7477,7444,7162,3643,10710,5629,7286,6238,7486,8035,6768,11153,6544,7462,6313,9692,9289,7462,9169,12959,7237,11169,11169,3155,6306,3689,14014,10175,5574,7335,10152,7442,7382,5580,7424,11198,9314,11178,10752,12675,5295,7136,12100,4753,4551,9808,6990,7370,7425,4697,5007,11191,10231,7426,5622,3689,6746,11181,7464,6989,11107,6050,2929,7475,6571]
+
+threshold(r100)

@@ -1,0 +1,30 @@
+using Gadfly
+
+include("../src/saddle_point_solve.jl") 
+include("toeplitz.jl")
+
+
+m = 4000
+n = 6000
+(F,G,H) = toeplitz(m,n)
+f = randn(m,1)
+g = randn(n,1)
+
+
+tic()
+(x,y) = saddle_point_solve(F,G,H,f,g) 
+toc()
+
+println("Done.") 
+
+# Compare to straightforward implementation
+A = [F   H ;
+     H' -G]
+b = [f ; g]
+x = A\b 
+
+tic()
+println("Straighforward implementation residual : ", norm(A*x-b)/norm(b))
+toc()
+
+

@@ -1,0 +1,257 @@
+module lexer
+include("tools.jl")
+
+legacy_regexes = Dict{AbstractString, Regex}(
+    "string" => r"'(^'|'')*'",
+    "item" => r".+[\.:]+|[^\w][\.:]+",
+    "name" => r"[A-Za-z][\w\d]*",
+    "number" => r"[\d_]([\w\d]*(\s*[\d_])?)+",
+    "paren" => r"[()]",
+)
+
+regexes = Dict{AbstractString, Regex}(
+    "string" => r"'([^']|\.)*'",
+    "multistring" => r"'''.*?'''", # The ? is lazy matching
+    "item" => r"[^()']+[\.:]+|[^\w()'][\.:]*",
+    "name" => r"[^!-@\[-`{-~\s][^!-/:-@\[-`{-~]", #Supports unicode
+    "number" => r"[\d_]([\w\d]*(\s*[\d_])?)+",
+    "paren" => r"[()]",
+)
+
+regex_meta_dict = Dict{Bool, Dict{AbstractString, Regex}}(
+    true => legacy_regexes,
+    false => regexes
+)
+
+escape_chars = Dict{Bool, Char}(
+    true => '\'',
+    false => '\\'
+)
+
+legacy_escapes = Dict{Char, Char}(
+    '\'' => '\''
+)
+
+escapes = Dict{Char, Char}(
+    '\\' => '\\',
+    'n' => '\n',
+    '\'' => '\'',
+    '0' => '\0'
+)
+
+escape_dicts = Dict{Bool, Dict{Char, Char}}(
+    true => legacy_escapes,
+    false => escapes
+)
+
+function stripped_string_parser(to_parse::AbstractString, legacy::Bool=false)
+    quote_char = '\''
+
+    return_vector = Vector{Char}()
+    escaped = false
+    escape_char = escape_chars[legacy]
+    escape_dict = escape_dicts[legacy]
+
+    for i in to_parse
+        if !escaped
+            if i == escape_char
+                escaped = true
+            elseif i == quote_char
+                raise("Unescaped quote found in string $to_parse", 0)
+            else
+                push!(return_vector, i)
+            end
+        else
+            push!(return_vector, escape_dict[i])
+            escaped = false
+        end
+    end
+
+    if escaped
+        raise("Escape char at last place of string. $to_parse", 0)
+    end
+
+    return_vector
+end
+
+function generic_string_parser(to_parse::AbstractString,
+    number_of_quotes::Integer, parser_name::AbstractString, legacy::Bool=false)
+    if match(regex_meta_dict[legacy][parser_name], to_parse) === nothing
+        raise(
+            "Trying to parse invalid string: " *
+            "$to_parse (does not match regex)", 0
+        )
+    end
+
+    inner_string = to_parse[1 + number_of_quotes:end - number_of_quotes]
+    stripped_string_parser(inner_string, legacy)
+end
+
+function string_parser(to_parse::AbstractString, legacy::Bool=false)
+    generic_string_parser(to_parse, 1, "string", legacy)
+end
+
+function multistring_parser(to_parse::AbstractString, legacy::Bool=false)
+    if legacy
+        raise("You did not intend to use multistring_parser in legacy mode." *
+              "(If you think otherwise, you are wrong; plain wrong.)", 0)
+    end
+    generic_string_parser(to_parse, 3, "multistring", legacy)
+end
+
+base_alphabet = join('0':'9') * join('a':'z')
+function convert_base(base, expression)
+    if base == 0
+        search(base_alphabet, expression[end]) - 1
+    else
+        # TODO: float support
+        expression = map(search, repeated(base_alphabet), expression) - 1
+        if base == 1
+            sum(expression)
+        else
+            l = length(expression)
+            sum(expression .* (base .^ collect(range(l-1, -1, l))))
+        end
+    end
+end
+
+count_number(count_from, to_count) = count(x -> x == to_count, count_from)
+
+exponents = Dict{Char, Number}(
+# TODO: implement a legacy version of this  dict
+# Number instead of Real because imaginary exponents are not unfeasible
+    'x' => e,
+    'p' => π,
+    'π' => π,
+    'e' => 10,
+    'E' => 10
+)
+
+function handle_exponent(to_parse::AbstractString, legacy::Bool=false)
+    for key in keys(exponents)
+        if count_number(to_parse, key) == 1
+            factor, exponent = map(
+                number_parser,
+                split(to_parse, key, limit=2, keep=true)
+            )
+            base = exponents[key]
+            return factor * base ^ exponent
+        end
+    end
+    raise("Wrong number of exponents in (part of) number: $to_parse", 1)
+end
+
+function handle_base(to_parse::AbstractString, legacy::Bool=false)
+    base, expression = split(to_parse, 'b', limit=2, keep=true)
+    base = number_parser(base)
+    if !legacy
+        expression = lowercase(expression)
+        if base <= 1
+            raise(
+                "Using a base <= 1 can have (yet completely predictable, no " *
+                "randomness involved) unexpected results. If you want a " *
+                "negative expression in a certain base, use " *
+                "(base)b_(number) instead. So: _16bff becomes 16b_ff.", 1
+            )
+        end
+    end
+    convert_base(base, expression)
+end
+
+function handle_bignum(to_parse::AbstractString, legacy::Bool=false)
+    stripped = to_parse[1:end-1]
+    if stripped == "_"
+        BigFloat(Inf)
+    else
+        parse('.' ∈ stripped ? BigFloat : BigInt, stripped)
+    end
+end
+
+function handle_frac(to_parse::AbstractString, legacy::Bool=false)
+    #TODO: what were the names for top and bottom of a fraction again?
+    top, bottom = map(number_parser, split(to_parse, 'r'))
+    top // bottom
+end
+
+postfixes = ['x', 'p', 'π']
+
+downgrades = Dict{DataType, DataType}(
+    AbstractFloat => Int,
+    Integer => Bool,
+    BigInt => BigInt,
+    BigFloat => BigFloat
+)
+
+function downgrade{from <: Number}(parsed::from)
+    current = from
+    while current <: Number
+        if current ∈ keys(downgrades) && downgrades[current] !== typeof(parsed)
+            try
+                parsed = downgrades[current](parsed)
+            catch InexactError
+                break
+            end
+            current = typeof(parsed)
+        else
+            current = super(current)
+        end
+    end
+    parsed
+end
+
+function number_parser(to_parse::AbstractString, legacy::Bool=false)
+    if match(r"\s", to_parse) !== nothing
+        map(number_parser, split(to_parse), repeated(legacy))
+
+    elseif 'b' ∈ to_parse # Explicit base
+        handle_base(to_parse, legacy)
+
+    elseif "_" == to_parse
+        Inf
+
+    # TODO: This should probably be bundled with the bignum implementation
+    elseif !legacy && endswith(to_parse, ['p', 'π'])
+        number_parser(to_parse[1:end-1]) * π
+
+    # The …[2:end-1] excludes catches in the begin and end, those are invalid
+    # in this context, and handled elsewhere. For example, 3x shouldn't match.
+    elseif length(to_parse[2:end-1] ∩ keys(exponents)) > 0
+        handle_exponent(to_parse, legacy)
+
+    elseif 'r' ∈ to_parse
+        handle_frac(to_parse, legacy)
+
+    #HACK: The rstrip is fugly
+    elseif startswith(to_parse, "_") && rstrip(to_parse, postfixes) != "_"
+        # This doesn't catch ∞, because it is handled earlier
+        -number_parser(to_parse[2:end])
+
+    elseif endswith(to_parse, "x")
+        handle_bignum(to_parse)
+
+    else
+        parse('.' ∈ to_parse ? float : Int, to_parse)
+    end
+end
+
+parsers = Dict{AbstractString, Function}(
+    "string" => string_parser,
+    "multistring" => multistring_parser,
+    "number" => number_parser
+)
+
+function get_tokens(line::AbstractString, legacy::Bool=false)
+    regex_dict = regex_meta_dict[legacy]
+    tokens = []
+    idx = 1
+    while idx <= length(line)
+        for regex in regex_dict
+            if m
+                idx = m.offset
+                new_idx = idx + length(m.match)
+                parse_string(m[idx:idx + length(m.match)])
+            end
+        end
+    end
+end
+end

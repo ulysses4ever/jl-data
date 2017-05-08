@@ -1,0 +1,134 @@
+module GPTest
+
+using MathProgBase
+importall MathProgBase.SolverInterface
+
+export GPSolver
+type GPSolver <: MathProgBase.AbstractMathProgSolver
+end
+type GPModel <: MathProgBase.AbstractMathProgModel
+end
+MathProgBase.model(s::GPSolver) = GPModel()
+
+function MathProgBase.loadnonlinearproblem!(m::GPModel, numVar, numConstr, x_l, x_u, g_lb, g_ub, sense, 
+    d::MathProgBase.AbstractNLPEvaluator)
+
+    MathProgBase.initialize(d, [:ExprGraph])
+    
+    for c in 1:numConstr
+        check_expr_gp(MathProgBase.constr_expr(d,c))
+    end
+
+    #@test (objexpr == :(x[1]^x[2])) || (objexpr == :(-1.0*x[1]+1.0*x[2]))
+    #@assert MathProgBase.isconstrlinear(d,1)
+    #@test MathProgBase.constr_expr(d,1) == :(2.0*x[1] + 1.0*x[2] <= 1.0)
+    #@test MathProgBase.constr_expr(d,2) == :(2.0*x[1]*x[1] + 1.0*x[2] + -2.0 >= 0)
+    #@test MathProgBase.constr_expr(d,3) == :(sin(x[1]) * cos(x[2]) - 5 == 0.0)
+    #@test MathProgBase.constr_expr(d,4) == :(1.0*x[1]^2 - 1.0 == 0.0)
+    #@test MathProgBase.constr_expr(d,5) == :(2.0*x[1]^2 - 2.0 == 0.0)
+end
+
+MathProgBase.setwarmstart!(m::GPModel,x) = nothing
+MathProgBase.optimize!(m::GPModel) = nothing
+MathProgBase.status(m::GPModel) = :Optimal
+MathProgBase.getobjval(m::GPModel) = NaN
+MathProgBase.getsolution(m::GPModel) = [1.0,1.0]
+
+
+abstract Xial
+
+type Monomial <: Xial
+    c::Float64
+    idxs::Vector{Int}     # Should be a JuMP.IndexedVector
+    as::Vector{Float64}
+end
+Monomial() = Monomial(1,Int[],Float64[])
+function Base.print(io::IO, mon::Monomial)
+    print(io, mon.c)
+    for i in 1:length(mon.idxs)
+        print(io, "*x_{$(mon.idxs[i])}^{$(mon.as[i])}")
+    end
+end
+
+type Posynomial <: Xial
+    mons::Vector{Monomial}
+end
+function Base.print(io::IO, pos::Posynomial)    
+    if length(pos.mons) == 0
+        print(io, "0")
+    elseif length(pos.mons) == 1
+        print(io, pos.mons[1])
+    else
+        print(io, "[")
+        for mon in pos.mons[1:end-1]
+            print(io, mon, " + ")
+        end
+        print(io, pos.mons[end], "]")
+    end
+end
+
+# Mon-number
+(*)(num::Number, m::Monomial) = Monomial(num*m.c, m.idxs[:], m.as[:])
+(-)(m::Monomial, num::Number) = Monomial(m.c/num, m.idxs[:], m.as[:])
+(-)(num::Number, m::Monomial) = Monomial(m.c/num, m.idxs[:], m.as[:])
+# Mon-Mon
+(+)(m::Monomial, n::Monomial) = Posynomial([m,n])
+(*)(m::Monomial, n::Monomial) = Monomial(m.c*n.c, vcat(m.idxs, n.idxs), vcat(m.as, n.as))
+(/)(m::Monomial, n::Monomial) = Monomial(m.c/n.c, vcat(m.idxs, n.idxs), vcat(m.as,-n.as))
+
+
+(*)(num::Number, pos::Posynomial) = Posynomial(map(m->(num*m), pos.mons))
+function (-)(pos::Posynomial, num::Number)
+    # pos - number -> 1/number*pos [- 1]
+    # Requires expanding out and simplifying all constants first though
+    return (1/num)*pos
+end
+
+function check_expr_gp(ex::Expr)
+    println("check_expr_gp:  $ex")
+    #dump(ex)
+    
+    # Get constraint type
+    con_type = ex.args[2]
+    println("Constraint type: $con_type")
+    if con_type != :(<=)
+        warn("Skipping constraint, only handle <= right now")
+        return
+    end
+
+    # Process expression
+    lhs = ex.args[1]
+    
+    function descend(ex)
+        if ex.head == :ref
+            # A variable - simplest monomial
+            mon = Monomial(1.0, [ex.args[2]], [1.0])
+            println(mon)
+            return mon
+        else
+            # First arg is operation type
+            op = ex.args[1]
+            # Collect any Xials (or numbers)
+            xials = Union(Xial,Number)[]
+            for a in ex.args
+                if isa(a, Expr)
+                    push!(xials, descend(a))
+                elseif isa(a, Number)
+                    push!(xials, a)
+                end
+            end
+            # Merge them
+            merged = reduce(eval(op), xials)
+            println(merged)
+            return merged
+        end
+    end
+
+    final = descend(lhs)
+    println("Final: ", final)
+
+    println("")
+end
+
+
+end

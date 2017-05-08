@@ -1,0 +1,49 @@
+include( "IO_MCITW-1P.jl" )
+include( "verification.jl" )
+include( "searching.jl" )
+include( "neighbourhoods.jl" )
+
+function VND( prob, penPar )
+  
+  sol = GIS( prob )
+  
+  currObj = sol.trspCost + sol.invCost + sol.penCost*penPar
+  newObj = 0
+
+  indP = [0 0]
+
+#   for j1 in 1:(prob.cardP-1)
+#     for j2 = (j1+1):prob.cardP
+
+  for i1 in 1:(prob.cardD-1)
+    for i2 in (i1+1):prob.cardD
+    
+#       solNew = swapPickups( prob, sol, [j1 j2] )
+      solNew = swapDelivs( prob, sol, [i1 i2] )
+      newObj = solNew.trspCost + solNew.invCost + solNew.penCost*penPar
+
+      if ( ( sol.feas < 0 ) && ( solNew.feas >= 0 ) )
+        println("( sol.feas < 0 ) && ( solNew.feas >= 0 ) - solNew chosen")
+        sol = solNew
+        printSol(prob,sol)
+        currObj = sol.trspCost + sol.invCost + sol.penCost*penPar
+      elseif ( solNew.feas < 0 )
+        println("( solNew.feas < 0 ) - solNew discarded")
+        continue
+      else
+        if ( newObj < currObj )
+          println("( sol.feas >= 0 ) && ( solNew.feas >= 0 ) - solNew chosen")
+          println("currObj = $currObj ... newObj = $newObj")
+          sol = solNew
+          printSol(prob,sol)
+          currObj = sol.trspCost + sol.invCost + sol.penCost*penPar
+        else
+          println("currObj = $currObj ... newObj = $newObj")
+        end
+      end
+    end
+  end
+
+  return sol
+  
+end

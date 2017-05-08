@@ -1,0 +1,61 @@
+#Date Adjusters
+
+#Extracted from https://github.com/JuliaLang/julia/blob/master/test/dates/adjusters.jl
+# U.S. Federal Holidays
+newyears(y) = (y,1,1)
+independenceday(y) = (y,7,4)
+veteransday(y) = (y,11,11)
+christmas(y) = (y,12,25)
+boxingDay(y) = (y,12,26)
+dec27nth(y) = (y,12,27)
+dec28nth(y) = (y,12,28)
+dec29nth(y) = (y,12,29)
+dec30nth(y) = (y,12,30)
+dec31nth(y) = (y,12,31)
+
+isWinterHolidays(dt) = Dates.yearmonthday(dt) == christmas(Dates.year(dt))||
+  Dates.yearmonthday(dt) == boxingDay(Dates.year(dt))||
+  Dates.yearmonthday(dt) == dec27nth(Dates.year(dt))||
+  Dates.yearmonthday(dt) == dec28nth(Dates.year(dt))||
+  Dates.yearmonthday(dt) == dec29nth(Dates.year(dt))||
+  Dates.yearmonthday(dt) == dec30nth(Dates.year(dt))||
+  Dates.yearmonthday(dt) == dec31nth(Dates.year(dt))
+
+isnewyears(dt) = Dates.yearmonthday(dt) == newyears(Dates.year(dt))
+isindependenceday(dt) = Dates.yearmonthday(dt) == independenceday(Dates.year(dt))
+isveteransday(dt) = Dates.yearmonthday(dt) == veteransday(Dates.year(dt))
+ischristmas(dt) = Dates.yearmonthday(dt) == christmas(Dates.year(dt))
+ismartinlutherking(dt) = Dates.dayofweek(dt) == Dates.Mon &&
+    Dates.month(dt) == Dates.Jan && Dates.dayofweekofmonth(dt) == 3
+ispresidentsday(dt) = Dates.dayofweek(dt) == Dates.Mon &&
+    Dates.month(dt) == Dates.Feb && Dates.dayofweekofmonth(dt) == 3
+# Last Monday of May
+ismemorialday(dt) = Dates.dayofweek(dt) == Dates.Mon &&
+                    Dates.month(dt) == Dates.May &&
+                    Dates.dayofweekofmonth(dt) == Dates.daysofweekinmonth(dt)
+islaborday(dt) = Dates.dayofweek(dt) == Dates.Mon &&
+    Dates.month(dt) == Dates.Sep && Dates.dayofweekofmonth(dt) == 1
+iscolumbusday(dt) = Dates.dayofweek(dt) == Dates.Mon &&
+    Dates.month(dt) == Dates.Oct && Dates.dayofweekofmonth(dt) == 2
+isthanksgiving(dt) = Dates.dayofweek(dt) == Dates.Thu &&
+    Dates.month(dt) == Dates.Nov && Dates.dayofweekofmonth(dt) == 4
+
+function easter(y)
+    # Butcher's Algorithm: http://www.smart.net/~mmontes/butcher.html
+    a=y%19
+    b=div(y,100)
+    c=y%100
+    d=div(b,4)
+    e=b%4
+    f=div(b+8,25)
+    g=div(b-f+1,3)
+    h=(19*a+b-d-g+15)%30
+    i=div(c,4)
+    k=c%4
+    l=(32+2*e+2*i-h-k)%7
+    m=div(a+11*h+22*l,451)
+    month=div(h+l-7*m+114,31)
+    p=(h+l-7*m+114)%31
+    return (y,month,p+1)
+end
+iseaster(dt) = Dates.yearmonthday(dt) == easter(Dates.year(dt))

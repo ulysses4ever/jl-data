@@ -1,0 +1,90 @@
+# === cost function ==========================
+function costGradFunction(params, input_layer_size, hidden_layer_size, num_labels, X, y, lambda)
+
+  # get the theta parameters from the params vector back into matricies
+  Theta1 = reshape(params[1:hidden_layer_size * (input_layer_size + 1)],
+                   hidden_layer_size, (input_layer_size + 1))
+  Theta2 = reshape(params[1 + (hidden_layer_size * (input_layer_size + 1)):end],
+                   num_labels, (hidden_layer_size + 1))
+
+  Theta1_no_bias = Theta1[:, 2:end]
+  Theta2_no_bias = Theta2[:, 2:end]
+
+  m = size(X, 1)
+
+  # setup return values
+  J = 0.0
+  Theta1_grad = zeros(size(Theta1))
+  Theta2_grad = zeros(size(Theta2))
+
+  # ---- begin: calucate cost
+  # --> perform feedforward
+  a_1 = [ones(m, 1) X]
+
+  # get values for layer 2
+  z_2 = a_1 * Theta1'
+  a_2 = sigmoid(z_2)
+  a_2 = [ones(m, 1) a_2]
+
+  # get values for layer 3
+  z_3 = a_2 * Theta2'
+  a_3 = sigmoid(z_3)
+
+  # --> expand labels to binary forms
+  binary_labels = eye(num_labels)
+  all_binary_y = binary_labels[y[:], :] # the y[:] converts the 1xnum_labels matrix to a column vector.
+
+  pos = -all_binary_y .* log(a_3)
+  neg = (1 - all_binary_y) .* log(1 - a_3)
+  all_cost = pos - neg
+
+  # get the sum of all costs per label
+  sum_label_costs = sum(all_cost)
+
+  # get sum of the sum of all labels
+  total_cost = sum(sum_label_costs)
+
+  # complete the last step of the cost function
+  J = total_cost/m
+
+  # calculate regularization term
+  Theta1_cost_reg = sum(sum(Theta1_no_bias.^2))
+  Theta2_cost_reg = sum(sum(Theta2_no_bias.^2))
+
+  J += lambda / (2 * m) * (Theta1_cost_reg + Theta2_cost_reg)
+  # ---- end: caluclate cost
+
+  # --- start: back propagation
+  Delta_1 = zeros(size(Theta1))
+  Delta_2 = zeros(size(Theta2))
+
+  # calculate the delta for layer 3 (output).
+  d_3 = a_3 - all_binary_y
+
+  # calculate the delta for layer 2 (hidden).
+  d_2 = d_3 * Theta2_no_bias .* sigmoidGradient(z_2)
+
+  # accumulate gradients
+  Delta_1 = Delta_1 + d_2' * a_1
+  Delta_2 = Delta_2 + d_3' * a_2
+
+  Theta1_grad = Delta_1/m
+  Theta2_grad = Delta_2/m
+
+  # calculate regularization term
+  lambda_term = lambda/m
+
+  # regularize gradiens
+  Theta1_grad_reg = lambda_term * Theta1_no_bias
+  Theta2_grad_reg = lambda_term * Theta2_no_bias
+
+  # add and insert regularized terms back into the calculated gradients
+  Theta1_grad[:, 2:end] = Theta1_grad[:, 2:end] + Theta1_grad_reg
+  Theta2_grad[:, 2:end] = Theta2_grad[:, 2:end] + Theta2_grad_reg
+
+  # --- end: back propagation
+  grad = [Theta1_grad[:], Theta2_grad[:]]
+
+  return J
+end
+

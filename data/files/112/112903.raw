@@ -1,0 +1,21 @@
+# wtok 2015-01-12
+# euler 006
+#   Find the difference between the sum of the squares of the first one hundred natural numbers and the square of the sum.
+
+function sumOfSquares(maxn::Int)
+  nums = zeros(maxn)
+  for i = 1:maxn
+    nums[i] = i^2
+  end
+  return sum(nums)
+end
+
+sumOfSquares(10)
+
+squareOfSum(maxn::Int) = sum([1:maxn])^2
+
+squareOfSum(10)
+
+eul006(maxn::Int) = squareOfSum(maxn) - sumOfSquares(maxn)
+
+eul006(100)

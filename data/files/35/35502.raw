@@ -1,0 +1,6 @@
+type TurboParams_t
+    opBits::Array{Bool,3};
+    nextStates::Array{Int64,2};
+    intlv::Array{Int64,2};
+    punct::Array{Int64,2};
+end

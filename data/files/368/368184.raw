@@ -1,0 +1,452 @@
+
+export 
+	featureSpace,	 #constructs the feature space (extended depth coordinates) of a data set
+	ddalpha_classify #classification via the ddalpha procedure
+
+exponents = Tuple{Int8,Int8}[]
+
+#Calculates the extended D-representation of two classes as in Lange et al 2012
+#Returns (Z,k,l) in [0,1]^r, r is binom(p+q,q) - 1 where p is the maximum power. k and l are the exponents of the extended coordinates
+#for example: (ziv,1,1) is D_X * D_Y or (ziv,0,2) is D_Y^2
+#dimension (n1+n2,r)
+#depth_function = chosen depth function as parameter
+#location and ai_matrix are for pre-computed means or inverse covariance matrices (Mahalanois Depth or Spatial Depth)
+#It is recommended to pre-compute those for a faster feature space Z
+function featureSpace(data, depth_function, p=2,w1=[],proj1=[],w2=[],proj2=[])
+    q = length(data)
+    complete_data = zeros(0,length(data[1][1,:]))
+    for i in 1:q
+        complete_data = vcat(complete_data,data[i])
+    end
+    r = binomial((p+q),q)-1 
+    Z = cell(length(complete_data[:,1]),r) 
+    
+    #Exponents will be pushed to the global exponents variable in the order of the filled Z's
+    #So we can get the k and l exponents always to the corresponding index mu
+    resize!(exponents,0)
+    enough_exponents = false
+    
+    for i in 1:length(complete_data[:,1])      
+        cnt = 1
+        
+        depth_x = 0.0
+        depth_y = 0.0
+        
+        ### Idea for more than 1 class: Check sum of exponent tuple (..,...,...) == 1. Get ALL indices of them.
+        ### In this manner we can get all of the already calculated Depths with exponent 1.
+        
+        ## Check if simple depths with exponent 1 are already calculated to load them
+        #Class X
+        if(length(findin(exponents,[(1,0)])) >= 1 && findin(exponents,[(1,0)])[1] < cnt)
+            tmp_col = findin(exponents,[(1,0)])[1]
+            depth_x = Z[i,tmp_col]
+        else 
+			if(depth_function == depth_halfspace_bisectors)
+				depth_x = depth_halfspace_bisectors(vec(complete_data[i,:]),data[1],w1,proj1)
+            else
+                depth_x = depth_function(vec(complete_data[i,:]),data[1])
+            end
+        end
+                    
+        #Class Y
+        if(length(findin(exponents,[(0,1)])) >= 1 && findin(exponents,[(0,1)])[1] < cnt)
+            tmp_col = findin(exponents,[(0,1)])[1]
+            depth_y = Z[i,tmp_col]
+        else
+			if(depth_function == depth_halfspace_bisectors)
+				depth_y = depth_halfspace_bisectors(vec(complete_data[i,:]),data[2],w2,proj2)
+            else
+                depth_y = depth_function(vec(complete_data[i,:]),data[2])
+            end
+        end
+        
+        for l in 0:p
+            for k in 0:p
+                if (k+l) >=1 && (k+l) <= p
+                    Z[i,cnt] = (depth_x)^k * (depth_y)^l
+                    if enough_exponents == false
+                        push!(exponents,(k,l)) 
+                    end
+                    cnt = cnt + 1
+                end
+            end
+        end
+        enough_exponents = true
+    end 
+    return Z
+end
+
+#Generates the feature space of data points in a leave one out fashion
+#Every depth coordinate is calculated using a depth function D(x|X_1/{x}) and D(x|X_2/{x})
+function LOOFeatureSpace(data,depth_function,p=1,w1=[],proj1=[],w2=[],proj2=[])
+	q = length(data)
+    complete_data = zeros(0,length(data[1][1,:]))
+    for i in 1:q
+        complete_data = vcat(complete_data,data[i])
+    end
+    r = binomial((p+q),q)-1 
+    Z = cell(length(complete_data[:,1]),r) 
+    
+    #Exponents will be pushed to the global exponents variable in the order of the filled Z's
+    #So we can get the k and l exponents always to the corresponding index mu
+    resize!(exponents,0)
+    enough_exponents = false
+    
+    for i in 1:length(complete_data[:,1])      
+        cnt = 1
+        
+        depth_x = 0.0
+        depth_y = 0.0
+        
+        ### Idea for more than 1 class: Check sum of exponent tuple (..,...,...) == 1. Get ALL indices of them.
+        ### In this manner we can get all of the already calculated Depths with exponent 1.
+        
+        ## Check if simple depths with exponent 1 are already calculated to load them
+        #Class X
+        if(length(findin(exponents,[(1,0)])) >= 1 && findin(exponents,[(1,0)])[1] < cnt)
+            tmp_col = findin(exponents,[(1,0)])[1]
+            depth_x = Z[i,tmp_col]
+        else
+            tmp_row_loo = find(all(data[1] .== complete_data[i,:], 2))
+            tmp_row = setdiff(collect(1:length(data[1][:,1])),tmp_row_loo)
+			if(depth_function == depth_halfspace_bisectors)
+				depth_x = depth_halfspace_bisectors(vec(complete_data[i,:]),data[1][tmp_row,:],w1,proj1)
+			else
+				depth_x = depth_function(vec(complete_data[i,:]),data[1][tmp_row,:])
+			end
+        end
+                    
+        #Class Y
+        if(length(findin(exponents,[(0,1)])) >= 1 && findin(exponents,[(0,1)])[1] < cnt)
+            tmp_col = findin(exponents,[(0,1)])[1]
+            depth_y = Z[i,tmp_col]
+        else
+            tmp_row_loo = find(all(data[2] .== complete_data[i,:], 2))
+            tmp_row = setdiff(collect(1:length(data[2][:,1])),tmp_row_loo)
+			if(depth_function == depth_halfspace_bisectors)
+				depth_y = depth_halfspace_bisectors(vec(complete_data[i,:]),data[2][tmp_row,:],w2,proj2)
+			else
+				depth_y = depth_function(vec(complete_data[i,:]),data[2][tmp_row,:])
+			end
+        end
+        
+        for l in 0:p
+            for k in 0:p
+                if (k+l) >=1 && (k+l) <= p
+                    Z[i,cnt] = (depth_x)^k * (depth_y)^l
+                    if enough_exponents == false
+                        push!(exponents,(k,l)) 
+                    end
+                    cnt = cnt + 1
+                end
+            end
+        end
+        enough_exponents = true
+    end
+    return Z
+end
+
+#Calculates the average misclassification rate (AMR)
+#n1 and n2 = number of points in classes 1 and 2
+#(mu1,mu2) = the chosen 2-dimensional subspace of the  
+#Z = extended D-representation of the points
+#alpha = angle of the discriminating line in the 2-dimensional subspace
+#Returns AMR value
+function amr(n1,n2,alpha,mu1,mu2,Z)
+    res = 0
+    
+    for i in 1:n1
+        res = res + I((Z[i,mu1]*cos(alpha) - Z[i,mu2]*sin(alpha)) < 0)
+    end
+    for i in (n1+1):(n1+n2)
+        res = res + I((Z[i,mu1]*cos(alpha) - Z[i,mu2]*sin(alpha)) > 0)
+    end
+    return (1.0/(n1+n2))*res
+end
+
+#Returns the angle that minimizes the AMR and the corresponding AMR in a tuple (alpha,min_amr)
+function min_amr(n1,n2,mu1,mu2,Z)
+    a_amr = typemax(Float64)
+    a_alpha = 0.0
+    a_tuple = cell(0,2)
+    for alpha in linspace(0,2*pi)
+        amr_f = amr(n1,n2,alpha,mu1,mu2,Z)
+        if amr_f <= a_amr
+            a_amr = amr_f
+            a_tuple = vcat(a_tuple,[amr_f alpha])
+        end
+    end
+    
+    # This checks if the min. AMR is attained at an interval and takes its middle value
+    min_amr = minimum(a_tuple[:,1])
+    a_tuple = a_tuple[a_tuple[:,1] .== min_amr ,:]
+    n = length(a_tuple[:,1])
+    
+    return (a_tuple[ceil(Int64,n/2),2],a_tuple[ceil(Int64,n/2),1])
+end
+
+#Returns [angle, mu1, mu2, AMR] that minimizes the AMR
+#c only matters in iterations 2,...,n of DDalpha when we want to couple new D-features u with the others
+#c = 0: First step
+#c != 0: Number of the column of a new D-feature u
+function minimize_amr(n1,n2,Z,c=0)
+    r = length(Z[1,:])
+    result = cell(sum(1:(r-1))*2,4)
+    cnt = 1
+    if(c == 0)
+        for i in 1:length(Z[1,:])
+            for j in 1:length(Z[1,:])
+                if(i != j) #Forbids pairs like (D_X, D_X) etc. Two D-Features have to belong to different classes.
+                    amr = min_amr(n1,n2,i,j,Z) #amr[1] = angle, amr[2] = min AMR
+                    result[cnt,:] = [amr[1],i,j,amr[2]]
+                    cnt = cnt + 1
+                end
+            end
+        end
+        return minimal_pair(result,Z)
+    else
+        amr = typemax(Int64)
+        result = (0.0,0,0,0.0)
+        for i in 1:length(Z[1,:])
+            if(c != i)
+                amr_t = min_amr(n1,n2,c,i,Z)
+                if(amr_t[2] < amr)
+                    amr = amr_t[2]
+                    result = (amr_t[1],c,i,amr_t[2])
+                end
+            end
+        end
+        return result
+    end
+end
+
+#Helper function for minimize_amr(n1,n2,Z) which gets the pair (v1,v2) with smallest k and l if min. AMR is not unique
+function minimal_pair(result,Z)
+    #Get index of minimal AMR(s) => Can be one value or more values, returns an array
+    ind = findin(result[:,4],minimum(result[:,4]))
+    #For every indices check: Minimal k and l value (k + l minimal!) => this is the searched minimal AMR
+    kl = typemax(Int64)
+    mu = [0,0]
+    ind_tmp = 0
+    for i in ind
+        (mu1,mu2) = (Int64(result[i,2]),Int64(result[i,3]))
+        if(exponents[mu1][1] + exponents[mu1][2] + exponents[mu2][1] + exponents[mu2][2] <= kl)
+            kl = exponents[mu1][1] + exponents[mu1][2] + exponents[mu2][1] + exponents[mu2][2]
+            mu[1] = mu1
+            mu[2] = mu2
+            ind_tmp = i
+        end
+    end
+    return (result[ind_tmp,1],mu[1],mu[2],result[ind_tmp,4])
+end
+
+#Calculates the new D-Feature: Projection of (z_i,mu1 , z_i,mu2) to a straight line in the (mu1,mu2) plane
+#This deletes the columns mu1 and mu2 from Z and appends the new D-feature at the end of Z
+function newDFeature(minimum_amr,Z)
+    mu1 = minimum_amr[2]
+    mu2 = minimum_amr[3]
+    z_u = cell(length(Z[:,1]))
+    new_exponents = (exponents[mu1][1]+exponents[mu1][2],exponents[mu2][1]+exponents[mu2][2])
+    for i in 1:length(Z[:,1])
+        new_z = Z[i,mu1] * cos(minimum_amr[1]) - Z[i,mu2] * sin(minimum_amr[1])
+        #save tuple (new z value, k1+l1, k2+l2)
+        #check if this makes sense... 2 vectors with own k and l's are considered here.
+        z_u[i] = new_z
+    end
+    
+    if(mu1 < mu2)
+        Z = Z[:,[1:(mu1-1); (mu1+1):(mu2-1); (mu2+1):end]]
+    else
+        Z = Z[:,[1:(mu2-1); (mu2+1):(mu1-1); (mu1+1):end]]
+    end
+    
+    if(mu1 < mu2)
+        splice!(exponents,mu1)
+        mu2 = mu2 -1
+        splice!(exponents,mu2)
+    else
+        splice!(exponents,mu2)
+        mu1 = mu1 - 1
+        splice!(exponents,mu1)
+    end
+    
+    push!(exponents,new_exponents)
+    
+    return hcat(Z,z_u)
+end
+
+#This constructs the polynomial for class separation
+#Darboux vector of seperation decision plane as in Lange & Mozharovskyi 2012
+function constructPolynomial(x,data,selected_features,depth_function,w1=[],proj1=[],w2=[],proj2=[])
+    res = 0
+    angle = selected_features[1][1]
+    
+    if(depth_function == depth_halfspace_bisectors)
+	a = depth_halfspace_bisectors(vec(x),data[1],w1,proj1)^(selected_features[1][2]) * depth_halfspace_bisectors(vec(x),data[2],w2,proj2)^(selected_features[1][3])
+	b = depth_halfspace_bisectors(vec(x),data[1],w1,proj1)^(selected_features[2][2]) * depth_halfspace_bisectors(vec(x),data[2],w2,proj2)^(selected_features[2][3])
+    else
+    	a = depth_function(vec(x),data[1])^(selected_features[1][2]) * depth_function(vec(x),data[2])^(selected_features[1][3]) 
+    	b = depth_function(vec(x),data[1])^(selected_features[2][2]) * depth_function(vec(x),data[2])^(selected_features[2][3])
+    end
+
+    splice!(selected_features,1)
+    splice!(selected_features,1)
+    res = res + alpha_transform(angle,a,b)
+    while(length(selected_features) >= 1)
+        angle = selected_features[1][1]
+        a = res
+	if(depth_function == depth_halfspace_bisectors)
+		b = depth_halfspace_bisectors(vec(x),data[1],w1,proj1)^(selected_features[1][2]) * depth_halfspace_bisectors(vec(x),data[2],w2,proj2)^(selected_features[1][3])
+	else
+		b = depth_function(vec(x),data[1])^(selected_features[1][2]) * depth_function(vec(x),data[2])^(selected_features[1][3])
+	end
+        res = res + alpha_transform(angle,a,b)
+        splice!(selected_features,1)
+    end
+    return res
+end
+
+#helper function for calculating cos(angle)*a - sin(angle)*b
+function alpha_transform(angle,a,b)
+    return (cos(angle)*a - sin(angle)*b)
+end
+
+#x: one Point to classify
+#data: given data, already labeled
+#p: chosen p (maximum exponent) for the extended coordinates
+#DDAlpha as in Lange et al. 2012
+function ddalpha(x,data,classlabels,depth_function,p=2)
+    #q = #classes
+    q = length(data)
+    r = binomial((p+q),q) - 1
+    
+    sortedData = sortData(data,classlabels)
+    classes = sort(unique(classlabels))
+    
+    Z = 0
+    w1 = []
+    proj1 = []
+    w2 = []
+    proj2 = []
+    if(depth_function == depth_halfspace_bisectors)
+		w1 = generateWeightVectors(sortedData[1])
+		proj1 = preCalculateWeightProjections(sortedData[1],w1)
+		w2 = generateWeightVectors(sortedData[2])
+		proj2 = preCalculateWeightProjections(sortedData[2],w2)
+    end
+
+    ### TRAINING PHASE => Construction of Z and the separation line
+    ###Step 1: t = 1
+    
+    #Selected Features contain a tuple of 1. parameter and 2. the two exponents (for the depths)
+    selected_features = Tuple{Float64,Int64,Int64}[]
+    
+	#First calculate feature space of the data
+    Z = featureSpace(sortedData,depth_function,p,w1,proj1,w2,proj2)
+	#Z = LOOFeatureSpace(sortedData,depth_function,p,w1,proj1,w2,proj2)
+    
+	#Get (min_angle, mu1*, mu2*, respective min_AMR)
+    minimum_amr = minimize_amr(length(sortedData[1][:,1]),length(sortedData[2][:,1]),Z)
+    
+	#Save the exponents k and l of mu1 and mu2 as we need them to construct the polynomial for classification later
+    push!(selected_features,(minimum_amr[1],exponents[minimum_amr[2]][1],exponents[minimum_amr[2]][2]))
+    push!(selected_features,(minimum_amr[1],exponents[minimum_amr[3]][1],exponents[minimum_amr[3]][2]))
+    
+    #Calculate new D-Feature z_u and remove the prior (mu1*,mu2*) from Z
+    Z = newDFeature(minimum_amr,Z)
+    
+    ###Steps t = 2,...,n until amr(t) - amr(t+1) = 0 or t = r
+    t = 2
+    amr_old = minimum_amr[4]
+    amr_new = typemax(Int64)
+    while (t != r)
+        #amr(t) - amr(t+1) = 0 => AMR doesn't change anymore, don't continue computing
+        if(amr_new - amr_old == 0 || minimum_amr[2] == 0 || minimum_amr[3] == 0)
+            break
+        end
+        if(t > 2)
+            amr_old = amr_new
+        end
+        minimum_amr = minimize_amr(length(sortedData[1][:,1]),length(sortedData[2][:,1]),Z,length(Z[1,:]))
+        amr_new = minimum_amr[4]
+        if(amr_new > amr_old || minimum_amr[2] == 0 || minimum_amr[3] == 0)
+            break
+        end
+        push!(selected_features,(minimum_amr[1],exponents[minimum_amr[3]][1],exponents[minimum_amr[3]][2])) #minimum_amr[2] is always our combined z_u which we don't need for the polynomial construction
+        
+        Z = newDFeature(minimum_amr,Z)
+        t = t + 1
+    end
+    
+	knn_count = 0
+
+    ###TESTING PHASE: Is the test data left or right to the separation line?
+    label_vector = cell(length(x[:,1]))
+    for i in 1:length(x[:,1])
+        selected_features_tmp = copy(selected_features)
+       
+	if(depth_function == depth_halfspace_bisectors)
+		if(depth_function(vec(x[i,:]),sortedData[1],w1,proj1) == 0 && depth_function(vec(x[i,:]),sortedData[2],w2,proj2) != 0)
+			label_vector[i] = classes[2]
+		elseif(depth_function(vec(x[i,:]),sortedData[1],w1,proj1) != 0 && depth_function(vec(x[i,:]),sortedData[2],w2,proj2) == 0)
+			label_vector[i] = classes[1]
+		elseif(depth_function(vec(x[i,:]),sortedData[1],w1,proj1) == 0 && depth_function(vec(x[i,:]),sortedData[2],w2,proj2) == 0)
+			label_vector[i] = kNN(x[i,:],data,classlabels,3)[1]
+			knn_count = knn_count + 1
+		else
+			pol = constructPolynomial(x[i,:],sortedData,selected_features_tmp,depth_halfspace_bisectors,w1,proj1,w2,proj2)
+			if pol >= 0
+				label_vector[i] = classes[1]
+			else
+				label_vector[i] = classes[2]
+			end
+		end
+	else
+		if(depth_function(vec(x[i,:]),sortedData[1]) == 0 && depth_function(vec(x[i,:]),sortedData[2]) != 0)
+			label_vector[i] = classes[2]
+		elseif(depth_function(vec(x[i,:]),sortedData[1]) != 0 && depth_function(vec(x[i,:]),sortedData[2]) == 0)
+			label_vector[i] = classes[1]
+		elseif(depth_function(vec(x[i,:]),sortedData[1]) == 0 && depth_function(vec(x[i,:]),sortedData[2]) == 0)
+			label_vector[i] = kNN(x[i,:],data,classlabels,3)[1]
+			knn_count = knn_count + 1
+		else
+			pol = constructPolynomial(x[i,:],sortedData,selected_features_tmp,depth_function)
+			if pol >= 0
+				label_vector[i] = classes[1]
+			else
+				label_vector[i] = classes[2]
+			end
+		end
+	end
+		
+    end
+    return label_vector
+end
+
+#DDalpha for more points x, a (nxd) matrix
+#x: data points to test
+#data: trained data
+#classes: class labels
+#Returns a vector with the labels of the classification
+function ddalpha_classify(x,data,classlabels,depth_function,p=2)
+    q = length(unique(classlabels))
+    uniqueClasses = sort(unique(classlabels))
+    class_combinations = collect(combinations(1:q,2))
+
+    testResult = cell(length(x[:,1]),length(class_combinations))
+    cnt = 1
+    #This collects all indices of every 2-class-combination for DDalpha
+    for i in class_combinations
+        indices_class1 = find(z-> z == uniqueClasses[i[1]],classlabels)
+        indices_class2 = find(z-> z == uniqueClasses[i[2]],classlabels)
+        indices = [indices_class1;indices_class2]
+		indices = sort(indices)
+        tmp_trainingData = data[indices,:]
+        tmp_trainingClasslabels = classlabels[indices]
+        
+        testResult[:,cnt] = ddalpha(x,tmp_trainingData,tmp_trainingClasslabels,depth_function,p)
+        cnt = cnt + 1
+        
+    end
+    return majorityVote(testResult)
+end

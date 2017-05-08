@@ -1,0 +1,76 @@
+
+# types for MarketRisk module
+
+###################
+# HISTORICAL DATA
+###################
+abstract HistoricalData
+
+type Index <: HistoricalData
+	name::ASCIIString
+end
+
+# Not bound to maturity. Is bound to entire term structure.
+type SpreadCurve <: HistoricalData
+	name::ASCIIString
+end
+
+####################
+# RISK FACTORS
+####################
+abstract RiskFactor
+
+type SpotCurrency <: RiskFactor
+	name::ASCIIString
+end
+
+# Not bound to maturity. Is bound to entire term structure.
+type IRCurveRisk <: RiskFactor
+	name::ASCIIString
+end
+
+# Bound to specific maturity on a term structure
+type IRCurveRiskVertex <: RiskFactor
+	name::ASCIIString
+	maturity::Date
+end
+
+IRCurveRiskVertex(factor::IRCurveRisk, maturity::Date) = IRCurveRiskVertex(factor.name, maturity)
+
+##################
+# PRICING MODELS
+##################
+abstract PricingModel
+abstract FixedIncome <: PricingModel
+abstract Derivative <: PricingModel
+
+type Bullet <: FixedIncome
+	currency::SpotCurrency
+	basecurve::IRCurveRisk
+	spreadcurve::SpreadCurve
+end
+
+type ForwardCurrency <: Derivative
+	currency::SpotCurrency
+	currencycurve::IRCurveRisk
+	basecurve::IRCurveRisk
+end
+
+##################
+
+type Scenario
+	date :: Date
+	data :: Dict{Union{HistoricalData, RiskFactor}, Union{Float64, AbstractIRCurve}}
+end
+
+abstract AbstractFinancialContract
+
+type FinancialContract <: AbstractFinancialContract
+	id::Int
+	portfolio::Vector{ASCIIString}
+	model::PricingModel
+	attributes::Dict{ASCIIString, Union{Float64, Int, ASCIIString, Date}}
+	log::Vector{ASCIIString}
+
+	FinancialContract(id::Int, portfolio::Vector{ASCIIString}, model::PricingModel) = new(id, portfolio, model, Dict{ASCIIString, Union{Float64, Int, ASCIIString, Date}}(), Vector{ASCIIString}())
+end

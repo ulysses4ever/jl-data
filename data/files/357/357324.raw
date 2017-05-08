@@ -1,0 +1,80 @@
+importall Gadfly
+importall DataFrames
+using OVRFF: model, validation, risk, optimizer, preprocessing
+
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
+function main()
+    p = 5
+    d = 5
+    m = 100
+
+    X = 2 * rand( d, m ) - 1
+    scaler = preprocessing.StandardScaler(X)
+    preprocessing.transform!(scaler, X, X)
+
+    A = 2 * rand( p, p ) - 1
+    A = A' * A
+
+    ke = model.GaussianKernel(1., d)
+    ked = model.DecomposableKernel( ke, Symmetric(A) )
+
+    D_table = [1, 10, 100, 1000]
+    var_table = Vector{Float64}(size(D_table, 1))
+    var_emp_table = Vector{Float64}(size(D_table, 1))
+    mean_emp_table = Vector{Float64}(size(D_table, 1))
+
+    i1 = 1
+    i2 = 2
+
+    @time for D_idx = 1:size(D_table, 1)
+        D = D_table[D_idx]
+        n_samples = max(10000, 10 * D)
+        err = SharedArray(Float64, n_samples, p, p)
+        phi_x1 = Vector{Float64}(2 * D)
+        phi_x2 = Vector{Float64}(2 * D)
+        @sync @parallel for i = 1:n_samples
+            phi = model.OVRFF(ked, D)
+            model.map!(phi, X[:,i1], phi_x1)
+            model.map!(phi, X[:,i2], phi_x2)
+            Kapprox = kron(phi_x1' * phi_x2, phi.kernel.B' * phi.kernel.B)
+            err[i, :, :] = (model.Gram(ked, X[:, i1], X[:, i2] ) - Kapprox)
+        end
+        var_mat = zeros(p, p)
+        mean_mat = zeros(p, p)
+        for i=1:n_samples
+            mean_mat += slice(err, i, :, :)
+        end
+        mean_mat /= n_samples
+        for i=1:n_samples
+            var_mat += (slice(err, i, :, :) - mean_mat)^2
+        end
+        var_mat /= (n_samples - 1)
+        p1 = model.Gram(ked, 0 * X[:,i1:i1], 0 * X[:,i2:i2])
+        p2 = model.Gram(ked, 2 * X[:,i1:i1], 2 * X[:,i2:i2])
+        p3 = model.Gram(ked, X[:,i1:i1], X[:,i2:i2])^2
+        vr = norm(( p1 + p2) * ked.A - 2 * p3)
+        var_table[D_idx] = vr / (2 * D)
+        var_emp_table[D_idx] = norm(var_mat)
+        mean_emp_table[D_idx] = norm(mean_mat)
+    end
+    println(var_table)
+    println(var_emp_table)
+
+    df1 = DataFrame(x=D_table, y=sdata(var_emp_table), Variance="Empirical")
+    df2 = DataFrame(x=D_table, y=sdata(var_table), Variance="Estimated")
+    df = vcat(df1, df2)
+
+    min_err = reduce(min, sdata(var_table))
+    max_err = reduce(max, sdata(var_table))
+    pl = Gadfly.plot(df, x="x", y="y", color="Variance", Gadfly.Geom.line,
+        Gadfly.Scale.color_discrete_manual("blue","red", "black"),
+        Gadfly.Guide.title("Decomposable kernel"),
+        Gadfly.Guide.xlabel("D"), Gadfly.Guide.ylabel("Error"),
+        Gadfly.Scale.y_log10(minvalue=min_err, maxvalue=max_err),
+        Gadfly.Scale.x_log10(minvalue=D_table[1], maxvalue=D_table[end]))
+
+    Gadfly.draw(Gadfly.PGF("./variance.pgf", 4Gadfly.inch, 3Gadfly.inch), pl)
+end
+
+main()

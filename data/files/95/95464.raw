@@ -1,0 +1,39 @@
+@everywhere include("common.jl")
+
+@everywhere function compute_and_write_ber_with_artificial_noise(a::Float64, b::Float64)
+  SSDATAFILE = joinpath(OUTDIR, "adjusted_driver_with_a"*@sprintf("%.2f", a)*".txt")
+  SRDATAFILE = joinpath(OUTDIR, "adjusted_driver_with_b"*@sprintf("%.2f", b)*".txt")
+  OUTFILE = joinpath(OUTDIR, "suncohcsk_ber_with_a"*@sprintf("%.2f", a)*"_and_b"*@sprintf("%.2f", b)*".txt")
+
+  xstream = open(XDATAFILE, "r")
+  snoisestream = open(SNOISEDATAFILE, "r")
+  rnoisestream = open(RNOISEDATAFILE, "r")
+  ssdatastream = open(SSDATAFILE, "w+")
+  srdatastream = open(SRDATAFILE, "w+")
+
+  # Reading headers
+  readline(xstream)
+  readline(snoisestream)
+  readline(rnoisestream)
+
+  while !eof(xstream)
+    x = float64(readline(xstream))
+    snoise = float64(readline(snoisestream))
+    rnoise = float64(readline(rnoisestream))
+    @printf(ssdatastream, "%f\n", x+(1+a)*snoise)
+    @printf(srdatastream, "%f\n", x+(1+b)*rnoise)
+  end
+
+  close(xstream)
+  close(snoisestream)
+  close(rnoisestream)
+  close(ssdatastream)
+  close(srdatastream)
+
+  compute_and_write_ber(SSDATAFILE, SRDATAFILE, 2:25, OUTFILE)
+end
+
+@everywhere grid = [-1, -0.9, -0.75, -0.5, -0.25, -0.1, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0]
+@everywhere a = repeat(grid, outer=[length(grid)])[2:end]
+@everywhere b = repeat(grid, inner=[length(grid)])[2:end]
+pmap(compute_and_write_ber_with_artificial_noise, a, b)

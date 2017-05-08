@@ -1,0 +1,451 @@
+#Library related to Generation of Initial Solution
+#Copyright(c) 2015: Kally Chung
+
+#01...orderD( cardD )
+#02...findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd, 
+#                 valueBin )
+#03...convDem( valP, cardValP, optDem )
+#04...findDemand( indD, DA, DS, cardP, PA, PE, availP )
+#05...assignSetS( indD, setSDem, cardSetS, prob )
+#06...calcCosts( prob, sol, indD, timeD, setSDem, timeS, cardSetS )
+#07...GIS( prob )
+
+include( "IO_MCITW-1P.jl" )
+include( "verification.jl" )
+
+function orderD( cardD )
+#orderD
+#======#
+#given a number, return an array with sorted numbers
+#
+#    input: int cardD
+#   output: array sortedD
+
+  sortedD = zeros( Int, cardD)  #output
+
+  aux = zeros( Int, cardD)  #keep which number is available or not
+                            #{0-available, 1-already selected}
+  count = 0   #count how many numbers have been sorted
+  num = 0     #number selected
+
+  #checking process
+  if ( cardD <= 0 )
+    println( "cardD -> invalid number " )
+    return []
+  end
+  
+  #selection process
+  while( count != (cardD-1) )
+    num = rand( 1:cardD )
+    if ( aux[ num ] == 0 )
+      count +=  1
+      sortedD[ count ] = num
+      aux[ num ] = 1
+    end
+  end
+  
+  #selection process for the last number
+  for i in 1:cardD
+    if ( aux[i] == 0 )
+      sortedD[ cardD ] = i
+      break
+    end
+  end
+
+  return sortedD
+end
+
+function findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currDem, currInd, valueBin )
+#findDemRec
+#==========#
+#recursive function to find a set of pickups to fullfill offer
+#
+#    input: int offer -------------> DA
+#           array(int) valPA ------> array containing PA's from available pickups
+#           int cardValP ----------> number of available pickups
+#           array(bool) currValP --> array containing which pickups are being
+#                                    considered
+#           array(bool) optDem-----> array containing the pickups that will be 
+#                                    the demand
+#           int diff --------------> difference between offer and sum of PA's
+#           int currInd -----------> current index in the recursion
+#           bool valueBin ---------> which value is been considered {0,1}
+#
+#   output: array optDem-----------> array updated containing the solution
+#           int diff---------------> difference between offer and sum of PA's
+  
+  #update array currValP and check currDem
+  currValP[ currInd ] = valueBin
+  currDem += currValP[ currInd ] * valPA[ currInd ]
+  
+  #check if it's worthy to continue in the branch
+  if ( currDem > offer )
+    return optDem, diff
+  else
+    #check if array currValP is a better option than the current one
+    if ( currInd == cardValP )
+      aux = offer - currDem
+      #update array currValP case a better option has been found
+      if ( aux < diff )
+        for i in 1:cardValP
+          optDem[i] = currValP[i]
+        end
+        diff = aux
+      end
+      return optDem, diff
+    else
+      #proceeding with the recursion
+      (optDem, diff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currDem, currInd + 1, 0 )
+      (optDem, diff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currDem, currInd + 1, 1 )
+    end
+  end
+end
+
+function convDem( valP, cardValP, optDem )
+#convDem
+#=======#
+#convert bool solution from recursive solution into puckups indexes
+#
+#    input: array(int) valP ------> array containing valids pinckups' indexes
+#           int cardValP ---------> valids pickups cardinality
+#           array(bool) optDem ---> bool array containing the pickups to 
+#                                   fullfill offer
+#
+#   output: array(int) setSDem ---> array with the pickups indexes to fullfill 
+#                                   offer
+  
+  cardSetS = countnz( optDem )
+  setSDem = zeros( Int, cardSetS )
+  aux = 1
+  for ind in 1:cardValP
+    if ( optDem[ ind ] == 1 )
+      setSDem[ aux ] = valP[ ind ]
+      aux += 1
+    end
+  end
+  
+  return setSDem
+end
+
+function findDemand( indD, DA, timeD, cardP, PA, PE, availP )
+#findDemand
+#==========#
+#look out for a set of pickups to fullfill offer
+#
+#    input: int indD -------------> delivery index
+#           array(int) DA --------> array containing deliveries' amount
+#           array(int) DS --------> array containing deliveries' start time of
+#                                   the time window
+#           int cardP ------------> pickup cardinality
+#           array(int) PA --------> array containing pickups' amount
+#           array(int) PE --------> array containing pickups' end time of the
+#                                   time window
+#           array(bool) availP ---> array containing available pickups, which 
+#                                   hasn't been assigned {0 if is assigned, 
+#                                   1 if is available}
+#
+#   output: array(int) setSDem ---> array with the pickups to fullfill offer
+
+  #getting the inputs for the recursive function to find set P to fullfill offer
+  #offer, valPA, cardValP, currValP, optDem, diff
+  offer = DA[ indD ]
+  cardValP = 0;
+  for j in 1:cardP
+    if ( ( PA[j] <= offer ) && ( PE[j] >= timeD ) && ( availP[j] == 1 ) )
+      cardValP += 1
+    end
+  end
+  
+  if ( cardValP == 0 )
+    println( "There aren't useful pickups to fulfill offer." )
+    return []
+  end
+  
+  valP = zeros( Int, cardValP )
+  valPA = zeros( Int, cardValP )
+  aux = 1
+  for j in 1:cardP
+    if ( ( PA[j] <= offer ) && ( PE[j] >= timeD ) && ( availP[j] == 1 ) )
+      valP[ aux ] = j
+      valPA[ aux ] = PA[j]
+      aux += 1
+    end
+  end
+  
+#   println( "valP = $valP" )
+  
+  #starting recursive function
+  currValP = zeros( Int, cardValP )
+  optDem = zeros( Int, cardValP )
+  diff = offer
+  currDem = 0
+  (solArray, solDiff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currDem, 1, 0 )
+  (solArray, solDiff) = findDemRec( offer, valPA, cardValP, currValP, solArray, solDiff, currDem, 1, 1 )
+  
+  #converting the solution obtained by recursive function
+  setSDem = convDem( valP, cardValP, optDem )
+  
+  return setSDem
+end
+
+function assignSetS( indD, setSDem, cardSetS, prob )
+#assignSetS
+#==========#
+#given set S of pickups, assign delivery and pickups from S
+#
+#    input: int indD -------------> delivery index
+#           array(int) setSDem ---> array containing set S of pickups
+#           int cardSetS ---------> set S cardinality
+#           type prob ------------> parameters of the problem considered
+#
+#   output: int timeD ------------> delivery D_indD assignment
+#           array(int) timeS -----> set S assignment
+
+  #determine timeD
+  aux = 0
+  timeS = zeros( Int, cardSetS )
+  for ind in 1:cardSetS
+    aux = setSDem[ ind ]
+    timeS[ ind ] = prob.PE[ aux ]
+  end
+  aux = minimum( timeS )
+  timeD = min( aux, prob.DE[ indD ] )
+  
+  #determine timeS
+  for ind in 1:cardSetS
+    aux = setSDem[ ind ]
+    timeS[ ind ] = max( timeD, prob.PS[ aux ] )
+  end
+  
+  return timeD, timeS
+end
+
+function assignSetS( indD, setSDem, cardSetS, prob, sol )
+#assignSetS
+#==========#
+#given set S of pickups, assign delivery and pickups from S
+#
+#    input: int indD -------------> delivery index
+#           array(int) setSDem ---> array containing set S of pickups
+#           int cardSetS ---------> set S cardinality
+#           type prob ------------> parameters of the problem considered
+#
+#   output: int timeD ------------> delivery D_indD assignment
+#           array(int) timeS -----> set S assignment
+
+  #determine timeD
+  aux = 0
+  timeS = zeros( Int, cardSetS )
+  for ind in 1:cardSetS
+    aux = setSDem[ ind ]
+    timeS[ ind ] = prob.PE[ aux ]
+  end
+  aux = minimum( timeS )
+  timeD = searchDelivSol( prob, sol, indD )[2]
+  if ( timeD == 0 )
+    println( "D", indD, " is a unassigned delivery" )
+    return timeS
+  end
+  
+  #determine timeS
+  for ind in 1:cardSetS
+    aux = setSDem[ ind ]
+    timeS[ ind ] = max( timeD, prob.PS[ aux ] )
+  end
+  
+  return timeS
+end
+
+function calcCosts( prob, sol, indD, timeD, setSDem, timeS, cardSetS )
+#calcCosts
+#=========#
+#given delivery D_indD and set S of pickups, (1) find the cdock to manage D_indD
+#and set S and (2) update solution, excepting feasibility and penalty cost
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution of the problem
+#           int indD -------------> delivery index
+#           int timeD ------------> instant time of delivery D_indD
+#           array(int) setSDem ---> array containing set S of pickups
+#           array(int) timeS -----> set S assignment
+#           int cardSetS ---------> set S cardinality
+#
+#   output: type sol -------------> current solution of the problem
+
+  #initializing variables
+  aux = 0
+  auxTCost = zeros( Int, prob.cardC )
+  auxICost = zeros( Int, prob.cardC )
+  auxBinCapExc = zeros( Int, prob.cardC )
+  auxILevel = zeros( Int, prob.cardT )
+  optCdock = 0
+  trspCost = 0
+  invCost = 0
+  
+  #evaluate cost for all cdocks
+  for k in 1:(prob.cardC)
+    auxICost[k] = prob.CCost[k] * DA[ indD ] * ( cardT - timeD + 1 ) 
+    auxTCost[k] = prob.DD[ indD, k ]
+    
+    for ind in 1:cardSetS
+      aux = setSDem[ ind ]
+      auxICost[k] -= prob.CCost[k] * prob.PA[ aux ] * ( cardT - timeS[ ind ] + 1 )
+      auxTCost[k] += prob.PD[ aux, k ]
+    end
+  end
+  
+  #evaluate inventory level
+  for t in timeD:prob.cardT
+    auxILevel[t] += prob.DA[indD]
+  end
+  for j in 1:cardSetS
+    for t in timeS[j]:prob.cardT
+      auxILevel[t] -= prob.PA[ setSDem[j] ]
+    end
+  end
+#   println("auxILevel = $auxILevel")
+  
+  #check inventory level
+  for k in 1:prob.cardC
+    for t in 1:prob.cardT
+      if ( sol.solZ[k,t] + auxILevel[t] > prob.CCap[k] )
+        auxBinCapExc[k] = 1
+      end
+    end
+  end
+  
+  #check if the capacity will exceed for all cdocks
+  if ( ( length( unique( auxBinCapExc ) ) == 1 ) && ( unique( auxBinCapExc ) == 1 ) )
+    println("The capacity will exceed for all cdocks. $setSDem nor assigned.")
+    return 0, sol
+  else
+    aux = findmax( auxICost + auxTCost )[1]
+    for k in 1:prob.cardC
+      if ( auxBinCapExc[k] == 1 )
+        auxTCost[k] += aux
+      end
+    end
+  end
+  
+  #determine the cdock that will manage D_indD and pickups from set S
+  optCdock = findmin( auxICost + auxTCost )[2]
+  trspCost = auxTCost[ optCdock ]
+  invCost = auxICost[ optCdock ]
+#   println( "optCdock = $optCdock" )
+
+  #update solution excepting feasibility and penalty cost
+  sol.trspCost += trspCost
+  sol.invCost += invCost
+  sol.solX[ indD, optCdock, timeD ] = 1
+  for ind in 1:cardSetS
+    sol.solY[ setSDem[ind], optCdock, timeS[ind] ] = 1
+  end
+  for t in 1:(prob.cardT)
+    sol.solZ[ optCdock, t ] += auxILevel[t]
+  end
+  
+  return 1, sol
+end
+
+function GIS( prob )
+#function GIS( fileProb )
+#GIS
+#===#
+#given the parameters of the problem and the penalty cost, generate the initial
+#solution
+#
+#    input: type prob ------------> parameters of the problem considered
+#
+#   output: type sol -------------> current solution of the problem
+
+  tic()
+  
+#  prob = readProblem( "Tests/00-0instanceMCITW-1P.dat" )
+#  prob = readProblem( "test_data.jl" )
+#  prob = readProblem( fileProb )
+  
+  #initialize sol and some auxiliar variables
+  sol = initializeSol( prob.cardC, prob.cardD, prob.cardP, prob.cardT )
+  numPickup = 0
+  numDeliv = 1
+  setSDem = Array{ Int, 1}
+  indD = 0
+  availP = ones( Int, prob.cardP )
+  aux = 0
+  timeD = 0
+  timeS = Array{ Int, 1}
+  auxFeas = 0
+  flagCalcCosts = 1
+  timeD = 0
+  
+  #rearrange deliveries randomly
+  sortedD = zeros( Int, prob.cardD )
+  sortedD = orderD( cardD )
+#    println( "sortedD = $sortedD" )
+
+  while ( ( numDeliv <= prob.cardD ) && ( numPickup < prob.cardP ) )
+  
+    indD = sortedD[ numDeliv ]
+#     println( "indD = $indD" )
+#     println( "availP = $availP" )
+    
+    #find set S of pickups
+    timeD = prob.DS[indD]
+    setSDem = findDemand( indD, prob.DA, timeD, prob.cardP, prob.PA, prob.PE, availP )
+#     println( "setSDem = $setSDem" )
+    cardSetS = length(setSDem)
+#     println( "cardSetS = $cardSetS" )
+    
+    if ( cardSetS == 0 )
+      numDeliv += 1
+      continue
+    end
+    
+    for ind in 1:cardSetS
+      aux = setSDem[ ind ]
+      availP[ aux ] = 0
+    end
+    
+    #assign D_indD and set S
+    ( timeD, timeS ) = assignSetS( indD, setSDem, cardSetS, prob )
+#     println( "timeD = $timeD" )
+#     println( "timeS = $timeS" )
+    
+    #printSol ( prob, sol )
+    #find a cdock foir D_indD and set S, update solution
+    (flagCalcCosts, sol) = calcCosts( prob, sol, indD, timeD, setSDem, timeS, cardSetS )
+#   println( "sol = $sol" )
+#   printSol ( prob, sol )    
+    
+    #verify if current solution is feasible (if it is, break the while)
+    if ( flagCalcCosts == 1 )
+      numPickup += cardSetS
+    end
+    if ( numPickup == prob.cardP )
+      auxFeas = checkFeas( prob, sol )
+    end
+    
+    numDeliv += 1
+    auxFeas = checkInventoryLevel( prob, sol )
+#     println( "aux Inv Level = $auxFeas" )
+#     auxFeas = checkCostsGIS( prob, sol )
+#     println( "aux Check Costs = $auxFeas" )
+    
+#     printSol ( prob, sol )
+    
+#     return
+  end
+
+  #if necessary, calculate penalty costs and feasibility
+  sol.penCost = ( prob.cardP - numPickup )
+  sol.feas = checkFeas( prob, sol )
+  #check solution
+  auxFeas = checkInventoryLevel( prob, sol ) * checkCostsGIS( prob, sol )
+#   println( "auxFeas = $auxFeas" )
+  eTime = toc()
+  println("")
+  printSol ( prob, sol )
+  println( "eTime = $eTime" )
+  return sol
+
+end

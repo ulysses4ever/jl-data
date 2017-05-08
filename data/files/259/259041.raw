@@ -1,0 +1,44 @@
+#=this file contains code for use with "Think Stats 2",
+by Allen B. Downey, available from greenteapress.com
+
+Copyright 2010 Allen B. Downey
+License: GNU GPLv3 http://www.gnu.org/licenses/gpl.html
+=#
+
+include("Chapter1.jl")
+
+##
+# Run script
+#
+using Base.Test
+
+function valuecounts(df::DataFrame, colname::Symbol)
+    uniquevalues = (eltype(df[colname]) => Integer)[]
+    
+    dfna = dropna(df[colname])
+    
+    for value in unique(dfna)
+        uniquevalues[value] = size(find(x -> x == value, dfna))[1]
+    end
+
+    uniquevalues
+end
+
+df = Chapter1.readdatafile("2002FemPreg.dct", "2002FemPreg.dat.gz",x->x)
+
+print("$(size(df))")
+
+@test DataFrames.nrow(df) == 13593
+
+@test df[:caseid][13592] == "12571"
+valuecounts(df, :pregordr)[1]
+@test valuecounts(df, :pregordr)[1] == 5033
+@test valuecounts(df, :nbrnaliv)[1] == 8981
+@test valuecounts(df, :babysex)[1] == 4641
+@test valuecounts(df, :birthwgt_lb)[7] == 3049
+@test valuecounts(df, :birthwgt_oz)[0] == 1037
+@test valuecounts(df, :prglngth)[39] == 4744
+@test valuecounts(df, :outcome)[1] == 9148
+@test valuecounts(df, :birthord)[1] == 4413
+@test valuecounts(df, :agepreg)[2275] == 100
+#@test valuecounts(df, :totalwgt_lb)[7.5] == 302

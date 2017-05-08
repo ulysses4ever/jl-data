@@ -1,0 +1,34 @@
+
+type Wire
+    T0::Float64
+    R0::Float64
+    alpha::Float64
+    a::Float64
+    h::Float64
+    k::Float64
+    X::Float64
+    Y::Float64
+    Z::Float64
+end
+
+overheat(w::Wire) = w.a
+overtemp(w::Wire) = w.a/w.alpha
+wireresist(w::Wire) = w.R0 * (1.0 + w.a)
+wiretemp(w::Wire) = overtemp(w) + w.T0
+
+temp_corr(Ta, T0=25.0, Tw=245.0) = sqrt( (Tw-T0) / (Tw - Ta) )
+temp_corr(w::Wire, Ta) = w.a/w.alpha / (w.a/w.alpha + (w.T0 - Ta))
+
+import CurveFit
+function wire_calibr{T<:CurveFit.LeastSquares}(w::Wire, E, U, Tc, ::Type{T})
+
+    ef = tempCorr(w, Tc)
+
+    Ec = E .* ef
+
+    CurveFit.curve_fit(T, Ec, U)
+end
+
+
+    
+    

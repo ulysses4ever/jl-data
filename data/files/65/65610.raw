@@ -1,0 +1,25 @@
+#@author titus 
+#-------------------------begin test header----------------------------------
+using   Base.Test
+import  Base.Test: Success, Failure, Error, with_handler
+test_sep()          =  println(repeat("---",20))
+strictequal(a , b)  = (a == b)
+#handler
+test_handler(r::Success) = begin 
+  println("sucess on \t ----> \t expr : $(r.expr)")
+end
+test_handler(r::Failure) = begin
+    #get function to resample
+    println("ERROR:  expression : \n\t\t$(r.expr)")
+    expected = (r.expr.args[2])
+    exp_msg = "\t-> expected:: $(r.expr.args[2]) :: \n\t\t"
+    println(exp_msg, expected)
+
+    got = r.expr.args[3]
+    got_msg = "\t-> got     :: $(r.expr.args[3]) :: \n\t\t";
+    println(got_msg, got)
+
+    error("$(r.expr)")
+end
+test_handler(r::Error) =   rethrow(r);
+#--------------------------end test header----------------------------------

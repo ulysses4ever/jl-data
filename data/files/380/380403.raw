@@ -1,0 +1,215 @@
+#
+# types for representing context free grammars.
+#
+
+global phrase_id = 0
+
+############################################################
+## ContextFreeProduction type
+## Used for representing a node in a context-free grammar.
+############################################################
+type ContextFreeProduction
+    symbol::String
+    children::Vector
+    is_lexical::Bool
+end
+
+#######################################
+# ContextFreeProduction constructors
+#######################################
+function ContextFreeProduction(s::String; sep::String="->")
+    if ! contains(s, sep)
+        error("error parsing ruls \"$s\" (doesn't contain \"$sep\")")
+    end
+    left, right = split(s, Regex(" ?"*sep*" ?"))
+    children = split(right, r" +")
+    is_lexical = false
+    for (i, ch) in enumerate(children)
+        if ismatch(r"^\".*\"$", ch) || ismatch(r"^'.*'$", ch)
+            children[i] = ch[2:end-1]
+            is_lexical = true
+        end
+    end
+    return ContextFreeProduction(left, children, is_lexical)
+end
+
+###################################
+# ContextFreeProduction functions
+###################################
+function is_binary(p::ContextFreeProduction)
+    return length(p.children) == 2
+end
+
+function is_unary(p::ContextFreeProduction)
+    return length(p.children) == 1
+end
+
+###############################
+# End of ContextFreeProduction
+###############################
+
+############################################################
+## ContextFreeGrammar type
+## Used for representing a node in a context-free grammar.
+############################################################
+type ContextFreeGrammar
+    top_symbol::String
+    productions::Array{ContextFreeProduction}
+end
+
+function ContextFreeGrammar(f::IOStream)
+    top = nothing
+    productions = ContextFreeProduction[]
+    lineno = 0
+    for line = readlines(f)
+        lineno += 1
+        line = strip(line)
+        prod = ContextFreeProduction(line)
+        if lineno == 1
+            top = prod.symbol
+        end
+        push!(productions, prod)
+    end
+    return ContextFreeGrammar(top, productions)
+end
+
+#################################
+## ContextFreeGrammar functions
+#################################
+function productions(g::ContextFreeGrammar; lhs::String="", rhs::String="")
+    prods = ContextFreeProduction[]
+    for prod in g.productions
+        if lhs == "" || lhs == prod.symbol
+            if rhs == "" || rhs == first(prod.children)
+                push!(prods, prod)
+            end
+        end
+    end
+    return prods
+end
+
+function unit_productions(g::ContextFreeGrammar; lhs=String="", rhs::String="")
+    prods = ContextFreeProduction[]
+    for prod in g.productions
+        if is_unary(prod)
+            append!(prods, prod)
+        end
+    end
+    return prods
+end
+
+function nonterminals(g::ContextFreeGrammar; lhs::String="", rhs::String="")
+    prods = ContextFreeProduction[]
+    for prod in productions(g, lhs=lhs, rhs=rhs)
+        if ! prod.is_lexical
+            push!(prods, prod)
+        end
+    end
+    return prods
+end
+
+function terminals(g::ContextFreeGrammar; lhs::String="", rhs::String="")
+    prods = ContextFreeProduction[]
+    for prod in productions(g, lhs=lhs, rhs=rhs)
+        if prod.is_lexical
+            push!(prods, prod)
+        end
+    end
+    return prods
+end
+
+function is_chomsky_normal_form(g::ContextFreeGrammar)
+    for prod in terminals(g)
+        if ! is_unary(prod)
+            ## println(prod, " is not unary")
+            return false
+        end
+    end
+    for prod in nonterminals(g)
+        if ! is_binary(prod)
+            ## println(prod, "is nonterminal and not binary")
+            return false
+        end
+    end
+    return true
+end
+
+function new_phrasename()
+    global phrase_id += 1
+    return "XP__" * string(phrase_id)
+end
+
+function collapse_unit_productions(ps::Array{ContextFreeProduction})
+    new_productions = ContextFreeProduction[]
+    while true
+        current_set = 
+        iterated = false
+
+        if ! iterated
+            break
+        end
+    end
+    return new_productions
+end
+
+function convert_mixed_production(p::ContextFreeProduction)
+    new_productions = ContextFreeProduction[]
+    newphrase = new_phrasename()
+    for (i, child) in enumerate(p.children)
+        if ismatch(r"^\".*\"$", child) || ismatch(r"^'.*'$", child)
+            # child in position i is lexical
+            new_productions.push!(ContextFreeProduction(newphrase, [child], true))
+        else
+            if i == 2
+                push!(new_productions, ContextFreeProduction(p.symbol, [child, newphrase], false))
+            else
+                push!(new_productions, ContextFreeProduction(p.symbol, [newphrase, child], false))
+            end
+        end
+    end
+    return new_productions
+end
+
+function convert_to_chomsky_normal_form(g::ContextFreeGrammar)
+    #
+    ## local top = g.top
+    local new_productions = ContextFreeProduction[]
+    local terms = terminals(g)
+    local nonterms = nonterminals(g)
+    local unit_prods = unit_productions(g)
+    for prod in productions(g)
+        if prod.is_lexical && is_binary(prod) == 2
+            # mixed productions
+            
+        elseif in(prod, unit_prods)
+            # unit productions
+
+        elseif length(prod.children) > 2
+            # not in binary form
+
+        else
+            # already cnf
+            push!(new_productions, prod)
+        end
+    end
+    return ContextFreeGrammar(g.top, new_productions)
+end
+
+#################################
+## end of ContextFreeGrammar
+#################################
+
+##############################
+## reading, writing grammars 
+##############################
+function load_cfg(f::String)
+    return ContextFreeGrammar(open(f))
+end
+
+function write_cfg(g::ContextFreeGrammar, f::String)
+    outf = open(f, 'w')
+    for p in productions(g)
+        write(outf, p, "\n")
+    end
+    close(outf)
+end

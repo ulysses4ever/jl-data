@@ -1,0 +1,10 @@
+# Parse args
+if length(ARGS) >0 && ARGS[1] == "kmeans"
+  include("modules/KMeans.jl")
+
+  euclidian_distance(a,b) = sqrt((a.x - b.x)^2 + (a.y - b.y)^2)
+  kmeans("dots.csv", ',', 3, 3, euclidian_distance)
+else
+  include("modules/KMeans.jl")
+  build_from_file("dots.csv", ',', [])
+end

@@ -1,0 +1,38 @@
+"""
+A Julia port of [community_structure.m](https://sites.google.com/site/bctnet/measures/list#TOC-Clustering-and-Community-Structure), a Matlab script by Mike Rubinov of U. Cambridge implementing a fast and accurate multi-iterative generalization of the original Louvain algorithm. The referenced script is part of the [Brain Connectivity Toolbox]().
+
+* W, a weighted, directed connection matrix. Negative weights are allowed.
+* gamma, a resolution parameter
+  + gamma > 1 detects smaller modules
+  + 0 <= gamma < 1 detects larger modules
+  + gamma = 1 detects classic modules and is the default
+* M0, initial community affiliation vector (optional)
+* B, objective function type or custom objective matrix (optional)
+  + :modularity, modularity (the default)
+  + :potts,      Potts-model Hamiltonian (for binary networks)
+  + :negative_sym, symmetric treatment of negative weights
+  + :negative_asym, asymmetric treatment of negative weights
+
+The Matlab implementation cites the following:
+
+* Blondel et al. (2008)  J. Stat. Mech. P10008.
+* Reichardt and Bornholdt (2006) Phys. Rev. E 74, 016110.
+* Ronhovde and Nussinov (2008) Phys. Rev. E 80, 016109
+* Sun et al. (2008) Europhysics Lett 86, 28004.
+* Rubinov and Sporns (2011) Neuroimage 56:2068-79.
+
+"""
+function community_louvain{Tw<:Real,
+                           Tg<:Real,
+                           Tm<:Real,
+                           Tb<:Real}(W::Matrix{Tw};
+                                     gamma::Tg=1,
+                                     M0::Vector{Tm}=
+                                     collect(1:size(W,1)),
+                                     B::Matrix{Tb}=zeros(W),
+                                     option::Symbol=
+                                     B==zeros(W) ? :custom :
+                                     :modularity)
+    @show size(M0)
+
+end

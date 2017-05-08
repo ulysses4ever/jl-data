@@ -1,0 +1,72 @@
+#! /usr/bin/env julia
+
+#=push!(LOAD_PATH, "./localmodules")=#
+include("CACode.jl")
+
+using Base.Test
+
+using gps_cacode
+
+# SV =>  CA First 10chips (octal)
+cacheck = {
+   1=>"1440",
+   2=>"1620",
+   3=>"1710",
+   4=>"1744",
+   5=>"1133",
+   6=>"1455",
+   7=>"1131",
+   8=>"1454",
+   9=>"1626",
+  10=>"1504",
+  11=>"1642",
+  12=>"1750",
+  13=>"1764",
+  14=>"1772",
+  15=>"1775",
+  16=>"1776",
+  17=>"1156",
+  18=>"1467",
+  19=>"1633",
+  20=>"1715",
+  21=>"1746",
+  22=>"1763",
+  23=>"1063",
+  24=>"1706",
+  25=>"1743",
+  26=>"1761",
+  27=>"1770",
+  28=>"1774",
+  29=>"1127",
+  30=>"1453",
+  31=>"1625",
+  32=>"1712",
+  65=>"1745",
+  66=>"1713",
+  67=>"1134",
+  68=>"1456",
+  69=>"1713"
+}
+
+# Generate the MLS for the G1 and G2 shift registers
+#g1_mls = Gx_mls(ones(Uint8, 10), [3,10], 1023)
+#g2_mls = Gx_mls(ones(Uint8, 10), [2,3,6,8,9,10], 1023)
+
+println("SV\tcw_10\tcw_check")
+println("--\t-----\t--------")
+for i in 1:32
+	cw = cacode_word(i)
+	cw_10 = oct(base_two_reg_to_num(cw[1:10]))
+	cw_check = cacheck[i]
+	println(i,"\t", cw_10,"\t", cw_check)
+	@test cw_10==cw_check
+end
+
+for i in 65:69
+	cw = cacode_word(i)
+	cw_10 = oct(base_two_reg_to_num(cw[1:10]))
+	cw_check = cacheck[i]
+	println(i,"\t", cw_10,"\t", cw_check)
+	@test cw_10==cw_check
+end
+

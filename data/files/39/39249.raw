@@ -1,0 +1,80 @@
+#= DegreeAndSimilarity
+
+Adaptation of BCT's [degree and similarity](https://sites.google.com/site/bctnet/measures/list#TOC-Degree-and-Similarity) API.
+
+=#
+
+import Graphs
+
+function has_edge_attribute{G<:Graphs.GenericGraph}(g::G, key::AbstractString)
+    if num_edges(g) == 0 return false end
+    if findfirst(fieldnames(g.edges[1]),:attributes) == 0 return false end
+    for edge in edges(g)
+        if findfirst(collect(keys(edge.attributes))) == 0 return false end
+    end
+    return true;
+end
+
+""" strengths{G<:Graphs.GenericGraph}(g::G, key::AbstractString="weight")
+
+Returns a Float64 array, one row per vertex. The array's first column will contain the total weight of all incident edges.
+
+If `g` is directed, a second column will contain the total weight of all incoming vectors.
+
+If `g` is undirected, there will be no second column.
+
+If all edges of `g` have a `weight` attribute with `key` as given in the arguement, it will be used as such. If not, each edge will be given a weight of 1.0.
+"""
+function strengths{G<:Graphs.GenericGraph}(g::G, key::AbstractString = "weight")
+    n = Graphs.num_vertices(g);
+    # Do edges have attributes?
+    has_weights = has_edge_attribute(g, key);
+    if is_directed(g)
+        # Allocate nx2 array of zeros.
+        S = fill(0.0, (n,2));
+        for edge in edges(g)
+            W = has_weights ? edge.attributes[key] : 1.0;
+            S[edge.source.index, 1] += W; 
+            S[edge.target.index, :] += W;
+        end
+        return S;
+    else
+        # Allocate n-long array of zeros.
+        S = fill(0.0, n);
+        for edge in edges(g)
+            W = has_weights ? edge.attributes[key] : 1.0;
+            S[edge.source.index] += W;
+            S[edge.target.index] += W;
+        end
+        return S;
+    end
+end
+
+""" joint_degree{G <: Graphs.GenericGraph}(g::G)
+
+If `g` is directed, `joint_degree` returns a 2D array whose the i,jth element is the number of vertices that have i-1 outgoing and j-1 incoming edges. Edge weights are ignored. 
+
+If `g` is undirected, `joint_degree` returns a vector whose ith element is the number of vertices of degree i-1, i.e, have i-1 incident edges. Edge weights are ignored.
+
+Origin shifts, i-1, j-1, are to accommodate cases with no edges of one type or another.
+"""
+function joint_degree{G <: Graphs.GenericGraph}(g::G)
+    if g.is_directed
+        tmp =  hcat([Graphs.in_degree(v,g) for v in g.vertices],
+                    [Graphs.out_degree(v,g) for v in g.vertices]);
+        n = maximum(tmp)+1;
+        JD = fill(0::Int, (n,n));
+        for k in 1:size(tmp,1)
+            JD[tmp[k,1]+1, tmp[k,2]+1] += 1;
+        end
+    else
+        tmp = [Graphs.out_degree(v,g) for v in g.vertices];
+        JD = fill(0::Int, maximum(tmp)+1);
+        for k in 1:size(tmp,1)
+            JD[tmp[k]+1] += 1;
+        end
+    end
+    return JD;
+end
+
+

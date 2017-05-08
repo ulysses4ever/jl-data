@@ -1,0 +1,15 @@
+function curved_binary(x::Float64, p::Float64=0.999)
+  if 0 <= x < 0.5
+    return 1-(1-2*x)^p
+  elseif 0.5 <= x <= 1.0
+    return 1-(2-2*x)^p
+  else
+    error("Argument out of function's domain")
+  end
+end
+
+iterator = SignalIterator(curved_binary, 0.2)
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_curved_binary.txt")
+
+simulate_signal(iterator, OUTFILE, 10^7)

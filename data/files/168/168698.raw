@@ -1,0 +1,36 @@
+
+abstract Dispatchable{Fn}
+#Could easily have added extra argument to Dispatchable, but want to show inheritance case:
+abstract Dispatchable2Arg{Fn} <: Dispatchable{Fn}
+
+call{F}(::Type{Dispatchable2Arg{F}}, x1, x2) = eval(:($F($x1,$x2)))
+function call{F,T1,T2}(fn::Type{Dispatchable2Arg{F}}, v1::Vector{T1}, v2::Vector{T2})
+	RT = promote_type(T1,T2) #For type stability!
+	return RT[fn(v1[i],v2[i]) for i in 1:length(v1)]
+end
+
+function _myadd(x::Number, y::Number)
+	return x+y+1
+end
+
+typealias myadd Dispatchable2Arg{:_myadd}
+
+@show myadd(5,6)
+@show myadd(collect(1:10),collect(21:30.0)) #Type stable!
+
+#==But this would be significantly nicer if Julia syntax allowed:
+abstract Dispatchable <: Function
+abstract Dispatchable2Arg <: Dispatchable
+
+call(fn::Dispatchable2Arg, x1, x2) = fn(x1,x2)
+function call{T1,T2}(fn::Dispatchable2Arg, v1::Vector{T1}, v2::Vector{T2})
+	RT = promote_type(T1,T2) #For type stability!
+	return RT[fn(v1[i],v2[i]) for i in 1:length(v1)]
+end
+
+#Note: by default, functions would be <: Function:
+function myadd(x::Number, y::Number) <: Dispatchable2Arg
+	return x+y+1
+end
+
+==#

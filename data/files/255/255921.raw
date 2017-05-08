@@ -1,0 +1,11 @@
+using HTTPClient.HTTPC
+using Base.Test
+#using ZipFile
+
+function downloadBhavFile()
+	ostream=open("/tmp/bhav.zip", "w+")
+	r=HTTPClient.get("http://www.bseindia.com/download/BhavCopy/Equity/EQ210515_CSV.ZIP", RequestOptions(ostream=ostream))
+	r.http_code == 200
+	close(ostream)
+end
+

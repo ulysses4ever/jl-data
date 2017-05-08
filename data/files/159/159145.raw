@@ -1,0 +1,92 @@
+
+type Ecoc <:MulticlassWithBinaryClassifier
+  binary_models::Vector{Classifier}
+  design::EcocDesign
+end
+
+type EcocConfig <:MulticlassWithBinaryClassifierConfig
+    binary_classifier_config::ClassifierConfig
+    design::EcocDesign
+end
+
+
+function fit(c::EcocConfig,x,y)
+    classes,codes=size(c.design)
+    #binary_models=Classifier[]
+    function train_classifier(code::Int)
+      println("ECOC: Training model $code/$codes")
+    x_code,y_code=dataset_for_code(c.design[:,code],x,y)
+    fit(c.binary_classifier_config,x_code,y_code)
+    end
+    binary_models=map(train_classifier,1:codes)
+    # for code=1:codes
+    #   println("Training model $code/$codes")
+    #   x_code,y_code=dataset_for_code(c.design[:,code],x,y)
+    #   binary_model=fit(c.binary_classifier_config,x_code,y_code)
+    #   push!(binary_models,binary_model)
+    # end
+    Ecoc(binary_models,c.design)
+end
+
+function dataset_for_code(code::Vector{Int},x::Vector,y::Vector{Int})
+  indices_positive=Int[]
+  indices_negative=Int[]
+  for i=1:length(code)
+      if (code[i]==1)
+        append!(indices_positive,find(y.==i))
+      end
+      if (code[i]==-1)
+        append!(indices_negative,find(y.==i))
+      end
+  end
+  x_code=x[ [indices_positive ; indices_negative] ]
+  y_code=[ones(Int,length(indices_positive)); -ones(Int,length(indices_negative))]
+  # println(indices_positive)
+  # println(indices_negative)
+  # println(y_code)
+  # println(length(x_code))
+  # println(length(y_code))
+  # println(y_code)
+  x_code,y_code
+end
+
+function modified_hamming_distance(a::Vector{Int},b::Vector{Int})
+  abs_a=abs(a)
+  abs_b=abs(b)
+  0.5 * sum( abs(a-b) .* abs_a .* abs_b )
+end
+
+function modified_hamming_distances(outputs::Vector{Int},design::EcocDesign)
+  classes,codes=size(design)
+  distances=zeros(classes)
+  abs_outputs=abs(outputs)
+  abs_design=abs(design)
+    # println(outputs)
+    # println(size(design))
+  for i=1:classes
+    distances[i]=0.5 * sum( abs(design[i,:]-outputs) .* abs_design[i,:] .* abs_outputs )
+  end
+  distances
+end
+
+function predict(m::Ecoc,x)
+    classes,codes=size(m.design)
+    n=length(x)
+    binary_models=Classifier[]
+    results=zeros(Int,n,codes)
+    for code=1:codes
+      binary_model=m.binary_models[code]
+      #println(binary_model)
+      # println("code $code/$codes")
+      results[:,code]=round(Int,sign(predict(binary_model,x)))
+    end
+    predicted=zeros(Int,n)
+    for i=1:n
+      distances=modified_hamming_distances(results[i,:],m.design)
+      # println(distances)
+      predicted[i]=indmin(distances)
+    end
+    predicted
+end
+
+loss(m::Ecoc,predicted::Vector{Int},y::Vector{Int}) = predicted.!=y

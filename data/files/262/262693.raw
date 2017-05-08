@@ -1,0 +1,19 @@
+function pe12()
+    numdivmax = 1
+    n = 1
+    while numdivmax < 500
+        for i in 2:10000
+            n += i
+            d = 2
+            for j = 2:div(n, 2)
+                if n % j == 0
+                    d += 1
+                end
+            end
+            if d > numdivmax
+                numdivmax = d
+                @printf "(%d) %d : %d divisors\n" i n d
+            end
+        end
+    end
+end

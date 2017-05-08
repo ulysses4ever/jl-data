@@ -1,0 +1,19 @@
+module DualNumbers
+  importall Base
+
+  import Calculus
+
+  include("dual.jl")
+
+  export
+    Dual,
+    Dual128,
+    Dual64,
+    DualPair,
+    dual,
+    dual128,
+    dual64,
+    isdual,
+    dual_show,
+    epsilon
+end

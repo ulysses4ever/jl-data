@@ -1,0 +1,232 @@
+###
+#   Isotherm models
+#   Author: CoryMSimon@gmail.com
+###
+
+
+type LangmuirIsotherm
+    """
+    Langmuir isotherm object
+    """
+    M::Float64  # saturation loading (units: same as in input isotherm loading units)
+    K::Float64  # Langmuir constant (units: 1 / pressure)
+    residualsumofsquares::Float64  # residual of fit
+
+    # original isotherm data to which we fit the Langmuir isotherm
+    data::DataFrame  
+    loading_key::Symbol
+    pressure_key::Symbol
+
+    # functions
+    loading::Function  # get loading at a pressure(s)
+    Π::Function  # spreading pressure
+    _loading::Function  # loading at a given K, M, P.
+
+    function _loading(K::Float64, M::Float64, P::Union(DataArray{Float64}, Array{Float64}, Float64))
+        """
+        Compute loading of Langmuir adsorption isotherm at pressure P
+        K : Langmuir constant (units: 1 / P)
+        M : Saturation loading
+        """
+        return M .* K .* P ./ (1.0 + K .* P)
+    end
+
+    # constructor
+    function LangmuirIsotherm(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+        """
+        Constructor
+
+        df: DataFrame of pure component isotherm
+        loading_key: name of loading column in df
+        pressure_key: name of pressure column in df
+        """
+        langmuirisotherm = new()
+        langmuirisotherm.data = df
+        langmuirisotherm.loading_key = loading_key
+        langmuirisotherm.pressure_key = pressure_key
+        
+        # define residual sum of squares (RSS) to minimize
+        # x := [K, M]
+        RSS(x) = sum((df[loading_key] - _loading(x[1], x[2], df[pressure_key])) .^ 2)
+        
+        # initial guesses for parameters
+        M_guess = df[loading_key][end]  # guess saturation loading to be highest loading
+        K_guess = df[loading_key][1] / df[pressure_key][1] / (M_guess - df[pressure_key][1])  # guess K using M_guess and first point
+
+        # use optimization routine to find best fit params
+        res = optimize(RSS, [K_guess, M_guess], method = :l_bfgs)
+        langmuirisotherm.K = res.minimum[1]
+        langmuirisotherm.M = res.minimum[2]
+
+        langmuirisotherm.residualsumofsquares = RSS(res.minimum)
+        
+        # define function to compute loading, given this object's params
+        langmuirisotherm.loading  = function(P::Union(DataArray{Float64}, Array{Float64}, Float64))
+            """
+            Compute loading at pressure P
+            """
+            return langmuirisotherm.M .* langmuirisotherm.K .* P ./ (1.0 + langmuirisotherm.K .* P)
+        end
+        
+        langmuirisotherm.Π = function(p::Float64)
+            """
+            Spreading pressure
+            \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+            eqn 13 of Tarafder
+
+            p: pressure of component
+            """
+            return langmuirisotherm.M * log(1 + langmuirisotherm.K * p)
+        end
+       
+        return langmuirisotherm 
+    end  # end constructor
+end  # end LangmuirIsotherm type
+
+type QuadraticIsotherm
+    """
+    Langmuir isotherm object
+    """
+    M::Float64  # 1/2 of the saturation loading (units: same as in input isotherm loading units)
+    Ka::Float64  # constant (units: 1 / pressure)
+    Kb::Float64  # constant (units: 1 / pressure^2)
+    residualsumofsquares::Float64  # residual of fit
+
+    # original isotherm data to which we fit the Langmuir isotherm
+    data::DataFrame  
+    loading_key::Symbol
+    pressure_key::Symbol
+
+    # functions
+    loading::Function  # get loading at a pressure(s)
+    Π::Function  # spreading pressure
+    _loading::Function  # loading at a given Ka, Kb, M, P.
+
+    function _loading(Ka::Float64, 
+                      Kb::Float64,
+                      M::Float64, 
+                      P::Union(DataArray{Float64}, Array{Float64}, Float64))
+        """
+        Compute loading of Quadratic adsorption isotherm at pressure P 
+        eqn (8) of Tarafder
+        """
+        return M .* (Ka + 2 * Kb * P) .* P ./ (1.0 + Ka * P + Kb * P .^ 2)
+    end
+
+    # constructor
+    function QuadraticIsotherm(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+        """
+        Constructor
+
+        df: DataFrame of pure component isotherm
+        loading_key: name of loading column in df
+        pressure_key: name of pressure column in df
+        """
+        quadraticisotherm = new()
+        quadraticisotherm.data = df
+        quadraticisotherm.loading_key = loading_key
+        quadraticisotherm.pressure_key = pressure_key
+        
+        # define residual sum of squares to minimize
+        # x := [Ka, Kb, M]
+        RSS(x) = sum((df[loading_key] - _loading(x[1], x[2], x[3], df[pressure_key])) .^ 2)
+        
+        # initial guesses for parameters
+        M_guess = df[loading_key][end] / 2.0  # guess 1/2 loading to be 1/2 loading at last point
+        Ka_guess = df[loading_key][1] / df[pressure_key][1] / (M_guess - df[pressure_key][1])  # assume Langmuir
+        Kb_guess = 0.0001 # start with Langmuir assumption (Kb \approx 0)
+        
+        # use optimization routine to find best fit params
+        res = optimize(RSS, [Ka_guess, Kb_guess, M_guess], method = :l_bfgs)
+        quadraticisotherm.Ka = res.minimum[1]
+        quadraticisotherm.Kb = res.minimum[2]
+        quadraticisotherm.M = res.minimum[3]
+
+        quadraticisotherm.residualsumofsquares = RSS(res.minimum)
+    
+        # define function to compute loading, given this object's params
+        quadraticisotherm.loading  = function(P::Union(DataArray{Float64}, Array{Float64}, Float64))
+            """
+            Compute loading at pressure P
+            """
+            return quadraticisotherm.M .* (quadraticisotherm.Ka + 2 * quadraticisotherm.Kb * P) .* P ./ 
+                        (1.0 + quadraticisotherm.Ka * P + quadraticisotherm.Kb * P .^ 2)
+        end
+        
+        quadraticisotherm.Π = function(p::Float64)
+            """
+            Spreading pressure
+            \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+            eqn 15 of Tarafder
+
+            p: pressure of component
+            """
+            return quadraticisotherm.M * log(1 + quadraticisotherm.Ka * p + quadraticisotherm.Kb * p ^ 2)
+        end
+       
+        return quadraticisotherm 
+    end  # end constructor
+end  # end QuadraticIsotherm type
+
+type InterpolatorIsotherm   
+    """
+    Isotherm type where we linearly interpolate the pure component isotherm data
+    """
+    interpolator::InterpIrregular # from Grid package
+    
+    # original isotherm data to which we fit the Langmuir isotherm
+    data::DataFrame  
+    loading_key::Symbol
+    pressure_key::Symbol
+
+    # functions
+    loading::Function  # get loading at a pressure(s)
+    Π::Function  # spreading pressure
+    
+    # constructor
+    function InterpolatorIsotherm(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+        """
+        Constructor
+
+        df: DataFrame of pure component isotherm
+        loading_key: name of loading column in df
+        pressure_key: name of pressure column in df
+        """
+        interpolatorisotherm = new()
+
+        # needs sorted
+        df = sort(df, cols=pressure_key)
+        
+        interpolatorisotherm.data = df
+        interpolatorisotherm.loading_key = loading_key
+        interpolatorisotherm.pressure_key = pressure_key
+        
+        interpolatorisotherm.interpolator = Grid.InterpIrregular(convert(Array, df[pressure_key]), convert(Array, df[loading_key]), Grid.BCnan, Grid.InterpLinear)
+
+        interpolatorisotherm.loading = function(P::Union(DataArray{Float64}, Array{Float64}, Float64))
+            return interpolatorisotherm.interpolator[P]
+        end
+
+        interpolatorisotherm.Π = function(p)
+            """
+            Spreading pressure, calculated from trapezoid rule on isotherm
+            \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+            eqn 4 of Tarafder
+
+            p: pressure of component
+            """
+            # area of first triangle in integral, from 0 to first pressure point
+            # (1/2 * p1 * [height=loading/p1]
+            first_triangle = interpolatorisotherm.data[loading_key][1] / 2.0  
+            
+            # get all data points less than this p
+            idx = interpolatorisotherm.data[pressure_key] .< p
+            p_array = [interpolatorisotherm.data[idx, :][pressure_key], p]  # array of pressures
+            l_array = [interpolatorisotherm.data[idx, :][loading_key] , interpolatorisotherm.interpolator[p]] # array of loadings 
+            return trapz(l_array ./ p_array, p_array) + first_triangle
+        end
+
+        return interpolatorisotherm
+    end  # end constructor
+end  # end InterpolatorIsotherm type
+    

@@ -1,0 +1,8 @@
+include("utils.jl")
+include("calculator.jl")
+include("test.jl")
+
+test_cases = ["case1a", "case1b", "case1c"]
+for tc in test_cases
+  run_test(tc)
+end

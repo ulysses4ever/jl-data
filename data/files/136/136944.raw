@@ -1,0 +1,246 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+#  Affine Gap Penalties
+#  --------------------
+#  id := identity, sub := subsitution
+#
+#                                   delete [-o]                     
+#                          __________________________                              
+#                         /__________________________\                          
+#                        /                            \
+#                       /           insert [-o]        \  
+#                      /     ______________________    ||                         
+#                     /    //                      \\  ||        
+#                    ||   //                        \\ ||        
+#                    ||   |                          | ||   _______{Gapping context: insertion}
+#                    ||   |        id [+s(a,a)]      | ||  /       
+#                     \   |           ___            | || /     
+#               _____  \  \\         |   |          /  / /_____  
+#              |     | \\/ /  [-o]  \ /  |   [-o] \// / /|     |         
+#  delete [-d] |     ------- delete ------- insert -------     | insert [-d]
+#              |____\|  -  | <----- |-   -| -----> |  +  |/____|
+#                   /|  -  | -----> |- - -| <----- |  +  |\
+#                    ------- id/sub ------- id/sub -------
+#                     \    [+s(x,y)] |   /\\[+s(x,y)] 
+#                      \             |   || \_____________{Main context}
+#                       \            -----
+#                        \        sub [+s(a,g)]
+#                         \
+#                          \_{Gapping context: deletion}
+#
+
+#====================================================================================
+
+
+#====================================================================================
+
+abstract AffineAction
+
+type InsertAction <: AffineAction end
+
+type DeleteAction <: AffineAction end
+
+type MatchAction <: AffineAction end
+
+type SubstitutionAction <: AffineAction end
+
+
+abstract AffineState
+
+type InsertionAffineState <: AffineState end
+
+type DeletionAffineState <: AffineState end
+
+type MainAffineState <: AffineState end
+
+immutable AffineNode
+  _fixedState::AffineState
+  _nextStates::Dict{Any,Any}
+end
+
+function createAffineNode(state::AffineState)
+  return AffineNode(state,Dict()) 
+end
+
+function init!(anAffineNode::AffineNode, transitions::Dict{Any,Any})
+  merge!(anAffineNode._nextStates, transitions) 
+end
+
+type InvalidAffineStateTransition end
+
+function getNext(anAffineNode::AffineNode, anAction::AffineAction)
+  return get(anAffineNode._nextStates, anAction, InvalidAffineStateTransition())
+end
+
+#====================================================================================
+
+#====================================================================================
+
+
+const _D_ = createAffineNode(DeletionAffineState())
+const _M_ = createAffineNode(MainAffineState())
+const _I_ = createAffineNode(InsertionAffineState()) 
+
+type AffineGapSystem
+  _startNode::AffineNode
+  _currNode::AffineNode
+
+  _contiguousGapCount::Int64
+  _accGapPenalty::Float64
+end
+
+# julia supports seemless function passing!! - heart
+function createAffineGapAutomata(startStateChoice::AffineState, subst_mat_lambda_fn, open_gap_cost_lambda_fn, extend_gap_cost_lamba_fn)
+  o = open_gap_cost_lambda_fn
+  d = extend_gap_cost_lamba_fn
+  s = subst_mat_lambda_fn
+
+  D = _D_
+  M = _M_
+  I = _I_
+
+  init!(D, {DeleteAction()=>[D, -d], MatchAction()=>[M, s], SubstitutionAction()=>[M, s], InsertAction()=>[I, -o]})
+  init!(M, {DeleteAction()=>[D, -o], MatchAction()=>[M, s], SubstitutionAction()=>[M, s], InsertAction()=>[I, -o]})
+  init!(I, {InsertAction()=>[I, -d], MatchAction()=>[M, s], SubstitutionAction()=>[M, s], DeleteAction()=>[D, -o]})
+
+  retNode = (isa(startStateChoice, MainAffineState)? M : (isa(startStateChoice, DeletionAffineState)? D : isa(startStateChoice, InsertionAffineState)? I : error("Serious Error, invalid state-node-traversal") ))
+
+  return retNode 
+end
+
+function setCurrNode(system::AffineGapSystem, aNode::AffineNode)
+  system._currNode = aNode
+end
+
+function getCurrNode(system::AffineGapSystem)
+  return system._currNode
+end
+
+const negInf_f = -float(0xffff)
+
+# Fri 2:21am, not sure about this
+function update!(system::AffineGapSystem, affineAction::AffineAction, s1_i::Char, s2_j::Char)
+  const beforeNode = _system._currNode
+  const result = get(system._currNode, affineAction, InvalidStateTransition())
+
+  # when system was initialized it was given lambda function for subst matrix,
+  # and gap costs. we use the gap costs to update the ongoing gap cost,
+  # which we return as an element in the result tuple. we do the same for
+  # identities and substitutions
+
+  const afterNode = result[1]
+  cost = negInf_f
+  
+  if afterNode == _M_
+    # for sure we're in a state not involving gaps
+    system._contiguousGapCount = 0
+    s = result[2](s1_i,s2_j)
+    cost = s
+    system._currIndelCost = 0
+  elseif afterNode != beforeNode
+    system._contiguousGapCount = 0
+    o = result[2](s1_i,s2_j)
+    system._currIndelCost = o
+  else
+    system._continguousGapCount += 1
+    d = result[2](s1_i,s2_j)
+    # i think there may be two ways to do the following:
+    #  either keep currIndel cost at top level, or keep gapcount here
+    #   force the top level to take on the result as here its recomputed
+    #   (im not entirely sure which one is better but since we choose
+    #    the cost function by transition it might just be easier to force
+    #     the current indel cost to be kept at top layer. ....so we dont
+    #      need contiguousGap count??? for anything other than debug???
+    cost = system._currIndelCost + d
+    system._currIndelCost = cost 
+  end
+
+end
+
+
+#====================================================================================
+#====================================================================================
+
+function createAffineGapSystem(startState::AffineState, openGapLambda, extendGapLambda, substLambda)
+  startNode = createAffineGapAutomata(startState, openGapLambda, extendGapLambda, substLambda)
+  return AffineGapSystem(startNode, startNode, 0, 0)
+end
+
+function getCurrentState(affineSystem::AffineGapSystem)
+  return affineSystem._currNode._fixedState
+end
+
+function updateSystem!(affineSystem::AffineGapSystem, anAction::AffineAction)
+  affineSystem._currNode = getNext(affineSystem, anAction)
+
+  if (getCurrentState(affineSystem) != MainAffineState())
+
+    affineSystem._contiguousGapCount += 1
+  else
+    affineSystem._contiguousGapCount = 0
+  end    
+
+  return affineSystem._currNode._fixedState
+end
+
+# correct way to do it
+# we use shell to avoid creating new objects all over the place
+function updateSystem(shellOfAffineSystem::AffineGapSystem,
+                      currNode::AffineNode,
+                      currState::AffineState,
+                      numberOfGaps::Int64,
+                      anAction::AffineAction)
+  setCurrNode(shellOfAffineSystem, currNode)
+
+  if (getCurrentState(affineSystem) != _M_)
+    affineSystem._contiguousGapCount += 1
+  else
+    affineSystem._contiguousGapCount = 0
+  end
+
+end
+
+function getNext(affineSystem::AffineGapSystem, anAction::AffineAction)
+  return getNext(affineSystem._currNode, anAction)
+end
+
+function getGapCount(affineSystem::AffineGapSystem)
+  return affineSystem._contiguousGapCount
+end
+
+#====================================================================================
+
+function testAffineGapAutomata()
+  aff_system = createAffineGapSystem()
+
+  println("Testing Affine Gap System")
+  println("Update with Match: $(updateSystem!(aff_system, MatchAction())) $(getGapCount(aff_system))")
+  println("Update with Match: $(updateSystem!(aff_system, MatchAction())) $(getGapCount(aff_system))")
+  println("Update with Insertion: $(updateSystem!(aff_system, InsertAction())) $(getGapCount(aff_system))")
+  println("Update with Insertion: $(updateSystem!(aff_system, InsertAction())) $(getGapCount(aff_system))")
+  println("Update with Substitution: $(updateSystem!(aff_system, SubstitutionAction())) $(getGapCount(aff_system))")
+  println("Update with Deletion: $(updateSystem!(aff_system, DeleteAction())) $(getGapCount(aff_system))")
+  println("Update with Match: $(updateSystem!(aff_system, MatchAction())) $(getGapCount(aff_system))")
+end
+

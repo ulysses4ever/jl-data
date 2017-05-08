@@ -1,0 +1,44 @@
+include("FESetModule.jl")
+include("FENodeSetModule.jl")
+include("MeshTriangleModule.jl")
+include("MeshExportModule.jl")
+include("FEMMBaseModule.jl")
+include("IntegRuleModule.jl")
+include("FEMMHeatDiffusionModule.jl")
+include("MeshModificationModule.jl")
+
+using FESetModule
+using FENodeSetModule
+using MeshTriangleModule
+
+
+fens,fes =MeshTriangleModule.T3block(10.0, 20.0, 12, 23)
+
+using MeshExportModule
+
+File =  "a.vtk"
+X=zeros(size(fens.xyz,1),3)
+X[:,1:2]=fens.xyz
+S=cos(1/3*X[:,1])+sin(1/2*X[:,2]).^2+X[:,2]/100
+X[:,3]=S
+MeshExportModule.vtkexportmesh (File, fes.conn, X, MeshExportModule.T3; scalars=S, scalars_name ="scalars_name")
+
+using FEMMBaseModule
+using IntegRuleModule
+
+material = nothing
+integration_rule = IntegRuleModule.TriRule(npts=1)
+Rm = nothing
+b=FEMMBaseModule.FEMMBase(fes=fes, material=material, integration_rule=integration_rule, Rm=Rm)
+
+using FEMMHeatDiffusionModule
+f = FEMMHeatDiffusionModule.FEMMHeatDiffusion(fes=fes, material=material, integration_rule=integration_rule, Rm=Rm)
+
+
+
+using MeshModificationModule
+bfes  =MeshModificationModule.meshboundary(fes)
+FESetModule.count (bfes)
+MeshExportModule.vtkexportmesh ("b.vtk", bfes.conn, fens.xyz, MeshExportModule.L2)
+
+

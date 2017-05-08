@@ -1,0 +1,31 @@
+## =============================================================================
+## self.jl - self referential type and its constructor example
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+
+type SelfReferential
+    obj::SelfReferential
+
+    SelfReferential() = (x = new(); x.obj = x)
+end
+
+type SR1
+    str::ASCIIString
+    obj::SR1
+    ##    SR1(str) = new()
+    ## SR1(str, obj) = new(str, obj)
+    SR1() = (x = new(); x.obj = x; x.str = "hoge")
+    
+end
+
+
+type Incomplete
+    xx
+    Incomplete() = new()
+end
+
+type HasPlain
+    n::Int
+    HasPlain() = new()
+end
+

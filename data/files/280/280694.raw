@@ -1,0 +1,47 @@
+
+@debug function decode(ex::Expr,state)
+	@bp
+	(syms,actives) = active_syms(ex)
+	for s in syms
+		if haskey(state["overwriting",s])
+			astack = state["overwriting"][s]
+			if a in state["initialized_f"]
+				#
+			else
+				#
+			end
+		end
+	end
+	#all bad -- instead, want an "Overwriting{A<:Active} type"
+	Expr(ex.head,map(x->decode(x,state),ex.args)...)
+end
+
+function decode(a::Active,state)
+	if haskey(state["overwriting"],sym(a))
+		#need to push value of x to state["overwriting"][x] here
+		#to do this, need a system like derivatives where we track
+		#which syms are "initialized"
+		astack = state["overwriting"][sym(a)]
+		if a in state["initialized_f"]
+			:(push!($(astack),$(sym(a))); $(sym(a)))
+		else
+			push!(state["initialized_f"],a)
+			:($(state["overwriting"][sym(a)])=typeof($sym(a))[];  push!($(astack),$(sym(a))); $(sym(a)) )
+		end
+	else
+		sym(a)
+	end
+end
+decode(a::AFor,state) = Expr(:for,decode(a.loop,state),decode(a.block,state))
+
+function decode(a::AIf,state)
+	ifcond = gensym("ifcond")
+	arg1 = :($ifcond = $(a.ifcond))
+	arg2 = :(push!($(state["ifstack"]),$ifcond))
+	arg3 = Expr(:if,ifcond,decode(a.ifTrue,state), decode(a.ifFalse,state))
+	Expr(:block, arg1, arg2, arg3)
+end
+
+decode(ex_list::Array,state) = map(x->decode(x,state),ex_list)
+decode(s::Symbol,state) = s
+decode(a::Any,state) = a

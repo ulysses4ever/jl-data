@@ -1,0 +1,80 @@
+## Naive Bayes classification
+
+type NaiveBayesClassifier
+    total::Int
+    examples::Counter
+    feats::Dict{Any, Counter}
+    class_counts::Counter
+    ## constructor
+    NaiveBayesClassifier() = new(0, counter(), Dict{Any, Counter}(), counter())
+end
+
+function train_ex!(model::NaiveBayesClassifier, example)
+    (class, feats) = example
+    model.examples[class] += 1
+    for feat in feats
+        if !in(feat, keys(model.feats))
+            model.feats[feat] = counter()
+        end
+        model.feats[feat][class] += 1
+        model.class_counts[class] += 1
+        model.total += 1
+    end
+end
+
+function train_naive_bayes(examples)
+    model = NaiveBayesClassifier()
+    for example in examples
+        train_ex!(model, example)
+    end
+    return model
+end
+
+function p_class(m::NaiveBayesClassifier, class)
+    return get(m.examples, class, 0) / m.examples.total
+end
+
+function p_feat_mle(m::NaiveBayesClassifier, feat)
+    if in(feat, keys(m.feats))
+        return m.feats[feat].total / m.class_counts.total
+    else
+        return 0
+    end
+end
+
+function p_feat_add1(m::NaiveBayesClassifier, feat)
+    if in(feat, keys(m.feats))
+        return (m.feats[feat].total+1) / (m.class_counts.total+1)
+    else
+        return 1 / (m.class_counts.total+1)
+    end
+end
+
+function p_feat_gvn_class_mle(m::NaiveBayesClassifier, feat, class)
+    if in(feat, keys(m.feats))
+        return m.feats[feat][class] / m.class_counts[class]
+    else
+        return 0
+    end
+end
+
+function p_feat_gvn_class_add1(m::NaiveBayesClassifier, feat, class)
+    if in(feat, keys(m.feats))
+        return (m.feats[feat][class]+1) / (m.class_counts[class]+1)
+    else
+        return 1 / (m.class_counts[class]+1)
+    end
+end
+
+function p_class_gvn_feat_mle(m::NaiveBayesClassifier, class, feat)
+    pf = p_feat_mle(m, feat)
+    if pf == 0.0
+        error("unseen feature, can't divide by zero")
+    else
+        return p_feat_gvn_class_mle(m, feat, class) * p_class(m, class) / pf
+    end
+end
+                                
+function p_class_gvn_feat_add1(m::NaiveBayesClassifier, class, feat)
+    return p_feat_gvn_class_add1(m, feat, class) * p_class(m, class) / p_feat_add1(m,feat)
+end

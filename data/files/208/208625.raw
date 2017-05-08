@@ -1,0 +1,9 @@
+
+sm = @parallel (+) for i in 1:999
+    if (i % 5 == 0) || (i % 3 == 0)
+    	i
+    else
+        0
+    end
+end
+println(sm)

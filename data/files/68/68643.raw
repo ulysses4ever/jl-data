@@ -1,0 +1,10 @@
+include(Pkg.dir("BismarkSummary","src","bismark-report.jl"))
+test_bismark_report1 = joinpath(Pkg.dir(), "BismarkSummary","testdata","bismark_report.txt")
+test_bismark_report2 = joinpath(Pkg.dir(), "BismarkSummary","testdata","bismark_report1.txt")
+test_bismark_report3 = joinpath(Pkg.dir(), "BismarkSummary","testdata","bismark_report2.txt")
+bismark_report_filenames = [test_bismark_report1,test_bismark_report2,test_bismark_report3]
+sampleinfo_path = joinpath(Pkg.dir(), "BismarkSummary","testdata","datasource.tsv")
+report_dict=parse_bismark_reports( bismark_report_filenames)
+append_report_info_to_sampleinfo!(sampleinfo,report_dict)
+plots = plot_bismark_summary(sampleinfo,["Sequence pairs analysed in total","Mapping efficiency"],["sex"])
+hstack(plots...)

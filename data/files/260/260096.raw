@@ -1,0 +1,34 @@
+function scenario_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, ScenarioRiskInput}()
+  include(job_file)
+  input = ScenarioRiskInput(assets, gmfs, tax_vf_map)
+  inputs["b1"] = input
+  return inputs
+end
+
+function scenario_damage_preprocess(job_file)
+  inputs = Dict{ASCIIString, ScenarioDamageInput}()
+  include(job_file)
+  input = ScenarioDamageInput(assets, gmfs, tax_ff_map)
+  inputs["b1"] = input
+  return inputs
+end
+
+function event_based_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, EventBasedRiskInput}()
+  insured_loss = false
+  include(job_file)
+  input = EventBasedRiskInput(assets, gmfs, tax_vf_map,
+                              risk_investigation_time,
+                              num_sims, loss_curve_res)
+  inputs["b1"] = input
+  return inputs
+end
+
+function classical_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, ClassicalRiskInput}()
+  include(job_file)
+  input = ClassicalRiskInput(assets, hcs, tax_vf_map, risk_investigation_time, num_steps)
+  inputs["b1"] = input
+  return inputs
+end

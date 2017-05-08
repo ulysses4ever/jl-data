@@ -1,0 +1,44 @@
+module JuMPTools
+
+    using JuMP
+    import JuMP: AbstractJuMPScalar, JuMPArray, JuMPDict,
+                    GenericAffExpr
+
+    """
+        JuMPTools.normL1(m::Model, x)
+
+    Support for L₁ norms in linear/quadratic JuMP models.
+    Returns a variable `z` that is constrained to be `0 ≤ z ≤ ‖x‖₁`.
+
+    Warning: creates auxiliary variables and constraints that are
+    added to the model (but not returned).
+
+    Formulation: Given `x = [x₁, x₂, …]` (where `x` may be an array of
+    affine expressions, variables, or even constants), define new
+    variables `y = [y₁, y₂, …]` and `z` with constraints:
+
+        yᵢ ≥  x₁
+        yᵢ ≥ -xᵢ
+        z  ≥ ∑ᵢ yᵢ
+
+    Note that objective functions like `max normL1(x)` and constraints
+    like `normL1(x) >= b` are nonconvex and will produce incorrect
+    results, as `z` is unbounded above and can be set to any value.
+    """
+    normL1(m::Model, x)            = _normL1(m, [x])
+    normL1(m::Model, x::Array)     = _normL1(m, vec(x))
+    normL1(m::Model, x::JuMPArray) = _normL1(m, vec(x.innerArray))
+    normL1(m::Model, x::JuMPDict)  = _normL1(m, collect(values(x)))
+    function _normL1(m::Model, x::Vector)
+        n = length(x)
+        @defVar(m, JuMPTools_normL1_y[1:n] ≥ 0)
+        @defVar(m, JuMPTools_normL1_z >= 0)
+        for i in 1:n
+            @addConstraint(m, JuMPTools_normL1_y[i] ≥  x[i])
+            @addConstraint(m, JuMPTools_normL1_y[i] ≥ -x[i])
+        end
+        @addConstraint(m, JuMPTools_normL1_z ≥ sum(JuMPTools_normL1_y))
+        return JuMPTools_normL1_z
+    end
+
+end # module

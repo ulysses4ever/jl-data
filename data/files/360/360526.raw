@@ -1,0 +1,155 @@
+#ImgProc.jl
+#Image processing module for image IO + filtering/sharpening
+# ---meanFilter
+
+module ImgProc
+	using Images
+	using ImageView
+
+	export imread,imshow,imwrite, meanFilter,medianFilter,gaussianFilter,gaussianUSM
+
+	#I/O wrapper, converts images from ImageMagick format to regular arrays
+	#Returns 2D array grayscale image in int16 format
+	function imread(filename)
+		im = Images.imread(filename)
+
+		#If image isn't grayscale then convert it
+		if Images.colorspace(im) != "Gray"
+			im = convert(Image{Gray},im)
+		end
+
+		data = Images.reinterpret(Uint8,Images.data(im))
+		data = int16(data)
+		return data
+	end
+
+	#I/O wrapper, converts array to Image format and writes it.
+	#Creates only grayscale images
+	function imwrite(im, filename)
+		img = uint8(im)
+		img = Images.grayim(img)
+		Images.imwrite(img, filename)
+	end
+
+	#Show the image
+	function imshow(im)
+		img = uint8(im)
+		img = Images.grayim(img)
+		ImageView.view(img)
+	end
+
+	# Function to perform image smoothing using a 3x3 neighborhood mean
+	function meanFilter(im)
+		img = zeros(Int16, size(im))
+
+		#Process the pixels
+		for r = 2:size(im,1)-1
+			for c = 2:size(im,2)-1
+				sumP = 0
+				for i = 0:2
+					for j = 0:2
+						pixel = im[r+i-1,c+j-1]
+                    	sumP = sumP + pixel
+					end
+				end
+				img[r,c] = int16(sumP / 9)
+			end
+		end
+		return img	
+	end
+
+	# Function to perform image smoothing using a 3x3 neighborhood median
+	function medianFilter(im)
+		img = zeros(Int16, size(im))
+		v = int16((3-1)/2)
+		#Process the pixels
+		for r = 1:size(im,1)
+			for c = 1:size(im,2)
+				maxX = max(r-v,1)
+				minX = min(r+v+1,size(im,1))
+				maxY = max(c-v,1)
+				minY = min(c+v+1,size(im,2))
+				block = im[maxX:minX,maxY:minY]
+				img[r,c] = int16(median(block))
+			end
+		end
+		return img	
+	end
+
+	# Function to perform Gaussian smoothing using a Gaussian filter
+	# of a specified width and a certain value of sigma. 
+	# Common values include sigma = 1.0/1.41, width=3/5
+
+	function gaussianFilter(im,sigma,width)
+		half = float64(width/2)
+
+		#Create Gaussian Kernel
+		kernel = zeros(width,width)
+		for i = 1:width
+			for j = 1:width
+				r = i - half - 1
+				s = j - half - 1
+
+				top = (r^2.0)+(s^2.0)
+				bottom = 2.0*sigma^2.0
+
+				result = -(top/bottom)
+				kernel[i,j] = exp(result)
+			end
+		end
+
+		#Normalize the kernel
+		kSum = sum(kernel)
+		for i = 1:width
+			for j = 1:width
+				kernel[i,j] = kernel[i,j] / kSum
+			end
+		end
+
+		img = zeros(Int16, size(im))
+
+
+		for r = itrunc(half):size(im,1)-itrunc(half)-1
+			for c = itrunc(half):size(im,2) - itrunc(half)-1
+				sumP = 0
+				for i = 0:width-1
+					for j = 0:width-1
+						pixel = im[r+i-itrunc(half)+1, c+j-itrunc(half)+1]
+						sumP = sumP + (pixel * kernel[i+1,j+1])
+					end
+				end
+
+				(sumP > 0) ? img[r,c] = int16(sumP) : img[r,c] = 0
+
+			end
+		end
+
+		return img
+	end
+
+	# Unsharp masking using Gaussian blurring
+	function gaussianUSM(im,sigma,width)
+		imG = gaussianFilter(im,sigma,width)
+
+		mask = zeros(Int16, size(im))
+		img = zeros(Int16, size(im))
+
+		for i = 1:size(im,1)
+			for j = 1:size(im,2)
+				mask[i,j] = im[i,j] - imG[i,j]
+			end
+		end
+
+		for i = 1:size(im,1)
+			for j = 1:size(im,2)
+				newPixel = im[i,j] + mask[i,j]
+				(newPixel <= 255) ? (img[i,j] = int16(newPixel)) : img[i,j] = 255	
+			end
+		end
+
+		return img
+
+	end
+
+
+end

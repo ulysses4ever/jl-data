@@ -1,0 +1,46 @@
+# A Demo of Matrix Multiplication on A GPU, Using MXNet Lower-Level API
+
+using MXNet
+
+"Delete & Release NDArray Memory - Good Status"
+macro del(arr)
+	quote
+		mx.@mxcall(:MXNDArrayFree,(mx.MX_handle,),$(esc(arr)).handle.value)
+		mx.@mxcall(:MXNDArrayWaitAll,())
+		$(esc(arr)).handle.value = C_NULL
+	end
+end
+
+"Distributed Splitting Function, Splitting M into N pieces"
+function dSplitFast(M,N)
+	a = [floor(Int64,M/N)+(i<=M%N) for i=1:N]
+	b = unshift!([sum(a[1:j]) for j=1:N],0)
+	c = [p[1]+1:p[2] for p in[b[k:k+1] for k=1:N]]
+	return c
+end
+
+"2D Matrix Multiplication Splitting on A Single GPU"
+function gmul{T}(MTX_A::Array{T,2},MTX_B::Array{T,2},PA::Int64=1,PB::Int64=1,CTX::MXNet.mx.Context=mx.gpu(0),RTYPE::DataType=T)
+	rA,cA = size(MTX_A)
+	rB,cB = size(MTX_B)
+	MTX_R = zeros(T,(rA,cB))
+	AList = dSplitFast(rA,PA)
+	BList = dSplitFast(cB,PB)
+	for i in AList
+		lpart = MTX_A[i,:]
+		LP = mx.copy(lpart,CTX)
+		for j in BList
+			rpart = MTX_B[:,j]
+			RP = mx.copy(rpart,CTX)
+			PP = mx.dot(RP,LP) # exchange
+			MTX_R[i,j] = mx.convert(Array{RTYPE},PP)
+			@del RP
+		end
+		@del LP
+	end
+	return MTX_R
+end
+
+a = rand(30000,20000)
+b = rand(20000,15000)
+c = gmul(a,b,2,200,mx.gpu(0))

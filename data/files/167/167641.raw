@@ -1,0 +1,76 @@
+#!/usr/bin/env julia
+
+import Sudoku
+
+const warmup_puzzle = "52...6.........7.13...........4..8..6......5...........418.........3..2...87....."
+const NS_PER_SEC = 1000000000
+
+function timeit(puzzle, verbose::Bool)
+    b0 = Base.gc_bytes()
+    t0 = Base.time_ns()
+    g0 = Base.gc_time_ns()
+
+    sb = Sudoku.solve(puzzle)
+
+    g1 = Base.gc_time_ns()
+    t1 = Base.time_ns()
+    b1 = Base.gc_bytes()
+
+    ans = sb != nothing && Sudoku.verify(sb)
+    t = t1-t0
+    b = b1-b0
+    g = g1-g0
+    if verbose
+        print(ans ? "Pass" : "Fail", " ")
+        Base.time_print(t, b, g)
+    end
+    return ans, t, b, g
+end
+
+function perf(io::IO, verbose::Bool = false)
+    puzzles = readlines(io)
+    length(puzzles) == 0 && return
+
+    # Warm up
+    timeit(warmup_puzzle, false)
+
+    results = map(p->timeit(p, verbose), puzzles)
+    ans = similar(results, eltype(results)[1])
+    times = similar(results, eltype(results)[2])
+    bytes = similar(results, eltype(results)[3])
+    gctimes = similar(results, eltype(results)[4])
+    for (i, v) in enumerate(results)
+        ans[i] = v[1]
+        times[i] = v[2]
+        bytes[i] = v[3]
+        gctimes[i] = v[4]
+    end
+
+    # Sumary
+    times ./= NS_PER_SEC
+    gctimes ./= NS_PER_SEC
+    timeswithoutgc = times - gctimes
+
+    @printf("Solved %d of %d puzzles\n", sum(ans), length(puzzles))
+    @printf("Elapsed time:\t\t\t%.4f secs\n", sum(times))
+    @printf("Average time:\t\t\t%.4f secs (%d Hz)\n", mean(times), 1/mean(times))
+    @printf("Average time without gc:\t%.4f secs (%d Hz, %.2f%% gc time)\n",
+            mean(timeswithoutgc), 1/mean(timeswithoutgc), 100*sum(gctimes)/sum(times))
+    @printf("Max time:\t\t\t%.4f secs\n", maximum(times))
+    @printf("Max time without gc:\t\t%.4f secs\n", maximum(timeswithoutgc))
+    @printf("Standard deviation:\t\t%.4f secs\n", std(times))
+    @printf("Standard deviation without gc:\t%.4f secs\n", std(timeswithoutgc))
+    @printf("Average allocated:\t\t%d bytes\n", mean(bytes))
+    @printf("Max allocated:\t\t\t%d bytes\n", maximum(bytes))
+end
+
+function main(args)
+    verbose = false
+    if length(args) > 0 && args[1] == "-v"
+        verbose = true
+    end
+
+    perf(STDIN, verbose)
+end
+
+main(ARGS)

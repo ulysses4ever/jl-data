@@ -1,0 +1,442 @@
+module Population
+
+
+using Config
+using Genotype
+using Preallocation
+
+
+type Type_Population
+
+    genotypes::Array{Genotype.Type_Genotype, 1}
+    previous_generations_genotypes::Array{Genotype.Type_Genotype, 1}
+    children::Array{Genotype.Type_Genotype, 1}
+    fitness_vals_1::Dict{Int64, Float64}
+    fitness_vals_2::Dict{Int64, Float64}
+    target_number::Int64
+
+    average_fitness::Float32
+    best::Genotype.Type_Genotype
+    previous_best::Genotype.Type_Genotype
+
+    preallocation::Preallocation.Type_Preallocation
+
+    dummy_genotype::Genotype.Type_Genotype
+    density_threshold::Int64
+
+end
+
+
+function make_population(config_vals::Config.Type_Config_Values)
+
+    if config_vals.scikit_writing
+        data_file = open(config_vals.scikit_data_filename, "w")
+        write(data_file, "")
+        close(data_file)
+
+        fitnesses_file = open(config_vals.scikit_fitnesses_filename, "w")
+        write(fitnesses_file, "")
+        close(fitnesses_file)
+
+        labels_file = open(config_vals.scikit_labels_filename, "w")
+        write(labels_file, "")
+        close(labels_file)
+    end
+
+    genotypes::Array{Genotype.Type_Genotype, 1} = Genotype.Type_Genotype[]
+
+    for i = 1:config_vals.population_size
+        push!(genotypes, Genotype.make_random_genotype(config_vals))
+    end
+
+    previous_generations_genotypes::Array{Genotype.Type_Genotype, 1} = Genotype.Type_Genotype[]
+
+    for i = 1:config_vals.population_size
+        push!(previous_generations_genotypes, Genotype.make_random_genotype(config_vals))
+    end
+    
+    children::Array{Genotype.Type_Genotype, 1} = Genotype.Type_Genotype[]
+
+    for i = 1:config_vals.births_and_deaths_per_generation
+        push!(children, Genotype.make_random_genotype(config_vals))
+    end
+
+    best = Genotype.make_random_genotype(config_vals)
+    previous_best = Genotype.make_random_genotype(config_vals)
+
+    layer_1_weights = zeros(Float32, config_vals.num_input_nn_nodes * config_vals.num_hidden_nn_nodes)
+    layer_2_weights = zeros(Float32, config_vals.num_output_nn_nodes * config_vals.num_hidden_nn_nodes)
+    inputs = zeros(Float32, config_vals.num_input_nn_nodes)
+    hidden_activations = zeros(Float32, config_vals.num_hidden_nn_nodes)
+    outputs = zeros(Float32, config_vals.num_output_nn_nodes)
+    fitness_ref = [convert(Float32, 1)]
+    if config_vals.wall_avoidance_objective
+        walls = config_vals.single_island_walls
+    else
+        walls = config_vals.waypoint_collection_walls
+    end
+
+    dummy_genotype = Genotype.make_random_genotype(config_vals)
+
+    preallocation::Preallocation.Type_Preallocation = Preallocation.Type_Preallocation(layer_1_weights, layer_2_weights, 
+                                                                                       inputs, hidden_activations, outputs, 
+                                                                                       fitness_ref, walls)
+
+    return Type_Population(genotypes, previous_generations_genotypes, children, Dict{Int64, Float64}(), Dict{Int64, Float64}(),
+                           convert(Int32, 1), convert(Float32, 0.0), best, previous_best, preallocation, dummy_genotype, 12)
+
+end
+
+
+function switch_target(population::Type_Population, config_vals::Config.Type_Config_Values, repetition::Int64, generation::Int64)
+
+    Genotype.copy_into(population.previous_best, population.best)
+
+    if config_vals.print_on_target_switch
+        println(generation, " ", population.target_number, "    ", population.average_fitness, " ", population.best.fitness)
+    end
+
+    if config_vals.randomize_targets
+        #config_vals.logic_network_outputs[1, :] = deepcopy(config_vals.intrinsic_logic_network_outputs)
+        used_flips = []
+        num_flips = 1
+        #=if rand(1:4) == 1
+            num_flips = 2
+        end=#
+        for i = 1:1
+            flip_index = 0
+            while (flip_index == 0) | (flip_index in used_flips)
+                flip_index = rand(1:length(config_vals.logic_network_outputs[1, :]))
+            end
+            push!(used_flips, flip_index)
+            config_vals.logic_network_outputs[1, flip_index] = 1 - config_vals.logic_network_outputs[1, flip_index]
+        end
+    else
+        max_target_number = 0
+        if config_vals.logic_network
+            max_target_number = length(config_vals.logic_network_outputs[:, 1])
+        else
+            max_target_number = length(config_vals.GRN_target_expressions[:, 1])
+        end
+
+        new_target = population.target_number
+
+        while new_target == population.target_number
+            new_target = rand(1:max_target_number)
+        end
+
+        population.target_number = new_target
+        #population.target_number = config_vals.transitions[population.target_number, rand(1:3)]
+    end
+
+    for genotype in population.genotypes
+        genotype.evaluated = false
+    end
+
+    evaluate(population, config_vals, generation)
+
+    return 0
+
+end
+
+
+function evaluate(population::Type_Population, config_vals::Config.Type_Config_Values, generation)
+
+    if config_vals.density_sampling
+
+        dummy_genotype = Genotype.make_random_genotype(config_vals)
+        for genotype in population.genotypes
+            frequencies = zeros(Int, 8, 4)
+            config_vals.global_weight_mutation_rate = 0.2
+            
+            for i = 1:config_vals.num_samples
+
+                Genotype.copy_into(dummy_genotype, genotype)
+                Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+                Genotype.evaluate(dummy_genotype, config_vals, 1, 1, population.preallocation)
+                
+                for j = 1:length(dummy_genotype.all_targets_fitnesses)
+                    if dummy_genotype.all_targets_fitnesses[j] >= 13.0
+                        frequencies[j, round(Int, dummy_genotype.all_targets_fitnesses[j] - 12)] += 1
+                    end
+                end
+            end
+
+            config_vals.global_weight_mutation_rate = 0.05
+            
+            types = zeros(Int, 4)
+
+            for i = 1:4
+                for j = 1:8
+                    if frequencies[j, i] > 0
+                        types[i] += 1
+                    end
+                end
+            end
+
+            sums = zeros(Int, 4)
+            
+            for i = 1:4
+                sorteds = sort(frequencies[:, i])
+                sums[i] = sorteds[1] + sorteds[2] + sorteds[3] + sorteds[4]
+            end
+
+            #genotype.fitness = types[1] + types[2] + (0.1 * sums[1]) + (0.4 * sums[2])
+            genotype.fitness = frequencies[1, 1] + 5 * frequencies[1, 2]
+
+
+            #if (population.best.fitness >= 60) & (population.density_threshold < 13)
+            # if (minimum([f1_frequencies[1], f2_frequencies[1]]) >= 10) & (population.density_threshold < 13)
+            #     println("\nThreshold change\n")
+            #     population.density_threshold += 1
+            # end
+        end
+    else
+
+        for genotype in population.genotypes
+            Genotype.evaluate(genotype, config_vals, population.target_number, generation, population.preallocation)
+        end
+
+        for genotype in population.children
+            Genotype.evaluate(genotype, config_vals, population.target_number, generation, population.preallocation)
+        end
+
+    end
+
+    sum = 0
+    population.average_fitness = 0
+    
+    population.best = population.genotypes[1]
+
+    for k = 1:length(population.genotypes)
+        sum += population.genotypes[k].fitness
+        if population.genotypes[k].fitness > population.best.fitness
+            population.best = population.genotypes[k]
+        end
+    end
+
+    population.average_fitness = sum / config_vals.population_size
+
+    return 0
+
+end
+
+
+function print_stats(population::Type_Population, config_vals::Config.Type_Config_Values, repetition::Int64, generation::Int64) 
+
+
+    evaluate(population, config_vals, generation)
+
+    if (config_vals.interval_printing & ((generation % config_vals.generations_per_target_switch) in config_vals.print_times)) | (config_vals.fixed_interval_printing & (generation % config_vals.fixed_interval_printing_interval == 0))
+        println(generation, " ", generation % config_vals.generations_per_target_switch, " ", population.target_number, "   ", 
+                population.average_fitness, " ", population.best.fitness) 
+        difference = 0
+        for i = 1:length(population.previous_best.connections)
+            if population.previous_best.connections[i] != population.best.connections[i]
+                difference += 1
+            end
+        end
+        #println(difference)
+        #println(population.best.difference_from_parent)
+    end
+
+    if config_vals.experiment_printing
+        println(repetition, " ", generation, " ", population.best.fitness, " ", population.average_fitness, " ")
+
+        dummy_genotype = Genotype.make_random_genotype(config_vals)
+        second_dummy_genotype = Genotype.make_random_genotype(config_vals)
+        #bias = zeros(Int, length(config_vals.logic_network_outputs[:, 1]), 4)
+        #robustness = zeros(Int, length(config_vals.logic_network_outputs[:, 1]), 4)
+        num_targets = zeros(Int, 2)
+
+        if population.best.fitness == 16.0
+            tested_genotypes = 0
+            while tested_genotypes < config_vals.population_samples
+                index = rand(1:length(population.genotypes))
+                num_first_order = 0
+                num_second_order = 0
+                if population.genotypes[index].fitness == 16.0
+                    tested_genotypes += 1
+                    for i = 1:config_vals.first_order_mutation_samples
+                        Genotype.copy_into(dummy_genotype, population.genotypes[index])
+                        Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+                        Genotype.evaluate(dummy_genotype, config_vals, population.target_number, 1, population.preallocation)
+                        if dummy_genotype.fitness == 16.0
+                            num_first_order += 1
+                            for j = 1:config_vals.second_order_mutation_samples
+                                Genotype.copy_into(second_dummy_genotype, population.genotypes[index])
+                                Genotype.mutate_at_global_rate(second_dummy_genotype, config_vals)
+                                Genotype.evaluate(second_dummy_genotype, config_vals, population.target_number, 1, population.preallocation)
+                                if second_dummy_genotype.fitness == 16.0
+                                    num_second_order += 1
+                                end
+                            end
+                        end
+                    end
+                    if num_first_order > 0
+                        println(num_first_order, " ", num_second_order / Float64(num_first_order))
+                    else
+                        println(0, " ", 0)
+                    end
+                end
+            end
+        else
+            for i = 1:200
+                println(0, " ", 0)
+            end
+        end
+
+        tested_genotypes = 0
+        while tested_genotypes < config_vals.population_samples
+            index = rand(1:length(population.genotypes))
+            num_first_order = 0
+            num_second_order = 0
+            if population.genotypes[index].fitness == 16.0
+                tested_genotypes += 1
+                for i = 1:config_vals.first_order_mutation_samples
+                    Genotype.copy_into(dummy_genotype, population.genotypes[index])
+                    Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+                    Genotype.evaluate(dummy_genotype, config_vals, population.target_number, 1, population.preallocation)
+                    if dummy_genotype.fitness == 16.0
+                        num_first_order += 1
+                        for j = 1:config_vals.second_order_mutation_samples
+                            Genotype.copy_into(second_dummy_genotype, population.genotypes[index])
+                            Genotype.mutate_at_global_rate(second_dummy_genotype, config_vals)
+                            Genotype.evaluate(second_dummy_genotype, config_vals, population.target_number, 1, population.preallocation)
+                            if second_dummy_genotype.fitness == 16.0
+                                num_second_order += 1
+                            end
+                        end
+                    end
+                end
+                if num_first_order > 0
+                    println(num_first_order, " ", num_second_order / Float64(num_first_order))
+                else
+                    println(0, " ", 0)
+                end
+            end
+        end
+    end
+
+    if config_vals.scikit_writing
+        data_file = open(config_vals.scikit_data_filename, "a")
+        Genotype.write_for_scikit(population.best, config_vals, data_file)
+        close(data_file)
+
+        fitnesses_file = open(config_vals.scikit_fitnesses_filename, "a")
+        write(fitnesses_file, string(population.best.fitness), "\n")
+        close(fitnesses_file)
+
+        labels_file = open(config_vals.scikit_labels_filename, "a")
+        write(labels_file, string(generation), "\n")
+        close(labels_file)
+    end
+
+    return 0
+
+end
+
+
+function breed_and_exterminate(population::Type_Population, config_vals::Config.Type_Config_Values, generation)
+
+    for i = 1:config_vals.population_size
+        Genotype.copy_into(population.previous_generations_genotypes[i], population.genotypes[i])
+    end
+
+    for i = 1:config_vals.births_and_deaths_per_generation
+        index_to_breed = 1
+        highest_fitness::Float32 = -1
+
+        for j = 1:config_vals.breeding_tournament_size
+            new_index = rand(1:length(population.genotypes))
+            if population.genotypes[new_index].fitness > highest_fitness
+                index_to_breed = new_index
+                highest_fitness = population.genotypes[new_index].fitness
+            end
+        end
+        
+        Genotype.copy_into(population.children[i], population.genotypes[index_to_breed])
+        if config_vals.use_global_mutation_rate
+            Genotype.mutate_at_global_rate(population.children[i], config_vals)
+            population.children[i].difference_from_parent = 0
+
+            # for j = 1:length(population.children[i].connections)
+            #     if population.children[i].connections[j] != population.genotypes[index_to_breed].connections[j]
+            #         population.children[i].difference_from_parent += 1
+            #     end
+            # end
+            
+            #Genotype.point_mutate(population.children[i], config_vals)
+        else
+            Genotype.point_mutate(population.children[i], config_vals)
+        end
+
+    end
+
+    evaluate(population, config_vals, generation)
+
+    # for genotype in population.children
+    #     if (genotype.all_targets_fitnesses[2] == length(config_vals.logic_network_outputs[1, :])) & ((generation % 10) == 0) & (population.target_number == 2)
+    #         dummy_genotype = Genotype.make_random_genotype(config_vals)
+    #         frequencies = zeros(Int, 2, 4)
+
+    #         for i = 1:100
+    #             Genotype.copy_into(dummy_genotype, genotype)
+    #             #Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+    #             Genotype.point_mutate(dummy_genotype, config_vals)
+    #             Genotype.evaluate(dummy_genotype, config_vals, 1, 1, population.preallocation)
+                
+    #             for j in 1:length(dummy_genotype.all_targets_fitnesses)
+    #                 if dummy_genotype.all_targets_fitnesses[j] >= 13
+    #                     frequencies[j, round(Int, dummy_genotype.all_targets_fitnesses[j] - 12.0)] += 1
+    #                 end
+    #             end
+                
+    #         end
+            
+    #         println(frequencies)
+
+    #         if (frequencies[1, 4] >= 1) & (frequencies[1, 4] <= 6) & (frequencies[2, 4] >= 1) & (frequencies[2, 4] <= 6)
+    #             println("Huzzah")
+    #             println(frequencies)
+    #             Genotype.write_to_file(genotype, config_vals)
+    #             exit()
+    #         end
+    #     end
+    # end
+    
+    # Implementation of elitist survivor selection amongst children and adults
+    # Shuffle first to ensure random order of equal fitness genotypes
+    genotype_indeces = collect(1:config_vals.population_size)
+    shuffle!(genotype_indeces)
+    permute!(population.genotypes, genotype_indeces)
+    
+    sort!(population.genotypes, by = x -> x.fitness, rev = true)
+
+    children_indeces = collect(1:config_vals.births_and_deaths_per_generation)
+    shuffle!(children_indeces)
+    permute!(population.children, children_indeces)
+    
+    sort!(population.children, by = x -> x.fitness, rev = true)
+
+    children_index = 1
+ 
+    for i = 1:config_vals.population_size
+        if children_index <=  config_vals.births_and_deaths_per_generation
+            if (population.genotypes[i].fitness < population.children[children_index].fitness) | ((population.genotypes[i].fitness == population.children[children_index].fitness) & convert(Bool, rand(0:1)))
+
+                insert!(population.genotypes, i, population.genotypes[config_vals.population_size])
+                pop!(population.genotypes)
+                Genotype.copy_into(population.genotypes[i], population.children[children_index])
+                children_index += 1
+                
+            end
+        end
+    end
+
+    return 0
+
+end
+
+
+end

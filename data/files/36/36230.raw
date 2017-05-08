@@ -1,0 +1,12 @@
+module JFFoundationModule
+
+typealias JFInt Int
+typealias JFFlt Float64
+typealias JFFltVec Vector{JFFlt}
+typealias JFIntVec Vector{JFInt}
+typealias JFFltMat Matrix{JFFlt}
+typealias JFIntMat Matrix{JFInt}
+export JFInt, JFFlt, JFFltVec, JFIntVec, JFFltMat, JFIntMat 
+
+end
+

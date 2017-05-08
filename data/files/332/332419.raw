@@ -1,0 +1,51 @@
+num_input_nn_nodes = convert(Int32, 2)
+num_hidden_nn_nodes = convert(Int32, 2)
+num_output_nn_nodes = convert(Int32, 2)
+
+layer_1_weights = zeros(Float32, num_input_nn_nodes * num_hidden_nn_nodes)
+layer_2_weights = zeros(Float32, num_output_nn_nodes * num_hidden_nn_nodes)
+inputs = zeros(Float32, num_input_nn_nodes)
+hidden_activations = zeros(Float32, num_hidden_nn_nodes)
+outputs = zeros(Float32, num_output_nn_nodes)
+walls = [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+         convert(Float32, 1), convert(Float32, 0), convert(Float32, 0),
+         convert(Float32, 0), convert(Float32, 1), convert(Float32, 200),
+         convert(Float32, 1), convert(Float32, 0), convert(Float32, 400),]
+         fitness_ref = [convert(Float32, 1)]
+
+
+num_goals = convert(Int32, 10)
+goals = convert(Array{Float32, 1},                 [200, 20,
+                275, 20,
+                300, 20,
+                480, 20,
+                480, 100,
+                480, 180,
+                480, 180,
+                320, 180,
+])
+
+bit_string = []
+
+file = open("out_grn_1")
+lines = []
+for line in eachline(file)
+    push!(lines, line)
+end
+line = lines[end - 1]
+line = line[7:end-2]
+bits = split(line, ",")
+for bit in bits
+    push!(bit_string, parse(Int32, bit))
+end
+bit_string = convert(Array{Int32, 1}, bit_string)
+
+for i = 1:1
+Libdl.dlopen("/home/david/TehzCodes/GRNEvolution/librobosim")
+ccall((:simulate, "/home/david/TehzCodes/GRNEvolution/librobosim"), Void,
+      (Int32, Ptr{Float32}, Ptr{Float32}, Int32, Ptr{Int32}, Int32, Int32, Int32, 
+       Int32, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Int32),
+      convert(Int32, 250), walls, goals, num_goals, bit_string, convert(Int32, 6), num_input_nn_nodes, num_hidden_nn_nodes, 
+      num_output_nn_nodes, layer_1_weights, layer_2_weights, inputs, hidden_activations, 
+      outputs, fitness_ref, convert(Int32, 1))
+end

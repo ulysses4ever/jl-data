@@ -1,0 +1,24 @@
+__precompile__()
+module SimpleDDDML
+
+include("utils.jl")
+
+include("libsvm_parse.jl")
+export LibSVMFileIterator, LibSVMChunkIterator, get_dimension
+
+include("kpmeans.jl")
+export ClusterSolution, kpmeans, cluster_keys, num_clusters
+
+include("dispatchers.jl")
+export Dispatcher, dispatch, dispatch_file, dispatch_to_learners
+include("rpt_dispatcher.jl")
+export RPTDispatcher
+#include("flann_dispatcher.jl")
+#export FLANNDispatcher
+include("random_dispatcher.jl")
+export RandomDispatcher
+
+#include("learners.jl")
+#export Learner, add_example!, add_examples!, train!, predict, LibLinClassifier
+
+end

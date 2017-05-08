@@ -1,0 +1,26 @@
+## Penn Treebank
+
+PTB_LOCATION = joinpath(homedir(), "TREEBANK_3")
+
+function wsj_section_path(sec::Int)
+    if sec < 0 || sec > 24
+        error("section num must be between 0 and 24")
+    end
+    joinpath(PTB_LOCATION, "parsed", "mrg", "wsj", @sprintf("%02d", sec))
+end
+
+function wsj_trees(sec::Int, recursive=true)
+    return get_trees_dir(wsj_section_path(sec), recursive)
+end
+
+function wsj_tagged_sentences(sec::Int, recursive=true)
+    get_treebank_tagged_sentences(wsj_section_path(sec), recursive)
+end
+
+function wsj_tagged_sentences(secs::AbstractArray{Int}, recursive=true)
+    sentences = Array{(String,String)}[]
+    for sec in secs
+        append!(sentences, wsj_tagged_sentences(sec, recursive))
+    end
+    return sentences
+end

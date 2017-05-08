@@ -1,0 +1,64 @@
+using FactCheck
+using Sudoku
+
+facts("initialize() should initialize global variables correctly") do
+  initialize()
+  @fact InRow[1] => 1
+  @fact InCol[1] => 1
+  @fact InBlock[1] => 1
+  @fact InRow[10] => 2
+  @fact InCol[10] => 1
+  @fact InBlock[10] => 1
+  @fact InRow[41] => 5
+  @fact InCol[41] => 5
+  @fact InBlock[41] => 5
+  @fact InRow[81] => 9
+  @fact InCol[81] => 9
+  @fact InBlock[81] => 9
+  @fact Sequence[1] => 1
+  @fact Sequence[81] => 81
+  @fact Entry[1] => 0
+  @fact LevelCount[1] => 0
+  @fact Block[1] => 0b1111111110
+  @fact Row[1] => 0b1111111110
+  @fact Col[1] => 0b1111111110
+end
+
+facts("initentry() should update each Entry, Block, Row, and Col with correct bit flag") do
+  initialize()
+  initentry(unsolved1)
+  @fact Entry[2] => 0b0000000100
+  @fact Entry[41] => 0b0000000010
+  @fact Entry[80] => 0b0001000000
+
+  @fact Block[InBlock[1]] => 0b0100000000
+  @fact Col[InCol[1]] => 0b0100000000
+  @fact Row[InRow[1]] => 0b0100000000
+  @fact Block[InBlock[81]] => 0b0010000000
+  @fact Col[InCol[81]] => 0b0010000000
+  @fact Row[InRow[81]] => 0b0010000000
+
+#   unsure of this
+  @fact Sequence[1] => 2
+  @fact Sequence[81] => 1
+end
+
+solved1 = [8 2 7 1 5 4 3 9 6
+           9 6 5 3 2 7 1 4 8
+           3 4 1 6 8 9 7 5 2
+           5 9 3 4 6 8 2 7 1
+           4 7 2 5 1 3 6 8 9
+           6 1 8 9 7 2 4 3 5
+           7 8 6 2 3 5 9 1 4
+           1 5 4 7 9 6 8 2 3
+           2 3 9 8 4 1 5 6 7]
+
+unsolved1 = [0 2 7 1 5 4 3 9 6
+             9 6 5 3 2 7 1 4 8
+             3 4 1 6 8 9 7 5 2
+             5 9 3 4 6 8 2 7 1
+             4 7 2 5 1 3 6 8 9
+             6 1 8 9 7 2 4 3 5
+             7 8 6 2 3 5 9 1 4
+             1 5 4 7 9 6 8 2 3
+             2 3 9 8 4 1 5 6 0]

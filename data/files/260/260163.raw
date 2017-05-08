@@ -1,0 +1,64 @@
+function scenario_risk_branch(input::ScenarioRiskInput)
+  assets, gmfs, tax_vf_map = input.assets, input.gmfs, input.tax_vf_map
+  asset_lts = scenario_risk_portfolio(assets, gmfs, tax_vf_map)
+  branch_output = [scenario_risk_postprocess(asset_lts)]
+  if input.insured_losses
+    asset_insured_lts = scenario_risk_insurance(assets, asset_lts)
+    push!(branch_output, scenario_risk_postprocess(asset_insured_lts))
+  end
+  return branch_output
+end
+
+function scenario_risk_tree(inputs::Dict{ASCIIString, ScenarioRiskInput})
+  tree_outputs = [branch_ref => scenario_risk_branch(branch_input)
+                  for (branch_ref, branch_input) in inputs]
+  return tree_outputs
+end
+
+function scenario_damage_branch(input::ScenarioDamageInput)
+  assets, gmfs, tax_ff_map = input.assets, input.gmfs, input.tax_ff_map
+  states = (first(tax_ff_map[first(assets).tax])).states
+  states = ["none", states]
+  asset_damages, taxonomy_damages, portfolio_damages = scenario_damage_portfolio(assets, gmfs, tax_ff_map)
+  branch_output = scenario_damage_postprocess(states, asset_damages, taxonomy_damages, portfolio_damages)
+  return branch_output
+end
+
+function scenario_damage_tree(inputs::Dict{ASCIIString, ScenarioDamageInput})
+  tree_outputs = [branch_ref => scenario_damage_branch(branch_input)
+                  for (branch_ref, branch_input) in inputs]
+  return tree_outputs
+end
+
+function classical_risk_branch(input::ClassicalRiskInput)
+  asset_loss_curves = classical_risk_portfolio(input.assets, input.hcs, input.tax_vf_map,
+                                               input.risk_investigation_time, input.num_steps)
+  branch_output = classical_risk_postprocess(asset_loss_curves)
+  return branch_output
+end
+
+function classical_risk_tree(inputs::Dict{ASCIIString, ClassicalRiskInput})
+  tree_outputs = [branch_ref => classical_risk_branch(branch_input)
+                  for (branch_ref, branch_input) in inputs]
+  return tree_outputs
+end
+
+function event_based_risk_branch(input::EventBasedRiskInput)
+  asset_elts = event_based_risk_portfolio(input.assets, input.gmfs, input.tax_vf_map)
+  branch_output = [event_based_risk_postprocess(asset_elts, input.time_h, input.time_r,
+                                               input.num_ses, input.loss_curve_res)]
+  if input.insured_losses
+    asset_insured_elts = event_based_risk_insurance(input.assets, asset_elts)
+    push!(branch_output, event_based_risk_postprocess(asset_insured_elts,
+                                                      input.time_h, input.time_r,
+                                                      input.num_ses,
+                                                      input.loss_curve_res))
+  end
+  return branch_output
+end
+
+function event_based_risk_tree(inputs::Dict{ASCIIString, EventBasedRiskInput})
+  tree_outputs = [branch_ref => event_based_risk_branch(branch_input)
+                  for (branch_ref, branch_input) in inputs]
+  return tree_outputs
+end

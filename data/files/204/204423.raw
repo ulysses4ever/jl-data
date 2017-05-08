@@ -1,0 +1,305 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Graphs, Logging, Stats
+
+@Logging.configure(level=DEBUG)
+
+include("io.jl")
+include("utils.jl")
+include("graphs.jl")
+include("RW.jl")
+
+# compose 2 old vertex ids -> new vertex ids dictionaries
+function compose_o2n{T}(oni::Dict{T,T},oni2::Dict{T,T})
+	o2nb = Dict{T,T}()
+	n2ob = Dict{T,T}()
+	for k in keys(oni)
+		v = oni[k]
+		if haskey(oni2,v)
+			o2nb[k] = oni2[v]
+			n2ob[oni2[v]] = k
+		end
+	end
+	return o2nb,n2ob
+end
+
+function repulsive_vector(pr::Array{Float64,1})
+	return stochastic((exp(-pr)-exp(-1))/(1-exp(-1)))
+end
+
+function get_min_index{T}(pr::Array{Float64,1},tabu_indices::Array{T,1}=None)
+	if tabu_indices == None || length(tabu_indices) == 0
+		value,pos = findmin(pr) 
+	else
+		pr2 = copy(pr)
+		for t in tabu_indices
+			pr2[t] = maximum(pr)
+		end
+		value,pos = findmin(pr2) 
+	end
+	return pos
+end
+
+function unblock_vertices!(blocked_vertices,g,o2nb)
+	ko2nb = keys(o2nb)
+	for b in blocked_vertices
+		cs = out_neighbors(b,g)
+		inter = intersect(cs,ko2nb)
+		if length(inter)>0
+			setdiff!(blocked_vertices,b)
+		end
+	end
+end
+
+# total # of nodes to be sampled
+total = 200000
+
+g = load_serialized(ARGS[1])
+rg = load_serialized(ARGS[2])
+graph_size = length(vertices(g))
+
+# select a random node
+start_v = uint32(rand(1:graph_size))
+#start_v = uint32(4352632)
+#start_v = uint32(27556848)
+@debug("starting vertex: ", start_v)
+
+#depth = 3
+#discovery_proba = 0.05
+seed_size = uint32(2000)
+seed_jumping_cst = 0.15
+
+#ccs = load_serialized("core_colink-coefficients.jld")
+ccs = load_serialized("core_ncolinks.jld")
+ccs = float64(ccs)
+#in_degrees = load_serialized("core_in_degrees.jld")
+#out_degrees = load_serialized("core_out_degrees.jld")
+#@debug("min,max,avg: ", minimum(ccs),":",maximum(ccs),":",mean(ccs))
+
+# get the seed ball
+#seed_ball = get_forward_ball(start_v,g,depth,discovery_proba)
+#ng,oni,noi = subgraph(g,seed_ball)
+
+@debug("simulating seed ball nodes")
+#seed_ball = get_MHRW_flying_ball(g, seed_size, in_degrees, out_degrees, start_v, seed_jumping_cst)
+seed_ball = get_CC_MHRW_flying_ball(g, seed_size, ccs, start_v, seed_jumping_cst)
+
+@debug("extracting seed ball subgraph")
+ng,o2n,n2o = subgraph(g,seed_ball)
+@debug("# vertices of see ball: ", length(seed_ball))
+@debug("AVG external in-degree of seed ball: ", get_avg_out_degree(rg,collect(keys(o2n))))
+@debug("AVG external out-degree of seed ball: ", get_avg_out_degree(g,collect(keys(o2n))))
+
+# getting seed core
+@debug("extracting seed core")
+score,o2n2,n2o2 = get_core(ng)
+rscore = get_reverse_graph(score)
+# o2nb: old->new indices
+# n2ob: new->old indices
+o2nb,n2ob = compose_o2n(o2n,o2n2)
+
+# computing pagerank
+@debug("computing seed core pagerank")
+pr = my_pagerank(score,rscore)
+pr = stochastic(pr)
+
+# size of the sampled subgraph
+sub_size = length(vertices(score))
+@debug("seed core initial size: ", sub_size)
+#@debug("seed core initial size (o2nb): ", length(keys(o2nb)))
+#@debug("seed core initial size (n2ob): ", length(keys(n2ob)))
+@debug("AVG EXT in-degree of seed core: ", get_avg_out_degree(rg,collect(keys(o2nb))))
+@debug("AVG EXT out-degree of seed core: ", get_avg_out_degree(g,collect(keys(o2nb))))
+@debug("AVG INT in-degree of seed core: ", get_avg_out_degree(score,vertices(score)))
+@debug("AVG INT out-degree of seed core: ", get_avg_out_degree(rscore,vertices(rscore)))
+
+if sub_size < 1000 || sub_size > 2000
+	println("wrong initial seed size")
+	quit()
+end
+
+@debug("----------")
+
+count = 0
+avg_od = 0
+# vertices whose children have no child in core
+ball_tabu_vertices = Uint32[]
+# vertices that have no child outside core
+ball_excluded_vertices = Uint32[]
+# freeing vertices
+blocked_vertices = Set{Uint32}()
+
+while sub_size < total
+	@label start_exploring
+	# unblock vertices
+	unblock_vertices!(blocked_vertices,g,o2nb)
+	#	
+	# get repulsive vector based on the pagerank vector
+	#rv = repulsive_vector(pr)
+	#pos = get_flying_index(rv)
+	#
+	# get vertex of minimum pagerank
+	ignore_vertices = union(ball_excluded_vertices,ball_tabu_vertices)
+	vpos = get_min_index(pr,ignore_vertices)
+	push!(ball_tabu_vertices,vpos)
+	v = n2ob[vpos]
+	# get children of v
+	cvs = out_neighbors(v,g)
+	# candidate node out-degree
+	pod = length(cvs)
+	# @debug("exploring vertex $v (# children: $pod)")
+	
+	@label select_child
+	# selecting child
+	# choose child uniformly at random
+	#cv = cvs[rand(1:length(cvs))]
+	if length(cvs) > 1
+		# compute scores of neighbors
+		scores = Float64[]
+		for i in cvs
+			if ccs[i] != 0
+				sc = ccs[v]/ccs[i]
+				#score = minimum([1.,score])
+				push!(scores,sc)
+			else
+				# to be set to the max value
+				push!(scores,-1.)
+			end
+		end
+		if maximum(scores) > 0
+			mv = maximum(scores)
+			scores = map(x->x==-1?mv:x,scores)
+			scores = stochastic(scores)
+		# all entries are equal to 0
+		else
+			scores = float64(ones(length(cvs)))/length(cvs)
+		end
+		pos = get_flying_index(scores)
+		cv = cvs[pos]
+
+		# child cv is already in the ball OR child cv is blocked
+		# -> look for another child
+		if haskey(o2nb,cv) || cv in blocked_vertices
+			# @debug("selected child $cv already in seed core")
+			splice!(cvs,pos)
+			@goto select_child
+		end
+	else
+		pos = 1
+		cv = cvs[pos]
+
+		# child cv is already in the ball OR child cv is blocked
+		if haskey(o2nb,cv) || cv in blocked_vertices
+			# @debug("selected child $cv already in seed core")
+			# vertex v has no child outside the core
+			push!(ball_excluded_vertices,vpos)
+			# @debug("vertex $v is excluded")
+			# @debug("----------")
+			@goto start_exploring
+		end
+	end
+	
+	# @debug("selected child: $cv")
+	ccvs = out_neighbors(cv,g)
+	edges = Uint32[]
+
+	# adding potential edges
+	for c in ccvs
+		# if cv's child is in core
+		if haskey(o2nb,c)
+			push!(edges,cv)
+			push!(edges,c)
+		end
+	end
+
+	# adding new edges
+	if length(edges) > 0
+		# adding new vertices
+		@debug("adding new vertex $cv")
+		sub_size += 1
+		o2nb[cv] = uint32(sub_size)
+		n2ob[uint32(sub_size)] = cv
+		add_vertex!(score,uint32(sub_size))
+		# adding new edges
+		ees = 0
+		for i in 1:(length(edges)-1)
+			v1 = edges[i]
+			v2 = edges[i+1]
+			add_edge!(score,o2nb[v1],o2nb[v2])
+			ees += 1
+		end
+		@debug("# added new edges: $ees")
+		# adding missing internal edges
+		ies = 0
+		for u in keys(o2nb)
+			cus = out_neighbors(u,g)
+			for cu in cus
+				if cu == cv
+					add_edge!(score,o2nb[u],o2nb[cv])
+					ies += 1
+				end
+			end
+		end
+		@debug("# internal edges added: $ies")
+
+		lv = length(vertices(score))
+		le = num_edges(score)
+		gamma = le/(lv*(lv-1))
+		avg_od += pod
+		count += 1
+		@info("new subgraph (#v #e gamma): $lv $le $gamma")
+		#@debug("# indices o2n: ", length(keys(o2nb)))
+		#@debug("# indices n2o: ", length(keys(n2ob)))
+		#@debug("size of intersect(score,keys(n2o)): ", length(intersect(Set(vertices(score)),Set(keys(n2ob)))))
+		@info("AVG EXT out-degree of selected vertices: ", avg_od/count)
+		@info("AVG EXT ball in-degree: ", get_avg_out_degree(rg,collect(keys(o2nb))))
+		@info("AVG EXT ball out-degree: ", get_avg_out_degree(g,collect(keys(o2nb))))
+		@info("AVG INT ball in-out degree (*): ", get_avg_out_degree(score,vertices(score)))
+		rscore = get_reverse_graph(score)
+		pr = my_pagerank(score,rscore)
+		pr = stochastic(pr)
+		# reset tabu list
+		ball_tabu_vertices = Uint32[]
+		# save snapshot if necessary
+		if sub_size % 10000 == 0
+			svids = collect(keys(o2nb))
+			serialize_to_file(svids, "sample-graph_core-vertices_$sub_size.jld")
+			serialize_to_file(score, "sample-graph_$sub_size.jld")
+		end
+		@debug("----------")
+	else
+		# @debug("vertex ", cv, " has no child in seed core")
+		push!(blocked_vertices, cv)
+
+		if length(cvs) > 1
+			# retry with another child of v
+			splice!(cvs,pos)
+			@goto select_child
+		else
+			# no child of v has children in the core
+			# @debug("----------")
+			@goto start_exploring
+		end
+	end
+end
+
+svids = collect(keys(o2nb))
+serialize_to_file(svids, "sample-graph_core-vertices.jld")
+serialize_to_file(score, "sample-graph.jld")
+
+@info("AVG EXT ball out-degree: ", get_avg_out_degree(g,svids))
+@info("AVG EXT ball in-degree: ", get_avg_out_degree(rg,svids))
+@info("AVG INT ball in-out degree (*): ", get_avg_out_degree(score,vertices(score)))

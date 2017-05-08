@@ -1,0 +1,12 @@
+#!/usr/bin/env julia
+
+import Sphere
+
+Sphere.id("test")
+Sphere.addSphericalGrain([0., 0., 0.], 0.5)
+Sphere.addSphericalGrain([1., 0., 0.], 0.5)
+
+Sphere.findTimeStep()
+Sphere.setOutputFileInterval(0.1)
+Sphere.setTotalTime(1.0)
+Sphere.run()

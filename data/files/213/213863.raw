@@ -1,0 +1,205 @@
+## =============================================================================
+## treepredict.jl - a re-written version of a decsition tree python
+##                  by Toby Segaran's Collective inttelligence
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+## import Base.import
+
+my_data = readdlm("./data/decision_tree_example.txt", '\t')
+
+## class definition
+
+type Data
+    col::Int
+    value::Any
+    results::Dict{AbstractString, Int64}
+    
+    Data() = new(-1, "", Dict{AbstractString, Int64}())
+    Data(col, value, results) = new(col, value, results)
+end
+
+type DecisionNode
+    data::Data
+    tb::DecisionNode
+    fb::DecisionNode
+
+    function DecisionNode(data::Data)
+        dn = new()
+        dn.data = data
+        dn.tb = dn
+        dn.fb = dn
+    end
+end
+
+## Divides a set on a specific column.
+## Can handle numeric or nomnal values.
+function divide_set(rows::Array{Any, 2}, column::Int64, value::Any)
+
+    idx_y = Array{Int}[]
+    idx_n = Array{Int}[]
+
+    if isa(value, Int) || isa(value, Float32)
+        idx_y = find(x -> x >= value, rows[:, column])
+        idx_n = find(x -> !(x >= value), rows[:, column])
+    else
+        idx_y = find(x -> x == value, rows[:, column])
+        idx_n = find(x -> !(x == value), rows[:, column])
+    end
+
+    return (rows[idx_y, :], rows[idx_n, :])
+end
+
+## Create counts of possible results 
+## (the last column of each row is the result.)
+function unique_counts(rows::Array{Any, 2})
+    results = Dict{AbstractString, Int64}()
+    (n_rows, n_cols) = size(rows)
+
+    for i in 1:n_rows
+        val = rows[i, n_cols] # value of the last column of each row
+        if ! (val in keys(results))
+            results[val] = 0
+        end
+        results[val] += 1
+    end
+
+    return results
+end
+
+## Probability that a randomly placed item wil be
+## in the wrong category
+function gini_impurity(rows::Array{Any, 2})
+    (n_rows, n_cols) = size(rows)
+    counts = unique_counts(rows)
+    imp = 0.0
+    for k1 in keys(counts)
+        p1 = float(counts[k1] / n_rows)
+        for k2 in keys(counts)
+            if k1 == k2
+                continue
+            end
+            p2 = float(counts[k2] / n_rows)
+            imp += p1 * p2
+        end
+    end
+
+    return imp
+end
+
+## Entropy is the sum of p(x)*log(p(x)) across
+## all the different possible results
+function entropy(rows::Array{Any, 2})
+    (n_rows, n_cols) = size(rows)
+    log_normalized = x -> log(x) / log(2)
+    results = unique_counts(rows)
+
+    ent = 0.0
+    for k in keys(results)
+        p = float(results[k] / n_rows)
+        ent = ent - p * log_normalized(p)
+    end
+
+    return ent
+end
+
+## building a tree with DecisionNode type
+##
+function buildtree(rows::Array{Any, 2}, scoref::Function = entropy)
+
+    (n_rows, n_cols) = size(rows)
+
+    if n_rows == 0
+        return DecisionNode()
+    end
+
+    current_score = scoref(rows)
+
+    best_gain = 0.0
+    best_criteria = Tuple{}
+    best_sets = Tuple{}
+    
+    column_count = n_cols - 1 ## do not need the last column
+    ## column_count = n_cols
+
+    for col in 1:column_count
+        column_values = Dict{Any, Int64}()
+        for value in rows[:, col]
+            column_values[value] = 1
+        end
+
+        ## println("$col, $column_values") ## DEBUG
+        
+        for value in keys(column_values)
+            (set1, set2) = divide_set(rows, col, value)
+
+            (n_rows1, n_cols1) = size(set1)
+            (n_rows2, n_cols2) = size(set2)
+
+            p = float(n_rows1) / n_rows
+            gain = current_score - p * scoref(set1) - (1 - p) * scoref(set2)
+
+            ## println("$(gain), $(col), $(value) : n_rows1 -> $(n_rows1), n_rows2 -> $(n_rows2)") ## DEBUG
+
+            if gain > best_gain && n_rows1 > 0 && n_rows2 > 0
+                best_gain = gain
+                best_criteria = (col, value)
+                best_sets = (set1, set2)
+            end
+        end
+    end
+
+    if best_gain > 0
+        true_branch  = buildtree(best_sets[1])
+        false_branch = buildtree(best_sets[2])
+
+        data = Data(best_criteria[1], # col
+                   best_criteria[2], # value
+                   Dict{AbstractString, Int64}()) # results
+
+        tmp = DecisionNode(data)
+        tmp.tb = true_branch
+        tmp.fb = false_branch
+        
+        return tmp
+        
+    else # terminal node with the results
+        data = Data(-1, "", unique_counts(rows))
+        tmp = DecisionNode(data)
+        return tmp
+    end
+end
+
+## prit tree in a simple way
+##
+function printtree(tree::DecisionNode, indent::ASCIIString = " ")
+    # Is this a leaf node (terminal node)?
+    if length(tree.data.results) > 0
+        println(string(tree.data.results))
+    else
+        println(string(tree.data.col) * ":" * string(tree.data.value) * "? ")
+        print(indent * "T-> ")
+        printtree(tree.tb, indent * "  ")
+        print(indent * "F-> ")
+        printtree(tree.fb, indent * "  ")
+    end        
+end
+
+
+## -----------------------------------------------------------------------------
+##
+##
+function get_width(tree::DecisionNode)
+    if tree.tb == tree && tree.fb == tree ## if terminal node
+        return 1
+    end
+    return get_width(tree.tb) + get_width(tree.fb)
+end
+
+function get_depth(tree::DecisionNode)
+    if tree.tb == tree && tree.fb == tree ## if terminal node
+        return 0
+    end
+    return max(get_depth(tree.tb), get_depth(tree.fb)) + 1
+end
+
+

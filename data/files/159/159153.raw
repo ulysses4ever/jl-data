@@ -1,0 +1,23 @@
+function subfolders(path::AbstractString)
+  path=abspath(path)
+  files=filter(x->!startswith(x,"."),readdir(path))
+  files=map(x->joinpath(path,x), files)
+  folders=filter(isdir,files)
+  subsubfolders=map(subfolders,folders)
+  result=[path]
+  for f=subsubfolders
+    append!(result,f)
+  end
+  return result
+end
+
+append!(LOAD_PATH,subfolders("../"))
+
+using ClassificationUtils
+using TestUtils
+using SequentialPatterns
+using TestUtils
+
+x,y,subjects=lsa64_kadir_dataset()
+
+x_train,y_train,x_test,y_test=split_dataset(x,y,0.8)

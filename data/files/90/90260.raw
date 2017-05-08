@@ -1,0 +1,17 @@
+module EvolvingGraphAlgs
+
+using Requires
+using EvolvingGraphs
+
+include("random_walk.jl")
+
+@require Compose begin
+    layoutfiles(fname::AbstractString) = 
+         joinpath(dirname(@__FILE__), "plot", "layout", fname)
+    include(layoutfiles("random.jl"))
+    include(layoutfiles("spring.jl"))
+    include(layoutfiles("circular.jl"))
+    @require Colors include(joinpath(dirname(@__FILE__),"plot","draw.jl"))
+end
+
+end # module

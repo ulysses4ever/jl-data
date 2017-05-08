@@ -1,0 +1,25 @@
+#push!(LOAD_PATH,"/home/facuq/dev/Boosting.jl/src")
+
+using Classifiers
+using Boosting
+import RDatasets
+import RandomHyperplaneClassifiers
+
+x,y,labels=iris_dataset_binary()
+
+c=RandomHyperplaneClassifiers.RandomHyperplaneConfig()
+fit_function(x,y)= RandomHyperplaneClassifiers.fit(c,x,y)
+predict_function(m::RandomHyperplaneClassifiers.RandomHyperplaneClassifier,x)= RandomHyperplaneClassifiers.predict(m,x)
+
+classifiers=5
+#bc=AdaBoostConfig(fit_function,predict_function,classifiers)
+bc=AdaBoostConfig(c,classifiers)
+m=fit(bc,x,y)
+e=loss(m,x,y)
+println("Models:")
+for i=1:length(m.models)
+  print(m.models[i])
+  print(", w=")
+  println(m.weights[i])
+end
+println("Error: $e")

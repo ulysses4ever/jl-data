@@ -1,0 +1,5 @@
+{"business_profile":{"address":"x","business_name":"Vincensini Jean-Jacques","city":"Aix en Provence","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13100","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"La Belle Epoque","city":"Bordeaux","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"33000","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"A.R.C.P.G","city":"AIX EN PROVENCE","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13851","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"A.R.C.P.G","city":"AIX EN PROVENCE","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13851","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"Aix Conseil Expertise Comptable","city":"AIX EN PROVENCE","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13090","geo":[52.3396,4.96247]}}

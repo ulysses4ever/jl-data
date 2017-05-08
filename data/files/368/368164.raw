@@ -1,0 +1,45 @@
+#==========================================================================
+  Wrapper for already implemented R data depths 
+==========================================================================#
+
+export  R_depth_projection, 
+		R_depth_halfspace,
+		R_depth_zonoid,
+		R_depth_simplicial,
+		R_depth_simplicialVolume
+		
+using RCall
+		
+function R_depth_projection{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},k::Int64=1000)
+	x = x'
+	R"library(ddalpha)"
+	return R"depth.projection($(x),$(data_set),num.directions=$(k))"[1]
+end
+
+function R_depth_halfspace{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},k::Int64=1000,exact::Bool=false)
+	x = x'
+	R"library(ddalpha)"
+	if(exact == false)
+		return R"depth.halfspace($(x),$(data_set),num.directions=$(k))"[1]
+	else 
+		return R"depth.halfspace($(x),$(data_set),exact=T,num.directions=$(k))"[1]
+	end
+end
+
+function R_depth_zonoid{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2})
+	x = x'
+	R"library(ddalpha)"
+	return R"depth.zonoid($(x),$(data_set))"[1]
+end
+
+function R_depth_simplicial{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2})
+	x = x'
+	R"library(ddalpha)"
+	return R"depth.simplicial($(x),$(data_set))"[1]
+end
+
+function R_depth_simplicialVolume{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2})
+	x = x'
+	R"library(ddalpha)"
+	return R"depth.simplicialVolume($(x),$(data_set))"[1]
+end

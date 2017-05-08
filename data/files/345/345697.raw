@@ -1,0 +1,322 @@
+using SortedVectors
+
+
+function testBasic()
+	s = SortedVector(rand(1:10, 10))
+	v = SortedUniqueVector(rand(1:10, 10))
+	string(s)
+	string(v)
+	show(s)
+	show(v)
+	s[1]
+	v[1]
+	length(s)
+	length(v)
+	size(s)
+	size(v)
+	size(s, 1)
+	size(v, 1)
+	sizeof(s)
+	sizeof(v)
+	first(s)
+	first(v)
+	last(s)
+	last(v)
+	endof(s)
+	endof(v)
+	copy(s)
+	copy(v)
+	deepcopy(s)
+	deepcopy(v)
+	issorted(s)
+	issorted(v)
+	searchsorted(s, 1)
+	searchsortedfirst(s, 1)
+	searchsortedlast(s, 1)
+	search(s, 1)
+	searchfirst(s, 1)
+	searchlast(s, 1)
+	searchsorted(v, 1)
+	searchsortedfirst(v, 1)
+	searchsortedlast(v, 1)
+	search(v, 1)
+	searchfirst(v, 1)
+	searchlast(v, 1)
+	empty!(s)
+	empty!(v)
+	length(s) != 0 && error("empty fail 1")
+	length(v) != 0 && error("empty fail 2")
+	return(true)
+end
+
+function simSV(N::Int, r::UnitRange)
+	x = rand(r, N)
+	sort!(x)
+	return(x, SortedVector(x, alreadySorted=true))
+end
+function simSUV(N::Int, r::UnitRange)
+	x = unique(rand(r, N))
+	sort!(x)
+	return(x, SortedUniqueVector(x, alreadySorted=true, alreadyUnique=true))
+end
+
+
+function testIn(KK::Int)
+	for kk = 1:KK
+		(x, s) = simSV(5, 1:10)
+		a = rand(1:10)
+		in(a, x) != in(a, s) && error("in fail 1")
+		(x, s) = simSUV(5, 1:10)
+		a = rand(1:10)
+		in(a, x) != in(a, s) && error("in fail 2")
+	end
+	return(true)
+end
+
+
+function testdeleteat(KK::Int)
+	for kk = 1:KK
+		(x, s) = simSV(5, 1:10)
+		i = rand(1:length(x))
+		a = x[i]
+		deleteat!(x, i)
+		deleteat!(s, a)
+		x != s.x && error("deleteat fail 1")
+		in(a, s) && error("deleteat fail 2")
+		(x, s) = simSUV(5, 1:10)
+		i = rand(1:length(x))
+		a = x[i]
+		deleteat!(x, i)
+		deleteat!(s, a)
+		x != s.x && error("deleteat fail 3")
+		in(a, s) && error("deleteat fail 4")
+
+	end
+	return(true)
+end
+
+
+function testinsert(KK::Int)
+	for kk = 1:KK
+		(x, s) = simSV(5, 1:10)
+		a = rand(1:10)
+		insert!(s, a)
+		length(s) != length(x)+1 && error("insert fail 1")
+		!(in(a, s)) && error("insert fail 2")
+		!(issorted(s.x)) && error("insert fail 3")
+		(x, s) = simSUV(5, 1:10)
+		a = rand(1:10)
+		while in(a, s)
+			a = rand(1:10)
+		end
+		insert!(s, a)
+		length(s) != length(x)+1 && error("insert fail 1")
+		!(in(a, s)) && error("insert fail 2")
+		!(issorted(s)) && error("insert fail 3")
+		!(isunique(s)) && error("insert fail 4")
+	end
+	return(true)
+end
+
+
+
+function testintersect(KK::Int)
+	for kk = 1:KK
+		(x1, s1) = simSV(6, 1:10)
+		(x2, s2) = simSV(6, 1:10)
+		(i1, i2) = intersectIndex(s1, s2)
+		sInt = intersect(s1, s2)
+		xInt = intersect(x1, x2)
+		sIntComp = Array(Int, 0)
+		for n = 1:length(s1)
+			in(s1[n], xInt) && insert!(sIntComp, s1[n])
+		end
+		for n = 1:length(s2)
+			in(s2[n], xInt) && insert!(sIntComp, s2[n])
+		end
+		sInt != sIntComp && error("intersect fail 1")
+		s1Comp = s1[i1]
+		for n = 1:length(s1Comp)
+			!(in(s1Comp[n], sIntComp)) && error("intersect fail 2")
+		end
+		s2Comp = s2[i2]
+		for n = 1:length(s2Comp)
+			!(in(s2Comp[n], sIntComp)) && error("intersect fail 3")
+		end
+		(x1, s1) = simSUV(6, 1:10)
+		(x2, s2) = simSUV(6, 1:10)
+		(i1, i2) = intersectIndex(s1, s2)
+		sI = intersect(s1, s2)
+		sI != intersect(x1, x2) && error("intersect fail 4")
+		s1[i1] != sI && error("intersect fail 5")
+		s2Comp = s2[i2]
+		for n = 1:length(s2Comp)
+			!(in(s2Comp[n], sI)) && error("intersect fail 6")
+		end
+	end
+	return(true)
+end
+
+
+function testunion(KK:Int)
+
+
+	#UP TO HERE!!!!!!!!!!!!!!!!!!!!!
+
+
+Base.union,
+		Base.setdiff,
+		Base.setdiff!,
+		Base.unique,
+		Base.unique!
+		intersectIndex,
+		unionIndex,
+		isunique,
+		trimRange,
+		trim,
+		trim!
+
+
+
+function testIntersectFunctions(M::Int)
+	#No duplicates
+	for m = 1:M
+		x = rand(0:20, rand(0:10))
+		y = rand(0:20, rand(0:10))
+		sort!(x)
+		sort!(y)
+		(I1, I2) = intersectIndexSort(x, y, allowDuplicates=false)
+		if x[I1] != y[I2]; error("intersectIndexSort test fail"); end
+		z = intersectSort(x, y, allowDuplicates=false)
+		if z != intersectSort(y, x, allowDuplicates=false); error("intersectSort fail (symmetry)"); end
+		if z != sort(unique(intersect(x, y))); error("intersectSort fail"); end
+	end
+	#Function currently not able to allow for duplicates
+	println("Test passed.")
+end
+function testUnionFunctions(M::Int)
+	#Allow duplicates
+	for m = 1:M
+		x = rand(0:20, rand(0:10))
+		y = rand(0:20, rand(0:10))
+		sort!(x)
+		sort!(y)
+		z = unionSort(x, y)
+		if z != unionSort(y, x); error("unionSort fail (symmetry)"); end
+		if z != sort([x; y]); error("unionSort fail"); end
+	end
+	#No duplicates
+	for m = 1:M
+		x = unique(rand(0:20, rand(0:10)))
+		y = unique(rand(0:20, rand(0:10)))
+		sort!(x)
+		sort!(y)
+		z = unionSort(x, y, allowDuplicates=false)
+		if z != unionSort(y, x, allowDuplicates=false); error("unionSort fail (symmetry)"); end
+		if z != sort(union(x, y)); error("unionSort fail"); end
+	end
+	println("Test passed.")
+end
+function testComplement(M::Int)
+	for m = 1:M
+		Nx = rand(0:10)
+		xSt = rand(-5:5)
+		xEnd = xSt + rand(0:20)
+		xMin = xSt + rand(-10:10)
+		xMax = xEnd + rand(-10:10)
+		c = 1
+		while xMin > xMax
+			xMin = xSt + rand(-10:10)
+			xMax = xEnd + rand(-10:10)
+			c += 1
+			if c > 500; error("Stuck in infinite loop [ctb]"); end
+		end
+		x = [ rand(xMin:xMax) for n = 1:Nx ]
+		sort!(x)
+		xC1 = complementSort(x, xSt, xEnd, indsUnique=false)
+		xC2 = complementSort(sort(unique(x)), xSt, xEnd, indsUnique=true)
+		if any(xC1 .> xEnd); error("complementSort fail 1 [ctb]"); end
+		if any(xC2 .> xEnd); error("complementSort fail 2 [ctb]"); end
+		if any(xC1 .< xSt); error("complementSort fail 3 [ctb]"); end
+		if any(xC2 .< xSt); error("complementSort fail 4 [ctb]"); end
+		y = [xSt:xEnd]
+		for n = length(y):-1:1
+			r = searchsorted(x, y[n])
+			if r.start <= r.stop
+				deleteat!(y, n)
+			end
+		end
+		if xC1 != y; error("complementSort fail 5 [ctb]"); end
+		if xC2 != y; error("complementSort fail 6 [ctb]"); end
+	end
+	println("Test passed.")
+end
+function testUniqueSort(M::Int)
+	for m = 1:M
+		Nx = rand(0:20)
+		x = [ rand(1:10) for n = 1:Nx ]
+		y = sort!(x)
+		if uniqueSort(y) != sort(unique(x)); error("uniqueSort fail 1"); end
+	end
+	println("Test passed.")
+end
+function testIsUniqueSort(M::Int)
+	for m = 1:M
+		x = sort(rand(1:10, rand(0:10)))
+		xBool = isuniqueSort(x)
+		if length(unique(x)) != length(x)
+			if xBool == true; error("isuniqueSort fail"); end
+		else
+			if xBool == false; error("isuniqueSort fail"); end
+		end
+	end
+	println("Test success")
+end
+function testTrimFunctions(M::Int)
+	for m = 1:M
+		xLength = rand(0:10)
+		x = rand(1:rand(1:20), xLength)
+		sort!(x)
+		if length(x) == 0
+			if trimRange(x, 1, 1) != 1:0; error("trimRange fail (empty input case)"); end
+			if trim(x, 1, 1) != Array(Int, 0); error("trimRange fail (empty input case)"); end
+			continue
+		end
+		LB = rand(1:xLength)
+		UB = rand(LB:xLength)
+		for n = LB-1:-1:1 #Ensure LB is lowest of set of duplicates
+			if x[n] == x[LB]
+				LB = n
+			else
+				break
+			end
+		end
+		for n = UB+1:xLength #Ensure UB is largest in set of duplicates
+			if x[n] == x[UB]
+				UB = n
+			else
+				break
+			end
+		end
+		intervalLength = UB - LB + 1
+		xSt = x[LB]
+		xEnd = x[UB]
+		xRange = trimRange(x, xSt, xEnd)
+		if any(x[xRange.start:xRange.stop] .< xSt); error("trimRange fail 1"); end
+		if any(x[xRange.start:xRange.stop] .> xEnd); error("trimRange fail 2"); end
+		if any(x[1:xRange.start-1] .>= xSt); error("trimRange fail 3"); end
+		if any(x[xRange.stop+1:end] .<= xEnd); error("trimRange fail 4"); end
+		if xRange.start != LB; error("trimRange fail 5"); end
+		if xRange.stop != UB; error("trimRange fail 6"); end
+		y = trim(x, xSt, xEnd)
+		if y != x[xRange.start:xRange.stop]; error("trim fail 1"); end
+		xCopy = copy(x)
+		trim!(xCopy, xSt, xEnd)
+		if y != xCopy;
+			error("trim fail 2");
+		end
+	end
+	println("Test passed.")
+end
+
+

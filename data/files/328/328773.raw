@@ -1,0 +1,11 @@
+export HttpServer
+
+# exported
+
+type HttpServer
+    handle::Function
+    port::Integer
+    socket::Base.UVServer
+
+    HttpServer(port::Integer, handle::Function) = new(handle, port, Base.TcpServer())
+end

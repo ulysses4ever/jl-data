@@ -1,0 +1,45 @@
+include("common.jl")
+
+RDATAFILE01 = joinpath(OUTDIR, "adjusted_driver_with_optical_noise_g0.25.txt")
+RDATAFILE02 = joinpath(OUTDIR, "adjusted_driver_with_optical_noise_g0.50.txt")
+RDATAFILE03 = joinpath(OUTDIR, "adjusted_driver_with_optical_noise_g0.75.txt")
+RDATAFILE04 = joinpath(OUTDIR, "adjusted_driver_with_optical_noise_g1.00.txt")
+
+OUTFILE01 = joinpath(OUTDIR, "suncohcsk_ber_with_artificial_noise_g0.25.txt")
+OUTFILE02 = joinpath(OUTDIR, "suncohcsk_ber_with_artificial_noise_g0.50.txt")
+OUTFILE03 = joinpath(OUTDIR, "suncohcsk_ber_with_artificial_noise_g0.75.txt")
+OUTFILE04 = joinpath(OUTDIR, "suncohcsk_ber_with_artificial_noise_g1.00.txt")
+
+xstream = open(XDATAFILE, "r")
+noisestream = open(RNOISEDATAFILE, "r")
+
+rstream01 = open(RDATAFILE01, "w+")
+rstream02 = open(RDATAFILE02, "w+")
+rstream03 = open(RDATAFILE03, "w+")
+rstream04 = open(RDATAFILE04, "w+")
+
+# Reading headers
+readline(xstream)
+readline(noisestream)
+
+while !eof(xstream)
+  x = float64(readline(xstream))
+  noise = float64(readline(noisestream))
+  @printf(rstream01, "%f\n", x+1.25*noise)
+  @printf(rstream02, "%f\n", x+1.5*noise)
+  @printf(rstream03, "%f\n", x+1.75*noise)
+  @printf(rstream04, "%f\n", x+2*noise)
+end
+
+close(xstream)
+close(noisestream)
+
+close(rstream01)
+close(rstream02)
+close(rstream03)
+close(rstream04)
+
+compute_ber(SDATAFILE, RDATAFILE01, 2:25, OUTFILE01; s_header=true)
+compute_ber(SDATAFILE, RDATAFILE02, 2:25, OUTFILE02; s_header=true)
+compute_ber(SDATAFILE, RDATAFILE03, 2:25, OUTFILE03; s_header=true)
+compute_ber(SDATAFILE, RDATAFILE04, 2:25, OUTFILE04; s_header=true)

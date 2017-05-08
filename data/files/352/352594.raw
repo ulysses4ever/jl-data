@@ -1,0 +1,13 @@
+module misc_julia
+	include("nansuite.jl");
+	include("polyfit.jl");
+	include("waveletba.jl");
+	include("gencoi.jl");
+	include("coi2nan.jl");
+	include("psdw.jl");
+
+	searchdir(path,key) = filter(x->contains(x,key), readdir(path));
+	using wave_julia
+	
+	export nanmean, polyfit, waveletba,searchdir, wave_bases, gencoi, coi2nan, psdw
+end

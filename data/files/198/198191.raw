@@ -1,0 +1,14 @@
+using Jml
+
+tests = [
+  "test/kmeans.jl",
+  "test/datasets.jl"
+]
+
+println("Running suite.")
+
+for test in tests
+  println(" * $(test)")
+  include(test)
+end
+

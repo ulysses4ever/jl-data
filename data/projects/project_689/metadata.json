@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:06 GMT
+Date: Wed, 03 May 2017 21:01:19 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5447
+Content-Length: 6893
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2914
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3981
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "0d1721c4e76635fcd1e2d8742429dcf4"
-Last-Modified: Fri, 16 Dec 2016 13:22:54 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "29483bf26df9799541b433c7606cf585"
+Last-Modified: Sun, 11 Oct 2015 10:45:47 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,121 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: b535085e7f4d6e3423e016e684de0829
-X-GitHub-Request-Id: B2D5:6633:DD6BD4:11EB2B8:590231E2
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 253E:5CA5:FD35E5:145B9C7:590A451F
 
 {
-  "id": 55709186,
-  "name": "GAP.jl",
-  "full_name": "laurentbartholdi/GAP.jl",
+  "id": 43560902,
+  "name": "Jumos.jl",
+  "full_name": "JuliaPackageMirrors/Jumos.jl",
   "owner": {
-    "login": "laurentbartholdi",
-    "id": 2230352,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/2230352?v=3",
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/laurentbartholdi",
-    "html_url": "https://github.com/laurentbartholdi",
-    "followers_url": "https://api.github.com/users/laurentbartholdi/followers",
-    "following_url": "https://api.github.com/users/laurentbartholdi/following{/other_user}",
-    "gists_url": "https://api.github.com/users/laurentbartholdi/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/laurentbartholdi/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/laurentbartholdi/subscriptions",
-    "organizations_url": "https://api.github.com/users/laurentbartholdi/orgs",
-    "repos_url": "https://api.github.com/users/laurentbartholdi/repos",
-    "events_url": "https://api.github.com/users/laurentbartholdi/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/laurentbartholdi/received_events",
-    "type": "User",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/laurentbartholdi/GAP.jl",
-  "description": "GAP in Julia",
+  "html_url": "https://github.com/JuliaPackageMirrors/Jumos.jl",
+  "description": "Julia package mirror.",
   "fork": false,
-  "url": "https://api.github.com/repos/laurentbartholdi/GAP.jl",
-  "forks_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/forks",
-  "keys_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/teams",
-  "hooks_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/events",
-  "assignees_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/tags",
-  "blobs_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/subscription",
-  "commits_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/merges",
-  "archive_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/downloads",
-  "issues_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/laurentbartholdi/GAP.jl/deployments",
-  "created_at": "2016-04-07T16:12:28Z",
-  "updated_at": "2016-12-16T13:22:54Z",
-  "pushed_at": "2016-04-09T21:31:21Z",
-  "git_url": "git://github.com/laurentbartholdi/GAP.jl.git",
-  "ssh_url": "git@github.com:laurentbartholdi/GAP.jl.git",
-  "clone_url": "https://github.com/laurentbartholdi/GAP.jl.git",
-  "svn_url": "https://github.com/laurentbartholdi/GAP.jl",
-  "homepage": null,
-  "size": 19,
-  "stargazers_count": 2,
-  "watchers_count": 2,
+  "url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPackageMirrors/Jumos.jl/deployments",
+  "created_at": "2015-10-02T15:34:55Z",
+  "updated_at": "2015-10-11T10:45:47Z",
+  "pushed_at": "2016-03-24T16:45:40Z",
+  "git_url": "git://github.com/JuliaPackageMirrors/Jumos.jl.git",
+  "ssh_url": "git@github.com:JuliaPackageMirrors/Jumos.jl.git",
+  "clone_url": "https://github.com/JuliaPackageMirrors/Jumos.jl.git",
+  "svn_url": "https://github.com/JuliaPackageMirrors/Jumos.jl",
+  "homepage": "https://github.com/Luthaf/Jumos.jl",
+  "size": 7581,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 1,
+  "forks_count": 0,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 1,
+  "forks": 0,
   "open_issues": 0,
-  "watchers": 2,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 1,
-  "subscribers_count": 2
+  "organization": {
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

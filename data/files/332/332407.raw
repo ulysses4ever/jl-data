@@ -1,0 +1,213 @@
+include("config.jl")
+
+import Config
+
+function evolve()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+
+    num_input_nn_nodes = convert(Int32, 2)
+    num_hidden_nn_nodes = convert(Int32, 2)
+    num_output_nn_nodes = convert(Int32, 2)
+
+    layer_1_weights = zeros(Float32, num_input_nn_nodes * num_hidden_nn_nodes)
+    layer_2_weights = zeros(Float32, num_output_nn_nodes * num_hidden_nn_nodes)
+    inputs = zeros(Float32, num_input_nn_nodes)
+    hidden_activations = zeros(Float32, num_hidden_nn_nodes)
+    outputs = zeros(Float32, num_output_nn_nodes)
+    walls = [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+             convert(Float32, 1), convert(Float32, 0), convert(Float32, 0),
+             convert(Float32, 0), convert(Float32, 1), convert(Float32, 200),
+             convert(Float32, 1), convert(Float32, 0), convert(Float32, 400),]
+    fitness_ref = [convert(Float32, 1)]
+
+
+    num_goals = convert(Int32, 8)
+    goals_1 = convert(Array{Float32, 1},[250, 10,  
+                                         300, 10,
+                                         350, 10,
+                                         390, 10,
+                                         390, 50,
+                                         390, 100,
+                                         390, 150, 
+                                         390, 190,])                 
+
+    goals_2 = convert(Array{Float32, 1}, [150, 10,  
+                                          100, 10,
+                                          50, 10,
+                                          10, 10,
+                                          10, 50,
+                                          10, 100,
+                                          10, 150, 
+                                          10, 190,])
+
+    fitness_vals_1::Dict{Int64, Float64} = Dict{Int64, Float64}()
+    fitness_vals_2::Dict{Int64, Float64} = Dict{Int64, Float64}()
+
+    to_copy_over::Array{Int32, 1} = zeros(Int32, config_vals.births_and_deaths_per_generation)
+
+    population = []
+    for i = 1:config_vals.population_size
+        push!(population, rand(convert(Int32, 0):convert(Int32, 1), config_vals.max_num_nodes))
+    end
+    
+    fitnesses = zeros(Float32, config_vals.population_size)
+
+    max_fitness = 0
+    average_fitness = 0
+
+    goal_number::Int32 = 1
+    goals = goals_1
+    fitness_vals = fitness_vals_1
+
+    generation_tracker = 0
+
+    first_max_eight = 0
+    first_average_three = 0
+    first_average_six = 0
+
+    for i = 1:config_vals.num_generations
+        generation_tracker += 1
+
+        evaluate(config_vals, population, fitnesses, fitness_vals,  walls, goals, num_goals, num_input_nn_nodes, 
+                 num_hidden_nn_nodes, num_output_nn_nodes, layer_1_weights, layer_2_weights, inputs, 
+                 hidden_activations, outputs, fitness_ref, goal_number)
+
+        sum = 0
+        for j = 1:config_vals.population_size
+            sum += fitnesses[j]
+        end
+        average_fitness = sum/config_vals.population_size
+        max_fitness = maximum(fitnesses)
+
+        if (max_fitness == 8) & (first_max_eight == 0)
+            first_max_eight = generation_tracker
+        end
+        if (average_fitness >= 3.0) & (first_average_three == 0)
+            first_average_three = generation_tracker
+        end
+        if (average_fitness >= 6.0) & (first_average_six == 0)
+            first_average_six = generation_tracker
+        end
+        
+        if (i % config_vals.generations_per_target_switch) == 0
+            if goal_number == 1
+                goal_number = 2
+                fitness_vals = fitness_vals_2
+                goals = goals_2
+            else
+                goal_number = 1
+                fitness_vals = fitness_vals_1
+                goals = goals_1
+            end
+            for k = 1:config_vals.population_size
+                fitnesses[k] = -1
+            end
+            println("\n target switch to ", goal_number, " ", first_max_eight, " ", first_average_three, " ", first_average_six, "\n")
+            #println("generation ", generation_tracker, " maximum ", max_fitness, " average ", average_fitness)
+            average_fitness = 0
+            max_fitness = 0
+            first_max_eight = 0
+            first_average_three = 0
+            first_average_six = 0
+            #println("\n \n goal change to goal ", goal_number, " generation ", generation_tracker, "\n")
+            generation_tracker = 0
+            evaluate(config_vals, population, fitnesses, fitness_vals,  walls, goals, num_goals, num_input_nn_nodes, 
+                 num_hidden_nn_nodes, num_output_nn_nodes, layer_1_weights, layer_2_weights, inputs, 
+                 hidden_activations, outputs, fitness_ref, goal_number)
+        end
+
+        breed_and_exterminate(config_vals, population, fitnesses, to_copy_over)
+    end
+end
+
+
+
+function evaluate(config_vals::Config.Type_Config_Values, population, fitnesses::Array{Float32, 1}, 
+                  fitness_vals::Dict{Int64, Float64}, walls::Array{Float32, 1}, goals::Array{Float32, 1}, num_goals::Int32,
+                  num_input_nn_nodes::Int32, num_hidden_nn_nodes::Int32, num_output_nn_nodes::Int32, 
+                  layer_1_weights::Array{Float32, 1}, layer_2_weights::Array{Float32, 1}, inputs::Array{Float32, 1}, 
+    hidden_activations::Array{Float32, 1}, outputs::Array{Float32, 1}, fitness_ref::Array{Float32, 1}, goal_number::Int32)
+            
+    for j = 1:config_vals.population_size
+        index = activations_to_int(population[j])
+        fitness = get(fitness_vals, index, -1)
+        if fitness == -1
+            Libdl.dlopen("/home/david/TehzCodes/GRNEvolution/librobosim")
+            ccall((:simulate, "/home/david/TehzCodes/GRNEvolution/librobosim"), Void,
+                  (Int32, Ptr{Float32}, Ptr{Float32}, Int32, Ptr{Int32}, Int32, Int32, Int32, 
+                   Int32, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Int32, Int32),
+                  convert(Int32, 250), walls, goals, num_goals, population[j], convert(Int32, 5), num_input_nn_nodes, num_hidden_nn_nodes, 
+            num_output_nn_nodes, layer_1_weights, layer_2_weights, inputs, hidden_activations, 
+            outputs, fitness_ref, goal_number, convert(Int32, 0))
+            fitness = fitness_ref[1]
+            fitness_vals[index] = fitness
+        end
+        fitnesses[j] = fitness
+    end
+end
+
+function breed_and_exterminate(config_vals::Config.Type_Config_Values, population, 
+                               fitnesses::Array{Float32, 1}, to_copy_over::Array{Int32, 1})
+    for i = 1:config_vals.births_and_deaths_per_generation
+        index_to_delete = 0
+        lowest_fitness::Float32 = 2000
+        for j = 1:config_vals.extermination_tournament_size
+            new_index = rand(1:config_vals.population_size)
+            if fitnesses[new_index] < lowest_fitness
+                index_to_delete = new_index
+                lowest_fitness = fitnesses[new_index]
+            end
+        end
+        to_copy_over[i] = index_to_delete
+    end
+    for i = 1:config_vals.births_and_deaths_per_generation
+        index_to_breed = 0
+        highest_fitness::Float32 = -1
+        for j = 1:config_vals.breeding_tournament_size
+            new_index = rand(1:config_vals.population_size)
+            if fitnesses[new_index] > highest_fitness
+                index_to_breed = new_index
+                highest_fitness = fitnesses[new_index]
+            end
+        end
+        population[to_copy_over[i]] = deepcopy(population[index_to_breed])
+        mutate(config_vals, population[to_copy_over[i]])
+    end
+end
+
+function mutate(config_vals::Config.Type_Config_Values, bit_string::Array{Int32, 1})
+    mutation_prob = 0.1
+    for i = 1:config_vals.max_num_nodes
+        if rand(1:100) <= mutation_prob * 100
+            if bit_string[i] == 1
+                bit_string[i] = 0
+            else
+                bit_string[i] = 1
+            end
+        end
+    end
+end
+
+function mutate_with_spread(config_vals::Config.Type_Config_Values, bit_string::Array{Int32, 1})
+    num_mutations = Int(floor((1 + 10.0^(-10))^rand(0:0.01:(2 * (10^10))))) - 1
+    for i = 1:num_mutations
+        mutation_index = rand(1:config_vals.max_num_nodes)
+        if bit_string[mutation_index] == 1
+            bit_string[mutation_index] = convert(Int32, 0)
+        else
+            bit_string[mutation_index] = convert(Int32, 1)
+        end
+    end
+end
+    
+
+function activations_to_int(bit_string::Array{Int32, 1})
+    integer::Int64 = 0
+    for i = 1:length(bit_string)
+        integer += bit_string[i] * 2^(i - 1)
+    end
+    integer += 1
+    return integer
+end
+
+@time evolve()

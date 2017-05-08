@@ -1,0 +1,35 @@
+### Some functions for plotting data/results
+
+function plot_meth(X,c)
+    nc = int(maximum(c)) # number of clusters
+    if nc > 1
+        col = get_colors(nc)
+    else
+        col = zeros(3,1) # black
+    end
+    N,W = size(X)
+
+    y = 1
+    for n = 1:N
+        plot([0.5,W+0.5],[y,y],"-",color=col[:,c[n]])
+        for w = 1:W
+        	if isnan(X[n,w])
+        		continue
+	        elseif X[n,w] == 1.0
+                plot(w,y,"o",color=col[:,c[n]])
+            else
+                plot(w,y,"o",color=col[:,c[n]],mfc="w")
+            end
+        end
+        y += 1
+    end
+    xlim([0,1+W])
+    ylim([0,1+N])
+    xticks([])
+    yticks([])
+    if nc > 1
+        title("All reads, with assigned clusters")
+    else
+        title("All reads")
+    end
+end

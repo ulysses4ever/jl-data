@@ -1,0 +1,40 @@
+test_case = "case_2b"
+calculation_mode = "classical_risk"
+case_file = "test/$(calculation_mode)/data/$(test_case).jld"
+
+time_h = 1.0
+time_r = 1.0
+lrem_steps = 1
+
+hc1_imls = [0.05, 0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40, 1.60, 1.80, 2.00]
+hc1_poes = [3.8958243E-02, 2.2217381E-02, 8.1714271E-03, 3.0705064E-03, 1.2298430E-03, 5.1951722E-04, 2.2540125E-04, 9.9177852E-05, 4.3529320E-05, 1.8290866E-05, 6.9246566E-06]
+
+hc_imls = {"b1"=>[hc1_imls]}
+hc_poes = {"b1"=>[hc1_poes]}
+branches = keys(hc_imls)
+
+a_ref = ["a1"]
+a_loc = [1]
+a_tax = ["tax1"]
+a_num = [1]
+a_occ = [1]
+a_val = [5000]
+a_ded = [NaN]
+a_lim = [NaN]
+num_assets = length(a_ref)
+
+vf_type = {"vf1"=>"LN"}
+vf_ids = keys(vf_type)
+
+vf1_imls = [0.05, 0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40, 1.60, 1.80, 2.00]
+vf1_mean_lrs = [0.02, 0.10, 0.33, 0.66, 0.90, 0.98, 1.00, 1.00, 1.00, 1.00, 1.00]
+vf1_cov_lrs = [0.03, 0.12, 0.24, 0.24, 0.12, 0.03, 0.00, 0.00, 0.00, 0.00, 0.00]
+
+vf_imls = {"vf1"=>vf1_imls}
+vf_mean_lrs = {"vf1"=>vf1_mean_lrs}
+vf_cov_lrs = {"vf1"=>vf1_cov_lrs}
+
+tax_vf_map = {"tax1"=>["vf1"]}
+taxonomies = keys(tax_vf_map)
+
+include("write_jld.jl")

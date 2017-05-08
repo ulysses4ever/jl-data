@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:59:45 GMT
+Date: Wed, 03 May 2017 20:59:52 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5761
+Content-Length: 5549
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3243
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4152
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "43f68c180af641938906594731424d8e"
-Last-Modified: Fri, 17 Mar 2017 21:44:37 GMT
+ETag: "410003b0d23806e2f7360beaeca8fdc2"
+Last-Modified: Thu, 13 Apr 2017 16:49:36 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 7b641bda7ec2ca7cd9df72d2578baf75
-X-GitHub-Request-Id: 4C38:6637:1331129:18C5B6E:59023191
+X-Served-By: 52437fedc85beec8da3449496900fb9a
+X-GitHub-Request-Id: 9944:5C90:ABC11C:DCAE91:590A44C7
 
 {
-  "id": 58591091,
-  "name": "StandardizedMatrices.jl",
-  "full_name": "joshday/StandardizedMatrices.jl",
+  "id": 27504790,
+  "name": "Julia-Course",
+  "full_name": "ivanslapnicar/Julia-Course",
   "owner": {
-    "login": "joshday",
-    "id": 8075494,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/8075494?v=3",
+    "login": "ivanslapnicar",
+    "id": 8678320,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/8678320?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/joshday",
-    "html_url": "https://github.com/joshday",
-    "followers_url": "https://api.github.com/users/joshday/followers",
-    "following_url": "https://api.github.com/users/joshday/following{/other_user}",
-    "gists_url": "https://api.github.com/users/joshday/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/joshday/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/joshday/subscriptions",
-    "organizations_url": "https://api.github.com/users/joshday/orgs",
-    "repos_url": "https://api.github.com/users/joshday/repos",
-    "events_url": "https://api.github.com/users/joshday/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/joshday/received_events",
+    "url": "https://api.github.com/users/ivanslapnicar",
+    "html_url": "https://github.com/ivanslapnicar",
+    "followers_url": "https://api.github.com/users/ivanslapnicar/followers",
+    "following_url": "https://api.github.com/users/ivanslapnicar/following{/other_user}",
+    "gists_url": "https://api.github.com/users/ivanslapnicar/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ivanslapnicar/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ivanslapnicar/subscriptions",
+    "organizations_url": "https://api.github.com/users/ivanslapnicar/orgs",
+    "repos_url": "https://api.github.com/users/ivanslapnicar/repos",
+    "events_url": "https://api.github.com/users/ivanslapnicar/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ivanslapnicar/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/joshday/StandardizedMatrices.jl",
-  "description": "Operations for standardized matrices without changing the underlying data",
+  "html_url": "https://github.com/ivanslapnicar/Julia-Course",
+  "description": null,
   "fork": false,
-  "url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl",
-  "forks_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/forks",
-  "keys_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/teams",
-  "hooks_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/events",
-  "assignees_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/tags",
-  "blobs_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/subscription",
-  "commits_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/merges",
-  "archive_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/downloads",
-  "issues_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/joshday/StandardizedMatrices.jl/deployments",
-  "created_at": "2016-05-11T23:50:56Z",
-  "updated_at": "2017-03-17T21:44:37Z",
-  "pushed_at": "2017-03-19T00:56:46Z",
-  "git_url": "git://github.com/joshday/StandardizedMatrices.jl.git",
-  "ssh_url": "git@github.com:joshday/StandardizedMatrices.jl.git",
-  "clone_url": "https://github.com/joshday/StandardizedMatrices.jl.git",
-  "svn_url": "https://github.com/joshday/StandardizedMatrices.jl",
+  "url": "https://api.github.com/repos/ivanslapnicar/Julia-Course",
+  "forks_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/forks",
+  "keys_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/teams",
+  "hooks_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/hooks",
+  "issue_events_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/events",
+  "assignees_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/tags",
+  "blobs_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/languages",
+  "stargazers_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/stargazers",
+  "contributors_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/contributors",
+  "subscribers_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/subscribers",
+  "subscription_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/subscription",
+  "commits_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/merges",
+  "archive_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/downloads",
+  "issues_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/labels{/name}",
+  "releases_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/ivanslapnicar/Julia-Course/deployments",
+  "created_at": "2014-12-03T19:52:43Z",
+  "updated_at": "2017-04-13T16:49:36Z",
+  "pushed_at": "2017-04-19T14:30:44Z",
+  "git_url": "git://github.com/ivanslapnicar/Julia-Course.git",
+  "ssh_url": "git@github.com:ivanslapnicar/Julia-Course.git",
+  "clone_url": "https://github.com/ivanslapnicar/Julia-Course.git",
+  "svn_url": "https://github.com/ivanslapnicar/Julia-Course",
   "homepage": null,
-  "size": 17,
-  "stargazers_count": 4,
-  "watchers_count": 4,
-  "language": "Julia",
+  "size": 1715,
+  "stargazers_count": 3,
+  "watchers_count": 3,
+  "language": "Jupyter Notebook",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 1,
+  "forks_count": 0,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 1,
+  "forks": 0,
   "open_issues": 0,
-  "watchers": 4,
+  "watchers": 3,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 1,
-  "subscribers_count": 2
+  "network_count": 0,
+  "subscribers_count": 1
 }

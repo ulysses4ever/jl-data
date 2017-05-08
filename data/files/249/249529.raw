@@ -1,0 +1,27 @@
+using BinDeps
+
+@BinDeps.setup
+
+mesos_root = "~/Development/mesos"
+
+libmesosjl = library_dependency("libmesosjl")
+
+mesosbuilddir = BinDeps.builddir(libmesosjl)
+mesossrcdir = joinpath(BinDeps.depsdir(libmesosjl),"src")
+mesoslib = joinpath(BinDeps.libdir(libmesosjl), libmesosjl.name*"."*BinDeps.shlib_ext)
+
+provides(Sources, URI(mesossrcdir), libmesosjl)
+
+provides(BuildProcess,
+        (@build_steps begin
+            ChangeDirectory(mesosbuilddir)
+            FileRule(mesoslib, @build_steps begin
+                MakeTargets(env=[
+                    utf8("MESOS_ROOT")=>utf8(mesos_root)
+                ])
+                `make`
+                `make install`
+            end)
+        end), libmesosjl, os = :Unix)
+
+@BinDeps.install [ :libmesosjl => :libmesosjl]

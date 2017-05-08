@@ -1,0 +1,4 @@
+function run_test(test_case)
+  job_file = "test/event_based_risk/data/$(test_case)_data.jl"
+  risk_workflow("event_based_risk", job_file)
+end

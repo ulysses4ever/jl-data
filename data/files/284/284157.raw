@@ -1,0 +1,1 @@
+println([(x==0) ? "Hello, World!" : (x%3==0) && (x%5==0) ? "FizzBuzz" : (x%3==0) ? "Fizz" : (x%5==0) ? "Buzz" : x for x in 0:20])

@@ -1,0 +1,64 @@
+using Base.LinAlg.BLAS: dot
+
+"""
+    Swept approximate message-passing (SwAMP) for sparse estimation. See
+        Manoel et. al (2014).
+"""
+function iterate_swamp(y, F, opts)
+    # Parameters
+    x = get(opts, "x", nothing)
+    prior_prmts = get(opts, "prior_prmts", nothing)
+    t_max = get(opts, "t_max", 100)
+    disp = get(opts, "disp", 1)
+
+    if prior_prmts == nothing
+        error()
+    end
+
+    # Init vars, arrays and other structures
+    m, n = size(F)
+    sqrF = F.^2
+
+    A, B = zeros(n), ones(n)
+    a, c = zeros(n), ones(n)
+    w, v = zeros(m), ones(m)
+    dw, dv = zeros(m), zeros(m)
+    g = zeros(m)
+    F2c = zeros(m)
+    d = 1.
+
+    mses = zeros(t_max)
+
+    # Run algorithm
+    tic()
+    for t = 1:t_max
+        F2c = sqrF * c
+        w = (y - F * a) + g .* F2c
+        v = d + F2c
+
+        for i = randperm(n)
+            A[i] = dot(m, sqrF[:, i], 1, 1 ./ v, 1)
+            B[i] = A[i] .* a[i] + dot(m, F[:, i], 1, w ./ v, 1)
+
+            a_new, c_new = prior_gbc(A[i], B[i], prior_prmts)
+            dw, dv = F[:, i] * (a[i] - a_new), sqrF[:, i] * (c_new - c[i])
+            
+            w += dw + g .* dv
+            v += dv
+
+            a[i], c[i] = a_new, c_new
+        end
+
+        g = w ./ v
+        d *= sum(g.^2) / sum(1 ./ v)
+
+        if x != nothing; mses[t] = norm(x - a)^2 / norm(x)^2; end
+        if disp == 1
+            @printf("t = %d, delta = %.4e, mse = %.4e, rss = %.4e\n", 
+                t, d, mses[t], norm(y - F * a)^2 / m)
+        end
+    end
+    elapsed = toq()
+
+    return a, mses, elapsed
+end

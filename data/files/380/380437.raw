@@ -1,0 +1,6 @@
+
+include("../../src/stem/porter.jl")
+
+for line in readlines(open("./voc.txt"))
+    println( stem(strip(line)) )
+end

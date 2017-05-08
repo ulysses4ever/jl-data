@@ -1,0 +1,20 @@
+#=
+@author titus 
+=#
+using   Base.Test
+include("../area.jl")
+
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_area"] = function test_area()
+
+  poly = [(2.28, 3.7), (2.98, 5.36), (3.92, 4.8), (3.9, 3.64), (2.28, 3.7)]
+  @test ==(round(area(poly),4), 1.9164) #true
+  poly = reverse(poly)
+  @test ==(round(area(poly),4), -1.9164) #true  
+  poly = ((3.9,3.64),(3.92,4.8),(2.98,5.36),(2.28,3.7))
+  @test ==(round(area(poly),4), -1.9164) #true
+  ply = [(3.9,3.64),(3.92,4.8),(2.98,5.36),(2.28,3.7),(3.9,3.64)] 
+  @test ==(round(area(poly),4), -1.9164) #true
+end

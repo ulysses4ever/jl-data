@@ -1,0 +1,13 @@
+
+using Base.Test
+
+# test the "utilities" module
+## include("test_utils.jl")
+## using CompLingUtilsTest
+
+include("test_stemmer.jl")
+## using CompLingStemmerTest
+
+include("test_counter.jl")
+
+include("test_tokenizer.jl")

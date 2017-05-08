@@ -1,0 +1,29 @@
+# JuliaJags.jl
+# Autor: ryganon
+# 
+# Código de teste para calcular algumas estatísticas com valores
+# de amostras geradas pelo Jags
+
+require("JagsModule.jl")
+
+import JagsModule.*
+
+# JagsModel params:
+#    1- diretório do modelo jags
+#    2- nome do arquivo de script para o modelo
+#    3- arquivo com os indices das amostras gerado pelo jags
+teste = JagsModel("/air/","run.cmd", "CODAindex.txt")
+
+analise = readSamples(teste)
+
+for i in 1:size(analise,2)
+   
+    teste = analise[1,i]
+    println("Variavel: $(teste.name)")
+
+    println("   mean:   $(teste.statistics.mean)")
+    println("   std:    $(teste.statistics.std)")
+    println("   var:    $(teste.statistics.var)")
+    println("   median: $(teste.statistics.median)")
+    println("----------------------------------")
+end

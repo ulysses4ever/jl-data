@@ -1,0 +1,10 @@
+using Gadfly
+using DataFrames
+using Cairo
+
+input = readtable("./dataTest.txt", separator=' ', header=true)
+inputv = DataFrame(xval = input[:,1], yval = input[:,2])
+
+p1 = plot(x = inputv[:xval], y = inputv[:yval], Geom.line, Geom.point)
+
+draw(SVGJS("./Test.svg", 6inch, 6inch), p1)

@@ -1,0 +1,50 @@
+# Modelling of the acoustic 2d wave equation
+
+include("operators2d.jl")
+include("fwave.jl")
+
+nx = 128;
+ny = 256;
+dx = 10;
+dy = 10;
+
+f = 50.0;
+
+c = ones(nx+1,ny+1).*2000.;
+
+hx = ones(nx,1)*dx;
+hy = ones(ny,1)*dy;
+
+v = ones(nx,ny).*100;
+
+F = zeros(nx+1,ny+1);
+sx = 60;
+sy = 120;
+
+# Operators
+An = averageNode(nx,ny);
+Ae = averageEdge(nx,ny);
+G = gradient(hx,hy);
+A = sdiag(An'*v[:]);
+
+# Parameters
+dt = 0.0004;
+tmax = 0.1;
+nt = round(tmax/dt);
+
+# Initial wave fields
+uprev = zeros(nx+1,ny+1);
+ucurr = uprev;
+count = 1;
+
+# Time loop
+for i=1:nt
+	F[sx,sy] = fwave(i*dt,f);
+	b = -sdiag(An'*v[:])*uprev[:] + 2.*sdiag(An'*v[:])*ucurr[:] - dt^2.*c[:].^2.*((G'sdiag(Ae'*v[:])*G)*ucurr[:]) + sdiag(An'*v[:])*F[:];
+	unew = A\b;
+	uprev = ucurr;
+	ucurr = unew;
+end
+
+
+result = reshape(ucurr,(nx+1,ny+1));

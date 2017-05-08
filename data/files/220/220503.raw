@@ -1,0 +1,162 @@
+#Library containing the essential types for MCITW problem
+#...and some auxiliar functions
+#Copyright(c) 2015: Kally Chung
+
+type Problem
+  cardC::Int
+  cardD::Int
+  cardP::Int
+  cardT::Int
+  CCap::Array{Int,1}
+  CCost::Array{Int,1}
+  DA::Array{Int,1}
+  DS::Array{Int,1}
+  DE::Array{Int,1}
+  DD::Array{Int,2}
+  PA::Array{Int,1}
+  PS::Array{Int,1}
+  PE::Array{Int,1}
+  PD::Array{Int,2}
+end
+
+type Solution
+  feas::Int
+  # 1 - feasible
+  # 0 - infeasible with unassigned pickups
+  #-1 - infeasible with deliveries
+  #-2 - infeasible with TW issues
+  #-3 - infeasible with capacity exceed
+  #-4 - infeasible with negative level of inventory
+  
+  trspCost::Int
+  invCost::Int
+  penCost::Int
+  solX::Array{Int,3}
+  solY::Array{Int,3}
+  solZ::Array{Int,2}
+end
+
+import Base.copy
+function copy( sol::Solution )
+
+  sNew = Solution( sol.feas, sol.trspCost, sol.invCost, sol.penCost, copy(sol.solX), copy(sol.solY), copy(sol.solZ) )
+  
+  return sNew
+end
+
+
+function computeCosts!( prob, sol )
+#checkInventoryLevel
+#===================#
+#check if solZ is accurate
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#
+#   output: bool accur ------------> 0 if is incorrect, 1 otherwise
+
+#checkCostsGIS
+#=============#
+#check if all the costs are accurate
+#
+#    input: type prob ------------> parameters of the problem considered
+#           type sol -------------> current solution for the problem considered
+#
+#   output: bool accur -----------> 0 if is incorrect, 1 otherwise
+
+  #initializing variables
+  auxC = 0
+  auxT = 0
+  auxBin = 0
+  sol.trspCost = 0
+  sol.invCost = 0
+  sol.penCost = 0
+  for k in 1:(prob.cardC)
+    for t in 1:(prob.cardT)
+      sol.solZ[ k, t ] = 0
+    end
+  end
+  
+  #compute inventory level - delivery
+  for i in 1:(prob.cardD)
+    auxC = 0
+    auxT = 0  
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solX[ i,k,t ] == 1 )
+          auxC = k
+          auxT = t
+        end
+      end
+    end
+    
+    if ( auxC != 0 )
+      for t in auxT:(prob.cardT)
+        sol.solZ[ auxC, t ] += prob.DA[i]
+      end
+    end
+  end
+  
+  #compute inventory level - pickup
+  for j in 1:(prob.cardP)
+    auxC = 0
+    auxT = 0  
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          auxC = k
+          auxT = t
+        end
+      end
+    end
+    
+    if ( auxC != 0 )
+      for t in auxT:(prob.cardT)
+        sol.solZ[ auxC, t ] -= prob.PA[j]
+      end
+    end
+  end
+  
+  #compute transportation cost
+  for i in 1:(prob.cardD)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solX[ i,k,t ] == 1 )
+          sol.trspCost += prob.DD[ i, k ]
+        end
+      end
+    end
+  end
+  for j in 1:(prob.cardP)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          sol.trspCost += prob.PD[ j, k ]
+        end
+      end
+    end
+  end
+  
+  #compute inventory cost
+  for k in 1:(prob.cardC)
+    for t in 1:prob.cardT
+      sol.invCost += prob.CCost[k] * sol.solZ[ k, t ]
+    end
+  end
+
+  #compute penalty cost
+  for j in 1:(prob.cardP)
+    auxBin = 0
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          auxBin = 1
+        end
+      end
+    end
+    if ( auxBin == 0 )
+      sol.penCost += 1
+    end
+  end
+  
+end

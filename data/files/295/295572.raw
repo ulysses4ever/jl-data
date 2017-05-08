@@ -1,0 +1,39 @@
+const BLANK = 0
+const ONES = 0b1111111110
+
+InBlock = Array(Int, 81)
+InRow = Array(Int, 81)
+InCol = Array(Int, 81)
+
+SeqPtr = 1
+Sequence = Array(Int, 81)
+
+Entry = Array(Int, 81)
+Block = Array(Int, 9)
+Row = Array(Int, 9)
+Col = Array(Int, 9)
+
+Count = 0
+LevelCount = Array(Int, 81)
+
+function initialize()
+  for i = 1:9; for j = 1:9
+      Square = 9 * (i - 1) + (j - 1) + 1
+      InRow[Square] = i
+      InCol[Square] = j
+      InBlock[Square] = floor((i-1)/3) * 3 + floor((j-1)/3) + 1
+    end
+
+    for i = 1:81
+      Sequence[i] = i
+      Entry[i] = BLANK
+      LevelCount[i] = 0
+    end
+
+    for i = 1:9
+      Block[i] = ONES;
+      Row[i] = ONES;
+      Col[i] = ONES;
+    end
+  end
+end

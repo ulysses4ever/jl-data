@@ -1,0 +1,42 @@
+
+function indices_frame_to_frame(indices_frame::IndicesFrame,length::Int)
+  frame=Frame(length)
+  frame[:]=false
+  frame[indices_frame]=true
+  frame
+end
+
+#SequentialPattern(feature::Int,features::Int)=SequentialPattern(IndicesFrame[[feature]],features)
+SequentialPattern(indices_sp::IndicesFrame,features::Int)=SequentialPattern(IndicesFrame[indices_sp],features)
+
+function SequentialPattern(indices_sp::IndicesSequentialPattern,features::Int)
+  frames=length(indices_sp)
+  sp=SequentialPattern(features,frames)
+  sp[:,:]=false
+  for i=1:frames
+    frame=indices_sp[i]
+    for j=1:length(frame)
+        sp[frame[j],i]=1
+    end
+  end
+  sp
+end
+
+function print(io::IO,sps::Vector{SequentialPattern})
+  features=maximum(map(sp -> size(sp,1),sps))
+
+  iobuffer = IOBuffer()
+  #print(iobuffer,"Sequential Pattern: ($features features, $frames frames)\n")
+  for i=1:features
+    for sp=sps
+      _,frames=size(sp)
+      for j=1:frames
+        print(iobuffer,sp[i,j]?"1":"0")
+      end
+      print(iobuffer," ")
+    end
+    println(iobuffer,"");
+  end
+  print(io,takebuf_string(iobuffer))
+
+end

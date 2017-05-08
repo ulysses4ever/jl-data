@@ -1,0 +1,24 @@
+# How many routes are there from the top left corner to the bottom right corner
+# of a 20×20 grid when only allowed to move down and right?
+
+function numroutesgrid(n::Int)
+    grid = zeros(Int, n, n)
+
+    grid[:, 1] = 1
+    grid[1, :] = 1
+
+    for i in 2:n
+        for j in 2:n
+            grid[i, j] = grid[i - 1, j] + grid[i, j - 1]
+        end
+    end
+    println(grid)
+    return grid[n, n]
+end
+
+
+@time res = numroutesgrid(21)
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

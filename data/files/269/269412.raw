@@ -1,0 +1,195 @@
+module Population
+
+
+using Config
+using Genotype
+using Preallocation
+
+
+type Type_Population
+
+    genotypes::Array{Genotype.Type_Genotype, 1}
+    children::Array{Genotype.Type_Genotype, 1}
+    fitness_vals_1::Dict{Int64, Float64}
+    fitness_vals_2::Dict{Int64, Float64}
+    target_number::Int64
+
+    average_fitness::Float32
+    best::Genotype.Type_Genotype
+
+    preallocation::Preallocation.Type_Preallocation
+
+end
+
+
+function make_population(config_vals::Config.Type_Config_Values)
+
+    genotypes::Array{Genotype.Type_Genotype, 1} = Genotype.Type_Genotype[]
+
+    for i = 1:config_vals.population_size
+        push!(genotypes, Genotype.make_random_genotype(config_vals))
+    end
+    
+    children::Array{Genotype.Type_Genotype, 1} = Genotype.Type_Genotype[]
+
+    for i = 1:config_vals.births_and_deaths_per_generation
+        push!(children, Genotype.make_random_genotype(config_vals))
+    end
+
+    layer_1_weights = zeros(Float32, config_vals.num_input_nn_nodes * config_vals.num_hidden_nn_nodes)
+    layer_2_weights = zeros(Float32, config_vals.num_output_nn_nodes * config_vals.num_hidden_nn_nodes)
+    inputs = zeros(Float32, config_vals.num_input_nn_nodes)
+    hidden_activations = zeros(Float32, config_vals.num_hidden_nn_nodes)
+    outputs = zeros(Float32, config_vals.num_output_nn_nodes)
+    fitness_ref = [convert(Float32, 1)]
+    if config_vals.wall_avoidance_objective
+        walls = config_vals.single_island_walls
+    else
+        walls = config_vals.waypoint_collection_walls
+    end
+
+    preallocation::Preallocation.Type_Preallocation = Preallocation.Type_Preallocation(layer_1_weights, layer_2_weights, 
+                                                                                       inputs, hidden_activations, outputs, 
+                                                                                       fitness_ref, walls)
+
+    return Type_Population(genotypes, children, Dict{Int64, Float64}(), Dict{Int64, Float64}(),
+                           convert(Int32, 1), convert(Float32, 0.0), genotypes[1], preallocation)
+
+end
+
+
+function switch_target(population::Type_Population, config_vals::Config.Type_Config_Values, repetition::Int64, generation::Int64)
+
+    if config_vals.print_on_target_switch
+        println(generation, " ", population.target_number, "    ", population.average_fitness, " ", population.best.fitness)
+    end
+
+    max_target_number = 0
+    if config_vals.logic_network
+        max_target_number = length(config_vals.logic_network_outputs[:, 1])
+    else
+        max_target_number = length(config_vals.target_expressions[:, 1])
+    end
+
+    new_target = population.target_number
+
+    while new_target == population.target_number
+        new_target = rand(1:max_target_number)
+    end
+
+    population.target_number = new_target
+
+    for genotype in population.genotypes
+        genotype.evaluated = false
+    end
+
+    evaluate(population, config_vals)
+
+    return 0
+
+end
+
+
+function evaluate(population::Type_Population, config_vals::Config.Type_Config_Values)
+    
+    for genotype in population.genotypes
+            Genotype.evaluate(genotype, config_vals, population.target_number, population.preallocation)
+    end
+    
+    for genotype in population.children
+            Genotype.evaluate(genotype, config_vals, population.target_number, population.preallocation)
+    end
+
+    sum = 0
+    population.average_fitness = 0
+    population.best = population.genotypes[1]
+
+    for k = 1:length(population.genotypes)
+        sum += population.genotypes[k].fitness
+        if population.genotypes[k].fitness > population.best.fitness
+            population.best = population.genotypes[k]
+        end
+    end
+    
+    population.average_fitness = sum / config_vals.population_size
+
+    return 0
+end
+
+
+function print_stats(population::Type_Population, config_vals::Config.Type_Config_Values, repetition::Int64, generation::Int64) 
+
+    if config_vals.interval_printing & ((generation % config_vals.generations_per_target_switch) in config_vals.print_times)
+        println(generation % config_vals.generations_per_target_switch, " ", population.target_number, "   ", 
+                population.average_fitness, " ", population.best.fitness)
+    end
+    if config_vals.experiment_printing
+        print(repetition, " ", generation, " ", population.max_fitness, " ", population.average_fitness, " ")
+        mutation_sum::Int128 = 0
+    end
+
+    return 0
+
+end
+
+
+function breed_and_exterminate(population::Type_Population, config_vals::Config.Type_Config_Values)
+
+    for i = 1:config_vals.births_and_deaths_per_generation
+        index_to_breed = 1
+        highest_fitness::Float32 = -1
+
+        for j = 1:config_vals.breeding_tournament_size
+            new_index = rand(1:length(population.genotypes))
+            if population.genotypes[new_index].fitness > highest_fitness
+                index_to_breed = new_index
+                highest_fitness = population.genotypes[new_index].fitness
+            end
+        end
+        
+        Genotype.copy_into(population.children[i], population.genotypes[index_to_breed])
+        if config_vals.use_global_mutation_rate
+            Genotype.mutate_at_global_rate(population.children[i], config_vals)
+        else
+            Genotype.point_mutate(population.children[i], config_vals)
+        end
+
+    end
+
+    evaluate(population, config_vals)
+
+    # Implementation of elitist survivor selection amongst children and adults
+    # Shuffle first to ensure random order of equal fitness genotypes
+    genotype_indeces = collect(1:config_vals.population_size)
+    shuffle!(genotype_indeces)
+    permute!(population.genotypes, genotype_indeces)
+    
+    sort!(population.genotypes, by = x -> x.fitness, rev = true)
+
+    children_indeces = collect(1:config_vals.births_and_deaths_per_generation)
+    shuffle!(children_indeces)
+    permute!(population.children, children_indeces)
+    
+    sort!(population.children, by = x -> x.fitness, rev = true)
+
+    children_index = 1
+ 
+    for i = 1:config_vals.population_size
+        if children_index <=  config_vals.births_and_deaths_per_generation
+            if (population.genotypes[i].fitness < population.children[children_index].fitness) | ((population.genotypes[i].fitness == population.children[children_index].fitness) & convert(Bool, rand(0:1)))
+
+                insert!(population.genotypes, i, population.genotypes[config_vals.population_size])
+                pop!(population.genotypes)
+                Genotype.copy_into(population.genotypes[i], population.children[children_index])
+                children_index += 1
+
+            end
+        end
+    end
+
+    return 0
+
+end
+
+
+end

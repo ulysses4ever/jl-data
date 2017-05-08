@@ -1,0 +1,58 @@
+function baum_welch!(hmm::betabinom_HMM, max_iter, tol, scaling)
+    # convergence history of the fit, log-liklihood
+    ch = (Float64)[]
+
+    for k = 1:max_iter
+        # E step
+        log_p_obs, x, g = calc_stats(hmm,o,scaling)
+        push!(ch, log_p_obs)
+        
+        # Test for convergence
+        if length(ch)>1 && (ch[end]-ch[end-1] < tol)
+            println("Baum-Welch converged, stopping early")
+            break
+        end
+
+        # M step (re-estimation)
+        re_estimate!(hmm, o, x, g)
+    end
+
+    return ch
+end
+
+function re_estimate!(hmm::betabinom_HMM,x,g)
+    # Update hmm.A 
+    for i = 1:hmm.n_states
+        denom = sum(g[1:end-1,i]) # Expected number of transitions from state 'i'
+        for j = 1:hmm.n_states
+            # Numerator is the expected number of transitions from state 'i' to 'j' 
+            A[i,j] = sum(x[:,i,j]) / denom
+        end
+    end
+
+    # Update betabinomial parameters
+    for i = 1:hmm.n_states
+        for z = 1:hmm.n_ctxt
+            ind = hmm.c .== z # only consider observations in nucleotide context z
+            wt = g[ind,i]     # weight observations by probability of being in state 'i'
+
+            x0 = [1.0,1.0] # initial guess
+
+            # TODO: Use method of moments to get a rough estimate of betabinomial params
+            #wtn = wt / sum(wt) # normalize weights 
+            #m1 = sum(wtn*hmm.o[ind])/sum(wtn*hmm.k[ind])       # sample first moment
+            #m2 = sum(wtn*hmm.o[ind].^2)/sum(wtn*hmm.k[ind].^2) # sample second moment
+
+            # Use Optim.jl to find maximum likelihood betabinomial parameters
+            f = create_bb_objective_func(hmm.k[ind],hmm.o[ind],wt)
+            g! = create_bb_gradient_func(hmm.k[ind],hmm.o[ind],wt)
+            h! = create_bb_hessian_func(hmm.k[ind],hmm.o[ind],wt)
+
+            hmm.B[i,z,:] = optimize(f, g!, h!, x0, method = :newton)
+        end
+    end
+
+    # Update hmm.p (initial state variables)
+    hmm.p = vec(g[1,:])
+end
+

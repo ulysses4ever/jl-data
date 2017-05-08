@@ -1,0 +1,7 @@
+# Ricker wavelet
+function fwave(t,f)
+	agauss = 0.5*f;
+	tcut = 1.5/agauss;
+	s = (t-tcut)*agauss;
+	res = exp(-2.*s^2.)*cos(2.*pi*s);
+end

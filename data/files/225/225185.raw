@@ -1,0 +1,10 @@
+function Run()
+	sumsquares = 0
+	sum = 0
+	for i = 1:100
+		sum += i
+		sumsquares += i^2
+	end
+	return sum^2 - sumsquares
+end
+

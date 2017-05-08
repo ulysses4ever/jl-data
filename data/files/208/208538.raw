@@ -1,0 +1,8 @@
+
+ssq = @parallel (+) for i in 1:100
+    i^2
+end
+sm = @parallel (+) for i in 1:100
+    i
+end
+println(sm^2  - ssq)

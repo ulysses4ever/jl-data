@@ -1,0 +1,87 @@
+function d_assign_call{T}(ops,ex,state,c::CallExpr{T}) 
+    lhs = ex.args[1]::Active
+    rhs = ex.args[2].args[2:end]
+    newargs = {}
+    newrhs = {(isa(x,Active) ? sym(x) : x) for x in rhs}
+    actives = find(x->isa(x,Active),rhs)
+    #if we call a 1-arg fn, or a fn with one active argument e.g. :(h=sin(z)), then want to return e.g. :(dz += sin(SeedWihVal(dh),WRT(z)))
+    drhs = d_call(c, (sym(lhs)), (dsym(lhs)), newrhs...  )
+    if length(actives) == 1
+        ii = actives[1]
+        if length(rhs) > 1
+            drhs = drhs.args[ii]
+        end
+        push!(newargs,Expr(ops[ii],dsym(rhs[ii]), drhs))
+        #push!(newargs,Expr(ops[ii],dsym(rhs[ii]), Expr(:call,T,:(SeedWithVal($(sym(lhs)),$(dsym(lhs)))), newrhs...  )))
+    else #otherwise, call the function once, then increment the derivs w/r/t the various args
+        t = gensym("temp")
+        push!(newargs,Expr(:(=),t,Expr(:tuple,drhs[actives]...)))
+        for (ll,ii) in enumerate(actives)
+            push!(newargs,Expr(ops[ii],dsym(rhs[ii]),t[ll]))
+        end
+    end
+    newargs
+end
+
+#########################################
+## a couple of hand-coded d_assign_call fns below
+#these don't use d_call(), but maybe they should
+function d_assign_call(ops,ex,state,c::CallExpr{:+})
+    newargs = {}
+    lhs = ex.args[1]::Active
+    for (ix,rhsArg) in enumerate(ex.args[2].args[2:end])
+        if isa(rhsArg,Active)
+            push!(newargs,Expr(ops[ix],dsym(rhsArg),dsym(lhs)))
+        end
+    end
+    newargs
+end
+
+function d_assign_call(ops,ex,state,c::CallExpr{:*})
+    newargs = {}
+    lhs = ex.args[1]::Active
+    rhs = ex.args[2].args[2:end]
+    if length(rhs) > 2
+        error("grad can't (yet) accept *(a,b,...) with >2 args")
+    end
+    if isa(rhs[1],Active)
+        push!(newargs,Expr(ops[1],dsym(rhs[1]),:($(dsym(lhs))*$(sym(rhs[2])))))
+    end
+    if isa(rhs[2],Active)
+        push!(newargs,Expr(ops[2],dsym(rhs[2]),:($(sym(rhs[1]))'*$(dsym(lhs))) ))
+    end
+    newargs
+end
+
+#########################################
+#macros to generate d_call(...) functions
+#want to generate e.g. d_call(::CallExpr{:exp},y,dy,x) = :($y.*$dy) from  inputs (:exp, y.*dy)
+macro dcall_2arg(f, ex)
+    rhsExpr = Expr(:quote,ex)
+    esc(quote
+        function d_call(::CallExpr{$f},y,dy,x1,x2)
+            mydict = [:y=>y, :dy=>dy, :x1=>x1, :x2=>x2]
+            walk(arg->get(mydict,arg,arg), $rhsExpr)
+        end
+    end)
+end
+
+macro dcall_1arg(f, ex)
+    rhsExpr = Expr(:quote,ex)
+    esc(quote
+        function d_call(::CallExpr{$f},y,dy,x)
+            mydict = [:y=>y, :dy=>dy, :x=>x]
+            walk(arg->get(mydict,arg,arg), $rhsExpr)
+        end
+    end)
+end
+
+@dcall_1arg     :exp           y.*dy
+@dcall_1arg     :sin           cos(x).*dy
+@dcall_1arg     :cos          -sin(x).*dy
+@dcall_1arg     :maximum       (x.>=y).*dy
+@dcall_1arg     :-             -dy
+
+@dcall_2arg     :dot        (x2.*dy, x1.*dy)
+
+d_Call{T}(::CallExpr{T},y,dy,x...) = error("d_call can't differentiate $T with arguments $(x...)")

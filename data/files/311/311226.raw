@@ -1,0 +1,36 @@
+"""
+    First and second cumulants of 
+    
+        P(x) = GB(x; rho, m_pr, v_pr) * N(x; r, s)
+"""
+function prior_gb(r, s, prmts)
+    rho, m_pr, v_pr = prmts
+    
+    m_eff = (m_pr .* s + r .* v_pr) ./ (s + v_pr)
+    v_eff = v_pr .* s ./ (s + v_pr)
+
+    z = ((1. - rho) / rho) * sqrt(v_pr ./ v_eff) .*
+        exp(-.5 .* ( r .^ 2 ./ s - (m_pr - r) .^ 2 ./ (s + v_pr) ))
+    a = m_eff ./ (z + 1)
+    c = z .* a .^ 2 + v_eff ./ (z + 1)
+
+    return a, c
+end
+
+"""
+    First and second cumulants of 
+    
+        P(x) = GB(x; rho, m_pr, v_pr) * N(x; B/A, 1/A)
+"""
+function prior_gbc(A, B, prmts)
+    rho, m_pr, v_pr = prmts
+
+    beta, alpha = m_pr / v_pr, 1 / v_pr
+
+    z = ((1. - rho) / rho) * sqrt(1. + A ./ alpha) .*
+        exp(-.5 .* ( beta .^ 2 ./ alpha + (B + beta) .^ 2 ./ (A + alpha) ))
+    a = ( (B + beta) ./ (A + alpha) ) ./ (z + 1)
+    c = z .* a .^ 2 + ( 1 ./ (A + alpha) ) ./ (z + 1)
+
+    return a, c
+end

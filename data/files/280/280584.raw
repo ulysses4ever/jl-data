@@ -1,0 +1,19 @@
+using Spike
+
+# create window instance: width 400, height 400, "title", xpos, ypos 
+window = WindowInstance(400,400,"Making a window with Spike", 0, 0)
+
+
+# bool of whether or not window is open, requires type WindowInstance
+while open(window)
+
+	# requires type WindowInstance, clears window
+	clear(window)
+
+	# requires type WindowInstance, swaps buffer and polls events
+	update(window)
+
+end
+
+# end OpenGL
+terminate()

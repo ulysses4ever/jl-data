@@ -1,0 +1,15 @@
+using Romeo
+
+server = HttpServer(6060) do req::Request, res::Response
+    res.data = "Hello World!"
+end
+
+Event(server, "listening") do server::HttpServer
+    log(INFO, "listening on port $(server.port)")
+end
+
+Event(server, "request") do server::HttpServer, req::Request, res::Response
+    log(DEBUG, req.method, "=>", req.path)
+end
+
+run(server)

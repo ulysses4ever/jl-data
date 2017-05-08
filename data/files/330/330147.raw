@@ -1,0 +1,20 @@
+# this may be required in order for it all to work porperly.
+Pkg.build("TextAnalysis")
+Pkg.build("HDF5")
+Pkg.build("LIBSVM") # throws a bunch of warnings.... :s
+
+# get the needed packages
+Pkg.add("DataFrames")
+Pkg.add("TextAnalysis")
+Pkg.add("MAT")
+Pkg.add("LIBSVM")
+# Pkg.add("PyCall") # not sure. Might be relevant for the TextAnalysis.jl as this might be a wrapper of python calles to NLTK
+
+Pkg.update()
+
+
+# using PyCall
+using DataFrames
+using TextAnalysis
+using MAT
+using LIBSVM

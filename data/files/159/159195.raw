@@ -1,0 +1,70 @@
+module TestUtils
+import RDatasets
+using SequentialPatterns
+
+export iris_dataset,iris_dataset_binary,lsa64_kadir_dataset
+
+function iris_dataset()
+  iris = RDatasets.dataset("datasets", "iris")
+  x = convert(Array,iris[:, 1:end-1])
+  label_strings=convert(Array,iris[:, end])
+  label_to_index = Dict("setosa"=> 1, "versicolor"=> 2, "virginica"=> 3)
+  y = map( (label -> label_to_index[label]),label_strings)
+  data=Vector{Float64}[]
+  for i=1:size(x,1)
+    push!(data,x[i,:][:])
+  end
+  data,y,label_strings
+  # println(x)
+  # println(labels_string)
+  # println(y)
+end
+
+function iris_dataset_binary()
+  x,y,label_strings=iris_dataset()
+  y[y.==1]=-1
+  y[y.==2]=1
+  y[y.==3]=1
+  x,y,label_strings
+  # println(x)
+  # println(labels_string)
+  # println(y)
+end
+
+using MAT
+
+function lsa64_kadir_dataset()
+  vars = matread("lsa64_features_kadir_spb.mat")["db_features"]
+  matlab_features=vars["kadir_features_spb"]
+  n=length(matlab_features)
+
+  y=vars["class"]
+  y=convert(Vector{Int},vec(y))
+
+  subjects=vars["subject"]
+  subjects=convert(Vector{Int},vec(subjects))
+
+  features=41
+  sps=SequentialPatterns.SequentialPattern[]
+  for i=1:n
+    matlab_feature=matlab_features[i]
+    indices_sp=SequentialPatterns.IndicesSequentialPattern()
+    for j=1:length(matlab_feature)
+      matlab_frame=matlab_feature[j]
+      if (length(matlab_frame)==1)
+        frame=[convert(Int,matlab_frame)]
+      else
+        frame=convert(Vector{Int},vec(matlab_frame))
+      end
+      push!(indices_sp,frame)
+    end
+    sp=SequentialPatterns.SequentialPattern(indices_sp,features)
+    push!(sps,sp)
+  end
+
+  sps,y,subjects
+end
+
+
+
+end

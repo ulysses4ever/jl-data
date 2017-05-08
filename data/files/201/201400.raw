@@ -1,0 +1,12 @@
+module FracjackRun
+
+using Fracjack
+
+export go
+
+function go_show()
+    gen_pal!()
+    gen_show()
+end
+
+end

@@ -1,0 +1,638 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+abstract IRecognitionMode
+
+type RecognitionModeK1 <: IRecognitionMode
+
+end
+
+type RecognitionModeK2 <: IRecognitionMode
+
+end
+
+type NoRecognitionMode <: IRecognitionMode
+
+end
+
+abstract IState
+
+type State <: IState
+    _id::Int64
+    _transitions::Dict{Any,Any}
+end
+
+type NullState <: IState
+end
+
+abstract IStateKey;
+
+# State A is the first character considered in a repetitive seq. eg: A in AAA
+type StateKeyA <: IStateKey
+end
+
+# State B is the second unique character considered in a repetitive seq. eg: B in ABABABAB
+type StateKeyB <: IStateKey
+end
+
+# State C is the third unique character considered in a repetitive seq. eg: C in BACBACBACBAC
+type StateKeyC <: IStateKey
+end
+
+# State A' is the first character considered in a repetitive seq. eg: A in AAA
+type StateKeyAprime <: IStateKey
+end
+
+# State B' is the second unique character considered in a repetitive seq. eg: B in ABABABAB
+type StateKeyBprime <: IStateKey
+end
+
+# State C' is the third unique character considered in a repetitive seq. eg: C in BACBACBACBAC
+type StateKeyCprime <: IStateKey
+end
+
+type StateKeyNull <: IStateKey
+end
+
+type RecognitionStackEntry
+    _recognitionMode::IRecognitionMode
+    _currentIndexInTarget::Int64
+    _target::Array{Char}
+end
+
+# organized with entries containing (repitionLength,currentPlace,"AB"}
+type RecognitionStack
+    _entries::Array{RecognitionStackEntry}
+end
+
+##################################################################################
+
+
+
+##################################################################################
+
+function hash(stateKey::StateKeyA)
+    return 1
+end
+
+function hash(stateKey::StateKeyB)
+    return 2
+end
+
+function hash(stateKey::StateKeyC)
+    return 3
+end
+
+function hash(stateKey::StateKeyAprime)
+    return 4
+end
+
+function hash(stateKey::StateKeyBprime)
+    return 5
+end
+
+function hash(stateKey::StateKeyCprime)
+    return 6
+end
+
+function hash(stateKey::StateKeyNull)
+    return 7
+end
+
+function pop(array::Array{RecognitionStackEntry})
+    println("POPPING ::Array{RecognitionStackEntry}")
+
+    if isempty(array)
+        return RecognitionStackEntry(NoRecognitionMode(),0,[' '])
+    else
+        poppedElement = array[end]
+        ccall(:jl_array_del_end, Void, (Any, Uint), array, 1)
+        return poppedElement
+    end
+end
+
+##################################################################################
+
+
+##################################################################################
+
+function pop(recognitionStack::RecognitionStack)
+    return pop(recognitionStack._entries)
+end
+
+function nwstring(A::StateKeyA)
+    return "<StateKey:A>"
+end
+
+function nwstring(B::StateKeyB)
+    return "<StateKey:B>"
+end
+
+function nwstring(C::StateKeyC)
+    return "<StateKey:C>"
+end
+
+# we have to use this fn when printing State ob; to prevent print from trying recusrsively print 
+#  all the State obj's member field details - because some objects are self-referencing through dictionaries
+#  and type inference by default tries to evaluate the "whole type"...
+function nwstring(state::State)
+    return strcat("<State:",string(state._id),">")
+end
+
+function nwstring(state::NullState)
+    return "<State:NullState>"
+end
+
+abstract PushDownAutomata
+
+type RecognitionPDA <: PushDownAutomata
+    _stack::RecognitionStack
+    _startState::IState
+    _currentState::IState
+    _visitedStates::Array{State}
+    _corePattern::Array{State}
+    _isCorePatternSet
+end
+
+##################################################################################
+
+##################################################################################
+
+function getTransitionMap(state::State)
+    return state._transitions;
+end
+
+function createState(id::Int64)
+    return State(id, Dict())
+end
+
+function init(state::State,transitions::Array{Dict{Any,Any}})
+    del_all(state._transitions)
+
+    print("\nInit(")
+    print(state)
+    println(")")
+
+    for transition in transitions
+        println(transition)
+        state._transitions = merge(state._transitions, transition)
+    end
+
+    ## tests ##
+    for transition in transitions
+        ## for each dictionary check that the keys all address a value ##
+        for key in keys(transition)
+            val = get(state._transitions, key, NullState())
+            
+            print("\t -- ")
+            print(key)
+            print(" => ")
+            show(nwstring(val))
+            print("\n")
+        end
+    end
+
+    print("\n")
+end
+
+function createRecognitionStack()
+    return RecognitionStack([RecognitionStackEntry(NoRecognitionMode(),0,[' '])])
+end
+
+function createRecognitionPDA(stack::RecognitionStack,startState::IState)
+    return RecognitionPDA(stack,startState,startState,[startState],[startState],false)
+end
+
+function addToVisitedStates(pda::RecognitionPDA,state::IState)
+    push(pda._visitedStates,state)
+end
+
+function clearVisitedStates(pda::RecognitionPDA)
+    del_all(pda._visitedStates)
+    push(pda._visitedStates, pda._startState)
+end
+
+function getVisitedStates(pda::RecognitionPDA)
+    return pda._visitedStates
+end
+
+function getEntries(stack::RecognitionStack)
+    return stack._entries
+end
+
+function isCorePatternSet(pda::RecognitionPDA)
+    return pda._isCorePatternSet
+end
+
+function getLengthOfCurrentPattern(pda::RecognitionPDA)
+# if pattern is set return the length of corePattern
+
+# if pattern is not set, then return the length of the curren 'visited' (this gives us a conservative estimate 
+# still if recognition cannot verify pattern quick enough. For example it may take two cycles to recognize 
+# ABCABC as a pattern of ABC. By returning the leOfOccurences is evaluated we'll have the 
+# length(inputStream)/(lengthOfCorePattern=length(InputStream)) 
+# and technically we're still right and if we're ever off (the error in our case is negligable) 
+# eg. In the above case when it sees AB  it SHOULD assume a pattern with a number of occurences of 1. That pattern would be 'AB'.
+# For ABC ABC we get 1, which is good and dead on again, but at this point the pattern hasn't actually been 
+# recognized (maybe this is my fault...) but the result is gotten just as easily by dividing the length of the
+# input by the length of the list of states visited (which are exactly the same number in this case -- when pattern is not set)
+# For ABC ABCA we actually still get 1.3333 because by this time we've recognized the letter patten and 4/3=1.333 
+# Ooooops. I think our recognizer IS BROKEN (logically). ABAABAABA, is this RECOGNIZED as 3 letter pattern...
+# I don't think so. todo:will Fix this please. 
+# From the start it's possible that we have a "pattern whose core is one letter, or two, or three" that can  of 1, until we know for sure that the 
+# pattern occurs twice and then it'll start counting the number of occurences "correctly"
+# And if we havee ABCB (automata does not recognize), remember that
+# we usually evaluate this putting an input to the RecognitionPDA. The PDA would actually reset to 'B' as A
+# and will STILL return 1, because it still be a pattern of A with a core whose length is 1.
+
+    if pda._isCorePatternSet
+        return length(pda._corePattern)
+    else
+        return length(pda._visitedStates) - 1
+    end
+end
+
+function pushToStack(pda::RecognitionPDA, entry::RecognitionStackEntry)
+    pdaStack = pda._stack
+    stackEntries = getEntries(pdaStack)
+    push(stackEntries, entry)
+end
+
+function popTopOfStack(pda::RecognitionPDA)
+    pdaStack = pda._stack
+    stackEntries = getEntries(pdaStack)
+    poppedEntry = pop(stackEntries)
+
+    return poppedEntry
+end
+
+##################################################################################
+##################################################################################
+
+function getNextState(aState::IState, input::IStateKey)
+    nextState = get(getTransitionMap(aState), input, NullState())
+    return nextState
+end
+
+# creates push down automata for pattern recognition 
+function createRecognitionPDA()
+    ## state definitions ##
+    s0 = createState(0)
+    s1 = createState(1)
+    s2 = createState(2)
+    s3 = createState(3)
+    s4 = createState(4)
+    s5 = createState(5)
+    s6 = createState(6)
+    s7 = createState(7)
+    s8 = createState(8)
+    s9 = createState(9)
+    s10 = createState(10)
+    s11= createState(11)
+    s12 = createState(12)
+
+    print("\n")
+    show(s0)
+
+    ## transition defns ##
+    init(s0, [{StateKeyA()=>s1}, {StateKeyAprime()=>s7}])
+
+    ## k1 ##
+    init(s1, [{StateKeyA()=>s1}, {StateKeyB()=>s2}])
+    init(s2, [{StateKeyA()=>s3}, {StateKeyC()=>s4}])
+      init(s3, [{StateKeyB()=>s2}])
+    init(s4, [{StateKeyA()=>s5}])
+      init(s5, [{StateKeyB()=>s6}])
+        init(s6, [{StateKeyC()=>s4}])
+
+    ## k2 ##
+    init(s7, [{StateKeyAprime()=>s7}, {StateKeyBprime()=>s8}])
+    init(s8, [{StateKeyAprime()=>s9}, {StateKeyCprime()=>s10}])
+      init(s9, [{StateKeyBprime()=>s8}])
+    init(s10, [{StateKeyAprime()=>s11}])
+      init(s11, [{StateKeyBprime()=>s12}])
+        init(s12, [{StateKeyCprime()=>s10}])
+
+    ## tests ##
+    testS0_1 = getNextState(s0, StateKeyC())
+    println(nwstring(testS0_1))
+
+    testS0_2 = getNextState(s0, StateKeyA())
+    println(nwstring(testS0_2))
+
+    if isa(typeof(testS0_1),Type{NullState})
+        println("S0_1 Test Succeeded")
+    else
+        println("S0_1 Test Failed")
+    end
+
+    if isa(typeof(testS0_2),Type{NullState})
+        println("S0_2 Test Failed\n")
+    else
+        println("S0_2 Test Succeeded\n")
+    end
+
+    recognitionStack = createRecognitionStack()
+
+    recognitionPDA = createRecognitionPDA(recognitionStack, s0)
+
+    # just testing out basic functionality of recognition stack
+    topOfRecognitionStack = popTopOfStack(recognitionPDA)
+    print("Test(1) - Top Of Recognition Stack: ")
+    println(topOfRecognitionStack)
+
+    topOfRecognitionStack._recognitionMode = RecognitionModeK1()
+    topOfRecognitionStack._currentIndexInTarget = topOfRecognitionStack._currentIndexInTarget + 1
+    topOfRecognitionStack._target = ['C']
+    pushToStack(recognitionPDA, topOfRecognitionStack)
+
+    topOfRecognitionStack1 = popTopOfStack(recognitionPDA)
+    print("Test(2) - Top Of Recognition Stack: ")
+    println(topOfRecognitionStack1)
+
+    push(topOfRecognitionStack1._target, 'G')
+    topOfRecognitionStack1._currentIndexInTarget = topOfRecognitionStack1._currentIndexInTarget + 1
+    pushToStack(recognitionPDA, topOfRecognitionStack1)
+
+    topOfRecognitionStack2 = popTopOfStack(recognitionPDA)
+    print("Test(3) - Top Of Recognition Stack: ")
+    println(topOfRecognitionStack2)
+
+    return recognitionPDA
+end
+
+
+# todo:will - (1) we need to extract lenth of core repeition string once we know it.
+#  easiest way is to do this to keep a list of visited IStates, each time we comes accross
+#  one we check it against all those in list, if one is matched that is NOT s0 or NullState, we know that
+#  the core repition string is from the point  in the list matched and onward. Then we don't need to upate
+#  the list while pattern is still valid. Once we get NullState or s0, we know to clear the array and start 
+#  looking again.
+# todo:will - (2) we need to switch from k1 to k2, and sort of get rid of the concept of tracking different
+#  sequences, not sure what to call it - (we're really just creating two different contexts fro back to back
+#  patterns each different 
+function tickPDAGivenInput(pda::RecognitionPDA, input::Char)
+    print("Ticking '")
+    print(input)
+    println("'")
+
+    topRecognitionStackEntry = popTopOfStack(pda)
+
+    println(topRecognitionStackEntry)
+
+    # if top of stack is empty, then we know:
+    #   1) either PDA just initialized or reset due to non occurence
+    #       of expected value in target pattern.
+    #   2) _ index = 0 and _target=[] should be only StackEntry (if any).
+    #   3) the choices for StateKey will be {StateKeyA,StateKeyAprime}, which one
+
+    # Friday 11:00pm, new strategy.We choose StateKey(A_n) entirely by whether its the nth unique character
+    # where A_n = (char) 125 + n   (ASCII - so 1st unique is 126, 2nd is 127, 3rd is 128. -- and it takes
+    #                               no more than the target length to determine what n is. For our
+    #                               purposes we have 4 letters in the alphabet, and the actual automata
+    #                               currently only recognizes patterns only 3 letters at a time -
+    #                               a fourth unique character in the input will always break the pattern.
+    #                               More, generally another way of breaking the pattern would be to have
+    #                               out of place characters in input. So say StateKeyA and StateKeyB
+    #                               and StateKeyC are both valid and the pattern in some imaginary
+    #                               automata is ABBA. Already we have "toot", a 't' input is valid
+    #                               to make "toott", but after that we must have 2 "o"'s to keep with
+    #                               the pattern.  In other words we need query the transitions in the
+    #                               current state with  StateKeyB twice, each time setting the result
+    #                               to be the current state. Alternatvely, can follow "toot" with 'y'
+    #                               as the input, which would be the 3rd unique character in pattern,
+    #                               prompting us to query the system with StateKeyC. But of course,
+    #                               this should return the NullState b/c it doesn't conform to the pattern
+    #                               in the automata. For it to conform the automata would need to
+    #                               accept ABBAC. The final C allowing a third unique character, a 'y'
+    #                               'or anything else but a 't' or an 'o'
+
+    uniqueRank = 0
+    for c in topRecognitionStackEntry._target
+        print("going through targetArray, index")
+        println(uniqueRank)
+
+        print("comparing input '")
+        print(input)
+        print("' to targetArray[")
+        print(uniqueRank)
+        print("] '")
+        print(c)
+        println("'")
+
+        if input == c
+            println("Found match input")
+            break
+        end
+
+        uniqueRank = uniqueRank + 1
+    end
+    print("input: ")
+    print(input)
+    print(" is the ")
+    print(uniqueRank)
+    println(" unique character in target")
+
+    # doing switch on unique rank to get proper StateKey
+    stateKey = StateKeyA()
+
+    if uniqueRank == 1
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK1})
+            stateKey = StateKeyA()
+        elseif isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK2})
+            stateKey = StateKeyAprime()
+        end
+    elseif uniqueRank == 2
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK1})
+            stateKey = StateKeyB()
+        elseif isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK2})
+            stateKey = StateKeyBprime()
+        end
+    elseif uniqueRank == 3
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK1})
+            stateKey = StateKeyC()
+        elseif isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK2})
+            stateKey = StateKeyCprime()
+        end
+    else
+        # this sort of like insider knowledge, if were ever to accept MORE unique letters
+        # in a sequence then we'd probably keep going: uniqueRank=3 giving StateKeyD or StateKeyDprime
+        # and etc. Or use the @eval funtion...
+        stateKey = StateKeyNull()
+    end    
+
+    print("Chose the state key: ")
+    println(stateKey)
+
+
+
+    theNextState = getNextState(pda._currentState, stateKey)
+
+
+    print("The next state:")
+    println(nwstring(theNextState))
+
+    if isa(typeof(theNextState), Type{NullState})
+        println("Pattern broken!")
+        pda._currentState = pda._startState
+
+        clearVisitedStates(pda)
+        pda._isCorePatternSet = false
+
+        recognitionMode = topRecognitionStackEntry._recognitionMode
+        stateKeyAfterReset = StateKeyNull()
+
+        # we switch between k1 and when patterns and broken (or dispelled)
+        if isa(typeof(recognitionMode), Type{RecognitionModeK1})
+            recognitionMode = RecognitionModeK2()
+            stateKeyAfterReset = StateKeyAprime()
+        elseif isa(typeof(recognitionMode), Type{RecognitionModeK2})
+            recognitionMode = RecognitionModeK1()
+            stateKeyAfterReset = StateKeyA()
+        else
+            recognitionMode = RecognitionModeK2() #k1 is the default, so a broken pattern means k2...not sure if this should ever happen 
+            stateKeyAfterReset = StateKeyAprime()
+        end
+
+        theNextState = getNextState(pda._currentState, stateKeyAfterReset)
+        pda._currentState = theNextState
+        addToVisitedStates(pda,theNextState)
+
+        topRecognitionStackEntry._target = [' ', input]
+
+        pushToStack(pda, RecognitionStackEntry(recognitionMode, 1, topRecognitionStackEntry._target))
+    else
+        println("Pattern ALIVE")
+        pda._currentState = theNextState
+
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{NoRecognitionMode})
+            # at first glance I should think this now only happens once, at the beginning...not entirely sure.
+            println("Top of stack is empty")
+
+            pushToStack(pda, RecognitionStackEntry(RecognitionModeK1(), 1, [' ',input]))
+        else
+            println("Top of stack NOT empty")
+
+            push(topRecognitionStackEntry._target,input)
+            topRecognitionStackEntry._currentIndexInTarget = topRecognitionStackEntry._currentIndexInTarget + 1
+            pushToStack(pda, topRecognitionStackEntry)        
+
+            # if we haven;t already found the core pattern:
+            #  here we check for cycles. a cycle here would denotethe bounds of core pattern + tell us its length
+
+            if !isCorePatternSet(pda)
+            print("Checking for corePattern: ")
+            print(nwstring(theNextState))
+            print(" [")
+            visitedStates = getVisitedStates(pda)
+            for aVisitedState in visitedStates
+                print(nwstring(aVisitedState))
+                print(", ")
+                if theNextState == aVisitedState
+                    println("Found Core Pattern!")
+                    
+                    isRecording = false
+                    del_all(pda._corePattern)
+
+                    for bVisitedState in visitedStates
+                        if theNextState == bVisitedState
+                            isRecording = true
+                            push(pda._corePattern,bVisitedState)
+                        elseif isRecording
+                            push(pda._corePattern,bVisitedState)
+                        end
+                    end
+
+                    pda._isCorePatternSet = true
+
+                    break
+                end
+            end
+            println("]")
+
+            if (pda._isCorePatternSet)
+            print("Core Pattern <")
+            for stateInPattern in pda._corePattern
+                print(nwstring(stateInPattern))
+                print(",")
+            end
+            println(">")
+
+            pda._corePattern
+            end
+            end
+
+            if !isCorePatternSet(pda)
+            addToVisitedStates(pda,theNextState)
+            end
+        end
+    end
+
+
+    corePatterLen = getLengthOfCurrentPattern(pda)
+    print("Length Of Current Pattern = ")
+    println(corePatterLen)
+
+    print("Number Of Occurences Of Pattern = ")
+    println((length(topRecognitionStackEntry._target)-1)/corePatterLen)
+
+end
+
+##################################################################################
+
+println("Naive-Needleman-Wunsch")
+
+thePDA = createRecognitionPDA()
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'C')
+
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'C')
+tickPDAGivenInput(thePDA, 'B')
+
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+tickPDAGivenInput(thePDA, 'G')
+
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'B')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+tickPDAGivenInput(thePDA, 'A')
+
+

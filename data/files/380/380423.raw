@@ -1,0 +1,28 @@
+###
+### CompLing.jl
+###
+module CompLing
+
+# Counter type:
+# a Dict of keys (strings, usually) to their counts,
+# with a default value of 0. Also caches the total.
+export Counter, counter
+
+# ngrams, uni/bi/tri-grams
+export ngrams, unigrams, bigrams, trigrams
+
+# simple tokenizer
+export tokenize_ws
+
+# easily parse tagged tokens (like "the/DT")
+export token_tag, token_word, token_wordtag
+
+# Porter Stemmer
+export stem 
+
+include("util/counter.jl")
+include("util/ngrams.jl")
+include("stem/porter.jl")
+include("tokenize/tokenize.jl")
+
+end # module

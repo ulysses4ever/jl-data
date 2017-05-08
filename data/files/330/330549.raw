@@ -1,0 +1,149 @@
+# === FUNCTIONS =============================
+
+# === Display data ==========================
+function displayData(X)
+  m, n = size(X)
+
+  example_width = iround(round(sqrt(n)))
+  example_height = iround(n / example_width)
+
+  display_rows = ifloor(sqrt(m))
+  display_cols = iceil(m / display_rows)
+
+  height_range = 1:example_height
+  width_range = 1:example_width
+
+  # define image padding
+  pad = 1
+
+  # setup blank display
+  display_rows_size = pad + display_rows * (example_height + pad)
+  display_cols_size = pad + display_cols * (example_width + pad)
+  display_array = - ones(display_rows_size, display_cols_size)
+
+
+  # copy each example into a patch on the display array
+  current_example_id = 1
+  for j = 1:display_rows
+    for i = 1:display_cols
+      if current_example_id > m
+        break
+      end # check if we have gone to far
+
+      # copy the patch
+      # get the max value of the patch
+      current_example_values = X[current_example_id, :]
+      reshaped_example_values = reshape(current_example_values, example_height, example_width)
+
+      max_val = maxabs(current_example_values) # --> octave --> max(abs(X[current_example, :]))
+
+      display_array[pad + (j - 1) * (example_height + pad) + height_range,
+                    pad + (i - 1) * (example_width + pad) + width_range ] =
+        reshaped_example_values / max_val
+
+      current_example_id = current_example_id + 1
+    end
+    if current_example_id > m
+      break
+    end # check if we have gone to far
+  end
+
+  # display image
+  img = grayim(display_array)
+
+  # doesnt work. Might be something to do with the way the image data is formatted.
+  # Strangly enough Juno (IDE) can show a nice preview of the image.
+  # See Notes Section ERRORS
+  # view(img)
+
+end
+
+
+# === sigmoid ==========================
+function sigmoid(z)
+  g = 1.0 ./ (1.0 + exp(-z))
+  return g
+end
+
+# === sigmoid gradient ================
+function sigmoidGradient(z)
+  g = sigmoid(z) .* (1 - sigmoid(z))
+end
+
+# === randomly initialize weights =====
+function randInitializeWeights(L_in_size, L_out_size)
+  W = zeros(L_out_size, L_in_size + 1)
+
+  # a recommended way to determin epsilon given in the exercise notes was:
+  # e = sqrt(6)/sqrt(l_in + l_out)
+  epsilon = 0.12
+  #W = rand(L_in_size, L_out_size + 1) * 2 * epsilon - epsilon
+  W = rand(L_out_size, L_in_size + 1) * 2 * epsilon - epsilon
+end
+
+# === debug initialize weights =====
+function debugInitializeWeights(L_in_size, L_out_size)
+  W = zeros(L_out_size, L_in_size + 1)
+  W = reshape(sin(1:length(W)), size(W)) / 10
+end
+
+# === compute the numerical gradient =====
+function computeNumericalGradient(costFunction, params)
+
+  numgrad = zeros(size(params))
+  perturb = zeros(size(params))
+  ep = 1e-4
+
+  for p = 1:length(_params)
+    # set perturbation vector
+    perturb[p] = ep
+    loss1 = costFunction(params .- perturb)
+    loss2 = costFunction(params .+ perturb)
+
+    # compute numerical gradient
+    numgrad[p] = (loss2 - loss1) / (2 * ep)
+    perturb[p] = 0
+  end
+  return numgrad
+end
+
+
+# === check neural network gradients =======
+function checkNNGradients(lambda)
+
+  # create a small neural network to check the backprop. gradients
+  in_size = 3
+  hidden_size = 5
+  num_labels = 3
+  m = 5
+
+  # generate some 'random' test data
+  Theta1 = debugInitializeWeights(in_size, hidden_size)
+  Theta2 = debugInitializeWeights(hidden_size, num_labels)
+
+  # reusing debugInitializeWeights to generate X
+  X = debugInitializeWeights(in_size - 1, m)
+  y = 1 + ([1:m] .% num_labels)
+
+  # unroll parameters
+  params = [Theta1[:], Theta2[:]]
+  costF = (x) -> costFunction(x, in_size, hidden_size, num_labels, X, y, lambda)
+  gradF = (x, s) -> gradientFunction(x, s, in_size, hidden_size, num_labels, X, y, lambda)
+
+  grad = zeros(size(params))
+
+  J = costF(params)
+  gradF(params, grad)
+
+  numgrad = computeNumericalGradient(costF, params)
+
+  display([numgrad grad])
+  println("The above 2 columns should be very similar. [Numerical Grad. | Analytical Grad.]")
+
+  diff = norm(numgrad - grad) / norm(numgrad + grad)
+  println("Relative difference (should be small. Less than 1e-9): $(diff)")
+  println("Lambda: $(lambda)")
+end
+
+
+

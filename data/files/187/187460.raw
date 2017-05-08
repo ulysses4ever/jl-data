@@ -1,0 +1,1 @@
+{"business_profile":{"address":"Oberhausner Str. 7","business_name":"Michael Müller Michi's Angelshop","city":" Oberhausen/Groß-Enzersdorf","main_phone":"02249 28806","email":"michis.angelshop@aon.at","zip_code":"2301","geo":[48.18832, 16.578872]}}

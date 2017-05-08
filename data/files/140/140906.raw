@@ -1,0 +1,162 @@
+abstract Embedding
+
+type GaugeEmbedding<:Embedding
+  arr::Vector{Int64}
+end
+
+type SAPIEmbedding<:Embedding
+  arr::Vector{Vector{Int64}}
+  adjacency_matrix_unembedded::SparseMatrixCSC{Int64,Int64}
+  adjacency_matrix_embedded::SparseMatrixCSC{Int64,Int64}
+end
+
+function show(io::IO,embedding::SAPIEmbedding)
+  print(io,string(typeof(embedding))*"arr,adjacency_matrix_unembedded,adjacency_matrix_embedded")
+end
+
+sign_rand(x) = sign(x)==0 ? 2*rand(0:1)-1 : sign(x)
+
+function dw_find_embedding(dwi,solver)
+  h = dwi.h
+  J = full(dwi.J)
+  adjMat = int(J.!=0)
+  h2,J2 = ri_help.numpy2hJ(h,J)
+  adj = dwave_sapi.get_hardware_adjacency(solver)
+  adjMat_embed = getAdjacency(solver)
+  #nq = sum(getUsedQubits(zeros(Int64,size(adjMat_embed,1)),int(adjMat_embed)))
+  embedding = dwave_sapi.find_embedding(J2,size(J,1),adj,size(adjMat_embed,1))
+  jl_embedding = Vector{Int64}[]
+  for i=1:length(embedding)
+   push!(jl_embedding,[int(x)+1 for x in embedding[i]]) # +1 moves from 0 indexing in Python to 1 in Julia.
+  end
+  return SAPIEmbedding(jl_embedding,sparse(adjMat),sparse(adjMat_embed))
+end
+
+function applyEmbedding(embedding::Vector{Embedding},dwi::ProblemInstance)
+  if length(embedding)>2
+    dwi_embedded = applyEmbedding(embedding[2:end],applyEmbedding(embedding[1],dwi))
+  else
+    dwi_embedded = applyEmbedding(embedding[2],applyEmbedding(embedding[1],dwi))
+  end
+  return dwi_embedded
+end
+
+function applyEmbedding(embedding::GaugeEmbedding,dwi::ProblemInstance)
+  h=copy(dwi.h)
+  J=copy(dwi.J)
+  g = embedding.arr
+  for i=1:size(J,1)
+    h[i] = g[i]*h[i]
+    for j=1:size(J,2)
+      J[i,j] = g[i]*g[j]*J[i,j]
+    end
+  end
+  props = copy(dwi.properties)
+  return ProblemInstance(h,J,props)
+end
+
+function applyEmbedding(embedding::SAPIEmbedding,dwi::ProblemInstance)
+  g = embedding.arr
+  adjMat = int(embedding.adjacency_matrix_embedded)
+  h = copy(dwi.h)
+  J = copy(dwi.J)
+  nq = size(adjMat,1)
+  props = copy(dwi.properties)
+  h_new = zeros(typeof(h[1]),nq)
+  J_new = zeros(typeof(J[1]),nq,nq)
+  sum(J_new)
+  for qubit in 1:length(g)
+    h_new[g[qubit]] = h[qubit]./length(g[qubit])
+    for qubit2 in 1:length(g)
+      nc = 0
+      for q in g[qubit]
+        for q2 in g[qubit2]
+          (q2>q) && (nc+=adjMat[q,q2]) # add 0 if they don't connect, 1 if they do.
+        end
+      end
+      for q in g[qubit]
+        for q2 in g[qubit2]
+          if q2>q
+            J_new[q,q2] = adjMat[q,q2]*J[qubit,qubit2]./nc
+            # if not connected adjMat[q,q2]==0, so J_new[q,q2]=0.
+          end
+        end
+      end
+    end
+  end
+  J_F = 0.17*length(h)+0.9 # about the same curve as in arXiv:1406.7553v1 for optimal J_F
+  rescale_couplers = J_F*max(maximum(abs(h)),maximum(abs(J))) 
+  # i.e. strongest coupler should be 1, then rescale *that* 
+  # with J_F to make chains J_F time stronger than the problem
+  h_new./=rescale_couplers
+  J_new./=rescale_couplers
+  for qubit in 1:length(g)
+    for qubit2 in 1:length(g)
+      for q in g[qubit]
+        if find(q.==g[qubit])[1]<length(g[qubit]) 
+        # if I'm not on the last qubit
+          J_new[q,find(adjMat[q,g[qubit]])[1]] = -1
+         # the bond between each pair of variables is set to the max value -1. 
+        end
+      end
+    end
+  end
+  props[:graphtype] = "Chimera"
+  return ProblemInstance(h_new,sparse(J_new),props)
+end
+
+function reverseEmbedding(embedding::Vector{Embedding},dwi,energies,sols)
+  if length(embedding)>2
+    dwi_embedded = reverseEmbedding(embedding[end-1:-1:1],reverseEmbedding(embedding[end],dwi,energies,sols)...)
+  else
+    dwi_embedded = reverseEmbedding(embedding[1],reverseEmbedding(embedding[end],dwi,energies,sols)...)
+  end
+  return dwi_embedded
+end
+
+function reverseEmbedding(embedding::GaugeEmbedding,dwi::ProblemInstance,energies,sols)
+  g = embedding.arr
+  newE = copy(energies)
+  new_sols = 2.*bitunpack(sols).-1
+  for i=1:size(sols,2)
+    new_sols[:,i] = new_sols[:,i].*g
+  end
+  new_sols[new_sols.<0] = 0
+  out_sols = bitpack(new_sols)
+  return applyEmbedding(embedding,dwi),newE,out_sols
+end
+
+function reverseEmbedding(embedding::SAPIEmbedding,dwi::ProblemInstance,energies,sols)
+  adjMat = embedding.adjacency_matrix_embedded
+  adjMat_unembed = embedding.adjacency_matrix_unembedded
+  g=embedding.arr
+  nq = size(adjMat_unembed,1)
+  h = copy(dwi.h)
+  J = copy(dwi.J)
+  props = copy(dwi.properties)
+  h_unembed = zeros(typeof(h[1]),nq)
+  J_unembed = zeros(typeof(J[1]),nq,nq)
+  props[:graphtype]="full"
+  for i=1:nq
+    h_unembed[i] = sum(h[g[i]])
+    for j=1:nq
+      J_unembed[i,j] = sum(J[g[i],g[j]])
+    end
+  end
+  sols2 = 2.*sols-1
+  sols_unembed = zeros(Int64,size(adjMat_unembed,1),size(sols,2))
+  for i=1:size(sols_unembed,1)
+    for j=1:size(sols_unembed,2)
+      sols_unembed[i,j] = sign_rand(sum(sols2[g[i],j]))
+      sols2[g[i],j] = copy(sols_unembed[i,j]) 
+      # this is a downhill evaluation, using repeated majority votes, and changing the the solution
+      # to enforce consistency. Basically, simplest conceivable thing you can do, and I don't
+      # know why D-Wave doesn't do it already.
+    end
+  end
+  Es = zeros(Float64,size(energies,1))
+  for i=1:size(energies,1)
+    Es[i] = get_energy(h_unembed,J_unembed,sols_unembed[:,i])
+  end
+  return ProblemInstance(h,sparse(J),props),Es,sols_unembed
+end

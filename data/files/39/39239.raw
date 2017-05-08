@@ -1,0 +1,57 @@
+import Graphs;
+import Distributions;
+
+#= NOTE: The BCT's `density` function is omitted since it is just the number of edges over the number of possible edges. For a graph, `g`, this is just the ratio of `Graphs.num_edges(g)` and `Graphs.num_vertices(g)^2`.=#
+
+function has_vertex_attribute{G<:Graphs.GenericGraph}(g::G, key::AbstractString)
+    if Graphs.num_vertices(g) == 0 return false end
+    if findfirst(fieldnames(g.vertices[1]),:attributes) == 0 return false end
+    for v in Graphs.vertices(g)
+        if findfirst(collect(keys(v.attributes)),key) == 0 return false end
+    end
+    return true;
+end
+
+""" function rentian_scaling{G <: Graphs.GenericGraph}(`g`::G, `n`::Int, `key`::AbstractString="coordinates")
+
+Rentian scaling refers to a log-linear relationship between the number of vertices, `N`, enclosed in a physical volume, and the number of edges, `E`, crossing the boundary of that volume. This function returns counts of `N` and `E` for `n` randomly generated cubic volumes within a minimum cubic bounding volume of `g`. (Volumes which contain no vertices are rejected.) It is assumed that 3D coordinates are available as vertex attributes with key value, `key`.
+
+The *Rentian exponent* is the slope of `log(E)` vs `log(N)` and must be estimated separately. The algorithm implemented here is patterned after that of the Matlab BCT function of the same name and the algorithm described in Bassett, et. al., [Efficient Physical Embedding of Topologically Complex Information Processing Networks in Brains and Computer Circuits](http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1000748)(2010).
+    
+Bassett et. al. demonstrated a log-linear relationship in human brain, the nervous system of *C. elegans*, and a VLSI chip. According to the reference, "Rentian scaling represents a cost-efficient solution to the challenge of embedding a high dimensional functional interconnect topology in a relatively low dimensional physical space with economical wiring costs."
+    
+"""
+function rentian_scaling{G <: Graphs.GenericGraph}(g::G, n::Int, key::AbstractString="coordinates")
+    if !has_vertex_attribute(g,key)
+        error("Graph's vertices do not have ,", key," attributes.");
+    end
+    # Extract coordinates as an array
+    coords = fill(0.0, (Graphs.num_vertices(g),3));
+    for i in 1:size(coords,1) coords[i,:] = g.vertices[i].attributes[key] end
+    # Uniform distribution on upper and lower limits of minimum bounding cube
+    U = Distributions.Uniform(minimum(coords), maximum(coords));
+    # Sample random subcubes:
+    samples = fill(0,(n,2));
+    i = 1;
+    while i <= n
+        # Lower and upper bounds of a random cube
+        cube = sort(rand(U,2));
+        # Which individual coordinates are inside?
+        temp = cube[1] .<= coords .<= cube[2];
+        # Which vertices have all coordinates inside?
+        inside = temp[:,1].*temp[:,2].*temp[:,3];
+        N = sum(inside);
+        if N > 0
+            # Record their number
+            samples[i,1] = N;
+            # Count the edges which cross subcube's boundary, i.e., edges
+            # for which one, but not both, vertices are inside.
+            for edge in g.edges
+                samples[i,2] += (inside[edge.source.index] +
+                                 inside[edge.target.index]) % 2.
+            end
+            i += 1;
+        end
+    end
+    return samples;
+end

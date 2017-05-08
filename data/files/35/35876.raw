@@ -1,0 +1,41 @@
+# this standalone script can be put anywhere
+#
+# run from shell/command-line:
+# julia FastqSplitter.jl -i <index>  -l <READ1> -r <READ2>
+#
+# required arguments:
+#   -i, --index INDEX  the index file
+#                      http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
+#   -l, --read1 READ1  read1 input fastq file, can be gzipped
+#   -r, --read2 READ2  read2 input fastq file, can be gzipped
+
+using OpenGene
+using ArgParse
+
+function split_pair(index, read1, read2)
+end
+
+function main(args)
+
+    s = ArgParseSettings(description = "FastqSplitter: split fastq files by indexes")
+
+    @add_arg_table s begin
+        "--index",  "-i"
+            help = "the index file"
+            required = true
+        "--read1",   "-l"
+            help = "read1 input fastq file, can be gzipped"
+            required = true
+        "--read2",   "-r"
+            help = "read2 input fastq file, can be gzipped"
+            required = true
+    end
+
+    options = parse_args(s) # the result is a Dict{String,Any}
+    split_pair(options["index"], options["read1"],options["read2"])
+end
+
+# REPL is not supported
+if !isinteractive()
+    main(ARGS)
+end

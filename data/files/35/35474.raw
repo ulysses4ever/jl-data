@@ -1,0 +1,107 @@
+
+function sliceLLR(qam::Array{Complex{Float64},2},SNR::Array{Float64,2},Ncpc)
+    (m1,n1) = size(qam);
+    (m2,n2) = size(SNR);
+    if (m1 != m2) || (n1 != n2)
+        error("Size of QAMs not equal to size of SNR");
+    end
+    if(m1 == 1)
+        qam = reshape(qam,n1,1);
+        SNR = reshape(SNR,n1,1);
+    end
+    if(Ncpc == 1)
+        llr = sliceBPSK(qam,SNR);
+    elseif(Ncpc == 2)
+        llr = sliceQPSK(qam,SNR);
+    elseif(Ncpc == 4)
+        llr = slice16QAM(qam,SNR);
+    elseif(Ncpc == 6)
+        llr = slice64QAM(qam,SNR);
+    end
+        
+    return llr;
+end
+
+function sliceBPSK(r::Array{Complex{Float64},2},SNR::Array{Float64,2})
+    llr = SNR.*(-2*sqrt(2)*( real(r) + imag(r) ) );
+    return llr;
+end
+
+function sliceQPSK(r::Array{Complex{Float64},2},SNR::Array{Float64,2})
+    lenR = length(r);
+    yy = [ -2*sqrt(2)* SNR.*real(r) -2*sqrt(2)* SNR.* imag(r)];
+    llr = reshape(transpose(yy),lenR*2,1);
+    return llr;
+end
+
+function slice16QAM(r::Array{Complex{Float64},2},SNR::Array{Float64,2})
+     scale_r = sqrt(10)*r;
+     lenR    = length(r);
+     
+     realR      = real(scale_r);
+     imagR      = imag(scale_r);
+
+     b0_1     = max(-2*realR-1, -6*realR-9);
+     b0_0     = max(2*realR-1, 6*realR-9);
+     LLR_b0   = SNR.*(b0_1 - b0_0);
+ 
+     b1_1     = max(-2*imagR-1, -6*imagR-9);
+     b1_0     = max(2*imagR-1, 6*imagR-9);
+     LLR_b1   = SNR.*(b1_1 - b1_0);
+ 
+     b2_1     = max(6*realR-9, -6*realR-9);
+     b2_0     = max(2*realR-1, -2*realR-1);
+     LLR_b2   = SNR.*(b2_1 - b2_0);
+ 
+     b3_1     = max(6*imagR-9, -6*imagR-9);
+     b3_0     = max(2*imagR-1, -2*imagR-1);
+     LLR_b3   = SNR.*(b3_1 - b3_0);
+ 
+     yy      =  [LLR_b0 LLR_b1 LLR_b2 LLR_b3];
+     llr     = reshape(transpose(yy),lenR*4,1);
+     llr     =  llr/10;
+    
+    return llr;
+end
+
+function slice64QAM(r::Array{Complex{Float64},2},SNR::Array{Float64,2})
+     scale_r = sqrt(42)*r;
+     lenR    = length(r);
+     
+     realR      = real(transpose(scale_r));
+     imagR      = imag(transpose(scale_r));
+     SNR      = SNR';
+     n_qam    = length(SNR);
+ 
+ #@bp
+     b0_1     = maximum( 2*[-1 -3 -5 -7]'*realR -[1 9 25 49]'*ones(1,n_qam) ,1);
+     b0_0     = maximum( 2*[1  3  5 7]'*realR - [1 9 25 49]' * ones(1,n_qam),1);
+     LLR_b0   = SNR.*(b0_1 - b0_0);
+ 
+     b1_1     = maximum( 2*[-1 -3 -5 -7]'*imagR - [1 9 25 49]' *ones(1,n_qam) ,1);
+     b1_0     = maximum( 2*[1 3 5 7]'*imagR - [1 9 25 49]' * ones(1,n_qam),1);
+     LLR_b1   = SNR.*(b1_1 - b1_0);
+ 
+     b2_1     = maximum( 2*[-7 -5  5  7]'*realR - [49 25 25 49]'*ones(1,n_qam),1);
+     b2_0     = maximum( 2*[-3 -1  1  3]'*realR - [9 1 1 9]' * ones(1,n_qam),1);
+     LLR_b2   = SNR.*(b2_1 - b2_0);
+
+     b3_1     = maximum( 2*[-7 -5  5  7]'*imagR - [49 25 25 49]'*ones(1,n_qam),1);
+     b3_0     = maximum( 2*[-3 -1  1  3]'*imagR - [9 1 1 9]' * ones(1,n_qam),1);
+     LLR_b3   = SNR.*(b3_1 - b3_0);
+ 
+     b4_1     = maximum(2*[-7 -1  1  7]'*realR - [49 1 1 49]' * ones(1,n_qam),1);   
+     b4_0     = maximum(2*[-5 -3  3  5]'*realR - [25 9 9 25]' * ones(1,n_qam),1);
+     LLR_b4   = SNR.*(b4_1 - b4_0);
+ 
+     b5_1     = maximum(2*[-7 -1  1  7]'*imagR - [49 1 1 49]' * ones(1,n_qam),1);
+     b5_0     = maximum(2*[-5 -3  3  5]'*imagR - [25 9 9 25]' * ones(1,n_qam),1);
+     LLR_b5   = SNR.*(b5_1 - b5_0);
+ 
+     yy      =  [LLR_b0' LLR_b1' LLR_b2' LLR_b3' LLR_b4' LLR_b5'];
+
+     llr      = reshape(transpose(yy),lenR*6,1);
+    
+     llr      =  llr/42;
+    return llr;
+end

@@ -1,0 +1,74 @@
+using Distributions
+include("classes.jl")
+include("utils.jl")
+include("scientific.jl")
+include("random.jl")
+include("calculators.jl")
+include("trees.jl")
+include("workflows.jl")
+include("postprocessors.jl")
+
+
+
+function scenario_risk_workflow(job_file)
+  inputs = scenario_risk_preprocess(job_file)
+  outputs = scenario_risk_tree(inputs)
+  export_dir, job_name = splitdir(job_file)
+  scenario_risk_export(outputs, export_dir, job_name)
+end
+
+
+function scenario_damage_preprocess()
+  inputs = Dict{ASCIIString, ScenarioDamageInput}()
+  input = ScenarioDamageInput(assets, gmfs, tax_ff_map)
+  inputs["b1"] = input
+  return inputs
+end
+
+
+function scenario_damage_asset(gmv::Float64,
+                               ff::DiscreteFragilityFunction)
+  num_states = length(ff.states)
+  poes = [interpolate_vector(ff.imls, ff.poes[:,i], gmv)[1] for i in 1:num_states]
+  dmg_poos = [1.0, poes] .- [poes, 0.0]
+  return dmg_poos
+end
+
+function scenario_damage_asset(gmv::Float64,
+                               ff::ContinuousFragilityFunction)
+  num_states = length(ff.states)
+  poes = Float64[]
+  for i in 1:num_states
+    μ, σ = lognormal_params(ff.mean_imls[i], ff.std_imls[i])
+    push!(poes, cdf(LogNormal(μ, σ), gmv))
+  end
+  dmg_poos = [1.0, poes] .- [poes, 0.0]
+  return dmg_poos
+end
+
+function scenario_damage_portfolio(assets::Vector{Asset},
+                                   gmfs::Vector{GroundMotionField},
+                                   tax_ff_map::Dict{ASCIIString, FragilityFunction})
+  asset_damages = [asset.ref => Vector{Float64}[] for asset in assets]
+
+  for gmf in gmfs
+    for asset in assets
+      gmv = gmf.gmvs[asset.loc]
+      ff = tax_ff_map[asset.tax]
+      dmg_poos = scenario_damage_asset(gmv, ff)
+      dmg_dist = dmg_poos .* asset.num
+      push!(asset_damages[asset.ref], dmg_dist)
+    end
+  end
+
+  return asset_damages
+end
+
+asset_damages = scenario_damage_portfolio(assets, gmfs, tax_ff_map)
+means = mean(asset_damages["a1"])
+print(means)
+
+dams = Dict{Int, Vector{Float64}}()
+dams = [j => [asset_damages["a1"][i][j] for i in 1:num_sims] for j in 1:5]
+
+print([std(dams[i]) for i in 1:5])

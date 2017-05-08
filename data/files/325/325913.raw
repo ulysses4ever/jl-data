@@ -1,0 +1,23 @@
+module TensorBase
+
+using Reexport
+import Iterators: product
+
+@reexport using Einsum
+
+include("decompositions.jl")
+export CPDecomp,
+       CPDecompModel,
+       compose
+
+include("utils.jl")
+export unfold,
+       unfold_idx,
+       krprod,
+       tensordot
+
+# TODO: eventually migrate to new package?
+# TODO: sync with generative models from learnbase?
+include("generate_data.jl")
+
+end # module

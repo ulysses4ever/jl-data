@@ -1,0 +1,52 @@
+
+# Here be monsters! :)
+
+
+
+dict = [ "word1" => 1, "word2" => 1, "word3" => 5 ]
+
+dict["word1"] += 1
+
+dict
+
+dict["word5"] = 1
+
+dict
+
+test_file = "$(path)/vocab.txt"
+file_content = open(readall, test_file, "r")
+
+readtable(test_file, separator = '\t')
+
+# ------
+
+testing_path = "$(path)/testing_20_15/"
+word_counter = [utf8("_") => 0]
+
+testing_files = readdir(testing_path)
+
+for f=1:size(testing_files, 1)
+
+  test_file = "$(testing_path)/$(testing_files[f])"
+  file_content = open(readall, test_file, "r")
+  stemed_words = clean_email(file_content, false, url_handling = "remove", email_handling = "remove", dollar_handling = "remove", number_handling = "remove")
+  #stemed_words = clean_email(file_content, false)
+
+  for i=1:size(stemed_words, 1)
+
+    if haskey(word_counter, stemed_words[i])
+      word_counter[stemed_words[i]] += 1
+    else
+      word_counter[stemed_words[i]] = 1
+    end
+
+  end
+
+end
+
+most_relevant_words = filter((k, v) -> v  > 100, word_counter)
+words = collect(keys(most_relevant_words))
+df = DataFrame(id = 1:length(most_relevant_words), word = words )
+
+writetable("$(path)/my_vocab.txt", df, separator = '\t', quotemark = ' ')
+

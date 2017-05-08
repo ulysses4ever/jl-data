@@ -1,0 +1,224 @@
+include("Task_algo.jl")
+
+
+nfreq = 128; 
+nWavelet = 10;
+
+node = Nodes(40) ; 
+#create a canal connection of 10 Gbits/s
+canal = Canal(10.0*1024) 
+
+Compute_B = [string("Compute_B_",i_freq) for i_freq in [1:nfreq] ] ; 
+
+
+
+
+listTask = {}
+#X term 
+
+
+
+
+Dependency_X = Dict() ;
+X = Array(ASCIIString,1) ;resize!(X,nfreq) ;
+
+for i_freq in 1:nfreq
+	X[i_freq] = string("X_",i_freq) 
+	Dependency_X[i_freq] = TaskDependancy([( string("Wavelet_sum_",i_freq) ,0 ),(string("Gamma_P_",i_freq),-1),(string("Gamma_S_",i_freq),-1)  ]) ;
+	temp =  Task_algo(X[i_freq],Dependency_X[i_freq],1,1.0,node) 
+	push!(listTask,temp)
+end
+
+Dependency_Wavelet_sum= Dict() ;
+
+for i_freq in 1:nfreq
+	Wavelet_sum = string("Wavelet_sum_",i_freq)  ; 
+	dependency_string=Array((ASCIIString,Int64),1) ; resize!(dependency_string,nWavelet) ;
+	for i_wavelet in [1:nWavelet] 
+		dependency_string[i_wavelet] =( string("Wavelet_compute_transpose_",i_wavelet,"_",i_freq),0 )  ; 
+	end
+	
+	Dependency_Wavelet_sum = TaskDependancy(dependency_string) ;
+	temp =  Task_algo(Wavelet_sum,Dependency_Wavelet_sum,1,1.0,node) 
+	push!(listTask,temp)
+end
+
+
+for i_freq in 1:nfreq , i_wavelet in [1:nWavelet]
+
+	Wavelet_compute_transpose=string("Wavelet_compute_transpose_",i_wavelet,"_",i_freq)  ; 
+	Dependency_Wavelet_compute_transpose = TaskDependancy( [( string("X_",i_freq),-1 ) ] ); 	
+	temp =  Task_algo(Wavelet_compute_transpose,Dependency_Wavelet_compute_transpose,1,1.0,node) 
+	push!(listTask,temp)
+end
+
+
+
+
+
+
+##on ajoute les taches 
+
+
+
+#P term 
+
+
+
+Dependency_P = Dict() ;
+P = [string("P_",i_freq) for i_freq in [1:nfreq] ]
+for i_freq in 1:nfreq
+	P = string("P_",i_freq)  ; 
+	Dependency_P[i_freq] = TaskDependancy( [( string("X_",i_freq) ,0 ),(string("Gamma_P_",i_freq),-1)  ] );
+	temp =  Task_algo(P,Dependency_P[i_freq],1,1.0,node)  ;
+	push!(listTask,temp) 	;
+end
+
+Dependency_Gamma_P = Dict() ;
+for i_freq in 1:nfreq
+	taskName = string("Gamma_P_",i_freq)
+	Dependency_Gamma_P = TaskDependancy( [( string("X_",i_freq) ,0 ),(string("P_",i_freq),0)  ] ); 	
+	temp =  Task_algo(taskName,Dependency_Gamma_P,1,1.0,node) 
+	push!(listTask,temp) 
+end
+
+
+
+
+
+
+#S term 
+for i_freq in 1:nfreq
+	taskName = string("S_",i_freq) ;
+	Dependency_S = TaskDependancy( [( string("X_",i_freq) ,0 ),(string("transfer_V"),0)  ] );
+	temp =  Task_algo(taskName,Dependency_S,1,1.0,node) 
+	push!(listTask,temp) 
+
+	taskName = string("Gamma_S_",i_freq) ;
+	Dependency_Gamma_S_ = TaskDependancy( [( string("S_",i_freq) ,0 ) ] );
+	temp =  Task_algo(taskName,Dependency_S,1,1.0,node) 
+	push!(listTask,temp) 
+
+
+	transfer_S  =  string("transfer_S_",i_freq) ;
+	Dependency_transfer_S_ = TaskDependancy( [( string("S_",i_freq) ,0 ) ] );
+	temp =  DataTransfer(transfer_S,Dependency_transfer_S_,1,32.0,canal) ; 
+	push!(listTask,temp) 
+end
+
+
+
+#V term 
+
+
+taskName = "transfer_V" ;
+Dependency_transfer_V=TaskDependancy([("X_1",0)]);
+temp =  DataTransfer(taskName,Dependency_transfer_V,1,nfreq*32.0,canal) ; 
+push!(listTask,temp) 
+
+
+#T term 
+
+for i_wavelet in [1:nWavelet] , i_freq in [1:nfreq]
+
+	Gamma_T =  string("Gamma_T_",i_wavelet,"_",i_freq)  ;
+	Dependency_Gamma_T = TaskDependancy( [(string("T_",i_wavelet,"_",i_freq) ,0 ) ] );
+	temp =  Task_algo(Gamma_T,Dependency_Gamma_T,1,1.0,node)  ;  
+	push!(listTask,temp) 
+
+	T = string("T_",i_wavelet,"_",i_freq)   ; 
+	Dependency_T  = TaskDependancy( [ (string("Wavelet_compute_",i_wavelet,"_",i_freq),0 ) ] );
+	temp =  Task_algo(Gamma_T,Dependency_Gamma_T,1,1.0,node)  ;  
+	push!(listTask,temp)
+
+	Wavelet_compute=string("Wavelet_compute_",i_wavelet,"_",i_freq)  ; 
+	Dependency_Wavelet_compute  = TaskDependancy( [ ( string("X_",i_freq) ,0 ) ] );
+	temp =  Task_algo(Wavelet_compute,Dependency_Wavelet_compute,1,1.0,node)  ;  
+	push!(listTask,temp)
+
+end
+
+
+
+
+
+
+
+function eventloop(tache::Task_algo,etat::State,iterMax=100)
+	iterationNumber=tache.iterationNumber
+	taskName=tache.taskName
+	isReady(tache,etat) ; 
+	##on attent q'un processuer soit libre pour effectuer le calcul
+	nodeToExecute = tache.nodeToExecute ;
+	index_node =getOneProc(nodeToExecute)
+	sleep(tache.timeToCompute) ; 
+	nodeToExecute.availabeWorker[index_node] = true ; 
+	notify(nodeToExecute.cond_take; all=false)
+
+	put!(etat.states[taskName],iterationNumber,time() )  ;
+	println(taskName);
+	if (iterationNumber<iterMax)
+		@schedule(eventloop(tache +1 ,etat,iterMax)) ;
+	end
+end
+
+
+
+function eventloop(dataTransferTask::DataTransfer,etat::State,iterMax=100)
+	iterationNumber=dataTransferTask.iterationNumber ; 
+	taskName=dataTransferTask.taskName  
+	
+	#on attend que la tache soit faisable
+	isReady(dataTransferTask,etat) ; 
+
+	##on attent que le canal de communication soit libre
+	canalToTransfer = dataTransferTask.canalToTransfer ;
+	timeDataTrasnfer = dataTransferTask.dataSize/canalToTransfer.speed ; 
+
+	if( !canalToTransfer.availabe )
+		wait(canalToTransfer.cond_take)
+	end
+	canalToTransfer.availabe = false ; 
+	
+	sleep(timeDataTrasnfer) ; 
+	canalToTransfer.availabe = true ; 
+	notify(canalToTransfer.cond_take; all=false)
+
+	put!(etat.states[taskName],iterationNumber,true) ;
+	println(taskName);
+	if (iterationNumber<iterMax)
+		@schedule(eventloop(dataTransferTask +1 ,etat,iterMax)) ; #on 
+	end
+end
+
+
+etat = State() ;
+for a in  listTask
+	i = a.taskName ; 
+    etat.states[i] = DictChannel() 
+    put!(etat.states[i],0,true) ; 
+end
+
+
+for i in  1:nfreq
+ 
+    put!(etat.states[string("X_",i)],1,true) ; 
+end
+
+
+N_max= 10
+for t in listTask
+	@async begin 
+		eventloop(t,etat,N_max)
+	end 
+end
+
+
+
+
+
+
+for a in  listTask
+	i = a.taskName ; 
+    println(i)
+end

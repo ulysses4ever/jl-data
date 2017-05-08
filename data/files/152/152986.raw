@@ -1,0 +1,19 @@
+module Ordering
+
+export Order, Lesser, LesserEQ, Greater, GreaterEQ
+
+import Base: getindex
+
+#Ordering type
+immutable Order
+  cmp::Function
+end
+
+getindex(o::Order, x, y) = o.cmp(x,y)
+
+const Lesser = Order(<)
+const LesserEQ = Order(<=)
+const Greater = Order(>)
+const GreaterEQ = Order(>=)
+
+end

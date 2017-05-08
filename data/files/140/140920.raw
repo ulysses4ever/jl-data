@@ -1,0 +1,35 @@
+module DWave_API
+
+using PyCall
+h=ENV["HOME"]
+unshift!(PyVector(pyimport("sys")["path"]), "$h"*"/.julia/v0.3/DWave_API/src/")
+@pyimport numpy as np
+@pyimport scipy.io as sio
+@pyimport dwave_sapi
+@pyimport ri_help
+
+using Distributions
+using DataFrames
+using StatsBase
+using HDF5,JLD
+using MAT
+import Base.copy,Base.show
+using DWave
+
+include("embeddings.jl")
+include("api_wrappers.jl")
+
+# re-export functions from D-Wave, for convenience:
+export restrict,bootstrap,dfquantile,pbased_on,pby,optimizefield,tts_simple,timequantile,copy,r2,adjr2 #data_analysis
+export tts,ttsquantile,nbootstrap,ratiobootstrap,tts_bootstrap #data_analysis
+export importData #import_data
+export optimalAnnTime,getTTS,getAllTTS,getRatio,getAllRatios #postprocessing
+export getAdjacency,ProblemInstance,show,makeInstances,makeInstance,linear2chimera,writeinstdf,dwinst2probArr #DWaveInstances
+export binningtest,readRange # DWanalysis
+
+# functions from this module:
+export Embedding,GaugeEmbedding,SAPIEmbedding,applyEmbedding,reverseEmbedding,applyEmbedding,reverseEmbedding
+export get_energy,getSolver,solve_ising,runProgrammingCycle,runInstance
+export sign_rand
+
+end

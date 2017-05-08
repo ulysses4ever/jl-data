@@ -1,0 +1,31 @@
+export power_method
+
+function power_method(mult :: Function, n :: Integer; max_iter=100, tol=1.0e-8)
+  vec = rand(n)
+  vec /= norm(vec)
+  vec2 = mult(vec)
+  a = dot(vec,vec2)
+  vec = vec2/norm(vec2)
+  it = 2
+  while it <= max_iter
+    vec2 = mult(vec)
+    b = dot(vec,vec2)
+    vec = vec2/norm(vec2)
+    if abs(a-b) < tol
+      a = b
+      break
+    end
+    a = b
+    it += 1
+  end
+  return a,vec,it
+end
+
+function power_method(A :: AbstractMatrix; max_iter=100, tol=1.0e-8)
+  (n,m) = size(A)
+  if n != m
+    error("A is not square matrix.")
+  end
+  return power_method( v->A*v, n; max_iter=max_iter, tol=tol)
+end
+

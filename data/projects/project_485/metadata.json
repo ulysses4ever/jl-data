@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:27 GMT
+Date: Wed, 03 May 2017 21:00:32 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 6802
+Content-Length: 5211
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3090
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4083
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "99b3ce4c25875406433ecfb556f8db4f"
-Last-Modified: Thu, 17 Mar 2016 10:56:51 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "821dab870a5aad54eeadbd8065eedd23"
+Last-Modified: Tue, 10 Feb 2015 07:21:25 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,82 +22,82 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: e724c57ebb9961c772a91e2dd7421c8d
-X-GitHub-Request-Id: 9C66:6633:DD5101:11E9032:590231BA
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: CC0B:5CA3:FF7AB9:1488000:590A44F0
 
 {
-  "id": 54110981,
-  "name": "CQL.jl",
-  "full_name": "JuliaPackageMirrors/CQL.jl",
+  "id": 25266865,
+  "name": "tofu",
+  "full_name": "evanthebouncy/tofu",
   "owner": {
-    "login": "JuliaPackageMirrors",
-    "id": 14939231,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
+    "login": "evanthebouncy",
+    "id": 1041553,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1041553?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/JuliaPackageMirrors",
-    "html_url": "https://github.com/JuliaPackageMirrors",
-    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
-    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
-    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
-    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
-    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
-    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
-    "type": "Organization",
+    "url": "https://api.github.com/users/evanthebouncy",
+    "html_url": "https://github.com/evanthebouncy",
+    "followers_url": "https://api.github.com/users/evanthebouncy/followers",
+    "following_url": "https://api.github.com/users/evanthebouncy/following{/other_user}",
+    "gists_url": "https://api.github.com/users/evanthebouncy/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/evanthebouncy/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/evanthebouncy/subscriptions",
+    "organizations_url": "https://api.github.com/users/evanthebouncy/orgs",
+    "repos_url": "https://api.github.com/users/evanthebouncy/repos",
+    "events_url": "https://api.github.com/users/evanthebouncy/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/evanthebouncy/received_events",
+    "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/JuliaPackageMirrors/CQL.jl",
-  "description": "Julia package mirror.",
+  "html_url": "https://github.com/evanthebouncy/tofu",
+  "description": "inferencing by chopping tofu",
   "fork": false,
-  "url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl",
-  "forks_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/forks",
-  "keys_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/teams",
-  "hooks_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/events",
-  "assignees_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/tags",
-  "blobs_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/subscription",
-  "commits_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/merges",
-  "archive_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/downloads",
-  "issues_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/JuliaPackageMirrors/CQL.jl/deployments",
-  "created_at": "2016-03-17T10:56:44Z",
-  "updated_at": "2016-03-17T10:56:51Z",
-  "pushed_at": "2016-03-17T10:56:49Z",
-  "git_url": "git://github.com/JuliaPackageMirrors/CQL.jl.git",
-  "ssh_url": "git@github.com:JuliaPackageMirrors/CQL.jl.git",
-  "clone_url": "https://github.com/JuliaPackageMirrors/CQL.jl.git",
-  "svn_url": "https://github.com/JuliaPackageMirrors/CQL.jl",
-  "homepage": "https://github.com/dioptre/CQL.jl",
-  "size": 25,
+  "url": "https://api.github.com/repos/evanthebouncy/tofu",
+  "forks_url": "https://api.github.com/repos/evanthebouncy/tofu/forks",
+  "keys_url": "https://api.github.com/repos/evanthebouncy/tofu/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/evanthebouncy/tofu/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/evanthebouncy/tofu/teams",
+  "hooks_url": "https://api.github.com/repos/evanthebouncy/tofu/hooks",
+  "issue_events_url": "https://api.github.com/repos/evanthebouncy/tofu/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/evanthebouncy/tofu/events",
+  "assignees_url": "https://api.github.com/repos/evanthebouncy/tofu/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/evanthebouncy/tofu/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/evanthebouncy/tofu/tags",
+  "blobs_url": "https://api.github.com/repos/evanthebouncy/tofu/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/evanthebouncy/tofu/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/evanthebouncy/tofu/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/evanthebouncy/tofu/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/evanthebouncy/tofu/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/evanthebouncy/tofu/languages",
+  "stargazers_url": "https://api.github.com/repos/evanthebouncy/tofu/stargazers",
+  "contributors_url": "https://api.github.com/repos/evanthebouncy/tofu/contributors",
+  "subscribers_url": "https://api.github.com/repos/evanthebouncy/tofu/subscribers",
+  "subscription_url": "https://api.github.com/repos/evanthebouncy/tofu/subscription",
+  "commits_url": "https://api.github.com/repos/evanthebouncy/tofu/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/evanthebouncy/tofu/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/evanthebouncy/tofu/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/evanthebouncy/tofu/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/evanthebouncy/tofu/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/evanthebouncy/tofu/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/evanthebouncy/tofu/merges",
+  "archive_url": "https://api.github.com/repos/evanthebouncy/tofu/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/evanthebouncy/tofu/downloads",
+  "issues_url": "https://api.github.com/repos/evanthebouncy/tofu/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/evanthebouncy/tofu/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/evanthebouncy/tofu/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/evanthebouncy/tofu/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/evanthebouncy/tofu/labels{/name}",
+  "releases_url": "https://api.github.com/repos/evanthebouncy/tofu/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/evanthebouncy/tofu/deployments",
+  "created_at": "2014-10-15T18:05:10Z",
+  "updated_at": "2015-02-10T07:21:25Z",
+  "pushed_at": "2015-02-10T07:21:25Z",
+  "git_url": "git://github.com/evanthebouncy/tofu.git",
+  "ssh_url": "git@github.com:evanthebouncy/tofu.git",
+  "clone_url": "https://github.com/evanthebouncy/tofu.git",
+  "svn_url": "https://github.com/evanthebouncy/tofu",
+  "homepage": null,
+  "size": 392,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",
@@ -118,25 +118,6 @@ X-GitHub-Request-Id: 9C66:6633:DD5101:11E9032:590231BA
     "push": false,
     "pull": true
   },
-  "organization": {
-    "login": "JuliaPackageMirrors",
-    "id": 14939231,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/JuliaPackageMirrors",
-    "html_url": "https://github.com/JuliaPackageMirrors",
-    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
-    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
-    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
-    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
-    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
-    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
-    "type": "Organization",
-    "site_admin": false
-  },
   "network_count": 0,
-  "subscribers_count": 1
+  "subscribers_count": 2
 }

@@ -1,0 +1,45 @@
+module julianne
+
+import neurons
+import synapses
+import inputs
+
+export evolve, simulation
+
+### Time Evolution ###
+"""
+Provides one timestep of time evolution for a group of neurons connected by synapses and with a given external input.
+Inputs are:
+    *A Neurons object
+    *A Synapses object
+    *An array of external currents
+    *The timestep size
+"""
+function simulation_step(neur::neurons.Neurons, syn::synapses.Synapses, Iext::Array{Float64,1}, dt::Float64)
+    I = synapses.input_current(neur, syn)
+    I += Iext
+    return neurons.update_neurons(neur, I, dt)
+end
+
+"""
+Runs a simulation of a group of neurons connected by synapses.
+Inputs are:
+    *A Neurons object
+    *A Synapses object
+    *An Inputs object
+    *The total duration of the desired simulation
+    *The timestep size
+"""
+function simulation(neur::neurons.Neurons, syn::synapses.Synapses, inp::inputs.Inputs, duration::Float64, dt::Float64)
+    S = Int64[]
+    T = Float64[]
+    for t in 0:dt:duration
+        I = inputs.return_input(inp, t, neur.nneur)
+        v, spidx = simulation_step(neur, syn, I, dt)
+        append!(S, spidx)
+        append!(T, t*ones(length(spidx)))
+    end
+    return T, S
+end
+
+end

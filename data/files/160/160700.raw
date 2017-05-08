@@ -1,0 +1,73 @@
+module MethylHMM
+
+using Distributions, Optim
+
+export binomial_HMM,
+       betabinom_HMM,
+       generate,
+       forward,
+       backward,
+       viterbi,
+       fit!
+
+# Constructors and type definitions
+include("binomial_HMM.jl")
+include("betabinom_HMM.jl")
+
+include("file_io.jl")          # functions for loading data
+include("stat_funcs.jl")       # statistics helper functions
+include("forward_backward.jl") # dynamic programming functions
+include("binomial_fit.jl")     # fitting methods for binomial HMM
+include("betabinom_fit.jl")    # fitting methods for betabinomial HMM
+
+# Interface to fitting functions (chooses binom vs betabinom based on HMM type)
+function fit!(hmm; method=:baum_welch, max_iter=20, tol=1e-6, scaling=true)
+    # Setting tol to NaN will prevent early stopping, resulting in 'max_iter' iterations
+    if method == :baum_welch
+        return baum_welch!(hmm, max_iter, tol, scaling)
+    else
+        error("method not recognized/implemented")
+    end
+end
+
+# Interface to draw samples from an hmm
+function generate(hmm, k::Vector{Int}, c::Vector{Int})
+    # Generate a sequence of observations (methylation events) given current HMM params
+    #   'k' -- coverage, k[t] provides number of reads that include site t
+    #   'c' -- nucleotide context, c[t] provides integer key for hmm.context_map for site t
+    # Returns:
+    #   'o' -- observations, o[t] provides number of methylation events at site t
+    n_obs = length(c)
+
+    # Sequence of states and observations
+    s = zeros(Int,n_obs) # states
+    o = zeros(Int,n_obs) # observations
+
+    # Choose initial state with probabilities weighted by 'hmm.p'
+    s[1] = sample(hmm.p)               # hmm.p are the initial state probabilities
+    o[1] = rand() <= hmm.B[s[1],c[1]]  # draw obs given initial state, s[1], and context, c[1]
+
+    # Iterate drawing observations and updating state
+    for t = 2:n_obs
+        # sample from appropriate row of state-transition matrix
+        s[t] = sample(hmm.A[s[t-1],:])
+
+        if typeof(hmm) == binomial_HMM
+            # B[s,c] is probability of being methylated in state 's' and context 'c'
+            prob = hmm.B[s[t],c[t]]
+            o[t] = rand(Binomial(k[t],prob))
+        elseif typeof(hmm) == betabinom_HMM
+            a = hmm.B[s[t],c[t],1]
+            b = hmm.B[s[t],c[t],2]
+            rand_prob = rand(Beta,a,b)
+            o[t] = rand(Binomial(k[t],prob))
+        else
+            error("HMM type not recognized")
+        end
+    end
+
+    # return sequence of states and observations
+    return (s,o)
+end
+
+end

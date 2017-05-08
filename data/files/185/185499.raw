@@ -1,0 +1,244 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
+module Willow
+
+using ModernGL, GLFW, Colors, AudioIO, Tau, Images, FreeType, FreeTypeAbstraction
+@osx_only begin using ObjectiveC end
+
+play([0]) # force AudioIO to initialize
+sleep(2)
+
+include("constants.jl")
+
+type stateStruct
+	program::GLuint
+	drawTexture::Bool
+	bgCol::Array{Color, 1}
+	fillStuff::Bool
+	fillCol::Array{Color, 1}
+	strokeStuff::Bool
+	strokeCol::Array{Color, 1}
+	tintStuff::Bool
+	tintCol::Array{Color, 1}
+	strokeWeight::Float32
+	fontFace::String
+	textSize::Float32
+	height::Int
+	width::Int
+	left::Float32
+	right::Float32
+	top::Float32
+	bottom::Float32
+	cMode::String
+	title::String
+	ellipseMode::String
+	rectMode::String
+	shapeMode::String
+	imageMode::String
+	frameRate::Int
+	frameCount::Int
+	initialized::Bool
+end
+
+# need to generalize font system
+state = stateStruct(GLuint(0), false, [RGB(0.94, 0.92, 0.9)], true, [RGB(0.7, 0.7, 0.7)], true, [RGB(0.0, 0.0, 0.0)], false, [RGB(0.0, 0.0, 0.0)], 1.0, "/Users/rje/Library/Fonts/SourceCodePro-Medium.otf", 0.4, 275, 275, -1., 1., 1., -1., "RGB", "Willow.jl", "CENTER", "CORNER", "CORNER", "CORNER", 60, 0, false)
+
+type vertexStruct
+	shapeVertices::Array{GLfloat, 1}
+	textureCoords::Array{GLfloat, 1}
+	vertexStride::Int
+	nVertices::Int
+	shapeType::GLuint
+end
+
+shapeData = vertexStruct(GLfloat[], GLfloat[], -1, -1, GL_POINTS)
+
+include("openglaux.jl")
+include("audio.jl")
+include("color.jl")
+include("environment.jl")
+include("image.jl")
+include("input.jl")
+include("pixels.jl")
+include("rendering.jl")
+include("shapes2d.jl")
+# include("shapes3d.jl")
+include("textures.jl")
+include("transform.jl")
+include("typography.jl")
+
+type textCharacter
+    texID::GLuint
+    size::Array{Float64, 1}
+    bearing::Array{Float64, 1}
+    advance::GLuint
+end
+
+blankChar = textCharacter(GLuint(0), Float64[], Float64[], GLuint(0))
+
+type fontStruct
+	face::Array{Ptr{FreeType.FT_FaceRec}, 1}
+	characters::Dict{Char, textCharacter}
+	fontWidth::Int
+	fontHeight::Int
+end
+
+fontState = fontStruct(Ptr{FreeType.FT_FaceRec}[], Dict(' ' => blankChar), 0, 48)
+
+function __init__()
+	FreeTypeAbstraction.init() # initialize FreeType
+	fontState.face = newface(state.fontFace)
+	FreeTypeAbstraction.setpixelsize(fontState.face, fontState.fontWidth, fontState.fontHeight)
+end
+
+include("shaders.jl")
+
+shaderBank = Dict("basicShapes" => UInt32(0),
+				"texturedShapes" => UInt32(0),
+				"fontDrawing" => UInt32(0))
+
+# do we really need this?
+textureBank = zeros(GLuint, 31) # it's unlikely that most people will need
+                                # more than 31 textures at a time
+
+# for now, we turn all images into 1D arrays for OpenGL textures.
+# this still isn't used anywhere in the code.
+type GLimage
+	img::Array{Float32, 1}
+	w::Int
+	h::Int
+end
+
+type GLobjs
+	vaos::Array{GLuint, 1}
+	vbos::Array{GLuint, 1}
+	ebos::Array{GLuint, 1}
+	fbos::Array{GLuint, 1}
+end
+
+globjs = GLobjs(GLuint[], GLuint[], GLuint[], GLuint[])
+
+export screen, animate, endDrawing, drawingWindow
+
+function screen(width, height; fullScreen=false)
+	GLFW.Init()
+	state.width = width
+	state.height = height
+
+	GLFW.WindowHint(GLFW.CONTEXT_VERSION_MAJOR, 3)
+	GLFW.WindowHint(GLFW.CONTEXT_VERSION_MINOR, 2)
+	GLFW.WindowHint(GLFW.OPENGL_PROFILE, GLFW.OPENGL_CORE_PROFILE)
+	GLFW.WindowHint(GLFW.OPENGL_FORWARD_COMPAT, GL_TRUE)
+
+	# i'm not actually sure if I am doing this right.
+	# does it actually give the running Julia process high priority?
+	@osx_only begin
+		ObjectiveC.loadbundle("/System/Library/Frameworks/Foundation.framework")
+		@classes NSProcessInfo
+
+		NSActivityIdleDisplaySleepDisabled = Culonglong(1) << 40
+		NSActivityIdleSystemSleepDisabled = Culonglong(1) << 20
+		NSActivitySuddenTerminationDisabled = Culonglong(1) << 14
+		NSActivityAutomaticTerminationDisabled = Culonglong(1) << 15
+		NSActivityUserInitiated = Culonglong(0x00FFFFFF) | NSActivityIdleSystemSleepDisabled
+		NSActivityLatencyCritical = Culonglong(0xFF00000000)
+		options = NSActivityIdleDisplaySleepDisabled | NSActivityIdleSystemSleepDisabled | NSActivitySuddenTerminationDisabled | NSActivityAutomaticTerminationDisabled | NSActivityUserInitiated | NSActivityLatencyCritical
+
+		activity = @objc [[NSProcessInfo processInfo] beginActivityWithOptions:options reason:"High priority for better stimulus timing."]
+	end
+
+	# anti-aliasing by default
+	GLFW.WindowHint(GLFW.SAMPLES, 4)
+	GLFW.WindowHint(GLFW.RESIZABLE, false)
+
+	if state.frameRate != 60
+		GLFW.WindowHint(GLFW.REFRESH_RATE, state.frameRate)
+	end
+
+	if fullScreen
+		window = GLFW.CreateWindow(state.width, state.height, state.title, GLFW.GetPrimaryMonitor())
+	else
+		window = GLFW.CreateWindow(state.width, state.height, state.title)
+	end
+
+	GLFW.MakeContextCurrent(window)
+	GLFW.ShowWindow(window)
+	GLFW.SetWindowSize(window, state.width, state.height)
+	glViewport(0, 0, state.width*2, state.height*2)
+	GLFW.SwapInterval(1)
+
+	println(createcontextinfo())
+
+	glPointSize(2) # points are too small to see when 1-pixel big at high res
+
+	# don't re-enable this until we have a better way of making
+	# sure that vertices always wind in the correct direction.
+	# currently, this is only enabled during text writing.
+	# glEnable(GL_CULL_FACE)
+
+	glEnable(GL_BLEND) # using blending by default
+
+	# the enums here aren't in ModernGL.jl yet
+	# glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD)
+
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE)
+	glEnable(GL_MULTISAMPLE) # just be double sure that multisampling is on
+
+	push!(globjs.vaos, glGenVertexArray())
+	glBindVertexArray(globjs.vaos[1])
+
+	push!(globjs.vbos, glGenBuffer())
+	# push!(globjs.vbos, glGenBuffer())
+	# glBindBuffer(GL_ARRAY_BUFFER, globjs.vbos[2])
+	# glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*6*4, C_NULL, GL_DYNAMIC_DRAW)
+	glBindBuffer(GL_ARRAY_BUFFER, globjs.vbos[1])
+
+	push!(globjs.ebos,  glGenBuffer())
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, globjs.ebos[1])
+
+	initShaders()
+
+	push!(globjs.fbos,  glGenFrameBuffer())
+	glBindBuffer(GL_FRAMEBUFFER, globjs.fbos[1])
+
+	glEnable(GL_TEXTURE_2D)
+
+	glEnable(GL_POINT_SMOOTH)
+	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST)
+
+	glEnable(GL_DEPTH_TEST)
+	glDepthFunc(GL_LEQUAL)
+
+	if !state.initialized
+		setupFontCharacters()
+	end
+	state.initialized = true
+
+	glClearColor(state.bgCol[1].r, state.bgCol[1].g, state.bgCol[1].b, 1.0)
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+	GLFW.SwapBuffers(window)
+	GLFW.PollEvents()
+
+	return window
+end
+
+screen(w; fS=false) = screen(w, w; fullScreen=fS)
+screen(; fS=false) = screen(state.width, state.height; fullScreen=fS)
+
+function animate(window)
+	GLFW.SwapBuffers(window)
+	state.frameCount += 1
+end
+
+function endDrawing(window)
+	GLFW.DestroyWindow(window)
+	GLFW.Terminate()
+end
+
+function drawingWindow(window)
+	GLFW.MakeContextCurrent(window)
+	GLFW.ShowWindow(window)
+end
+
+end # module

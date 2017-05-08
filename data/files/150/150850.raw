@@ -1,0 +1,103 @@
+module BestSubsetRegression
+
+using StatsBase
+
+# Use the discrete first order algorithm described in
+#   Bertsimas, King, Mazumder.
+#   "Best Subset Selection via a Modern Optimization Lens" 
+#   http://arxiv.org/abs/1507.03133
+# to find a linear regression model with no more than k non-zero
+# coefficients.
+# We assume the following about the input:
+# - The columns of X are normalized: zero mean, unit l2-norm
+# - y is normalized
+# The method is a heuristic: it starts from a random starting
+# point and doesn't necessarily converge to the global optimum.
+# As a result, you need to provide a keyword argument `starts`
+# for the number of random starts to try.
+# Keyword argument ϵ controls when the first-order method will
+# terminate due to β changing little between iterations.
+export bestsubset
+function bestsubset(X,y,k;starts=10,ϵ=0.01)
+    n, p = size(X)
+    # Record best solution so far
+    best_β = zeros(p)
+    best_err = Inf
+    # Calculate largest eigenvalue of X'X
+    λ = eigmax(X'X)
+    # Try starts random starting solutions
+    for start in 1:starts
+        @show start
+        # Step 1
+        # Initialize with β₁ such that ‖β₁‖₀ ≤ k
+        β = _initialguess(p,k)
+        while true
+            # Step 2
+            # Obtain β_m+1 as
+            # β_m+1 ∈ H_k(β_m - 1/L * ∇g(β_m))
+            #  g(β) = 0.5‖y - Xβ‖₂^2
+            # ∇g(β) = -X'(y-Xβ)
+            ∇gβ = -X'*(y-X*β)
+            adβ = β - 1/λ * ∇gβ
+            @show β
+            # Equation 22:
+            # H_k(c) = argmin_{‖β‖₀ ≤ k} ‖β-c‖₂^2
+            # Which can be solved by taking the k largest
+            # absolute values of c
+            absc = abs(adβ)
+            order = sortperm(absc, rev=true)
+            η = zeros(p)
+            for i in 1:k
+                η[order[i]] = adβ[order[i]]
+            end
+            # Step 3
+            # Check termination criterion ‖β_m+1 - β_m‖₂ ≤ ϵ
+            converged = norm(η - β) ≤ ϵ
+            β = η
+            converged && break
+            # Repeat Step 2
+        end
+        # Step 4
+        # Fix currently-zero coefficients in β at 0 and solve
+        # the ordinary regression equation
+        # TODO: Use a different method that doesn't require
+        #       forming the reduced model matrix.
+        supp = Int[]
+        for i in 1:p
+            # Exact equality OK here by construction
+            if β[i] != 0.0
+                push!(supp, i)
+            end
+        end
+        @show supp
+        Xred = X[:,supp]
+        βredopt = Xred\y
+        @show βredopt
+        err = sumabs2(y - Xred*βredopt)
+        βopt = zeros(p)
+        for i in 1:length(supp)
+            βopt[supp[i]] = βredopt[i]
+        end
+        @show βopt
+        if err <= best_err
+            best_err = err
+            best_β = βopt
+        end
+    end
+    return best_β
+end
+
+
+# _initialguess
+# Internal. Draws a random vector in R^p with k non-zero
+# values that a drawn from a standard normal.
+function _initialguess(p,k)
+    nonzeroidx = sample(1:p,k,replace=false)
+    β = zeros(p)
+    for idx in nonzeroidx
+        β[idx] = randn()
+    end
+    return β
+end
+
+end # module

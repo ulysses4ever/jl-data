@@ -1,0 +1,23 @@
+include("FESetModule.jl")
+include("FENodeSetModule.jl")
+include("MeshExportModule.jl")
+include("FEMMBaseModule.jl")
+include("IntegRuleModule.jl")
+include("FEMMHeatDiffusionModule.jl")
+include("MeshModificationModule.jl")
+include("MeshQuadrilateralModule.jl")
+
+            
+using FESetModule
+using FENodeSetModule
+using MeshModificationModule
+
+ X=[-1.0 -1.0; 0.0 -1.0; 0.0 0.0; -1.0 0.0]
+ fens1=FENodeSetModule.FENodeSet(xyz=[X[:,1] X[:,2]])
+ fens2=FENodeSetModule.FENodeSet(xyz=[X[:,1]+1.0 X[:,2]])
+ tolerance= 0.001
+ fens,nid=MeshModificationModule.fusenodes(fens1, fens2, tolerance)
+ show(fens.xyz)
+
+
+

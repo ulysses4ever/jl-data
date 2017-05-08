@@ -1,0 +1,21 @@
+module Sudoku3
+
+export replaceCellErrors
+
+function sudokuSolver()
+end
+
+function replaceCellErrors(originalPuzzle)
+  correctedPuzzle = deepcopy(originalPuzzle)
+
+  for i = 1:length(correctedPuzzle)
+    if 1 > correctedPuzzle[i] || correctedPuzzle[i]> 9
+      correctedPuzzle[i] = 0
+    end
+  end
+
+  return correctedPuzzle
+end
+
+
+end

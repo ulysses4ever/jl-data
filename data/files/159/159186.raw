@@ -1,0 +1,81 @@
+
+function subfolders(path::AbstractString)
+  path=abspath(path)
+  files=filter(x->!startswith(x,"."),readdir(path))
+  files=map(x->joinpath(path,x), files)
+  folders=filter(isdir,files)
+  subsubfolders=map(subfolders,folders)
+  result=[path]
+  for f=subsubfolders
+    append!(result,f)
+  end
+  return result
+end
+
+append!(LOAD_PATH,subfolders("../src"))
+
+using MAT
+
+function read_samples()
+  vars = matread("lsa64_features_kadir_spb.mat")["db_features"]
+  matlab_features=vars["kadir_features_spb"]
+  n=length(matlab_features)
+
+  y=vars["class"]
+  y=convert(Vector{Int},vec(y))
+
+  subject=vars["subject"]
+  subject=convert(Vector{Int},vec(subject))
+
+  subject=zeros(n)
+  features=41
+  sps=SequentialPatterns.SequentialPattern[]
+  for i=1:n
+    matlab_feature=matlab_features[i]
+    indices_sp=SequentialPatterns.IndicesSequentialPattern()#IndicesFrame[]
+    for j=1:length(matlab_feature)
+      matlab_frame=matlab_feature[j]
+      if (length(matlab_frame)==1)
+        frame=[convert(Int,matlab_frame)]
+      else
+        frame=convert(Vector{Int},vec(matlab_frame))
+      end
+      push!(indices_sp,frame)
+    end
+    sp=SequentialPatterns.SequentialPattern(indices_sp,features)
+    push!(sps,sp)
+  end
+
+  sps,y,subject
+end
+
+using Classifiers
+import AdaBoosts
+import SequentialPatterns
+using Multiclass
+
+x,y=read_samples()
+
+features=41
+max_frames=8
+max_iterations=10
+spc=SequentialPatterns.SequentialPatternConfig(features,max_frames,max_iterations)
+
+max_classifiers=10
+subsample_cumulative_distribution=0.7
+min_samples=10
+bc=AdaBoosts.AdaBoostConfig(spc,max_classifiers,subsample_cumulative_distribution,min_samples)
+mc=AllVersusAllClassifierConfig(bc)
+model=fit(mc,x,y)
+predicted=predict(model,x)
+println(predicted)
+println(y)
+println(loss(model,x,y))
+
+
+
+#TODO
+# implement AVA Multiclass
+# implement ECOC Multiclass
+# classifiers should return confidence levels?
+# plot results

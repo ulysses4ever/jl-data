@@ -1,0 +1,31 @@
+module Romeo
+
+export HttpServer,
+       run
+
+type HttpServer
+    self::HttpServer
+    socket::Base.UVServer
+    port::Integer
+    handle::Function
+
+    HttpServer(port::Integer, handle::Function) = (
+        s = new();
+        s.handle = handle;
+        s.port = port;
+        s.socket = Base.TcpServer();
+        s.self = s;
+    )
+end
+
+function run(server::HttpServer)
+    bind(server.socket, Base.IPv4(uint32(0)), uint16(server.port))
+    listen(server.socket)
+
+    while true
+        sock = accept(server.socket)
+        @async server.handle(sock)
+    end
+end
+
+end # module Romeo

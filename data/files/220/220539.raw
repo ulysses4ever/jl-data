@@ -1,0 +1,154 @@
+#read data and write another
+
+
+for ind1 in 0:1
+  for ind2 in 0:3
+    for ind3 in 0:9
+      fInput = @sprintf( "%d%d-%dinstanceMCITW.txt", ind1, ind2, ind3 )
+      fOutput = @sprintf( "%d%d-%dinstanceMCITW-1P.dat", ind1, ind2, ind3 )
+      
+fMAT = open( fInput, "r" )
+fJulia = open( fOutput, "w" )
+
+aux = readline( fMAT )
+cardC = int( float( aux ) )
+
+aux = readline( fMAT )
+cardD = int( float( aux ) )
+
+aux = readline( fMAT )
+cardP = int( float( aux ) )
+
+aux = readline( fMAT )
+cardT = int( float( aux ) )
+
+CCap = zeros( Int, 1, cardC )
+for k in 1:cardC
+  aux = readline( fMAT )
+  CCap[k] = int( float( aux ) )
+end
+
+CCost = zeros( Int, 1, cardC )
+for k in 1:cardC
+  aux = readline( fMAT )
+  CCost[k] = int( float( aux ) )
+end
+
+DA = zeros( Int, 1, cardD )
+for i in 1:cardD
+  aux = readline( fMAT )
+  DA[i] = int( float( aux ) )
+end
+
+DS = zeros( Int, 1, cardD )
+for i in 1:cardD
+  aux = readline( fMAT )
+  DS[i] = int( float( aux ) )
+end
+
+DE = zeros( Int, 1, cardD )
+for i in 1:cardD
+  aux = readline( fMAT )
+  DE[i] = int( float( aux ) )
+end
+
+DD = zeros( Int, cardD, cardC )
+for i in 1:cardD
+  line = readline( fMAT )
+  DD[i,:] = int( float( split( line ) ) )
+end
+
+PA = zeros( Int, 1, cardP )
+for j in 1:cardP
+  aux = readline( fMAT )
+  PA[j] = int( float( aux ) )
+end
+
+PS = zeros( Int, 1, cardP )
+for j in 1:cardP
+  aux = readline( fMAT )
+  PS[j] = int( float( aux ) )
+end
+
+PE = zeros( Int, 1, cardP )
+for j in 1:cardP
+  aux = readline( fMAT )
+  PE[j] = int( float( aux ) )
+end
+
+PD = zeros( Int, cardP, cardC )
+for j in 1:cardP
+  line = readline( fMAT )
+  PD[j,:] = int( float( split( line ) ) )
+end
+
+write( fJulia, "cardC = $cardC\n" )
+write( fJulia, "cardD = $cardD\n" )
+write( fJulia, "cardP = $cardP\n" )
+write( fJulia, "cardT = $cardT\n\n" )
+
+write( fJulia, "CCap = [ " )
+write( fJulia, join(CCap,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "CCost = [ " )
+write( fJulia, join(CCost,"  "))
+write( fJulia, "]\n\n" )
+
+write( fJulia, "DA = [ " )
+write( fJulia, join(DA,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "DS = [ " )
+write( fJulia, join(DS,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "DE = [ " )
+write( fJulia, join(DE,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "DD = [ " )
+for i in 1:cardD
+  if ( i >= 2 )
+    write( fJulia, "       " )
+  end
+  write( fJulia, join(DD[i,:],"  "))
+  if ( i == cardD )
+    write( fJulia, "]\n\n" )
+  else
+    write( fJulia, ";\n" )
+  end
+end
+
+write( fJulia, "PA = [ " )
+write( fJulia, join(PA,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "PS = [ " )
+write( fJulia, join(PS,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "PE = [ " )
+write( fJulia, join(PE,"  "))
+write( fJulia, "]\n" )
+
+write( fJulia, "PD = [ " )
+for j in 1:cardP
+  if ( j >= 2 )
+    write( fJulia, "       " )
+  end
+  write( fJulia, join(PD[j,:],"  "))
+  if ( j == cardP )
+    write( fJulia, "]" )
+  else
+    write( fJulia, ";\n" )
+  end
+end
+
+close( fMAT )
+close( fJulia )
+      
+    end
+  end
+end
+

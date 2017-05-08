@@ -1,0 +1,27 @@
+###################################################
+## Tests
+###################################################
+
+using JuMP, Gurobi
+using LightGraphs, JLD, DataFrames
+using Base.Test
+
+include("../src/agent/params.jl")
+include("../src/sim/import_data.jl")
+include("../src/sim/instancegraph.jl")
+include("../src/agent/brain.jl")
+include("../src/runsim.jl")
+include("../src/agent/match.jl")
+
+
+testdir = dirname(@__FILE__)
+
+tests = [
+    "match"
+]
+
+for t in tests
+    tp = joinpath(testdir, t, "run_tests.jl")
+    println("running $(tp) ...")
+    include(tp)
+end

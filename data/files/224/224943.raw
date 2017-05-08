@@ -1,0 +1,102 @@
+module Parallel
+
+export @modeverywhere, @dopara
+
+# # # #
+#
+# @modeverywhere(ex)
+#   
+#   Like `Base.@everywhere`, but executes `ex` in the scope of the
+#   current module rather then in `Main`.
+#
+
+macro modeverywhere(ex)
+    quote
+        @sync for p in procs()
+            @spawnat p $(esc(ex))
+        end
+    end
+end
+
+# # # #
+#
+# @dopara m func
+#   
+#   Useful for SharedArrays as a replacement of `@parallel for`, to
+#   distribute the computation in chunks.
+#   So a loop like
+#
+#     for j = 1:m
+#       dosomething(j)
+#     end
+#   
+#   could become
+#
+#     function dosomething_on_whole_chunk(r::UnitRange)
+#       for j in r
+#         dosomething(j)
+#       end
+#     end
+#
+#     @dopara m (i,r)->begin
+#       result[i] = dosomething_on_whole_chunk(r)
+#     end
+#
+#   More in detail: the range `1:m` is split into equal chunks among available
+#   workers, and `func` is called on each worker. `func` must be an anonymous
+#   function of two arguments: the first represents the chunk index, the second
+#   the chunk range assigned to the worker.
+#
+# @dopara ps m func
+#
+#   Like the two-argument version, but allows specifying a list of processes
+#
+
+subargs(s, args::Vector, sargs::Vector) = s
+
+function subargs(s::Symbol, args::Vector, sargs::Vector)
+    for (a,sa) in zip(args, sargs)
+        s == a && return sa
+    end
+    return esc(s)
+end
+
+subargs(body::Expr, args::Vector, sargs::Vector) = Expr(body.head, map(x->subargs(x, args, sargs), body.args)...)
+
+function dopara_genbody(ps, m, func::Expr)
+    Meta.isexpr(func, :(->)) || error("func must be an anonymous function")
+    Meta.isexpr(func.args[1], :tuple) && length(func.args[1].args) == 2 || error("func must be a function of 2 arguments")
+    fargs = func.args[1].args
+    fbody = func.args[2]
+    inner = subargs(fbody, fargs, [:i, :r])
+    quote
+        lp = length($(esc(ps)))
+        cs = div($(esc(m)), lp)
+        @sync for i = 1:lp
+            p = $(esc(ps))[i]
+            r = i < lp ?  ((i-1)*cs+1:i*cs) : ((i-1)*cs+1:$(esc(m)))
+            @spawnat p begin
+                $inner
+            end
+        end
+    end
+end
+
+function dopara_genbody(m, func)
+    ps = gensym("ps")
+    psex = quote
+        $(esc(ps)) = workers()
+        length($(esc(ps))) > $(esc(m)) && ($(esc(ps)) = $(esc(ps))[1:$(esc(m))])
+    end
+    paraex = dopara_genbody(ps, m, func)
+    retex = quote
+        $psex
+        $paraex
+    end
+end
+
+macro dopara(args...)
+    dopara_genbody(args...)
+end
+
+end

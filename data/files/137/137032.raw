@@ -1,0 +1,103 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+include("recognitionPDA.jl")
+
+type NWMatrixRow
+    row::Array{Float64}
+end
+
+type NWMatrix
+    _rows::Array{NWMatrixRow}
+    _pos_i::Int64
+    _pos_j::Int64
+
+    _numRows::Int64
+    _numCols::Int64
+end
+
+function createMatrix(numRows, numColumns)
+    matrix = NWMatrix([NWMatrixRow(zeros(numColumns))], 1, 1, numRows, numColumns)
+
+    # we need to add numRows - 1 more rows
+    for n=1:numRows-1
+        push(matrix._rows, NWMatrixRow(zeros(numColumns)))
+    end
+
+    return matrix
+end
+
+
+function getCurrentPosI(matrix::NWMatrix)
+    return matrix._pos_i
+end
+
+function getCurrentPosJ(matrix::NWMatrix)
+    return matrix._pos_j
+end
+
+function getNumOfRows(matrix::NWMatrix)
+    return matrix._numRows
+end
+
+function getNumOfCols(matrix::NWMatrix)
+    return matrix._numCols
+end
+
+function setMatrixValue(matrix::NWMatrix, i::Int64, j::Int64, val::Float64)
+    if i <1 || j < 1 || i > matrix._numRows || j > matrix._numCols
+        error("Invalid values to index matrix cell. Must be >= 1\n")
+    end
+
+    matrix._rows[i].row[j] = val
+end
+
+function getMatrixValue(matrix::NWMatrix, i::Int64, j::Int64)
+    if i <1 || j < 1 || i > matrix._numRows || j > matrix._numCols
+        error("Invalid values to index matrix cell. Must be >= 1\n")
+    end
+
+    return matrix._rows[i].row[j]
+end
+
+function drawMatrix(matrix::NWMatrix)
+    for i=1:getNumOfRows(matrix)
+        for j=1:getNumOfCols(matrix)
+            val::Float64 = getMatrixValue(matrix, i, j)
+            
+            if val == 0
+                print("Z")
+            elseif val < 0
+                print("N")
+            elseif val < 10
+                print("D")
+            else
+                print("G")
+            end
+        end
+        print("\n")
+    end 
+end
+
+#mat = createMatrix(7,8)
+#println(mat)

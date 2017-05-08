@@ -1,0 +1,56 @@
+#### EXPORTED FUNCTIONS ####
+function fit_soft(A , k; initX=nothing, initY=nothing, n_repeats=10, xscale=1.0, yscale=1.0)
+	# Construct GLRM
+	m,n = size(A)
+	obs = find_observations(A)
+	losses = fill(quadratic(),n)
+	glrm = GLRM(A,obs,losses,nonneg_onereg(xscale),quadreg(yscale),k)
+
+	# Fit GLRM
+	return fit_batch(glrm,initX,initY,n_repeats)
+end
+
+function fit_hard(A , k; initX=nothing, initY=nothing, n_repeats=1)
+	# Construct GLRM
+	m,n = size(A)
+	obs = find_observations(A)
+	losses = fill(quadratic(),n)
+	glrm = GLRM(A,obs,losses,unitonesparse(),zeroreg(),k)
+
+	# Fit GLRM
+	return fit_batch(glrm,initX,initY,n_repeats)
+end
+
+#### NON-EXPORTED FUNCTIONS ####
+
+function fit_batch(glrm,initX,initY,n_repeats)
+    ## Fits a specified low-rank model n_repeats times, returns best fit
+
+    # Initialize GLRM
+	if initX != nothing
+		glrm.X = initX
+	end
+	if initY != nothing
+		glrm.Y = initY
+	end
+
+    # Storage for best fit
+    best = Inf
+    X,Y,ch = 0,0,0
+    
+    for i = 1:n_repeats
+        # Fit data
+        Xest,Yest,ch_ = fit!(glrm,verbose=false)
+        
+        # If objective function is better, save results
+        if ch_.objective[end] < best
+            best = ch_.objective[end]
+            X,Y,ch = Xest,Yest,ch_
+        end
+
+        # Randomly initialize glrm for the next fit
+        glrm.X = rand(size(glrm.A,1),glrm.k)
+        glrm.Y = rand(glrm.k,size(glrm.A,2))
+    end
+    return X,Y,ch
+end

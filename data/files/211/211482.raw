@@ -1,0 +1,24 @@
+
+#include("HW5_Q2_lookup_table.jl")
+
+xmin=0.
+xmax=2.
+n=10
+n2=10*n
+sinh_table = make_table_linear(x1->integrate(x->sinh(x),0.,x1),xmin,xmax,n)
+
+x1=[xmin + (xmax-xmin)*i/(n-1) for i in 0:(n-1)]
+x2=[xmin + (xmax-xmin)*i/(n2-1) for i in 0:(n2-1)]
+
+@time y11=[sinh(i) for i in x1]
+@time y12=[lookup(sinh_table,i) for i in x1]
+
+@time y21=[integrate(x->sinh(x),0.,i) for i in x2]
+@time y22=[lookup(sinh_table,i) for i in x2]
+
+using PyPlot
+#plot(x1,y11)
+#plot(x1,y12,color="red")
+
+plot(x2,y21)
+plot(x2,y22,color="red")

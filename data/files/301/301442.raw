@@ -1,0 +1,32 @@
+#area.jl
+function area(coords) 
+  b = coords[end]
+  v = 0.0
+  for i in 1:length(coords)
+    a, b = b, coords[i]
+    v += a[2] * b[1] - a[1] * b[2]
+  end
+  return v * 0.5
+end
+
+#=
+Returns the signed area for a ring.  
+The area is positive if the ring is oriented CW.
+CGAL Algorithms
+=#
+function signedarea(ring)
+  if length(ring) < 3
+    return 0.0
+  end
+  x, y = 1, 2
+  v = 0.0;
+  n = length(ring)
+  for i in 1:n
+    bx, by = ring[i][x], ring[i][y]
+    j = (i == n) ? 1 : i + 1
+    cx, cy = ring[j][x], ring[j][y]
+    v += (bx + cx) * (cy - by)
+  end
+  return -v / 2.0
+end
+

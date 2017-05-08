@@ -1,0 +1,298 @@
+###
+#  Perform binary Ideal Adsorbed Solution Theory
+#  Author: CoryMSimon@gmail.om
+###
+
+using Optim
+using Gadfly
+using DataFrames
+using Roots
+using Grid
+include("trapz.jl")  # for trapezoid rule
+
+###
+#   Isotherm models
+###
+function LoadingLangmuir(K::Float64, M::Float64, P::Union(DataArray{Float64}, Array{Float64}, Float64))
+    """
+    Compute loading of Langmuir adsorption isotherm at pressure P
+
+    K : Langmuir constant (units: 1 / P)
+    M : Saturation loading
+    """
+    return M .* K .* P ./ (1.0 + K .* P)
+end
+
+function LoadingQuadratic(Ka::Float64, 
+                          Kb::Float64,
+                          M::Float64, 
+                          P::Union(DataArray{Float64}, Array{Float64}, Float64))
+    """
+    Compute loading of Quadratic adsorption isotherm at pressure P, eqn (8) of Tarafder
+
+    Ka : Constant (units: 1 / P)
+    Kb : Constant (units: 1 / P^2)
+    M : Half of the saturation loading
+    """
+    return M .* (Ka + 2 * Kb * P) .* P ./ (1.0 + Ka * P + Kb * P .^ 2)
+end
+
+###
+#   Functions to fit isotherm models to adsorption isotherm data
+###
+function FitLangmuir(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+    """
+    Fits data to Langmuir isotherm
+    returns K, M of best fit
+    """
+    # define residual sum of squares (RSS) to minimize
+    # x := [K, M]
+    RSS(x) = sum((df[loading_key] - LoadingLangmuir(x[1], x[2], df[pressure_key])) .^ 2)
+    
+    # initial guesses for parameters
+    M_guess = df[loading_key][end]  # guess saturation loading to be highest loading
+    K_guess = df[loading_key][1] / df[pressure_key][1] / (M_guess - df[pressure_key][1])  # guess K using M_guess and first point
+
+    # use optimization routine to find best fit params
+    res = optimize(RSS, [K_guess, M_guess], method = :l_bfgs)
+    K = res.minimum[1]
+    M = res.minimum[2]
+    
+    return K, M
+end
+
+function FitQuadratic(df::DataFrame, loading_key::Symbol, pressure_key::Symbol)
+    """
+    Fit data to Quadratic isotherm
+    returns Ka, Kb, M of best fit
+    """
+    # define residual sum of squares to minimize
+    # x := [Ka, Kb, M]
+    RSS(x) = sum((df[loading_key] - LoadingQuadratic(x[1], x[2], x[3], df[pressure_key])) .^ 2)
+    
+    # initial guesses for parameters
+    M_guess = df[loading_key][end] / 2.0  # guess 1/2 loading to be 1/2 loading at last point
+    Ka_guess = df[loading_key][1] / df[pressure_key][1] / (M_guess - df[pressure_key][1])  # assume Langmuir
+    Kb_guess = 0.0001 # start with Langmuir assumption (Kb \approx 0)
+    
+    # use optimization routine to find best fit params
+    res = optimize(RSS, [Ka_guess, Kb_guess, M_guess], method = :l_bfgs)
+    Ka = res.minimum[1]
+    Kb = res.minimum[2]
+    M = res.minimum[3]
+    
+    return Ka, Kb, M
+end
+
+###
+#   Functions to compute spreading pressures for isotherm models (eqn 4 of Tarafder)
+#   \int_0^p q(\hat{p})/ \hat{p} d\hat{p} 
+###
+function Π_Langmuir(p, M, K)
+    """
+    Spreading pressure calculated from Langmuir isotherm
+    eqn 13 of Tarafder
+
+    M: saturation loading in Langmuir isotherm
+    K: Langmuir parameter in Langmuir isotherm
+    p: pressure of component
+    """
+    return M * log(1 + K * p)
+end
+
+function Π_Quadratic(p, M, Ka, Kb)
+    """
+    Spreading pressure calculated from Quadratic isotherm
+    eqn 15 of Tarafder
+
+    M: 1/2 saturation loading
+    Ka, Kb: parameters in Quadratic isotherm
+    p: pressure of component
+    """
+    return M * log(1 + Ka * p + Kb * p ^ 2)
+end
+
+function Π_Interpolate(p, interpolator::InterpIrregular, df::DataFrame, pressure_key::Symbol, loading_key::Symbol)
+    """
+    Spreading pressure calculated from trapezoid rule on isotherm
+    eqn 4 in Tarafder
+    """
+    first_triangle = df[loading_key][1]  # area of first triangle in integral
+    p_array = linspace(df[pressure_key][1], p)  # array of pressures
+    l_array = interpolator[p_array] ./ p_array  # array of function loading / p 
+    return trapz(l_array, p_array) + first_triangle
+end
+
+function plot_isotherms_and_fits(df::DataFrame, loading_keys::Array{Symbol}, pressure_key::Symbol, method::String, 
+                                 P, predictedloading1, predictedloading2)
+    """
+    Plot isotherms and their fits
+    """
+    fit = plot(
+           layer(x=P, y=predictedloading1, Geom.line, Theme(default_color=color("red"))),
+           layer(x=P, y=predictedloading2, Geom.line, Theme(default_color=color("blue"))),
+           layer(x=df[pressure_key], y=df[loading_keys[1]], Geom.point, Theme(default_color=color("red"))),
+           layer(x=df[pressure_key], y=df[loading_keys[2]], Geom.point, Theme(default_color=color("blue"))),
+           Scale.x_log10,
+           Guide.xlabel("Pressure"), 
+           Guide.ylabel("Loading"),
+           Guide.title("$method isotherm fit"),
+           Guide.manual_color_key("Component", 
+                        [@sprintf("%s", loading_keys[1]), @sprintf("%s", loading_keys[2])],
+                        ["red", "blue"]) 
+    )
+    draw(PNG(6inch, 3inch), fit)
+end
+
+###
+#   Perform IAST
+###
+function IAST(p::Array{Float64}, df::DataFrame, loading_keys::Array{Symbol}, pressure_key::Symbol; method="Langmuir", plotflag::Bool=false, verboseflag::Bool=false)
+    """
+    Perform IAST calculation
+
+    Follows method outlined in A. Tarafder and M. Mazzotti. A method for deriving explicit binary isotherms obeying ideal adsorbed solution theory.
+                               Chem. Eng. Technol. 2012, 35, No. 1, 102-108.
+    """
+    if (verboseflag == true)
+        @printf("Performing IAST on loading columns %s and %s using method %s\n\n", loading_keys[1], loading_keys[2], method)
+    end
+
+    if (method == "Langmuir")
+        # fit isotherms to Langmuir model  
+        K = zeros(2)
+        M = zeros(2)
+        K[1], M[1] = FitLangmuir(df, loading_keys[1], pressure_key)
+        K[2], M[2] = FitLangmuir(df, loading_keys[2], pressure_key)
+        
+        # plot isotherm fits
+        if (plotflag == true)
+            P = logspace(log(minimum(df[pressure_key])), log(maximum(df[pressure_key])))
+            predictedloading1 = LoadingLangmuir(K[1], M[1], P)
+            predictedloading2 = LoadingLangmuir(K[2], M[2], P)
+            plot_isotherms_and_fits(df, loading_keys, pressure_key, method, 
+                                 P, predictedloading1, predictedloading2)
+        end
+        
+        # solve for mole fractions in adsorbed phase s.t. spreading pressures are equal
+        f(x1) = Π_Langmuir(p[1]/x1, M[1], K[1]) - Π_Langmuir(p[2]/(1-x1), M[2], K[2])  # want to be zero
+ #         x1 = fzero(f, p[1]/(p[1]+p[2]))
+        x1 = fzero(f, [0,1])
+
+        # mole fraction in adsorbed phase
+        x = [x1, 1 - x1] 
+
+        p0 = p ./ x
+
+        # solve for the total gas adsorbed
+        q_total = 1.0 / (x[1] / LoadingLangmuir(K[1], M[1], p0[1]) + x[2] / LoadingLangmuir(K[2], M[2], p0[2]))
+        
+        # get loading of each component by multiplying by mole fractions
+        q = x * q_total
+    end
+    
+    if (method == "Quadratic")
+        # fit isotherms to Langmuir model  
+        Ka = zeros(2)
+        Kb = zeros(2)
+        M = zeros(2)
+        Ka[1], Kb[1], M[1] = FitQuadratic(df, loading_keys[1], pressure_key)
+        Ka[2], Kb[2], M[2] = FitQuadratic(df, loading_keys[2], pressure_key)
+        
+        # plot resulting fit
+        if (plotflag == true)
+            P = logspace(log(minimum(df[pressure_key])), log(maximum(df[pressure_key])))
+            predictedloading1 = LoadingQuadratic(Ka[1], Kb[1], M[1], P)
+            predictedloading2 = LoadingQuadratic(Ka[2], Kb[2], M[2], P)
+            plot_isotherms_and_fits(df, loading_keys, pressure_key, method, 
+                                 P, predictedloading1, predictedloading2)
+        end
+        
+        # solve for mole fractions in adsorbed phase s.t. spreading pressures are equal
+        f(x1) = Π_Quadratic(p[1]/x1, M[1], Ka[1], Kb[1]) - Π_Quadratic(p[2]/(1-x1), M[2], Ka[2], Kb[2])  # want to be zero
+ #         x1 = fzero(f, p[1]/(p[1]+p[2]))
+        x1 = fzero(f, [0,1])
+
+        # mole fraction in adsorbed phase
+        x = [x1, 1 - x1] 
+
+        p0 = p ./ x
+
+        # solve for the total gas adsorbed
+        q_total = 1.0 / (x[1] / LoadingQuadratic(Ka[1], Kb[1], M[1], p0[1]) + x[2] / LoadingQuadratic(Ka[2], Kb[2], M[2], p0[2]))
+        
+        # get loading of each component by multiplying by mole fractions
+        q = x * q_total
+   end
+    
+   if (method == "Interpolation")
+        # create linear interpolators
+        interpolator1 = Grid.InterpIrregular(convert(Array, df[pressure_key]), convert(Array, df[loading_keys[1]]), Grid.BCnan, Grid.InterpLinear)
+        interpolator2 = Grid.InterpIrregular(convert(Array, df[pressure_key]), convert(Array, df[loading_keys[2]]), Grid.BCnan, Grid.InterpLinear)
+        
+        # plot resulting fit
+        if (plotflag == true)
+            P = logspace(log(minimum(df[pressure_key])), log(maximum(df[pressure_key])))
+            plot_isotherms_and_fits(df, loading_keys, pressure_key, method, 
+                                 P, interpolator1[P], interpolator2[P])
+        end
+        
+        # solve for mole fractions in adsorbed phase s.t. spreading pressures are equal
+        f(x1) = Π_Interpolate(p[1] / x1, interpolator1, df, pressure_key, loading_keys[1]) - Π_Interpolate(p[2] / (1 - x1), interpolator2, df, pressure_key, loading_keys[2])  # want to be zero
+
+        if (false)
+            # plot f(x1) to ensure roots, for testing...
+            x1 = linspace(0.0001, .999)
+            y = zeros(length(x1))
+            for i=1:length(y)
+                y[i]=f(x1[i])
+            end
+            fit = plot(x=x1, y=y, Geom.line,  Guide.xlabel("x1"),Guide.ylabel("f(x)"),  Guide.title("ensureing roots"))
+            draw(PNG(6inch, 3inch), fit)
+        end
+
+ #         x1 = fzero(f, p[1]/(p[1]+p[2]))
+        x1 = fzero(f, [0.0001,0.9999])
+        
+        # mole fraction in adsorbed phase
+        x = [x1, 1 - x1] 
+
+        p0 = p ./ x
+
+        # solve for the total gas adsorbed
+        q_total = 1.0 / (x[1] / interpolator1[p0[1]] + x[2] / interpolator2[p0[2]])
+        
+        # get loading of each component by multiplying by mole fractions
+        q = x * q_total
+    end
+
+    if (verboseflag == true) 
+        for i = 1:2
+            @printf("IAST loading of adsorbate %s at p_%s = %f: %f\n", loading_keys[i], loading_keys[i], p[i], q[i])
+        end
+    end
+
+   return q
+end
+
+function plot_selectivity_vs_molfraction(P_total::Float64, df::DataFrame, loading_keys::Array{Symbol}, pressure_key::Symbol, method::String="Langmuir"; y1_range::Array{Float64}=[0.01,0.99])
+    """
+    Plot selectivity against mole fraction of first component using IAST
+    """
+    y1 = linspace(y1_range[1], y1_range[2])  # mole fraction component 1 in gas phase
+    selectivity = zeros(length(y1))
+    # TODO: this refits the isotherm each time, not efficient...
+    for i = 1:length(y1)
+        # compute IAST loading at this condition
+        q = IAST(P_total * [y1[i], 1 - y1[i]], df, loading_keys, pressure_key, method=method)
+        selectivity[i] = (q[1] / q[2]) / (y1[1] / y1[2])
+    end
+
+    # plot selectivity against mole fraction in gas phase
+    fit = plot(x=y1, y=selectivity, Geom.point, Geom.line,
+                Guide.xlabel(@sprintf("Mole fraction %s", loading_keys[1])),
+                Guide.ylabel(@sprintf("Selectivity %s/%s", loading_keys[1], loading_keys[2])),
+                Guide.title(@sprintf("Total pressure %f", P_total))
+          )
+    draw(PNG(6inch, 3inch), fit)
+end

@@ -1,0 +1,55 @@
+importall Sorting
+importall Validation
+using BinHeap: leq
+
+function timesort(sorting::Function, array)
+  cpy = copy(array)
+
+  tic()
+  sorted = sorting(cpy)
+  time = toq()
+
+  if !validatesorting(sorted, leq)
+    error("Something went wrong with this sort: ", sorting)
+  end
+  time
+end
+
+#TODO: run each test at least 5 seconds and output the average
+function timeall(n, ub::Int = typemax(Int))
+  timecomp(f1,f2) = f1[2] <= f2[2]
+
+  quickfixed!(arr, comp = leq, l = 1, r = length(arr)) =
+    quicksort!(arr, comp, l, r, false)
+
+  quickrand!(arr, comp = leq, l = 1, r = length(arr)) =
+    quicksort!(arr, comp, l, r, true)
+
+  functions = [(insertionsort!, 4),
+               (heapsort!,      5),
+               (mergesort,      100),
+               (quickfixed!,     100),
+               (quickrand!,      100)]
+
+  for i = 0:(10.^(n-1)):(10^n)
+    array = rand(1:ub, i)
+
+    timing = (Function, Float64)[]
+
+    for (f, lim) in functions
+      if n <= lim
+        time = timesort(f, array)
+        push!(timing, (f, time))
+      end
+    end
+
+    insertionsort!(timing, timecomp)
+
+    println("#", i)
+    for (f, time) in timing
+      println("\t", f, "\t\t\t", time)
+    end
+  end
+end
+
+timeall(6)

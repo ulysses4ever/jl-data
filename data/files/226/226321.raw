@@ -1,0 +1,66 @@
+module rdborn_hw4
+
+using PyPlot
+
+export JuliaConvergence, JuliaConvergenceIter, JuliaVis
+
+#---------------------------------------------------------------------------
+# AUTOMATICALLY LOAD VISUALIZATION
+#---------------------------------------------------------------------------
+function JuliaVis(R::Function, x, y, n_iter=10, escape_tol=100)
+	A = JuliaConverge(R, x, y, n_iter, escape_tol)
+	matshow(A)
+	return A
+end
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# RECURSIVE IMPLEMENTATION
+#---------------------------------------------------------------------------
+function JuliaConverge(R::Function, x, y, n_iter=10, escape_tol=100)
+	A = zeros(length(x),length(y))
+	for i = 1:length(x)
+		for j = 1:length(y)
+			z = x[i] + 1im * y[j]
+			A[i,j] = JuliaConvergeRec(R, z, (n_iter - 1), n_iter, escape_tol)
+		end
+	end
+	return A
+end
+
+function JuliaConvergeRec(R, z, n_iter, max_iter, escape_tol)
+	if n_iter <= 0
+		return escape_tol + 1
+	elseif norm(R(z)) > escape_tol
+		return max_iter - n_iter
+	else
+		return JuliaConvergeRec(R, R(z), (n_iter - 1), max_iter, escape_tol)
+	end
+end
+#---------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------
+# ITERATIVE IMPLEMENTATION
+#---------------------------------------------------------------------------
+function JuliaConvergeIter(R::Function, x, y, n_iter=10, escape_tol=100)
+	A = zeros(length(x),length(y))
+	for i = 1:length(x)
+		for j = 1:length(y)
+			z = x[i] + 1im * y[j]
+			for k = 1:n_iter
+				if norm(R(z)) > escape_tol
+					A[i,j] = k
+					break
+				end
+				z = R(z)
+			end
+			if A[i,j] == 0
+				A[i,j] = escape_tol + 1
+			end
+		end
+	end
+	return A
+end
+#---------------------------------------------------------------------------
+
+end # module

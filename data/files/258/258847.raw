@@ -1,0 +1,17 @@
+
+cd("/Users/martinsouchier/Desktop/Julia/Term paper/TermPaper_Portfolio")
+include("src/Opt_portfolio_choices.jl")
+include("test/runtests.jl")
+
+# Create a dictionary with the parameters
+parameters = Dict("teta"=> 0.7,"rho"=>0.99, "sigma"=>0.05, "alpha" => 0.8, "lambda" => 2,"gamma"=>10, "beta"=>1, "psi" => 0.05, "tau" => 0.00419)
+k0 = 0.5 # value to start with
+N = 1000000 # Number of periods for the simulation - tradeoff speed versus accuracy
+tol = 0.00001 # Define tolerance for the loop
+
+# Get the optimal portfolio choice for some values of the parameters
+@time results = Opt_portfolio_choices.solver(parameters,k0,N,tol)
+
+# Graphs - runs the solver over an interval of points - graph(parameters, variable to change, lb, ub, N, tolerance, size of the interval)
+@time Opt_portfolio_choices.graph(parameters,"tau",0.0,0.01,10000,tol, 100)
+@time Opt_portfolio_choices.graph(parameters,"gamma",7.0,13.0,10000,tol, 100)

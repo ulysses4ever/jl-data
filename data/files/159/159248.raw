@@ -1,0 +1,28 @@
+
+
+module Boosting
+using Classifiers
+
+export fit,BoostedModelConfig,BoostedModel
+
+
+type BoostedModelConfig <: ClassifierConfig
+  weak_model_config::ClassifierConfig
+  weak_classifiers::Int
+end
+
+type BoostedModel <:Classifier
+    models::Classifier
+    config::BoostedModelConfig
+end
+
+
+function fit(c::BoostedModelConfig,x,y)
+
+end
+
+function predict(c::BoostedModel,x)
+
+end
+
+end

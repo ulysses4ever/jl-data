@@ -1,0 +1,35 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function evolve()
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    
+    for repetition = 1:config_vals.num_experiment_repetitions
+        population::Population.Type_Population = Population.make_population(config_vals)    
+        
+        generation = 0
+        for generation = 1:config_vals.num_generations
+            if (generation % config_vals.generations_per_target_switch) == 0
+                Population.switch_target(population, config_vals, repetition, generation)
+            end
+            Population.breed_and_exterminate(population, config_vals, generation)
+            Population.print_stats(population, config_vals, repetition, generation)
+        end
+        println(generation)
+        println(population.best.connections)
+        Genotype.write_to_graphml(population.best, config_vals, "nand.graphml")
+    end
+
+end
+
+evolve()

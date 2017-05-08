@@ -1,0 +1,51 @@
+const intelurl = "https://www.threadingbuildingblocks.org/" *
+      "sites/default/files/software_releases/source/" *
+      "tbb43_20150424oss_src.tgz"
+
+tbb = Package(
+  "intel-thread-building-blocks",
+  TarSource(intelurl),
+  :Make,
+  homepage = "https://www.threadingbuildingblocks.org",
+  extra_build=[
+    "build/intel-thread-building-blocks::",
+    "\tmkdir -p debian/tmp/usr/lib",
+    "\tcp build/*_release/libtbb*.so* debian/tmp/usr/lib",
+    "build/intel-thread-building-blocks-dbg::",
+    "\tmkdir -p debian/tmp/usr/lib",
+    "\tcp build/*_debug/libtbb*_debug.so* debian/tmp/usr/lib",
+    "build/intel-thread-building-blocks-dev::",
+    "\tmkdir -p debian/tmp/usr/include",
+    "\tcp -r include/tbb debian/tmp/usr/include"
+  ],
+  email = "rc-softdev@ucl.ac.uk",
+  maintainer = "Research Software Development Team",
+  version = v"4.3.5+1",
+  license = "gpl",
+  build_depends = ["gcc (>= 4.0)", "make (>= 3.0)", "g++ (>= 4.0)", "cdbs"],
+  distribution = distribution,
+
+  description=["Library to do threads the intel way"],
+  install=["usr/lib/libtbb.so*", "usr/lib/libtbbmalloc.so*", "usr/lib/libtbbmalloc_proxy.so*"],
+
+  package="intel-thread-building-blocks-dev",
+  architecture="all",
+  depends=["intel-thread-building-blocks"],
+  description=["Headers for intel threading library"],
+  install=["usr/include"],
+
+  package="intel-thread-building-blocks-dbg",
+  description=["Debug libraries for intel threading"],
+  install=["usr/lib/libtbb*debug.so*"]
+)
+
+prepare(tbb, workspace)
+machine |> activate |> DebbyPacker.container(tbb, workspace) |> `make` |> run
+build(machine, tbb, workspace)
+test(machine, tbb, workspace) do package
+  "test -e /usr/lib/libtbb.so\n" *
+  "test -e /usr/lib/libtbb.so.2\n" *
+  "test -e /usr/lib/libtbb_debug.so\n" *
+  "test -e /usr/lib/libtbb_debug.so.2\n" *
+  "test -e /usr/include/tbb/tbb.h\n"
+end

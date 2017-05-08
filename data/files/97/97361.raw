@@ -1,0 +1,75 @@
+function generate_jl(path::String)
+  if isfile(path)
+    result = readcsv(path)
+    if size(result,2) != 6 ||  result[1,1:end] != [ "包名"  "模块名"  "引入"  "名"  "输出名"  "类型"]
+      error("文件格式不正确。")
+    end
+    respath = open(string(path,".jl"),"w")
+
+    rowsize = size(result)[1]
+    list_of_yes = Array(Int,0)
+
+    println(respath,"# 宏 ：    ")
+    # 优先写入宏，因为需要更改具体内容
+    for temp in 2:rowsize
+      if result[temp,3] != "是"
+        continue
+      end
+      push!(list_of_yes,temp)
+      if result[temp,6] == "宏"
+        print(respath, "macro ", result[temp,5], "(x)","\n")
+        print(respath,"    ", result[temp,4],"(x)","\n")
+        println(respath,"end")
+        println(respath,"")
+      end # if
+    end # for
+
+    println(respath,"# 类型：    ")
+    # 类型
+    for temp = list_of_yes
+      if result[temp,6] == "类型"
+        print(respath, "typealias ", result[temp,5]," ",result[temp,4],"\n")
+        println(respath,"")
+      end
+    end
+
+
+    println(respath,"# 函数：    ")
+    # 函数
+    for temp = list_of_yes
+      if result[temp,6] == "函数"
+        print(respath, result[temp,5], " = ",result[temp,4],"\n")
+        println(respath,"")
+      end
+    end
+
+    println(respath,"# 常量：    ")
+    # 常量
+    for temp = list_of_yes
+      if result[temp,6] == "常量" || result[temp,6] == "变量"
+        print(respath, result[temp,5], " = ",result[temp,4],"\n")
+        println(respath,"")
+      end
+    end
+
+    # pring export
+    for temp = list_of_yes
+      println(respath,"export ",result[temp,5])
+    end
+    close(respath)
+    
+    respath = open(string(path,".export.jl"),"w")
+
+    for temp = list_of_yes
+      println(respath,"export ",result[temp,5])
+    end
+    close(respath)
+
+
+    else
+      error("这不是一个文件。")
+  end # ifelse
+
+end # function
+
+

@@ -1,0 +1,6 @@
+
+undoubleTranspose(ex::Expr) =
+    (isexpr(ex,symbol('\'')) && isexpr(ex.args[1],symbol('\''))) ? ex.args[1].args[1] : ex
+undoubleTranspose(ex::Any) = ex
+cleanup(ex::Expr) = walk(undoubleTranspose,ex)
+#cleanup(a::Array) = map(cleanup,a)

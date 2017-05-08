@@ -1,0 +1,21 @@
+include("../sset.jl")
+
+function cmp(a, b) 
+	dx = a[1] - b[1]
+	dy = a[2] - b[2]
+	(dx == 0) && return dy
+	return dx
+end
+
+ss = SSet([(1,2),(3,4),(-1,3)], cmp)
+push!(ss, (3,4))
+push!(ss, (3,4))
+push!(ss, (1,-1))
+push!(ss, (-5,-1))
+println(ss.items)
+
+#items
+empty(ss)
+println(ss.items)
+println(isempty(ss))
+

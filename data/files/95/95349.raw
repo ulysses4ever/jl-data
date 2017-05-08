@@ -1,0 +1,23 @@
+function curved_bernoulli_3d(x::Float64, y::Float64)
+  z::Float64 = 0
+
+  if (0 <= y < 0.5) && (0 <= x < 0.5)
+    z = (2*y)^(1+x)
+  elseif (0 <= y < 0.5) && (0.5 <= x <= 1)
+    z = (2*y)^(2-x)
+  elseif (0.5 <= y <= 1) && (0 <= x < 0.5)
+    z = (2*y-1)^(1+x)
+  elseif (0.5 <= y <= 1) && (0.5 <= x <= 1)
+    z = (2*y-1)^(2-x)
+  else
+    error("Arguments out of function's domain")
+  end
+
+  return z
+end
+
+iterator = SignalIterator(curved_bernoulli_3d, [0.1, 0.2], 1)
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_curved_bernoulli_3d.txt")
+
+simulate_signal(iterator, OUTFILE, 10^3)

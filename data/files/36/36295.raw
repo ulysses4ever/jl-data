@@ -1,0 +1,32 @@
+using  MeshSelectionModule
+
+v=[ -0.112375  -0.00948801  -0.166931
+-0.350424   0.69307     -0.156534
+-0.598674  -0.320759    -0.0274385
+-0.201131  -0.201112    -0.453311
+ 0.251947   0.859246    -0.00522395
+ 0.29006    0.246621     0.262588
+ 0.412998   0.198732    -0.531057]
+MeshSelectionModule.vselect(v; box=[0. 1. 0. 1. 0.0 1.0])
+
+l=MeshSelectionModule.vselect(v; distance=1.2, from  = [-0.59  -0.3    -0.02] )
+
+l=MeshSelectionModule.vselect(v; nearestto  = [-0.59  -0.3    -0.02] )
+
+l=MeshSelectionModule.vselect(v; distance=1.2, from  = [-0.59  -0.3    -0.02] )
+
+v=[ -0.112375  -0.00948801  -0.166931
+-0.350424   0.69307     -0.156534
+-0.598674  -0.320759    -0.0274385
+-0.201131  -0.201112    -0.453311
+ 0.251947   0.859246    -0.00522395
+ 0.29006    0.246621     0.262588
+ 0.412998   0.198732    -0.531057]
+ v [[1,4,7],2,:] =v [[1,4,7],2,:]*0+0.5
+l=MeshSelectionModule.vselect(v; plane=[0.0 1.0 0.0 0.5], thickness =  0.0001, inflate  = 0.0 )
+
+using FENodeSetModule
+
+fens=FENodeSetModule.FENodeSet(xyz=v)
+l=MeshSelectionModule.fenodeselect(fens; plane=[0.0 1.0 0.0 0.5], thickness =  0.0001, inflate  = 0.0 )
+

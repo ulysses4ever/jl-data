@@ -1,0 +1,64 @@
+module ClassificationUtils
+export confusionmatrix,split_dataset
+
+function confusionmatrix(real, pred)
+  real_range = unique(real)
+  conf_matrix = zeros(length(real_range) + 2, length(real_range) + 1)
+  #count hits and misses
+  for i = 1:length(real_range)
+    for j = 1:length(real_range)
+      conf_matrix[i,j] = sum((pred .== real_range[i]) & (real .== real_range[j]))
+    end
+    conf_matrix[length(real_range) + 1, i] = sum((pred .== 0) & (real .== real_range[i]))
+  end
+  #class precision, recall and accuracy
+  for i = 1:length(real_range)
+    #precision
+    conf_matrix[i, end] = conf_matrix[i,i] / sum(conf_matrix[i,:])
+    #recall
+    conf_matrix[end, i] = conf_matrix[i,i] / sum(conf_matrix[:,i])
+    #accumulate hits for accuracy
+    conf_matrix[end, end] += conf_matrix[i,i]
+  end
+  #normalize accuracy
+  conf_matrix[end, end] /= length(real)
+  return conf_matrix
+end
+
+
+function split_dataset(x::Vector,y::Vector{Int},subjects::Vector{Int},subject::Int)
+  train_indices=subjects.==subject
+  x_train=x[train_indices]
+  y_train=y[train_indices]
+  test_indices=!train_indices
+  x_test=x[test_indices]
+  y_test=y[test_indices]
+  x_train,y_train,x_test,y_test
+end
+
+#stratified random subsampling
+function split_dataset(x::Vector,y::Vector{Int},train_percentage::Float64,randomize=false)
+  classes=maximum(y)
+  train_indices=[]
+  for i=1:classes
+      indices_class=find(y.==i)
+      n_class=length(indices_class)
+      n_class_train=round(Int,n_class*train_percentage)
+      if randomize
+        rand_indices=randperm(n_class)[1:n_class_train]
+        indices_class_train=indices_class[rand_indices]
+      else
+        indices_class_train=indices_class[1:n_class_train]
+      end
+      append!(train_indices,indices_class_train)
+  end
+  x_train=x[train_indices]
+  y_train=y[train_indices]
+  n=length(x)
+  test_indices=setdiff(1:n,train_indices)
+  x_test=x[test_indices]
+  y_test=y[test_indices]
+  x_train,y_train,x_test,y_test,train_indices
+end
+
+end

@@ -1,0 +1,148 @@
+importall ParameterServer
+typealias SgdModel Dict{UInt64, Float64}
+
+function norm(w::SgdModel)
+	n = 0.0
+	for x in values(w)
+		n += x^2
+	end
+	return sqrt(n)
+end
+
+function init_worker(params, global_ps_rr, features::Set{UInt64})
+	global ps_local = Vector{PS}()
+	global mb_iter = Vector{minibatch_iter}()
+	global ps_global = global_ps_rr
+	global test_files = []
+	global t = 1.0
+	global global_my_clusters
+	global local_features = features
+
+	for i in global_my_clusters
+		push!(ps_local, init_PS(params.lambda_l1_local, params.lambda_l2))
+		push!(mb_iter, minibatch_iter(joinpath(params.output, "train_$(i).txt"), params.mb_size))
+		push!(test_files, joinpath(params.output, "test_$(i).txt"))
+	end
+end
+
+
+function min_num_pass(mb_iter::Vector{minibatch_iter})
+	m::Int = mb_iter[1].num_passes
+	for i in 2:length(mb_iter)
+		m = min(m,mb_iter[i].num_passes)
+	end
+	return m
+end
+
+function run_sgd(params, max_data_pass)
+	losstype = params.loss_type
+	beta_l = params.beta_l; alpha_l = params.alpha_l #defaults
+	beta_g = params.beta_g; alpha_g = params.alpha_g #defaults
+	eta_l = 0.0; eta_g = 0.0
+
+	global local_features
+	global global_my_clusters 
+	global ps_local
+	global ps_global
+	global mb_iter
+	global t
+
+	new_iter = 0
+	counter = 0
+	while (new_iter < max_data_pass)
+		counter += 1
+		eta_l =( (beta_l + sqrt(t/params.t_factor)) / alpha_l) #step size
+		eta_g =( (beta_g + sqrt(t/params.t_factor)) / alpha_g) #step size
+		old_iter = min_num_pass(mb_iter)
+		for ii in 1:length(global_my_clusters)
+			mb = read_mb(mb_iter[ii])
+			#pull
+			req_ks = unique(mb.idxs)
+			w_ks, w_vals = fetch(@spawn pull(fetch(ps_global), req_ks))
+			w_g = [w_ks[i]::UInt64 => w_vals[i]::Float64 for i in 1:length(w_ks)]
+
+			grad_l, grad_g = lossGradientNormalized(losstype, ps_local[ii].w, w_g, local_features, mb, params.TYPE)
+			println("$(counter): $(ii): $(norm(grad_l)) $(norm(grad_g))")
+			flush(STDOUT)
+			flush(STDERR)
+			old_iter = min_num_pass(mb_iter)
+
+			#push				
+			push(ps_local[ii], collect(keys(grad_l)), collect(values(grad_l)), eta_l)
+			grad_g_k = collect(keys(grad_g))
+			grad_g_v = collect(values(grad_g))
+			@spawn push(fetch(ps_global), grad_g_k, grad_g_v, eta_g)
+			new_iter =  min_num_pass(mb_iter)
+			#println("norm : $(norm(w))")
+		end
+		#t += one(t)
+		t = 20.1
+	end
+	#acc = predict()
+	#println("Iteration $(new_iter): Accuracy $(acc), Sparsity $(length(collect(keys(w_global))))")
+	flush(STDOUT)
+	return predict()
+	#catch e
+	#	println(e)
+	#end
+end
+
+function predict_one(testfile::AbstractString, w_local::SgdModel, w_global::SgdModel)
+	correct::Int = 0
+	total::Int = 0
+	fout = open(testfile, "r")
+	has_value = true
+	ix = 0; e = 0.0; 
+	for line in eachline(fout)
+		dotp = 0.0
+		ix = findfirst(line, ' ')
+		y = parse(Int, strip(line[1:ix-1]))
+		if (y != 1)
+			y = -1
+		end
+		tokens = split(strip(line[ix+1:end]), ' ')
+		for token in tokens
+			colon_ix = findfirst(token, ':')
+			if (colon_ix != 0)
+				ix = parse(UInt64, token[1:colon_ix-1])
+				e = parse(Float64, token[colon_ix+1:end])
+			else
+				ix = parse(UInt64, strip(token))
+				e = 1.0
+			end
+			dotp += (get(w_local, ix, 0.0) + get(w_global, ix, 0.0)) * e
+		end
+		if (sign(dotp) == y)
+			correct += 1
+		end
+		total += 1
+	end
+	println("$(correct)/$(total)")
+
+	return correct, total	
+end
+
+
+function predict()
+	try
+
+		correct = Dict{Int, Int}()
+		total = Dict{Int, Int}()
+		global test_files
+		global ps_local
+		global ps_global
+		global global_my_clusters
+
+		ps_global_copy = fetch(ps_global)
+
+		for i in 1:length(test_files)
+			c1, t1 = predict_one(test_files[i], ps_local[i].w, ps_global_copy.w)
+			correct[global_my_clusters[i]] = c1
+			total[global_my_clusters[i]] = t1
+		end
+		return correct, total	
+	catch e
+		println("****PREDICT ERROR\n", e)
+	end
+end
+

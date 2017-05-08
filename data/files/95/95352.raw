@@ -1,0 +1,5 @@
+iterator = SignalIterator(curved_bernoulli_3d, [0.1, 0.2], 1)
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_curved_bernoulli_3d.txt")
+
+simulate_signal(iterator, OUTFILE, 10^7)

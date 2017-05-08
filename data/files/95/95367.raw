@@ -1,0 +1,5 @@
+iterator = SignalIterator((xtm2, xtm1) -> ar2(xtm2, xtm1, 1.5, -0.75), [10.0, 7.0], 1)
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_ar2_02.txt")
+
+simulate_signal(iterator, OUTFILE, 10^7)

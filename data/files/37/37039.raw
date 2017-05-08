@@ -1,0 +1,42 @@
+#=
+  @description compute segment intersection
+  @param p1{Array} - first vertex for line 1
+  @param p2{Array} - second vertex for line 1
+  @param p3{Array} - first vertex for line 2
+  @param p4{Array} - second vertex for line 2
+  @param [xypointer]{Array|nothing} - coordinates
+  @return {stateean}
+ =#
+function intersect(p1, p2, p3, p4)
+  x, y   = 1, 2
+  x1, y1 = p1[x], p1[y]
+  x2, y2 = p2[x], p2[y]
+  x3, y3 = p3[x], p3[y]
+  x4, y4 = p4[x], p4[y]
+  eps    = 1e-10
+  state  = false
+  xy     = (NaN, NaN)
+
+  denom  = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+  numera = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)
+  numerb = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)
+
+  if (abs(numera) < eps &&
+      abs(numerb) < eps &&
+      abs(denom)  < eps)
+    # Are the line coincident?
+      xy = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+      state = true
+  elseif (abs(denom) < eps)
+    # Are the line parallel
+    state = false
+  else
+    # Is the intersection along the the segments 
+    mua   = numera / denom
+    mub   = numerb / denom
+    xy    = x1 + mua * (x2 - x1), y1 + mua * (y2 - y1)
+    state = !(mua < 0 || mua > 1 || mub < 0 || mub > 1)
+  end
+
+  return state, xy
+end

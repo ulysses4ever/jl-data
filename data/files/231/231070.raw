@@ -1,0 +1,55 @@
+"""
+draw_reads_allc(n, len; start=0, stop=nothing)
+
+Reads through an .allc file and draws 'n' binary arrays of
+length 'len' (representing methylation of cytosines) between
+positions 'start' and 'stop' (by default, stop=Inf, which
+means go to the end of the chromosome).
+"""
+function draw_reads_allc(filename, n, len; start=0, stop=Inf)
+    # Estimate methylation probabilities at each cytosine
+    f = open(filename)
+    readline(f) # skip header line
+
+    # Construct p, array of methylation probabilities
+    p = (Float64)[]
+    done = false
+    while !eof(f) && !done
+        data = split(readline(f),'\t')
+        position = int(data[2])
+        if position >= start && data[3] == "+"
+            if position <= stop
+                push!(p,float(data[end])/float(data[end-1]))
+            else
+                close(f); done = true;
+            end
+        end
+    end
+
+    # Draw reads from the probability vector, save them in a
+    # sparse matrix A, with observed indices I,J
+    len_p = length(p)
+    I,J,V = (Int64)[], (Int64)[], (Int64)[]
+    js = int(ceil(len/2))
+    je = int(floor(len/2)-1)
+    for i = 1:n
+        mid = rand(1:len_p)
+        a = max(1,mid-js)
+        b = min(len_p,mid+je)
+        read_p = p[a:b] # read methylation probabilities
+
+        # read_p[j] is the probability of being methylated
+        for j = 1:length(read_p)
+            push!(I,i)      # row index
+            push!(J,a+j-1)  # column index
+            if rand() < read_p[j]
+                push!(V,1) # methylated 
+            else
+                push!(V,-1) # unmethylated
+            end
+        end
+    end
+
+    # Sparse matrix dataset
+    return sparse(I,J,V)
+end

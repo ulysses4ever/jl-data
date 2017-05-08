@@ -1,0 +1,9 @@
+using Spike
+
+# create window instance: width 400, height 400, "title", bgcolor = array 
+window = WindowInstance(400,400,"Making a window with Spike", [1.0,1.0,0.0,1.0])
+
+while true
+	# requires type WindowInstance
+	update(window)
+end

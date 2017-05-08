@@ -1,0 +1,10 @@
+using JuMP
+using Gurobi
+
+m = Model(:Max, mipsolver=GurobiSolver())
+@defVar(m, 0 <= x <= 2)
+@defVar(m, 0 <= y <= 5)
+@setObjective(m, 5x + 3y)
+@addConstraint(m, 1x + 2y <= 3)
+status = solve(m)
+println("Solved problem, objective is $(round(getObjectiveValue(m),1))")

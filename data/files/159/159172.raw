@@ -1,0 +1,82 @@
+module AdaBoosts
+
+using Distributions
+
+import Classifiers.fit,Classifiers.predict,Classifiers.ClassifierConfig,Classifiers.Classifier
+
+
+export predict,fit,AdaBoostConfig,AdaBoost
+
+type AdaBoostConfig <: ClassifierConfig
+  # fit_function::Function
+  # predict_function::Function
+  weak_config::ClassifierConfig
+  max_weak_classifiers::Int
+  subsample_cumulative_distribution::Float64
+  min_samples::Float64
+end
+
+type AdaBoost <: Classifier
+    models::Vector{Classifier}
+    weights::Vector{Float64}
+    config::AdaBoostConfig
+end
+
+function subsample(probabilities::Vector{Float64},subsample_cumulative_distribution::Float64)
+  c=Categorical(probabilities)
+  a = sampler(c)
+  sampled=0
+  n=length(probabilities)
+  selected=falses(n)
+  while (sampled<subsample_cumulative_distribution)
+    index=rand(a)
+    while (selected[index])
+      index=rand(a)
+    end
+    selected[index]=true
+    sampled+=probabilities[index]
+  end
+
+  return selected
+end
+
+
+function fit(c::AdaBoostConfig,x,y)
+models=Classifier[]
+weights=Float64[]
+n=length(x)
+probabilities=ones(Float64,n)/n
+i=1
+average_error=1
+while i<=c.max_weak_classifiers && average_error>0.001
+    indices=subsample(probabilities,c.subsample_cumulative_distribution)
+    samples=count(identity,indices)
+    #println("$samples samples")
+    #println("Min max prob: $(minimum(probabilities)) $(maximum(probabilities))")
+    if (samples<c.min_samples)
+      break
+    end
+    model=fit(c.weak_config,x[indices],y[indices])
+    predicted=predict(model,x)
+    errors=predicted.!=y
+    average_error=mean(errors)
+    #println("Weak model $i error: $average_error")
+    weight=0.5*log((1-average_error)/average_error)
+    probabilities=probabilities.*exp(-weight.*predicted.*y)
+    probabilities=probabilities./sum(probabilities)
+    push!(models,model)
+    push!(weights,weight)
+    i=i+1
+end
+
+return AdaBoost(models,weights,c)
+end
+
+function predict_one(m::AdaBoost,x)
+  sign(dot(map(weak_model->predict(weak_model,x),m.models),m.weights))
+end
+function predict(m::AdaBoost,xs)
+  map(x -> predict_one(m,x),xs)
+end
+
+end

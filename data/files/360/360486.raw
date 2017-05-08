@@ -1,0 +1,33 @@
+#----------------------------------------------------------------------
+# Test name: splitmalloc
+#
+# split/search was doing excessive allocation
+# Issue: https://github.com/JuliaLang/julia/issues/12520
+#
+# Parameters:
+# n         log10 size of the string to split through
+#----------------------------------------------------------------------
+
+module SplitMalloc
+
+using BasePerfTests
+n = 8
+n_samples = 1
+n_evals = 1
+
+function _splitmalloc(s)
+    r = split(s)
+end
+
+Benchmarks.@benchmarkable(
+    splitmalloc,
+    begin
+        s = string(rand(1:10000, 1, 10^n))
+    end,
+    _splitmalloc(s),
+    nothing
+)
+
+BasePerfTests.profile(splitmalloc, n_samples, n_evals)
+
+end # module SplitMalloc

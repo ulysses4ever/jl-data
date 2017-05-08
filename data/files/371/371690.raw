@@ -1,0 +1,54 @@
+#
+# GTSM: Genes Transcription Simple Model 
+# Copyright (C) 2015  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+
+# from http://arxiv.org/pdf/1305.0954v2.pdf
+
+# get the derivative of the binary array
+function get_derivative(A::Array{Int8,1})
+	return A[1:end-1]$A[2:end]
+end
+
+# get BiEntropy value of the binary array
+function BiEn(A::Array{Int8,1})
+	n = length(A)
+	T = A
+	s = 0.
+	for k in 0:(n-2)
+		p = sum(T)/length(T)
+		if p != 0 && p != 1
+			s += (-p*log(2,p)-(1-p)*log(2,1-p))*2^k
+		end
+		T = get_derivative(T)
+	end
+	return (1/(2^(n-1)-1))*s
+end
+
+# get Tres BiEntropy value of the binary array
+function TBiEn(A::Array{Int8,1})
+	n = length(A)
+	T = A
+	s1 = 0.
+	s2 = 0.
+	for k in 0:(n-2)
+		s1 += log(2,k+2)
+		p = sum(T)/length(T)
+		if p != 0 && p != 1
+			s2 += (-p*log(2,p)-(1-p)*log(2,1-p))*log(2,k+2)
+		end
+		T = get_derivative(T)
+	end
+	return s2/s1
+end

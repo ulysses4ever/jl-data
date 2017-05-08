@@ -1,0 +1,84 @@
+###################################################
+## Run simulation
+###################################################
+
+"""
+Takes a typeGraph as argument, and runs a simulation of dynamic matching where
+the matching policy and other parameters are defined a Params element.
+The length of the simulation is specified by the steps parameters
+
+Returns a DataFrame object with the statistics of the simulation run.
+"""
+function run_dynamic(t::TypeGraph, steps::Int64, parameters::Params)
+  println("Running with steps = $steps, batch = $(p.batchSize), techno = $(p.techno),
+          priorities= $(p.priorities)")
+
+  pool = InstanceGraph(t)
+  tic()
+  time_tot = []
+  for k in 1:steps
+    time_tot_tic = time()
+    arriving_node = t.nodes[rand(1:t.n)]
+    arrival!(pool, arriving_node, k)
+    if k%p.batchSize == 0
+      time_tic = time()
+      matched_nodes, solve_time = match(pool, parameters)
+      if length(matched_nodes) > 0
+        remove_matched!(pool, matched_nodes, k)
+      end
+    end
+    departures!(pool, k)
+    push!(time_tot, time() - time_tot_tic)
+    if k%(steps/20) == 0
+      print_status(pool, k, parameters)
+      println("average time for one iteration: $(mean(time_tot))")
+    end
+  end
+  toc()
+
+  return pool_summary(pool, steps, parameters)
+end
+
+function print_status(pool::InstanceGraph, k::Int64, p::Params)
+  if p.verbose > 0
+    println("It: $k, pool size: $(pool.n_present)")
+  end
+end
+
+"""
+Computes a summary of the simulation. Inputs a pool with all arrivals and departures,
+Outputs a dataFrame with the pool summary.
+"""
+function pool_summary(pool::InstanceGraph, steps::Int64, p::Params)
+  n_types = length(pool.type_graph.nodes)
+  summary = DataFrame(n_arr = zeros(Int64, n_types),
+                      n_match = zeros(Int64, n_types),
+                      n_dep = zeros(Int64, n_types),
+                      n_inpool = zeros(Int64, n_types),
+                      wait_match = zeros(Float64, n_types),
+                      wait_dep = zeros(Float64, n_types),
+                      )
+  for n in pool.all_nodes
+    if n.arr_time >= steps/5
+      id = n.node_type.id
+      summary[id, :n_arr] += 1
+      if n.dep_time == -1
+        wait = steps - n.arr_time
+      elseif n.dep_time - n.arr_time >= 0
+        wait = n.dep_time - n.arr_time
+      else
+        println("Error, departure before arrival: dep= $(n.dep_time), arr= $(n.arr_time)")
+      end
+      if n.matched
+        summary[id, :n_match] += 1
+        summary[id, :wait_match] += wait
+      elseif n.departed
+        summary[id, :n_dep] += 1
+        summary[id, :wait_dep] += wait
+      else
+        summary[id, :n_inpool] += 1
+      end
+    end
+  end
+  return summary
+end

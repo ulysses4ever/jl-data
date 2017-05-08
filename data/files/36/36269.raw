@@ -1,0 +1,35 @@
+using FESetModule: FESetL2, nfens, count
+const feMod=FESetModule
+
+a=FESetL2(;conn=[2 5;1 3;4 11],other_dimension=1.0)
+a.conn
+a.conn=[12 5; 11 3; 4 1; 14 10; 5 3]
+
+nfens(a)
+
+a.label
+b = deepcopy(a)
+
+count(a)
+#b=a
+#L=[1,3]
+#b.conn =a.conn[L,:]
+b=FESetModule.subset(a,[1,3])
+b.conn
+a.conn[[1,3],:]
+
+FESetModule.dim(a)
+
+FESetModule.bfun(a,1.0)
+
+Float64 <: FloatingPoint
+Array{Float64} <: Array{FloatingPoint}
+
+a=[1 2 3]
+type T
+    ia
+end
+t = T(a)
+t.ia
+a[3]=4
+t.ia

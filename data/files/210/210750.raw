@@ -1,0 +1,107 @@
+module Symbolic
+
+import Base.show
+import Base.print
+
+export @t, @s, Term, simplify
+
+const ops = [:+, :-, :*, :/, :^]
+
+#Datatype and constructors
+immutable Term{S, Args<:Tuple}
+    Term() = error()
+end
+Term(S, args...) = Term{S, map(Term, args)}
+Term(t::Type{Term}) = t
+Term(ex::Expr) = begin
+    @assert ex.head == :call
+    Term(ex.args...)
+end
+macro t(ex)
+    Term(ex)
+end
+
+#Infix printing
+show{S, Args}(io::IO, t::Type{Term{S, Args}}) = print(io, t)
+print{S}(io::IO, t::Type{Term{S, ()}}) = print(io, string(S))
+print{S, Args}(io::IO, t::Type{Term{S, Args}}) = 
+    if in(S, ops) && length(Args) > 1
+        print(io, "(")
+        for i = 1:(length(Args)-1)
+            print(io, Args[i])
+            print(io, string(S))
+        end
+        print(io, Args[end])
+        print(io, ")")
+    else
+        print(io, string(S))
+        print(io, "(")
+        for i = 1:(length(Args)-1)
+            print(io, Args[i])
+            print(io, ",")
+        end
+        print(io, Args[end])
+        print(io, ")")
+    end
+
+
+#Simplification rules
+#Addition
+simplify{X}(t::Type{Term{:+, (X, X)}}) = Term(:*, 2, X)
+simplify{X}(t::Type{Term{:+, (X, Term(0))}}) = X
+simplify{X}(t::Type{Term{:+, (Term(0), X)}}) = X
+
+#Multiplication
+simplify{X}(t::Type{Term{:*, (X, X)}}) = Term(:^, X, 2)
+
+simplify{X}(t::Type{Term{:*, (X, Term(1))}}) = X
+simplify{X}(t::Type{Term{:*, (Term(1), X)}}) = X
+
+simplify{X}(t::Type{Term{:*, (X, Term(0))}}) = Term(0)
+simplify{X}(t::Type{Term{:*, (Term(0), X)}}) = Term(0)
+
+#Subtraction
+simplify{X}(t::Type{Term{:-, (X, X)}}) = Term(0)
+simplify{X}(t::Type{Term{:+, (X, Term{:-, (X,)})}}) = Term(0)
+
+#Division
+simplify{X}(t::Type{Term{:/, (X, X)}}) = Term(1)
+simplify{X}(t::Type{Term{:*, (X, Term{:/, (Term(1), X)})}}) = Term(1)
+
+simplify{S}(t::Type{Term{S, ()}}) = t
+simplify{S, Args}(t::Type{Term{S, Args}}) = Term(S, map(simplify, Args)...)
+
+macro s(ex)
+    simplify(Term(ex))
+end
+symb{S}(t::Term{S}) = S
+
+#Find the term matching a pattern.
+find_path(pattern::Term, s::Symbol) = begin
+    if length(pattern.args) == 0
+        if s==symb(pattern)
+            return Int[]
+        else
+            return nothing
+        end
+    else 
+        for i = 1:length(pattern.args)
+            res = find_path(pattern.args[i], s)
+            if isa(res, Vector{Int})
+                return [i, res]
+            end
+        end
+        nothing
+    end
+end
+
+#Should be a macro, producing target.args[1].args[2]...
+extract(target::Term, pattern::Term, s::Symbol) = begin
+    current_term = target
+    path = find_path(pattern, s)
+    for arg in path
+        current_term = current_term.args[arg]
+    end
+    current_term
+end
+end

@@ -1,0 +1,63 @@
+# Linear fractional transformation "lift"
+
+module Lifts
+
+import Base.inv, Base.isequal
+export Lift, isequal
+
+immutable Lift
+    M::Array{Complex{Float64},2}
+    function Lift(a, b, c, d)
+        dd = a*d-b*c
+        if dd == 0
+            error("Singularity detected")
+        end
+
+        ddd = sqrt(dd+0im)
+        new( [ a/ddd b/ddd; c/ddd d/ddd])
+    end
+end
+
+function Lift(M::Array)
+    return Lift(M[1,1], M[1,2], M[2,1], M[2,2])
+end
+
+function Lift()
+    return Lift(1,0,0,1)
+end
+
+# Equality checking
+isequal(f::Lift, g::Lift) = f.M == g.M || f.M == -g.M
+==(f::Lift,g::Lift) = isequal(f,g)
+
+# Inverse transformation
+function inv(L::Lift)
+    a = L.M[1,1]
+    b = L.M[1,2]
+    c = L.M[2,1]
+    d = L.M[2,2]
+    return Lift(d,-b,-c,a)
+end
+
+# Composition
+*(A::Lift, B::Lift) = Lift(A.M * B.M)
+
+# Function application
+function getindex(A::Lift, x::Number)
+    if norm(x)==Inf
+        a = A.M[1,1]
+        b = A.M[2,1]
+        if b==0
+            return Inf+Inf*im
+        end
+        return a/b
+    end
+    w = A.M * [ x+0im ; 1.+0im ]
+    if w[2] == 0
+        return Inf + Inf*im
+    end
+    return w[1]/w[2]
+end
+
+
+end # end of module "Lifts"

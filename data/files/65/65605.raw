@@ -1,0 +1,17 @@
+
+# Test Using/Includes
+#------------------------------
+include("test_handler.jl")
+include("00.jl")
+include("01.jl")
+
+with_handler(test_handler) do
+  println("Test_Stack")
+  for (key,test_func) in exports
+   test_sep()
+      println(key)
+      println(repeat("-",length(key)))
+      test_func()
+   test_sep()
+ end
+end

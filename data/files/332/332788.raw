@@ -1,0 +1,63 @@
+include("genotype.jl")
+include("config.jl")
+
+import Genotype
+import Config
+
+function evolve()
+    population::Array{Genotype.Type_Genotype} = []
+    for i = 1:Config.population_size
+        push!(population, Genotype.make_random_genotype())
+    end
+    for org in population
+        Genotype.simulate(org)
+    end
+    println(population[1].activations[(Config.num_simulation_iterations 
+                                       * population[1].num_nodes):((Config.num_simulation_iterations + 1) 
+                                                                   * population[1].num_nodes)])
+    for org in population
+        Genotype.delete_node(org)
+    end
+    for org in population
+        Genotype.simulate(org)
+    end
+    println(population[1].activations[(Config.num_simulation_iterations 
+                                       * population[1].num_nodes):((Config.num_simulation_iterations + 1) 
+                                                                   * population[1].num_nodes)])
+end
+
+function test_functionality()
+    println("\n INITIALISE \n")
+    foo = Genotype.make_random_genotype()
+    println("connections")
+    for i = 1:foo.num_nodes
+        println(foo.connections[(foo.connection_indeces[i] + 1):foo.connection_indeces[i + 1]])
+    end
+    println("truth table")
+    for i = 1:foo.num_nodes
+        println(foo.truth_table[(foo.truth_table_indeces[i] + 1):foo.truth_table_indeces[i + 1]])
+    end
+
+    println("\n DELETE NODE \n")
+    Genotype.delete_node(foo)
+    println("connections")
+    for i = 1:foo.num_nodes
+        println(foo.connections[(foo.connection_indeces[i] + 1):foo.connection_indeces[i + 1]])
+    end
+    println("truth table")
+    # println(sizeof(foo.truth_table)/sizeof(foo.truth_table[1]))
+    # println(sizeof(foo.truth_table_indeces[1]))
+    for i = 1:foo.num_nodes
+        println(foo.truth_table[(foo.truth_table_indeces[i] + 1):foo.truth_table_indeces[i + 1]])
+    end
+    println("\n SIMULATE \n")
+    #Genotype.simulate(foo)
+    println("activations")
+    for i = 1:Config.num_simulation_iterations
+        println(foo.activations[((i - 1) * foo.num_nodes + 1):(i * foo.num_nodes)])
+    end
+end
+#@time evolve()
+
+test_functionality()
+    

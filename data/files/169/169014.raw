@@ -1,0 +1,8 @@
+module Algorithms
+
+    export Operation, evaluate, compose
+    export SegTree, update!, query!, search!, searchleft, searchright
+
+    include("segtree.jl")
+
+end # module

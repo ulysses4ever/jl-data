@@ -1,0 +1,40 @@
+
+# Getting own data
+# - get the data
+function get_data(data_path, data_label, vocab::DataFrame)
+
+  raw_data_files = readdir(data_path)
+
+  data_raw = zeros(size(raw_data_files, 1), 1)
+  data_raw = map(x -> open(readall, "$(data_path)/$(x)", "r"), raw_data_files)
+
+  data_headerless = map( x -> remove_header(x), data_raw)
+
+  # - run each email through the cleaning process
+  data_cleaned = map( x -> clean_email(x, true), data_headerless)
+
+  # - remove empty strings
+  data_cleaned = filter( x -> isempty(x) == false, data_cleaned)
+
+  # get a index vector of all the word indexes that are in the vocab list and the word list
+  vocab_count = size(vocab, 1)
+  indexed_words = []
+
+  # featurize all the emails and create a nice feature matrix
+  data_featurized = zeros(size(data_cleaned, 1), vocab_count)
+  data_cleaned_size = size(data_cleaned, 1)
+
+  # this could be done in a map function but some how I couldnt get it to output in simple matrix format. It would always come out as a Vector of Matricies.
+  for i = 1:data_cleaned_size
+    email_features = featureize_email(data_cleaned[i], vocab)'
+    data_featurized[i, :] = email_features
+  end
+
+
+  # create the labels for the feature matrix
+  data_labels = ones(data_cleaned_size, 1) * data_label
+
+  return data_featurized, data_labels
+
+end
+

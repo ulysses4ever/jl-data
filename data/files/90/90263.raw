@@ -1,0 +1,34 @@
+module EvolvingGraphAlgs
+
+using Reexport
+@reexport using EvolvingGraphs
+import Base.reverse
+export replace_node!
+
+include("random_walk.jl")
+
+for elty in (:EvolvingGraph, :AttributeEvolvingGraph)
+    @eval begin
+        function reverse!(g::$elty)
+            g.ilist, g.jlist = g.jlist, g.ilist
+            g
+        end
+    end
+end
+
+for elty in (:EvolvingGraph, :AttributeEvolvingGraph)
+    @eval begin
+        reverse(g::$elty) = reverse!(copy(g))
+    end
+end
+
+"remove node v1 from the graph and add its edges to v2"
+function replace_node!(g::EvolvingGraph, v1, v2)
+    iidx= findin(g.ilist, [v1])
+    jidx = findin(g.jlist, [v1])
+    g.ilist[iidx] = [v2 for i in 1:length(iidx)]
+    g.jlist[jidx] = [v2 for i in 1:length(jidx)]
+    g
+end
+
+end # module

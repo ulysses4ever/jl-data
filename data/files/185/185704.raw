@@ -1,0 +1,144 @@
+include("typographyaux.jl")
+
+export text, textFont, textSize
+export textWidth, textHeight, textAscent, textDescent
+
+## Loading & Displaying
+
+#loadFont
+
+function text(str::String, x, y)
+	x = ((x+1)/2)*state.width
+	y = ((y+1)/2)*state.height
+	switchShader("fontDrawing")
+	glActiveTexture(GL_TEXTURE1)
+    glEnable(GL_CULL_FACE)
+	# glBindBuffer(GL_ARRAY_BUFFER, globjs.vbos[2])
+	for c in str
+		ch = fontState.characters[c]
+
+		xpos = x + ch.bearing[1] * state.textSize
+        ypos = y - (ch.size[2] - ch.bearing[2]) * state.textSize
+
+        w = ch.size[1] * state.textSize
+        h = ch.size[2] * state.textSize
+
+        vertexData = zeros(GLfloat, 6*9)
+        vertexData[1] = xpos
+        vertexData[2] = ypos + h
+        vertexData[3] = 0.0
+        vertexData[4] = 1.0
+
+        vertexData[5] = 0.0
+        vertexData[6] = 0.0
+        vertexData[7] = 0.0
+        vertexData[8] = 0.0
+        vertexData[9] = 0.0
+
+		vertexData[10] = xpos
+        vertexData[11] = ypos
+        vertexData[12] = 0.0
+        vertexData[13] = 1.0
+
+        vertexData[14] = 0.0
+        vertexData[15] = 1.0
+        vertexData[16] = 0.0
+        vertexData[17] = 0.0
+        vertexData[18] = 0.0
+
+        vertexData[19] = xpos + w
+        vertexData[20] = ypos
+        vertexData[21] = 0.0
+        vertexData[22] = 1.0
+
+        vertexData[23] = 1.0
+        vertexData[24] = 1.0
+        vertexData[25] = 0.0
+        vertexData[26] = 0.0
+        vertexData[27] = 0.0
+
+        vertexData[28] = xpos
+        vertexData[29] = ypos + h
+        vertexData[30] = 0.0
+        vertexData[31] = 1.0
+
+        vertexData[32] = 0.0
+        vertexData[33] = 0.0
+        vertexData[34] = 0.0
+        vertexData[35] = 0.0
+        vertexData[36] = 0.0
+
+        vertexData[37] = xpos + w
+        vertexData[38] = ypos
+        vertexData[39] = 0.0
+        vertexData[40] = 1.0
+
+        vertexData[41] = 1.0
+        vertexData[42] = 1.0
+        vertexData[43] = 0.0
+        vertexData[44] = 0.0
+        vertexData[45] = 0.0
+
+        vertexData[46] = xpos + w
+        vertexData[47] = ypos + h
+        vertexData[48] = 0.0
+        vertexData[49] = 1.0
+
+        vertexData[50] = 1.0
+        vertexData[51] = 0.0
+        vertexData[52] = 0.0
+        vertexData[53] = 0.0
+        vertexData[54] = 0.0
+
+        glBindTexture(GL_TEXTURE_2D, ch.texID)
+        # glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexData), vertexData)
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW)
+		glDrawArrays(GL_TRIANGLES, 0, 6)
+		x += ch.advance * state.textSize
+	end
+    glDisable(GL_CULL_FACE)
+	switchShader("basicShapes")
+	# glBindBuffer(GL_ARRAY_BUFFER, globjs.vbos[1])
+end
+
+function textFont(fontname::String)
+    state.fontFace = fontname
+    fontState = fontStruct(newface(state.fontFace), Dict(' ' => blankChar), 0, 12)
+	setpixelsize(fontState.face, fontState.fontWidth, fontState.fontHeight)
+	setupFontCharacters()
+end
+
+## Attributes
+
+#function textAlign()
+#
+#end
+
+#textLeading
+#textMode
+
+function textSize(size)
+	state.textSize = size
+end
+
+function textWidth(str::String)
+    # extents = Cairo.text_extents(cr, str)
+    # return extents[1]
+end
+
+function textHeight(str::String)
+    # extents = Cairo.text_extents(cr, str)
+    # return extents[2]
+end
+
+## Metrics
+
+function textAscent(str::String)
+   # extents = Cairo.scaled_font_extents(cr, str)
+   # return extents[1]
+end
+
+function textDescent(str::String)
+   # extents = Cairo.scaled_font_extents(cr, str)
+   # return extents[2]
+end

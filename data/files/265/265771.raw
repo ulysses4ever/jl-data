@@ -1,0 +1,40 @@
+module Romeo
+
+include("Log.jl")
+
+include("HttpServer.jl")
+include("Request.jl")
+include("Response.jl")
+
+include("Event.jl")
+
+export run
+
+# exported
+
+function run(server::HttpServer)
+    bind(server.socket, Base.IPv4(uint32(0)), uint16(server.port))
+    listen(server.socket)
+
+    emit_event(server, "listening")
+
+    while true
+        socket = accept(server.socket)
+        @async process(server, socket)
+    end
+end
+
+# NOT exported
+
+function process(server::HttpServer, socket::TcpSocket)
+    local request, response
+
+    request = Request(socket)
+    response = Response(socket)
+
+    server.handle(request, response)
+
+    close(response.socket)
+end
+
+end # module Romeo

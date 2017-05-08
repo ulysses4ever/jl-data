@@ -1,0 +1,89 @@
+using FactCheck
+
+facts("lexer") do
+    include("lexer.jl")
+
+    lexer.string_parser("''")
+
+    # Empty strings should be empty in both modes:
+    @fact lexer.string_parser("''") --> isempty
+    @fact lexer.string_parser("''", true) --> isempty
+
+    @fact length(lexer.string_parser("'asdf'")) --> 4
+
+    @fact lexer.string_parser("'asdf'") --> ['a', 's', 'd', 'f'] #--> true
+
+    # Last quote missing
+    @fact_throws lexer.string_parser("'asdf")
+
+    # First quote missing
+    @fact_throws lexer.string_parser("asdf'")
+
+    # Both quotes missing
+    @fact_throws lexer.string_parser("asdf")
+
+    @fact_throws lexer.string_parser("'''")
+
+    #This should throw in regular mode...
+    @fact_throws lexer.string_parser("''''")
+
+    # ... but not in legacy mode
+    @fact length(lexer.string_parser("''''", true)) --> 1
+
+    # Unclosed escape on end
+    @fact_throws lexer.string_parser("'asdf\\'")
+
+    # Unclosed legacy escape on end
+    @fact_throws lexer.string_parser("'asdf''", true)
+
+    # Escapes
+    @fact lexer.string_parser("'\\''") --> ['\'']
+
+    @fact lexer.multistring_parser("'''foo'''") --> lexer.string_parser("'foo'")
+
+    @fact_throws lexer.multistring_parser("'''asdf'''", true)
+
+    # This should raise a warning:
+    lexer.number_parser("_16b23")
+
+
+    @fact lexer.number_parser("10b123") --> 123
+
+    @fact lexer.number_parser("16bFF") --> 255
+
+    # General tests for the number parser
+    @fact lexer.number_parser("123") --> 123
+
+    @fact lexer.number_parser("1 2 3") --> [1,2,3]
+
+    @fact lexer.number_parser("16bff") --> 255
+
+    @fact lexer.number_parser("_") --> Inf
+
+    @fact lexer.number_parser("__") --> -Inf
+
+    @fact lexer.number_parser("_12") --> -12
+
+    @fact lexer.number_parser("1e3") --> 1000
+
+    @fact lexer.number_parser("3x") --> BigInt(3)
+
+    @fact lexer.number_parser("3.0x") --> BigFloat(3)
+
+    @fact lexer.number_parser("__x") --> BigFloat(-Inf)
+
+    @fact lexer.number_parser("3r2") --> 3//2
+
+    @fact lexer.number_parser("3r2x") --> 3//BigInt(2)
+    #FIXME @fact_approx lexer.number_parser("_1xπ") --> BigFloat(-π)
+
+    @fact lexer.downgrade(1) --> true
+
+    @fact lexer.downgrade(3.0) --> 3
+
+    @fact lexer.downgrade(1.0) --> true
+
+    @fact lexer.downgrade(BigInt(3)) --> BigInt(3)
+    
+    @fact lexer.downgrade(BigFLoat(3.0)) --> BigFloat(3.0)
+end

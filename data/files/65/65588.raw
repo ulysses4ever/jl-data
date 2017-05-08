@@ -1,0 +1,68 @@
+#=
+  @author titus tienaah
+	@description stack.jl
+	@module stack
+=#
+import Base.push!
+import Base.pop!
+import Base.empty!
+
+#=
+ * @description Stack
+ * @param cap
+ * @constructor
+ =#
+type Stack{T}
+  _cap::Real
+  _stack::Array{T,1}
+
+  function Stack(cap::Real=Inf)
+  	this        = new()
+  	this._stack = T[]
+  	this._cap   = float(cap)
+  	return this
+  end
+end
+
+cap(this::Stack)     = this._cap
+size(this::Stack)    = length(this._stack)
+isempty(this::Stack) = (size(this) == 0)
+
+function push!(this::Stack, x)
+  (size(this) == this._cap) &&
+    error("push(): stack is full.")
+  return push!(this._stack, x)
+end
+
+function pop!(this::Stack)
+  isempty(this) &&
+    error("cant pop an empty stack")
+  return pop!(this._stack)
+end
+
+function top(this::Stack)
+  isempty(this._stack) &&
+    error("can't top() an empty stack")
+  return this._stack[size(this)];
+end
+
+function empty!(this::Stack)
+  empty!(this._stack)
+  return this
+end
+
+function iter(this::Stack)
+  index = size(this) + 1
+
+  hasnext() =  index > 1
+
+  function next()
+    !hasnext() &&
+      error("next(): no such element.")
+    return this._stack[(index -= 1)];
+  end
+
+  return hasnext, next
+end
+
+

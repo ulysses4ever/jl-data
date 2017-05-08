@@ -1,0 +1,32 @@
+function numFactors(num)
+	out = 1
+	cur = num
+	max = convert(Int64, ceil(sqrt(num)))
+	for pr in primes(max)
+		offset = 0
+		order = 0
+		while mod(cur, pr) == 0
+			offset = 1
+			order += 1
+			cur = convert(Int64, cur / pr)
+		end
+		tot = offset + order
+		if tot > 0
+			out *= offset + order
+		end
+	end
+	out
+	return out
+end
+
+function Run()
+	i = 1
+	tri = 1
+	while true
+		if numFactors(tri) > 500
+			return tri
+		end
+		i += 1
+		tri += i
+	end
+end

@@ -1,0 +1,39 @@
+require("custom_types.jl")
+
+#ENTRY OBJECTS
+
+function ret_array(num1::Array, num2::Array)
+	if ndims(num1) == 2
+		temp = Array(Array{Entry, 1}, 1, 1)
+		temp[1,1] = num2
+		return hcat(num1, temp)
+	elseif ndims(num2) == 2
+		temp = Array(Array{Entry, 1}, 1, 1)
+		temp[1,1] = num1
+		return hcat(num2, temp)
+	else
+		ret_arr = Array(Array{Entry, 1}, 1, 2)
+		ret_arr[1,1] = num1
+		ret_arr[1,2] = num2
+		return ret_arr
+	end
+end
+
+#FLOATS
+
+function ret_array(num1::Float64, num2::Float64)
+	return [num1, num2]
+end
+
+function ret_array(num1::Array, num2::Float64)
+	ret_arr = [ x for x in num1 ]
+	push!(ret_arr, num2)
+	return ret_arr
+end
+
+function ret_array(num1::Float64, num2::Float64)
+	ret_arr = [ y for y in num2 ]
+	push!(ret_arr, num1)
+	return ret_arr
+end
+

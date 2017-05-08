@@ -1,0 +1,24 @@
+include("Task_algo.jl")
+include("util.jl")
+
+waveletList = [WT.db1,WT.db2,WT.db3,WT.db4,WT.db5,WT.db6,WT.db7,WT.db8,WT.db9] ;
+nWavelet = length(waveletList)
+
+n_x = 2048 //taille d'une image
+nfreq= 40  // nombre de fréquence
+ 
+dataSim=DataSimulation(n_x,nfreq,waveletList)
+
+dataSim.waveletList = waveletList ; 
+dataSim.Nnode = 1 ;  //nombre de noeud
+dataSim.Nproc = 40 ; //nombre de processeur par noeud
+dataSim.NprocDct =40 ; 
+dataSim.etat = State()
+dataSim.canal = Canal(10000.0) // canal de communication 10 000 Mbit/s
+
+N_max = 5
+dataSim.etat = State()
+simulate(dataSim,N_max)
+timePerIteration = mean([fetch(dataSim.etat.states["X_1"],i+1) - fetch(dataSim.etat.states["X_1"],i) for i in [1:N_max-1]])
+
+	

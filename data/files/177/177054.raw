@@ -1,0 +1,38 @@
+#imgpredict.jl
+#This script takes an image and runs the random forest predictor on it
+#author: Timothy Evans
+#date: 30/07/15
+
+using DecisionTree, JLD, Images, DataFrames
+importall config, signalprocessing
+
+# Define all relative paths from config.jl. Changes should only be made
+# to config.jl
+if path_rel
+  projdir = pwd()[1:end-3]; #remove src directory
+  specpath = string(projdir,specdir)
+  modelpath = string(projdir,modeldir)
+else
+  specpath = specdir
+  modelpath = modeldir
+end
+
+model = jldopen(string(modelpath,"model.jld"),"r") do file
+  read(file,"model")
+end
+
+spec = readdir(specpath)[1];
+img = imread(string(specpath,spec));
+recorderdata = readtable(string(specpath,"recorderdata.csv"));
+(pixels,freq,boxmu,boxvar) = imgfeature_predict(img,spec,recorderdata);
+featuredata = hcat(pixels,freq,boxmu,boxvar);
+
+#normalise features using saved mean and standard dev
+normvalues = readcsv(string(modelpath,"musigma.csv"))
+mu = normvalues[1,:];
+sigma = normvalues[2,:];
+(m,n) = size(featuredata)
+X = (featuredata - ones(m)*mu) ./ (ones(m)*sigma)
+
+y = apply_forest(model,X);
+ypred = reshapepred(y,size(img,1),size(img,2));

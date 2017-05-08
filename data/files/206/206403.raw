@@ -1,0 +1,129 @@
+############################################
+### Random partition tree implementation ###
+############################################
+
+immutable RPTSplit
+    U::Vector{Float64} # RPTSplit direction
+    v::Float64         # RPTSplit point
+end
+
+"Decides whether a point should be routed to the right or left of a split."
+route(s::RPTSplit, q) = dot(s.U, q) < s.v ? :left : :right
+
+routes_left(s::RPTSplit, q) = dot(s.U, q) < s.v
+
+"Randomly generates a split according to the RPT paper."
+function make_split(X, ixs)
+    n = length(ixs)
+    d = size(X,1)
+    # Generate a standard normal random vector
+    U = randn(d)
+    # Generate a quantile in [1/4, 3/4]
+    β = rand()/2 + 1/4
+    # Compute the projection of the data onto direction U
+    projections = [dot(slice(X,:,ix), U) for ix in ixs]
+    # Find the value of the β quantile
+    βix = ceil(Int, β*n)
+    select!(projections, βix)
+    v = projections[βix]
+    # Return the split
+    return RPTSplit(U, v)
+end
+
+abstract RPTNode
+
+immutable InternalRPTNode <: RPTNode
+    split::RPTSplit
+    left::RPTNode
+    right::RPTNode
+end
+
+immutable Leaf <: RPTNode
+    ixs::Array{Int}
+end
+
+function build_rpt(X, ixs, n0)
+    n = length(ixs)
+    d = size(X,1)
+    if n < n0
+        return Leaf(ixs)
+    else
+        split = make_split(X, ixs)
+        left_ixs = Array(Int, 0)
+        right_ixs = Array(Int, 0)
+        for ix in ixs
+            if routes_left(split, slice(X, :, ix))
+                push!(left_ixs, ix)
+            else
+                push!(right_ixs, ix)
+            end
+        end
+        left = build_rpt(X, left_ixs, n0)
+        right = build_rpt(X, right_ixs, n0)
+        return InternalRPTNode(split, left, right)
+    end
+end
+
+build_rpt(X, n0) = build_rpt(X, collect(1:size(X,2)), n0)
+
+function find_nn(n::InternalRPTNode, X, q)
+    routes_left(n.split, q) ? find_nn(n.left, X, q) : find_nn(n.right, X, q)
+end
+
+function find_nn(n::Leaf, X, q)
+    min_dist = Inf
+    best_ix = -1
+    for ix in n.ixs
+        const dist = sqdist(slice(X, :, ix), q)
+        if dist < min_dist
+            min_dist = dist
+            best_ix = ix
+        end
+    end
+    return best_ix
+end
+
+function find_nns(n::InternalRPTNode, X, q, k)
+    routes_left(n.split, q) ? find_nns(n.left,X,q,k) : find_nns(n.right,X,q,k)
+end
+
+function find_nns(n::Leaf, X, q, k)
+    dists = [sqdist(slice(X, :, ix), q) for ix in n.ixs]
+    cutoff = dists[select(dists, dists, k)]
+    nn_ixs = Array(Int, k)
+    i = 1
+    @itr for (j,d) in enumerate(dists)
+        if d <= cutoff
+            nn_ixs[i] = j
+            i += 1
+        end
+        if i > k
+            break
+        end
+    end
+    return nn_ixs
+end
+
+##################################################
+### Dispatcher based on random partition trees ###
+##################################################
+
+"Container for all information neccessary to dispatch data to learners."
+type RPTDispatcher <: Dispatcher
+    X::Array{Float64, 2}
+    rptree::RPTNode
+    clustering::ClusterSolution
+end
+
+function RPTDispatcher(X, n0, clustering)
+    rptree = build_rpt(X, n0)
+    return RPTDispatcher(X, rptree, clustering)
+end
+
+cluster_keys(d::RPTDispatcher) = cluster_keys(d.clustering)
+
+"Returns a the set of cluster indices that point `x` should be dispatched to."
+function dispatch(d::RPTDispatcher, x)
+    nn_ix = find_nn(d.rptree, d.X, x)
+    return d.clustering.p2cs[nn_ix]
+end

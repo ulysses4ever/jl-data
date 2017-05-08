@@ -1,0 +1,116 @@
+module Fracjack
+
+using Images, ImageView, Color, FixedPointNumbers
+
+export Bounds, colorIdxMod_none, colorFn_HSV, gen_pal!, gen_data, gen_img, gen, gen_view, gen_save
+
+function colorIdxMod_none(frameId, size, idx)
+    return idx
+end
+
+function colorIdxMod_offsetFrame(frameId, size, idx)
+    (idx + frameId) % size + 1
+end
+
+function colorFn_HSV(frameId, size, idx, colorIdxModFn)
+    idx_mod = colorIdxModFn(frameId, size, idx)
+    rgb = convert(RGB{Ufixed8}, HSV(idx_mod, 1, 1))
+    (rgb.r, rgb.g, rgb.b)
+end
+
+palette = Array(Float64, 256, 3)
+
+function gen_pal!(;frameId = 1, palette=Fracjack.palette, size=256, colorFn = colorFn_HSV, colorIdxModFn = colorIdxMod_offsetFrame)
+    for i=1:size
+        palette[i, 1:3] = [colorFn(frameId, size, i, colorIdxModFn)...]
+    end
+end
+
+type Bounds
+    min :: Complex{Float64}
+    max :: Complex{Float64}
+end
+
+function Bounds(point :: Complex{Float64}, size :: Complex{Float64}, aspectRatio::Float64)
+    if aspectRatio < 1
+        size = real(size) + imag(size) / aspectRatio * im
+    else
+        size = real(size) * aspectRatio + imag(size) * im
+    end
+    Bounds(point - size / 2, point + size / 2)
+end
+
+function Bounds(point :: Complex{Float64}, size :: Float64, aspectRatio::Float64)
+    Bounds(point, size + size*im, aspectRatio)
+end
+
+function gen_data(;imageSize=(400, 400), iterations=200, nx::Bounds = Bounds(0.0 + 0.0im, 4.0 + 4.0im, imageSize[1]/imageSize[2]), fn = fn_mandel, chk = chk_mandel)
+    println (nx)
+
+    x, y = imageSize
+    xs = (real(nx.max) - real(nx.min)) / x
+    ys = (imag(nx.max) - imag(nx.min)) / y
+    data = Array(Int64, imageSize[2], imageSize[1])
+
+    cx, cy = real(nx.min), imag(nx.min) # nx.rn, nx.in
+
+    for xi = 1:x
+        cx += xs
+        cy = imag(nx.min)
+
+        for yi = 1:y
+            data[yi, xi] = 0
+            cy += ys
+            c = complex(cx, cy)
+
+            z = 0 + 0im
+            for i = 1:iterations
+                z = fn(z, c)
+                if chk(z)
+                    data[yi, xi] = i
+                    break
+                end
+            end
+        end
+    end
+
+    data
+end
+
+fn_mandel(z, c) = z^2 + c
+chk_mandel(z) =  z |> real |> abs2 > 4.0 || z |> imag |> abs2 > 4.0
+
+function gen_img(data, palette=Fracjack.palette)
+    imageData = Array(Float64, size(data, 1), size(data, 2), 3)
+    for xi = 1:size(data, 2)
+        for yi = 1:size(data,1)
+            idx = data[yi, xi]
+            if idx > 0
+                idx = floor(Int64, data[yi, xi] % size(palette, 1)) + 1
+                imageData[yi, xi, 1:3] = palette[idx, 1:3]
+            else
+                imageData[yi, xi, 1:3] = [0.0, 0.0, 0.0]
+            end
+        end
+    end
+
+    colorim(imageData, "RGB")
+end
+
+function gen_view(data; palette=Fracjack.palette)
+    view(gen_img(data, palette))
+end
+
+function gen_save(data; fileNameBase="fj", fileIndex=1, palette=Fracjack.palette)
+    strIdx = "$fileIndex"
+    strIdxPre = "0"^(5 - length(strIdx))
+    filename = "$fileNameBase$strIdxPre$strIdx.png"
+    print ("$filename... ")
+
+    img = gen_img(data, palette)
+
+    imwrite(img, filename)
+    println ("done.")
+end
+
+end

@@ -1,0 +1,15 @@
+include("../khypot.jl")
+
+#handle identity
+println(hypot(4)) 			  #4.0
+#default 2d
+println(hypot([3, 4])) 	   #5.0
+println(hypot((3, 4, 7)))  #5.0
+
+println(hypot((1, 1, 1, 3), 3)) #1.73205...
+println(hypot([1, 1, 1, 3], 3)) #1.73205...
+
+a = [[2, 3, 4, 5] [1, 1, 1, 3]]
+
+println(hypot(a, col=2, dim=3))
+println(hypot(a, col=2))	#sqrt(2) - default 2d

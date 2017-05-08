@@ -1,0 +1,36 @@
+
+# create a dictionary of matrices used to record network parameters
+function create_recording(net, props_to_record, duration)
+
+  rec_data = Dict()
+  nt = int(duration / net.dt)
+
+  net_params = keys(net.observables)
+
+  for k in keys(props_to_record)
+    if !(k in net_params)
+      continue
+    end
+
+    # get the length of the observed value
+    sz = net.observables[k]
+
+    # construct an empty array to contain the values
+    rec_data[k] = zeros(nt, sz[1])
+  end
+
+  # create an entry for time
+  rec_data["t"] = zeros(nt, 1)
+
+  return rec_data
+end
+
+# record the network parameters at one point in time
+function record(net, rec_data)
+
+  rec_data["t"][net.t, :] = net.t*net.dt
+  for k in keys(rec_data)
+    rec_data[k][net.t, :] = net.(symbol(k))
+  end
+
+end

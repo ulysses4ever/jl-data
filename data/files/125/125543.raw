@@ -1,0 +1,392 @@
+#=
+ main functions of EvolutionaryAction.jl
+  intended to be called by user
+=#
+
+# reconstruct phylogenetic tree and add to existing EvAc object
+function maketree! ( evac::EvAc, file::ASCIIString )
+	# run raxml in shell
+	treefile = ascii( string( file,"_raxml.tre" ) )
+	if ! isfile(treefile)
+		# reconstruct unrooted tree
+		pid = getpid()
+		raxml_call = `raxml -m PROTCATAUTO -p 12345 -n $pid -s $file`
+		println( "reconstructing unrooted tree using RAxML ..." )
+		run( raxml_call |> DevNull )	
+		run( `rm RAxML_info.$pid RAxML_log.$pid RAxML_parsimonyTree.$pid RAxML_result.$pid` )
+		# root the tree
+		raxml_call = `raxml -f I -m PROTCATAUTO -p 12345 -n $pid -t RAxML_bestTree.$pid`
+		println( "rooting the tree using RAxML ..." )
+		run( raxml_call |> DevNull )
+		run( `mv RAxML_rootedTree.$pid $treefile` )
+		run( `rm RAxML_bestTree.$pid` )
+	else
+		println( "RAxML tree file already exists - using this one" )
+	end
+	# read tree and update field in EvAc object
+	evac.phy = readtree( treefile )[1]
+end
+
+
+# reconstruct phylogenetic tree and return new EvAc object
+function maketree ( file::ASCIIString )
+	# read-in alignment
+	aln = readfasta( file )
+	# run raxml in shell
+	treefile = ascii( string( file,"_raxml.tre" ) )
+	if ! isfile(treefile)
+		# reconstruct unrooted tree
+		pid = getpid()
+		raxml_call = `raxml -m PROTCATAUTO -p 12345 -n $pid -s $file`
+		println( "reconstructing unrooted tree using RAxML ..." )
+		run( raxml_call |> DevNull )	
+		run( `rm RAxML_info.$pid RAxML_log.$pid RAxML_parsimonyTree.$pid RAxML_result.$pid` )
+		# root the tree
+		raxml_call = `raxml -f I -m PROTCATAUTO -p 12345 -n $pid -t RAxML_bestTree.$pid`
+		println( "rooting the tree using RAxML ..." )
+		run( raxml_call |> DevNull )
+		run( `mv RAxML_rootedTree.$pid $treefile` )
+		run( `rm RAxML_bestTree.$pid` )
+	else
+		println( "RAxML tree file already exists - using this one" )
+	end
+	# read tree
+	phy  = readtree( treefile )[1]
+	# return alignment and tree as new EvAc object
+	evac = EvAc( aln, phy )
+	return( evac )
+end
+
+
+# calculate real-value Evolutionary Trace measure for an alignment
+#  using a given tree
+function rvevolutionarytrace! ( evac::EvAc )
+	println("calculating real-value Evolutionary Trace")
+	# get hierarchical groupings of the tree
+	hiera = divideintogroups( evac.phy )
+	# get residue for given sequence ID at given position
+	function getresidue ( i, p )
+		for si in 1:length(evac.aln)
+			if evac.aln[si][1] == i
+				return uppercase( evac.aln[si][2][p] )
+			end
+		end
+	end
+	# calculate ET measure for an alignment position
+	#  by summing over the nodes and associated groups
+	function rvetpos ( pos )
+		etp = 1.0
+		for i in 1:length(hiera)
+			etpg = 0.0
+			for j in 1:length(hiera[i])
+				resis = Char[]
+				for id in hiera[i][j]
+					resis = vcat( resis, getresidue(id,pos) )
+				end
+				for resi in unique(resis)
+					if sum( resi .== evac.alphabet ) != 0
+						rf    = sum( resis .== resi ) / length(resis)
+						etpg -= (rf * log(rf))
+					end
+				end
+			end
+			etp += (etpg / i)
+		end
+		return etp
+	end
+	# calculate ET measure for each alignment position
+	evac.et = convert( Array{Float32,1}, pmap( rvetpos, 1:length(evac.aln[1][2]) ) )
+end
+
+
+# determine consensus sequence of an alignment
+function consensusseq ( aln, alphabet )
+	# do for each position
+	cons = Char[]
+	for pos in 1:length(aln[1][2])
+		re, rn = countresinums( aln, pos, alphabet )
+		if length(re) == 0
+			println( "   ! Warning: possible gap-only column (",pos,") !")
+			println( "   ! Remove such columns and rerun !")
+			cons = vcat( cons, '-' )
+		else
+			cons = vcat( cons, re[1] )
+		end
+	end
+	# return consensus as string
+	return join( cons )
+end
+
+
+# calculate substitution log-odds for pairs of amino acids
+#  using a given alignment
+function substlogodds! ( evac::EvAc )
+	println("calculating substitution log-odds")
+	# calculate total number of matches for aa pairs (fij)
+	fij = zeros(Int32,20,20)
+	# count amino acids for a single alignment
+	function countaa ( ali )
+		for pos in 1:length(ali[1][2])
+			# count number of occurrences for each aa in column
+			aa, an = countresinums( ali, pos, evac.alphabet )
+			# disregard gap-only columns
+			if length(aa) == 0
+				continue
+			end
+			# count number of substitutions from most common
+			#  to each other aa
+			ix = findin( evac.alphabet, aa[1] )
+			fij[ix,ix] += (an[1] * (an[1]-1) / 2)
+			j = 2
+			while j <= length(aa)
+				jx = findin( evac.alphabet, aa[j] )			
+				fij[ix,jx] += (an[1] * an[j])
+				j += 1
+			end
+		end
+	end
+	countaa( evac.aln )
+	# calculate substitution frequencies for aa pairs (qij)
+	qij = zeros(Float32,20,20)
+	for i in 1:size(fij,1)
+		rsum = sum( fij[i,:] )
+		for j in 1:size(fij,2)
+			qij[i,j] = (fij[i,j] / rsum)
+		end
+	end
+	# calculate probability of occurrence for each aa (ej)
+	ej = zeros(Float32,20)
+	fsum = sum(fij)
+	for j in 1:size(fij,2)
+		ej[j] = (sum(fij[:,j]) / fsum)
+	end
+	# calculate log-odds
+	sij = ones(Float32,20,20)
+	for i in 1:size(qij,1)
+		for j in 1:size(qij,2)
+			if qij[i,j] > 0
+				sij[i,j] = qij[i,j] / ej[j]
+			end
+		end
+	end
+	sij = log2(sij)
+	# check for zero log-odds indicating undersized data set
+	if sum(sij .== 0) > 0
+		println( "   ! Warning: some substitution log-odds are zero, indicating undersized data set !" )
+	end
+	# update log-odds field of the EvAc object
+	evac.odds = sij
+end
+
+# calculate substitution log-odds for pairs of amino acids
+#  using several alignments
+function substlogodds ( files::Array{ASCIIString,1}, alphabet::Array{Char,1} )
+	println("calculating substitution log-odds")
+	# calculate total number of matches for aa pairs (fij)
+	fij = zeros(Int32,20,20)
+	# count amino acids for a single alignment
+	function countaa ( ali )
+		for pos in 1:length(ali[1][2])
+			# count number of occurrences for each aa in column
+			aa, an = countresinums( ali, pos, alphabet )
+			# disregard gap-only columns
+			if length(aa) == 0
+				continue
+			end
+			# count number of substitutions from most common
+			#  to each other aa
+			ix = findin( alphabet, aa[1] )
+			fij[ix,ix] += (an[1] * (an[1]-1) / 2)
+			j = 2
+			while j <= length(aa)
+				jx = findin( alphabet, aa[j] )			
+				fij[ix,jx] += (an[1] * an[j])
+				j += 1
+			end
+		end
+	end
+	for file in files
+		aln = readfasta( file )
+		countaa( aln )
+	end
+	# calculate substitution frequencies for aa pairs (qij)
+	qij = zeros(Float32,20,20)
+	for i in 1:size(fij,1)
+		rsum = sum( fij[i,:] )
+		for j in 1:size(fij,2)
+			qij[i,j] = (fij[i,j] / rsum)
+		end
+	end
+	# calculate probability of occurrence for each aa (ej)
+	ej = zeros(Float32,20)
+	fsum = sum(fij)
+	for j in 1:size(fij,2)
+		ej[j] = (sum(fij[:,j]) / fsum)
+	end
+	# calculate log-odds
+	sij = ones(Float32,20,20)
+	for i in 1:size(qij,1)
+		for j in 1:size(qij,2)
+			if qij[i,j] > 0
+				sij[i,j] = qij[i,j] / ej[j]
+			end
+		end
+	end
+	sij = log2(sij)
+	# check for zero log-odds indicating undersized data set
+	if sum(sij .== 0) > 0
+		println( "   ! Warning: some substitution log-odds are zero, indicating undersized data set !" )
+	end
+	# update log-odds field of the EvAc object
+	return( sij )
+end
+
+
+# calculate Evolutionary Action (FINAL MEASURE!)
+#  using pre-calculated Evolutionary Trace and substitution log-odds
+function evolutionaryaction! ( evac::EvAc )
+	println("calculating Evolutionary Action")
+	# get consensus sequence of the alignment
+	consensus = consensusseq( evac.aln, evac.alphabet )
+	# normalize Evolutionary Trace scores to percentiles based on their ranks
+	etn = sortrank(evac.et,rev=true) / length(evac.et) * 100
+	# normalize substitution log-odds to percentiles based on ranking
+	# among all possible substitutions
+	subs = Float32[]
+	for pos in 1:length(consensus)
+		ai = findin( evac.alphabet, consensus[pos] )[1]
+		for aj in 1:length(evac.alphabet)
+			subs = vcat( subs, evac.odds[ai,aj] )
+		end
+	end
+	subsn = sortrank(subs,rev=true) / length(subs) * 100
+	# calculate EA for each possible substitution 
+	ea = Float32[]
+	for pos in 1:length(consensus)
+		for aj in 1:length(evac.alphabet)
+			ea = vcat( ea, etn[pos] * subsn[ (pos-1)*20+aj ] )
+		end
+	end
+	# normalize EA scores
+	ean = sortrank(ea) / length(ea) * 100
+	# get EA scores for individual mutations in each sequence
+	eam = zeros(Float32,length(evac.aln),length(consensus))
+	for si in 1:length(evac.aln)
+		for pos in 1:length(consensus)
+			resi = evac.aln[si][2][pos]
+			aj   = findin( evac.alphabet,resi )
+			if length(aj) == 0
+				aj = findin( evac.alphabet, consensus[pos] )
+			end
+			eam[si,pos] = ean[ (pos-1)*20+aj[1] ]
+		end
+	end
+	# update ea filed of EvAc object
+	evac.ea = eam
+end
+
+
+# print substitution log-odds matrix to file
+function printlogodds( evac::EvAc, file; digits=2 )
+	# open file for writing
+	outf = open( file, "w" )
+	# write matrix to file
+	write( outf, join(vcat("",evac.alphabet,"\n"), "\t") )
+	for i in 1:size(evac.odds,1)
+		row = round( evac.odds[i,:], digits )
+		write( outf, join(hcat(string(evac.alphabet[i]),row,"\n"), "\t") )
+	end
+	# close file
+	close(outf)
+end
+
+
+# read substitution log-odds matrix from file
+function readlogodds( file )
+	# read data from file
+	inp  = readdlm( file )[ 2:end,2:end ]
+	# convert data type
+	odds = convert( Array{Float32,2},inp )
+	# return log-odds
+	return odds
+end
+
+
+# print final EA scores to file
+function printea( evac::EvAc, file; digits=2 )
+	# open file for writing
+	outf = open( file, "w" )
+	# write EA scores to file
+	for i in 1:size(evac.ea,1)
+		row = round( evac.ea[i,:], digits )
+		sid = evac.aln[i][1]
+		write( outf, join(hcat(sid,row,"\n"), "\t") )
+	end
+	# close file
+	close(outf)
+end
+
+
+# run full analysis for a single alignment
+function runea( file::ASCIIString )
+	# calculate tree and init EvAc object
+	evac = maketree( file )
+	# compute substitution log-odds
+	substlogodds!( evac )
+	# compute evolutionary trace scores
+	rvevolutionarytrace!( evac )
+	# compute evolutionary action scores
+	evolutionaryaction!( evac )	
+	# return results
+	return( evac )
+end
+
+
+# run full analysis in batch mode
+#  using all alignments in specified folder
+#  common substitution log-odds will be calculated
+function runea( folder::ASCIIString, resdir::ASCIIString )
+	# get all fasta alignment filenames in folder
+	alnfiles = filter( x->ismatch(r".fas[A]*$",x), readdir(folder) )
+	resfiles = map( x->string(resdir,"/",x,"-EA.txt"), alnfiles )
+	map!( x->string(folder,"/",x), alnfiles )
+	alnfiles = map( ascii, alnfiles )
+	resfiles = map( ascii, resfiles )
+	# check if proper files in folder
+	if length(alnfiles) == 0
+		println( "   ! No alignment files found in the specified folder !")
+		println( "   ! Make sure all alignment filenames end with '.fas' or '.fasA' !")
+		return( false )
+	else
+		println( length(alnfiles)," alignment files will be analyzed")
+		println( "results will be written to ",resdir )
+	end
+	# check if result directory exists
+	if !isdir(resdir)
+		mkdir( resdir )
+	end
+	# compute common substitution log-odds and save to file
+	evactmp = EvAc()
+	evactmp.odds = substlogodds( alnfiles, evactmp.alphabet )
+	printlogodds( evactmp, string(resdir,"/","logodds.txt") )
+	# compile tree, ET, and EA scores for each alignment
+	if nprocs() > 1
+		println("running in parallel mode")
+	end
+	function easingle ( files )
+		# report progress
+		println( "analyzing ",files[1]," ..." )
+		# init by tree
+		evac  = maketree( files[1] )
+		# set substitution log-odds
+		evac.odds = evactmp.odds
+		# compute evolutionary trace
+		rvevolutionarytrace!( evac )
+		# compute evolutionary action and save to file
+		evolutionaryaction!( evac )
+		# save evolutionary action to file
+		printea( evac, files[2] )
+	end	
+	pmap( easingle, collect(zip(alnfiles,resfiles)) )
+end
+

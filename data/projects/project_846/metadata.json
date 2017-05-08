@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:37 GMT
+Date: Wed, 03 May 2017 21:01:51 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 6049
+Content-Length: 5567
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2775
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3911
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "ee3ddc7e64b94ec6c8fc0e313a15f2cc"
-Last-Modified: Sat, 19 Dec 2015 21:42:15 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "9e2bdb2d3fac240cead2daf01e10d6d7"
+Last-Modified: Wed, 10 Aug 2016 22:59:10 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,82 +22,82 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
-X-GitHub-Request-Id: ED1F:6634:1347CFC:18EC04C:59023201
+X-Served-By: 139317cebd6caf9cd03889139437f00b
+X-GitHub-Request-Id: 6682:5CA5:FD5059:145DB0D:590A453F
 
 {
-  "id": 48298163,
-  "name": "kaggle_helpingSantasHelpers",
-  "full_name": "jcardente/kaggle_helpingSantasHelpers",
+  "id": 63313424,
+  "name": "MPFR3.jl",
+  "full_name": "JuliaNumberTypes/MPFR3.jl",
   "owner": {
-    "login": "jcardente",
-    "id": 153670,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/153670?v=3",
+    "login": "JuliaNumberTypes",
+    "id": 20150142,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/20150142?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/jcardente",
-    "html_url": "https://github.com/jcardente",
-    "followers_url": "https://api.github.com/users/jcardente/followers",
-    "following_url": "https://api.github.com/users/jcardente/following{/other_user}",
-    "gists_url": "https://api.github.com/users/jcardente/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/jcardente/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/jcardente/subscriptions",
-    "organizations_url": "https://api.github.com/users/jcardente/orgs",
-    "repos_url": "https://api.github.com/users/jcardente/repos",
-    "events_url": "https://api.github.com/users/jcardente/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/jcardente/received_events",
+    "url": "https://api.github.com/users/JuliaNumberTypes",
+    "html_url": "https://github.com/JuliaNumberTypes",
+    "followers_url": "https://api.github.com/users/JuliaNumberTypes/followers",
+    "following_url": "https://api.github.com/users/JuliaNumberTypes/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaNumberTypes/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaNumberTypes/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaNumberTypes/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaNumberTypes/orgs",
+    "repos_url": "https://api.github.com/users/JuliaNumberTypes/repos",
+    "events_url": "https://api.github.com/users/JuliaNumberTypes/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaNumberTypes/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/jcardente/kaggle_helpingSantasHelpers",
-  "description": "Attempted solution to Kaggle's 2014 holiday contest, Helping Santa's Helpers.",
+  "html_url": "https://github.com/JuliaNumberTypes/MPFR3.jl",
+  "description": "precision parameterized rewrite of mpfr.jl",
   "fork": false,
-  "url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers",
-  "forks_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/forks",
-  "keys_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/teams",
-  "hooks_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/hooks",
-  "issue_events_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/events",
-  "assignees_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/tags",
-  "blobs_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/languages",
-  "stargazers_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/stargazers",
-  "contributors_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/contributors",
-  "subscribers_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/subscribers",
-  "subscription_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/subscription",
-  "commits_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/merges",
-  "archive_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/downloads",
-  "issues_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/labels{/name}",
-  "releases_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/jcardente/kaggle_helpingSantasHelpers/deployments",
-  "created_at": "2015-12-19T21:41:56Z",
-  "updated_at": "2015-12-19T21:42:15Z",
-  "pushed_at": "2015-12-19T21:42:13Z",
-  "git_url": "git://github.com/jcardente/kaggle_helpingSantasHelpers.git",
-  "ssh_url": "git@github.com:jcardente/kaggle_helpingSantasHelpers.git",
-  "clone_url": "https://github.com/jcardente/kaggle_helpingSantasHelpers.git",
-  "svn_url": "https://github.com/jcardente/kaggle_helpingSantasHelpers",
+  "url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl",
+  "forks_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaNumberTypes/MPFR3.jl/deployments",
+  "created_at": "2016-07-14T07:36:22Z",
+  "updated_at": "2016-08-10T22:59:10Z",
+  "pushed_at": "2016-08-10T23:15:46Z",
+  "git_url": "git://github.com/JuliaNumberTypes/MPFR3.jl.git",
+  "ssh_url": "git@github.com:JuliaNumberTypes/MPFR3.jl.git",
+  "clone_url": "https://github.com/JuliaNumberTypes/MPFR3.jl.git",
+  "svn_url": "https://github.com/JuliaNumberTypes/MPFR3.jl",
   "homepage": null,
-  "size": 38,
+  "size": 50,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",
@@ -119,5 +119,5 @@ X-GitHub-Request-Id: ED1F:6634:1347CFC:18EC04C:59023201
     "pull": true
   },
   "network_count": 0,
-  "subscribers_count": 1
+  "subscribers_count": 2
 }

@@ -1,0 +1,15 @@
+module julianne
+
+using neurons
+using synapses
+
+export evolve
+
+### Time Evolution ###
+function evolve(neur::neurons.Neurons, syn::synapses.Synapses, Iext::Array{Float64,1}, dt::Float64)
+    I = synapses.input_current(neur, syn)
+    I += Iext
+    return neurons.update_neurons(neur, I, dt)
+end
+
+end

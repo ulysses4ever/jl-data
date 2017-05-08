@@ -1,0 +1,8 @@
+using DSP
+
+include("../spectrum.jl")
+
+DATADIR = "../../../data/experiment02"
+OUTDIR = "../../output/experiment02"
+
+SIGNALFILE01 = joinpath(DATADIR, "signal01.txt")

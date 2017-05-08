@@ -1,0 +1,100 @@
+import Base: +, size, factor, slice, copy
+export FrontalMatrix, UpdateMatrix, add!
+
+# Frontal Matrix
+immutable FrontalMatrix{T, S<:Integer}
+    data::Matrix{T}     # dense matrix data
+    rowval::Vector{S}   # row indices
+end
+size(F::FrontalMatrix) = size(F.data)
+copy(F::FrontalMatrix) = FrontalMatrix(copy(F.data), copy(F.rowval))
+FrontalMatrix{T}(::Type{T}, n ::Int) = FrontalMatrix(zeros(T,n,n), Int[])
+
+# Initialize a frontal matrix from the original matrix A.
+function FrontalMatrix{T}(A::SparseMatrixCSC{T}, locs::Vector, col::Int)
+    n = length(locs)
+    F = FrontalMatrix(T, n)
+    for (i,k) in enumerate(locs)
+        F.data[i, 1] = A[k,col]
+        if i > 1; F.data[1, i] = F.data[i,1] end
+    end
+    append!(F.rowval, locs)
+    F
+end
+
+typealias UpdateMatrix FrontalMatrix
+
+function UpdateMatrix{T}(::Type{T}, v::Vector)
+    n = length(v)
+    UpdateMatrix(zeros(T, n,n), v)
+end
+
+# one step of Cholesky factorization
+function factor{T}(F::FrontalMatrix{T})
+    A = F.data
+    n, = size(A)
+    l = zeros(T,n)
+    U = UpdateMatrix(T, n -1)
+    [l[i] = A[i,1]/sqrt(A[1,1]) for i = 1:n]
+    for j = 2:n
+        for i = 2:n
+            @inbounds U.data[i-1,j-1] = A[i,j] - A[1,j]*A[1,i]/A[1,1]
+        end
+    end
+    append!(U.rowval, F.rowval[2:end])
+    return l, U
+end
+
+function factor(F::RemoteRef)
+    @spawnat F.where factor(fetch(F))
+end
+
+
+# extended add
+function +{T}(U1::UpdateMatrix{T}, U2::UpdateMatrix{T})
+    rowval = sort(union(U1.rowval, U2.rowval))
+    U = UpdateMatrix(T, length(rowval))
+    u1in = findin(rowval, U1.rowval)
+    u2in = findin(rowval, U2.rowval)
+    U.data[u1in,u1in] = U1.data
+    U.data[u2in,u2in] = U.data[u2in,u2in] + U2.data
+    append!(U.rowval, rowval)
+    U
+end
+
+"""
+ `add!(F, U)`
+
+extend-adds a Frontal Matrix `F` with a UpdateMatrix `U` and 
+overwrite the result on `F`, assuming `U.rowval` is a subset
+of `F.rowval`.
+"""
+function add!{T}(F::FrontalMatrix{T}, U::UpdateMatrix{T})
+    uin = findin(F.rowval, U.rowval)
+    F.data[uin,uin] = F.data[uin,uin] + U.data
+    F
+end
+
+function add!(F::RemoteRef, U::RemoteRef)
+    @spawnat F.where add!(fetch(F), fetch(U))
+end
+
+# convert an update matrix to a frontal matrix
+FrontalMatrix(U::UpdateMatrix) = FrontalMatrix(U.data, U.rowval)
+
+"
+ `slice(U, rowval)`
+
+slices an update matrix `U` according to the row indices 
+`rowval`. Only return the dense matrix that corresponds to
+the intersection of `rowval` and `U.rowval`.
+"
+function slice(U::UpdateMatrix, rowval::Vector)
+    new_rowval = intersect(U.rowval, rowval)
+    uin = findin(U.rowval, new_rowval)
+    UpdateMatrix(U.data[uin,uin], new_rowval)
+end
+
+function slice(U::RemoteRef, rowval::RemoteRef)
+    @spawnat U.where slice(fetch(U)[2], fetch(rowval))
+end

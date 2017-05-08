@@ -1,0 +1,13 @@
+## =============================================================================
+## timezone.jl - sample timezone script
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using TimeZones # https://github.com/quinnj/Timezones.jl/
+
+gmt_today = DateTime(2015, 10, 11)
+
+newyork = TimeZone("America/New_York")
+tokyo = TimeZone("Asia/Tokyo")
+
+dt_ny = ZonedDateTime(gmt_today, newyork)
+dt_tk = ZonedDateTime(gmt_today, tokyo)

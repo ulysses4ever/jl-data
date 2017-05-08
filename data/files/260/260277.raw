@@ -1,0 +1,38 @@
+function risk_workflow(calc_mode, job_file)
+  if calc_mode == "scenario_risk"
+    scenario_risk_workflow(job_file)
+  elseif calc_mode == "scenario_damage"
+    scenario_damage_workflow(job_file)
+  elseif calc_mode == "classical_risk"
+    classical_risk_workflow(job_file)
+  elseif calc_mode == "classical_damage"
+    classical_damage_workflow(job_file)
+  elseif calc_mode == "event_based_risk"
+    event_based_risk_workflow(job_file)
+  elseif calc_mode == "classical_bcr"
+    classical_bcr_workflow(job_file)
+  else
+    error("Unrecognized calculation mode!")
+  end
+end
+
+function scenario_risk_workflow(job_file)
+  inputs = scenario_risk_preprocess(job_file)
+  outputs = scenario_risk_tree(inputs)
+  export_dir, job_name = splitdir(job_file)
+  scenario_risk_export(outputs, export_dir, job_name)
+end
+
+function scenario_damage_workflow(job_file)
+  inputs = scenario_damage_preprocess(job_file)
+  outputs = scenario_damage_tree(inputs)
+  export_dir, job_name = splitdir(job_file)
+  scenario_damage_export(outputs, export_dir, job_name)
+end
+
+function classical_risk_workflow(job_file)
+  inputs = classical_risk_preprocess(job_file)
+  outputs = classical_risk_tree(inputs)
+  export_dir, job_name = splitdir(job_file)
+  classical_risk_export(outputs, export_dir, job_name)
+end

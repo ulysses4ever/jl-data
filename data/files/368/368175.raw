@@ -1,0 +1,49 @@
+export ncc_classify, ddncc_classify
+
+#Traditional Nearest centroid classifier (not depth-based)
+function ncc_classify{T<:Number}(test_data::AbstractArray{T,2},training_data::AbstractArray{T,2},training_labels::AbstractVector)
+    sortedTrainingData = sortData(training_data,training_labels)
+    centroids = cell(length(sortedTrainingData))
+    uniqueClasslabels = unique(sort(training_labels))
+    
+    #Calculate centroids of each class
+    for i in 1:length(sortedTrainingData)
+        centroids[i] = mean(sortedTrainingData[i],1)
+    end
+    
+    #Prediction for our test data points
+    predictions = cell(length(test_data[:,1]))
+    for i in 1:length(test_data[:,1])
+        tmp = zeros(length(centroids))
+        for j in 1:length(centroids)
+            tmp[j] = norm(centroids[j] - test_data[i,:])
+        end
+        predictions[i] = uniqueClasslabels[indmin(tmp)]
+    end
+    return predictions
+end
+
+#Max data depth to training classes: Evaluates the depth of a test points to given training data sets and assigns them to the max. depth
+#This is called DD-NCC classifier
+#Points test_data must be in a (nxd) matrix format, not in single vectors 
+function ddncc_classify{T<:Number}(test_data::AbstractArray{T,2},training_data::AbstractArray{T,2},training_labels::AbstractVector,depth_function::Function)
+    sortedTrainingData = sortData(training_data,training_labels)
+    uniqueClasslabels = unique(sort(training_labels))
+	
+    #Prediction for our test data points
+    predictions = cell(length(test_data[:,1]))
+    for i in 1:length(test_data[:,1])
+        tmp = zeros(length(sortedTrainingData))
+		for j in 1:length(tmp)
+			if(depth_function == depth_halfspace_bisectors)
+				w = generateWeightVectors(sortedTrainingData[j])
+				proj = preCalculateWeightProjections(sortedTrainingData[j],w)
+				tmp[j] = depth_halfspace_bisectors(vec(test_data[i,:]),sortedTrainingData[j],w,proj)
+			else
+				tmp[j] = depth_function(vec(test_data[i,:]),sortedTrainingData[j])
+			end	
+		end
+        predictions[i] = uniqueClasslabels[indmax(tmp)]
+    end
+    return predictions
+end

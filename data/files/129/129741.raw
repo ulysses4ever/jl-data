@@ -1,0 +1,7 @@
+zero(::Type{Expr}) = :(:0)
+one(::Type{Expr}) = :(:1)
+
++(x::Union(Number, Symbol, Expr), y::Union(Number, Symbol)) = :($x+$y);
++(x::Union(Number, Symbol), y::Union(Number, Symbol, Expr)) = :($x+$y);
++(x::Union(Number, Symbol, Expr), y::Expr) = y == :(:0) ? x : :($x+$y);
++(x::Expr, y::Union(Number, Symbol, Expr)) = x == :(:0) ? y : :($x+$y);

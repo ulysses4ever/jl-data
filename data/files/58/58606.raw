@@ -1,0 +1,90 @@
+type ItemValue
+  x::Float64
+  y::Float64
+  ItemValue(itemvalue::ItemValue) = new(itemvalue.x, itemvalue.y)
+end
+
+type Item
+  value::ItemValue
+  cluster_id::Int
+  id::Int
+end
+stringify(item::Item) = string(item.value.x, ", ", item.value.y, " => ", item.cluster_id, "\n")
+
+type Cluster
+  core::ItemValue
+  id::Int
+end
+
+# Build the basic data structures
+function build_from_file (filename::String, delimiter::Char, items)
+  # Mettre les items dans une matrice (une rangee = un item)
+  # Distance == norme (A - B) ou A est un item et B est un noyau de segment
+  lines = readdlm(filename, delimiter, header = true)
+  item_cluster = zeros(length(lines[1][:,1]), 2)
+  println(item_cluster)
+  #map((x) -> push!(items, Item(ItemValue(lines[x,1], lines[x,2]), 0, x - 1)), 2:rows(lines))
+end
+
+# Add to cluster function
+function set_related_cluster (new_cluster_id::Int, item_id::Int, items) 
+  items[item_id].cluster_id = new_cluster_id
+end
+
+# Select the random starting items for clusters
+function randomize_starting_cluster_cores (items, clusters, number_of_cores)
+  selected_cores = Int[]
+  while length(selected_cores) < number_of_cores
+    new_core = rand(1:length(items))
+    if(all((x) -> (x != new_core), selected_cores))
+      push!(selected_cores, new_core)
+      push!(clusters, Cluster(ItemValue(items[new_core].value.x, items[new_core].value.y), length(clusters) + 1)) 
+      set_related_cluster(length(clusters), new_core, items)
+    end
+  end
+end
+
+# Compute cluster core // Works only for continuous numeric values
+function compute_cluster_core(items, clusters, cluster_id)
+  x = 0
+  y = 0
+  nb_items = 0
+  for item in items
+    if item.cluster_id == cluster_id
+      x += item.value.x
+      y += item.value.y
+      nb_items += 1
+    end
+  end
+  clusters[cluster_id].core.x = x / nb_items
+  clusters[cluster_id].core.y = y / nb_items
+end
+
+# Kmeans effective function
+function kmeans_iteration (items, clusters, distance_function)
+  for item in items
+    distances = Float64[]
+    for cluster in clusters
+      push!(distances, distance_function(cluster.core, item.value))
+    end
+    # findmin(distances)[2] => index of the smallest distance
+    set_related_cluster(findmin(distances)[2], item.id, items)
+  end
+  map((cluster) -> compute_cluster_core(items, clusters, cluster.id), clusters)
+end
+
+# Kmeans Wrapper
+function kmeans (data_file_name, data_file_delimiter, number_of_cores, stop_after_iterations, distance_function)
+  items = Item[]
+  clusters = Cluster[]
+  read_from_file(data_file_name, data_file_delimiter, items)
+  randomize_starting_cluster_cores(items, clusters, number_of_cores)
+  for i in [1:stop_after_iterations]
+    kmeans_iteration(items, clusters, distance_function)
+  end
+  outfile = open("out.rez", "w")
+  write(outfile, map((x) -> stringify(x), items))
+#  write(outfile, map((x) -> stringify(x), clusters))
+println("over")
+end
+

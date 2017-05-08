@@ -1,0 +1,36 @@
+#train.jl
+#This script takes the saved feature data and will train a Random Forest to
+# classify bird syllables in spectrograms
+#author: Timothy Evans
+#date: 30/07/15
+
+using DecisionTree, JLD
+importall config
+
+#import data
+data = readcsv(datafile);
+(m,n) = size(data);
+
+#use 70% of data in training set
+ind = randperm(m);
+ntrain = ceil(0.7*m);
+trainind = ind[1:ntrain];
+testind = ind[ntrain+1:end]
+
+xtrain = data[trainind,1:end-1];
+ytrain = data[trainind,end];
+xtest = data[testind,1:end-1];
+ytest = data[testind,end];
+
+model = build_forest(ytrain, xtrain, int(ceil(sqrt(n))), ntrees, ratio)
+
+jldopen("model.jld","w") do file
+  write(file,"model",model)
+end
+
+#pixelwise accuracy:
+
+testpred = apply_forest(model,xtest);
+accuracy = 1-sum(abs(ytest-testpred))/length(ytest);
+
+print("Test set accuracy is: $accuracy")

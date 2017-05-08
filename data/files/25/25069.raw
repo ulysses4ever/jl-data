@@ -1,0 +1,42 @@
+using Multirate
+using DSP
+using GtkInteract
+using Winston
+
+N𝜙         = 32                                           # Number of polyphase partitions
+tapsPer𝜙   = 12                                           # N𝜙 * tapsPer𝜙 will be the length of out protoyTimepe filter taps
+ƒsIn       = 1.0                                          # Input sample rate
+ƒsOut      = π                                            # Input sample rate
+ratio      = ƒsOut/ƒsIn
+polyorder  = 4                                            # Our taps will tranformed into
+xƒ1        = 0.125                                        # First singal frequency
+xƒ2        = 0.3                                          # Second signal frequency
+xLen       = 20                                           # Number of signal samples
+xTime      = [0:xLen-1]                                   # Signal time vector
+x          = cos(2*pi*xƒ1*xTime)
+x          = x + 0.5sin(2*pi*xƒ2*xTime*pi)                # Create the two signals and add them
+x          = x + cos(0.1*xTime)
+cutoffFreq = min( 0.45/N𝜙, ratio/N𝜙 )                     # N𝜙 is also the integer interpolation, so set cutoff frequency accordingly
+hLen       = tapsPer𝜙*N𝜙                                  # Tintal number of filter taps
+h          = firdes( hLen, cutoffFreq, DSP.kaiser ) .* N𝜙 # Generate filter taps and scale by polyphase interpolation (N𝜙)
+δfilter    = (hLen-1)/(2*N𝜙)                              # The time delay (at output rate) caused by the filtering process
+
+
+@manipulate for ratio in 1.0:0.1:10.0,
+                    δout in 0.0:0.1:floor(xTime[end]-δfilter),
+                        out = :plot
+
+    myfilter            = FIRFilter( h, ratio, N𝜙, polyorder )  # Construct a FIRFilter{FIRFarrow} object
+    kernel              = myfilter.kernel
+    (phase,throwaway)   = modf(δfilter+δout)
+    setphase( myfilter, phase )
+    kernel.inputDeficit = throwaway+1
+    y                   = filt( myfilter, x )
+    yTime               = (0.0:length(y)-1)/ratio+δout
+    plottable           = Table( 3, 1 )
+    plottable[1,1]      = plot( xTime, x, "b-*" )
+    plottable[2,1]      = plot( yTime, y, "r-*" )
+    plottable[3,1]      = plot( xTime, x, "b-*", yTime, y, "r-*" )
+
+    push!(out, plottable)
+end

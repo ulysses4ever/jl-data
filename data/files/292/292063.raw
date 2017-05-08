@@ -1,0 +1,19 @@
+function plot_histogram(x, n = 100; normed = false)
+    bins,count = Base.hist(x,n)
+    x = []
+    y = []
+    for i in 1:length(bins)-1
+#         y = bins[i]
+        push!(x, bins[i])
+        push!(x, bins[i+1])
+        push!(y, count[i])
+        push!(y, count[i])
+#         println(x)
+    end
+    if normed
+        y=y/sum(y)
+    end
+#     y = [count[i] count[i] for i in 1:length(bins)]
+    plot(x,y)
+    return x,y
+end

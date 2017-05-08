@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:27 GMT
+Date: Wed, 03 May 2017 20:54:20 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 4995
+Content-Length: 5418
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2825
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4589
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "f5dd959781b2a5957daad965f8f402e4"
-Last-Modified: Wed, 27 Jul 2016 07:16:44 GMT
+ETag: "5b5cf27a67a9a838a30daef7de724412"
+Last-Modified: Sun, 03 Jul 2016 21:02:41 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 15bc4ab707db6d6b474783868c7cc828
-X-GitHub-Request-Id: 3F4C:6634:13475C4:18EB6CF:590231F7
+X-Served-By: a6882e5cd2513376cb9481dbcd83f3a2
+X-GitHub-Request-Id: F043:5C90:AB25CC:DBE3CF:590A437C
 
 {
-  "id": 48720349,
-  "name": "HTM.jl",
-  "full_name": "iizukak/HTM.jl",
+  "id": 49015326,
+  "name": "ArbFloats.jl",
+  "full_name": "J-Sarnoff/ArbFloats.jl",
   "owner": {
-    "login": "iizukak",
-    "id": 478824,
-    "avatar_url": "https://avatars2.githubusercontent.com/u/478824?v=3",
+    "login": "J-Sarnoff",
+    "id": 13563390,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/13563390?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/iizukak",
-    "html_url": "https://github.com/iizukak",
-    "followers_url": "https://api.github.com/users/iizukak/followers",
-    "following_url": "https://api.github.com/users/iizukak/following{/other_user}",
-    "gists_url": "https://api.github.com/users/iizukak/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/iizukak/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/iizukak/subscriptions",
-    "organizations_url": "https://api.github.com/users/iizukak/orgs",
-    "repos_url": "https://api.github.com/users/iizukak/repos",
-    "events_url": "https://api.github.com/users/iizukak/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/iizukak/received_events",
+    "url": "https://api.github.com/users/J-Sarnoff",
+    "html_url": "https://github.com/J-Sarnoff",
+    "followers_url": "https://api.github.com/users/J-Sarnoff/followers",
+    "following_url": "https://api.github.com/users/J-Sarnoff/following{/other_user}",
+    "gists_url": "https://api.github.com/users/J-Sarnoff/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/J-Sarnoff/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/J-Sarnoff/subscriptions",
+    "organizations_url": "https://api.github.com/users/J-Sarnoff/orgs",
+    "repos_url": "https://api.github.com/users/J-Sarnoff/repos",
+    "events_url": "https://api.github.com/users/J-Sarnoff/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/J-Sarnoff/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/iizukak/HTM.jl",
-  "description": "Hierarchical Temporal Memory (HTM) implementation in Julia",
+  "html_url": "https://github.com/J-Sarnoff/ArbFloats.jl",
+  "description": "ArbFloat30, ArbFloat70, ArbFloat140, ArbFloat300 for accurate floating point math at extended precision",
   "fork": false,
-  "url": "https://api.github.com/repos/iizukak/HTM.jl",
-  "forks_url": "https://api.github.com/repos/iizukak/HTM.jl/forks",
-  "keys_url": "https://api.github.com/repos/iizukak/HTM.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/iizukak/HTM.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/iizukak/HTM.jl/teams",
-  "hooks_url": "https://api.github.com/repos/iizukak/HTM.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/iizukak/HTM.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/iizukak/HTM.jl/events",
-  "assignees_url": "https://api.github.com/repos/iizukak/HTM.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/iizukak/HTM.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/iizukak/HTM.jl/tags",
-  "blobs_url": "https://api.github.com/repos/iizukak/HTM.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/iizukak/HTM.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/iizukak/HTM.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/iizukak/HTM.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/iizukak/HTM.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/iizukak/HTM.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/iizukak/HTM.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/iizukak/HTM.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/iizukak/HTM.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/iizukak/HTM.jl/subscription",
-  "commits_url": "https://api.github.com/repos/iizukak/HTM.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/iizukak/HTM.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/iizukak/HTM.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/iizukak/HTM.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/iizukak/HTM.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/iizukak/HTM.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/iizukak/HTM.jl/merges",
-  "archive_url": "https://api.github.com/repos/iizukak/HTM.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/iizukak/HTM.jl/downloads",
-  "issues_url": "https://api.github.com/repos/iizukak/HTM.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/iizukak/HTM.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/iizukak/HTM.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/iizukak/HTM.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/iizukak/HTM.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/iizukak/HTM.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/iizukak/HTM.jl/deployments",
-  "created_at": "2015-12-29T01:21:16Z",
-  "updated_at": "2016-07-27T07:16:44Z",
-  "pushed_at": "2016-01-04T23:46:14Z",
-  "git_url": "git://github.com/iizukak/HTM.jl.git",
-  "ssh_url": "git@github.com:iizukak/HTM.jl.git",
-  "clone_url": "https://github.com/iizukak/HTM.jl.git",
-  "svn_url": "https://github.com/iizukak/HTM.jl",
+  "url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl",
+  "forks_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/forks",
+  "keys_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/teams",
+  "hooks_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/events",
+  "assignees_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/tags",
+  "blobs_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/subscription",
+  "commits_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/merges",
+  "archive_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/downloads",
+  "issues_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/J-Sarnoff/ArbFloats.jl/deployments",
+  "created_at": "2016-01-04T18:32:13Z",
+  "updated_at": "2016-07-03T21:02:41Z",
+  "pushed_at": "2016-07-03T21:02:40Z",
+  "git_url": "git://github.com/J-Sarnoff/ArbFloats.jl.git",
+  "ssh_url": "git@github.com:J-Sarnoff/ArbFloats.jl.git",
+  "clone_url": "https://github.com/J-Sarnoff/ArbFloats.jl.git",
+  "svn_url": "https://github.com/J-Sarnoff/ArbFloats.jl",
   "homepage": null,
-  "size": 7,
-  "stargazers_count": 1,
-  "watchers_count": 1,
+  "size": 6,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 0,
+  "forks_count": 1,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 0,
+  "forks": 1,
   "open_issues": 0,
-  "watchers": 1,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 0,
-  "subscribers_count": 0
+  "network_count": 1,
+  "subscribers_count": 1
 }

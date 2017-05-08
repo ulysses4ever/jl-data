@@ -1,0 +1,4 @@
+function ols(y::Array,x::Array)
+  β = (x'x)\x'y
+  return β
+end

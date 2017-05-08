@@ -1,0 +1,70 @@
+using JuMP
+
+# Fill in the ### sections
+
+# Define an ingredient type
+type Ingredient
+  cost
+  protein
+  fat
+  fiber
+  salt
+end
+
+# Load the data
+nutri = readcsv("nutrition.csv")
+costs = ###...
+names = costs[:,1]
+num_ingredients = length(names)
+ingredients = Dict()
+
+# Process costs first
+for i = 1:num_ingredients
+  name = costs[i,1]
+  cost = costs[i,2]
+  ingredients[name] = Ingredient(costs[i,2],0,0,0,0)
+end
+
+# Now process nutrition
+for i = 1:num_ingredients
+  name = nutri[i,1]
+  ingredients[name].protein = ### ...
+  ### ...fat...
+  ### ...fiber...
+  ### ...salt...
+end
+
+# Build the model
+m = Model(:Min)
+
+# Decide fraction of can
+@defVar(m, ### ... x[...] ...)
+
+# Minimize cost
+@setObjective(m, ### sum{...})
+
+# Protein
+@addConstraint(m, sum{ingredients[n].protein * x[n], n=names} >= 8)
+# Fiber
+### ...
+# Fat
+### ...
+# Salt
+### ...
+# Beef
+### ...
+
+# Fractions: variables sum up to 1
+### ...
+
+# Solve it!
+solve(m)
+
+# Print out fraction of each ingredient
+for name in names
+  println("$name : $(getValue(x[name]))")
+end
+
+
+
+

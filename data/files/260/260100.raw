@@ -1,0 +1,36 @@
+function scenario_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, ScenarioRiskInput}()
+  include(job_file)
+  inputs = [branch::ASCIIString => ScenarioRiskInput(assets, gmfs[branch], tax_vf_map)
+            for branch in branches]
+  return inputs
+end
+
+function scenario_damage_preprocess(job_file)
+  inputs = Dict{ASCIIString, ScenarioDamageInput}()
+  include(job_file)
+  inputs = [branch::ASCIIString => ScenarioDamageInput(assets, gmfs[branch], tax_ff_map)
+            for branch in branches]
+  return inputs
+end
+
+function event_based_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, EventBasedRiskInput}()
+  insured_losses = false
+  include(job_file)
+  inputs = [branch::ASCIIString => EventBasedRiskInput(assets, gmfs[branch], tax_vf_map,
+                                          risk_investigation_time,
+                                          num_sims, loss_curve_res,
+                                          insured_losses)
+            for branch in branches]
+  return inputs
+end
+
+function classical_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, ClassicalRiskInput}()
+  include(job_file)
+  inputs = [branch::ASCIIString => ClassicalRiskInput(assets, hcs[branch], tax_vf_map,
+                                         risk_investigation_time, num_steps)
+            for branch in branches]
+  return inputs
+end

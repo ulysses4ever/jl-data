@@ -1,0 +1,8 @@
+using Cpp
+a = 0
+#for i = 1:100
+#    Libdl.dlopen("/home/david/TehzCodes/GRNEvolution/librobo")
+    @cpp ccall((:foo, "/home/david/TehzCodes/GRNEvolution/librobo"), Int32, (Int32,), convert(Int32, 0))
+ #   println(a)
+#    a += 1
+#end

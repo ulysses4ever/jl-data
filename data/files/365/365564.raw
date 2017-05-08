@@ -1,0 +1,49 @@
+const Cr = 2.0*pi
+const c = tan(2*pi/20)
+const a1x = Cr*cos(2*pi/5)
+const a1y = Cr*sin(2*pi/5)
+const a2x = Cr*cos(4*pi/5)
+const a2y = Cr*sin(4*pi/5)
+const a3x = Cr*cos(6*pi/5)
+const a3y = Cr*sin(6*pi/5)
+const a4x = Cr*cos(8*pi/5)
+const a4y = Cr*sin(8*pi/5)
+
+function f(x::Float64, y::Float64)
+	t1 = x*a1x + y*a1y
+	t2 = x*a2x + y*a2y
+	t3 = x*a3x + y*a3y
+	t4 = x*a4x + y*a4y
+	t5 = Cr*x
+	return (cos(t1) + cos(t2 + Cr/5) + cos(t3 + 2*Cr/5) + cos(t4 + 3*Cr/5) + cos(t5 + 4*Cr/5), sin(t1) + sin(t2 + Cr/5) + sin(t3 + 2*Cr/5) + sin(t4 + 3*Cr/5) + sin(t5 + 4*Cr/5))
+end
+
+function map(L::Float64, d::Float64)
+	arr = zeros(Int64, 1210, 1210)
+	t1 = 0.0
+	t2 = 0.0
+	a1::Int64 = 0
+	a2::Int64 = 0
+	for i in 0:d:L
+		for j in 0:d:(i*c)
+			(t1, t2) = f(i, j)
+			a1 = 1 + iround(120*(t1 + 5))		
+			a2 = 1 + iround(120*(t2 + 5))
+			arr[a1, a2] += 1
+			arr[a1, 1202 - a2] += 1
+		end
+	end
+	return arr
+end
+
+# @time arr = map(5.0, 0.001);
+# typeof([f(x,y) for x in 0.0:1.0:0.1, y in 0.0:0.1:1.0])
+# IPM.ExportImage(arr/(80), "s1.png", ColorFunction = "Orangescale")
+# IPM.ExportImage(arr/(1200*2.5*2.5*6*6/4), "s30.png", ColorFunction = "Orangescale")
+function t()
+	count = 0.0
+	for i in 1:10^9
+		count += 1/i
+	end
+	return count
+end

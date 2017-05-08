@@ -1,0 +1,5 @@
+include("scatter2d.jl")
+include("random.jl")
+include("log_sum_exp.jl")
+include("slice_sample.jl")
+include("adjusted_rand_index.jl")

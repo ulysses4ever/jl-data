@@ -1,0 +1,21 @@
+using Distributions
+using Lora
+using LoraMPI
+using MPI
+
+function main()
+  MPI.Init()
+
+  mpistate = MPIState(MPI, 0)
+
+  nchains::Int = 6
+  mcmodel = MCLikelihoodPatch(x->-dot(x, x), x->logpdf(MvNormal(fill(10.0, 3), 10.0), x), fill(1.0, 3))
+  mcsamplers = Lora.MCSampler[RAM() for i in 1:nchains]
+  mcrunner = FrielMC(burnin=1000, nsteps=11000, t=map(t->t^4, 0:1/(nchains-1):1))
+
+  run(mpistate, mcmodel, mcsamplers, mcrunner)
+
+  MPI.Finalize()
+end
+
+main()

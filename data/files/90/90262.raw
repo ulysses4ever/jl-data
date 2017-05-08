@@ -1,0 +1,25 @@
+module EvolvingGraphAlgs
+
+using Reexport
+@reexport using EvolvingGraphs
+import Base.reverse
+
+
+include("random_walk.jl")
+
+for elty in (:EvolvingGraph, :AttributeEvolvingGraph)
+    @eval begin
+        function reverse!(g::$elty)
+            g.ilist, g.jlist = g.jlist, g.ilist
+            g
+        end
+    end
+end
+
+for elty in (:EvolvingGraph, :AttributeEvolvingGraph)
+    @eval begin
+        reverse(g::$elty) = reverse!(copy(g))
+    end
+end
+
+end # module

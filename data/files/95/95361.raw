@@ -1,0 +1,9 @@
+### AR(2) process: x_t = φ_1*x_{t-1}+φ_2*x_{t-2}+ε_t,  ε_t ~ Normal(0, 1)
+
+ar2(xtm2::Float64, xtm1::Float64, φ1::Float64, φ2::Float64) = φ1*xtm1+φ2*xtm2+randn()
+
+iterator = SignalIterator((xtm2, xtm1) -> ar2(xtm2, xtm1, 1.0, -0.6), [10.0, 7.0], 1)
+
+OUTFILE = joinpath(DATADIR, "simulated_signal_ar2_01.txt")
+
+simulate_signal(iterator, OUTFILE, 10^7)

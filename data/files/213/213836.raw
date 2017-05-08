@@ -1,0 +1,9 @@
+#!/usr/bin/julia
+
+using Gadfly
+using RDatasets, DataFrames
+
+plot(x=rand(100), y=rand(100))
+iris = dataset("datasets", "iris")
+
+## data = dataset("car", "SLID")

@@ -1,0 +1,52 @@
+function stochasticSymmetricPeriodicOptimalOrderless()
+	n = 640
+	m = 360
+	arr = rand(Float32, m, n)
+	arr2 = zeros(Float32, m, n)
+	delta = 0.4
+	S = 3
+	ra = -S:S
+	for iter in 1:300
+		IPM.ExportImage(exp((2.0*pi*im)*arr), string("Radius 7 Random Mirror", formatnumber(iter), ".png"))
+		for iter2 in 1:20
+			d = 0.0
+			jR = rand(ra)
+			iR = rand(ra)
+			while d < 0.1
+				jR = rand(ra)
+				iR = rand(ra)
+				d = sqrt(iR^2 + jR^2)
+			end
+			for j in (S+1):(n-S)
+				for i in (S+1):(m-S)
+					arr2[i, j] = delta*(circleDir(arr[i + iR, j + jR], arr[i, j]) + circleDir(arr[i + jR, j - iR], arr[i, j]) + circleDir(arr[i - iR, j - jR], arr[i, j]) + circleDir(arr[i - jR, j + iR], arr[i, j]))/d^2
+				end
+			end
+			for j in 1:S
+				for i in 1:m
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in (n-S+1):n
+				for i in 1:m
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in (S+1):(n-S)
+				for i in 1:S
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end	
+			for j in (S+1):(n-S)
+				for i in (m-S+1):m
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in 1:n
+				for i in 1:m
+					arr[i, j] += arr2[i, j]
+				end
+			end		
+		end
+	end
+end

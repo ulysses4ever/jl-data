@@ -1,0 +1,49 @@
+module preprocessing
+
+immutable StandardScaler
+    std::Vector{Float64}
+    mean::Vector{Float64}
+end
+
+function StandardScaler(X::StridedVecOrMat)
+
+    StandardScaler(vec(std(X, 2)), vec(mean(X, 2)))
+end
+
+function transform!(tfrm::StandardScaler, X::StridedVecOrMat, X_scaled::StridedVecOrMat)
+    broadcast!(-, X_scaled, X, tfrm.mean)
+    broadcast!(/, X_scaled, X_scaled, tfrm.std)
+end
+
+function inverse_transform!(tfrm::StandardScaler, X::StridedVecOrMat, X_scaled::StridedVecOrMat)
+    broadcast!(*, X_scaled, X, tfrm.std)
+    broadcast!(+, X_scaled, X_scaled, tfrm.mean)
+end
+
+function transform(tfrm::StandardScaler, X::StridedVecOrMat)
+    X_scaled = similar(X)
+    transform!(tfrm, X, X_scaled)
+    X_scaled
+end
+
+function inverse_transform(tfrm::StandardScaler, X::StridedVecOrMat)
+    X_scaled = similar(X)
+    inverse_transform!(tfrm, X, X_scaled)
+    X_scaled
+end
+
+function shuffle(X_collection::StridedVecOrMat...)
+    perm = randperm(size(X_collection[1], 2))
+    map((X)->X[:,perm], X_collection)
+end
+
+function random_split(balance::Float64, X_collection::StridedVecOrMat...)
+    perm = randperm(size(X_collection[1], 2))
+    map(
+        (X)->
+        (X[:,perm[1:ceil(Int64, balance * end)]],
+            X[:,perm[ceil(Int64, balance * end) + 1:end]]),
+        X_collection)
+end
+
+end # module preprocessing

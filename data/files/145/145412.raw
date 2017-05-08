@@ -1,0 +1,27 @@
+include ("frank.jl")
+include ("power_method.jl")
+
+function test_power_method(dim)
+  fmat = frank_matrix(dim)
+  (evals_lib, evecs_lib) = eig(fmat)
+  imax = indmax(evals_lib)
+  (eval_lib, evec_lib) = (evals_lib[imax], evecs_lib[:,imax])
+
+  (eval_power, evec_power, nitr) = power_method(fmat)
+
+  Test.@test_approx_eq_eps eval_lib eval_power 1.0e-8
+  if dot(evec_lib, evec_power) < 0.0
+    evec_power *= -1.0
+  end
+  for i in 1:dim
+    Test.@test_approx_eq_eps evec_lib[i] evec_power[i] 1.0e-6
+  end
+end
+
+function test_power_method_large(dim)
+  (eigen_val, _, _) = power_method(multiple_frank, dim)
+  Test.@test_approx_eq_eps eigen_val frank_matrix_eigval(dim,1) 1.0e-8
+end
+
+test_power_method(10)
+test_power_method_large(100)

@@ -1,0 +1,83 @@
+"""
+    Relaxed belief propagation for CS-like problems. See Guo and Wang (2006),
+        Rangan (2010) and Krzakala et al. (2011).
+"""
+function iterate_rbp(y, F, opts)
+    # Parameters
+    x = get(opts, "x", nothing)
+    prior_prmts = get(opts, "prior_prmts", nothing)
+    channel_prmts = get(opts, "channel_prmts", nothing)
+    t_max = get(opts, "t_max", 100)
+    disp = get(opts, "disp", 1)
+    parallel = get(opts, "parallel", true)
+
+    if prior_prmts == nothing
+        error()
+    end
+
+    # Init vars, arrays and other structures
+    m, n = size(F)
+    sqrF = F.^2
+
+    A, B = zeros(n), zeros(n)
+    a, c = zeros(m, n), ones(m, n)
+    w, v = zeros(m, n), ones(m, n)
+    x_hat = zeros(n)
+    Fa, F2c = zeros(m, n), ones(m, n)
+    sum_Fa, sum_F2c = zeros(m), n * ones(m)
+    d = channel_prmts != nothing ? channel_prmts[1] : 1.
+
+    mses = zeros(t_max)
+    diff = 0.
+
+    tic()
+    for t = 1:t_max
+        a_old = copy(a)
+        if parallel == true
+            # Update (w, v) ...
+            w, v = broadcast(+, y - sum_Fa, Fa), d + broadcast(-, sum_F2c, F2c)
+
+            # ... then (A, B), (a, c) ...
+            dA = sqrF ./ v
+            dB = F .* w ./ v
+            A, B = sum(dA, 1), sum(dB, 1)
+            a, c = prior_gbc(broadcast(-, A, dA), broadcast(-, B, dB), prior_prmts)
+
+            # and finally, (F * a, F^2 * c)
+            Fa, F2c = F .* a, sqrF .* c
+            sum_Fa, sum_F2c = sum(Fa, 2), sum(F2c, 2)
+        else
+            for i = randperm(n)
+                # Update (w, v) ...
+                sum_Fa, sum_F2c = sum_Fa - Fa[:, i], sum_F2c - F2c[:, i]
+                w[:, i], v[:, i] = y - sum_Fa, d + sum_F2c
+
+                # ... then (A, B), (a, c) ...
+                dA = sqrF[:, i] ./ v[:, i]
+                dB = F[:, i] .* w[:, i] ./ v[:, i]
+                A[i], B[i] = sum(dA), sum(dB)
+                a[:, i], c[:, i] = prior_gbc(A[i] - dA, B[i] - dB, prior_prmts)
+
+                # and finally, (F * a, F^2 * c)
+                Fa[:, i], F2c[:, i] = F[:, i] .* a[:, i], sqrF[:, i] .* c[:, i]
+                sum_Fa, sum_F2c = sum_Fa + Fa[:, i], sum_F2c + F2c[:, i]
+            end
+        end
+        diff = mean(abs(a_old - a))
+
+        x_hat = vec( prior_gbc(A, B, prior_prmts)[1] )
+        if channel_prmts == nothing
+            w_, v_ = y - sum_Fa, d + sum_F2c
+            d *= sum((w_ ./ v_).^2) / sum(1 ./ v_)
+        end
+
+        if x != nothing; mses[t] = norm(x - x_hat)^2 / norm(x)^2; end
+        if disp == 1
+            @printf("t = %d; diff = %.4e, delta = %.4e, MSE = %.4e, RSS = %.4e\n", 
+                t, diff, d, mses[t], norm(y - F * x_hat)^2 / m)
+        end
+    end
+    elapsed = toq()
+
+    return x_hat, mses, elapsed
+end

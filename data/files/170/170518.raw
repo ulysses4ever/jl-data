@@ -1,0 +1,166 @@
+module SimpleStats
+
+# COMAND LINE
+# ===========
+
+module Comandline
+
+export parse_commandline
+
+using ArgParse
+
+function parse_commandline(args...)
+  settings = ArgParseSettings()
+
+  add_arg_table(settings,
+                "FILE",
+                Dict(
+                  :help => "Name of the file. If it is not used, the script reads from STDIN.",
+                  :required => false
+                  ),
+                ["--delimiter", "-d"],
+                Dict(
+                  :help => "Field delimiter.",
+                  :default => "\t"
+                  ),
+                ["--missing", "-m"],
+                Dict(
+                  :help => "Missing values.",
+                  :default => ",NA"
+                  ),
+                ["--skip", "-s"],
+                Dict(
+                  :help => "Specify the number of initial rows to skip.",
+                  :default => "0"
+                  ),
+                args...)
+
+  return parse_args(settings)
+end
+
+end
+
+# READ DATA
+# =========
+
+using DataFrames
+using DataStructures
+using UnicodePlots
+using KernelDensity
+
+export Comandline, read_data, describe_univariate
+
+function read_data(file; delimiter::ByteString="\t", missing::ByteString=",NA", skip::ByteString="0")
+  readtable(file,
+            separator=collect(delimiter)[1],
+            header=false,
+            nastrings=ASCIIString[ str for str in split(missing, ",") ],
+            skipstart=parse(Int, skip))
+end
+
+macro _set_and_print(dict, key, val)
+  quote
+    $dict[$key] = $val
+    println($key, ":\t", $dict[$key])
+  end
+end
+
+function _clean_and_show!(dict::OrderedDict{ASCIIString,Any}, col)
+  len = length(col)
+  println("Data:\trow\t X")
+  println("=====\t---\t---")
+  if len >= 5
+    println("     \t1\t", col[1])
+    println("     \t2\t", col[2])
+    println("     \t⋮\t⋮")
+    println("     \t",len-1,"\t", col[len-1])
+    println("     \t",len,"\t", col[len])
+  else
+    for i in 1:len
+      println("     \t",i,"\t",col[i])
+    end
+  end
+  println("     \t---\t---")
+  println()
+
+  nas = isna(col)
+  col = col[!nas]
+  nans = isnan(col)
+  col = col[!nans]
+
+  @_set_and_print dict "N rows" length(nas)
+
+  dict["N Observations"] = length(col)
+  dict["NaN"] = sum(nans)
+  dict["NaN%"] = @sprintf("%1.2f", (dict["NaN"]/dict["N rows"])*100.0)
+  dict["NA"] = sum(nas)
+  dict["NA%"] = @sprintf("%1.2f", (dict["NaN"]/dict["N rows"])*100.0)
+
+  println("N Observations:\t", dict["N Observations"], "\t", @sprintf("%1.2f", (dict["N Observations"]/dict["N rows"])*100.0), "%")
+  println("NA:\t", dict["NA"], "\t", dict["NA%"], "%")
+  println("NaN:\t", dict["NaN"], "\t", dict["NaN%"], "%")
+  println()
+
+  col
+end
+
+function _histo(col, bins::ByteString="5")
+  println("""
+  Histogram:
+  ==========
+  """)
+  println( histogram(col, bins = parse(Int, bins), border=:none) )
+end
+
+function _density(col, label::ByteString="X")
+  println("""
+  Density:
+  ========
+  """)
+  kdest = kde(col)
+  density = lineplot(kdest.density, kdest.x, border=:none)
+  ylabel!(density, label)
+  m = mean(col)
+  lineplot!(density, x -> m, name = @sprintf("mean: %1.2f", m))
+  println(density)
+end
+
+function _description!(dict::OrderedDict{ASCIIString,Any}, col)
+  println("""
+  Stats:
+  ======
+  """)
+  @_set_and_print dict "Skewness" skewness(col)
+  @_set_and_print dict "Kurtosis" kurtosis(col)
+  println()
+  @_set_and_print dict "Modes" modes(col)
+  println()
+  Q = quantile(col, [0.25, 0.5, 0.75])
+  E = extrema(col)
+  @_set_and_print dict "Minimum" E[1]
+  @_set_and_print dict "1st Quartile" Q[1]
+  @_set_and_print dict "Median" Q[2]
+  @_set_and_print dict "3rd Quartile" Q[3]
+  @_set_and_print dict "Maximum" E[2]
+  println()
+  @_set_and_print dict "Range" E[2] - E[1]
+  @_set_and_print dict "InterQuartile Range" Q[3]-Q[1]
+  @_set_and_print dict "Median Absolute Deviation" mad(col)
+  println()
+  @_set_and_print dict "Mean" mean(col)
+  println()
+  @_set_and_print dict "Variance" var(col, mean=dict["Mean"])
+  @_set_and_print dict "Standard Deviation" sqrt(dict["Variance"])
+  @_set_and_print dict "Standard Error" dict["Standard Deviation"] / sqrt(dict["N Observations"])
+end
+
+function describe_univariate(col; bins::ByteString="5", label::ByteString="X")
+  dict = OrderedDict{ASCIIString,Any}()
+  col = _clean_and_show!(dict, col)
+  _histo(col, bins)
+  _density(col, label)
+  _description!(dict, col)
+  dict
+end
+
+end

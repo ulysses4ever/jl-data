@@ -1,0 +1,56 @@
+# Callback wrappers
+function frameworkMessage_wrap(data::Ptr{Uint8}, callback::Ptr{Void})
+    f = unsafe_pointer_to_objref(callback)::Function
+    f(bytestring(data))
+    return
+end
+function error_wrap(msg::Ptr{Uint8}, callback::Ptr{Void})
+    f = unsafe_pointer_to_objref(callback)::Function
+    f(bytestring(msg))
+    return
+end
+function shutdown_wrap(callback::Ptr{Void})
+    f = unsafe_pointer_to_objref(callback)::Function
+    f()
+    return
+end
+
+# Callback C handles
+const frameworkMessage_wrap_c = cfunction(frameworkMessage_wrap, Void, (Ptr{Uint8}, Ptr{Void}))
+const shutdown_wrap_c = cfunction(shutdown_wrap, Void, (Ptr{Void},))
+const error_wrap_c = cfunction(error_wrap, Void, (Ptr{Uint8}, Ptr{Void}))
+
+
+# Executor (callback container)
+type Executor
+    frameworkMessage_cf::Ptr{Void}
+    frameworkMessage_callback::Any
+    shutdown_cf::Ptr{Void}
+    shutdown_callback::Any
+    error_cf::Ptr{Void}
+    error_callback::Any
+    Executor(frameworkMessage::Function, shutdown::Function, error::Function) =
+    new(
+        frameworkMessage_wrap_c, frameworkMessage,
+        shutdown_wrap_c, shutdown,
+        error_wrap_c, error
+    )
+end
+
+# function Base.run(executor::Executor)
+#     executorDriver = ccall((:initialize, Mesos.libmesosjl), Ptr{Void}, (Ptr{Executor},), &executor)
+#     println("ED:", executorDriver)
+#     if executorDriver == C_NULL
+#         error("Cannot start executor driver")
+#     end
+#     status = ccall((:run_driver, Mesos.libmesosjl), Cint, (Ptr{Void},), executorDriver)
+#     ccall((:finalize, Mesos.libmesosjl), Void, (Ptr{Void},), executorDriver)
+#     exit(status == Status.DRIVER_STOPPED ? 0 : 1)
+# end
+
+function Base.run(executor::Executor)
+    status = ccall((:run_executor, Mesos.libmesosjl), Cint, (Ptr{Executor},), &executor)
+    println("Executor ststus: $status")
+    exit(status == Status.DRIVER_STOPPED ? 0 : 1)
+end
+

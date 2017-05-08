@@ -1,0 +1,68 @@
+module ModelInterface
+export Model,ModelConfig,fit,predict,mean_loss
+
+abstract Model
+abstract ModelConfig
+
+
+macro mustimplement(sig)
+    fname = sig.args[1]
+    arg1 = sig.args[2]
+    if isa(arg1,Expr)
+        arg1 = arg1.args[1]
+    end
+    :($(esc(sig)) = error(typeof($(esc(arg1))),
+                          " must implement ", $(Expr(:quote,fname))))
+end
+
+@mustimplement fit(c::ModelConfig)
+
+@mustimplement predict(c::Model)
+
+function mean_loss(c::Model,x::Vector{Vector{Float64}},y::Vector{Int})
+  a=predict(c,x,y)
+end
+
+# function fit{I,O}(c::ModelConfig{I,O},x::Vector{I},y::Vector{O})
+#   error("fit() not implemented for $c")
+# end
+
+# function predict(m::Model,x)
+#   error("predict() not implemented for $m")
+# end
+
+
+end
+
+module MLModels
+  importall ModelInterface
+  export MLModelConfig,MLModel,fit,predict
+
+  type MLModel <: ModelInterface.Model
+    foo::Int
+  end
+  type MLModelConfig <: ModelInterface.ModelConfig
+
+  end
+  function fit(c::MLModelConfig,x::Vector{Vector{Float64}},y::Vector{Int})
+    return MLModel(1)
+  end
+
+  function predict(c::MLModel,x::Vector{Vector{Float64}},y::Vector{Int})
+    return 1
+  end
+end
+
+using ModelInterface
+using MLModels
+
+
+
+a=rand(3)
+x=Vector{Float64}[a,a,a,a]
+y=[1;2;3;4]
+c=MLModelConfig()
+println(c)
+m=fit(c,x,y)
+println(m)
+mean_loss(m,x,y)

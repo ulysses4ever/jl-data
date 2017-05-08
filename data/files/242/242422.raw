@@ -1,0 +1,54 @@
+#=
+This illustrates the adaptive importance sampling density. The
+true parameter values are 0.5, 0.5. This shows how the AIS 
+algorithm is able to concentrate sampling in a region around
+the true point.
+=#
+using Distributions
+using Distances
+using PyPlot
+#using KernelDensity
+pygui(true)
+include("Auction.jl") # load the user code
+include("AIS.jl") # load the main algorithm
+
+# generate Zn by Monte Carlo
+const samplesize = 80  # sample size
+theta = [0.5 0.5] # true theta
+Zn = aux_stat(theta)
+
+# set up the simulations
+nParticles = 500
+multiples = 5  # try this many new particles per particle
+                # the proportion kept is multiples/nParticles
+StopCriterion = 0.2 # stop when proportion of new particles accepted is below this
+# call the algorithm
+particles, Zs = AIS_algorithm(nParticles, multiples, StopCriterion, Zn)
+
+
+# now look at Importance sampling density
+WeightAIS = 0.9 # this weight on AIS, rest on prior (maintains support)
+
+npoints = 100
+
+theta1 = linspace(-1,3,npoints)
+theta2 = linspace(0,2,npoints)
+d = zeros(npoints,npoints)
+for j = 1:npoints
+    thetap = [theta1[j] .* ones(npoints,1) theta2]
+    d[:,j] = (1-WeightAIS)*prior(thetap) + WeightAIS*AIS_density(thetap, particles)
+end
+contour(theta1, theta2, d)
+figure()
+scatter(particles[:,1], particles[:,2])
+println(size(particles))
+
+figure()
+npoints = 500
+theta = mean(particles,1)
+theta = repmat(theta, npoints, 1)
+theta2 = linspace(0.,2.,npoints)
+thetap = [theta[:,1] theta2]
+d = (1-WeightAIS)*prior(thetap) + WeightAIS*AIS_density(thetap, particles)
+plot(theta2, d)
+

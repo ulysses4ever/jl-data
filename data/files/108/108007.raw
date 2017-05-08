@@ -1,0 +1,18 @@
+#(ugly) tests
+using sevengoldenrules
+#using Base.Test
+
+dict = findStoechio("CH3NO2")
+dict = completeSoechio(dict)
+println(dict)
+println("e- :\t\t", eminusCalc(dict))
+println("sum :\t\t", atomSum(dict))
+println("lewissum :\t",LewisSum(dict))
+println("ratioHC :\t",rat(dict["H"], dict["C"]))
+println("ratioNC :\t",rat(dict["N"], dict["C"]))
+println("ratioPC :\t",rat(dict["P"], dict["C"]))
+println("ratioCP :\t",rat(dict["C"], dict["P"]))
+println("ratioZeros :\t",rat(0, 0))
+println("NOPSTest :\t",NOPSCheck(dict) ? "TRUE" : "FALSE")
+println("HNOPSTest :\t",HNOPSCheck(dict) ? "TRUE" : "FALSE")
+println("SeniorMaxTest :\t",SeniorMaxCheck(dict) ? "TRUE" : "FALSE")

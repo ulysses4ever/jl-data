@@ -1,0 +1,144 @@
+# -*- coding: utf-8 -*-
+#=
+Created on Fri Oct 02 14:39:39 2015
+
+@author: William Herrera
+
+IMPORTANT: run as administrator
+
+Color breathing package for G20 series PC
+
+=#
+
+include("LightACPI.jl")
+using .LightACPI
+
+
+"""
+Make rgb for components
+"""
+function makergb(cred, cgreen, cblue)
+    redval = UInt32(round(cred))
+    greenval = UInt32(round(cgreen))
+    blueval = UInt32(round(cblue))
+    ret = redval * 0x10000 + greenval * 0x100 + blueval
+    if ret < 0
+        ret = 0
+    elseif ret > 0x00ffffff
+        ret = 0x00ffffff
+    end
+    ret
+end
+
+
+"""
+Split rgb into red, green, blue
+"""
+function splitrgb(color)
+    color = UInt32(color)
+    red = (color & 0xff0000) / 0x10000
+    green = (color & 0xff00) / 0x100
+    blue = color & 0xff
+    return UInt32(red), UInt32(green), UInt32(blue)
+end
+
+
+"""
+Get ratios of colors
+"""
+function makeratios(cred, cgreen, cblue)
+    maxcolor = Float64(maximum([cred, cgreen, cblue]))
+    return Float64(cred) / maxcolor, Float64(cgreen) / maxcolor,
+           Float64(cblue) / maxcolor
+end
+
+
+"""
+Make a sequence of 256 colors
+"""
+function makegamut(color)
+    sequence256 = Array(UInt32, 256)
+    cred, cgreen, cblue = splitrgb(color)
+    rred, rgreen, rblue = makeratios(cred, cgreen, cblue)
+    for step in 1:256
+        fstep = Float64(step)
+        tred = fstep * rred
+        tgreen = fstep * rgreen
+        tblue = fstep * rblue
+        sequence256[step] = makergb(tred, tgreen, tblue)
+    end
+    return sequence256, indexin([color], sequence256)[1]
+end
+
+
+"""
+Reframe the sequence
+"""
+function dim_up_down_up_sequence(gamut, idx, frames)
+    cseq = deepcopy(gamut[end:-1:1])
+    prepend!(cseq, deepcopy(gamut[idx:end]))
+    append!(cseq, gamut[1:idx])
+    # adjust size for the number of frames per breath
+    ratio = 512.0 / Float64(frames)
+    reframed = Array(UInt32, frames)
+    for frameidx in 1:frames
+        reframed[frameidx] = cseq[UInt32(round(frameidx * ratio))]
+    end
+    reframed
+end
+
+
+"""
+Run a breathing type change sequence through once,
+sleepinterval is in seconds or fractions of seconds
+"""
+function run_color_sequence(light_to_change, colors, sleepinterval)
+    for colr in colors
+        setcolor(light_to_change, colr)
+        sleep(sleepinterval)
+    end
+end
+
+
+"""
+Breathe in color saturation
+"""
+function continuous_cycle(lpos, startcolor, frames=32, sleepint=0.1)
+    gam, orig_idx = makegamut(startcolor)
+    seq = dim_up_down_up_sequence(gam, orig_idx, frames)
+    while true
+        run_color_sequence(lpos, seq, sleepint)
+    end
+end
+
+
+"""
+Do all 3 lights given list of all 3
+"""
+function run_triple_sequence(colorlist, sleeptime)
+    for idx in 1:size(colorlist)[2]
+        setcolor(LLIGHT, colorlist[1, idx])
+        setcolor(RLIGHT, colorlist[2, idx])
+        setcolor(BLIGHT, colorlist[3, idx])
+        sleep(sleeptime)
+    end
+end
+
+
+"""
+Asus G20 desktop LED lighting continuous cycle breathing lights
+make color lists and run with interval sleepinterval for changes
+"""
+function all_cycle(scolors, frames=32, sleepinterval=0.1)
+    clists = Array(UInt32, (3, frames))
+    for idx in 1:3
+        gam, orig_idx = makegamut(scolors[idx])
+        orig_idx = orig_idx < 1 ? 1 : orig_idx
+        clists[idx, :] = dim_up_down_up_sequence(gam, orig_idx, frames)
+    end
+    while true
+        run_triple_sequence(clists, sleepinterval)
+    end
+end
+
+

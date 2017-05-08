@@ -1,0 +1,28 @@
+module EvolutionaryAction
+
+	# dependencies
+	#using	Docile
+	#@docstrings
+	using	FastaIO,
+		Phylogenetics
+
+	# export types and methods
+	export	EvAc,
+		maketree!,
+		maketree,
+		rvevolutionarytrace!,
+		substlogodds!,
+		substlogodds,
+		evolutionaryaction!,
+		printlogodds,
+		readlogodds,
+		printea,
+		runea
+
+	# import package files
+	include( Pkg.dir("EvolutionaryAction","src","typedefs.jl") )
+	include( Pkg.dir("EvolutionaryAction","src","lowlevel.jl") )
+	include( Pkg.dir("EvolutionaryAction","src","highlevel.jl") )
+
+end # module
+

@@ -1,0 +1,123 @@
+module SimpleStats
+
+# COMAND LINE
+# ===========
+
+module Comandline
+
+export parse_commandline
+
+using ArgParse
+
+function parse_commandline(args...)
+  settings = ArgParseSettings()
+
+  add_arg_table(settings,
+                "FILE",
+                Dict(
+                  :help => "Name of the file. If it is not used, the script reads from STDIN.",
+                  :required => false
+                  ),
+                ["--delimiter", "-d"],
+                Dict(
+                  :help => "Field delimiter.",
+                  :default => "\t"
+                  ),
+                ["--missing", "-m"],
+                Dict(
+                  :help => "Missing values.",
+                  :default => ",NA"
+                  ),
+                ["--skip", "-s"],
+                Dict(
+                  :help => "Specify the number of initial rows to skip.",
+                  :default => "0"
+                  ),
+                args...)
+
+  return parse_args(settings)
+end
+
+end
+
+# READ DATA
+# =========
+
+using DataFrames
+using UnicodePlots
+using KernelDensity
+
+export Comandline, read_data, clean_and_show, histo, density, stats
+
+function read_data(file; delimiter="\t", missing=",NA", skip="0")
+  readtable(file,
+            separator=delimiter,
+            header=false,
+            nastrings=ASCIIString[ str for str in split(missing, ",") ],
+            skipstart=parse(Int, skip))
+end
+
+function clean_and_show(col)
+  len = length(col)
+  println("Data:\trow\t X")
+  println("=====\t---\t---")
+  if len >= 5
+    println("     \t1\t", col[1])
+    println("     \t2\t", col[2])
+    println("     \t⋮\t⋮")
+    println("     \t",len-1,"\t", col[len-1])
+    println("     \t",len,"\t", col[len])
+  else
+    for i in 1:len
+      println("     \t",i,"\t",col[i])
+    end
+  end
+  println("     \t---\t---")
+
+  nas = isna(col)
+  println("")
+  println("N rows:\t", length(nas))
+  println("N observations:\t", sum(!nas))
+  println("NAs:\t", sum(nas))
+  println("NA%:\t", @sprintf("%1.6f", mean(nas)*100.0) )
+  println("")
+  col[!nas]
+end
+
+function histo(col, bins="5")
+  println("""
+  Histogram:
+  ==========
+  """)
+  println( histogram(col, bins = parse(Int, bins), border=:none) )
+end
+
+function density(col, label="X")
+  println("""
+  Density:
+  ========
+  """)
+  kdest = kde(col)
+  density = lineplot(kdest.density, kdest.x, border=:none)
+  ylabel!(density, label)
+  m = mean(col)
+  lineplot!(density, x -> m, name = @sprintf("mean: %1.1f", m))
+  println(density)
+end
+
+function description(col)
+  println("""
+  Stats:
+  ======
+  """)
+  describe(col)
+end
+
+function stats(col; bins="5", label="X")
+  col = clean_and_show(col)
+  histo(col, bins)
+  density(col, label)
+  description(col)
+end
+
+end

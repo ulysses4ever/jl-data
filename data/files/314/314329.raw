@@ -1,0 +1,98 @@
+function walk!(x)
+   for i in 1:length(x)
+       x[i] = x[i] + sqrt(dt)*randn()  
+   end
+end
+
+function branch!(x,Er)
+    W(x) = exp(-dt*(V(x)-Er))
+    N = length(x)
+    distrutti = Int[]
+    for i in 1:N
+        rep = min(floor(W(x[i]) + rand()), 3)  # calcolo le repliche di ogni walker
+        if rep == 0
+            push!(distrutti, i)
+        elseif rep == 2
+            push!(x, x[i])
+        elseif rep == 3
+            append!(x, [x[i], x[i]]) 
+        end
+    end
+    deleteat!(x, distrutti)
+    # attaccare quelli aggiunti ad x
+    if length(x) > Nmax
+        error("Superato il numero massimo di walker! N = $(length(x))")
+    end
+end
+
+function diffuse(x, Er)
+    # metto tutte le distribuzioni in una matrice? tanto sono piccole 
+    gs = zeros(length(edges)-1)
+    N = Int[length(x)]
+    E = [Er]
+    for i in 1:2*steps
+        walk!(x)
+        branch!(x, E[end])
+        # regolo l'energia per tenere costante il numero di walkers
+        push!(N, length(x))
+        println(N[end])
+        #plot(r,hist(x, edges)[2])
+        #sleep(0.1)
+        #clf()
+        #push!(E, mean(map(V,x)) + 1/dt * log(N[1]/N[end]))
+        push!(E, mean(map(V,x)) + 1/dt * (1 - N[end]/N[1]))
+        # la convergenza si controlla vedendo se <V> è stabile
+        if i > steps # se sono a convergenza costruisco la funzione d'onda
+            gs += hist(x, edges)[2]
+        end
+    end
+    return E, gs/(norm(gs)*sqrt(edges[2]-edges[1])), N
+end
+
+function metropolis(N, p::Function, δ, x_init=0)
+    # pesca N punti da p, δ è il lato del cubo da cui pesco per la catena di Markov
+    x = Float64[x_init] # iniziamo da un valore a caso della variabile,
+    accepted = 0
+    for i in 1:N-1
+        x_prop = x[end] + δ*(rand() - 0.5) # propongo un nuovo punto dentro un cubo di lato δ
+        w = p(x_prop)/p(x[end])         # rapporto ingenuo
+        if w >= 1 || w > rand() 
+            accepted += 1
+            push!(x, x_prop)
+        else 
+            push!(x, x[end])
+        end
+    end
+    return x, accepted/N
+end
+
+# esplode. probabilmente devo iniziare da una roba molto larga e stringere
+N0 = 1500                            # walker iniziali
+Nmax = Inf # walker massini
+steps = 20000                        # ne faccio altrettanti dopo la convergenza
+dt = 0.001                            # passo temporale
+xmin, xmax = 0, 10
+bins = 200                          # in quanti punti stimo la funzione d'onda
+edges = linspace(xmin, xmax, bins)  
+r = (edges[2:end]+edges[1:end-1])/2 # punti in cui valuto la funzione
+#V(x) = 0.5*x^2                      # potenziale
+x0 = 1.0                            # posizione iniziale
+x = fill(x0, N0)
+# Potenziale
+# non fa niente anche valutarlo in 0, julia gestisce bene i valori infiniti
+A  =  7.39
+B  = -3.22
+μ1 =  3.11
+μ2 =  1.555
+V(r) = 19.732*(A*exp(-μ1*r) + B*exp(-μ2*r))/r # 197.32*
+# inizio dando la distribuzione variazionale
+p(x) = x>0 ? x^4 * exp(-6*sqrt(x)) : zero(x)
+x, acc = metropolis(N0, p, 35.0, 1.0)
+Er = mean(map(V, x))                # stima iniziale dell'energia
+
+#psi(x) = exp(-x^2/2)/pi^0.25        # soluzione analitica h.o.
+#ho = map(psi, r)
+
+E, gs, pop = diffuse(x, Er)
+
+E0, dE0 = mean(E[steps:end]), std(E[steps:end])

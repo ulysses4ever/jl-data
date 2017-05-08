@@ -1,0 +1,24 @@
+module tools
+
+export rand_normal
+
+function rand_normal(mean, stdev)
+    if stdev <= 0.0
+        error("standard deviation must be positive")
+    end
+    u1 = rand()
+    u2 = rand()
+    r = sqrt( -2.0*log(u1) )
+    theta = 2.0*pi*u2
+    mean + stdev*r*sin(theta)
+end
+
+function rand_normal(mean, stdev, num)
+    a = zeros(num)
+    for i in 1:num
+        a[i] = rand_normal(mean, stdev)
+    end
+    return a
+end
+
+end

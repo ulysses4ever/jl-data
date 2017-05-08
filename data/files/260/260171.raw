@@ -1,0 +1,23 @@
+function scenario_risk_export(tree_outputs::Dict{ASCIIString, ScenarioRiskOutput},
+                              export_dir::ASCIIString,
+                              job_name::ASCIIString)
+  job_name = split(job_name, "_")[1]
+  export_dir = normpath("/Users/anirudh/GEM/OpenQuake/Tests/test/scenario_risk/outputs/")
+  assets_file = export_dir * job_name * "_assets.out"
+  portfolio_file = export_dir * job_name * "_portfolio.out"
+  fa = open(assets_file, "w")
+  fp = open(portfolio_file, "w")
+  write(fa, "assetRef, meanLoss, stdLoss \n")
+  write(fp, "meanLoss, stdLoss \n")
+  for (branch_ref, branch_output) in tree_outputs
+    alm = branch_output.asset_loss_moments
+    plm = branch_output.portfolio_loss_moments
+    for (asset_ref, loss_moment) in alm
+      write(fa, join((asset_ref, loss_moment.mean_l, loss_moment.std_l), ", "), "\n")
+    end
+    write(fp, join((plm.mean_l, plm.std_l), ", "), "\n")
+  end
+  close(fa)
+  close(fp)
+
+end

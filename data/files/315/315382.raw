@@ -1,0 +1,26 @@
+include("/home/betrema/Julia/workspace/jb2048.jl")
+# julia set working module
+g=initgame()
+@time play!(g,moves=1000)
+play!(g,display=true)
+plot(g)
+
+play!(g,moves=1,display=true)
+
+i=0
+i+=1;plot(g.hist[i]...)
+i-=1;plot(g.hist[i]...)
+evals(g.hist[i][1],4)
+back!(g,i)
+force!(g,3)
+g[4]=1
+
+b=[20 19 2 1; 18 3 1 1; 2 0 0 0; 1 0 0 0]
+g=Game(b)
+@time repartition(10,board=b)
+
+versioninfo()
+Pkg.status()
+
+g[g.board.<7]
+find(g.board.<7)

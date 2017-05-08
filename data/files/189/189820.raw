@@ -1,0 +1,22 @@
+module execution
+parsers = Dict{AbstractString, Function}(
+    "string" => string_parser,
+    "multistring" => multistring_parser,
+    "number" => numbers.number_parser
+)
+
+function get_tokens(line::AbstractString, legacy::Bool=false)
+    regex_dict = regex_meta_dict[legacy]
+    tokens = []
+    idx = 1
+    while idx <= length(line)
+        for regex in regex_dict
+            if m
+                idx = m.offset
+                new_idx = idx + length(m.match)
+                parse_string(m[idx:idx + length(m.match)])
+            end
+        end
+    end
+end
+end

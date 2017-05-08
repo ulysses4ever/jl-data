@@ -1,0 +1,66 @@
+using NeuralNet
+DataInputs =reshape(readcsv("NumData.csv"),320,39*36)
+k=36
+DataOutputs = repeat(eye(k),inner=[1,39])
+NHLayers = [100; 50]
+l=30
+t = Array(SupervisedNet,k)
+indices = 1:l
+TrainingInputs  = DataInputs[:,indices]
+TrainingOutputs = DataOutputs[:,indices]
+TSet = TrainingSet(TrainingInputs,TrainingOutputs)
+t[1] = supervisednet(TSet,NHLayers)
+
+for i=2:k
+    indices = indices+39
+    TrainingInputs  = DataInputs[:,indices]
+    TrainingOutputs = DataOutputs[:,indices]
+    TSet = TrainingSet(TrainingInputs,TrainingOutputs)
+    t[i] = supervisednet(TSet,NHLayers,t[1].Weights)
+end
+
+function test!(a,x,l=0.5,st=10)
+    xj = 1
+    k=length(a)
+    @time while x>0
+        @show i = randperm(k)
+        @time for j in i
+            BatchBackpropagate!(a[j],l,st)
+        end
+        @show xj = xj+1 > k ? 1 : xj+1
+        Feedforward!(a[xj])
+        @show sum(abs(a[xj].TS.OS-a[xj].OS))
+        @show sum(abs(a[xj].TS.OS-a[xj].OS).>=0.4)
+        @show x-=st
+    end
+end
+
+test!(t,10000,0.01,50)
+six = reshape(Float64[  0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0
+                        0 0 0 1 1 1 1 1 1 1 1 1 1 0 0 0
+                        0 0 1 1 0 0 0 0 0 0 0 0 1 1 0 0
+                        0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+                        1 1 0 0 0 0 1 1 1 1 0 0 0 0 0 0
+                        1 1 0 0 1 1 1 1 1 1 1 1 1 0 0 0
+                        1 1 0 1 1 1 0 0 0 0 0 1 1 1 0 0
+                        1 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0
+                        1 1 1 0 0 0 0 0 0 0 0 0 0 0 1 1
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1
+                        1 1 0 0 0 0 0 0 0 0 0 0 0 1 1 0
+                        1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 0
+                        0 1 1 1 0 0 0 0 0 0 1 1 1 1 0 0
+                        0 0 1 1 1 1 1 1 1 1 1 1 1 0 0 0
+                        0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 ],320,1)
+
+o=t[1].Weights[1]*six
+AI.sigmoid!(o,o)
+o=t[1].Weights[2]*o
+AI.sigmoid!(o,o)
+o=t[1].Weights[3]*o
+AI.sigmoid!(o,o)
+findmax(o)

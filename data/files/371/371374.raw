@@ -1,0 +1,66 @@
+function walk!(x)
+   for i in 1:length(x)
+       x[i] += sqrt(dt)*randn()  
+   end
+end
+
+function branch!(x,Er)
+    W(x) = exp(-dt*(V(x)-Er))
+    repliche = Int[min(floor(W(xi) + rand()), 3) for xi in x] 
+    distrutti = Int[]
+    for (index, m) in enumerate(repliche)
+        if m == 0
+            push!(distrutti, index)
+        elseif m == 2
+            push!(x, x[index])
+        elseif m == 3
+           append!(x, [x[index], x[index]]) 
+        end
+    end
+    deleteat!(x, distrutti)
+    if length(x) > Nmax
+        error("Superato il numero massimo di walker! N = $(length(x))")
+    end
+end
+
+function diffuse(x, Er)
+   # metto tutte le distribuzioni in una matrice? tanto sono piccole 
+   gs = zeros(length(edges)-1)
+   N = [N0]
+   E = [Er]
+   for i in 1:2*steps
+       walk!(x)
+       branch!(x, E[end])
+       # regolo l'energia per tenere costante il numero di walkers
+       push!(N, length(x))
+       #plot(hist(x, edges)[2])
+       #sleep(0.1)
+       #clf()
+       #push!(E, mean(map(V,x)) + 1/dt * log(N0/N[end]))
+       push!(E, mean(map(V,x)) + 1/dt * (1 - N[end]/N0))
+       # la convergenza si controlla vedendo se <V> è stabile
+       if i > steps # se sono a convergenza costruisco la funzione d'onda
+           gs += hist(x, edges)[2]
+       end
+   end
+  return E, gs/(norm(gs)*sqrt(edges[2]-edges[1])), N
+end
+
+N0 = 500                            # walker iniziali
+Nmax = 2000                         # walker massini
+steps = 1000                        # ne faccio altrettanti dopo la convergenza
+dt = 0.1                            # passo temporale
+x0 = 0.0                            # posizione iniziale
+xmin, xmax = -10, 10
+bins = 200                          # in quanti punti stimo la funzione d'onda
+edges = linspace(xmin, xmax, bins)  
+r = (edges[2:end]+edges[1:end-1])/2 # punti in cui valuto la funzione
+
+V(x) = 0.5*x^2                      # potenziale
+
+psi(x) = exp(-x^2/2)/pi^0.25        # soluzione analitica
+ho = map(psi, r)
+
+Er = mean(map(V, x))                # stima iniziale dell'energia
+E, gs, pop = diffuse(x, Er)
+E0, dE0 = mean(E[steps:end]), std(E[steps:end])

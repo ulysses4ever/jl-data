@@ -1,0 +1,4 @@
+for pkg in ["DataFrames","FunctionalCollections","Morsel","Logging","DataStructures","HDF5","Gadfly","StatsBase"]
+  println("installing package $(pkg)")
+  Pkg.add(pkg)
+end

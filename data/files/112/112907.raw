@@ -1,0 +1,17 @@
+# wtok 2015-02-12
+# By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13.
+# What is the 10 001st prime number?
+
+function eul007(n::Int)
+  primeCount = 0;
+  i = 0;
+  while true
+    if isprime(i)
+      primeCount += 1
+      primeCount == n && return i
+    end
+    i += 1;
+  end
+end
+
+eul007(10001)

@@ -1,0 +1,127 @@
+using Graphs, Logging, Stats, Distributions, StatsBase, ProgressMeter
+
+@Logging.configure(level=DEBUG)
+
+include("io.jl")
+include("utils.jl")
+include("graphs.jl")
+include("dist.jl")
+include("RW.jl")
+
+task = 1
+
+if task == 1
+	np3 = load_serialized("core_np3.jld")
+	unp3 = load_serialized("core_unique-np3.jld")
+	n3 = load_serialized("core_ntriangles.jld")
+
+	s = 0.
+	count = 0
+
+	for i in 1:length(np3)
+		cc = 0.
+		if np3[i] > 0
+			cc = n3[i]/np3[i]
+		end
+		s += cc
+		count += 1
+	end
+
+	sn3 = sum(n3)
+	snp3 = sum(np3)
+	sunp3 = sum(unp3)
+	ac2 = s/count
+	@debug("# triangles: $sn3")
+	@debug("# unique triangles: ", (sn3/3))
+	@debug("---")
+	@debug("# potential triangles: $snp3")
+	@debug("---")
+	@debug("# unique potential triangles: $sunp3")
+	@debug("---")
+	@debug("AVG C2: $ac2")
+	@debug("Transitivity: ", ((sn3/3)/sunp3))
+end
+
+if task == 2
+	g = load_serialized("twitter-core.jld")
+	rg = load_serialized("twitter-rcore.jld")
+	dpos = load_serialized("dpos.jld")
+
+	#@debug("initializing mnt array")
+	#mnt = init_mnt_array(g,rg)
+	#serialize_to_file(mnt,"mnt.jld")
+
+	#sum_mnt = sum(mnt)
+	#@debug("# of potential triangles: $sum_mnt")
+
+	#@debug("sorting mnt array")
+	#smnt = load_serialized("smnt.jld")
+	#smnt = bottom_up_sort!(mnt)
+	#serialize_to_file(smnt,"smnt.jld")
+	#@debug("mnt array sorted")
+	#@debug("loading position dictionary")
+	##dpos = load_serialized("dpos.jld")
+	#dpos = Dict{Uint64,Uint64}()
+	#pos = 1
+	#for v in smnt
+	#	dpos[v] = pos
+	#	pos += 1
+	#end
+	#serialize_to_file(dpos,"dpos.jld")
+	#@debug("dictionary loaded")
+
+	n = length(vertices(g))
+	pb = Progress(n, 1)
+
+	pt = Uint64[]
+	upt = Uint64[]
+
+	spt = 0
+	supt = 0
+
+	for v in vertices(g)
+		parents = out_neighbors(v,rg)
+		children = out_neighbors(v,g)
+
+		dv = dpos[v]
+		
+		nchildren = Uint32[]
+		for c in children
+			if dpos[c] > dv
+				push!(nchildren,c)
+			end
+		end
+		
+		nparents = Uint32[]
+		for p in parents
+			if dpos[p] > dv
+				push!(nparents,p)
+			end
+		end
+		
+		lp = length(parents)
+		lc = length(children)
+		li = length(intersect(parents,children))
+
+		lp2 = length(nparents)
+		lc2 = length(nchildren)
+		li2 = length(intersect(nparents,nchildren))
+
+		score1 = lp*lc-li
+		score2 = lp2*lc2-li2
+
+		push!(pt,score1)
+		push!(upt,score2)
+		
+		spt += score1
+		supt += score2
+		
+		next!(pb)
+	end
+
+	@debug("# np3: $spt")
+	@debug("# unique np3: $supt")
+
+	serialize_to_file(pt,"core_np3.jld")
+	serialize_to_file(upt,"core_unique-np3.jld")
+end

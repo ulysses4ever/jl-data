@@ -1,0 +1,145 @@
+###################################################
+# Oscillatore armonico 3D Variational Monte Carlo #
+###################################################
+
+n_part     = 1         # Numero di particelle
+dimensione = 3*n_part  # numero di dimensioni dello spazio in cui integro
+
+a_min, a_max = 0.495, 0.51          # stima iniziale del parametro variazionale
+a_iniz = 0.51
+
+# distribuzione da campionare, può non essere normalizzata
+# nell'esponente c'è il 2 perchè è il quadrato dell'orbitale exp(-ax^2)
+p(x,a) = exp(-2*a*dot(x, x))
+
+# stimatori utili
+en_loc(x,p,a,da)   = 3*a + (0.5 - 2*a^2)*dot(x,x)  # en. locale
+en_kin(x,p,a,da)   = 3*a - 2*a^2*dot(x,x)          # en. cinetica standard
+en_pot(x,p,a,da)   = 0.5*dot(x,x)                  # en. potenziale
+sq_pos(x,p,a,da)   = dot(x,x)                      # distanza quadratica
+# li metto in una tupla che passo a monte_carlo
+est = (en_loc, en_kin, en_pot, sq_pos)
+
+# tipo che contiene i parametri di un montecarlo, se è immutable è più veloce
+type Parametri_MC
+    n_steps::Int
+    n_ignored::Int
+    acc_rate::Real
+    dimensione::Int
+end
+
+# n_ignored andrebbe aggiustato adattivamente controllando la convergenza dell'energia
+n_steps, n_ignored, acc_rate = 20000, 500, 0.5
+parmc = Parametri_MC(n_steps, n_ignored, acc_rate, dimensione)
+
+function monte_carlo(est::Tuple, p::Function, alfa::Real, dalfa::Real, pmc::Parametri_MC; delta=1)
+# restituisce un vettore con gli stimatori, delta è il lato del cubo per Metropolis
+I = zeros(length(est))            # vettore in cui accumulo gli stimatori
+acc_tolerance = 0.05              # tolleranza su acc_rate atteso
+acc_rate, catene = 0, 0
+n_steps  = 10000
+# u(x) = -2*alfa*dot(x, x)          # il rapporto naive rischia l'underflow
+    ### Metropolis ###
+    while true
+        I[:] = 0.                 # resetto gli accumulatori
+        x = randn(pmc.dimensione) # iniziamo da un valore a caso della variabile
+        accepted = 0              # passi accettati
+        for r in 1:n_steps
+            x_prop = x + delta*(rand(length(x)) - 0.5)
+            w = p(x_prop, alfa)/p(x, alfa)   # rapporto ingenuo
+            # w = exp(u(x_prop) - u(x))          # trucco dell'esponenziale
+            if w >= 1
+                accepted += 1
+                x = x_prop
+            else
+                if w > rand()
+                    accepted += 1
+                    x = x_prop
+                else
+                    x = x
+                end
+            end
+            if r > pmc.n_ignored   # se sto campionando la p_infinito accumulo gli stimatori
+                for m in 1:length(est)
+                    I[m] += est[m](x, p, alfa, dalfa)
+                end
+            end
+        end
+        I /= n_steps - pmc.n_ignored  # media sul numero di campionamenti
+        acc_rate = accepted/(n_steps-pmc.n_ignored)
+        print("catene:$catene\t  acc.rate: $(round(acc_rate, 4)) \t delta = $(round(delta,2))\r")
+        if n_steps < pmc.n_steps
+            if abs(acc_rate - pmc.acc_rate) > acc_tolerance
+                delta *= (acc_rate - pmc.acc_rate) < 0 ? 0.9 : 1.1 # regolo il lato del cub
+                catene += 1
+            else
+                n_steps = pmc.n_steps
+            end
+        else
+            break
+        end
+    end
+    print("\n")
+    return I
+end
+
+
+function gradiente_ripesamento(p::Function, f::Function, parmc::Parametri_MC, alfa::Real, dalfa::Real)
+
+    # fa il gradiente dello stimatore f sulla distribuzione p centrato
+    # sul parametro alfa
+    en_right(x,p,a,da) = W_right(x,p,a,da)*f(x,p,a+da,0)
+    W_right(x,p,a,da)  = p(x,a+da)/p(x,a)
+    en_left(x,p,a,da)  = W_left(x,p,a,da) *f(x,p,a-da,0)
+    W_left(x,p,a,da)   = p(x,a-da)/p(x,a)
+    est = (en_right, W_right, en_left, W_left)
+
+    I = monte_carlo(est, p, alfa, dalfa, parmc)
+
+    return (I[1]/I[2] - I[3]/I[4])/(2*dalfa)  # sarebbe fantastico usare i dizionari
+end
+
+function minimizza_energia_bisezione(p::Function, a_min::Real, a_max::Real, da::Real, tolerance::Real, parmc::Parametri_MC)
+    # boh, in realtà bisezione a causa degli errori statistici non è che vada così bene
+
+    # stimatore secondo cui minimizzo
+    en_loc(x,p,a,da) = 3*a + (0.5 - 2*a^2)*dot(x,x)
+
+    a, b = a_min, a_max
+    a_cand = (a+b)/2
+
+    # cerco il minimo con bisezione
+    while abs(a-b)>tolerance
+        a_cand = (a+b)/2
+        f_c    = gradiente_ripesamento(p, en_loc, parmc, a_cand, da)
+
+        if gradiente_ripesamento(p, en_loc, parmc, a, da)*f_c > 0
+            a = a_cand
+        else
+            b = a_cand
+        end
+
+        print("a_cand = $a_cand \t grad = $f_c \t |a-b|=$(round(abs(a-b), 3))\n")
+    end
+
+    return (a+b)/2
+end
+
+
+function minimizza_energia_braveness(p::Function, a_iniz::Real, braveness::Real, da::Real, tolerance::Real, parmc::Parametri_MC)
+    en_loc(x,p,a,da) = 3*a + (0.5 - 2*a^2)*dot(x,x) # stimatore secondo cui minimizzo
+    a = a_iniz
+
+    while true
+        grad = gradiente_ripesamento(p, en_loc, parmc, a, da)
+        # mediare sugli ultimi 5 valori?
+        println("a = $(round(a, 5)) \t grad = $(round(grad, 5))")
+        if norm(grad)<tolerance
+            break
+        else
+            a = a - grad*braveness
+        end
+    end
+
+    return a
+end

@@ -1,0 +1,5 @@
+function resetall!(heap::SMMALAHeap, x::Vector{Float64})
+  reset!(heap, x)
+  heap.current_invtensor = inv(heap.instate.current.tensorlogtarget)
+  heap.current_termone = heap.successive_invtensor*heap.instate.current.gradlogtarget
+end

@@ -1,0 +1,12 @@
+include("../Network.jl")
+
+using PyPlot
+
+net,duration = construct("test/config_single_neuron.json")
+rec_data = run(net, duration)
+
+
+
+
+
+

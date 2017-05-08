@@ -1,0 +1,137 @@
+import JSON
+
+
+# an iterator for an NxT matrix, N is number of features, T is number of time points
+type VectorTimeSeries
+  X::Array
+end
+
+Base.start(v::VectorTimeSeries) = 1
+Base.done(v::VectorTimeSeries, state) = size(v.X)[2] == state-1
+Base.next(v::VectorTimeSeries, state) = v.X[:, state], state+1
+
+
+# a simple spiking network
+type SSNetwork
+
+  t::Integer  # the number of steps that have been taken
+  dt::Float64 # the time step of the network simulation
+
+  num_neurons::Integer
+  num_inputs::Integer
+  spike_times::Array   # an array of the most recent spike times for each input and neuron
+  tau::Array           # an array of membrane time constants
+
+  W::SparseMatrixCSC   # a sparse matrix of network connection weights
+  Win::SparseMatrixCSC # sparse input weight matrix
+
+  input_stream::Type   # an iterable object
+
+  tau_synapse::Float64 # synaptic output time constant for each input/neuron
+
+  u::Array              # the membrane potential
+  urest::Float64       # the resting membrane potential
+  u0::Array            # the membrane potential threshold
+  ualpha::Array        # the membrane potential scaling
+
+  g::Array              # the gain
+  r::Array              # the refractory function
+  p::Array              # the firing rate probability
+
+  tau_abs::Float64      # the absolute refractory period
+  tau_refr::Float64     # the soft refractory period
+
+  r0::Array            # baseline firing rate
+
+  just_spiked::Array   # an array of indices for neurons that just spiked
+
+  function SSNetwork(num_neurons, num_inputs, dt=1e-4, spike_history_length=10)
+    this = new()
+
+    this.num_neurons = num_neurons
+    this.num_inputs = num_inputs
+
+    this.t = 0
+    this.dt = dt
+
+    this.state = zeros(num_neurons)
+    this.tau = zeros(num_neurons)
+
+    this.spike_times = ones(num_inputs+num_neurons, spike_history_length)*-Inf
+
+    this.W = sparse([], [], [], num_neurons, num_neurons+num_inputs)
+
+    this.tau_synapse = ones(num_neurons + num_inputs)*0.010
+
+    this.u = ones(num_neurons)*-0.070
+    this.urest = ones(num_neurons)*-0.070
+    this.u0 = ones(num_neurons)*-0.055
+    this.ualpha = 1
+
+    this.r0 = ones(num_neurons)*5
+
+    return this
+  end
+end
+
+# create a network from a JSON config file
+function construct(config_file)
+
+  cfg = JSON.parsefile(config_file)
+
+end
+
+
+# run the network for a single time step
+function step(net)
+
+  the_t = net.t*net.dt
+
+  # get the input spikes
+  x = Array(Bool, net.num_inputs)
+  if !done(net.input_stream, net.t)
+    x,tt = next(net.input_stream, net.t)
+  end
+
+  # roll the input spikes that have occurred
+  i = find(x)
+  net.spike_times[i, 1:end-1] = net.spike_times[i, 2:end]
+  net.spike_times[i, end] = the_t
+
+  # compute the EPSPs
+  total_psp = sum(synapse_function(net.t, net.spike_times, net.tau_synapse), 2)
+
+  # update the membrane potential
+  net.u = net.urest + net.W*total_psp
+
+  # compute the gain function
+  net.g = net.r0*log(1 + exp( (net.u - net.u0) / net.ualpha ))
+
+  # compute the refractory function
+  rr = (the_t - net.spike_times[net.num_inputs:end, end] - net.tau_abs).^2
+  r = rr ./ (net.tau_refr.^2 + rr)
+
+  # determine firing probabilites
+  net.p = 1. - exp(-g .* r * net.dt)
+
+  # sample from a uniform distribution to determine which neurons fire
+  r = rand(net.num_neurons)
+  i = find(r .> net.p) + net.num_inputs
+  net.just_spiked = i
+
+  # add the new spike times to the spike times array
+  net.spike_times[i, 1:end-1] = net.spike_times[i, 2:end]
+  net.spike_times[i, end] = the_t
+
+  # increment the time step counter
+  net.t += 1
+
+end
+
+
+# computes an exponential PSP at time t resulting from input spikes at spike_times
+function synapse_function(t, spike_times, time_const)
+  return exp(-(t - spike_times) ./ time_const)
+end
+
+

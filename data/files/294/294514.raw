@@ -1,0 +1,19 @@
+using Quaternions
+using Base.Test
+
+m,n = 10,10
+
+A = Quaternion{Float64}[Quaternion(randn(4)...) for i = 1:m, j = 1:n]
+
+# Test QR
+Aqr = qrfact!(copy(A))
+@test_approx_eq Aqr[:Q]*Aqr[:R] A
+
+# Test LU
+Alu = lufact(A)
+@test_approx_eq Alu[:L]*Alu[:U] A[Alu[:p],:]
+
+# Test eigenvalues
+vals = sort(randn(n))
+B = Hermitian(Aqr[:Q]*(diagm(vals)*Aqr[:Q]'),:L)
+@test_approx_eq eigvals(B) vals

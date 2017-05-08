@@ -1,0 +1,92 @@
+#More generic vectorization algorithm.  Not sure this is really necessary.
+
+#Types
+#-------------------------------------------------------------------------------
+abstract _Function #Because in v0.4.0, you cannot <: Function
+immutable VectorizableSymbol{ID}; end
+immutable Vectorizable{S, N} <: _Function; end
+
+#Other/hybrid vectorizable... for special functions:
+immutable OtherVectorizable{S, N} <: _Function; end
+immutable HybridVectorizableSymbol{ID}; end
+
+#Generic Vectorizations:
+#-------------------------------------------------------------------------------
+function call{ID, T}(fn::Vectorizable{ID, 1}, v1::Vector{T})
+	return T[fn(v1[i]) for i in 1:length(v1)]
+end
+function call{ID, T1,T2}(fn::Vectorizable{ID, 2}, v1::Vector{T1}, v2::Vector{T2})
+	RT = promote_type(T1,T2) #For type stability!
+	return RT[fn(v1[i],v2[i]) for i in 1:length(v1)]
+end
+
+#OtherVectorizable: no type stability!
+function call{ID, T1,T2}(fn::OtherVectorizable{ID, 2}, v1::Vector{T1}, v2::Vector{T2})
+	return [fn(v1[i],v2[i]) for i in 1:length(v1)]
+end
+
+
+#Traps calls referencing vectorizable symbols, and call specialized vectorizations:
+#-------------------------------------------------------------------------------
+#Normal vectorizable functions:
+call{ID, T}(::VectorizableSymbol{ID}, v1::T) = call(Vectorizable{ID, 1}(), v1)
+call{ID, T1, T2}(::VectorizableSymbol{ID}, v1::T1, v2::T2) = call(Vectorizable{ID, 2}(), v1, v2)
+
+#Hybrid vectorizable functions
+#(use Vectorizable for 1 arg & OtherVectorizable for 2 args):
+call{ID, T}(::HybridVectorizableSymbol{ID}, v1::T) = call(Vectorizable{ID, 1}(), v1)
+call{ID, T1, T2}(::HybridVectorizableSymbol{ID}, v1::T1, v2::T2) = call(OtherVectorizable{ID, 2}(), v1, v2)
+
+
+#SECTION F: Function in need of vectorizing:
+#-------------------------------------------------------------------------------
+const myadd = VectorizableSymbol{:myadd}() #myadd "Symbol"
+typealias MyAdd{N} Vectorizable{:myadd, N}
+function call(::MyAdd{1}, x::Number)
+	return x-3
+end
+function call(::MyAdd{2}, x::Number, y::Number)
+	return x+y+1
+end
+
+const mysub = HybridVectorizableSymbol{:mysub}() #mysub "Symbol"
+#No typealias... because depends on # of arguments
+function call(::Vectorizable{:mysub, 1}, x::Number)
+	return x+8
+end
+function call(::OtherVectorizable{:mysub, 2}, x::Number, y::Number)
+	return x-y-1
+end
+
+#Tests
+#-------------------------------------------------------------------------------
+@show myadd(5,6)
+@show myadd(collect(1:10),collect(21:30.0)) #Type stable
+@show myadd(5)
+@show myadd(collect(21:30.0))
+
+
+@show mysub(5,6)
+@show mysub(collect(1:10),collect(21:30.0)) #Type stable
+@show mysub(5)
+@show mysub(collect(21:30.0))
+:DONE
+
+#==Would be nicer if Julia syntax allowed section F to be replaced with:
+
+function myadd(x::Number) <: Vectorizable{1}
+	return x-3
+end
+function myadd(x::Number, y::Number) <: Vectorizable{2}
+	return x+y+1
+end
+function mysub(x::Number) <: Vectorizable{1}
+	return x+8
+end
+function mysub(x::Number, y::Number) <: OtherVectorizable{2}
+	return x-y-1
+end
+
+
+
+==#

@@ -1,0 +1,39 @@
+# Find path to Maxima executable
+
+using Compat
+using Conda
+
+# from environmen variable
+if haskey(ENV, "MAXIMA")
+    MAXIMA = ENV["MAXIMA"]
+else
+    # check for installed maxima
+    try
+        if is_unix()
+            MAXIMA = readchomp(`which maxima`)
+        else is_windows()
+            MAXIMA = readchomp(`cmd /c where.exe maxima.bat`)
+        end
+    catch
+        info("Maxima executable not found, attempting to install with Conda...")
+        if is_apple() || is_linux()
+            if !("conda-forge" in Conda.channels())
+                Conda.add_channel("conda-forge")
+            end
+            Conda.add("maxima")
+            MAXIMA = "$(Conda.BINDIR)/maxima"   
+        elseif is_windows()
+            info("Couldn't install Maxima on Windows platform")
+            error("Maxima is not installed or not in your path")
+        else
+            info("Coun't install Maxima on your platform")
+            error("Maxima is not installed or not in your path")
+        end
+    end
+end
+
+deps = "const MAXIMA = \"$(escape_string(MAXIMA))\"\n"
+
+if !isfile("deps.jl") || readstring("deps.jl") != deps
+    write("deps.jl", deps)
+end

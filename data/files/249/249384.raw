@@ -1,0 +1,14 @@
+module Manager
+
+    using Mesos
+    using ZMQ
+
+    import Base: launch, manage, connect, kill
+
+    include("clustermanager.jl")
+    include("executor.jl")
+    include("scheduler.jl")
+
+    export MesosManager
+
+end

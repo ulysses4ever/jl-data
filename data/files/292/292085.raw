@@ -1,0 +1,100 @@
+import misc_julia.psdf
+function psdf(x, dt::Float64, inc::Bool=false, y=0)
+##PSDF Calculate power spectral density using fast fourier transform
+#
+#   [P,f] = PSDf[x, dt, inc, y)
+#
+#   INPUT:
+#           x:   Data time series
+#           dt:  Time increment
+#           inc: Pre-whitening (incrementing) of time series on/off
+#                (default 0)
+#           y:   second data time series. then a cross power spectral
+#                density is computed
+#
+#   OUTPUT:
+#           P:   Power spectral density vector of length of frequencies
+#           f:   Frequency vector
+#
+# Author: Michael von Papen
+#
+# Date: 14.10.15
+#
+#	Modified and translated to Julia by Felix Gerick, 21.12.15
+## Check sizes, transpone if necessary
+x=x[:]
+n = length(x);
+
+if y != 0
+    y = y[:];
+end
+
+
+## Pre-Whitening
+if inc
+    x = x[2:end]-x[1:end-1];
+    if y != 0
+        y = y[2:end]-y[1:end-1];
+    end
+end
+
+
+## Calculate PSD
+# for i = 1:m
+#     x[:,i] = x[:,i]-mean(x[:,i]);
+#     if y ~= 0
+#         y[:,i] = y[:,i]-mean(y[:,i]);
+#     end
+# end
+xf = fft(x);
+if y != 0
+    yf = fft(y);
+end
+
+if mod(n,2) == 0
+    if y != 0
+        P = 2/n*dt*xf[1:div(n,2)+1].*conj(yf[1:div(n,2)+1]);
+    else
+        P = 2/n*dt*abs(xf[1:div(n,2)+1]).^2;
+    end
+    P[div(n,2)+1] = P[div(n,2)+1]/2; #This is the Nyquist frequency
+else
+    if y != 0
+            P = 2/n*dt*xf[1:div(n+1,2)].*conj(yf[1:div(n+1,2)]);
+    else
+        P = 2/n*dt*abs(xf[1:div(n+1,2)]).^2;
+    end
+end
+P[1]*=1/2; #This is the zero-frequency
+
+
+## Check Parseval
+if y == 0
+        if y!= 0
+            pt = sum(x)*sum(y)/n;
+        else
+            pt = sum(x.^2)/n;
+        end
+        pf = sum(abs(P))/n/dt;
+        if abs(pt-pf)>1e-9
+            println("Parseval check failed!");
+        end
+end
+
+## Output is one-sided spectrum
+if mod(n,2) == 0
+    f = (0:div(n,2))/(n*dt);
+        P = P[1:div(n,2)+1];
+else
+    f = (0:div(n+1,2)-1)/(n*dt);
+        P = P[1:div(n+1,2)];
+end
+
+
+## Post-Darkening
+if inc
+	P=P./(4*sin(pi*dt*f).^2);
+end
+return P,f
+
+end

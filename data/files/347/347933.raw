@@ -1,0 +1,27 @@
+using Brainstorm
+
+Brainstorm.Test.test_all()
+
+println("")
+
+VERSION < v"0.4-" && Pkg.test("Combinatorics")
+# Pkg.test("ContinuedFractions")
+Pkg.test("DataStructures")
+Pkg.test("FastAnonymous")
+Pkg.test("FunctionalCollections")
+VERSION < v"0.4-" && Pkg.test("Graphs")
+VERSION < v"0.4-" && Pkg.test("IterationManagers")
+Pkg.test("Iterators")
+# Pkg.test("Lazy")
+Pkg.test("LightGraphs")
+Pkg.test("Match")
+# Pkg.test("Memoize")
+# Pkg.test("MinimalPerfectHashes")
+VERSION < v"0.4-" && Pkg.test("NamedTuples")
+Pkg.test("Pipe")
+Pkg.test("ProgressMeter")
+Pkg.test("Reexport")
+Pkg.test("SortingAlgorithms")
+Pkg.test("SparseVectors")
+Pkg.test("ValidatedNumerics")
+# Pkg.test("ValueDispatch")

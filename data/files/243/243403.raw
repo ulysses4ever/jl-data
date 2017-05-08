@@ -1,0 +1,232 @@
+#Solves the path planning problem for a target
+#tracking UAV using an MDP formulation and
+#offline value iteration algorithm
+
+using PyPlot
+using AutoHashEquals
+
+#2D grid
+nx = 100;
+ny = 100;
+dx = 1;
+dy = 1;
+
+#time step
+dt = .5;
+
+#problem constants
+u = 8; #UAV velocity
+v = 5; #target velocity
+g = 9.8;
+
+max_roll = 35*pi/180; #max roll angle
+
+theta_max = dt*g*tan(max_roll)/u
+
+#angle discretisation
+m = convert(Int32,floor(4*pi/theta_max));
+thetas = linspace(0, 2*pi*(1-1/m), m);
+
+#actions - heading angles
+actions = [-2*2*pi/m -2*pi/m 0 2*pi/m 2*2*pi/m];
+
+#state data structure
+@auto_hash_equals type State
+    x_ind::Int32; #x-position with respect to target
+    y_ind::Int32; #y-postion with respect to target
+    theta_ind::Int32; #heading angle with respect to target heading
+    v::Float64; #target velocity
+end;
+
+#reward function
+function R(x,y,a)
+    C = 30; #field of view
+    r = C-sqrt(x^2+y^2);#-sqrt(a^2);
+    #r = (C-sqrt(x^2+y^2))/C-sqrt(a^2)/theta_max;
+end
+
+#distance between point (i,j) and position (x,y) where (x,y) may not be on grid
+function distance(i,j,x,y)
+    x_grid = i*dx;
+    y_grid = j*dy;
+    d = sqrt((x-x_grid)^2+(y-y_grid)^2);
+end
+    
+    
+#continuous update
+function expectedPosition(x,y,phi)
+    x_p = x+dt*u*cos(phi)-dt*v; 
+    y_p = y+dt*u*sin(phi);
+    (x_p,y_p);
+end
+
+#given grid position and point (x_p,y_p), computes
+#probability of each grid point
+function getPositionProbs(positions, x_p, y_p)
+    positions_prob = zeros(4,1);
+    elem = 1;
+    sum_dist = 0;
+    for pos in positions
+        i = pos[1]; j = pos[2];
+        dist = distance(i,j,x_p,y_p);
+        positions_prob[elem] = 1/dist;
+        sum_dist += 1/dist;
+        elem +=1;
+    end
+    positions_prob = positions_prob/sum_dist;
+end
+
+#compute utility function value given state s, action a, and value function U
+function computeValue(s,a,U)
+    i = s.x_ind; j = s.y_ind; th = s.theta_ind;
+    x_curr = i*dx; #current x-position
+    y_curr = j*dx; #current y-position
+    theta_curr = thetas[th]; #current heading angle
+    phi = (theta_curr+a)%(2*pi);
+    if (phi<0)
+        phi = phi+2*pi;
+    end
+    phi_index = indmin(abs(thetas.-phi));
+    (x_p,y_p) = expectedPosition(x_curr,y_curr,phi); #expected position from continuous update
+    (i_next,j_next) = (convert(Int32,floor(x_p/dx)), convert(Int32,floor(y_p/dy))); #expected position indices
+    
+    #possible next positions and associated probabilities
+    positions = [(i_next,j_next),(i_next+1,j_next),(i_next+1,j_next+1),(i_next,j_next+1)]; #grid positions
+    positions_prob = getPositionProbs(positions, x_p, y_p);
+    
+    #possible next headings and associated probabilities
+    headings = [phi_index-1, phi_index, phi_index+1];
+    
+    if (phi_index == m)
+        headings[3] = 1;
+    end
+    if (phi_index == 1)
+        headings[1] = m;
+    end
+    headings_probs = [0.2, 0.6, 0.2];
+    
+    sum = 0;
+    gamma = 0.95;
+    for p = 1:length(positions)
+        for h = 1:length(headings)
+            i_next = positions[p][1];
+            j_next = positions[p][2];
+            theta_next = headings[h];
+            T = positions_prob[p]*headings_probs[h];
+            s = State(i_next,j_next, theta_next, v);
+            val = T*U[s];
+            sum += val;
+        end
+    end
+    utility = R(x_curr,y_curr,a)+gamma*sum;
+end
+    
+#compute utility function at state s
+function updateValue(s,U)
+    max = 0;
+    a_opt = -1;
+    for a in actions
+        utility = computeValue(s,a,U);
+        if (utility > max)
+            a_opt = a;
+            max = utility;
+        end
+    end
+    (max,a_opt);
+end
+
+#value iteration
+
+#initialise utility function
+function initialise(U)
+    for i = -2*nx:2*nx
+        for j = -2*ny:2*ny
+            for th = 1:m
+                s = State(i,j,th,v);
+                U[s] = 0;
+            end
+        end
+    end
+    U;
+end
+
+U = Dict{State,Float64}();
+U = initialise(U);
+U_prev = U;
+N = 10;
+count=0;
+for k = 1:N
+    count = 0;
+    for i = -1*nx:1*nx
+        for j = -1*ny:1*ny
+            for th = 1:m
+                s = State(i,j,th,v);
+                res = updateValue(s,U_prev);
+                U[s] = res[1];
+            end
+        end
+    end
+    U_prev = U;
+end
+U_opt = U; #optimal value function
+
+#compute policy
+P = Dict{State,Float64}();
+for i = -1*nx:1*nx
+    for j = -1*ny:1*ny
+        for th = 1:m
+            s = State(i,j,th,v);
+            res = updateValue(s,U_opt);
+            P[s] = res[2];
+        end
+    end
+end
+
+#simulation
+N = 500;
+
+#UAV position update in target frame
+X_p = zeros(N,1);
+Y_p = zeros(N,1);
+
+#UAV position update in inertial frame
+X_u = zeros(N,1);
+Y_u = zeros(N,1);
+
+#target position update in inertial frame
+X_t = zeros(N,1);
+Y_t = zeros(N,1);
+s_0 = State(-2,2,2,v); #initial state
+theta = thetas[1];
+X_u[1] = s_0.x_ind;
+Y_u[1] = s_0.y_ind;
+s_curr = s_0;
+
+for t = 2:N
+    a = P[s_curr];
+    
+    X_p[t] = X_p[t-1]+dt*u*cos(theta+a)-v*dt;
+    Y_p[t] = Y_p[t-1]+dt*u*sin(theta+a);
+    
+    X_u[t] = X_u[t-1]+dt*u*cos(theta+a);
+    Y_u[t] = Y_u[t-1]+dt*u*sin(theta+a);
+    
+    X_t[t] = X_t[t-1]+dt*v;
+
+    theta = (theta+a)%(2*pi);
+    if theta<0
+        theta=theta+2*pi;
+    end
+    
+    (i,j) = (convert(Int32,floor(X_p[t]/dx)), convert(Int32,floor(Y_p[t]/dy)));
+    positions = [(i,j),(i+1,j),(i+1,j+1),(i,j+1)]; #grid positions
+    positions_prob = getPositionProbs(positions, X_p[t], Y_p[t]);
+    (i_next,j_next) = positions[indmax(positions_prob)];
+    
+    theta_ind = indmin(abs(thetas.-theta));
+    s_curr = State(i_next,j_next,theta_ind,v);
+    
+end
+
+#plot trajectories
+plot(X_u[1:N],Y_u[1:N],X_t[1:N],Y_t[1:N])

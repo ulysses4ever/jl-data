@@ -1,0 +1,4 @@
+function Run()
+	fact = string(factorial(BigInt(100)))
+	return sum([int(fact[i]) - 48 for i in 1:length(fact)])
+end

@@ -1,0 +1,47 @@
+# Versao Julia do demoNaiveBayes.m
+
+ # English
+ xE=[0 1 1 1 0 0;
+     0 0 1 1 1 0;
+     1 1 0 0 0 0;
+     1 1 0 0 0 1;
+     1 0 1 0 1 0]
+ 
+ # Sottish
+ xS=[1 1 1 1 1 1 1;
+     0 1 1 1 1 0 0;
+     0 0 1 0 0 1 1;
+     1 0 1 1 1 1 0;
+     1 1 0 0 1 0 0]
+
+
+# Cada coluna de pE e pS representam os valores para cada atributo analisado
+# Então, p(E) = n. colunas xE / (n. col. xE + n. col. xS)
+pE = size(xE,2)/(size(xE,2) + size(xS,2));
+pS =1-pE;
+
+# Primeiro transforma xE ou xS em transposta, xE' e sS'
+# Depois calcula a media de cada coluna da transposta
+function ColTranspose(x::Array)
+    tX = Array(Float64,tuple(size(x,1),1))
+    for i=1:size(x',2)
+         tX[i,1] = mean(x[i,:])
+    end
+    tX
+end
+
+mS = ColTranspose(xS)
+mE = ColTranspose(xE)
+
+# Atribuindo um valor de teste
+xtest=[1 0 1 1 0]' 
+println("Amostra, x=[1 0 1 1 0]")
+
+npE = pE*prod(mE.^xtest.*(1-mE).^(1-xtest)); # p(x,c=E)
+npS = pS*prod(mS.^xtest.*(1-mS).^(1-xtest)); # p(x,c=S)
+
+pxE = npE/(npE+npS)
+
+# Verificando se xtest é inglês
+println("Probabilidade de x ser English = ",pxE)
+

@@ -1,0 +1,80 @@
+"""
+    dist = cpd_dist(A::CPDecomp, B::CPDecomp)
+
+Normalized distance between A and B based on cosine similarity
+between their factor matrices (search over all permutations).
+The distance is bounded between zero (same factors) and one
+(orthogonal factors).
+"""
+function cpd_dist(A::CPDecomp,B::CPDecomp)
+    dist, = _cpd_dist_perm(A,B)
+    return dist
+end
+
+"""
+    C,dist = A_match_B(A::CPDecomp, B::CPDecomp)
+
+Permute the factors of A to match the factors of B as closely as 
+possible and return the result in a new CPDecomp object C. Also 
+returns the distance between A and B, see `cpd_dist(A,B)`.
+"""
+@generated function A_match_B{N}(A::CPDecomp{T,N},B::CPDecomp{T,N})
+    dist,Aperm = _cpd_dist_perm(A,B)
+    perm_factors = @ntuple $N n->(A.factors[n][])
+    C = CPDecomp()
+    return C,dist
+end
+
+@generated function _cpd_dist_perm{N}(A::CPDecomp{T,N},B::CPDecomp{T,N})
+    size(A) != size(B) && error("CP decompositions must have the same dimensions.")
+    rank(A) != rank(B) && error("CP decompositions must have the same number of factors.")
+
+    A_norms = []
+
+    @eval n_perm = factorial($N)
+    dist_and_perm = @ntuple $n_perm n->(perm_cos_dist(B.factors[n],A.factors[n]))
+
+    # calculate distance
+    dist = 0.0
+    @nexprs 5 n->(dist += dist_and_perm[n][1])
+    dist = 1.0 - (dist/(ndims(A)*rank(A)))
+
+    # collect permutations
+    Aperm = @ntuple $n_perm n->(dist_and_perm[n][2])
+
+    return (dist,Aperm)
+end
+
+
+"""
+    d,Yperm = perm_dist(X::Matrix, Y::Matrix)
+
+Computes cosine distance between the columns of two matrices, minimized
+over all permutations of the columns. Returns distance (d) and
+best permutation of Y columns (Yperm).
+"""
+function perm_cos_dist{T<:AbstractFloat}(X::Matrix{T}, Y::Matrix{T})
+
+    n = size(X,2)
+    Xnorm = [ norm(X[:,j]) for j in 1:n ]
+    Ynorm = [ norm(Y[:,j]) for j in 1:n ]
+
+    d = convert(T,Inf)
+    Yperm = 1:n
+
+    error("this needs to be done over rows")
+
+    for colperm in permutations(1:n)
+        d = 0.0
+        for (jX,jY) in zip(1:n,colperm)
+            u += abs(dot(X[:,jX],Y[:,jY])/(Xnorm[jX]*Ynorm[jY]))
+            u > z && break
+        end
+        if u < z
+            z = u
+        end
+    end
+
+    return d,Yperm
+end
+

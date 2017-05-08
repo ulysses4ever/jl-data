@@ -1,0 +1,178 @@
+# 2D FFT examples
+# Bryan Kaiser 
+# 12/22/15
+
+using DataArrays
+using PyCall
+using PyPlot
+@pyimport numpy as np
+@pyimport pylab as py
+
+
+## ============================================================================
+# domain
+
+Lx = 3000.0 # km, domain size
+Ly = Lx # km
+Lxcenter = 0.0 # x value at the center of the grid
+Lycenter = 0.0 # y value at the center of the grid
+N = 2^7 # series length (must be at least even)
+dx = Lx/float(N) # km, uniform longitudinal grid spacing
+dy = Ly/float(N) # km, uniform longitudinal grid spacing
+x = collect(0.5*dx:dx:dx*N)-(Lx/2.0-Lxcenter) # km, centered uniform grid 
+y = collect(0.5*dy:dy:dy*N)-(Ly/2.0-Lxcenter) # km, centered uniform grid
+X,Y = np.meshgrid(x,y) 
+
+psi0 = 1.0 # km/s
+
+## ============================================================================
+# test fields
+
+test = 2
+# 1 for centered box (no derivatives!), 
+# 2 for cos(kx+ly), 
+# 3 for a 2D Gaussian.
+
+if test == 1 # signal 2: box at (x,y)=(0,0) 
+# WARNING: NO DERIVATIVES
+# box signal with dimensions ND by ND) 
+U0 = 1.0
+ND = 2^3
+for i=(2^8-ND+1):(2^8+ND)
+	for j=(2^8-ND+1):(2^8+ND)
+		psi[i,j] = U0
+	end
+end 
+box_width = (2*ND-1)*dx # box width wavenumber 
+k_box = 2*pi/box_width
+@show(k_box) 
+
+elseif test == 2 #= signal 3: x,y propogating wave psi0*cos(kx+ly) =#
+kwx = 20.0*pi/Lx # longitudinal fundamental wavenumber
+kwy = 20.0*pi/Ly # latitudinal fundamental wavenumber
+kw = sqrt(kwx^2+kwy^2)
+psi = zeros(N,N) 
+div_psiA = zeros(N,N) 
+laplacian_psiA = zeros(N,N)
+for i = 1:N
+	for j = 1:N
+		psi[j,i] = psi0*cos(kwx*x[i]+kwy*y[j])
+        	div_psiA[j,i] = -(kwx+kwy)*psi0*sin(kwx*x[i]+kwy*y[j])
+        	laplacian_psiA[j,i] = -(kwx^2+kwy^2)*psi[j,i]
+	end
+end
+qA = laplacian_psiA
+
+elseif test == 3 #= 2D Gaussian =#
+sigma = Lx/20.0
+psi = exp(-((X-Lxcenter).^2+(Y-Lycenter).^2)/(2.0*sigma^2)).*psi0
+div_psiA = (X-Lxcenter+Y-Lycenter).*psi.*(-sigma^(-2)) # divergence of psi
+dxpsiA = -(X-Lxcenter).*psi.*(sigma^(-2)) 
+dypsiA = -(Y-Lycenter).*psi.*(sigma^(-2)) 
+laplacian_psiA = psi.*(((X-Lxcenter).^2+(Y-Lycenter).^2).*sigma^(-4)-2.0*sigma^(-2)) 
+qA = laplacian_psiA
+
+end # test signal choice if statement
+
+# plot signal psi(x,y) 
+CP1 = py.contourf(X,Y,psi,200,cmap="Spectral")
+xlabel("x (km)")
+ylabel("y (km)")
+title("psi (signal)")
+py.colorbar(CP1)
+py.show()
+#readline() 
+
+# signal q layer 2 
+CP1 = py.contourf(X,Y,qA,200,cmap="PuOr")
+xlabel("x (km)")
+ylabel("y (km)")
+title("Laplacian of psi (signal)")
+py.colorbar(CP1)
+py.show()
+
+
+## ============================================================================
+# 2D FFT of psi(x,y) 
+
+# Fourier transform of psi into PSI 
+PSI = fft(psi) # 2D fft
+
+# shifted wavenumbers for plotting ??
+kp = zeros(1,N)
+lp = zeros(1,N)
+kp[2:Int32(N/2)] = collect(1:Int32(N/2)-1).*(2.0*pi/Lx) # rad/km
+kp[Int32(N/2)+2:N] = -collect(Int32(N/2)-1:-1:1).*(2.0*pi/Lx) # rad/km 
+lp[2:Int32(N/2)] = collect(1:Int32(N/2)-1).*(2.0*pi/Ly) # rad/km
+lp[Int32(N/2)+2:N] = -collect(Int32(N/2)-1:-1:1).*(2.0*pi/Ly) # rad/km 
+Kp,Lp = np.meshgrid(kp,lp) 
+
+# the correct wavenumbers (one 0!) for derivatives, inversions, etc.
+k = zeros(N)
+k[2:Int32(N/2)+1] = collect(1:Int32(N/2)).*(2*pi/Lx) # rad/km
+k[Int32(N/2)+2:N] = -collect(Int32(N/2)-1:-1:1).*(2*pi/Lx) # rad/km
+l = zeros(N)
+l[2:Int32(N/2)+1] = collect(1:Int32(N/2)).*(2*pi/Ly) # rad/km
+l[Int32(N/2)+2:N] = -collect(Int32(N/2)-1:-1:1).*(2*pi/Ly) # rad/km
+K,L = np.meshgrid(k,l) 
+
+
+## ============================================================================
+# divergence of psi: dpsi/dx+dpsi/dy  
+
+#= compute first derivative magnitude |nabla(psi)| in wavenumber space =#
+div_psi = ifft(PSI.*(K+L).*im) 
+
+# div psi analytical 
+CP3 = py.contourf(X,Y,div_psiA,100,cmap="RdBu")
+xlabel("x (km)")
+ylabel("y (km)")
+title("divergence of psi analytical")
+py.colorbar(CP3)
+py.show()
+# div psi computed 
+CP3 = py.contourf(X,Y,real(div_psi),100,cmap="RdBu")
+xlabel("x (km)")
+ylabel("y (km)")
+title("divergence of psi (computed)")
+py.colorbar(CP3)
+py.show()
+
+# real component, computational error for |nabla(psi)| 
+CP3 = py.contourf(X,Y,abs(div_psiA-real(div_psi)),100,cmap="RdBu")
+xlabel("x (km)")
+ylabel("y (km)")
+title("divergence of psi (error)")
+py.colorbar(CP3)
+py.show()
+
+
+## ============================================================================
+# Laplacian of psi: d^2psi/dx^2+d^2psi/dy^2 
+
+# compute the Laplacian in wavenumber space 
+q = ifft(-PSI.*(K.^2+L.^2)) 
+
+# q=nabla2(psi) analytical 
+CP3 = py.contourf(X,Y,laplacian_psiA,100)
+xlabel("x (km)")
+ylabel("y (km)")
+title("Laplacian of psi (analytical)")
+py.colorbar(CP3)
+py.show()
+# readline()
+# q=nabla2(psi) computed 
+CP3 = py.contourf(X,Y,real(q),100)
+xlabel("x (km)")
+ylabel("y (km)")
+title("Laplacian of psi (computed)")
+py.colorbar(CP3)
+py.show()
+
+# real component, computational error 
+CP3 = py.contourf(X,Y,abs(laplacian_psiA-real(q)),100,cmap="PuOr")
+xlabel("x (km)")
+ylabel("y (km)")
+title("Laplacian of psi error")
+py.colorbar(CP3)
+py.show()

@@ -1,0 +1,19 @@
+module Quaternions
+
+	import Base: convert, promote_rule
+	export Quaternion
+
+	immutable Quaternion{T<:Real} <: Number
+		a::T
+		b::T
+		c::T
+		d::T
+	end
+
+	convert{T<:Real}(::Type{Quaternion{T}},x::Real) = Quaternion(convert(T,x),zero(T),zero(T),zero(T))
+	promote_rule{T<:Real,S<:Real}(::Type{Quaternion{T}},::Type{S}) = Quaternion{promote_type(T,S)}
+	promote_rule{T1<:Real,T2<:Real}(::Type{Quaternion{T1}},::Type{Quaternion{T2}}) = Quaternion{promote_type(T1,T2)}
+
+	include("arithmeric.jl")
+
+end # module

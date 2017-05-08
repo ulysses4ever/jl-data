@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:41 GMT
+Date: Wed, 03 May 2017 21:01:50 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5683
+Content-Length: 5304
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2756
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3913
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "f500ae87d1c712daad49dc89efde4208"
-Last-Modified: Thu, 07 Jan 2016 18:30:27 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "966859ba773a5aad34811d5061300ad7"
+Last-Modified: Wed, 10 Feb 2016 14:32:51 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,84 +22,84 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: d256f86292c6dde5d09d15d926ec67a3
-X-GitHub-Request-Id: D974:6631:86654C:AD97D6:59023205
+X-Served-By: bd82876e9bf04990f289ba22f246ee9b
+X-GitHub-Request-Id: 29CD:5CA5:FD4FB3:145DA48:590A453E
 
 {
-  "id": 48316935,
-  "name": "Julia-Machine-Learning",
-  "full_name": "ischlag/Julia-Machine-Learning",
+  "id": 49070737,
+  "name": "TrafficJl",
+  "full_name": "aespinosav/TrafficJl",
   "owner": {
-    "login": "ischlag",
-    "id": 7107156,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/7107156?v=3",
+    "login": "aespinosav",
+    "id": 4818574,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/4818574?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/ischlag",
-    "html_url": "https://github.com/ischlag",
-    "followers_url": "https://api.github.com/users/ischlag/followers",
-    "following_url": "https://api.github.com/users/ischlag/following{/other_user}",
-    "gists_url": "https://api.github.com/users/ischlag/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/ischlag/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/ischlag/subscriptions",
-    "organizations_url": "https://api.github.com/users/ischlag/orgs",
-    "repos_url": "https://api.github.com/users/ischlag/repos",
-    "events_url": "https://api.github.com/users/ischlag/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/ischlag/received_events",
+    "url": "https://api.github.com/users/aespinosav",
+    "html_url": "https://github.com/aespinosav",
+    "followers_url": "https://api.github.com/users/aespinosav/followers",
+    "following_url": "https://api.github.com/users/aespinosav/following{/other_user}",
+    "gists_url": "https://api.github.com/users/aespinosav/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/aespinosav/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/aespinosav/subscriptions",
+    "organizations_url": "https://api.github.com/users/aespinosav/orgs",
+    "repos_url": "https://api.github.com/users/aespinosav/repos",
+    "events_url": "https://api.github.com/users/aespinosav/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/aespinosav/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/ischlag/Julia-Machine-Learning",
-  "description": "Machine Learning Algorithms in Julia",
+  "html_url": "https://github.com/aespinosav/TrafficJl",
+  "description": "Static Traffic assignment in Julia (based on my python traffic repo)",
   "fork": false,
-  "url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning",
-  "forks_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/forks",
-  "keys_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/teams",
-  "hooks_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/hooks",
-  "issue_events_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/events",
-  "assignees_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/tags",
-  "blobs_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/languages",
-  "stargazers_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/stargazers",
-  "contributors_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/contributors",
-  "subscribers_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/subscribers",
-  "subscription_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/subscription",
-  "commits_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/merges",
-  "archive_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/downloads",
-  "issues_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/labels{/name}",
-  "releases_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/ischlag/Julia-Machine-Learning/deployments",
-  "created_at": "2015-12-20T11:05:46Z",
-  "updated_at": "2016-01-07T18:30:27Z",
-  "pushed_at": "2016-01-07T01:02:32Z",
-  "git_url": "git://github.com/ischlag/Julia-Machine-Learning.git",
-  "ssh_url": "git@github.com:ischlag/Julia-Machine-Learning.git",
-  "clone_url": "https://github.com/ischlag/Julia-Machine-Learning.git",
-  "svn_url": "https://github.com/ischlag/Julia-Machine-Learning",
+  "url": "https://api.github.com/repos/aespinosav/TrafficJl",
+  "forks_url": "https://api.github.com/repos/aespinosav/TrafficJl/forks",
+  "keys_url": "https://api.github.com/repos/aespinosav/TrafficJl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/aespinosav/TrafficJl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/aespinosav/TrafficJl/teams",
+  "hooks_url": "https://api.github.com/repos/aespinosav/TrafficJl/hooks",
+  "issue_events_url": "https://api.github.com/repos/aespinosav/TrafficJl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/aespinosav/TrafficJl/events",
+  "assignees_url": "https://api.github.com/repos/aespinosav/TrafficJl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/aespinosav/TrafficJl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/aespinosav/TrafficJl/tags",
+  "blobs_url": "https://api.github.com/repos/aespinosav/TrafficJl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/aespinosav/TrafficJl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/aespinosav/TrafficJl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/aespinosav/TrafficJl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/aespinosav/TrafficJl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/aespinosav/TrafficJl/languages",
+  "stargazers_url": "https://api.github.com/repos/aespinosav/TrafficJl/stargazers",
+  "contributors_url": "https://api.github.com/repos/aespinosav/TrafficJl/contributors",
+  "subscribers_url": "https://api.github.com/repos/aespinosav/TrafficJl/subscribers",
+  "subscription_url": "https://api.github.com/repos/aespinosav/TrafficJl/subscription",
+  "commits_url": "https://api.github.com/repos/aespinosav/TrafficJl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/aespinosav/TrafficJl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/aespinosav/TrafficJl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/aespinosav/TrafficJl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/aespinosav/TrafficJl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/aespinosav/TrafficJl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/aespinosav/TrafficJl/merges",
+  "archive_url": "https://api.github.com/repos/aespinosav/TrafficJl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/aespinosav/TrafficJl/downloads",
+  "issues_url": "https://api.github.com/repos/aespinosav/TrafficJl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/aespinosav/TrafficJl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/aespinosav/TrafficJl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/aespinosav/TrafficJl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/aespinosav/TrafficJl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/aespinosav/TrafficJl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/aespinosav/TrafficJl/deployments",
+  "created_at": "2016-01-05T14:25:07Z",
+  "updated_at": "2016-02-10T14:32:51Z",
+  "pushed_at": "2016-02-10T14:32:51Z",
+  "git_url": "git://github.com/aespinosav/TrafficJl.git",
+  "ssh_url": "git@github.com:aespinosav/TrafficJl.git",
+  "clone_url": "https://github.com/aespinosav/TrafficJl.git",
+  "svn_url": "https://github.com/aespinosav/TrafficJl",
   "homepage": null,
-  "size": 20370,
-  "stargazers_count": 1,
-  "watchers_count": 1,
+  "size": 3,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
@@ -111,7 +111,7 @@ X-GitHub-Request-Id: D974:6631:86654C:AD97D6:59023205
   "open_issues_count": 0,
   "forks": 0,
   "open_issues": 0,
-  "watchers": 1,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,

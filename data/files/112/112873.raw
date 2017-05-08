@@ -1,0 +1,34 @@
+# Walter O'Keefe
+# Created 2015-01-09
+# Project Euler, problem 01
+#  find the sum of all integers below 1000 with a factor of 3 or 5
+
+# General algorithm:
+#  For each number below 1000, find mod of n and 3 or 5.
+#  If mod is 0, add to list of answers. After loop, find sum.
+
+function eul01(nMax::Int, testNums::Array)
+    # minimal solution
+    ans = 0;
+    for i = 0:nMax
+        if in(0, i .% testNums)
+            ans += i
+        end
+    end
+    return ans
+end
+
+function eul01b(nMax::Int,testNums::Array)
+    # less minimal solution; produces more information about
+    # the problem.
+    ansList = zeros(nMax)
+    ansCount = 0
+    for i = 0:nMax
+        # bitwise modulus i -> testNums
+        if in(0, i .% testNums)
+            ansCount += 1
+            ansList[ansCount] = i
+        end
+    end
+    return sum(ansList[1:ansCount])
+end

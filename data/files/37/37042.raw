@@ -1,0 +1,30 @@
+
+# Test Using/Includes
+using   Base.Test
+import  Base.Test: Success, Failure, Error, with_handler
+#------------------------------
+test_handler(r::Success) = println(
+	"sucess on \t ----> \t expr : $(r.expr)"
+ )
+test_handler(r::Failure) = error("test failed: $(r.expr)")
+test_handler(r::Error)   = rethrow(r);
+test_sep()               = println(repeat("---",20))
+#------------------------------
+
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+#-------------test-----------------
+include("01.jl")
+#-------------test-----------------
+
+with_handler(test_handler) do
+  println("Test_binsearch")
+  for (key,test_func) in exports
+   test_sep()
+      println(key)
+      println(repeat("-",length(key)))
+      test_func()
+   test_sep()
+ end
+end

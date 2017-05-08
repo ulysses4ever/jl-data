@@ -1,0 +1,643 @@
+using SortedVectors
+using SortedStructures
+
+
+const letterVec = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]::Vector{ASCIIString}
+randletter() = letterVec[rand(1:10)]
+randletter(N::Int) = [ randletter() for n = 1:N ]
+function simSV(N::Int)
+	x = sort(randletter(N))
+	y = deepcopy(x)
+	return(x, SortedVector(y, alreadySorted=true))
+end
+function simSUV(N::Int)
+	N > 10 && error("Only sim max vec length of 10")
+	x = sort(letterVec[randperm(10)[1:N]])
+	y = deepcopy(x)
+	return(x, SortedUniqueVector(y, alreadySorted=true, alreadyUnique=true))
+end
+function simSDV(N::Int)
+	(temp, s) = simSV(N)
+	x = randn(N)
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedDataVector(ds, dx))
+end
+function simSUDV(N::Int)
+	(temp, s) = simSUV(N)
+	x = randn(N)
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedUniqueDataVector(ds, dx))
+end
+function simSDM(N::Int, NCol::Int=-1)
+	(temp, s) = simSV(N)
+	if NCol == -1
+		x = randn(N, rand(1:2))
+	else
+		x = randn(N, NCol)
+	end
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedDataMatrix(ds, dx))
+end
+function simSUDM(N::Int, NCol::Int=-1)
+	(temp, s) = simSUV(N)
+	if NCol == -1
+		x = randn(N, rand(1:2))
+	else
+		x = randn(N, NCol)
+	end
+	ds = deepcopy(s)
+	dx = deepcopy(x)
+	return(s, x, SortedUniqueDataMatrix(ds, dx))
+end
+
+
+function testbasic(KK::Int)
+	for kk = 1:KK
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		(s3, x3, d3) = simSDM(N)
+		(s4, x4, d4) = simSUDM(N)
+		string(d1)
+		string(d2)
+		string(d3)
+		string(d4)
+		#show(d1)
+		#show(d2)
+		#show(d3)
+		#show(d4)
+		if N > 0
+			Nrnd = rand(1:N)
+			d1[Nrnd] != (s1[Nrnd], x1[Nrnd]) && error("blah")
+			d2[Nrnd] != (s2[Nrnd], x2[Nrnd]) && error("blah")
+			d3[Nrnd] != (s3[Nrnd], x3[Nrnd, :]) && error("blah")
+			d4[Nrnd] != (s4[Nrnd], x4[Nrnd, :]) && error("blah")
+			i = Nrnd
+			Nrnd = IntSet([Nrnd])
+			d1[Nrnd] != (s1[Nrnd], [x1[i]]) && error("blah")
+			d2[Nrnd] != (s2[Nrnd], [x2[i]]) && error("blah")
+			d3[Nrnd] != (s3[Nrnd], [x3[i, :]]) && error("blah")
+			d4[Nrnd] != (s4[Nrnd], [x4[i, :]]) && error("blah")
+			getlist(d1, Nrnd) != s1[Nrnd] && error("blah")
+			getlist(d2, Nrnd) != s2[Nrnd] && error("blah")
+			getlist(d3, Nrnd) != s3[Nrnd] && error("blah")
+			getlist(d4, Nrnd) != s4[Nrnd] && error("blah")
+			getx(d1, Nrnd) != [x1[i]] && error("blah")
+			getx(d2, Nrnd) != [x2[i]] && error("blah")
+			getx(d3, Nrnd) != [x3[i, :]] && error("blah")
+			getx(d4, Nrnd) != [x4[i, :]] && error("blah")
+			getheader(d3, 1) != "" && error("blah")
+			getheader(d4, 1) != "" && error("blah")
+			first(d1)
+			first(d2)
+			first(d3)
+			first(d4)
+			last(d1)
+			last(d2)
+			last(d3)
+			last(d4)
+			endof(d1)
+			endof(d2)
+			endof(d3)
+			endof(d4)
+		end
+		copy(d1)
+		copy(d2)
+		copy(d3)
+		copy(d4)
+		d1 != deepcopy(d1) && error("basic fail 1")
+		d2 != deepcopy(d2) && error("basic fail 2")
+		d3 != deepcopy(d3) && error("basic fail 3")
+		d4 != deepcopy(d4) && error("basic fail 4")
+		!(issorted(d1)) && error("basic fail 5")
+		!(issorted(d2)) && error("basic fail 6")
+		!(issorted(d3)) && error("basic fail 7")
+		!(issorted(d4)) && error("basic fail 8")
+		a = letterVec[rand(1:10)]
+		search(d1, a) != search(d1.list, a) && error("basic fail 9")
+		search(d2, a) != search(d2.list, a) && error("basic fail 10")
+		search(d3, a) != search(d3.list, a) && error("basic fail 11")
+		search(d4, a) != search(d4.list, a) && error("basic fail 12")
+		searchfirst(d1, a) != searchfirst(d1.list, a) && error("basic fail 13")
+		searchfirst(d2, a) != searchfirst(d2.list, a) && error("basic fail 14")
+		searchfirst(d3, a) != searchfirst(d3.list, a) && error("basic fail 15")
+		searchfirst(d4, a) != searchfirst(d4.list, a) && error("basic fail 16")
+		searchlast(d1, a) != searchlast(d1.list, a) && error("basic fail 17")
+		searchlast(d2, a) != searchlast(d2.list, a) && error("basic fail 18")
+		searchlast(d3, a) != searchlast(d3.list, a) && error("basic fail 19")
+		searchlast(d4, a) != searchlast(d4.list, a) && error("basic fail 20")
+		searchlist(d1, d1.list[rand(1:N)])
+		searchlist(d2, d2.list[rand(1:N)])
+		searchlist(d3, d3.list[rand(1:N)])
+		searchlist(d4, d4.list[rand(1:N)])
+		N2 = rand(1:N)
+		a1 = d1.list[N2]
+		a2 = d2.list[N2]
+		a3 = d3.list[N2]
+		a4 = d4.list[N2]
+		i1 = Array(Int, 0)
+		i3 = Array(Int, 0)
+		for n = 1:length(s1)
+			s1[n] == a1 && push!(i1, n)
+		end
+		for n = 1:length(s3)
+			s3[n] == a3 && push!(i3, n)
+		end
+		getdata(d1, a1) != x1[i1] && error("getdata fail 1")
+		getdata(d2, a2) != x2[N2] && error("getdata fail 2")
+		getdata(d3, a3) != x3[i3, :] && error("getdata fail 3")
+		getdata(d4, a4) != x4[N2, :] && error("getdata fail 4")
+		in(d1, a) != in(d1.list, a) && error("basic fail 21")
+		in(d2, a) != in(d2.list, a) && error("basic fail 22")
+		in(d3, a) != in(d3.list, a) && error("basic fail 23")
+		in(d4, a) != in(d4.list, a) && error("basic fail 24")
+		length(d1) != N && error("basic fail 25")
+		length(d2) != N && error("basic fail 26")
+		length(d3) != N && error("basic fail 27")
+		length(d4) != N && error("basic fail 28")
+		size(d1, 1) != N && error("basic fail 29")
+		size(d2, 1) != N && error("basic fail 30")
+		size(d3, 1) != N && error("basic fail 31")
+		size(d4, 1) != N && error("basic fail 32")
+		size(d3, 2) != size(d3.x, 2) && error("basic fail 33")
+		size(d4, 2) != size(d4.x, 2) && error("basic fail 34")
+		eltype(d1, 1) != ASCIIString && error("basic fail 35")
+		eltype(d2, 1) != ASCIIString && error("basic fail 36")
+		eltype(d3, 1) != ASCIIString && error("basic fail 37")
+		eltype(d4, 1) != ASCIIString && error("basic fail 38")
+		eltype(d1, 2) != Float64 && error("basic fail 39")
+		eltype(d2, 2) != Float64 && error("basic fail 40")
+		eltype(d3, 2) != Float64 && error("basic fail 41")
+		eltype(d4, 2) != Float64 && error("basic fail 42")
+		eltype(d3, 3) != ASCIIString && error("basic fail 43")
+		eltype(d4, 3) != ASCIIString && error("basic fail 44")
+		!(d1 == d1) && error("basic fail 45")
+		!(d2 == d2) && error("basic fail 46")
+		!(d3 == d3) && error("basic fail 47")
+		!(d4 == d4) && error("basic fail 48")
+		!(d1.list == s1) && error("logic fail")
+		!(d2.list == s2) && error("logic fail")
+		!(d3.list == s3) && error("logic fail")
+		!(d4.list == s4) && error("logic fail")
+		!(d1.x == x1) && error("logic fail")
+		!(d2.x == x2) && error("logic fail")
+		!(d3.x == x3) && error("logic fail")
+		!(d4.x == x4) && error("logic fail")
+		if N >= 2
+			pop!(d1)
+			pop!(d2)
+			length(d1) != N-1 && error("basic fail 49")
+			length(d2) != N-1 && error("basic fail 50")
+			length(d1.x) != N-1 && error("basic fail 51")
+			length(d2.x) != N-1 && error("basic fail 52")
+			shift!(d1)
+			shift!(d2)
+			length(d1) != N-2 && error("basic fail 53")
+			length(d2) != N-2 && error("basic fail 54")
+			length(d1.x) != N-2 && error("basic fail 55")
+			length(d2.x) != N-2 && error("basic fail 56")
+		end
+	end
+	return(true)
+end
+
+
+function testdelete(KK::Int)
+	for kk = 1:KK
+		#deleteat!
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		indsRnd = [rand(1:N)]
+		a1 = d1.list[indsRnd][1]
+		a2 = d2.list[indsRnd][1]
+		deleteatlist!(d1, a1)
+		deleteatlist!(d2, a2)
+		for n = length(s1):-1:1
+			if s1[n] == a1
+				deleteat!(s1, n)
+				deleteat!(x1, n)
+			end
+		end
+		deleteat!(s2, indsRnd)
+		deleteat!(x2, indsRnd)
+		d1.list != s1 && error("deleteat fail 1")
+		d1.x != x1 && error("deleteat fail 2")
+		d2.list != s2 && error("deleteat fail 3")
+		d2.x != x2 && error("deleteat fail 4")
+		#empty!
+		empty!(d1)
+		empty!(d2)
+		length(d1) != 0 && error("empty fail 1")
+		length(d2) != 0 && error("empty fail 2")
+		#deleteat
+		(s1, x1, d1) = simSDM(N)
+		(s2, x2, d2) = simSUDM(N)
+		indsRnd = [rand(1:N)]
+		a1 = d1.list[indsRnd][1]
+		a2 = d2.list[indsRnd][1]
+		d1Del = deleteatlist(d1, [a1])
+		d2Del = deleteatlist(d2, [a2])
+		indsKeep = Array(Int, 0)
+		for n = 1:length(s1)
+			s1[n] != a1 && push!(indsKeep, n)
+		end
+		s1 = SortedVector(s1[indsKeep], alreadySorted=true)
+		x1 = x1[indsKeep, :]
+		rDel = search(s2, a2)
+		indsKeep = setdiff(IntSet(1:N), IntSet([rDel.start]))
+		iVec = Array(Int, 0)
+		length(indsKeep) > 0 && [ push!(iVec, i) for i in indsKeep ]
+		s2 = SortedUniqueVector(s2[iVec], alreadySorted=true)
+		x2 = x2[iVec, :]
+		d1Del.list != s1 && error("deleteat fail 5")
+		d1Del.x != x1 && error("deleteat fail 6")
+		d2Del.list != s2 && error("deleteat fail 7")
+		d2Del.x != x2 && error("deleteat fail 8")
+		#deletenotat
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		indsRnd = [rand(1:N)]
+		deletenotat!(d1, indsRnd)
+		deletenotat!(d2, indsRnd)
+		d1.list[1] != s1[indsRnd][1] && error("deletenotat fail 1")
+		d1.x[1] != x1[indsRnd][1] && error("deletenotat fail 2")
+		d2.list[1] != s2[indsRnd][1] && error("deletenotat fail 3")
+		d2.x[1] != x2[indsRnd][1] && error("deletenotat fail 4")
+		(s1, x1, d1) = simSDM(N)
+		(s2, x2, d2) = simSUDM(N)
+		indsRnd = [rand(1:N)]
+		d1Del = deletenotat(d1, indsRnd)
+		d2Del = deletenotat(d2, indsRnd)
+		d1Del.list[1] != s1[indsRnd][1] && error("deletenotat fail 5")
+		d1Del.x[1, :] != x1[indsRnd, :] && error("deletenotat fail 6")
+		d2Del.list[1] != s2[indsRnd][1] && error("deletenotat fail 7")
+		d2Del.x[1, :] != x2[indsRnd, :] && error("deletenotat fail 8")
+	end
+	return(true)
+end
+
+
+
+
+function testinsert(KK::Int)
+	for kk = 1:KK
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		a = letterVec[rand(1:10)]
+		x = randn()
+		insert!(d1, a, x)
+		!(in(a, d1)) && error("insert fail 1")
+		!(issorted(d1.list)) && error("insert fail 2")
+		r = search(d1, a)
+		matchFound = false
+		for n = r.start:r.stop
+			if d1.x[n] == x
+				matchFound = true
+			end
+		end
+		matchFound == false && error("insert fail 3")
+		(s1, x1, d1) = simSDV(N)
+		a = letterVec[rand(1:10)]
+		while in(a, s1)
+			a = letterVec[rand(1:10)]
+		end
+		x = randn()
+		insert!(d1, a, x)
+		!(in(a, d1)) && error("insert fail 4")
+		!(issorted(d1.list)) && error("insert fail 5")
+		r = search(d1, a)
+		d1.x[r] != [x] && error("insert fail 6")
+	end
+	return(true)
+end
+
+
+
+
+
+function testreplace(KK::Int)
+	for kk = 1:KK
+		N = rand(1:5)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		(s3, x3, d3) = simSDM(N)
+		(s4, x4, d4) = simSUDM(N)
+		a1 = s1[rand(1:N)]
+		a2 = s2[rand(1:N)]
+		a3 = s3[rand(1:N)]
+		a4 = s4[rand(1:N)]
+		x1New = randn()
+		x2New = randn()
+		x3New = randn(1, size(x3, 2))
+		x4New = randn(1, size(x4, 2))
+		replace!(d1, a1, x1New)
+		replace!(d2, a2, x2New)
+		replace!(d3, a3, x3New)
+		replace!(d4, a4, x4New)
+		d1.list != s1 && error("replace fail 1")
+		d2.list != s2 && error("replace fail 2")
+		d3.list != s3 && error("replace fail 3")
+		d4.list != s4 && error("replace fail 4")
+		num1 = 0
+		for n = 1:length(s1)
+			s1[n] == a1 && (num1 += 1)
+		end
+		num3 = 0
+		for n = 1:length(s3)
+			s3[n] == a3 && (num3 += 1)
+		end
+		getdata(d1, a1) != x1New * ones(num1) && error("replace fail 5")
+		getdata(d2, a2) != x2New && error("replace fail 6")
+		getdata(d3, a3) != ones(num3) * x3New && error("replace fail 7")
+		getdata(d4, a4) != x4New  && error("replace fail 8")
+	end
+	return(true)
+end
+
+
+
+
+function testintersect(KK::Int)
+	for kk = 1:KK
+		Na = rand(1:6)
+		Nb = rand(1:6)
+		NCol = rand(1:2)
+		(s1a, x1a, d1a) = simSDV(Na)
+		(s2a, x2a, d2a) = simSUDV(Na)
+		(s3a, x3a, d3a) = simSDM(Na, NCol)
+		(s4a, x4a, d4a) = simSUDM(Na, NCol)
+		(s1b, x1b, d1b) = simSDV(Nb)
+		(s2b, x2b, d2b) = simSUDV(Nb)
+		(s3b, x3b, d3b) = simSDM(Nb, NCol)
+		(s4b, x4b, d4b) = simSUDM(Nb, NCol)
+		d1 = intersect(d1a, d1b)
+		list1 = intersect(d1a.list, d1b.list)
+		d1.list != list1 && error("intersect fail 1")
+		d1Unique = unique(d1.list)
+		for n = 1:length(d1Unique)
+			aCur = d1Unique[n]
+			xCur = getdata(d1, aCur)
+			xCur != [getdata(d1a, aCur), getdata(d1b, aCur)] && error("intersect fail 2")
+		end
+		d2 = intersect(d2a, d2b)
+		list2 = intersect(d2a.list, d2b.list)
+		d2.list != list2 && error("intersect fail 3")
+		d2Unique = unique(d2.list.x)
+		for n = 1:length(d2Unique)
+			aCur = d2Unique[n]
+			xCur = getdata(d2, aCur)
+			xCur != getdata(d2a, aCur) && error("intersect fail 4")
+		end
+		d3 = intersect(d3a, d3b)
+		list3 = intersect(d3a.list, d3b.list)
+		d3.list != list3 && error("intersect fail 5")
+		d3Unique = unique(d3.list)
+		for n = 1:length(d3Unique)
+			aCur = d3Unique[n]
+			xCur = getdata(d3, aCur)
+			xCur != [getdata(d3a, aCur); getdata(d3b, aCur)] && error("intersect fail 6")
+		end
+		d4 = intersect(d4a, d4b)
+		list4 = intersect(d4a.list, d4b.list)
+		d4.list != list4 && error("intersect fail 7")
+		d4Unique = unique(d4.list.x)
+		for n = 1:length(d4Unique)
+			aCur = d4Unique[n]
+			xCur = getdata(d4, aCur)
+			xCur != getdata(d4a, aCur) && error("intersect fail 8")
+		end
+	end
+	return(true)
+end
+
+
+
+function testunion(KK::Int)
+	for kk = 1:KK
+		Na = rand(1:6)
+		Nb = rand(1:6)
+		NCol = rand(1:2)
+		(s1a, x1a, d1a) = simSDV(Na)
+		(s2a, x2a, d2a) = simSUDV(Na)
+		(s3a, x3a, d3a) = simSDM(Na, NCol)
+		(s4a, x4a, d4a) = simSUDM(Na, NCol)
+		(s1b, x1b, d1b) = simSDV(Nb)
+		(s2b, x2b, d2b) = simSUDV(Nb)
+		(s3b, x3b, d3b) = simSDM(Nb, NCol)
+		(s4b, x4b, d4b) = simSUDM(Nb, NCol)
+		d1 = union(d1a, d1b)
+		d1.list != union(d1a.list, d1b.list) && error("union fail 1")
+		d1Unique = unique(d1.list.x)
+		for n = 1:length(d1Unique)
+			aCur = d1Unique[n]
+			xCur = getdata(d1, aCur)
+			if in(aCur, d1a) && in(aCur, d1b)
+				xComp = [getdata(d1a, aCur), getdata(d1b, aCur)]
+			elseif in(aCur, d1a)
+				xComp = getdata(d1a, aCur)
+			elseif in(aCur, d1b)
+				xComp = getdata(d1b, aCur)
+			else
+				error("union fail 1a")
+			end
+			xCur != xComp && error("union fail 2")
+		end
+		d2 = union(d2a, d2b)
+		d2.list != union(d2a.list, d2b.list) && error("union fail 3")
+		d2Unique = unique(d2.list.x)
+		for n = 1:length(d2Unique)
+			aCur = d2Unique[n]
+			xCur = getdata(d2, aCur)
+			if in(aCur, d2a) && in(aCur, d2b)
+				xComp = getdata(d2a, aCur)
+			elseif in(aCur, d2a)
+				xComp = getdata(d2a, aCur)
+			elseif in(aCur, d2b)
+				xComp = getdata(d2b, aCur)
+			else
+				error("union fail 4a")
+			end
+			xCur != xComp && error("union fail 5")
+		end
+		d3 = union(d3a, d3b)
+		d3.list != union(d3a.list, d3b.list) && error("union fail 6")
+		d3Unique = unique(d3.list.x)
+		for n = 1:length(d3Unique)
+			aCur = d3Unique[n]
+			xCur = getdata(d3, aCur)
+			if in(aCur, d3a) && in(aCur, d3b)
+				xComp = [getdata(d3a, aCur), getdata(d3b, aCur)]
+			elseif in(aCur, d3a)
+				xComp = getdata(d3a, aCur)
+			elseif in(aCur, d3b)
+				xComp = getdata(d3b, aCur)
+			else
+				error("union fail 6a")
+			end
+			xCur != xComp && error("union fail 7")
+		end
+		d4 = union(d4a, d4b)
+		d4.list != union(d4a.list, d4b.list) && error("union fail 8")
+		d4Unique = unique(d4.list.x)
+		for n = 1:length(d4Unique)
+			aCur = d4Unique[n]
+			xCur = getdata(d4, aCur)
+			if in(aCur, d4a) && in(aCur, d4b)
+				xComp = getdata(d4a, aCur)
+			elseif in(aCur, d4a)
+				xComp = getdata(d4a, aCur)
+			elseif in(aCur, d4b)
+				xComp = getdata(d4b, aCur)
+			else
+				error("union fail 8a")
+			end
+			xCur != xComp && error("union fail 9")
+		end
+	end
+end
+
+
+function testtrim(KK::Int)
+	letterVecLong = ["4", "5", letterVec, "s", "t"]
+	for kk = 1:KK
+		N = rand(1:8)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		(s3, x3, d3) = simSDM(N)
+		(s4, x4, d4) = simSUDM(N)
+		NLB = rand(1:13)
+		NUB = rand(NLB+1:14)
+		LB = letterVecLong[NLB]
+		UB = letterVecLong[NUB]
+		d1T = trim(d1, LB, UB)
+		d1T.list != trim(d1.list, LB, UB) && error("trim fail 1")
+		d2T = trim(d2, LB, UB)
+		d2T.list != trim(d2.list, LB, UB) && error("trim fail 2")
+		d3T = trim(d3, LB, UB)
+		d3T.list != trim(d3.list, LB, UB) && error("trim fail 3")
+		d4T = trim(d4, LB, UB)
+		d4T.list != trim(d4.list, LB, UB) && error("trim fail 4")
+		if length(d1T) > 0
+			NTemp = rand(1:length(d1T))
+			a = getlist(d1T, NTemp)
+			getdata(d1T, a) != getdata(d1, a) && error("trim fail 5")
+		end
+		if length(d2T) > 0
+			NTemp = rand(1:length(d2T))
+			a = getlist(d2T, NTemp)
+			getdata(d2T, a) != getdata(d2, a) && error("trim fail 6")
+		end
+		if length(d3T) > 0
+			NTemp = rand(1:length(d3T))
+			a = getlist(d3T, NTemp)
+			getdata(d3T, a) != getdata(d3, a) && error("trim fail 7")
+		end
+		if length(d4T) > 0
+			NTemp = rand(1:length(d4T))
+			a = getlist(d4T, NTemp)
+			getdata(d4T, a) != getdata(d4, a) && error("trim fail 8")
+		end
+	end
+	return(true)
+end
+
+
+
+function testmesh(KK::Int)
+	for kk = 1:KK
+		N = rand(1:7)
+		(s1, x1, d1) = simSDV(N)
+		(s2, x2, d2) = simSUDV(N)
+		(s3, x3, d3) = simSDM(N)
+		(s4, x4, d4) = simSUDM(N)
+		(mTemp, m) = simSUV(rand(1:7))
+		d1m = mesh(d1, m, allowForwardLooking=true)
+		d2m = mesh(d2, m, allowForwardLooking=true)
+		d3m = mesh(d3, m, allowForwardLooking=true)
+		d4m = mesh(d4, m, allowForwardLooking=true)
+		d1m.list != m && error("mesh fail 1")
+		d2m.list != m && error("mesh fail 2")
+		d3m.list != m && error("mesh fail 3")
+		d4m.list != m && error("mesh fail 4")
+		Nm = rand(1:length(m))
+		mx = getx(d1m, Nm)
+		matchFound = false
+		for n = length(d1):-1:1
+			if d1.list[n] <= m[Nm]
+				getx(d1, n) != mx && error("mesh fail 5")
+				matchFound = true
+				break
+			end
+		end
+		if matchFound == false
+			getx(d1, 1) != mx && error("mesh fail 6")
+		end
+		mx = getx(d2m, Nm)
+		matchFound = false
+		for n = length(d2):-1:1
+			if d2.list[n] <= m[Nm]
+				getx(d2, n) != mx && error("mesh fail 7")
+				matchFound = true
+				break
+			end
+		end
+		if matchFound == false
+			getx(d2, 1) != mx && error("mesh fail 8")
+		end
+		mx = getx(d3m, Nm)
+		matchFound = false
+		for n = length(d3):-1:1
+			if d3.list[n] <= m[Nm]
+				getx(d3, n) != mx && error("mesh fail 9")
+				matchFound = true
+				break
+			end
+		end
+		if matchFound == false
+			getx(d3, 1) != mx && error("mesh fail 10")
+		end
+		mx = getx(d4m, Nm)
+		matchFound = false
+		for n = length(d4):-1:1
+			if d4.list[n] <= m[Nm]
+				getx(d4, n) != mx && error("mesh fail 11")
+				matchFound = true
+				break
+			end
+		end
+		if matchFound == false
+			getx(d4, 1) != mx && error("mesh fail 12")
+		end
+	end
+	return(true)
+end
+
+function testall(KK::Int)
+	testbasic(KK)
+	testdelete(KK)
+	testinsert(KK)
+	testreplace(KK)
+	testintersect(KK)
+	testunion(KK)
+	testtrim(KK)
+	testmesh(KK)
+	println("test passed")
+	return(true)
+end
+
+testall(2)
+testall(10000)
+
+
+
+
+
+
+#UP TO HERE
+
+
+

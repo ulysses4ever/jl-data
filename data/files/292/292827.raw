@@ -1,0 +1,417 @@
+include("splay_tree.jl")
+
+module L1DecisionTree
+
+using DataFrames
+using Stats
+# import DataFrames.DataArray
+using BinarySearchTree
+import Base: insert!, delete!, median
+
+export DecisionTree, build_tree, predict
+
+
+abstract DTAbstractNode{T<:Real}
+
+type DTNode{T<:FloatingPoint} <: DTAbstractNode{T}
+	split_feat::Uint
+	split_val::Real
+	left_child::DTAbstractNode{T}
+	right_child::DTAbstractNode{T}
+end
+
+type DTLeaf{T<:FloatingPoint} <: DTAbstractNode{T}
+	value::T
+end
+
+type DecisionTree{T<:FloatingPoint}
+	head::DTAbstractNode{T}
+end
+
+function build_tree{T<:FloatingPoint}(X::DataFrame, Y::Vector{T}, min_leaf_samples::Int=5, max_depth::Int=50, feats_per_split::Int=0)
+	if feats_per_split == 0
+		feats_per_split = size(X, 2)
+	end
+	if size(X, 1) != length(Y)
+		throw(ArgumentError("X and Y must have the same length"))
+	end
+	return DecisionTree(build_stump(X, Y, min_leaf_samples, max_depth, feats_per_split))
+end
+
+function predict(tree::DecisionTree, X::DataFrame)
+	return predict(tree.head, X)
+end
+
+function predict{T}(node::DTNode{T}, X::DataFrame)
+	return [predict(node, DataArray(x)) for x in EachRow(X)]::Array{T, 1}
+end
+
+function predict(node::DTNode, x::DataArray)
+	if x[node.split_feat][1] <= node.split_val
+		return predict(node.left_child, x)
+	else
+		return predict(node.right_child, x)
+	end
+end
+
+function predict(leaf::DTLeaf, x)
+	return leaf.value
+end
+
+function build_stump{T<:FloatingPoint}(X::DataFrame, Y::Vector{T}, min_leaf_samples::Int, max_depth::Int, n_feats::Int)
+	if length(Y) <= min_leaf_samples || max_depth == 0
+		return DTLeaf{T}(median(Y)::T)
+	else
+		split_feat, split_val = get_split(X::DataFrame, Y::Vector, n_feats)
+		if split_feat == 0
+			return DTLeaf{T}(median(Y)::T)
+		end
+		left_mask = X[:, split_feat] .<= split_val
+		right_mask = X[:, split_feat] .> split_val
+		if all(left_mask) || all(right_mask)
+			return DTLeaf{T}(median(Y)::T)
+		end
+		return DTNode{T}(split_feat, split_val,
+					  build_stump(X[left_mask, :], Y[left_mask]::Vector{T}, min_leaf_samples, max_depth - 1, n_feats),
+					  build_stump(X[right_mask, :], Y[right_mask]::Vector{T}, min_leaf_samples, max_depth - 1, n_feats)
+					 )
+	end
+end
+
+function get_split(X::DataFrame, Y::Vector, n_feats::Integer)
+	best_gain = 0.0
+	best_feat::Uint = 0
+	best_split = 0.0
+
+	if n_feats != size(X, 2)
+		feats = Stats.sample(1:size(X, 2), n_feats, replace=false)
+	else
+		feats = 1:n_feats
+	end
+
+	for feat in feats
+		split, gain = get_best_gain(X[:, feat], Y)
+		if gain > best_gain
+			best_gain = gain
+			best_feat = feat
+			best_split = split
+		end
+	end
+
+	return best_feat, best_split
+end
+
+function get_best_gain(x::DataArray, y::Vector)
+	min = minimum(x)
+	max = maximum(x)
+
+	split_val = min + rand() * (max - min)
+
+	total_mae = sum(abs(median(y) - y))
+	left_indices = x .<= split_val
+	if sum(left_indices) > 0
+		left_mae = sum(abs(median(y[left_indices]) - y[left_indices]))
+	else
+		left_mae = 0
+	end
+	if sum(!left_indices) > 0
+		right_mae = sum(abs(median(y[!left_indices]) - y[!left_indices]))
+	else
+		right_mae = 0
+	end
+
+
+	return split_val, total_mae - left_mae - right_mae
+end
+
+
+abstract MAEAccumulator
+
+type OrderStatisticsTree
+end
+
+type FastMAEAccumulator{T} <: MAEAccumulator
+	data::BST
+	median::T
+	mae::Float64
+end
+
+type VectorMAEAccumulator <: MAEAccumulator
+	data::Vector
+	median
+	mae::Float64
+end
+
+FastMAEAccumulator() = FastMAEAccumulator{Float64}(BST(), 0.0, 0.0)
+VectorMAEAccumulator() = VectorMAEAccumulator([], 0.0, 0.0)
+
+
+function insert_many!(acc::VectorMAEAccumulator, y::Vector)
+	acc.data = [acc.data, y]
+	acc.median = median(y)
+	acc.mae = sum(abs(y - acc.median))
+	return acc
+end
+
+function insert!(acc::FastMAEAccumulator, y::Vector)
+	insert!(acc.data, y)
+	acc.median = median(acc.data)
+	acc.mae = sum(abs(y - acc.median))
+	return acc
+end
+
+
+function insert!(acc::VectorMAEAccumulator, yi::Real)
+	n_by_2_before = floor(size(acc.data, 1) / 2)
+	old_median = acc.median
+	acc.data = [acc.data, yi]
+	n_by_2_after = floor(size(acc.data, 1) / 2)
+	new_median = median(acc.data)
+	acc.mae += abs(yi - new_median)
+	acc.mae += abs(old_median - new_median) * (n_by_2_after - n_by_2_before)
+	acc.median = new_median
+end
+
+function insert!(acc::FastMAEAccumulator, yi::Real)
+	n_by_2_before = ifloor(size(acc.data) / 2)
+	old_median = acc.median
+	insert!(acc.data, yi)
+	n_by_2_after = ifloor(size(acc.data) / 2)
+	new_median = median(acc.data)
+	acc.mae += abs(yi - new_median)
+	acc.mae += abs(old_median - new_median) * (n_by_2_after - n_by_2_before)
+	acc.median = new_median
+end
+
+	
+function delete!(acc::MAEAccumulator, yi::Real)
+	n_by_2_before = ifloor(size(acc.data) / 2)
+	old_median = acc.median
+	delete!(acc.data, yi)
+	n_by_2_after = ifloor(size(acc.data) / 2)
+	new_median = size(acc.data) > 0 ? median(acc.data) : 0.0
+	acc.mae -= abs(yi - old_median)
+	acc.mae += abs(old_median - new_median) * (n_by_2_after - n_by_2_before)
+	acc.median = new_median
+end
+
+function delete{T}(v::Vector{T}, y::T)
+	o = Array(T, length(v)-1)
+	found = false
+	j::Uint = 1
+	for i in 1:length(v)
+		if v[i] != y || found
+			o[j] = v[i]
+			j += 1
+		else
+			found = true
+		end
+	end
+	return o
+end
+
+end
+
+# using Base.Test
+
+# function test_VectorMAEAccumulator_insert_many!()
+# 	x = rand(100)
+# 	acc = VectorMAEAccumulator()
+# 	insert_many!(acc, x)
+# 	@test median(acc.data) == median(x)
+# 	@test acc.mae == sum(abs(x - median(x)))
+# end
+
+# function test_FastMAEAccumulator_insert_many!()
+# 	x = rand(100)
+# 	acc = FastMAEAccumulator()
+# 	insert!(acc, x)
+# 	@test median(acc.data) == median(x)
+# 	@test acc.mae == sum(abs(x - median(x)))
+# end
+
+# function test_VectorMAEAccumulator_insert!()
+# 	# start with even number of elements, insert number > median
+# 	x = linspace(0, 5, 6)
+# 	acc = VectorMAEAccumulator()
+# 	insert_many!(acc, x)
+# 	insert!(acc, 3.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 3.5] - 3))
+
+# 	# start with even number of elements, insert number < median
+# 	x = linspace(0, 5, 6)
+# 	acc = VectorMAEAccumulator()
+# 	insert_many!(acc, x)
+# 	insert!(acc, 0.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 0.5] - 2))
+
+# 	# start with odd number of elements, insert number > median
+# 	x = linspace(0, 4, 5)
+# 	acc = VectorMAEAccumulator()
+# 	insert_many!(acc, x)
+# 	insert!(acc, 3.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 3.5] - 2.5))
+
+# 	# start with odd number of elements, insert number < median
+# 	x = linspace(0, 4, 5)
+# 	acc = VectorMAEAccumulator()
+# 	insert_many!(acc, x)
+# 	insert!(acc, 0.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 0.5] - 1.5))
+
+# 	n::Int64 = 100
+# 	x = rand(n)
+# 	acc = VectorMAEAccumulator()
+# 	split::Int64 = floor(n/2)
+# 	insert_many!(acc, x[1:split])
+# 	for i in (split+1):n
+# 		insert!(acc, x[i])
+# 		@test size(acc.data, 1) == size(x[1:i], 1)
+# 		@test_approx_eq acc.mae sum(abs(x[1:i] - median(x[1:i]))) 
+# 	end
+# end
+
+# function test_FastMAEAccumulator_insert!()
+# 	# start with even number of elements, insert number > median
+# 	x = linspace(0, 5, 6)
+# 	acc = FastMAEAccumulator()
+# 	insert!(acc, x)
+# 	insert!(acc, 3.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 3.5] - 3))
+
+# 	# start with even number of elements, insert number < median
+# 	x = linspace(0, 5, 6)
+# 	acc = FastMAEAccumulator()
+# 	insert!(acc, x)
+# 	insert!(acc, 0.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 0.5] - 2))
+
+# 	# start with odd number of elements, insert number > median
+# 	x = linspace(0, 4, 5)
+# 	acc = FastMAEAccumulator()
+# 	insert!(acc, x)
+# 	insert!(acc, 3.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 3.5] - 2.5))
+
+# 	# start with odd number of elements, insert number < median
+# 	x = linspace(0, 4, 5)
+# 	acc = FastMAEAccumulator()
+# 	insert!(acc, x)
+# 	insert!(acc, 0.5)
+# 	@test_approx_eq acc.mae sum(abs([x, 0.5] - 1.5))
+
+# 	n::Int64 = 100
+# 	x = rand(n)
+# 	acc = FastMAEAccumulator()
+# 	split::Int64 = floor(n/2)
+# 	insert!(acc, x[1:split])
+# 	for i in (split+1):n
+# 		insert!(acc, x[i])
+# 		@test size(acc.data) == size(x[1:i], 1)
+# 		@test_approx_eq acc.mae sum(abs(x[1:i] - median(x[1:i]))) 
+# 	end
+# end
+
+# function test_VectorMAEAccumulator_delete!()
+# 	n::Int64 = 100
+# 	x = rand(n)
+# 	acc = VectorMAEAccumulator()
+# 	split::Int64 = floor(n/2)
+# 	insert_many!(acc, x)
+# 	for i in reverse([(split):n])
+# 		delete!(acc, x[i])
+# 		@test size(acc.data) == size(x[1:i-1], 1)
+# 		@test_approx_eq acc.mae sum(abs(x[1:i-1] - median(x[1:i-1]))) 
+# 	end
+# end
+
+# function test_FastMAEAccumulator_delete!()
+# 	n::Int64 = 100
+# 	x = rand(n)
+# 	acc = FastMAEAccumulator()
+# 	split::Int64 = floor(n/2)
+# 	insert!(acc, x)
+# 	for i in reverse([(split):n])
+# 		delete!(acc, x[i])
+# 		@test size(acc.data) == size(x[1:i-1], 1)
+# 		@test_approx_eq acc.mae sum(abs(x[1:i-1] - median(x[1:i-1]))) 
+# 	end
+# end
+
+# function test_get_best_gain()
+# 	x = DataArray([1:10])
+# 	y = [ones(5), 2 * ones(5)]
+# 	split, gain = get_best_gain(x, y)
+# 	@test split == 5
+# 	@test gain == sum(abs(y - 1.5))
+# end
+
+# function test_get_split()
+# 	X = DataFrame()
+# 	X[1] = rand(100)
+# 	X[2] = [1:100]
+# 	X[3] = rand(100)
+# 	y = [ones(50), 2 * ones(50)]
+# 	feat, split = get_split(X, y)
+# 	@test feat == 2
+# 	@test split == 50
+# end
+
+# function test_build_stump()
+# 	X = DataFrame()
+# 	X[1] = rand(100)
+# 	X[2] = [1:100]
+# 	X[3] = rand(100)
+# 	y = [ones(50), 2 * ones(50)]
+# 	stump = build_stump(X, y, 10, 1)
+# end
+
+
+# function test_decision_tree()
+# 	df = readtable("Boston.csv")
+# 	X = df[:, 2:(size(df, 2)-1)]
+# 	y = df[:, size(df, 2)].data
+# 	tree = build_tree(X, y, 1)
+
+# 	y_pred = predict(tree, X)
+
+# 	@test mean(abs(y - y_pred)) < 1.
+# end
+
+# function time_decision_tree()
+# 	df = readtable("../../Kaggle/LoanDefault/data/train_imputed.csv",
+# 				   header=true, nrows=5000 )
+
+# 	# run once to get everything jit-ed
+# 	X = df[1:100, 1:20]
+# 	y = Float64[x for x in df[1:100, size(df, 2)]]
+# 	build_tree(X, y, 1, 10)
+
+# 	function time_tree(n::Integer, m::Integer)
+# 		if m > size(df, 2)-1
+# 			error("m must be less than number of features in dataset")
+# 		end
+# 		X = df[1:n, 1:(1+m)]
+# 		y = Float64[x for x in df[1:n, size(df, 2)]]
+# 		t1 = time()
+# 		build_tree(X, y, 1, 5)
+# 		t2 = time()
+# 		println(n, ",", m, ",", t2-t1)
+# 	end
+
+# 	for n in 50:50:2000
+# 		time_tree(n, 30)
+# 	end
+# end
+
+
+# test_FastMAEAccumulator_insert_many!()
+# test_FastMAEAccumulator_insert!()
+# test_FastMAEAccumulator_delete!()
+# test_get_best_gain()
+# test_get_split()
+# test_build_stump()
+# test_decision_tree()
+# test_decision_tree()
+
+# time_decision_tree()

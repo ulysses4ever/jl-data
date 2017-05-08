@@ -1,0 +1,12 @@
+## nomodul.jl  Separate Module encapsulation from code
+## (c) 2013--2015 David A. van Leeuwen
+## Licensed under the MIT software license, see LICENSE.md
+
+## re-load this file during development of the package. 
+
+include("modules.jl")
+
+## skip reading types that have been read before
+include("roctypes.jl")
+
+include("includes.jl")

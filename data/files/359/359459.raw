@@ -1,0 +1,10 @@
+#area.jl
+function area(coords) 
+  b = coords[end]
+  v = 0.0
+  for i in 1:length(coords)
+    a, b = b, coords[i]
+    v += a[2] * b[1] - a[1] * b[2]
+  end
+  return v * 0.5
+end

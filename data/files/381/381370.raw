@@ -1,0 +1,107 @@
+# -------------------------------------------------------------------- # 
+# Much of this code is modified from TensorDecompositions.jl (which is
+# distributed under an MIT license)
+# https://github.com/yunjhongwu/TensorDecompositions.jl
+# -------------------------------------------------------------------- #
+
+"""
+    CPDecomp{T<:Number,N}
+
+Canonical Polyadic Decomposition (CPD) representation of a Nth-order tensor
+with data type T.
+"""
+immutable CPDecomp{T<:Number,N}
+    factors::NTuple{N,Matrix{T}}
+    λ::Vector{T}
+end
+@generated function CPDecomp{N}(r::Integer,dims::NTuple{N})
+    quote
+    f_ = @ntuple $N i->randn(r,dims[i])
+    CPDecomp(f_,randn(r))
+    end
+end
+
+# Attributes
+Base.rank(cpd::CPDecomp) = length(cpd.λ)
+Base.ndims(cpd::CPDecomp) = length(cpd.factors)
+Base.deepcopy(cpd::CPDecomp) = CPDecomp(deepcopy(cpd.factors),deepcopy(cpd.λ))
+
+@generated function Base.size{T,N}(cpd::CPDecomp{T,N})
+    :(@ntuple $N i->size(cpd.factors[i],2))
+end
+Base.size(cpd::CPDecomp,i) = size(cpd.factors[i],2)
+
+@generated function compose!{T,N}(dest::AbstractArray{T,N}, cpd::CPDecomp{T,N})
+  quote
+    @nloops $N i dest begin
+        z = zero(T)
+        for r in 1:length(cpd.λ)
+            y = cpd.λ[r]
+            @nexprs $N n->(y *= cpd.factors[n][r,i_n]) 
+            z += y
+        end
+        @nref($N, dest, i) = z
+    end
+    dest
+  end
+end
+
+function compose{T}(cpd::CPDecomp{T})
+    dest=Array(T,size(cpd))
+    compose!(dest,cpd)
+end
+
+"""
+    normalize!(A::CPDecomp)
+
+Normalize all factors to be unit length and all λs to be non-negative.
+"""
+function normalize!{T}(A::CPDecomp{T})
+
+    R = rank(A)
+    N = ndims(A)
+
+    # Normalize factor matrices
+    for r = 1:R
+        for n = 1:N
+            s::T = norm(A.factors[n][r,:])
+            if s > 0.0 # prevent divide by zero
+                @simd for i = 1:size(A,n)
+                    @inbounds A.factors[n][r,i] /= s
+                end
+                A.λ[r] *= s
+            end
+        end
+    end
+
+    # make all λs positive
+    neg_one = -one(T)
+    for r = 1:R
+        if A.λ[r] < zero(T)
+            A.λ[r] *= neg_one
+            @simd for i = 1:size(A,1)
+                @inbounds A.factors[1][r,i] *= neg_one
+            end
+        end
+    end
+
+    return A
+
+end
+
+
+"""
+    B = normalize(A::CPDecomp)
+
+Normalizes A and returns a new CP Decomposition with all factors
+unit length and all λs >= 0.
+"""
+function normalize{T}(A::CPDecomp{T})
+    B = deepcopy(A)
+    normalize!(B)
+end
+
+
+
+
+

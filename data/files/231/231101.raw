@@ -1,0 +1,121 @@
+function makefigs(;fig_dir="./figs/")
+
+	### Example fit
+	A,P,c = generate_reads(N=100,W=30);
+
+	# figure()
+	# perm = randperm(100)
+	# subplot(1,2,1), plot_meth(A[perm,:],ones(100))
+	# subplot(1,2,2), plot_meth(A,c)
+	# savefig(fig_dir*"01_01.png",dpi=500)
+	# close()
+
+	# Plot fit
+	X,Y,ch = fit_soft(A,2)
+	MethylClust.eval_synthetic_results(A,X,Y,c,P;make_plots=true,save_plots=true,save_prefix="01_soft")
+
+	X2,Y2,ch = fit_hard(A,2; initX=X, initY=Y)
+	MethylClust.eval_synthetic_results(A,X2,Y2,c,P;make_plots=true,save_plots=true,save_prefix="01_softhard")
+
+	X3,Y3,ch = fit_hard(A,2)
+	MethylClust.eval_synthetic_results(A,X3,Y3,c,P;make_plots=true,save_plots=true,save_prefix="01_hard")
+	
+	### Synthetic Data Parameter Sweep
+	Nlevs = [10:10:100]
+	Wlevs = [7:3:36]
+	nr = 3 # number of replicates
+	L = 100 # genome length
+
+	# Storage for X and Y errors/distance
+	Xd = zeros(length(Nlevs),length(Wlevs),nr)
+	Yd = zeros(length(Nlevs),length(Wlevs),nr)
+
+	# Main loop -- fit for a variety of parameters
+	for n = 1:length(Nlevs)
+	    N = Nlevs[n]
+	    for w = 1:length(Wlevs)
+	        W = Wlevs[w]
+	        println("Fitting with N = ",N," reads of length W = ",W,".")
+	        for r = 1:nr
+	            print("*")
+	            A,P,c = generate_reads(N=N, W=W, L=L, Cprob=[0.5,0.5]);
+	            X,Y,ch = fit_soft(A,2)
+	            Xd[n,w,r],Yd[n,w,r] = MethylClust.eval_synthetic_results(A,X,Y,c,P;make_plots=false)
+	        end
+	        println()
+	    end
+	end
+
+	# Average classification error vs number and length of reads
+	Xdm = squeeze(mean(Xd,3),3)
+
+	imshow(Xdm,cmap=ColorMap("Greys"),interpolation="None")
+	xticks(0:length(Wlevs)-1,Wlevs),yticks(0:length(Nlevs)-1,Nlevs)
+	xlabel("Read Length"),ylabel("Number of Reads"),title("Xdist, Num Sites = "*string(L))
+	colorbar(label="L1 error")
+	savefig(fig_dir*"02_01.png",dpi=500),close()
+
+	# Average classification error vs coverage and number of reads
+	N = repmat(Nlevs,1,length(Wlevs))
+	W = repmat(Wlevs',length(Nlevs),1)
+
+	figure()
+	scatter(vec(N).*vec(W)./L,vec(Xdm),c=vec(W),s=40,cmap=ColorMap("Reds_r"))
+	colorbar(ticks=[10,30],label="sites per read")
+	xlim([-5,40]), xticks([0,10,20,30,40])
+	ylim([0,0.5]), yticks([0.1,0.3,0.5])
+	ylabel("proportion misclassified"), xlabel("coverage")
+	savefig(fig_dir*"02_02.svg"),close()
+
+	# Methylation Profile reconstruction error
+	Ydm = squeeze(mean(Yd,3),3)
+
+	imshow(Ydm,cmap=ColorMap("Greys"),interpolation="None")
+	xticks(0:length(Wlevs)-1,Wlevs),yticks(0:length(Nlevs)-1,Nlevs)
+	xlabel("Read Length"),ylabel("Number of Reads"),title("Ydist, Num Sites = "*string(L))
+	colorbar(label="average L1 error")
+	savefig(fig_dir*"02_03.png",dpi=500),close()
+
+	figure()
+	scatter(vec(N).*vec(W)./L,vec(Ydm),c=vec(W),s=40,cmap=ColorMap("Reds_r"))
+	colorbar(ticks=[10,30],label="sites per read")
+	xlim([-5,40]), xticks([0,10,20,30,40])
+	ylabel("reconstruction error"), xlabel("coverage")
+	savefig(fig_dir*"02_04.svg"),close()
+
+	### Performance as a function of Jensen-Shannon distance
+	d = (Float64)[]
+	Xd = (Float64)[]
+	Yd = (Float64)[]
+	nr = 3
+
+	for dist = 0.5:0.5:8.0
+	    println("Fitting with methylation profile approx dist = ",dist)
+	    for _ = 1:nr
+	        A,P,c = generate_reads(N=100, W=30, L=100, Cprob=[0.5,0.5], targ_dist=dist);
+	        X,Y,ch = fit_soft(A,2)
+	        xd,yd = MethylClust.eval_synthetic_results(A,X,Y,c,P;make_plots=false)
+	        push!(d,MethylClust.d_js_multivar_bern(vec(P[1,:]),vec(P[2,:])))
+	        push!(Xd,xd)
+	        push!(Yd,yd)
+	        print("*")
+	    end
+	    println()
+	end
+
+	figure()
+	plot(d,Xd,"ok")
+	ylim([0, ceil(maximum(Xd),1)])
+	xlabel("Jensen-Shannon Distance Between Cell Types")
+	ylabel("Proportion Misclassified")
+	savefig(fig_dir*"02_05.svg")
+	close()
+
+	figure()
+	plot(d,Yd,"ok")
+	ylim([0, ceil(maximum(Yd),1)])
+	xlabel("Jensen-Shannon Distance Between Cell Types")
+	ylabel("Reconstruction Error")
+	savefig(fig_dir*"02_06.svg")
+	close()
+end

@@ -1,0 +1,190 @@
+function stochasticSymmetricPeriodic()
+	n = 640
+	m = 360
+#	arr = rand(Float32, m, n)
+	arr = [float32(angle(y)/(2*pi)) for x in -m/2:(m/2-1), y in -n/2:(n/2-1)]
+	delta = 0.5
+	S = 12
+	ra = -S:S
+	for iter in 1:300
+		IPM.ExportImage(exp((2.0*pi*im)*arr), string("torus z^7", formatnumber(iter), ".png"))
+		for iter2 in 1:50
+			iR = rand(ra)
+			jR = rand(ra)
+			d = sqrt(iR^2 + jR^2)
+			if d < 0.5
+				d = 1.0
+			end
+			for j in 1:n
+				for i in 1:m
+					arr[i, j] += delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d
+				end
+			end
+		end
+	end
+end
+
+function stochasticSymmetricPeriodicOptimal()
+	n = 640
+	m = 360
+#	arr = rand(Float32, m, n)
+	arr = [float32(angle(sqrt(x^2+y^2)-100)/(2*pi)) for x in -m/2:(m/2-1), y in -n/2:(n/2-1)]
+	delta = 0.5
+	S = 12
+	ra = -S:S
+	for iter in 1:5
+#		IPM.ExportImage(exp((2.0*pi*im)*arr), string("x", formatnumber(iter), ".png"))
+		for iter2 in 1:50
+			iR = rand(ra)
+			jR = rand(ra)
+			d = sqrt(iR^2 + jR^2)
+			if d < 0.5
+				d = 1.0
+			end
+			for j in (S+1):(n-S)
+				for i in (S+1):(m-S)
+					arr[i, j] += delta*(circleDir(arr[i + iR, j + jR], arr[i, j]) + circleDir(arr[i + jR, j - iR], arr[i, j]) + circleDir(arr[i - iR, j - jR], arr[i, j]) + circleDir(arr[i - jR, j + iR], arr[i, j]))/d
+				end
+			end
+			for j in 1:S
+				for i in 1:m
+					arr[i, j] += delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d
+				end
+			end
+			for j in (n-S+1):n
+				for i in 1:m
+					arr[i, j] += delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d
+				end
+			end
+			for j in (S+1):(n-S)
+				for i in 1:S
+					arr[i, j] += delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d
+				end
+			end	
+			for j in (S+1):(n-S)
+				for i in (m-S+1):m
+					arr[i, j] += delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d
+				end
+			end
+		end
+	end
+end
+
+function stochasticSymmetricPeriodicOptimalOrderless()
+	n = 640
+	m = 360
+	arr = rand(Float32, m, n)
+#	arr = [float32(angle((x+y*im)^2)/(2*pi)) for x in -m/2:(m/2-1), y in -n/2:(n/2-1)]
+	arr2 = zeros(Float32, m, n)
+	delta = 0.4
+	S = 3
+	ra = -S:S
+	for iter in 1:300
+		IPM.ExportImage(exp((2.0*pi*im)*arr), string("Radius 7 Random Mirror", formatnumber(iter), ".png"))
+		for iter2 in 1:20
+			d = 0.0
+			jR = rand(ra)
+			iR = rand(ra)
+			while d < 0.1
+				jR = rand(ra)
+				iR = rand(ra)
+				d = sqrt(iR^2 + jR^2)
+			end
+			for j in (S+1):(n-S)
+				for i in (S+1):(m-S)
+					arr2[i, j] = delta*(circleDir(arr[i + iR, j + jR], arr[i, j]) + circleDir(arr[i + jR, j - iR], arr[i, j]) + circleDir(arr[i - iR, j - jR], arr[i, j]) + circleDir(arr[i - jR, j + iR], arr[i, j]))/d^2
+				end
+			end
+			for j in 1:S
+				for i in 1:m
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in (n-S+1):n
+				for i in 1:m
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in (S+1):(n-S)
+				for i in 1:S
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end	
+			for j in (S+1):(n-S)
+				for i in (m-S+1):m
+					arr2[i, j] = delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in 1:n
+				for i in 1:m
+					arr[i, j] += arr2[i, j]
+				end
+			end		
+		end
+	end
+end
+
+
+function stochasticSymmetricPeriodicOptimalOrderlessWave()
+	n = 640
+	m = 360
+#	arr = rand(Float32, m, n)
+#	arr = [float32(angle((x+y*im)^2)/(2*pi)) for x in -m/2:(m/2-1), y in -n/2:(n/2-1)]
+	arr = [float32(2.0*exp(-0.007*(x^2+y^2))) for x in -m/2:(m/2-1), y in -n/2:(n/2-1)]
+	arr2 = zeros(Float32, m, n)
+	arr3 = zeros(Float32, m, n)
+	for i in 1:m
+		for j in 1:n
+			arr3[i, j] = arr[i, j]
+		end
+	end
+	delta = 0.01
+	S = 5
+	ra = -S:S
+	for iter in 1:30
+		IPM.ExportImage(exp((2.0*pi*im)*arr), string("Wave Test", formatnumber(iter), ".png"))
+		for iter2 in 1:20
+			d = 0.0
+			jR = rand(ra)
+			iR = rand(ra)
+			while d < 0.1
+				jR = rand(ra)
+				iR = rand(ra)
+				d = sqrt(iR^2 + jR^2)
+			end
+#			jR = 1
+#			iR = 1
+			for j in (S+1):(n-S)
+				for i in (S+1):(m-S)
+					arr2[i, j] = arr[i, j] - arr3[i, j] + delta*(circleDir(arr[i + iR, j + jR], arr[i, j]) + circleDir(arr[i + jR, j - iR], arr[i, j]) + circleDir(arr[i - iR, j - jR], arr[i, j]) + circleDir(arr[i - jR, j + iR], arr[i, j]))/d^2
+				end
+			end
+			for j in 1:S
+				for i in 1:m
+					arr2[i, j] = arr[i, j] - arr3[i, j] + delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in (n-S+1):n
+				for i in 1:m
+					arr2[i, j] = arr[i, j] - arr3[i, j] + delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in (S+1):(n-S)
+				for i in 1:S
+					arr2[i, j] = arr[i, j] - arr3[i, j] + delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end	
+			for j in (S+1):(n-S)
+				for i in (m-S+1):m
+					arr2[i, j] = arr[i, j] - arr3[i, j] + delta*(circleDir(mirror(arr, i + iR, j + jR, m, n), arr[i, j]) + circleDir(mirror(arr, i + jR, j - iR, m, n), arr[i, j]) + circleDir(mirror(arr, i - iR, j - jR, m, n), arr[i, j]) + circleDir(mirror(arr, i - jR, j + iR, m, n), arr[i, j]))/d^2
+				end
+			end
+			for j in 1:n
+				for i in 1:m
+					arr3[i, j] = arr[i, j]
+					arr[i, j] += arr2[i, j]
+				end
+			end		
+		end
+	end
+end

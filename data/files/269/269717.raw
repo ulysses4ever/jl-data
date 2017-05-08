@@ -1,0 +1,221 @@
+include("config.jl")
+
+module Genotype
+using Config
+
+type Type_Genotype
+    num_nodes::Int32
+    used_connections::Array{Int32}
+    connection_indeces::Array{Int32}
+    truth_table_indeces::Array{Int32}
+    connections::Array{Int32}
+    truth_table::Array{Int32}
+    activations::Array{Int32}
+
+    fitness::Float32
+    marked_for_removal::Bool
+end
+
+function make_random_genotype()
+    used_connections::Array{Int32} = rand(0:Config.initial_max_num_connections, Config.initial_num_nodes)
+    # These indeces are meant to be exclusive of the first number and inclusive of the last
+    # In the C code this will swap, due to the 0 indexing
+    connection_indeces::Array{Int32} = zeros(Int32, Config.initial_num_nodes + 1)
+    truth_table_indeces::Array{Int32} = zeros(Int32, Config.initial_num_nodes + 1)
+    for i = 2:(Config.initial_num_nodes + 1)
+        connection_indeces[i] = connection_indeces[i - 1] + used_connections[i - 1]
+        truth_table_indeces[i] = truth_table_indeces[i - 1] + 2^used_connections[i - 1]
+    end
+    num_nodes = (sizeof(connection_indeces)/sizeof(connection_indeces[0])) - 1
+    connections::Array{Int32} = rand(1:Config.initial_num_nodes, convert(Int64, connection_indeces[Config.initial_num_nodes + 1]))
+    truth_table::Array{Int32} = rand(0:1, convert(Int64, truth_table_indeces[Config.initial_num_nodes + 1]))
+    activations::Array{Int32} = zeros(Int32, Config.initial_num_nodes * (Config.num_simulation_iterations + 1))
+    # Due to behaviour of rand!, the whole activations array is randomised. Obviousely, all values not in the first row will be overwritten.
+    rand!(0:1, activations)
+    return Type_Genotype(num_nodes, used_connections, connection_indeces, truth_table_indeces, connections, truth_table, activations, 0.0, false)
+end
+
+function simulate(genotype::Type_Genotype)
+    dlopen("/home/david/TehzCodes/GRNEvolution/libboolnet")
+    ccall((:run_network_flat, "/home/david/TehzCodes/GRNEvolution/libboolnet"), Void,
+          (Int32, Int32, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}),
+          Config.num_simulation_iterations, genotype.num_nodes,
+          genotype.connection_indeces, genotype.truth_table_indeces, genotype.activations,
+          genotype.connections, genotype.truth_table)
+
+    if !isequal(genotype.activations[(genotype.num_nodes * (Config.num_simulation_iterations - 1) + 1):(genotype.num_nodes * Config.num_simulation_iterations)], genotype.activations[(genotype.num_nodes * Config.num_simulation_iterations + 1):(genotype.num_nodes * (Config.num_simulation_iterations + 1))])
+
+        genotype.marked_for_removal = true
+
+    end
+            
+end
+
+function evaluate(genotype::Type_Genotype, target_expression::Array{Int32, 1})
+    if genotype.fitness == 0.0
+        simulate(genotype)
+        for i = 1:length(target_expression)
+            if genotype.activations[end - length(target_expression) + i] == target_expression[i]
+                genotype.fitness += 1.0
+            end
+        end
+    end
+end
+
+function mutate(genotype::Type_Genotype)
+    genotype.fitness = 0.0
+    if rand(1:100) < 100 * Config.mutate_dup_del_prob
+        if rand(0:1) == 0
+            delete_node(genotype)
+        else
+            duplicate_node(genotype)
+        end
+    end
+    if rand(1:100) < 100 * Config.mutate_conn_prob
+        for i = 1:rand(Config.min_num_conn_muts:Config.max_num_conn_muts)
+            mutate_connection(genotype)
+        end
+    end
+    if rand(1:100) < 100 * Config.mutate_activation_prob
+        for i = 1:rand(Config.min_num_activation_muts:Config.max_num_activation_muts)
+            mutate_activation(genotype)
+        end
+    end
+    if rand(1:100) < 100 * Config.mutate_truth_table_prob
+        for i = 1:rand(Config.min_num_tt_muts:Config.max_num_tt_muts)
+            mutate_truth_table(genotype)
+        end
+    end
+    if rand(1:100) < 100 * Config.delete_conn_prob
+        for i = 1:rand(Config.min_num_conn_dels:Config.max_num_conn_dels)
+            if genotype.connection_indeces[end] > 1
+                delete_connection(genotype, rand(1:genotype.connection_indeces[end]))
+            end
+        end
+    end
+    if rand(1:100) < 100 * Config.add_conn_prob
+        for i = 1:rand(Config.min_num_conn_adds:Config.max_num_conn_adds)
+            add_connection(genotype, -1)
+        end
+    end
+end
+
+function delete_connection(genotype::Type_Genotype, connection_index)
+    # For now the truth table is just truncated at the removed connection
+    node = 0
+    for index in genotype.connection_indeces
+        if connection_index <= index
+            break
+        end
+        node += 1
+    end
+    #println("delete connection", connection_index)
+    genotype.used_connections[node] -= 1
+    length_to_delete = ((genotype.truth_table_indeces[node + 1]) - genotype.truth_table_indeces[node])/2
+    deleteat!(genotype.truth_table, (genotype.truth_table_indeces[node] + 1):(genotype.truth_table_indeces[node] + length_to_delete))
+    for i = (node + 1):(genotype.num_nodes + 1)
+        genotype.truth_table_indeces[i] -= length_to_delete
+    end
+    deleteat!(genotype.connections, connection_index)
+    for j = 1:(genotype.num_nodes + 1)
+        if genotype.connection_indeces[j] >= connection_index
+            genotype.connection_indeces[j] -= 1
+        end
+    end
+    if genotype.used_connections[node] < Config.min_num_connections
+        add_connection(genotype, node)
+    end
+end
+
+function add_connection(genotype::Type_Genotype, node)
+    #println("adding connection")
+    if node == -1
+        node = rand(1:genotype.num_nodes)
+    end
+    if genotype.used_connections[node] < Config.max_num_connections
+        genotype.used_connections[node] += 1
+        index = genotype.connection_indeces[node] + 1
+        insert!(genotype.connections, index, rand(1:genotype.num_nodes))
+        truth_table_length = genotype.truth_table_indeces[node + 1] - genotype.truth_table_indeces[node]
+        for i = 0:(truth_table_length  - 1)
+            insert!(genotype.truth_table, genotype.truth_table_indeces[node] + (2 * i) + 1, 
+                    genotype.truth_table[genotype.truth_table_indeces[node] + (2 * i) + 1]) 
+        end
+        for i = (node + 1):(genotype.num_nodes + 1)
+            genotype.connection_indeces[i] += 1
+            genotype.truth_table_indeces[i] += truth_table_length
+        end
+    end
+end
+
+function delete_node(genotype::Type_Genotype)
+    if genotype.num_nodes > Config.min_num_nodes
+        to_delete = rand(1:genotype.num_nodes)
+        #println("delete node ", to_delete)
+        deleteat!(genotype.activations, to_delete)
+        deleteat!(genotype.activations, ((genotype.num_nodes - 1) * Config.num_simulation_iterations):(genotype.num_nodes * Config.num_simulation_iterations - 3))
+        deleteat!(genotype.connections, (genotype.connection_indeces[to_delete] + 1):genotype.connection_indeces[to_delete + 1])
+        deleteat!(genotype.truth_table, (genotype.truth_table_indeces[to_delete] + 1):genotype.truth_table_indeces[to_delete + 1])
+        for i = (to_delete + 1):(genotype.num_nodes + 1)
+            genotype.truth_table_indeces[i] -= 2 ^ genotype.used_connections[to_delete]
+            genotype.connection_indeces[i] -= genotype.used_connections[to_delete]
+        end
+        deleteat!(genotype.truth_table_indeces, to_delete)
+        deleteat!(genotype.connection_indeces, to_delete)
+        deleteat!(genotype.used_connections, to_delete)
+        genotype.num_nodes -= 1
+        connection_index = 1
+        last_index = genotype.connection_indeces[genotype.num_nodes + 1]
+        if genotype.connection_indeces[end] > 1
+            while true
+                if genotype.connections[connection_index] > to_delete
+                    genotype.connections[connection_index] -= 1
+                    connection_index += 1
+                elseif genotype.connections[connection_index] == to_delete
+                    last_index -= 1
+                    delete_connection(genotype, connection_index)
+                else
+                    connection_index += 1
+                end
+                if connection_index > last_index
+                    break
+                end
+            end
+        end
+    end
+end
+
+function duplicate_node(genotype::Type_Genotype)
+    to_duplicate = rand(1:genotype.num_nodes)
+    #println("\nduplicating ", to_duplicate, "\n")
+    genotype.num_nodes += 1
+    push!(genotype.activations, genotype.activations[to_duplicate])
+    append!(genotype.activations, zeros(Int32, Config.num_simulation_iterations))
+    append!(genotype.connections, genotype.connections[(genotype.connection_indeces[to_duplicate] + 1):genotype.connection_indeces[to_duplicate + 1]])
+    append!(genotype.truth_table, genotype.truth_table[(genotype.truth_table_indeces[to_duplicate] + 1):genotype.truth_table_indeces[to_duplicate + 1]])
+    push!(genotype.truth_table_indeces, sizeof(genotype.truth_table)/sizeof(genotype.truth_table[0]))
+    push!(genotype.connection_indeces, sizeof(genotype.connections)/sizeof(genotype.connections[0]))
+    push!(genotype.used_connections, genotype.used_connections[to_duplicate])
+end
+
+function mutate_connection(genotype::Type_Genotype)
+    #println("mutating conn")
+    if genotype.connection_indeces[end] > 0
+        genotype.connections[rand(1:genotype.connection_indeces[end])] = rand(1:genotype.num_nodes)
+    end
+end
+
+function mutate_activation(genotype::Type_Genotype)
+    #println("mutating act")
+    to_mutate = rand(1:genotype.num_nodes)
+    genotype.activations[to_mutate] = 1 - genotype.activations[to_mutate]
+end
+
+function mutate_truth_table(genotype::Type_Genotype)
+    #println("mutating tt")
+    to_mutate = rand(1:genotype.truth_table_indeces[end])
+    genotype.truth_table[to_mutate] = 1 - genotype.truth_table[to_mutate]
+end
+
+end
+

@@ -1,0 +1,14 @@
+## =============================================================================
+## 03_errorbar.jl - error bar sample
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using Distributions
+
+sds = [1, 1/2, 1/4, 1/8, 1/16, 1/32]
+n = 1000
+ys = [mean(rand(Normal(0, sd), n)) for sd in sds]
+ymins = ys .- (1.96 * sds / sqrt(n))
+ymaxs = ys .+ (1.96 * sds / sqrt(n))
+
+plot(x=1:length(sds), y=ys, ymin=ymins, ymax=ymaxs,
+     Geom.point, Geom.errorbar)

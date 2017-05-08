@@ -1,0 +1,51 @@
+function risk_workflow(job_file, output_dir)
+  srand(1)
+  f = jldopen(job_file, "r")
+  calc_mode = read(f, "calculation_mode")
+  close(f)
+  if calc_mode == "scenario_risk"
+    scenario_risk_workflow(job_file, output_dir)
+  elseif calc_mode == "scenario_damage"
+    scenario_damage_workflow(job_file, output_dir)
+  elseif calc_mode == "classical_risk"
+    classical_risk_workflow(job_file, output_dir)
+  elseif calc_mode == "classical_damage"
+    classical_damage_workflow(job_file, output_dir)
+  elseif calc_mode == "event_based_risk"
+    event_based_risk_workflow(job_file, output_dir)
+  elseif calc_mode == "classical_bcr"
+    classical_bcr_workflow(job_file, output_dir)
+  else
+    error("Unrecognized calculation mode!")
+  end
+end
+
+function scenario_risk_workflow(job_file, output_dir)
+  inputs = scenario_risk_preprocess(job_file)
+  outputs = scenario_risk_tree(inputs)
+  scenario_risk_export(outputs, output_dir)
+end
+
+function scenario_damage_workflow(job_file, output_dir)
+  inputs = scenario_damage_preprocess(job_file)
+  outputs = scenario_damage_tree(inputs)
+  scenario_damage_export(outputs, output_dir)
+end
+
+function classical_risk_workflow(job_file, output_dir)
+  inputs = classical_risk_preprocess(job_file)
+  outputs = classical_risk_tree(inputs)
+  classical_risk_export(outputs, output_dir)
+end
+
+function classical_damage_workflow(job_file, output_dir)
+  inputs = classical_damage_preprocess(job_file)
+  outputs = classical_damage_tree(inputs)
+  classical_damage_export(outputs, output_dir)
+end
+
+function event_based_risk_workflow(job_file, output_dir)
+  inputs = event_based_risk_preprocess(job_file)
+  outputs = event_based_risk_tree(inputs)
+  event_based_risk_export(outputs, output_dir)
+end

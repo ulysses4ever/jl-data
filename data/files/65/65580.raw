@@ -1,0 +1,29 @@
+
+using .List 
+
+lst = LinkList{Integer}()
+push!(lst, 8)
+unshift!(lst, 7)
+push!(lst, 4)
+push!(lst, 9)
+# [4, 89, 100]
+sq(x) = x*x
+
+k = map(sq, lst)
+println(items(k))
+
+gt100(x) = x > 70
+k = filter(gt100, k)
+println(items(k))
+
+println("reduce:   ", reduce(k))
+println("slice:   ", slice(lst, 1,2))
+println("collect: ", items(lst,5))
+println("at: ",   at(lst, 4))
+println("length: ", lst.length)
+println("pop : ",   pop!(lst))
+println("shift : ", shift!(lst))
+println("shift : ", shift!(lst))
+println("length: ", lst.length)
+println(first(lst))
+println(repr(lst))

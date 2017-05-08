@@ -1,0 +1,41 @@
+#!/usr/bin/julia
+
+using HTTPClient.HTTPC
+using ZipFile
+
+workingDrectory="/tmp/"
+
+## function to download any file
+function downloadFile(urlString::String)
+	fileBuff = IOBuffer()
+	try	
+		res = HTTPClient.get("$(urlString)", RequestOptions(ostream=fileBuff))
+		if ( res.http_code != 200 )
+			throw (Exception())
+		end
+	catch err
+		println ("downloadFile(): $err")
+	end
+	return fileBuff
+end
+
+## extract any file/IOBuffer
+function extractZip(fileBuff)
+	extractedFilename = ""
+	try
+		zipData = ZipFile.Reader(fileBuff);
+		for f in zipData.files
+			extractedFilename = "$workingDrectory$(f.name)"
+			ofs = open("$extractedFilename","w")
+			write (ofs,readall(f))
+			close (ofs)
+# assuming that there is only one file
+# else we need ot store filenames in a array
+		end
+		close(zipData)
+	catch err
+		println ("extractZip: $err")
+		extractedFilename = ""
+	end
+	return extractedFilename
+end

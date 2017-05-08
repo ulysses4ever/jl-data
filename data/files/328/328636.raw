@@ -1,0 +1,227 @@
+isdefined(Base, :__precompile__) && __precompile__()
+
+module JSON
+
+using Compat
+
+export json # returns a compact (or indented) JSON representation as a string
+
+include("Parser.jl")
+
+import .Parser.parse
+
+const INDENT=true
+const NOINDENT=false
+const unescaped = Bool[isprint(c) && !iscntrl(c) && !(c in ['\\','"']) for c in '\x00':'\x7F']
+
+type State{I}
+    indentstep::Int
+    indentlen::Int
+    prefix::AbstractString
+    otype::Array{Bool, 1}
+    State(indentstep::Int) = new(indentstep,
+                                 0,
+                                 "",
+                                 Bool[])
+end
+State(indentstep::Int=0) = State{indentstep>0}(indentstep)
+
+function set_state(state::State{INDENT}, operate::Int)
+    state.indentlen += state.indentstep * operate
+    state.prefix = " "^state.indentlen
+end
+
+set_state(state::State{NOINDENT}, operate::Int) = nothing
+
+suffix(::State{INDENT})   = "\n"
+suffix(::State{NOINDENT}) = ""
+
+prefix(s::State{INDENT})  = s.prefix
+prefix(::State{NOINDENT}) = ""
+
+separator(::State{INDENT})   = ": "
+separator(::State{NOINDENT}) = ":"
+
+# short hand for printing suffix then prefix
+printsp(io::IO, state::State{INDENT}) = Base.print(io, suffix(state), prefix(state))
+printsp(io::IO, state::State{NOINDENT}) = nothing
+
+function start_object(io::IO, state::State{INDENT}, is_dict::Bool)
+    push!(state.otype, is_dict)
+    Base.print(io, is_dict ? "{": "[", suffix(state))
+    set_state(state, 1)
+end
+
+function start_object(io::IO, state::State{NOINDENT}, is_dict::Bool)
+    Base.print(io, is_dict ? "{": "[")
+end
+
+function end_object(io::IO, state::State{INDENT}, is_dict::Bool)
+    set_state(state, -1)
+    pop!(state.otype)
+    printsp(io, state)
+    Base.print(io, is_dict ? "}": "]")
+end
+
+function end_object(io::IO, state::State{NOINDENT}, is_dict::Bool)
+    Base.print(io, is_dict ? "}": "]")
+end
+
+function print_escaped(io::IO, s::AbstractString)
+    for c in s
+        c <= '\x7f' ? (unescaped[@compat(Int(c))+1]  ? Base.print(io, c) :
+                       c == '\\'       ? Base.print(io, "\\\\") :
+                       c == '"'        ? Base.print(io, "\\\"") :
+                       8 ≤ @compat(UInt32(c)) ≤ 10 ? Base.print(io, '\\', "btn"[@compat(Int(c))-7]) :
+                       c == '\f'       ? Base.print(io, "\\f") :
+                       c == '\r'       ? Base.print(io, "\\r") :
+                                         Base.print(io, "\\u", hex(c, 4))) :
+                      Base.print(io, c) #JSON is UTF8 encoded
+    end
+end
+
+function _print(io::IO, state::State, s::AbstractString)
+    Base.print(io, '"')
+    JSON.print_escaped(io, s)
+    Base.print(io, '"')
+end
+
+if isdefined(Base, :Dates)
+    function _print(io::IO, state::State, s::Base.Dates.TimeType)
+        _print(io, state, string(s))
+    end
+end
+
+function _print(io::IO, state::State, s::Symbol)
+    _print(io, state, string(s))
+end
+
+@compat function _print(io::IO, state::State, s::Union{Integer, AbstractFloat})
+    if isnan(s) || isinf(s)
+        Base.print(io, "null")
+    else
+        Base.print(io, s)
+    end
+end
+
+@compat function _print(io::IO, state::State, n::Void)
+    Base.print(io, "null")
+end
+
+function _print(io::IO, state::State, a::Associative)
+    if length(a) == 0
+        Base.print(io, "{}")
+        return
+    end
+    start_object(io, state, true)
+    first = true
+    for (key, value) in a
+        first ? (first = false) : Base.print(io, ",", suffix(state))
+        Base.print(io, prefix(state))
+        JSON._print(io, state, string(key))
+        Base.print(io, separator(state))
+        JSON._print(io, state, value)
+    end
+    end_object(io, state, true)
+end
+
+@compat function _print(io::IO, state::State, a::Union{AbstractVector,Tuple})
+    if length(a) == 0
+        Base.print(io, "[]")
+        return
+    end
+    start_object(io, state, false)
+    Base.print(io, prefix(state))
+    i = start(a)
+    !done(a,i) && ((x, i) = next(a, i); JSON._print(io, state, x); )
+
+    while !done(a,i)
+        (x, i) = next(a, i)
+        Base.print(io, ",")
+        printsp(io, state)
+        JSON._print(io, state, x)
+    end
+    end_object(io, state, false)
+end
+
+function _print(io::IO, state::State, a)
+    start_object(io, state, true)
+    range = @compat fieldnames(a)
+    if length(range) > 0
+        Base.print(io, prefix(state), "\"", range[1], "\"", separator(state))
+        JSON._print(io, state, getfield(a, range[1]))
+
+        for name in range[2:end]
+            Base.print(io, ",")
+            printsp(io, state)
+            Base.print(io, "\"", name, "\"", separator(state))
+            JSON._print(io, state, getfield(a, name))
+        end
+    end
+    end_object(io, state, true)
+end
+
+if VERSION < v"0.5.0-dev+2396"
+function _print(io::IO, state::State, f::Function)
+    Base.print(io, "\"function at ", f.fptr, "\"")
+end
+end
+
+function _print(io::IO, state::State, d::DataType)
+    Base.print(io, "\"", d, "\"")
+end
+
+function _print(::IO, ::State, m::Module)
+    throw(ArgumentError("cannot serialize Module $m as JSON"))
+end
+
+# Note: Arrays are printed in COLUMN MAJOR format.
+# i.e. json([1 2 3; 4 5 6]) == "[[1,4],[2,5],[3,6]]"
+function _print{T, N}(io::IO, state::State, a::AbstractArray{T, N})
+    lengthN = size(a, N)
+    if lengthN > 0
+        start_object(io, state, false)
+        if VERSION <= v"0.3"
+            newdims = ntuple(N - 1, i -> 1:size(a, i))
+        else
+            newdims = ntuple(i -> 1:size(a, i), N - 1)
+        end
+        Base.print(io, prefix(state))
+        JSON._print(io, state, Compat.view(a, newdims..., 1))
+
+        for j in 2:lengthN
+            Base.print(io, ",")
+            printsp(io, state)
+            JSON._print(io, state, Compat.view(a, newdims..., j))
+        end
+        end_object(io, state, false)
+    else
+        Base.print(io, "[]")
+    end
+end
+
+function print(io::IO, a, indent=0)
+    JSON._print(io, State(indent), a)
+    if indent > 0
+        Base.print(io, "\n")
+    end
+end
+
+function print(a, indent=0)
+    JSON._print(STDOUT, State(indent), a)
+    if indent > 0
+        println()
+    end
+end
+
+json(a, indent=0) = sprint(JSON.print, a, indent)
+
+function parsefile{T<:Associative}(filename::AbstractString; dicttype::Type{T}=Dict{Compat.UTF8String, Any}, use_mmap=true)
+    sz = filesize(filename)
+    open(filename) do io
+        s = use_mmap ? Compat.UTF8String(Mmap.mmap(io, Vector{UInt8}, sz)) : readall(io)
+        JSON.parse(s; dicttype=dicttype)
+    end
+end
+
+end # module

@@ -1,0 +1,156 @@
+import Classifiers.fit,Classifiers.predict,Classifiers.ClassifierConfig,Classifiers.Classifier
+export SequentialPatternClassifier,SequentialPatternConfig,fit,predict
+
+type SequentialPatternClassifier <: Classifier
+  sp::SequentialPattern
+end
+
+type SequentialPatternConfig <: ClassifierConfig
+  features::Int
+  frames::Int
+  max_iterations::Int
+end
+
+type SequentialPatternError
+    error::Float64
+    error0::Float64
+    error1::Float64
+end
+
+type Extension
+  sp::SequentialPattern
+  feature_extensions::IndicesFrame
+  sequence_extensions::IndicesFrame
+  error::SequentialPatternError
+end
+
+type Data
+  x::Vector{SequentialPattern}
+  y::Vector{Int}
+end
+
+
+#fit(c::SequentialPatternConfig,x::Vector{SequentialPattern},y::Vector{Int})=fit(c,Data(x,y))
+fit(c::SequentialPatternConfig,x,y)=fit(c,Data(x,y))
+
+function fit(c::SequentialPatternConfig,d::Data)
+    extensions_queue=initial_extensions_queue(c,d);
+    if (isempty(extensions_queue))
+        #println(d.x)
+        println(d.y)
+        error("Could not generate a valid SequentialPattern")
+        #return SequentialPatternClassifier(SequentialPattern())
+    end
+    best_extension=extensions_queue[1]
+    steps=1;
+    #print("sp_train: Steps:");
+     while (~isempty(extensions_queue) && steps<c.max_iterations)
+          extension=shift!(extensions_queue)
+
+          best_extension=perform_sequence_extensions(extensions_queue,best_extension,extension,d);
+          best_extension=perform_feature_extensions(extensions_queue,best_extension,extension,d);
+          steps=steps+1;
+          #print("$steps,");
+    end
+    #println("...done")
+    return SequentialPatternClassifier(best_extension.sp)
+end
+
+function sp_errors(model::SequentialPattern,d::Data)
+    error1=loss(model,d.x[d.y.==1],d.y[d.y.==1])
+    error0=loss(model,d.x[d.y.==-1],d.y[d.y.==-1])
+    return SequentialPatternError(error0+error1,error0,error1)
+end
+
+loss(model::SequentialPatternClassifier,d::Data) = loss(model,d.x,d.y)
+loss(model::SequentialPatternClassifier,x::Vector{SequentialPattern},y::Vector{Int})= mean(predict(model,x).!=y)
+loss(sp::SequentialPattern,x::Vector{SequentialPattern},y::Vector{Int})=loss(SequentialPatternClassifier(sp),x,y)
+
+function initial_extensions_queue(c::SequentialPatternConfig,d::Data)
+    extensions_queue=Extension[];
+    features=c.features;
+    sequence_extensions=1:features;
+    for i=1:features
+        sp=SequentialPattern([i],features)
+        feature_extensions=(i+1):features
+        sequence_extensions=copy(sequence_extensions);
+        errors=sp_errors(sp,d);
+        if (errors.error0>=errors.error1)
+            extension=Extension(sp,sequence_extensions,feature_extensions,errors)
+            push!(extensions_queue,extension)
+        end
+    end
+    return extensions_queue
+end
+
+
+
+function perform_sequence_extensions(queue::Vector{Extension},best_extension::Extension,extension::Extension,d::Data)
+        extensions=Extension[];
+        sequence_extensions=extension.sequence_extensions
+        for i=1:length(sequence_extensions)
+            sp=sequence_extend(extension.sp,sequence_extensions[i]);
+            new_extension=Extension(sp,extension.sequence_extensions,extension.feature_extensions,sp_errors(sp,d))
+            push!(extensions,new_extension)
+        end
+        #prune criteria 1a: keep those
+        if (~isempty(extensions))
+            errors0=map(x-> x.error.error0,extensions)
+            errors1=map(x-> x.error.error1,extensions)
+
+            indices= (errors0.>=errors1) & (errors1.<best_extension.error.error)
+            #indices=[extended_items.error1]<best_item.error;
+            sequence_extensions=sequence_extensions[indices]
+            extensions=extensions[indices]
+        end
+        #Add new items to the queue. Update best_item if necessary.
+        for i=1:length(extensions)
+           new_extension=extensions[i]
+           new_extension.sequence_extensions=sequence_extensions
+           new_extension.feature_extensions=extension.feature_extensions[extension.feature_extensions.>sequence_extensions[i]]
+           push!(queue, new_extension)
+           if (new_extension.error.error<best_extension.error.error)
+                best_extension=new_extension
+           end
+        end
+        #prune sequence extensions
+        extension.sequence_extensions=sequence_extensions
+        return best_extension
+end
+
+
+
+function perform_feature_extensions(queue::Vector{Extension},best_extension::Extension,extension::Extension,d::Data)
+        extensions=Extension[];
+        feature_extensions=setdiff(extension.feature_extensions,extension.sequence_extensions)
+        for i=1:length(feature_extensions)
+            sp=feature_extend(extension.sp,feature_extensions[i]);
+            new_extension=Extension(sp,extension.sequence_extensions,extension.feature_extensions,sp_errors(sp,d))
+            push!(extensions,new_extension)
+        end
+        #prune criteria 1a: keep those
+        if (~isempty(extensions))
+            errors0=map(x-> x.error.error0,extensions)
+            errors1=map(x-> x.error.error1,extensions)
+
+            indices= (errors0.>=errors1) & (errors1.<best_extension.error.error)
+            feature_extensions=feature_extensions[indices]
+            extensions=extensions[indices]
+        end
+
+        for i=1:length(extensions)
+           new_extension=extensions[i]
+           new_extension.sequence_extensions=extension.sequence_extensions
+           new_extension.feature_extensions= feature_extensions[feature_extensions.>feature_extensions[i]]
+           push!(queue, new_extension)
+           if (new_extension.error.error<best_extension.error.error)
+                best_extension=new_extension
+           end
+        end
+        return best_extension
+end
+
+predict(m::SequentialPatternClassifier,sp::SequentialPattern)= m.sp<=sp ? 1:-1
+#predict(m::SequentialPatternClassifier,sp::SequentialPattern)= m.sp<=sp ? 1:-1
+#predict(m::SequentialPatternClassifier,xs::Vector{SequentialPattern})=map(x->predict(m,x),xs)
+predict(m::SequentialPatternClassifier,xs)=map(x->predict(m,x),xs)

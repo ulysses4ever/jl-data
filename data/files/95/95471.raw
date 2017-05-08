@@ -1,0 +1,8 @@
+include("../ber.jl")
+
+DATADIR = "../../../data/experiment01"
+OUTDIR = "../../output/experiment01"
+
+XDATAFILE = joinpath(DATADIR, "driver_laser.txt")
+SDATAFILE = joinpath(DATADIR, "adjusted_synchronous_driver.txt")
+RDATAFILE = joinpath(DATADIR, "adjusted_driver_with_optical_noise.txt")

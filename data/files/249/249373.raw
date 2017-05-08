@@ -1,0 +1,83 @@
+module TestUtils
+
+    using Mesos
+    using FactCheck
+
+    facts("Using @proto") do
+        context("to create object from inline KV") do
+            obj = @proto(Proto.OfferID, :value => "default")
+            @fact obj.value => "default"
+        end
+        context("to create object from KV with variable ref") do
+            val = "default"
+            obj = @proto(Proto.OfferID, :value => val)
+            @fact obj.value => val
+        end
+        context("to create object from KV variable") do
+            kv = (:value => "default")
+            obj = @proto(Proto.OfferID, kv)
+            @fact obj.value => kv[2]
+        end
+        context("to create object from inline KV array") do
+            obj = @proto Proto.FrameworkInfo (
+                :name => "name",
+                :user => "user"
+            )
+            @fact obj.name => "name"
+            @fact obj.user => "user"
+        end
+        context("to create object from KV array with variable refs") do
+            val1 = "name"
+            val2 = "user"
+            obj = @proto Proto.FrameworkInfo (
+                :name => val1,
+                :user => val2
+            )
+            @fact obj.name => val1
+            @fact obj.user => val2
+        end
+        context("to create object from KV variable") do
+            kvs = Pair{Symbol,ASCIIString}[]
+            push!(kvs, (:name => "name"))
+            push!(kvs, (:user => "user"))
+            obj = @proto Proto.FrameworkInfo kvs
+            @fact obj.name => kvs[1][2]
+            @fact obj.user => kvs[2][2]
+        end
+        context("to create object with nested @proto call") do
+            val = "fid"
+            obj = @proto Proto.FrameworkInfo (
+                :id => @proto(Proto.FrameworkID, :value => val)
+            )
+            @fact obj.id.value =>val
+        end
+    end
+
+    facts("Managing resources") do
+        context("create scalar resource") do
+            resval = 1.0
+            res = createScalarResourse(Mesos.CPU_RESOURSE, resval)
+            @fact res.name => Mesos.CPU_RESOURSE
+            @fact isdefined(res, :scalar) => true
+            @fact res.scalar.value => resval
+        end
+        context("get scalar resource from collection") do
+            resources = [
+                createScalarResourse(Mesos.CPU_RESOURSE, 1.),
+                createScalarResourse(Mesos.CPU_RESOURSE, 2.),
+                createScalarResourse(Mesos.MEM_RESOURSE, 128.)
+            ]
+            @fact getScalarResourse(resources, Mesos.CPU_RESOURSE) => 3.
+            @fact getScalarResourse(resources, Mesos.MEM_RESOURSE) => 128.
+        end
+    end
+
+    facts("Creating framework") do
+        context("with minimal set of fields") do
+            fwkname = "Test"
+            fwk = createFramework(fwkname)
+            @fact fwk.name => fwkname
+        end
+    end
+
+end

@@ -1,0 +1,104 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Graphs, DataStructures
+
+# MGS adjacency graph format
+#
+# unsigned integers stored in big endian format (byte and bit levels)
+# graph.index: vid1 (1 word), pos1 (1 word) | ...
+# graph.data: vid1, vid2, vid3, ...
+#
+
+# get the ordered dictionary vid -> startpos
+function load_graph_index(filename)
+	f1 = open(filename, "r")
+	ipos = OrderedDict{Uint32,Uint32}()
+	while !eof(f1)
+		id = read(f1,Uint8,4)
+		pos = read(f1,Uint8,4)
+		# Julia is 1-based -> +1
+		ipos[reinterpret(Uint32,reverse(id))[1]] = reinterpret(Uint32,reverse(pos))[1] + 1
+	end
+	close(f1)
+	return ipos
+end
+
+# get the array of children
+function load_graph_data(filename)
+	f2 = open(filename, "r")
+	children = Uint32[]
+	while !eof(f2)
+		child = read(f2,Uint8,4)
+		push!(children,reinterpret(Uint32,reverse(child))[1])
+	end
+	close(f2)
+	return children
+end
+
+# generate graph (adjacency list)
+function get_adjacency_list(ipos,children)
+	g = adjlist(Uint32, is_directed=true)
+	# ipos is an ordered dictionary
+	ks = collect(keys(ipos))
+	# vertex set
+	vs = sort(union(children,ks))
+
+	# add vertices
+	for i in 1:length(vs)
+        	add_vertex!(g,uint32(i))
+	end
+
+	# instantiate dictionary
+	oni = Dict{Uint32,Uint32}()
+
+	counter = uint32(1)
+	for v in vs
+		oni[v] = counter
+		counter += uint32(1)
+	end
+
+	# add edges
+	for i in 1:length(ks)
+		source = oni[ks[i]]
+		# if we reached the last parent vertex
+		if i == length(ks)
+			pos1 = ipos[ks[i]]
+			pos2 = length(children)
+		else
+			pos1 = ipos[ks[i]]
+			pos2 = ipos[ks[i+1]]-1
+		end
+		for p in pos1:pos2
+			target = oni[children[p]]
+			add_edge!(g,source,target)
+		end
+	end
+	return g
+end
+
+##########
+
+ipos = load_graph_index(ARGS[1])
+children = load_graph_data(ARGS[2])
+
+g = get_adjacency_list(ipos,children)
+
+println(length(vertices(g)))
+println(num_edges(g))
+
+open("graph.jld", "w") do file
+	serialize(file, g)
+end

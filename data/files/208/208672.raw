@@ -1,0 +1,138 @@
+#!/Users/nathanwbrei/julia/julia
+
+# A very basic subway simulator
+# Nathan Brei & Margo Kulkarni
+# HackerSchool batch 6
+
+
+print("Starting\n")
+
+# Let's describe some primitive objects: the station, the track, and the
+# train. For now let's assume that Train represents the current and
+# intended future states of one particular train car, and that the
+# train will attempt to follow its timetable to the best of its ability 
+# even in the face of major disruption. 
+
+# Stations and Tracks define our entire network. Stations are basically
+# nodes and Tracks are basically edges, only each is associated with a
+# nominal wait time - for Stations, boarding time, and for Tracks,
+# transit time. The train can then be modeled as a finite state machine
+# such that each update brings it to the next Stop (either a Track or a
+# Station) at t = sum(all Stops' wait times) + stochasticity +
+# interference.
+
+# It is assumed that trains can enter and exit a Station on any Track.
+# Tracks are bidirectional and can hold exactly one Train at a time.
+
+abstract Stop
+
+type Station <: Stop
+    name::String
+    wait::Int
+    stops::Array{Stop,1}
+end
+
+# We want to be able to instantiate a Station without knowing how the
+# Tracks connect
+Station(name::String, wait::Int) = Station(name, wait, Array(Stop, 0))
+
+type Track <: Stop
+    wait::Int
+    name::String 
+    stop1::Stop
+    stop2::Stop
+
+    # Constructing a track between two stations should also update the
+    # Stops associated with those stations
+    function Track(wait::Int, station1::Station, station2::Station)
+        track = new(wait, "Enroute", station1, station2)
+        push!(station1.stops, track)
+        push!(station2.stops, track)
+        track
+    end
+end
+
+type Train
+    name::String
+    stops::Array{Stop}
+    current_stop::Int
+    current_time::Int
+end
+
+# Julia doesn't use subtypes to inherit structure, so we have to
+# manually create a getter
+
+wait(s::Stop) = s.wait
+
+
+# The graph describing the entire network. We want to 
+# store this in a file and generate it when we need it
+
+shed = Station("Shed", 0)
+ezst = Station("Ergenzinger Straße", 60) 
+hpst = Station("Hauptstraße", 60)
+hfwt = Station("Hof Breitenach", 60)
+sfst = Station("Sofienstraße", 60)
+lbkw = Station("Leuchtenberger Kirchweg", 200)
+
+t0 = Track(100, shed, ezst)
+t1 = Track(50, ezst, hpst)
+t2 = Track(22, hpst, hfwt)
+t3 = Track(1000, hfwt, sfst)
+t4 = Track(75, shed, lbkw)
+t5 = Track(900, lbkw, hfwt)
+
+# And here we have our description of the actual subway lines, 
+# which might end up being generated from the network graph, 
+# but we prefer to keep fixed for now
+
+# In real life, these would be generated from the graph
+
+a_train = Train(
+    "The A Train",
+    [shed, t0, ezst, t1, hpst, t2, hfwt, t3, sfst],
+    1, 0)
+
+b_train = Train(
+    "The B Train",
+    [shed, t4, lbkw, t5, hfwt],
+    1, 0)
+
+# So now that we have trains, we want to be able to schedule them. So we
+# order trains by arrival time inside a priority queue. At each
+# timestep, we pop the soonest Train state and push its successor.
+
+#function next_stop(schedule::PriorityQueue)
+#    train = pop!(schedule)
+#    train.current_stop = train.stops.next
+#    train.time = train.time + train.state.wait +
+#       random_delay(current_stop)
+#    if length(current_stop.trains) > current_stop.bandwidth
+#       train.time += 60
+#    push!(schedule, train, train.time)
+
+
+using Base.Collections
+schedule = PriorityQueue{Train, Int}()
+schedule[a_train] = a_train.current_time
+schedule[b_train] = b_train.current_time
+
+while !isempty(schedule)
+    t = dequeue!(schedule)
+    print(t.name , ": ", t.stops[t.current_stop].name, " @" , t.current_time, "\n")
+    t.current_stop += 1
+    if t.current_stop < length(t.stops)
+        t.current_time += t.stops[t.current_stop].wait
+        enqueue!(schedule, t, t.current_time)
+    end
+end
+
+print("ending")
+
+
+
+
+
+
+
+

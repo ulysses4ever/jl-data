@@ -1,0 +1,275 @@
+include("config-nonadaptive.jl")
+include("genotype.jl")
+
+import Genotype
+import Config
+
+function make_graph()
+
+    # If this is false then the format is gexf
+    graphml = true
+
+    max_num_nodes::Int64 = 200000
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    temp::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    genotypes::Array{Genotype.Type_Genotype, 1} = [temp,]
+    for i = 1:max_num_nodes
+        temp = Genotype.make_random_genotype(config_vals)
+        push!(genotypes, temp)
+    end
+    num_edges::Array{Int64, 1} = [0]
+    num_nodes::Array{Int64, 1} = [0]
+    #println(vcat(temp.connections, temp.activations, temp.weights, temp.thresholds))
+    #dictionary::Dict{Genotype.Type_Genotype, Int64} = Dict{Genotype.Type_Genotype, Int64}()
+    dictionary::Dict{Array{Int32, 1}, Int64} = Dict{Array{Int32, 1}, Int64}()
+    sizehint!(dictionary, 10000)
+    
+    file_lines::Array{ASCIIString, 1} = [] 
+    if graphml
+        file_lines = ["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+                      "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n",
+                      "xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n",
+                      "<key id=\"d0\" for=\"node\" attr.name=\"genotype\" attr.type=\"int\" />\n",
+                      "<graph id=\"G\" edgedefault=\"undirected\">\n",
+                      "</graph>\n",
+                      "</graphml>\n"]
+    else
+        file_lines = ["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", 
+                      "<gexf xmlns=\"http://www.gexf.net/1.2draft\" xmlns:viz=\"http://www.gexf.net/1.1draft/viz\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd\" version=\"1.2\">",
+                      "<graph>\n",
+                      "<nodes>\n",
+                      "</nodes>\n",
+                      "<edges>\n",
+                      "</edges>\n",
+                      "</graph>\n",
+                      "</gexf>\n"]
+    end
+    enumerate(config_vals, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, graphml)
+
+    return 0
+
+end
+
+function enumerate(config_vals::Config.Type_Config_Values, num_edges::Array{Int64, 1}, num_nodes::Array{Int64, 1}, dictionary::Dict{Array{Int32, 1}, Int64},
+                   file_lines::Array{ASCIIString, 1}, max_num_nodes::Int64, genotypes::Array{Genotype.Type_Genotype, 1}, graphml::Bool)
+        
+    start_genotype::Genotype.Type_Genotype = Genotype.read_from_file(config_vals)
+
+    #start_genotype::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+
+    Genotype.run_GRN(start_genotype, config_vals, convert(Int32, 0))
+    dictionary[vcat(start_genotype.connections, start_genotype.activations, start_genotype.weights, start_genotype.thresholds)] = num_nodes[1]
+    
+    add_node_xml(config_vals, start_genotype, num_nodes, file_lines, graphml)
+    num_nodes[1] += 1
+
+    generate_genotypes(config_vals, start_genotype, 500, 501, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, graphml)
+
+    outfile = 0
+    if graphml
+        outfile = open("out.graphml", "w")
+    else
+        outfile = open("out_nand.gexf", "w")
+    end
+
+    for line in file_lines
+        write(outfile, line)
+    end
+end
+
+function generate_genotypes(config_vals::Config.Type_Config_Values, parent::Genotype.Type_Genotype, node_depth::Int64, 
+                            edge_depth::Int64, num_edges::Array{Int64, 1}, num_nodes::Array{Int64, 1}, dictionary::Dict{Array{Int32, 1}, Int64},
+                            file_lines::Array{ASCIIString, 1}, max_num_nodes::Int64, genotypes::Array{Genotype.Type_Genotype, 1}, graphml::Bool)
+    foo = 0
+    #println(parent.connections)
+    parent_index = dictionary[vcat(parent.connections, parent.activations, parent.weights, parent.thresholds)]
+    for i = 1:parent.num_nodes
+        temp = genotypes[num_nodes[1]]
+        Genotype.copy_into(temp, parent)
+        if temp.activations[i] == 0
+            temp.activations[i] = 1
+        else
+            temp.activations[i] = 0
+        end
+        Genotype.run_GRN(temp, config_vals, convert(Int32, 0))
+        add_node(config_vals, temp, parent, node_depth, edge_depth, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, foo, graphml)
+        foo += 1
+    end
+    for i = 1:parent.num_nodes
+        for j = config_vals.min_threshold:config_vals.max_threshold
+            temp = genotypes[num_nodes[1]]
+            Genotype.copy_into(temp, parent)
+            if j != temp.thresholds[i]
+                temp.thresholds[i] = j
+                Genotype.run_GRN(temp, config_vals, convert(Int32, 0))
+                add_node(config_vals, temp, parent, node_depth, edge_depth, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, foo, graphml)
+                foo += 1
+            else
+                continue
+            end
+        end
+    end
+    for i = 1:parent.num_nodes
+        if parent.used_connections[i] < config_vals.max_num_connections
+            for j = 1:parent.num_nodes
+                if !(j in parent.connections[(config_vals.max_num_connections * (i - 1) + 1):(config_vals.max_num_connections * i)])
+                    temp = genotypes[num_nodes[1]]
+                    Genotype.copy_into(temp, parent)
+                    Genotype.add_incoming_connection(temp, config_vals, Int32(i), Int32(j), Int32(-1))
+                    Genotype.run_GRN(temp, config_vals, convert(Int32, 0))
+                    add_node(config_vals, temp, parent, node_depth, edge_depth, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, foo, graphml)
+                    foo += 1
+                end
+            end
+        else
+            continue
+        end
+    end
+    for i = 1:parent.num_nodes
+        if parent.used_connections[i] > config_vals.min_num_connections
+            for j = 1:parent.used_connections[i]
+                temp = genotypes[num_nodes[1]]
+                Genotype.copy_into(temp, parent)
+                Genotype.add_incoming_connection(temp, config_vals, Int32(i), Int32(j), Int32(-1))
+                Genotype.delete_incomming_connection(temp, config_vals, Int32(i), Int32(j))
+                Genotype.run_GRN(temp, config_vals, convert(Int32, 0))
+                add_node(config_vals, temp, parent, node_depth, edge_depth, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, foo, graphml)
+                foo += 1
+            end
+        else
+            continue
+        end
+    end
+    for i = 1:length(parent.weights)
+        if parent.weights[i] != 0
+            for j = config_vals.min_weight:config_vals.max_weight
+                if j != parent.weights[i] & j != 0
+                    temp = genotypes[num_nodes[1]]
+                    Genotype.copy_into(temp, parent)
+                    temp.weights[i] = j
+                    Genotype.run_GRN(temp, config_vals, convert(Int32, 0))
+                    add_node(config_vals, temp, parent, node_depth, edge_depth, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, foo, graphml)
+                    foo += 1
+                else
+                    continue
+                end
+            end
+        end
+    end
+    for i = 1:length(parent.connections)
+        for j = config_vals.min_num_nodes:config_vals.max_num_nodes
+            if j != parent.connections[i]
+                temp = genotypes[num_nodes[1]]
+                Genotype.copy_into(temp, parent)
+                temp.connections[i] = j
+                Genotype.run_GRN(temp, config_vals, convert(Int32, 0))
+                add_node(config_vals, temp, parent, node_depth, edge_depth, num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, foo, graphml)
+                foo += 1
+            else
+                continue
+            end
+        end
+    end
+    return 0
+end
+
+function add_node(config_vals::Config.Type_Config_Values, genotype::Genotype.Type_Genotype, parent::Genotype.Type_Genotype, 
+                  node_depth::Int64, edge_depth::Int64, num_edges::Array{Int64, 1}, num_nodes::Array{Int64, 1}, dictionary::Dict{Array{Int32, 1}, Int64},
+                  file_lines::Array{ASCIIString, 1}, max_num_nodes::Int64, genotypes::Array{Genotype.Type_Genotype, 1}, foo::Int64, graphml::Bool)
+    
+    #=if (((genotype.activations[((config_vals.GRN_timesteps * config_vals.max_num_nodes)  + 1):((config_vals.GRN_timesteps + 1) * config_vals.max_num_nodes)] != config_vals.expression_1) | (genotype.parents_activations[((config_vals.GRN_timesteps * config_vals.max_num_nodes)  + 1):((config_vals.GRN_timesteps + 1) * config_vals.max_num_nodes)] != config_vals.expression_2)) & ((genotype.activations[((config_vals.GRN_timesteps * config_vals.max_num_nodes)  + 1):((config_vals.GRN_timesteps + 1) * config_vals.max_num_nodes)] != config_vals.expression_2) | (genotype.parents_activations[((config_vals.GRN_timesteps * config_vals.max_num_nodes)  + 1):((config_vals.GRN_timesteps + 1) * config_vals.max_num_nodes)] != config_vals.expression_1)))
+        return 0
+    end=#
+    parent_index = dictionary[vcat(parent.connections, parent.activations, parent.weights, parent.thresholds)]
+    #println(parent_index, " ", num_nodes[1])
+    #parent_index = dictionary[parent]
+    index = get(dictionary, vcat(genotype.connections, genotype.activations, genotype.weights, genotype.thresholds), -1)
+    #index = -1
+    #println(num_nodes[1])
+    if index == -1
+        if (num_nodes[1] < max_num_nodes) & (node_depth >= 0)
+            dictionary[vcat(genotype.connections, genotype.activations, genotype.weights, genotype.thresholds)] = num_nodes[1]
+            add_node_xml(config_vals, genotype, num_nodes, file_lines, graphml)
+            num_nodes[1] += 1
+            if num_nodes[1] % 100 == 0
+                println(num_nodes[1])
+            end
+            add_edge_xml(config_vals, num_nodes[1] - 1, parent_index, num_nodes, num_edges[1], file_lines, graphml)
+            num_edges[1] += 1
+            if edge_depth >= 0
+                generate_genotypes(config_vals, genotype, node_depth - 1, edge_depth - 1, 
+                                   num_edges, num_nodes, dictionary, file_lines, max_num_nodes, genotypes, graphml)
+            end
+        end
+    else
+        add_edge_xml(config_vals, index, parent_index, num_nodes, num_edges[1], file_lines, graphml)
+        num_edges[1] += 1
+    end
+
+    return 0
+end
+
+function add_node_xml(config_vals::Config.Type_Config_Values, genotype::Genotype.Type_Genotype, num_nodes, file_lines::Array{ASCIIString, 1}, graphml::Bool)
+    num_bits_per_color = Int(floor(config_vals.max_num_nodes / 3))
+    if (config_vals.max_num_nodes -  3 * num_bits_per_color) == 0
+        blue = compute_color_value(config_vals, genotype, 1, num_bits_per_color)
+        blue *= 2.0^(8 - num_bits_per_color)
+        green = compute_color_value(config_vals, genotype, (num_bits_per_color + 1), (2 * num_bits_per_color))
+        green *= 2.0^(8 - num_bits_per_color)
+        red = compute_color_value(config_vals, genotype, (2 * num_bits_per_color) + 1, 3 * num_bits_per_color)
+        red *= 2.0^(8 - num_bits_per_color)
+    elseif (config_vals.max_num_nodes - 3 * num_bits_per_color) == 1
+        blue = compute_color_value(config_vals, genotype, 1, num_bits_per_color)
+        blue *= 2.0^(8 - num_bits_per_color)
+        green = compute_color_value(config_vals, genotype, num_bits_per_color + 1, 2 * num_bits_per_color)
+        green *= 2.0^(8 - num_bits_per_color)
+        red = compute_color_value(config_vals, genotype, (2 * num_bits_per_color) + 1, 3 * num_bits_per_color + 1)
+        red *= 2.0^(8 - num_bits_per_color - 1)
+    else
+        blue = compute_color_value(config_vals, genotype, 1, num_bits_per_color)
+        blue *= 2.0^(8 - num_bits_per_color)
+        green = compute_color_value(config_vals, genotype, num_bits_per_color + 1, 2 * num_bits_per_color + 1)
+        green *= 2.0^(8 - num_bits_per_color - 1)
+        red = compute_color_value(config_vals, genotype, (2 * num_bits_per_color) + 2, 3 * num_bits_per_color + 2)
+        red *= 2.0^(8 - num_bits_per_color - 1)
+    end
+    red = Int(round(red/2))
+    green = Int(round(green/2))
+    blue = Int(round(blue/2))
+    red += 120
+    green += 120
+    blue += 120
+    if graphml
+        insert!(file_lines, 6 + 3 * num_nodes[1], string("<node id=\"n", num_nodes[1], "\">\n"))
+        insert!(file_lines, 7 + 3 * num_nodes[1], string("<data key=\"d0\">", red, green, blue, "</data>\n"))
+        insert!(file_lines, 8 + 3 * num_nodes[1], string("</node>\n"))
+    else
+        insert!(file_lines, 5 + 3 * num_nodes[1], string("<node id=\"", num_nodes[1], "\" label=\"", red, green, blue,"\" genotype=\"",red, green, blue ,"\">\n"))
+        insert!(file_lines, 6 + 3 * num_nodes[1], string("<viz:color r=\"", red,"\" g=\"", green,"\" b=\"", blue,"\" a=\"0.9\"/>\n"))
+        insert!(file_lines, 7 + 3 * num_nodes[1], "</node>\n")
+    end
+    return 0
+end
+
+function add_edge_xml(config_vals::Config.Type_Config_Values, source::Int64, destination::Int64, 
+                      num_nodes::Array{Int64, 1}, num_edges::Int64, file_lines::Array{ASCIIString, 1}, graphml::Bool)
+    if graphml
+        insert!(file_lines, 6  + 3 * num_nodes[1] + num_edges, string("<edge id=\"e", num_edges,"\" source=\"n", source,"\" target=\"n", destination,"\" />\n"))
+    else
+        insert!(file_lines, 7  + 3 * num_nodes[1] + num_edges, string("<edge id=\"", num_edges,"\" source=\"", source,"\" target=\"", destination,"\" />\n"))
+    end
+    return 0
+end
+
+function compute_color_value(config_vals::Config.Type_Config_Values, genotype::Genotype.Type_Genotype, start_index::Int64, end_index::Int64) 
+    color_value::Int64 = 0
+    j = 0
+    for i = start_index:end_index
+        color_value += genotype.activations[(config_vals.GRN_timesteps * config_vals.max_num_nodes)  + i] * 2^(j)
+        j += 1
+    end
+    return color_value
+end
+
+make_graph()

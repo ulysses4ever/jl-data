@@ -1,0 +1,32 @@
+#! /usr/bin/env julia
+
+#=push!(LOAD_PATH, "./localmodules")=#
+include("CACode.jl")
+using gps_cacode
+
+println("\nGenerate the lookup table for mls_chips for CACode.jl\n")
+
+g1_mls = gx_mls(ones(Uint8, 10), [3,10], 1023)
+
+g2_mls = gx_mls(ones(Uint8, 10), [2,3,6,8,9,10], 1023)
+
+tups = zip(g1_mls, g2_mls)
+
+print("mls_chips = [\n ")
+j = 0
+k = 0
+for i in tups
+	print("(",i[1],",",i[2],")")
+	j += 1
+	k += 1
+	if(k<length(tups)) print(",") end
+	if(j%10 == 0) 
+		print("\n ")
+		j=0
+	end
+end
+
+print("]\n")
+
+
+

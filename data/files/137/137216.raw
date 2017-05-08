@@ -1,0 +1,1053 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+include("affine_gap_nw_algorithm.jl")
+include("modelling_functions.jl")
+include("nw_algorithm.jl")
+
+##################################################################################
+
+
+
+##################################################################################
+
+type ModifiedNWSystem
+  _matrix::NWMatrix
+
+  _seq1::Array{Char}
+  _seq2::Array{Char}
+
+  _pdaSeq1::RecognitionPDA
+  _pdaSeq2::RecognitionPDA
+end
+
+type NaiveNWSystem
+  _matrix::NWMatrix
+
+  _seq1::Array{Char}
+  _seq2::Array{Char}
+
+  _substitutionMatrix::SubstMatrix
+end
+
+function getLengthOfSeq1(system::ModifiedNWSystem)
+  return length(system._seq1)
+end
+
+function getLengthOfSeq1(system::NaiveNWSystem)
+  return length(system._seq1)
+end
+
+
+function getLengthOfSeq2(system::ModifiedNWSystem)
+  return length(system._seq2)
+end
+
+function getLengthOfSeq2(system::NaiveNWSystem)
+  return length(system._seq2)
+end
+
+
+function getNuclInSeq1(system::ModifiedNWSystem, i::Int64)
+    return system._seq1[i]
+end
+
+function getNuclInSeq1(system::NaiveNWSystem, i::Int64)
+    return system._seq1[i]
+end
+
+function getNuclInSeq2(system::ModifiedNWSystem, j::Int64)
+    return system._seq2[j]
+end
+
+function getNuclInSeq2(system::NaiveNWSystem, j::Int64)
+    return system._seq2[j]
+end
+
+function getFullSeq1(system::NaiveNWSystem)
+  return system._seq1
+end
+
+function getFullSeq1(system::ModifiedNWSystem)
+  return system._seq1
+end
+
+function getFullSeq2(system::NaiveNWSystem)
+  return system._seq2
+end
+
+function getFullSeq2(system::ModifiedNWSystem)
+  return system._seq2
+end
+
+function getScoreInMatrix(system::NaiveNWSystem, i::Int64, j::Int64)
+  return getMatrixValue(system._matrix,i,j)
+end
+
+function getScoreInMatrix(system::ModifiedNWSystem, i::Int64, j::Int64)
+  return getMatrixValue(system._matrix,i,j)
+end
+
+function getIdentityOrSubstitutionScore(system::NaiveNWSystem, 
+                                        nucl_a::Char,
+                                        nucl_b::Char)
+  return getScore(system._substitutionMatrix, nucl_a, nucl_b)
+end
+
+function createModifiedNWSystem(seq1::Array{Char}, seq2::Array{Char})
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if lenOfSeq1 > lenOfSeq2
+        return ModifiedNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1,
+          createRecognitionPDA(lenOfSeq1), createRecognitionPDA(lenOfSeq1))  
+    else
+        return ModifiedNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2,
+          createRecognitionPDA(lenOfSeq2), createRecognitionPDA(lenOfSeq2))
+    end
+end
+
+function createNaiveNWSystem(seq1::Array{Char}, seq2::Array{Char})
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if lenOfSeq1 > lenOfSeq2
+        return NaiveNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1,
+          createDefaultSubstitutionMatrix())
+    else
+        return NaiveNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2,
+          createDefaultSubstitutionMatrix())
+    end
+end
+
+abstract SubstMatrixChoice
+
+type DefaultSubstMatrix <: SubstMatrixChoice
+end
+
+type CustomSubstMatrix1 <: SubstMatrixChoice
+end
+
+function createNaiveNWSystem(seq1::Array{Char}, seq2::Array{Char}, aChoiceOfSubstMatrix::SubstMatrixChoice)
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if isa(typeof(aChoiceOfSubstMatrix), Type{DefaultSubstMatrix})
+      chosenSubstMatrix = createDefaultSubstitutionMatrix()
+    elseif isa(typeof(aChoiceOfSubstMatrix), Type{CustomSubstMatrix1})
+      chosenSubstMatrix = createCustomSubstitutionMatrix1()
+    else
+      chosenSubstMatrix = createDefaultSubstitutionMatrix()
+    end
+
+    if lenOfSeq1 > lenOfSeq2
+        return NaiveNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1,
+          chosenSubstMatrix)
+    else
+        return NaiveNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2,
+          chosenSubstMatrix)
+    end
+end
+
+##################################################################################
+
+
+##################################################################################
+
+# once one line has gotten to the finish we decide whether it is the most optimalist to date
+ # if so, like the first time, we have that as the global optimum. All lines to reach the finish
+ # are those that have been ultimate choice at some i,j or they were tied for the most optimal at some point
+
+# Start_i,j is just for debugging (I'm gonna fuck this up I know first time) 
+type BacktrackLine
+  _start_i::Int64
+  _start_j::Int64
+
+  _curr_i::Int64
+  _curr_j::Int64
+
+  # march 8, 2013: todo: will think about implementing a referencing paradigm (reference objects (or a non duplicated
+    # string at index)) instead of lugging around complete copy (memory???)
+  _alignedSequence1::String
+  _alignedSequence2::String
+end
+
+
+function pop(array::Array{BacktrackLine})
+    if isempty(array)
+        error("Array{BacktrackLine} is empty: pop")
+    else
+        poppedElement = array[end]
+        ccall(:jl_array_del_end, Void, (Any, Uint), array, 1)
+        return poppedElement
+    end
+end
+
+# this right now is wrong/could be better (what if there's tie...yeah, but the solution is interesting!)
+function putTogetherConsensusString(system::NaiveNWSystem)
+  i,j = getNumOfRows(system._matrix),getNumOfCols(system._matrix)
+
+  println("(i,j) = ( $i , $j )")
+
+  consensusSeq1 = "$(getNuclInSeq1(system,i))"
+  consensusSeq2 = "$(getNuclInSeq2(system,j))"
+
+  println("Initial Consensus Seq 1: $consensusSeq1")
+  println("Initial Consensus Seq 2: $consensusSeq2")
+
+  overallNumberOfTies = 0
+  numberOfCellsBacktracked = 0
+
+  toBeProcessed = BacktrackLine[]
+  alreadyProcessed = BacktrackLine[]
+  push(alreadyProcessed, BacktrackLine(i,j,i,j,consensusSeq1,consensusSeq2))
+
+  optimalAlignments = BacktrackLine[]
+
+  # the new main loop for putTogetherConsensusString(...)
+
+
+  lenOfToBeProcessed = length(toBeProcessed)
+  lenOfAlreadyProcessed= length(alreadyProcessed)
+
+  while lenOfAlreadyProcessed > 0
+    while length(alreadyProcessed) > 0
+
+      popped = pop(alreadyProcessed)
+      push(toBeProcessed, popped)
+    end
+
+
+    lenOfToBeProcessed = length(toBeProcessed)
+    lenOfAlreadyProcessed = length(alreadyProcessed)
+
+    #println("Total # to go: $(lenOfToBeProcessed)")
+    #println("Length of alreadyProcessed: $(lenOfAlreadyProcessed)")
+
+    while length(toBeProcessed) > 0
+      poppedJob = pop(toBeProcessed)
+
+    lenOfToBeProcessed = length(toBeProcessed)
+    lenOfAlreadyProcessed = length(alreadyProcessed)
+
+      i,j = poppedJob._curr_i, poppedJob._curr_j
+      consensusSeq1 = poppedJob._alignedSequence1
+      consensusSeq2 = poppedJob._alignedSequence2
+
+      if i <= 1 && j <= 1
+        if i == 1 && j == 1
+          println("Weeeeeeee Reached Terminal Case")
+          push(optimalAlignments, poppedJob)
+        end
+      elseif i >= 1 || j >= 1
+        #println("Now at (i,j) = ( $i , $j )")
+
+        F_imin1_jmin1 = (((i-1) < 1 || (j-1) < 1) ? -float(0xffff) : getScoreInMatrix(system, i-1, j-1))
+        F_i_jmin1     = ((i < 1 || (j-1) < 1) ? -float(0xffff) : getScoreInMatrix(system, i, j-1))
+        F_imin1_j     = (((i-1) < 1 || j < 1) ? -float(0xffff) : getScoreInMatrix(system, i-1, j))
+
+        # println("Calculated F's, < F_{i-1}_{j-1}, F_{i}_{j-1}, F_{i-1}_{j} > = [$F_imin1_jmin1,$F_i_jmin1, $F_imin1_j]")
+        maxF = max(F_imin1_jmin1,F_i_jmin1,F_imin1_j)
+
+        howManyAreMax = 0
+
+        if (F_imin1_jmin1 == maxF)
+          howManyAreMax += 1
+        end
+
+        if (F_i_jmin1 == maxF)
+          howManyAreMax += 1
+        end
+
+        if (F_imin1_j == maxF)
+          howManyAreMax += 1
+        end
+
+        if howManyAreMax > 1
+          overallNumberOfTies += 1
+        end
+        # println("Max(F's) = $maxF")
+    
+        if maxF == -float(0xffff)
+          continue
+        end
+
+        if howManyAreMax == 1
+          if F_imin1_jmin1 == maxF
+            # println("F_imin1_jmin1: Trying to access index $(i-1) in nuclSeq1: $(getFullSeq1(system))")
+            consensusSeq1 = "$(getNuclInSeq1(system,i-1))$consensusSeq1"
+            consensusSeq2 = "$(getNuclInSeq2(system,j-1))$consensusSeq2"
+           
+            poppedJob._curr_i,poppedJob._curr_j = i-1,j-1
+          elseif F_i_jmin1 == maxF
+            # println("F_i_jmin1: Trying to access index $(j-1) in nuclSeq2: $(getFullSeq2(system))")
+            consensusSeq1 = "-$consensusSeq1"
+            consensusSeq2 = "$(getNuclInSeq2(system,j-1))$consensusSeq2"
+            poppedJob._curr_j = j-1
+          elseif F_imin1_j == maxF
+            # println("F_imin1_j: Trying to access index $(i-1) in nuclSeq1: $(getFullSeq1(system))")
+            consensusSeq1 = "$(getNuclInSeq1(system,i-1))$consensusSeq1"
+            consensusSeq2 = "-$consensusSeq2"
+            poppedJob._curr_i = i-1
+          end
+
+          poppedJob._alignedSequence1,poppedJob._alignedSequence2 = consensusSeq1, consensusSeq2
+          push(alreadyProcessed, poppedJob)
+        else howManyAreMax > 1
+          if (F_imin1_jmin1 == maxF)
+            # println("F_imin1_jmin1: Trying to access index $(i-1) in nuclSeq1: $(getFullSeq1(system))")
+            consensusSeq1 = "$(getNuclInSeq1(system,i-1))$consensusSeq1"
+            consensusSeq2 = "$(getNuclInSeq2(system,j-1))$consensusSeq2"
+
+            newJob = BacktrackLine(i, j, i-1, j-1, consensusSeq1, consensusSeq2)
+            push(alreadyProcessed, newJob)
+          end
+
+          if (F_i_jmin1 == maxF)
+            # println("F_i_jmin1: Trying to access index $(j-1) in nuclSeq2: $(getFullSeq2(system))")
+            consensusSeq1 = "-$consensusSeq1"
+            consensusSeq2 = "$(getNuclInSeq2(system,j-1))$consensusSeq2"
+
+            newJob = BacktrackLine(i, j, i, j-1, consensusSeq1, consensusSeq2)
+            push(alreadyProcessed, newJob)
+
+          end
+
+          if (F_imin1_j == maxF)
+            # println("F_imin1_j: Trying to access index $(i-1) in nuclSeq1: $(getFullSeq1(system))")
+            consensusSeq1 = "$(getNuclInSeq1(system,i-1))$consensusSeq1"
+            consensusSeq2 = "-$consensusSeq2"
+
+            newJob = BacktrackLine(i, j, i-1, j, consensusSeq1, consensusSeq2)
+            push(alreadyProcessed, newJob)
+          end
+
+
+          numberOfCellsBacktracked += 1
+        end
+
+        lenOfToBeProcessed = length(toBeProcessed)
+        lenOfAlreadyProcessed = length(alreadyProcessed)
+      end
+    end
+  end
+  
+  # take care of whats left (if anything?) over in alreadyProcessed
+  #while length(alreadyProcessed) > 0
+
+  #end
+
+  return (optimalAlignments,optimalAlignments, (numberOfCellsBacktracked, overallNumberOfTies, (overallNumberOfTies/numberOfCellsBacktracked)*100))
+end
+
+
+
+
+##################################################################################
+
+##################################################################################
+
+
+function createTestData()
+  retSystem = NaiveNWSystem()
+
+  matrix = retSystem._matrix
+
+  setMatrixValue(matrix, 1,1,1) 
+end
+
+
+abstract NaiveGapModel
+
+type LinearGapModel <: NaiveGapModel end
+type AffineGapModel <: NaiveGapModel end
+
+
+function runNeedlemanWunsch(system::NaiveNWSystem, gapModel::AffineGapModel)
+#  println("Running Naive Needleman Wunsch Algorithm (Filling Matrix, F)")
+
+  matrix = system._matrix
+
+  numberOfRows = getNumOfRows(matrix)
+  numberOfCols = getNumOfCols(matrix)
+
+#  println("Number of rows: $numberOfRows")
+#  println("Number of cols: $numberOfCols")
+
+  ## for testing here only ## 
+  openGapPenalty = 4.0
+  extendGapPenalty = 1.0
+
+#  println("Gap Penalty: $gapPenalty")
+
+  setMatrixValue(system._matrix, 1, 1, -openGapPenalty)
+
+  j = 2
+  while j <= numberOfCols
+    setMatrixValue(system._matrix, 1, j, -openGapPenalty - j*extendGapPenalty)
+    j = j + 1
+  end
+
+  i = 2
+  while i <= numberOfRows
+    setMatrixValue(system._matrix, i, 1, -openGapPenalty - i*extendGapPenalty)
+    i = i + 1
+  end 
+
+  i,j = 2, 2
+
+  identity_or_subst_score = 0 
+  deletion_score = 0
+  insertion_score = 0
+
+  const INSERTION_AFFINE_STATE = InsertionAffineState()
+  const DELETION_AFFINE_STATE = DeletionAffineState()
+  const MAIN_AFFINE_STATE = MainAffineState()
+
+  openGapLambdaFn = function (dontcare1,dontcare2) 5.0 end
+  extendGapLambdaFn = function (dontcare1,dontcare2) 0.1 end
+  substLambdaFn = function (s_1i::Char, s_2j::Char) getIdentityOrSubstitutionScore(system, s_1i, s_2j) end  
+
+  # the system's data is to be used a shell, we create it here and initilize mainly to build the automata beneath it
+  # Friday Mrch 15, 2013 2:42 - AAANNNDD, we just remembered that we have to build out the I and D (?) matrices at the same time
+  affineSystem = createAffineGapSystem(MainAffineState(),
+                                       openGapLambdaFn,
+                                       extendGapLambdaFn,
+                                       substLambdaFn)
+
+  lastAffineState = getCurrentState(affineSystem)
+  currAffineState = lastAffineState
+
+  # I and D matrices (lol not sure how to do this...)
+  I = [[]]
+  D = [[]]
+
+  while i <= numberOfRows
+    j = 2
+    while j <= numberOfCols
+      ## calculate the scores and costs for all options
+
+      # no need for this any more, it's taken care of in automata
+      #identity_or_subst_score =
+      #  getIdentityOrSubstitutionScore(system,
+      #                                 getNuclInSeq1(system, i),
+      #                                 getNuclInSeq2(system, j))
+
+      s1_curr = getNuclInSeq1(system, i)
+      s2_curr = getNuclInSeq2(system, j)
+
+      res = update!(affineSystem, s1_curr, s2_curr)
+
+
+      F_case_after_identity_or_subst = getMatrixValue(matrix, i-1, j-1) + identity_or_subst_score
+
+      F_case_after_indel = 0xffff
+      if currAffineState == lastAffineState
+        if currAffineState == INSERTION_AFFINE_STATE 
+          F_case_after_indel = getMatrixValue(matrix, i, j-1) - extendGapPenalty*getGapCount(affineSystem)
+        elseif currAffineState == DELETION_AFFINE_STATE
+          F_case_after_indel = getMatrixValue(matrix, i-1, j) - extendGapPenalty*getGapCount(affineSystem)
+        end  
+      else
+        if currAffineState == MAIN_AFFINE_STATE
+           if lastAffineState == INSERTION_AFFINE_STATE
+             F_case_after_indel = getMatrixValue(matrix, i, j-1) - extendGapPenalty
+           elseif lastAffineState == DELETION_AFFINE_STATE
+             F_case_after_indel = getMatrixValue(matrix, i-1, j) - extendGapPenalty
+           end
+        elseif currAffineState == INSERTION_AFFINE_STATE
+          F_case_after_indel = getMatrixValue(matrix, i, j-1) - openGapPenalty
+        elseif currAffineState == DELETION_AFFINE_STATE
+          F_case_after_indel = getMatrixValue(matrix, i-1, j) - openGapPenalty
+        end
+      end
+
+      highestF = max(F_case_after_identity_or_subst, F_case_after_indel)
+
+      if (F_case_after_identity_or_subst == F_case_after_indel == hi)
+
+      end
+
+      setMatrixValue(matrix, i, j, max(F_case_after_identity_or_subst,
+                                       F_case_after_indel))
+
+      j += 1
+    end
+
+    update
+
+    i += 1
+  end
+
+  # drawMatrix(matrix)
+  # print("\n $(drawMatrixWithNumbers(matrix))")
+end
+
+
+function runNeedlemanWunsch(system::NaiveNWSystem, gapModel::LinearGapModel)
+#  println("Running Naive Needleman Wunsch Algorithm (Filling Matrix, F)")
+
+  matrix = system._matrix
+
+  numberOfRows = getNumOfRows(matrix)
+  numberOfCols = getNumOfCols(matrix)
+
+#  println("Number of rows: $numberOfRows")
+#  println("Number of cols: $numberOfCols")
+
+  ## for testing here only ## 
+  gapPenalty = 5.0
+
+#  println("Gap Penalty: $gapPenalty")
+
+  j = 1
+  while j <= numberOfCols
+    setMatrixValue(system._matrix, 1, j, -j*gapPenalty)
+    j = j + 1
+  end
+
+  i = 1
+  while i <= numberOfRows
+    setMatrixValue(system._matrix, i, 1, -i*gapPenalty)
+    i = i + 1
+  end
+
+  i,j = 2, 2
+
+  identity_or_subst_score = 0
+  deletion_score = 0
+  insertion_score = 0
+
+  while i <= numberOfRows
+    j = 2
+    while j <= numberOfCols
+      ## calculate the scores and costs for all options
+
+      identity_or_subst_score = 
+        getIdentityOrSubstitutionScore(system,
+                                       getNuclInSeq1(system, i),
+                                       getNuclInSeq2(system, j)) 
+
+      ## initial debug...i.e. not what it should be
+      s1_curr = getNuclInSeq1(system, i)
+      s2_curr = getNuclInSeq2(system, j)
+
+      F_case_after_identity_or_subst = getMatrixValue(matrix, i-1, j-1) + identity_or_subst_score
+      F_case_after_deletion = getMatrixValue(matrix, i-1, j) - gapPenalty
+      F_case_after_insertion = getMatrixValue(matrix, i, j-1) - gapPenalty
+
+      setMatrixValue(matrix, i, j, max(F_case_after_identity_or_subst,
+                                       F_case_after_deletion,
+                                       F_case_after_insertion))
+
+      j += 1
+    end
+
+    i += 1
+  end
+
+  # drawMatrix(matrix)
+  # print("\n $(drawMatrixWithNumbers(matrix))")
+end
+
+
+function runNeedlemanWunsch(system::ModifiedNWSystem)
+#  println("Running Modified Needleman Wunsch Algorithm")
+
+  matrix = system._matrix
+
+  numberOfRows = getNumOfRows(matrix)
+  numberOfCols = getNumOfCols(matrix)
+
+#  println("Number of rows: $numberOfRows")
+#  println("Number of cols: $numberOfCols")
+
+  j = 1
+  while j < numberOfCols
+    setMatrixValue(system._matrix, 1, j, 0.0)
+    j = j + 1
+  end
+
+  i = 1
+  while i < numberOfRows
+    setMatrixValue(system._matrix, i, 1, 0.0)
+    i = i + 1
+  end
+
+  i,j = 1, 1
+
+  while i <= numberOfRows
+    while j <= numberOfCols
+      ## calculate the scores and costs for all options
+            
+      ## initial debug...i.e. not what it should be
+      s1_curr = getNuclInSeq1(system, i)
+      s2_curr = getNuclInSeq2(system, j)
+
+      if s1_curr == s2_curr
+        setMatrixValue(matrix, i, j, 6.0)
+      end
+
+      j += 1
+    end
+
+    i += 1
+  end
+
+  # drawMatrix(matrix)
+  # print("\n $(drawMatrixWithNumbers(matrix))")
+end
+
+function getAlignmentStats(alignedSeq1::String, alignedSeq2::String)
+  i = 1
+  alignmentLength = length(alignedSeq1)
+
+  numberOfMatches = 0
+  numberOfIndels = 0
+
+  while i <= alignmentLength
+    charati1, charati2 = alignedSeq1[i], alignedSeq2[i]
+    if charati1 == charati2
+      numberOfMatches += 1
+    elseif charati1 == '-' || charati2 == '-'
+      numberOfIndels += 1
+    end
+
+    i += 1
+  end
+
+  (numberOfMatches, alignmentLength - numberOfMatches - numberOfIndels, numberOfIndels)
+end
+
+function getConsensusDNASeq(system::NaiveNWSystem)
+  return putTogetherConsensusString(system)
+end
+
+function getConsensusDNASeq(system::ModifiedNWSystem)
+  return putTogetherConsensusString(system)
+end
+
+##################################################################################
+
+println("
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#\n")
+
+println("Naive-Needleman-Wunsch")
+
+runHandWrittenQualitativeRecognitionTests()
+
+const numberOfTimes = 1 # number of times to run test, taking average of summed recorded times
+alignmentResults = ()
+
+
+print("----------------------------------------------------------------------------------\n")
+println("Creating Modified Needleman Wunsch System (PDA+NWMatrix+etc)\n")
+println("\n----------------------------------------------------------------------------------")
+println("Running Modified NW...\n")
+
+# forcing the garbage collector to run
+gc()
+
+# time_start = time_ns()
+
+theModifiedNWSystem = createModifiedNWSystem(['G','T','C'],['G','A','A','A','A','T','C'])
+runNeedlemanWunsch(theModifiedNWSystem)
+
+# time_end = time_ns()
+# time_elapsed_ns = time_end - time_start
+ 
+println("\nResults For ModifiedNW Pairwise Alignment On Data (GTC vs. GAAAATC) with CustomMatrix1")
+println("  Alignment Time: (no time avail. as of yet) milliseconds")
+
+
+print("----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Default Matrix) (NWMatrix+etc)\n")
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW...\n")
+
+# forcing the garbage collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+
+while i < numberOfTimes
+
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(['G','T','C'],['G','A','A','A','A','T','C'])
+runNeedlemanWunsch(theNaiveNWSystem, LinearGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+sumOfTimes += time_elapsed_ns
+i+= 1
+
+end
+
+println("\nResults For Pairwise Alignment On Data (GTC vs. GAAAATC) with DefaultMatrix")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+
+
+print("\n----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Custom Subst. Matrix 1) (NWMatrix+etc)\n")
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW (Custom Subst. Matrix 1)...\n")
+
+# forcing the garbage collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+
+while i < numberOfTimes
+
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(['G','T','C'],['G','A','A','A','A','T','C'],CustomSubstMatrix1())
+runNeedlemanWunsch(theNaiveNWSystem, LinearGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+sumOfTimes += time_elapsed_ns
+i+= 1
+
+end
+
+println("\nResults For Pairwise Alignment On Data (GTC vs. GAAAATC) with CustomMatrix1")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+
+
+print("\n----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Linear Gap Model) (Custom Subst. Matrix 1) (NWMatrix+etc)\n")
+
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW On Generated Data(Adamson-300dna, Eve-250dna)...\n")
+
+# forcing the garbade collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+maxTime = 0
+minTime = 0xffff
+
+while i < numberOfTimes
+
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(
+  chars("TTTAGTGCGCGCGCGCGCGCGCGCGCGCGCCCGACCTCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCACACACACACACACACACGCAACAACAACAACAACAACAGCTTATGTGCCTTGTATCTCAGTGAAGACGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGTAGAAGCCTTGCCACAGACTGCCCTACTACTACTACTACTACTACTACTACTACTACTACTACTACTACTACC"),
+  chars("AGCCTCCAGCCACGCACGTCATGCCCACGCGTGGACCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCGTCAATGAGTAGTAGTAGTAGTAGTAGTAGTAGTAGTAGTGCCTCGATATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTAACTTGGCCGATTAGCGAAAGTATATATATATATATATAGCCACATGTCTCTCTCTCTCTCTCTCTCTCTCAAGAAGAAGAAGAAGAAGAAA"))
+
+runNeedlemanWunsch(theNaiveNWSystem, LinearGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+maxTime = max(maxTime,time_elapsed_ns)
+minTime = min(minTime,time_elapsed_ns)
+
+sumOfTimes += time_elapsed_ns
+i+= 1
+
+end
+
+println("\nResults For Pairwise Alignment On Generated Data (Adamson-300dna vs. Eve-250dna) With CustomMatrix1")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  Highest Time: $(maxTime/1000000)")
+println("  Lowest Time: $(minTime/1000000)")
+println("  Avg Alignment Time Without Highest: $(((sumOfTimes - maxTime)/1000000)/(numberOfTimes-1))")
+println("  Avg Alignment Time Without Highest + Lowest: $(((sumOfTimes - maxTime - minTime)/1000000)/(numberOfTimes-2))")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+println("\nNumber of cells backtracked: $(alignmentResults[3][1])")
+println("Number of ties:              $(alignmentResults[3][2])")
+println("Percentage tie:              $(alignmentResults[3][3])%")
+
+alignmentStats = getAlignmentStats(alignmentResults[1], alignmentResults[2])
+println("Alignment Stats (#of matches, #of substs, #of indels) = $alignmentStats")
+
+
+print("\n----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Affine Gap Model) (Custom Subst. Matrix 1) (PDA+NWMatrix+etc)\n")
+
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW On Generated Data(Adamson-300dna, Eve-250dna)...\n")
+
+# forcing the garbade collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+maxTime = 0
+minTime = 0xffff
+
+while i < numberOfTimes
+
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(
+  chars("TTTAGTGCGCGCGCGCGCGCGCGCGCGCGCCCGACCTCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCACACACACACACACACACGCAACAACAACAACAACAACAGCTTATGTGCCTTGTATCTCAGTGAAGACGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGTAGAAGCCTTGCCACAGACTGCCCTACTACTACTACTACTACTACTACTACTACTACTACTACTACTACTACC"),
+  chars("AGCCTCCAGCCACGCACGTCATGCCCACGCGTGGACCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCGTCAATGAGTAGTAGTAGTAGTAGTAGTAGTAGTAGTAGTGCCTCGATATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTAACTTGGCCGATTAGCGAAAGTATATATATATATATATAGCCACATGTCTCTCTCTCTCTCTCTCTCTCTCAAGAAGAAGAAGAAGAAGAAA"))
+
+runNeedlemanWunsch(theNaiveNWSystem, AffineGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+maxTime = max(maxTime,time_elapsed_ns)
+minTime = min(minTime,time_elapsed_ns)
+
+sumOfTimes += time_elapsed_ns
+i+= 1
+
+end
+
+println("\nResults For Pairwise Alignment On Generated Data (Adamson-300dna vs. Eve-250dna) With CustomMatrix1")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  Highest Time: $(maxTime/1000000)")
+println("  Lowest Time: $(minTime/1000000)")
+println("  Avg Alignment Time Without Highest: $(((sumOfTimes - maxTime)/1000000)/(numberOfTimes-1))")
+println("  Avg Alignment Time Without Highest + Lowest: $(((sumOfTimes - maxTime - minTime)/1000000)/(numberOfTimes-2))")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+println("\nNumber of cells backtracked: $(alignmentResults[3][1])")
+println("Number of ties:              $(alignmentResults[3][2])")
+println("Percentage tie:              $(alignmentResults[3][3])%")
+
+alignmentStats = getAlignmentStats(alignmentResults[1], alignmentResults[2])
+
+println("Alignment Stats (#of matches, #of substs, #of indels) = $alignmentStats")
+
+print("\n----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Linear Gap Model) (Custom Subst. Matrix 1) (NWMatrix+etc)\n")
+
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW On Generated Data(Adamson-600dna, Eve-600dna)...\n")
+
+# forcing the garbade collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+maxTime = 0
+minTime = 0xffff
+
+while i < numberOfTimes
+ 
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(
+  chars(
+    "TTGCGCGCGCGCGCGCGCGCGCGCGCAGGGTGGCCTTAGCACAACAACAACAACAACAACAGAGACGCCGCGATTTAGCACACACACACACACAACCCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCACGAACAGCTACGCTACCGGGGCCCCGAACTCCCCTAAACAAAAGTCAAAAGTGTGTCGAGTGCCACCTGTCAACGTAAGTCCACATTTTAGCAGCGGCTCCTCAATATCGGCATTTTCATAAAGCAATTACGAAAGCGCTGTTCCAGGAGCGAAACCCAATACTTCCTGAAGCCTAAGAGTTACATCTATGTTTTTGTCAACCGGCCAGGGTTAACGCACTCCATATGCTCGTATAGAACGCCGTCTGATGACGAACTCTTTATGGATAAAACTTAAGCAATCACAAGTCTTGCTGCATCGCCCTAAGACCCTAGAGGGGAGGCTGATAGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGACTACTACTACTACTACTACTACTACTACTACTACTACTACTACTATCT"
+  ),
+  chars(
+    "TCTTTTGGGTCTACGTTGTCCGAGTGCGCGTATATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTACCTGTCTGCTATTAACTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTGGTCTAGGGGGTGTTCTCCCGGGGGTGGTTGAGCTGTCACGTGTCCACCGAGGAGCCGGGTATGGATCTAAGAAGAAGAAGAAGAAGAAATGATGTACGAGTCGTTTTCGAAACGTGATTGGCACGTCGATTGTCTGTAAACTCGGTAGCTCAAGCACTGTAGTAGTAGTAGTAGTAGTAGTAGTAGTAGTAATAGTCTGTATTGAACTCGTCTATATATATATATATATAGTCTAAGCCCTGGAGCGCCGCGGCCTGCATGGCGATCAATTTTACATGTTTAGTCTCTCTCTCTCTCTCTCTCTCTCAAAGATGTAAGACGCGACATACAGGCAATACACGAGTGAGAGAAGCGACTAGGTAGAGGATAGACTCCAC"
+  ))
+
+runNeedlemanWunsch(theNaiveNWSystem, LinearGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+maxTime = max(maxTime,time_elapsed_ns)
+minTime = min(minTime,time_elapsed_ns)
+
+sumOfTimes += time_elapsed_ns
+
+i += 1
+
+end
+
+println("\nResults For Pairwise Alignment On Generated Data (Adamson-600dna vs. Eve-600dna) With CustomMatrix1")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  Highest Time: $(maxTime/1000000)")
+println("  Lowest Time: $(minTime/1000000)")
+println("  Avg Alignment Time Without Highest: $(((sumOfTimes - maxTime)/1000000)/(numberOfTimes-1))")
+println("  Avg Alignment Time Without Highest + Lowest: $(((sumOfTimes - maxTime - minTime)/1000000)/(numberOfTimes-2))")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+println("\nNumber of cells backtracked: $(alignmentResults[3][1])")
+println("Number of ties:              $(alignmentResults[3][2])")
+println("Percentage tie:              $(alignmentResults[3][3])%")
+
+alignmentStats = getAlignmentStats(alignmentResults[1], alignmentResults[2])
+println("Alignment Stats (#of matches, #of substs, #of indels) = $alignmentStats")
+
+
+
+print("\n----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Affine Gap Model) (Custom Subst. Matrix 1) (NWMatrix+etc)\n")
+
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW On Generated Data(Adamson-600dna, Eve-600dna)...\n")
+
+# forcing the garbade collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+maxTime = 0
+minTime = 0xffff
+
+while i < numberOfTimes
+
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(
+  chars(
+    "TTGCGCGCGCGCGCGCGCGCGCGCGCAGGGTGGCCTTAGCACAACAACAACAACAACAACAGAGACGCCGCGATTTAGCACACACACACACACAACCCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCACGAACAGCTACGCTACCGGGGCCCCGAACTCCCCTAAACAAAAGTCAAAAGTGTGTCGAGTGCCACCTGTCAACGTAAGTCCACATTTTAGCAGCGGCTCCTCAATATCGGCATTTTCATAAAGCAATTACGAAAGCGCTGTTCCAGGAGCGAAACCCAATACTTCCTGAAGCCTAAGAGTTACATCTATGTTTTTGTCAACCGGCCAGGGTTAACGCACTCCATATGCTCGTATAGAACGCCGTCTGATGACGAACTCTTTATGGATAAAACTTAAGCAATCACAAGTCTTGCTGCATCGCCCTAAGACCCTAGAGGGGAGGCTGATAGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGACTACTACTACTACTACTACTACTACTACTACTACTACTACTACTATCT"
+  ),
+  chars(
+    "TCTTTTGGGTCTACGTTGTCCGAGTGCGCGTATATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTATTACCTGTCTGCTATTAACTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTGGTCTAGGGGGTGTTCTCCCGGGGGTGGTTGAGCTGTCACGTGTCCACCGAGGAGCCGGGTATGGATCTAAGAAGAAGAAGAAGAAGAAATGATGTACGAGTCGTTTTCGAAACGTGATTGGCACGTCGATTGTCTGTAAACTCGGTAGCTCAAGCACTGTAGTAGTAGTAGTAGTAGTAGTAGTAGTAGTAATAGTCTGTATTGAACTCGTCTATATATATATATATATAGTCTAAGCCCTGGAGCGCCGCGGCCTGCATGGCGATCAATTTTACATGTTTAGTCTCTCTCTCTCTCTCTCTCTCTCAAAGATGTAAGACGCGACATACAGGCAATACACGAGTGAGAGAAGCGACTAGGTAGAGGATAGACTCCAC"
+  ))
+
+runNeedlemanWunsch(theNaiveNWSystem, AffineGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+maxTime = max(maxTime,time_elapsed_ns)
+minTime = min(minTime,time_elapsed_ns)
+
+sumOfTimes += time_elapsed_ns
+
+i += 1
+
+end
+
+println("\nResults For Pairwise Alignment On Generated Data (Adamson-600dna vs. Eve-600dna) With CustomMatrix1")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  Highest Time: $(maxTime/1000000)")
+println("  Lowest Time: $(minTime/1000000)")
+println("  Avg Alignment Time Without Highest: $(((sumOfTimes - maxTime)/1000000)/(numberOfTimes-1))")
+println("  Avg Alignment Time Without Highest + Lowest: $(((sumOfTimes - maxTime - minTime)/1000000)/(numberOfTimes-2))")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+println("\nNumber of cells backtracked: $(alignmentResults[3][1])")
+println("Number of ties:              $(alignmentResults[3][2])")
+println("Percentage tie:              $(alignmentResults[3][3])%")
+
+alignmentStats = getAlignmentStats(alignmentResults[1], alignmentResults[2])
+
+println("Alignment Stats (#of matches, #of substs, #of indels) = $alignmentStats")
+
+
+
+print("\n----------------------------------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Affine Gap Model) (Custom Subst. Matrix 1) (NWMatrix+etc)\n")
+
+println("\n----------------------------------------------------------------------------------")
+println("Running Naive NW On Generated Data(Adamson-600dna, Eve-600dna)...\n")
+
+# forcing the garbade collector to run
+gc()
+
+sumOfTimes = 0
+i = 0
+maxTime = 0
+minTime = 0xffff
+
+while i < numberOfTimes
+
+time_start = time_ns()
+
+theNaiveNWSystem = createNaiveNWSystem(
+  chars(
+    "TTGCGCGCGCGCGCGCGCGCGCGCGCAGGGTGGCCTTAGCACAACAACAACAACAACAACAGAGACGCCGCGATTTAGCACACACACACACACAACCCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCACGAACAGCTACGCTACCGGGGCCCCGAACTCCCCTAAACAAAAGTCAAAAGTGTGTCGAGTGCCACCTGTCAACGTAAGTCCACATTTTAGCAGCGGCTCCTCAATATCGGCATTTTCATAAAGCAATTACGAAAGCGCTGTTCCAGGAGCGAAACCCAATACTTCCTGAAGCCTAAGAGTTACATCTATGTTTTTGTCAACCGGCCAGGGTTAACGCACTCCATATGCTCGTATAGAACGCCGTCTGATGACGAACTCTTTATGGATAAAACTTAAGCAATCACAAGTCTTGCTGCATCGCCCTAAGACCCTAGAGGGGAGGCTGATAGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGGCGACTACTACTACTACTACTACTACTACTACTACTACTACTACTACTATCT"
+  ),
+  chars(
+    "TTGCGCGCGCGCGCGCGCGCGCGCGCAGGGTGGCCTTAGCACAACAACAACAACAACAGATTTAGCACATTTTTTTTTTTTTTTTCACACACACACAACCCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCACGAACAGCTACGCTTTTTAGCAGCGGCTCCTCAATATCGGCATTTTCATAAAGCAATTACGAAAGCGCTGTTCCAGGAGCGAAACCCAATACTTCCTGAAGCCTAAGAGTTACATCTATGTTTTTGTCAACCGGCCAGGGTTAACGCACTCCATATGCTCGTATAGAACGCCGTCTGATGACGAACTCTTTATGGATAAAACTTAAGCAATCACAAGTCTTGCTGCATCGCCCTAAGACCCTAGAGGGGAGGCTGATAGCGGCGGCGGCGGCGGCGGCGGGGCGGCGGGCGGCGCCTACTACTACTATCTGGCGGCGGCGGCGGCGGCGGCGACTACTACTACTACTACTACTACTACTACTACTA"
+  ))
+
+runNeedlemanWunsch(theNaiveNWSystem, AffineGapModel())
+alignmentResults = putTogetherConsensusString(theNaiveNWSystem)
+
+time_end = time_ns()
+time_elapsed_ns = time_end - time_start
+
+maxTime = max(maxTime,time_elapsed_ns)
+minTime = min(minTime,time_elapsed_ns)
+
+sumOfTimes += time_elapsed_ns
+
+i += 1
+
+end
+
+println("\nResults For Pairwise Alignment On Generated Data (Adamson-600dna vs. Eve-600dna) With CustomMatrix1")
+println("  Avg Alignment Time: $((sumOfTimes/1000000)/numberOfTimes) milliseconds")
+println("  Highest Time: $(maxTime/1000000)")
+println("  Lowest Time: $(minTime/1000000)")
+println("  Avg Alignment Time Without Highest: $(((sumOfTimes - maxTime)/1000000)/(numberOfTimes-1))")
+println("  Avg Alignment Time Without Highest + Lowest: $(((sumOfTimes - maxTime - minTime)/1000000)/(numberOfTimes-2))")
+println("  DNA Alignment:\n\t$(alignmentResults[1])\n\t$(alignmentResults[2])")
+
+println("\nNumber of cells backtracked: $(alignmentResults[3][1])")
+println("Number of ties:              $(alignmentResults[3][2])")
+println("Percentage tie:              $(alignmentResults[3][3])%")
+
+alignmentStats = getAlignmentStats(alignmentResults[1], alignmentResults[2])
+
+println("Alignment Stats (#of matches, #of substs, #of indels) = $alignmentStats")
+
+
+
+
+testDefaultScoring()
+
+# testRecognitionStackDataMap()

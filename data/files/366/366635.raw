@@ -1,0 +1,14 @@
+using DataFrames
+
+data = readtable("../data/training.csv")
+
+N = size(data,1)
+M = ceil(0.7*N)
+rind = randperm(N)
+trainind = rind[1:M]
+testind = rind[M+1:end]
+
+trainx = data[trainind,1:47]
+trainy = data[trainind,:signal]
+testx = data[testind,1:47]
+testy = data[testind,:signal]

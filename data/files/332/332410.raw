@@ -1,0 +1,21 @@
+
+
+num_inputs = convert(Int32, 2)
+num_hidden = convert(Int32, 4)
+num_outputs = convert(Int32, 2)
+
+layer_1_weights = rand(convert(Float32, 0):convert(Float32, 0.1):convert(Float32, 1), num_inputs * num_hidden)
+layer_2_weights = rand(convert(Float32, 0):convert(Float32, 0.1):convert(Float32, 1), num_outputs * num_hidden)
+inputs = rand(convert(Float32, 0):convert(Float32, 0.1):convert(Float32, 1), num_inputs)
+hidden_activations = zeros(Float32, num_hidden)
+outputs = zeros(Float32, num_outputs)
+
+for i = 1:1000000
+Libdl.dlopen("/home/david/TehzCodes/GRNEvolution/librobosim")
+ccall((:run_network, "/home/david/TehzCodes/GRNEvolution/librobosim"), Void,
+      (Int32, Int32, Int32, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Int32),
+      num_inputs, num_hidden, num_outputs, layer_1_weights, layer_2_weights, inputs, hidden_activations, outputs, convert(Int32, 1))
+end
+
+println(outputs)
+

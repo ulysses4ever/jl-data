@@ -1,0 +1,70 @@
+#=
+Various numerical experiments vaguely related to reproducing kernel Hilbert spaces.
+=#
+
+"""  grammian{T<:Real}(x::Array{T,2}, K::Function)
+
+Given a dxn array, x, of d-dimensional points, and a function K(x,i,j), returns the Grammian, an nxn symmetric matrix whose i,jth entry is K(x,i,j) where j >= i. K(x,i,j) represents the kernel of a reproducing kernel Hilbert space and may be interpreted as the correlation between values of a Gaussian random field at points x[:,i] and x[:,j].
+
+"""
+function grammian{T<:Real}(x::Array{T,2}, K::Function)
+    d,n = size(x)
+    gram = zeros(T,n,n)
+    for i in 1:n
+        gram[i,i] = K(x,i,i)
+        for j in (i+1):n
+            gram[j,i]=gram[i,j]=K(x,i,j)
+        end
+    end
+    return gram
+end
+
+""" solak{T}(gamma::Array{T,1}, alpha::Float64, nu::Float64)
+
+Returns a closure with function signature,
+
+    function K{U<:Real}(x::Array{U,2}, i::Int, j::Int),
+
+and containing gamma, alpha, and nu, where K(x,i,j) evaluates the kernel given in the reference at x[:,i] and x[:,j]. The first dimension of x must match that of gamma. 
+
+Reference: Solak et. al., Derivative observations in Gaussian Process Models of Dynamic Systems. [link](http://eprints.gla.ac.uk/3119/) [ungated pdf](http://eprints.gla.ac.uk/3119/01/derivative.pdf)
+"""
+function solak{T<:Real}(gamma::Array{T,1}, alpha::Float64, nu::Float64)
+    d = size(gamma,1)
+    name = :solak
+    function K{U<:Real}(x::Array{U,2}, i::Int, j::Int)
+        size(x,1)== d || error("x and gamma must have same number of rows")
+        if i==j
+            return nu + alpha
+        else
+            return alpha*exp(-.5*sum((gamma.*(x[:,i]-x[:,j])).^2))
+        end
+    end
+end
+
+#= The following kernels are taken from Genton, Classes of Kernels for Machine Learning: A Statistics Perspective, Journal of Machine Learning Research 2 (2001) 299-312
+=#
+
+""" circular(theta::Float64)
+
+Returns a closure with signature K{U<:Real}(x::Array{U,2}, i::Int, j::Int) representing the circular kernel with parameter theta. The circular kernel is appropriate for a 2 dimensional field only.
+
+"""
+function circular(theta::Float64)
+    theta > 0 || error("theta must be positive")
+    name = :circular
+    thetasq = theta^2
+    topi = 2/pi
+    function K{U<:Real}(x::Array{U,2}, i::Int, j::Int)
+        size(x,1) == 2 || error("size(x,1) must be 2 for the circular kernel to apply")
+        if i==j return 1.0 end
+        dsq = sum((x[:,i]-x[:,j]).^2)
+        if dsq > thetasq return 0.0 end
+        ysq = dsq/thetasq
+        y = sqrt(ysq)
+        return topi*(acos(y) + y*sqrt(1-ysq))
+    end
+end
+
+    
+

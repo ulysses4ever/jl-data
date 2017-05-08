@@ -1,0 +1,84 @@
+using CUTEst
+using DCI
+
+if length(ARGS) == 0
+  println("Need CUTEst problem as argument")
+  exit(1)
+end
+
+curdir = pwd();
+tmpdir = mktempdir();
+cd(tmpdir)
+
+nlp = CUTEstModel(convert(ASCIIString,ARGS[1]))
+
+if nlp.meta.ncon == 0
+  println("Problem is unconstrained, EXITING")
+  exit(1)
+end
+
+f(x) = obj(nlp, x)
+
+function g!(x::Vector, g::Vector)
+  st = Int32[0]
+  fx = [0.0]
+  CUTEst.cofg(st, Int32[nlp.meta.nvar], x, fx, g, Int32[1], nlp.libname)
+end
+
+function H!(x::Vector, y::Vector, H::Matrix)
+  n = length(x)
+  for i = 1:n
+    for j = 1:n
+      H[i,j] = 0.0
+    end
+  end
+  st = Int32[0]
+  nnzh = Int32[0]
+  Hval = Array(Cdouble, nlp.meta.nnzh)
+  Hrow = Array(Cint, nlp.meta.nnzh)
+  Hcol = Array(Cint, nlp.meta.nnzh)
+  CUTEst.csh(st, Int32[nlp.meta.nvar], Int32[nlp.meta.ncon], x, y, nnzh,
+      Int32[nlp.meta.nnzh], Hval, Hrow, Hcol, nlp.libname)
+  for k = 1:nnzh[1]
+    i = Hrow[k]
+    j = Hcol[k]
+    H[i,j] = Hval[k]
+    if i != j
+      H[j,i] = Hval[k]
+    end
+  end
+end
+
+function h!(x::Vector, h::Vector)
+  st = Int32[0]
+  nnzj = Int32[0]
+  CUTEst.ccfsg(st, Int32[nlp.meta.nvar], Int32[nlp.meta.ncon], x, h, nnzj,
+      Int32[nlp.meta.nnzj], [0.0], Int32[0], Int32[0], Int32[0], nlp.libname)
+end
+
+function J!(x::Vector, J::Matrix)
+  st = Int32[0]
+  nnzj = Int32[0]
+  h = Array(Cdouble, nlp.meta.ncon)
+  jval = Array(Cdouble, nlp.meta.nnzj)
+  jvar = Array(Cint, nlp.meta.nnzj)
+  jfun = Array(Cint, nlp.meta.nnzj)
+  CUTEst.ccfsg(st, Int32[nlp.meta.nvar], Int32[nlp.meta.ncon], x, h, nnzj,
+      Int32[nlp.meta.nnzj], jval, jvar, jfun, Int32[1], nlp.libname)
+  for i = 1:nlp.meta.ncon
+    for j = 1:nlp.meta.nvar
+      J[i,j] = 0.0
+    end
+  end
+  for k = 1:nnzj[1]
+    J[jfun[k],jvar[k]] = jval[k]
+  end
+end
+
+println("Ok")
+@time (x,k) = DCI.solve(nlp.meta, f, g!, H!, h!, J!, nlp.meta.x0, verbose=true)
+
+println("x = ", x)
+println("k = ", k)
+
+cd(curdir)

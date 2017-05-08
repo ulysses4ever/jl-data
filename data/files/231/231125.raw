@@ -1,0 +1,20 @@
+module MethylClust
+
+using PyPlot, LowRankModels, Distributions
+import Colors: convert, HSL, RGB
+
+if VERSION < v"0.4.0-dev"
+    using Docile
+end
+
+export generate_reads, draw_reads_allc,
+	   plot_meth, fit_soft, fit_hard,
+       eval_synthetic_results
+
+include("plots.jl")
+include("synthetic_data.jl")
+include("fit.jl")
+include("makefigs.jl")
+include("file_io.jl")
+
+end

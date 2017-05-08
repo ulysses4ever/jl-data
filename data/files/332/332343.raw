@@ -1,0 +1,84 @@
+module DCI
+
+using NLP
+using TrustNLS
+using QuadProg
+
+const phi1 = 0.5
+
+function solve (nlp::NLPModelMeta, f::Function, g!::Function, W!::Function, c!::Function,
+    J!::Function, x0::Vector)
+
+  if nlp.ncon == 0
+    error("DCI currently only works with constrained problems")
+  end
+  x = copy(x0)
+  xc = copy(x)
+
+  normgp = 1.0;
+  normc = 1.0;
+  rhomax = 1.0;
+  Delta = 100;
+  c = zeros(nlp.ncon)
+  g = zeros(nlp.nvar)
+  W = zeros(nlp.nvar, nlp.nvar)
+  J = zeros(nlp.ncon, nlp.nvar)
+  y = zeros(nlp.ncon)
+  c!(xc, c)
+  normc = norm(c);
+  Lref = Inf
+  DLH = Inf
+  DLV = 0.0
+  Ln = f(xc)
+  
+  while normgp >= 1e-6 || normc >= 1e-6
+    # Normal step
+    rho = min(phi1*rhomax*normgp, 0.75*rhomax)
+    xc = copy(x)
+    while normc > rho
+      (xc,k,c,J) = TrustNLS.solve(nlp.ncon, c!, J!, xc; normheps = rho)
+      g!(xc, g);
+      y = -J'\g
+      gp = g + J'*y;
+      normgp = norm(gp)
+      rho = min(phi1*rhomax*normgp, 0.75*rhomax)
+      normc = norm(c);
+    end
+
+    # Update rhomax
+    Lc = f(xc) + dot(y,c);
+    DLV = Lc - Ln;
+
+    if DLV >= 0.5*(Lref - Ln)
+      rhomax /= 2.0;
+    end
+    if DLV > -0.5*DLH
+      Lref = Lc;
+    end
+
+    # Tangent step
+    if normgp < 1e-6 && normc < 1e-6
+      break
+    end
+    (Q,R) = qr(J', thin=false)
+    Z = Q[:,nlp.ncon+1:nlp.nvar]
+    normcplus = 2*rho+1
+    while normcplus > 2*rho || DLH > eta1*qd
+      d, qd, k = QuadProg.solve(W, gp, Z, Delta; null_matrix = true, ortho_null = true)
+      x = xc + d;
+      DLH = Ln - Lc;
+      c!(xplus, cplus)
+      normcplus = norm(cplus)
+      if normcplus > 2*rho || DLH > eta1*qd
+        Delta = 0.25*Delta
+      elseif DLH <= eta2*qd
+        Delta *= 1.5
+      end
+    end
+  end
+
+  return xc
+
+end
+
+end

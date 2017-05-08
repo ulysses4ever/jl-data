@@ -1,15 +1,18 @@
-HTTP/1.1 301 Moved Permanently
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:58:54 GMT
+Date: Wed, 03 May 2017 20:59:03 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 168
-Status: 301 Moved Permanently
+Content-Length: 7073
+Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3495
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4283
+X-RateLimit-Reset: 1493847972
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "92cacf7e83c680d149846e995d7e934a"
+Last-Modified: Sun, 11 Oct 2015 11:05:16 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
-X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo_deployment, write:repo_hook
-Location: https://api.github.com/repositories/68233469
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
@@ -18,12 +21,120 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-Vary: Accept-Encoding
-X-Served-By: e183f7c661b1bbc2c987b3c4dc7b04e0
-X-GitHub-Request-Id: E3B7:6634:13403F6:18E2259:5902315E
+X-GitHub-Request-Id: 4CBB:5C90:ABAAEE:DC9196:590A4497
 
 {
-  "message": "Moved Permanently",
-  "url": "https://api.github.com/repositories/68233469",
-  "documentation_url": "https://developer.github.com/v3/#http-redirects"
+  "id": 43571411,
+  "name": "TextPlots.jl",
+  "full_name": "JuliaPackageMirrors/TextPlots.jl",
+  "owner": {
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/JuliaPackageMirrors/TextPlots.jl",
+  "description": "Julia package mirror.",
+  "fork": false,
+  "url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPackageMirrors/TextPlots.jl/deployments",
+  "created_at": "2015-10-02T19:13:11Z",
+  "updated_at": "2015-10-11T11:05:16Z",
+  "pushed_at": "2015-10-11T14:22:34Z",
+  "git_url": "git://github.com/JuliaPackageMirrors/TextPlots.jl.git",
+  "ssh_url": "git@github.com:JuliaPackageMirrors/TextPlots.jl.git",
+  "clone_url": "https://github.com/JuliaPackageMirrors/TextPlots.jl.git",
+  "svn_url": "https://github.com/JuliaPackageMirrors/TextPlots.jl",
+  "homepage": "https://github.com/sunetos/TextPlots.jl",
+  "size": 312,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "organization": {
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

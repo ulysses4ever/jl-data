@@ -1,0 +1,35 @@
+module Sudoku
+
+import Base: show
+export SudokuBoard
+
+type SudokuBoard
+    puzzle::Matrix{Int}
+    solution::Matrix{Int}
+    possibility::Array{Int, 3}
+
+    function SudokuBoard(puzzle::Matrix{Int})
+        size(puzzle) == (9, 9) || error("Only 9×9 boards are supported")
+        new(copy(puzzle), copy(puzzle), zeros(Int, 9, 9, 9))
+    end
+end
+
+function SudokuBoard(puzzle::String)
+    puzzle = replace(replace(puzzle, "[^0-9.]", ""), ".", "0")
+    SudokuBoard(reshape([parseint(c) for c in puzzle], 9, 9)')
+end
+
+function _show(io::IO, board::Matrix{Int})
+    for i = 1:size(board, 1)
+        i in (4, 7) && println(io, join(["-"^7 for k=1:3], "+"))
+
+        row = board[i, :]
+        println(" "*replace(join([join(row[k:k+2], " ") for k=1:3:9], " | "), "0", ".")*" ")
+    end
+end
+
+function show(io::IO, sb::SudokuBoard)
+    _show(io, sb.solution)
+end
+
+end

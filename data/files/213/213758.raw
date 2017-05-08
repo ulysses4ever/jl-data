@@ -1,0 +1,64 @@
+# =============================================================================
+# basic_collection_samp.jl - julia basic collection handling sample
+# sample
+# Copyright(C). masaru.nakagawa 2017. All rights reserved.
+# =============================================================================
+using DataFrames
+using DataArrays
+using StatsBase
+using Distributions
+using ScikitLearn
+using DecisionTree
+using Regression
+using GLM
+using Clustering
+# using PyPlot
+using Gadfly
+using RDatasets
+
+cd(expanduser("~/Dropbox/julia/88_misc/"))
+
+
+f = open("test.csv")
+
+# res = Array{Any}[]
+res = []
+
+for line in eachline(f)
+    val = split(strip(line), ",")
+    push!(res, val)
+end
+
+print("--------BEFORE---------\n")
+print(res)
+print(res |> typeof)
+
+# Array{Any,N}[Any["mike","10"],Any["john","20"],Any["smith","30"],Any["まさる","400"]]
+
+# 4-element Array{Array{Any,N},1}:
+#  Any["mike","10"] 
+#  Any["john","20"] 
+#  Any["smith","30"]
+#  Any["まさる","400"] 
+
+## code from Jacob here !
+for elm in res
+    for (i, v) in enumerate(elm)
+        parsed = tryparse(Int, v)
+        elm[i] = isnull(parsed) ? v : get(parsed)
+    end
+end
+
+print("\n")
+print("--------AFTER---------\n")
+print(res)
+print(res |> typeof)
+
+# Array{Any,N}[Any["mike",10],Any["john",20],Any["smith",30],Any["まさる",400]]
+# 4-element Array{Array{Any,N},1}:
+#  Any["mike",10] 
+#  Any["john",20] 
+#  Any["smith",30]
+#  Any["まさる",400] 
+
+close(f)

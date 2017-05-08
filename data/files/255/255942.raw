@@ -1,0 +1,34 @@
+function daemonizeTheProcess()
+	## infinite loop for child process
+	i = 10
+	while ( i < 10) 
+		println ("counter = " , i)		
+		sleep(2)
+		i = i -1
+	end
+end
+
+function daemon()
+	cpid = ccall(:fork, Cint, ())
+	if cpid < 0
+		print (cpid)
+		println(": fork failed" )
+	elseif cpid > 0
+		print (cpid)
+		println(": fork success parent process" )
+		exit()
+	elseif cpid == 0
+		sid = ccall(:setsid, Cint, ())
+		if sid < 0
+			print (cpid)
+			println(": new session id failed for child process" )
+		else	
+		# child process is here		
+			daemonizeTheProcess()
+		end
+	else
+		print (cpid)
+		println(": unreachable code section" )	
+	end
+end
+

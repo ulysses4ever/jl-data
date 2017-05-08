@@ -1,0 +1,95 @@
+const SQLITE_OK = 0   # Successful result */
+const SQLITE_ERROR = 1   # SQL error or missing database */
+const SQLITE_INTERNAL = 2   # Internal logic error in SQLite */
+const SQLITE_PERM = 3   # Access permission denied */
+const SQLITE_ABORT = 4   # Callback routine requested an abort */
+const SQLITE_BUSY = 5   # The database file is locked */
+const SQLITE_LOCKED = 6   # A table in the database is locked */
+const SQLITE_NOMEM = 7   # A malloc() failed */
+const SQLITE_READONLY = 8   # Attempt to write a readonly database */
+const SQLITE_INTERRUPT = 9   # Operation terminated by sqlite3_interrupt()*/
+const SQLITE_IOERR = 10   # Some kind of disk I/O error occurred */
+const SQLITE_CORRUPT = 11   # The database disk image is malformed */
+const SQLITE_NOTFOUND = 12   # Unknown opcode in sqlite3_file_control() */
+const SQLITE_FULL = 13   # Insertion failed because database is full */
+const SQLITE_CANTOPEN = 14   # Unable to open the database file */
+const SQLITE_PROTOCOL = 15   # Database lock protocol error */
+const SQLITE_EMPTY = 16   # Database is empty */
+const SQLITE_SCHEMA = 17   # The database schema changed */
+const SQLITE_TOOBIG = 18   # String or BLOB exceeds size limit */
+const SQLITE_CONSTRAINT = 19   # Abort due to constraint violation */
+const SQLITE_MISMATCH = 20   # Data type mismatch */
+const SQLITE_MISUSE = 21   # Library used incorrectly */
+const SQLITE_NOLFS = 22   # Uses OS features not supported on host */
+const SQLITE_AUTH = 23   # Authorization denied */
+const SQLITE_FORMAT = 24   # Auxiliary database format error */
+const SQLITE_RANGE = 25   # 2nd parameter to sqlite3_bind out of range */
+const SQLITE_NOTADB = 26   # File opened that is not a database file */
+const SQLITE_ROW = 100  # sqlite3_step() has another row ready */
+const SQLITE_DONE = 101  # sqlite3_step() has finished executing */
+
+
+
+function sqlite3_open(filename::String)
+    sqldb_handle = Array(Ptr{Void},1)
+    result = ccall((:sqlite3_open, "libsqlite3"), Int32, (Ptr{Uint8}, Ptr{Ptr{Void}}), filename, sqldb_handle)
+    return result, sqldb_handle[1]
+end
+
+function sqlite3_close(sqldb::Ptr{Void})
+    result = ccall((:sqlite3_close, "libsqlite3"), Int32, (Ptr{Void},), sqldb)
+    return result
+end
+
+function sqlite3_prepare(sqldb_handle::Ptr{Void}, statement::String)
+    unused = Array(Ptr{Uint8}, 128)
+    stmt_handle = Array(Ptr{Void}, 1)
+    result = ccall((:sqlite3_prepare, "libsqlite3"), Int32, (Ptr{Void}, Ptr{Uint8}, Int32, Ptr{Ptr{Void}}, Ptr{Ptr{Uint8}}), sqldb_handle, statement, int(length(statement)), stmt_handle, unused)
+    return result, stmt_handle[1]
+end
+
+function sqlite3_finalize(stmt_handle::Ptr{Void})
+    ccall((:sqlite3_finalize, "libsqlite3"), Int, (Ptr{Void},), stmt_handle)
+end
+
+function sqlite3_step(stmt_handle::Ptr{Void})
+    result = ccall((:sqlite3_step, "libsqlite3"), Int32, (Ptr{Void},), stmt_handle)
+end
+
+function sqlite3_column_count(stmt_handle::Ptr{Void})
+    ccall((:sqlite3_column_count, "libsqlite3"), Int, (Ptr{Void},), stmt_handle)
+end
+
+
+function sqlite3_column_text(stmt_handle, col_num)
+    result = ccall((:sqlite3_column_text, "libsqlite3"), Ptr{Uint8}, (Ptr{Void}, Int), stmt_handle, col_num)
+    (result == C_NULL) ? "NULL" : bytestring(result) 
+end
+
+function sqlGetRow(stmt_handle)
+    result = Array(String, 0)
+    for i in 0:sqlite3_column_count(stmt_handle) - 1
+       push!(result, sqlite3_column_text(stmt_handle, i))
+    end
+    return result
+end
+
+function sqlCallback(param_one, columns, row_data, col_names)
+    println("called sqlCallback")
+    println("got ", columns, " columns.")
+    println("column names: ", bytestring(unsafe_ref(col_names)))
+    println("row data: ", bytestring(unsafe_ref(row_data)))
+    println(typeof(convert(Ptr{Int}, param_one)))
+    return 0
+end
+
+
+p_callback = cfunction(sqlCallback, Int, (Ptr{Void}, Int, Ptr{Ptr{Uint8}}, Ptr{Ptr{Uint8}}))
+
+function sqlite3_exec(db_handle, sql_string, callback, param_one, msg)
+    ccall((:sqlite3_exec, "libsqlite3"), Int32, (Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Void}, Ptr{Ptr{Uint8}}), db_handle, sql_string, callback, param_one, msg)
+end
+
+
+
+

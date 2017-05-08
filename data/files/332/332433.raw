@@ -1,0 +1,70 @@
+include("config.jl")
+include("genotype.jl")
+
+import Genotype
+import Config
+
+function evolve_local_search()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    start_genotype::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    genotypes::Array{Genotype.Type_Genotype, 1} = []
+    for i = 1:10000
+        push!(genotypes, Genotype.make_random_genotype(config_vals))
+    end
+    for genotype in genotypes
+        Genotype.copy_into(genotype, start_genotype)
+    end
+    
+    j = 1
+    for i = convert(Int32, 1):config_vals.num_generations
+        if i % 5 == 0
+            println("generation ", i)
+        end
+        for genotype in genotypes
+            Genotype.mutate(genotype, config_vals)
+            if j == 1
+                Genotype.evaluate(genotype, config_vals, config_vals.expression_1)
+            else
+                Genotype.evaluate(genotype, config_vals, config_vals.expression_2)
+            end
+            if genotype.fitness == 13.0
+                println("target switch ", j)
+                fitness_values::Array{Float64, 1} = []
+                temp = Genotype.make_random_genotype(config_vals)
+                for i = 1:500
+                    Genotype.copy_into(temp, genotype)
+                    Genotype.mutate(temp, config_vals)
+                    if j == 2
+                        Genotype.evaluate(temp, config_vals.expression_1, config_vals, dummy)
+                    else
+                        Genotype.evaluate(temp, config_vals.expression_2, config_vals, dummy)
+                    end
+                    push!(fitness_values, temp.fitness)
+                end
+                fitness_values = sort(fitness_values)
+                println("mutattions ", fitness_values)
+                if j == 1
+                    j = 2
+                else
+                    j = 1
+                end
+                for dead_genotype in genotypes
+                    Genotype.copy_into(dead_genotype, genotype)
+                end
+            end
+        end 
+    end
+end
+
+#=function evolve_random_walk()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    primary_goal::Array{Int32, 1} = 
+    
+    start_genotype::Genotype.Type_Genotype = Genotype.make_random_genotype(config_vals)
+    genotype_store::Array{Genotype.Type_Genotype, 1} = []
+    for i = 1:10000
+        push!(genotype_store, Genotype.make_random_genotype(config_vals))
+    end
+end=#
+
+evolve_local_search()

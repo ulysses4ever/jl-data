@@ -1,0 +1,9 @@
+function randInitializeWeights(L_in_size, L_out_size)
+  W = zeros(L_out_size, L_in_size + 1)
+
+  # a recommended way to determin epsilon given in the exercise notes was:
+  # e = sqrt(6)/sqrt(l_in + l_out)
+  epsilon = 0.12
+  W = rand(L_out_size, L_in_size + 1) * 2 * epsilon - epsilon
+end
+

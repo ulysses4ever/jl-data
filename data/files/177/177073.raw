@@ -1,0 +1,51 @@
+#extract_spectrograms.jl
+#This script takes audio recordings and dumps the corresponding spectrograms
+#into specpath, defined in the config file.
+#author: Timothy Evans
+#date: 30/01/15
+
+using DSP, WAV, Winston, DataFrames, Images
+using config, signalprocessing
+
+#=wavfile = "0.wav";
+path = string(wavpath,wavfile);
+rec, fs = wavread(path);
+frec = hpfilter(rec,fs);
+spec = spectrogram(frec[14000:18000],442);
+A = spec.power;
+imagesc(1000*A)
+=#
+
+#sort project directories
+if path_rel
+  projdir = pwd()[1:end-3]; #remove src directory
+  wavpath = string(projdir,wavdir)
+  specpath = string(projdir,specdir)
+end
+
+#= loop through the levels of recording directories. i.e. BSR01/140107/concat/
+ NOTE: this is as per the file structure received from Eric Watson with the
+ Ark in the Park. If structure is different the following nested loop needs to
+ be adapted. =#
+
+fss = Uint[]
+
+for recorder in readdir(wavpath)
+  recdatepath = string(wavpath,recorder,"/")
+  for day in readdir(recdatepath)
+    recpath = string(recdatepath,day,"/concat/")
+    for file in readdir(recpath)
+      filepath = string(recpath,file)
+      rec,fs = wavread(filepath)
+      frec = filterwav(rec,fs)
+      #spectrogram segments will be spaced as per defined speclength
+      segments = 1:fs*speclength:length(frec)
+      specname = string(recorder,"_",day,"_",file[1],"_")
+      dumpspectrograms(frec,segments,specpath,specname,specwidth)
+    end
+  end
+  push!(fss,fs)
+end
+
+recorderdata = DataFrame(recorders=readdir(wavpath),fsample=fss)
+writetable(string(specpath,"recorderdata.csv"),recorderdata)

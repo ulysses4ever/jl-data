@@ -1,0 +1,28 @@
+#=
+@author titus 
+=#
+using   Base.Test
+include("../Point.jl")
+using Point
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_2d_point"] = function test_pt()
+
+  p1  = Pt(4, 5)
+  p2  = Pt(4.0,5.0)
+  p3  = Pt((4, 5))
+  p4  = Pt([4, 5])
+  p5  = Pt([4.0, 2.5])
+  p6  = Pt(p5)
+  @test isequal(p1, p2) #true
+  @test isequal(p3, p4) #true
+  @test isequal(p1, p4) #true
+  @test !isequal(p1, p5) #false
+  @test isequal(p6, p5)  #true
+
+  @test isequal(p1-p5, Pt{Float64}(0.0,2.5))
+  @test isequal(p1+p5, Pt{Float64}(8.0,7.5))
+  @test isequal([1,1]+p1, Pt{Float64}(5.0,6.0))
+  @test isequal(p1+[1,1], Pt{Float64}(5.0,6.0))
+end

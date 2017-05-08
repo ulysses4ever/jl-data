@@ -1,0 +1,29 @@
+module TensorBase
+
+using Reexport
+
+# Einstein summation notation
+@reexport using Einsum
+
+# @tensor macro
+import TensorOperations
+export @tensor
+
+# representations of Decompositions
+include("decompositions.jl")
+export CPDecomp,
+       compose
+
+# miscellaneous useful functions
+include("operations.jl")
+export unfold,
+       unfold_idx,
+       krprod,
+       tensordot
+
+# TODO: eventually migrate to new package?
+# TODO: sync with generative models from learnbase?
+include("generate_data.jl")
+export CPDecompModel
+
+end # module

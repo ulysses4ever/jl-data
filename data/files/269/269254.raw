@@ -1,0 +1,76 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function generate()
+
+    NUM_GENOTYPES = 200000000
+    NUM_MUTANTS = 10000
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    population = Population.make_population(config_vals)
+    genotype = Genotype.make_random_genotype(config_vals)
+
+    for i = 1:NUM_GENOTYPES
+
+        f1_frequencies = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        f2_frequencies = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        genotype = Genotype.make_random_genotype(config_vals)
+        Genotype.evaluate(genotype, config_vals, 1, population.preallocation)
+        f1 = genotype.fitness
+        genotype.evaluated = false
+        Genotype.evaluate(genotype, config_vals, 2, population.preallocation)
+        f2 = genotype.fitness
+        if f1 >= 12.0
+            dummy_genotype = Genotype.make_random_genotype(config_vals)
+            for i = 1:NUM_MUTANTS
+                Genotype.copy_into(dummy_genotype, genotype)
+                Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+                Genotype.evaluate(dummy_genotype, config_vals, 1, population.preallocation)
+                f1 = dummy_genotype.fitness
+                dummy_genotype.evaluated = false
+                Genotype.evaluate(dummy_genotype, config_vals, 2, population.preallocation)
+                f2 = dummy_genotype.fitness
+                #println(f1, f2)
+                if f1 >= 13.0
+                    f1_frequencies[round(Int, f1 - 12)] += 1
+                end
+                if f2 >= 13.0
+                    f2_frequencies[round(Int, f2 - 12)] += 1
+                end
+                #=max = f1
+                if f2 > f1
+                max = f2
+                end
+                path_num = 1
+                if max >= 13.0
+                while isfile(string("random_genotypes_supporting_info/", path_num))
+                path_num = rand(1:100000)
+                end
+                file = open(string("random_genotypes_supporting_info/", path_num), "w")
+                write(file, string(f1), "\n")
+                write(file, string(f2), "\n")
+                close(file)
+                Genotype.write_to_graphml(genotype, config_vals, string("random_genotypes_graphml/", path_num, ".graphml"))
+                Genotype.write_for_scikit(genotype, config_vals, string("random_genotypes_scikit/", path_num))
+                end=#
+            end
+            if (maximum(f1_frequencies) > 0) || (maximum(f2_frequencies) > 0)
+                println(f1_frequencies)
+                println(f2_frequencies)
+                println()
+            end
+        end
+    end
+end
+
+generate()

@@ -1,0 +1,21 @@
+function p_correlation(x,y)
+        @assert(length(x) == length(y))
+        n = length(x)
+        @assert(n>0)
+        avg_x = mean(x)
+        avg_y = mean(y)
+        prod_diff = 0
+        xdiff2 = 0
+        ydiff2 = 0
+        for id = 1:n
+                xdiff = x[id] - avg_x
+                ydiff = y[id] - avg_y
+                prod_diff += xdiff*ydiff
+                xdiff2 += xdiff^2
+                ydiff2 += ydiff^2
+        end
+return prod_diff/sqrt(xdiff2*ydiff2)
+end
+
+
+#println(p_correlation([1,2,3], [1,5,7]))

@@ -1,0 +1,33 @@
+#based on Haskell/Scala implementation of Cons/List
+abstract List{T}
+
+type Nil{T} <: List{T}
+end
+
+type Cons{T} <: List{T}
+  head::T
+  tail::List{T}
+end
+
+#constructors
+cons{T}(h::T, t::List{T}) = Cons{T}(h, t)
+cons{T}(h::T) = Cons{T}(h, Nil{T}())
+nil(t::Type) = Nil{t}()
+nil() = nil(Any)
+
+#interface
+head(l::List) = l.head
+tail(l::List) = l.tail
+push(l::List, ele) = cons(ele, l)
+
+#functional
+function map(f::Function, n::Nil)
+  n
+end
+
+#for now, f cannot change the type of list
+function map(f::Function, l::Cons)
+  cons(f(l.head), map(f, l.tail))
+end
+
+#TODO: implement flatmap, reverse, filter, blablabla

@@ -1,0 +1,5 @@
+function Run()
+	n = string(BigInt(2)^1000)
+	return sum([int(n[i])-48 for i in 1:length(n)])
+end
+

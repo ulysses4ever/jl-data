@@ -1,0 +1,250 @@
+#!/usr/bin/env julia
+module Docker
+export Machine, activate!, command, build_image, dockerfile, remove!, image
+
+import Base: run
+const program = "docker-machine"
+
+type Machine
+  name::String
+  exists::Bool
+end
+
+const default_image = "ubuntu:14.04"
+type ActiveMachine
+  config::String
+  image::String
+  volumes::Dict{String, String}
+  interactive::Bool
+  rm::Bool
+  dockerfile::String
+  tag::String
+  workdir::String
+  name::String
+  user::String
+  env::Dict
+
+  function ActiveMachine(config::String,
+    image::String=default_image, volumes::Dict{String, String}=Dict{String, String}(),
+    interactive::Bool=false, rm::Bool=true, dockerfile::String="Dockerfile", tag::String="",
+    workdir::String="", name::String="", user::String="", env::Dict=Dict{String, String}();
+    kwargs...)
+    result = new(config, image, volumes, interactive, rm, dockerfile, tag, workdir, name, user, env)
+    for (key, value) in kwargs
+      if key == :volume
+        result.volumes[value[1]] = value[2]
+      elseif key in names(result)
+        setfield!(result, key, value)
+      else
+        error("Unexpected field ", key, "=", value)
+      end
+    end
+    result
+  end
+end
+function ActiveMachine(m::ActiveMachine; kwargs...)
+    args = [getfield(m, n) for n in names(m)]
+    ActiveMachine(args...; kwargs...)
+end
+
+
+function Machine(name; vm="virtualbox", create=true, start=true)
+  result = Machine(name, false)
+  result.exists = exists(result)
+  if create && !result.exists
+    run(`$program create -d $vm $name`)
+  elseif start
+    run(`$program start $name`)
+  end
+  result
+end
+
+
+export Machine, exists, startoff
+
+function exists(machine::Machine)
+    open(`$program ls`) do stdout
+      readline(stdout)
+      for line in readlines(stdout)
+        if split(chomp(line))[1] == machine.name return true end
+      end
+      false
+    end
+end
+
+function startoff(machine::Machine; vm="virtualbox")
+  if machine.exists
+    run(`$program start $(machine.name)`)
+  else
+    run(`$program create -d $vm $(machine.name)`)
+    machine.exists = true
+  end
+  activate(machine)
+end
+
+activate(machine::Machine) = run(`$program active $(machine.name)`)
+function activate!(func::Function, machine::Machine, image::String=default_image;
+    delete=false, halt=false, kwargs...)
+  startoff(machine)
+  active = ActiveMachine(config(machine), image; kwargs...)
+  result = func(active)
+  if delete
+    remove!(machine)
+  end
+  if halt
+    run(`$program stop $(machine.name)`)
+  end
+  result
+end
+
+function config(machine::Machine)
+  if !machine.exists
+    error("machine does not exist")
+  end
+  activate(machine)
+  readchomp(`$program config $(machine.name)`)
+end
+
+function command(config::String, image::String=default_image, args::String="";
+        volumes::Dict{String, String}=Dict{String, String}(),
+        interactive=false, rm=true, name::String="", workdir::String="",
+        env::Dict=Dict{String, String}(), kwargs...)
+
+  volargs = ""
+  for (host, container) in volumes
+    volargs *= "-v $(chomp(abspath(host))):$(chomp(container)):rw "
+  end
+  intargs = if interactive "-i" else "" end
+  rmargs = if rm "--rm=true" else "" end
+  nmargs = if length(name) > 0 "--name=\"$(name)\"" else "" end
+  wkd = if length(workdir) > 0 "--workdir=\"$(workdir)\"" else "" end
+  envs = join(["-e $(string(k))=\"$(string(v))\"" for (k, v) in env], " ")
+  docker(config, "run", "$rmargs $envs $volargs $intargs $nmargs $wkd $image $args")
+end
+
+function command(machine::ActiveMachine, args::String=""; kwargs...)
+  active = ActiveMachine(machine; kwargs...)
+  filter!(kwargs) do kv
+    !(kv[1] in names(machine) || kv[1] == :volume)
+  end
+  command(active.config, active.image, args; volumes=active.volumes, interactive=active.interactive,
+    rm=active.rm, name=active.name, workdir=active.workdir, env=active.env, kwargs...)
+end
+
+function command(func::Function, machine::ActiveMachine, stdio=DevNull, program::String="/bin/bash";
+    kwargs...)
+  command(machine, program; interactive=true, kwargs...), func, stdio
+end
+function run(tuple::(Cmd, Function, Any))
+    open(tuple[1], "w", tuple[3]) do stream
+        write(stream, tuple[2]())
+    end
+end
+function run(cmds::Vector)
+  for cmd in cmds
+    run(cmd)
+  end
+end
+
+function docker(config::String, command::String, args::String="")
+    `docker $(split(config)) $command $(split(args))`
+end
+function docker(machine::ActiveMachine, command::String, args::String="")
+  docker(active.config, command, args)
+end
+
+function build_image(config::String, path::String="", args::String="";
+    tag::String=default_image, rm=true, dockerfile::String="Dockerfile",
+    kwargs...)
+
+  rmargs = if rm "--rm=true" else "" end
+  tag = if length(tag) > 0 && tag != default_image "--tag=\"$tag\"" else "" end
+  if length(dockerfile) > 0 && dockerfile != "Dockerfile"
+    dockerfile = "--file=\"$dockerfile\"" 
+  else
+    dockerfile = ""
+  end
+  if length(path) > 0 && ispath(path) && isfile(path) && length(dockerfile) == 0
+    dockerfile = "--file=\"$(path)\""
+    path = dirname(path)
+  end
+  argpath = if length(path) > 0 path else "" end
+
+  docker(config, "build", "$rmargs $dockerfile $tag $argpath $args")
+end
+
+function build_image(machine::ActiveMachine, path::String="", args::String=""; kwargs...)
+  active = ActiveMachine(machine; kwargs...)
+  filter!(kwargs) do kv
+    !(kv[1] in names(machine) || kv[1] == :volume)
+  end
+  build_image(active.config, path, args; interactive=active.interactive,
+    rm=active.rm, dockerfile=active.dockerfile, tag=active.tag, kwargs...)
+end
+
+function remove!(machine::Machine)
+  if machine.exists
+    run(`$program rm $(machine.name)`)
+    machine.exists = false
+  end
+end
+
+function dockerfile(machine::ActiveMachine, packages=[], pips=[], args=[]; kwargs...)
+    macho = ActiveMachine(machine; kwargs...)
+    if macho.user == "@you"
+        user_name = `whoami` |> readchomp
+    else
+        user_name = macho.user
+    end
+    result = "FROM $(macho.image)\n" * "RUN apt-get update\n"
+    if length(packages) > 0
+        result = result *"RUN apt-get install -y $(join(packages, " "))\n"
+    end
+    if length(pips) > 0
+        result = result * "RUN pip install $(join(pips, " "))\n"
+    end
+    if macho.user == "@you"
+        user_id = `id -u $user_name` |> readchomp |> int
+        result *= "RUN adduser --system --no-create-home --uid $user_id $user_name\n"
+    elseif length(user_name) > 0
+        result *= "RUN adduser --system --no-create-home $user_name\n"
+    end
+    if length(macho.volumes) > 0
+        volumes = join([chomp(u[2]) for u in macho.volumes], " ")
+        result *= "RUN mkdir -p $volumes \n"
+        if length(user_name) > 0
+            result *= "RUN chown $(user_name) $volumes\n"
+        end
+        result *= "VOLUME $volumes\n"
+    end
+    if length(macho.env) > 0
+      result *= "ENV " * join(["$(string(k))=\"$(string(v))\"" for (k, v) in macho.env], " ")
+      result *= "\n"
+    end
+    if length(user_name) > 0
+        result *= "USER $user_name\n"
+    end
+    if length(args) > 0
+        result = result * join(["RUN $(chomp(u))" for u in args], "\n")
+    end
+    if length(macho.workdir) > 0
+        result *= "WORKDIR $(macho.workdir)\n"
+    end
+    result
+end
+function dockerfile(filename::String, machine::ActiveMachine, args...; kwargs...)
+   open(abspath(filename), "w") do input
+     write(input, dockerfile(machine, args...; kwargs...))
+   end
+end
+
+function image(machine::Docker.ActiveMachine, tag::String, args...;
+    dockerdir::String="Dockerfile", kwargs...)
+  ispath(dockerdir) || mkdir(dockerdir)
+  isdir(dockerdir) || error(dockerdir, " already exists and is not a directory")
+  const filename = joinpath(dockerdir, tag)
+  dockerfile(filename, machine, args...; kwargs...)
+  build_image(machine, filename; tag=tag, kwargs...)
+end
+
+end

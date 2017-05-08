@@ -1,0 +1,22 @@
+###
+### contextwindow.jl
+###
+
+
+function context_window(ts::Array, i::Int, n::Int; null_value=nothing)
+    ctx = Array(Union(typeof(ts[1]), typeof(null_value)), n*2)
+    len = length(ctx)
+    idx_limit = length(ts)
+    for j = 1:len
+        idx = i - n - 1 + j
+        if idx >= i
+            idx += 1
+        end
+        if idx > 0 && idx <= idx_limit
+            ctx[j] = ts[idx]
+        else
+            ctx[j] = null_value
+        end
+    end
+    return ctx
+end

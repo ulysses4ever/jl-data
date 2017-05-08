@@ -1,0 +1,519 @@
+#
+# LNNA: Living Neural Network Analyzer 
+# Copyright (C) 2015  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Distances, Logging
+
+@Logging.configure(level=DEBUG)
+
+function get_H_entry(s::Int64,t::Int64,alphas::Array{Float64,1},betas::Array{Float64,2},gammas::Array{Float64,2})
+	n = length(alphas)
+	s_digits = digits(s,2,n)
+	t_digits = digits(t,2,n)
+
+	q = float64(0)
+	# @debug(s,":",t)
+
+	for i in 1:n
+		q += alphas[i]*t_digits[i]
+	end
+	for i in 1:n
+		for j in 1:n
+			q += betas[i,j]*t_digits[i]*t_digits[j]
+			q += gammas[i,j]*s_digits[i]*t_digits[j]
+		end
+	end
+
+	return exp(q)
+end
+
+# initialize matrix H
+#
+# alphas: lagrange multipliers associated to firing rate of individual neurons
+# betas: lagrange multipliers associated to instaneous pairwise correlations
+# gammas: lagrange multipliers associated to one time step pairwise correlations
+function init_H(n::Int64,alpha_min::Float64,alpha_max::Float64,beta_min::Float64,beta_max::Float64,gamma_min::Float64,gamma_max::Float64)
+	# inititalize alpha array (random vector)
+	alphas = rand(n)
+	alphas = float64([alphas[i]*(alpha_max-alpha_min)+alpha_min for i in 1:n])
+
+	# initialize matrix betas (upper triangular random matrix with 0's in the diagonal)
+	betas = zeros(Float64,n,n)
+	for i in 1:n
+		for j in 1:n
+			if j>i
+				betas[i,j] = rand()*(beta_max-beta_min)+beta_min
+			end
+		end
+	end
+	
+	# initialize matrix gammas (square random matrix with 0's in the diagonal)
+	gammas = zeros(Float64,n,n)
+	for i in 1:n
+		for j in 1:n
+			if j != i
+				gammas[i,j] = rand()*(gamma_max-gamma_min)+gamma_min
+			end
+		end
+	end
+
+	# initialize matrix H
+	H = zeros(2^n,2^n)
+
+	for x in 1:2^n
+		for y in 1:2^n
+			H[x,y] = get_H_entry(x-1,y-1,alphas,betas,gammas)
+		end
+	end
+
+	return alphas,betas,gammas,H
+end
+
+function get_principal_eigenvector(H)
+	 F = eigfact(H)
+	 return F.values[1],F.vectors[:,1]
+end
+
+function normalize_H(H,lambda,R)
+	N = size(H)[1]
+	for x in 1:N
+		for y in 1:N
+			H[x,y] = (H[x,y]*R[y])/(R[x]*lambda)
+		end
+	end
+end
+
+function get_stationary_distribution(L,R)
+	N = length(L)
+	dp = dot(L,R)
+	return float64([(L[i]*R[i])/dp for i in 1:N])
+end
+
+function get_entropy(P,p)
+	N = size(P)[1]
+	Ep = 0.
+	for x in 1:N
+		for y in 1:N
+			nt = p[x]*P[x,y]
+			dt = p[y]*P[y,x]
+			Ep += (nt-dt)*log(nt/dt)
+		end
+	end
+	return Ep/2
+end
+
+# load data from a text file
+#
+# time<TAB>neuron_id
+function load_data(filename::String,bin_length::Float64)
+	f = open(filename, "r")
+	lines = readlines(f)
+	close(f)
+	# nid -> array of firing times
+	Dt = Dict{Int64,Array{Float64,1}}()
+	# nid -> array of bids
+	Dn = Dict{Int64,Array{Int64,1}}()
+	# bid -> array of nids
+	Db = Dict{Int64,Array{Int64,1}}()
+	for l in lines
+		ts,ns = split(l,'\t')
+		t = float64(ts)
+		n = int64(ns)
+		bid = int64(floor(t/bin_length)+1)
+		# @debug("$bid : $n")
+		if haskey(Dt,n)
+			push!(Dn[n],t)
+		else
+			Dt[n] = [t]
+		end
+		if haskey(Dn,n)
+			push!(Dn[n],bid)
+		else
+			Dn[n] = [bid]
+		end
+		if haskey(Db,bid)
+			push!(Db[bid],n)
+		else
+			Db[bid] = [n]
+		end
+	end
+	return Dn,Db,Dt
+end
+
+# load data from a text file
+# 
+# initial format
+# n1<TAB>n2 ... <TAB>nk<TAB>t11<TAB>t21<TAB><TAB>t41 ... <TAB>tk1<TAB>t12 ...
+#
+# awk code to be used before: (split records on different lines)
+#BEGIN {
+#        FS="\t";
+#	ORS="\n";
+#	OFS=",";
+#}
+#{
+#	for(i=1;i<NF;i++) printf "%s",$i (i%151==0?ORS:OFS)
+#}
+#END{
+#}
+#
+# awks permits to create a new text file
+# n1<TAB>n2 ... <TAB>nk
+# t11<TAB>t21<TAB><TAB>t41 ... <TAB>tk1
+# t12 ...
+#
+function load_data2(filename::String, bin_length::Float64)
+	f = open(filename, "r")
+	lines = readlines(f)
+	close(f)
+	# nid -> array of firing times
+	Dt = Dict{Int64,Array{Float64,1}}()
+	# nid -> array of bids
+	Dn = Dict{Int64,Array{Int64,1}}()
+	# bid -> array of nids
+	Db = Dict{Int64,Array{Int64,1}}()
+	passed = false
+	for l in lines
+		# first line of the file: list of neuron ids	
+		if passed
+			fields = split(l,'\,')
+			n = 1
+			for f in fields
+				# f != " "
+				f = strip(f)
+				if length(f) > 0
+					t = float64(f)
+					bid = int64(floor(t/bin_length)+1)
+
+					if haskey(Dt,n)
+						push!(Dt[n],t)
+					else
+						Dt[n] = [t]
+					end
+					if haskey(Dn,n)
+						push!(Dn[n],bid)
+					else
+						Dn[n] = [bid]
+					end
+					if haskey(Db,bid)
+						push!(Db[bid],n)
+					else
+						Db[bid] = [n]
+					end
+				end
+				n += 1
+			end
+		end
+		passed = true
+	end
+	return Dn,Db,Dt
+end
+
+# export data in CSV
+# one line corresponds to the firing times of a given neuron
+function export_data(filename::String,Dt::Dict{Int64,Array{Float64,1}})
+	f = open(filename, "w")
+	for k in sort([n for n in keys(Dt)])
+		fields = sort(Dt[k])
+		write(f,string(join(fields,','),'\n'))
+	end
+	close(f)
+end
+
+# get number of spikes for a given neuron
+function get_n_nspikes(nid::Int64, Dt::Dict{Int64,Array{Float64,1}})
+	return length(Dt[nid])
+end
+
+# get max number of bin
+function get_m_nbins(Dt::Dict{Int64,Array{Float64,1}}, bin_length::Float64)
+	mt = maximum([maximum(v) for v in values(Dt)])
+	return int64(floor(mt/bin_length)+1)
+end
+
+# get neuron time series in the form of a 
+function get_n_ts(nid::Int64, Dt::Dict{Int64,Array{Float64,1}}, s::Int64, bin_length::Float64)
+	spike_times = Dt[nid]
+	ts = zeros(Int64,s)
+	for t in spike_times
+		bid = int64(floor(t/bin_length)+1)
+		ts[bid] += 1
+	end
+	return ts
+end
+
+# compute the transfer entropy X->Y between X and Y discrete time series
+#
+# see http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3403001/
+# T_X-Y = H(Y_t | Y_t-1:t-ybl) - H(Y_t | Y_t-1:t-yl,X_t-1:t-xbl)
+#
+# NB: xbl,ybl block lengths >= 1
+# NB: the time lag is assumed to be 1
+function get_transfer_entropy(ts_x::Array{Int64}, ts_y::Array{Int64}, xbl::Int64, ybl::Int64)
+	# generate binary time series
+	ts1 = int8([ts_x[i]>0?1:0 for i in 1:length(ts_x)])
+	ts2 = int8([ts_y[i]>0?1:0 for i in 1:length(ts_y)])
+	D = ybl-xbl
+	# leave some padding at the beginning if necessary
+	if D > 0
+		y_start = 1
+	else
+		y_start = 1-D
+	end
+	y_stop = length(ts2)-ybl
+	tl = y_stop-y_start+1
+	# compute distribution Y_t-1:t-ybl (ybl bits binary strings)
+	D_Y1 = Dict{Int64,Float64}()
+	for i in 0:2^ybl-1
+		D_Y1[i] = 0.
+	end
+	for i in y_start:y_stop
+		# l-bits strings
+		bs = join(ts2[i:i+ybl-1],"")
+		D_Y1[parseint(bs,2)] += 1  
+	end
+	for i in 0:2^ybl-1
+		D_Y1[i] /= tl
+	end
+	# compute joint distribution Y_t,Y_t-1:t-ybl (ybl+1 bits binary strings)
+	D_Y2 = Dict{Int64,Float64}()
+	for i in 0:2^(ybl+1)-1
+		D_Y2[i] = 0.
+	end
+	for i in y_start:y_stop
+		# (l+1)-bits strings
+		bs = join(ts2[i:i+ybl],"")
+		D_Y2[parseint(bs,2)] += 1  
+	end
+	tl = y_stop-y_start+1
+	for i in 0:2^(ybl+1)-1
+		D_Y2[i] /= tl
+	end
+	# compute joint distribution Y_t,Y_t-1:t-ybl,X_t-1:t-xbl (ybl+xbl+1 bits binary strings)
+	D_Y3 = Dict{Int64,Float64}()
+	for i in 0:2^(ybl+xbl+1)-1
+		D_Y3[i] = 0.
+	end
+	for i in y_start:y_stop
+		# (ybl+1)-bits strings
+		bs1 = join(ts2[i:i+ybl],"")
+		# xbl-bits strings
+		bs2 = join(ts1[i+D:i+D+xbl-1],"")
+		D_Y3[parseint(bs2*bs1,2)] += 1  
+	end
+	kiki = 0.
+	for i in 0:2^(ybl+xbl+1)-1
+		D_Y3[i] /= tl
+	end
+	# compute joint distribution Y_t-1:t-ybl,X_t-1:t-xbl (ybl+xbl bits binary strings)
+	D_Y4 = Dict{Int64,Float64}()
+	for i in 0:2^(ybl+xbl)-1
+		D_Y4[i] = 0.
+	end
+	for i in y_start:y_stop
+		# ybl-bits strings
+		bs1 = join(ts2[i:i+ybl-1],"")
+		# xbl-bits strings
+		bs2 = join(ts1[i+D:i+D+xbl-1],"")
+		D_Y4[parseint(bs2*bs1,2)] += 1  
+	end
+	for i in 0:2^(ybl+xbl)-1
+		D_Y4[i] /= tl
+	end
+	# compute H(Y_t | Y_t-1:t-ybl, X_t-1:t-xbl) = \sum\limits_{y_t, y_t-1:t-ybl, x_t-1:t-xbl} p(y_t, y_t-1:t-ybl, x_t-1:t-xbl) log [(p(y_t, y_t-1:t-ybl, x_t-1:t-xbl)*p(y_t-1:t-ybl)) / (p(y_t-1:t-ybl, x_t-1:t-xbl) * p(y_t, y_t-1:t-ybl))]
+	H = 0.
+	for i in 0:1
+		for j in 0:2^ybl-1
+			for k in 0:2^xbl-1
+				bs1 = bin(j)
+				bs2 = bin(j)*bin(i)
+				bs3 = bin(k)*bin(j)*bin(i)
+				bs4 = bin(k)*bin(j)
+				f1 = D_Y1[parseint(bs1,2)]
+				f2 = D_Y2[parseint(bs2,2)]
+				f3 = D_Y3[parseint(bs3,2)]
+				f4 = D_Y4[parseint(bs4,2)]
+				f13 = f1*f3
+				f24 = f2*f4
+				# 0 log 0 and 0 log c/0 = 0
+				if f3 != 0 && f24 != 0  
+					H += f3 * log(f13/f24)
+				end
+			end
+		end
+	end
+	return H
+end
+
+# generate the transfer entropy matrix
+#
+# bin_length: bin length in seconds
+# xbl: lag in # bins 
+# ybl: lag in # bins 
+# m_size: desired matrix size
+function generate_te_matrix(Dt::Dict{Int64,Array{Float64,1}}, bin_length::Float64, xbl::Int64, ybl::Int64, m_size::Int)
+	s = get_m_nbins(Dt, bin_length)
+	@info("# bins for dataset: $s")
+	nn = length(keys(Dt))
+	@info("# spiking neurons: $nn")
+	#tem = zeros(Float64,nn,nn)
+	tem = zeros(Float64,m_size,m_size)
+	# load time series
+	Dts = Dict{Int64,Array{Int64,1}}()
+	for k in keys(Dt)
+		Dts[k] = get_n_ts(k, Dt, s, bin_length)
+	end
+	# compute TE matrix entries
+	for k in keys(Dt)
+		for l in keys(Dt)
+			if k != l
+				H = get_transfer_entropy(Dts[k], Dts[l], xbl, ybl)
+				tem[k,l] = H
+			end
+		end
+	end
+	return tem
+end
+
+# export TE matrix to GraphML format
+function export_2_graphml(filename::String, TE::Array{Float64,2}, gamma::Float64)
+	graphmlFile = open(filename, "w")
+
+	write(graphmlFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	write(graphmlFile, "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns/graphml\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns/graphml\">\n")
+	write(graphmlFile, "<graph edgedefault=\"directed\">\n")
+
+	ste = size(TE,1)
+	n_edges = int(gamma*ste*(ste-1))
+	
+	# compute threshold value
+	values = sort(vec(reshape(TE,1,length(TE))), rev=true)
+	th = values[n_edges]
+
+	for i in 1:ste
+		write(graphmlFile, "<node id=\"$i\" />\n")
+	end
+	for k in 1:ste
+		for l in 1:ste
+			if k != l
+				value = TE[k,l]
+				if value >= th
+					write(graphmlFile, "<edge id=\"$k|$l\" directed=\"true\" source=\"$k\" target=\"$l\"/>\n")
+				end
+			end
+		end
+	end
+	write(graphmlFile, "</graph>\n")
+	write(graphmlFile, "</graphml>\n")
+	close(graphmlFile)
+end
+
+# get binary adjacency matrix
+function get_binary_adjacency_matrix(TE::Array{Float64,2}, gamma::Float64)
+	m_size = size(TE,1)
+	A = zeros(Int8, m_size, m_size)
+	n_edges = int(gamma*m_size*(m_size-1))
+	# compute threshold value
+	values = sort(vec(reshape(TE,1,length(TE))), rev=true)
+	th = values[n_edges]
+	for i in 1:m_size
+		for j in 1:m_size
+			if i != j
+				value = TE[i,j]
+				if value >= th
+					A[i,j] = 1
+				end
+			end
+		end
+	end
+	return A
+end
+
+# get weighted adjacency matrix
+function get_weighted_adjacency_matrix(TE::Array{Float64,2}, gamma::Float64)
+	m_size = size(TE,1)
+	A = zeros(Float64, m_size, m_size)
+	n_edges = int(gamma*m_size*(m_size-1))
+	# compute threshold value
+	values = sort(vec(reshape(TE,1,length(TE))), rev=true)
+	th = values[n_edges]
+	for i in 1:m_size
+		for j in 1:m_size
+			if i != j
+				value = TE[i,j]
+				if value >= th
+					A[i,j] = value
+				end
+			end
+		end
+	end
+	# make rows stochastic
+	for i in 1:m_size
+		s = sum(A[i,:])
+		if s != 0
+			A[i,:] /= s
+		end
+	end
+	return A
+end
+
+# check matrix connectivity
+function check_adj_mat_connectivity(A::Array{Int8,2})
+	sinks = Int64[]
+	sources = Int64[]
+	m_size = size(A,1)
+	for k in 1:m_size
+		if length(find(A[k,:])) == 0
+			push!(sinks,k)
+		end
+	end
+	for k in 1:m_size
+		if length(find(A[:,k])) == 0
+			push!(sources,k)
+		end
+	end
+	isolated = intersect(sources, sinks)
+	@info("# sources, # sinks, # isolated: ", length(sources), " ", length(sinks), " ", length(isolated))
+	return sources, sinks, isolated
+end
+
+# normalize matrix rows
+function normalize_rows(A::Array{Int8,2})
+	m_size = size(A,1)
+	P = zeros(Float64,m_size,m_size)
+	for i in 1:m_size
+		s = sum(A[i,:])
+		if s > 0
+			P[i,:] = A[i,:]/s
+		end
+	end
+	return P
+end
+
+# power method
+function my_pagerank(P::Array{Float64,2},damping::Float64=0.85,epsilon::Float64=1e-4)
+	p_size = size(P,1)
+	O = fill(1/p_size,p_size,p_size)
+	M = damping*P+(1-damping)*O
+	pr = fill(1/p_size,p_size)
+	while true
+		pr2 = vec(pr'*M)
+		#pr2 = pr2/norm(pr2)
+		pr2 = pr2/sum(pr2)
+		d = euclidean(pr,pr2) 
+		d <= epsilon && break
+		pr = copy(pr2)
+	end
+	return pr
+end

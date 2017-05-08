@@ -1,0 +1,15 @@
+function finddecconcatprod()
+    d = ""
+    x = 1
+    while length(d) < 1_000_000
+        d *= string(x)
+        x += 1
+    end
+    return prod(int([d[1], d[10], d[100], d[1_000], d[10_000], d[100_000], d[1_000_000]]) .- 48)
+end
+
+@time res = finddecconcatprod()
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

@@ -1,0 +1,20 @@
+module Multiclass
+
+using Classifiers
+
+importall Classifiers
+
+export MulticlassWithBinaryClassifier,fit,predict,loss
+export AllVersusAllClassifier, AllVersusAllClassifierConfig,OneVersusAllClassifier, OneVersusAllClassifierConfig
+export EcocDesign, Ecoc, EcocConfig, EcocDesignGenerator, EcocDenseRandom, EcocSparseRandom, EcocOVA,EcocOVO,generate_design
+
+abstract  MulticlassWithBinaryClassifier <: Classifier
+abstract  MulticlassWithBinaryClassifierConfig <: ClassifierConfig
+
+include("OneVersusAllClassifier.jl")
+include("AllVersusAllClassifier.jl")
+include("EcocDesign.jl")
+include("Ecoc.jl")
+
+
+end

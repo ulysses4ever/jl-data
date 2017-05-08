@@ -1,0 +1,155 @@
+include("typographyaux.jl")
+
+export text, textFont, textSize
+export textWidth, textHeight, textAscent, textDescent
+
+## Loading & Displaying
+
+#loadFont
+
+function text(str::String, x, y)
+	x = ((x+1)/2)*state.width
+	y = ((y+1)/2)*state.height
+
+	switchShader("fontDrawing")
+	glActiveTexture(GL_TEXTURE1)
+    glEnable(GL_CULL_FACE)
+	# glBindBuffer(GL_ARRAY_BUFFER, globjs.vbos[2])
+
+    vertexData = zeros(GLfloat, 6*9*length(str))
+
+    n = 0
+	for c in str
+		ch = fontState.characters[c]
+
+        bt = ch.size[2] - ch.bearing[2]
+		xpos = x + ch.bearing[1] * state.textSize
+        ypos = -y - bt * state.textSize + ch.advance[2] * state.textSize
+
+        w = ch.size[1] * state.textSize
+        h = ch.size[2] * state.textSize
+
+        if w == 0 || h == 0
+            continue
+        end
+
+        vertexData[n+1] = xpos
+        vertexData[n+2] = -ypos
+        vertexData[n+3] = 0.0
+        vertexData[n+4] = 1.0
+
+        vertexData[n+5] = ch.atlasOffset
+        vertexData[n+6] = 0.0
+        vertexData[n+7] = 0.0
+        vertexData[n+8] = 0.0
+        vertexData[n+9] = 0.0
+
+		vertexData[n+10] = xpos + w
+        vertexData[n+11] = -ypos
+        vertexData[n+12] = 0.0
+        vertexData[n+13] = 1.0
+
+        vertexData[n+14] = ch.atlasOffset + ch.bearing[1] / fontState.atlasWidth
+        vertexData[n+15] = 0.0
+        vertexData[n+16] = 0.0
+        vertexData[n+17] = 0.0
+        vertexData[n+18] = 0.0
+
+        vertexData[n+19] = xpos
+        vertexData[n+20] = -ypos - h
+        vertexData[n+21] = 0.0
+        vertexData[n+22] = 1.0
+
+        vertexData[n+23] = ch.atlasOffset
+        vertexData[n+24] = ch.bearing[2] / fontState.atlasWidth
+        vertexData[n+25] = 0.0
+        vertexData[n+26] = 0.0
+        vertexData[n+27] = 0.0
+
+        vertexData[n+28] = xpos + w
+        vertexData[n+29] = -ypos
+        vertexData[n+30] = 0.0
+        vertexData[n+31] = 1.0
+
+        vertexData[n+32] = ch.atlasOffset + ch.bearing[1] / fontState.atlasWidth
+        vertexData[n+33] = 0.0
+        vertexData[n+34] = 0.0
+        vertexData[n+35] = 0.0
+        vertexData[n+36] = 0.0
+
+        vertexData[n+37] = xpos
+        vertexData[n+38] = -ypos - h
+        vertexData[n+39] = 0.0
+        vertexData[n+40] = 1.0
+
+        vertexData[n+41] = ch.atlasOffset
+        vertexData[n+42] = ch.bearing[2] / fontState.atlasWidth
+        vertexData[n+43] = 0.0
+        vertexData[n+44] = 0.0
+        vertexData[n+45] = 0.0
+
+        vertexData[n+46] = xpos + w
+        vertexData[n+47] = -ypos - h
+        vertexData[n+48] = 0.0
+        vertexData[n+49] = 1.0
+
+        vertexData[n+50] = ch.atlasOffset + ch.bearing / fontState.atlasWidth
+        vertexData[n+51] = ch.bearing[2] / fontState.atlasWidth
+        vertexData[n+52] = 0.0
+        vertexData[n+53] = 0.0
+        vertexData[n+54] = 0.0
+
+		x += ch.advance[1] * state.textSize
+        n += 6*9
+	end
+    # glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexData), vertexData)
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW)
+    glDrawArrays(GL_TRIANGLES, 0, 6*length(str))
+
+    glDisable(GL_CULL_FACE)
+    glActiveTexture(GL_TEXTURE0)
+	switchShader("basicShapes")
+	# glBindBuffer(GL_ARRAY_BUFFER, globjs.vbos[1])
+end
+
+function textFont(fontname::String)
+    state.fontFace = fontname
+    fontState = fontStruct(newface(state.fontFace), Dict(' ' => blankChar), 0, 12)
+	setpixelsize(fontState.face, fontState.fontWidth, fontState.fontHeight)
+	setupFontCharacters()
+end
+
+## Attributes
+
+#function textAlign()
+#
+#end
+
+#textLeading
+#textMode
+
+function textSize(size)
+	state.textSize = size
+end
+
+function textWidth(str::String)
+    # extents = Cairo.text_extents(cr, str)
+    # return extents[1]
+end
+
+function textHeight(str::String)
+    # extents = Cairo.text_extents(cr, str)
+    # return extents[2]
+end
+
+## Metrics
+
+function textAscent(str::String)
+   # extents = Cairo.scaled_font_extents(cr, str)
+   # return extents[1]
+end
+
+function textDescent(str::String)
+   # extents = Cairo.scaled_font_extents(cr, str)
+   # return extents[2]
+end

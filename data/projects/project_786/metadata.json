@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:27 GMT
+Date: Wed, 03 May 2017 21:01:38 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5953
+Content-Length: 5532
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2828
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3928
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "12efe42a2b63b84d444726e4cb9cb343"
-Last-Modified: Fri, 17 Mar 2017 17:09:01 GMT
+ETag: "b1f047af586c6800370e9228764bf5b5"
+Last-Modified: Fri, 05 Aug 2016 23:21:37 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
-X-GitHub-Request-Id: B4BC:6633:DD77E7:11EC279:590231F6
+X-Served-By: 15bc4ab707db6d6b474783868c7cc828
+X-GitHub-Request-Id: 7F43:5CA5:FD456A:145CD73:590A4532
 
 {
-  "id": 48746718,
-  "name": "PerceptualColourMaps.jl",
-  "full_name": "peterkovesi/PerceptualColourMaps.jl",
+  "id": 65054508,
+  "name": "SirenSeq.jl",
+  "full_name": "GerhardVisser/SirenSeq.jl",
   "owner": {
-    "login": "peterkovesi",
-    "id": 6160897,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/6160897?v=3",
+    "login": "GerhardVisser",
+    "id": 20858869,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/20858869?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/peterkovesi",
-    "html_url": "https://github.com/peterkovesi",
-    "followers_url": "https://api.github.com/users/peterkovesi/followers",
-    "following_url": "https://api.github.com/users/peterkovesi/following{/other_user}",
-    "gists_url": "https://api.github.com/users/peterkovesi/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/peterkovesi/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/peterkovesi/subscriptions",
-    "organizations_url": "https://api.github.com/users/peterkovesi/orgs",
-    "repos_url": "https://api.github.com/users/peterkovesi/repos",
-    "events_url": "https://api.github.com/users/peterkovesi/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/peterkovesi/received_events",
+    "url": "https://api.github.com/users/GerhardVisser",
+    "html_url": "https://github.com/GerhardVisser",
+    "followers_url": "https://api.github.com/users/GerhardVisser/followers",
+    "following_url": "https://api.github.com/users/GerhardVisser/following{/other_user}",
+    "gists_url": "https://api.github.com/users/GerhardVisser/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/GerhardVisser/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/GerhardVisser/subscriptions",
+    "organizations_url": "https://api.github.com/users/GerhardVisser/orgs",
+    "repos_url": "https://api.github.com/users/GerhardVisser/repos",
+    "events_url": "https://api.github.com/users/GerhardVisser/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/GerhardVisser/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/peterkovesi/PerceptualColourMaps.jl",
-  "description": "Perceptually Uniform Colour Maps for Julia",
+  "html_url": "https://github.com/GerhardVisser/SirenSeq.jl",
+  "description": "Use Julia to compose and sequence music.",
   "fork": false,
-  "url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl",
-  "forks_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/forks",
-  "keys_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/teams",
-  "hooks_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/events",
-  "assignees_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/tags",
-  "blobs_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/subscription",
-  "commits_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/merges",
-  "archive_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/downloads",
-  "issues_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/peterkovesi/PerceptualColourMaps.jl/deployments",
-  "created_at": "2015-12-29T12:32:35Z",
-  "updated_at": "2017-03-17T17:09:01Z",
-  "pushed_at": "2017-04-13T12:44:16Z",
-  "git_url": "git://github.com/peterkovesi/PerceptualColourMaps.jl.git",
-  "ssh_url": "git@github.com:peterkovesi/PerceptualColourMaps.jl.git",
-  "clone_url": "https://github.com/peterkovesi/PerceptualColourMaps.jl.git",
-  "svn_url": "https://github.com/peterkovesi/PerceptualColourMaps.jl",
-  "homepage": "",
-  "size": 1262,
-  "stargazers_count": 15,
-  "watchers_count": 15,
+  "url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl",
+  "forks_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/forks",
+  "keys_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/teams",
+  "hooks_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/events",
+  "assignees_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/tags",
+  "blobs_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/subscription",
+  "commits_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/merges",
+  "archive_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/downloads",
+  "issues_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/GerhardVisser/SirenSeq.jl/deployments",
+  "created_at": "2016-08-05T23:09:56Z",
+  "updated_at": "2016-08-05T23:21:37Z",
+  "pushed_at": "2017-02-17T12:29:40Z",
+  "git_url": "git://github.com/GerhardVisser/SirenSeq.jl.git",
+  "ssh_url": "git@github.com:GerhardVisser/SirenSeq.jl.git",
+  "clone_url": "https://github.com/GerhardVisser/SirenSeq.jl.git",
+  "svn_url": "https://github.com/GerhardVisser/SirenSeq.jl",
+  "homepage": null,
+  "size": 73,
+  "stargazers_count": 0,
+  "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 3,
+  "forks_count": 0,
   "mirror_url": null,
   "open_issues_count": 1,
-  "forks": 3,
+  "forks": 0,
   "open_issues": 1,
-  "watchers": 15,
+  "watchers": 0,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 3,
-  "subscribers_count": 3
+  "network_count": 0,
+  "subscribers_count": 1
 }

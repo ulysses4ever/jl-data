@@ -1,0 +1,11 @@
+module BLIS
+
+if isfile(joinpath(dirname(dirname(@__FILE__)),"deps","deps.jl"))
+    include("../deps/deps.jl")
+else
+    error("BLIS not properly installed. Please run Pkg.build(\"BLIS\")")
+end
+
+include("blas.jl")
+
+end # module

@@ -1,0 +1,42 @@
+type Field
+  code::String
+  meaning::String
+  abbreviation::String
+end
+
+# TODO abbrevs for transformed fields are temp hack
+# blank code means it is computed, i.e. not in the orig dataset
+
+const FIELDS = [
+  Field("X", "electrodes", "lfp"),
+  Field("Xf", "electrodes_transformed", "lfpf"),
+  Field("sp", "neurons", "sp"),
+  Field("spf", "neurons_transformed", "spf"),
+  Field("pos", "positions", "pos"),
+  Field("", "positions_times_electrodes_pc1", "posXLfppc"),
+  Field("", "positions_times_electrodes_transformed_pc1", "posXLfpfpc"),
+]
+
+function field(name)
+  index = find(FIELDS) do f
+    f.meaning == name || f.code == name || f.abbreviation == name
+  end[1]
+  FIELDS[index]
+end
+
+field(field::Field) = field
+
+function colpattern(field::Field)
+  "^$(field.abbreviation)\\d+"
+end
+
+function colpattern(field::Field, i)
+  parts = split(colpattern(field), r"_")
+  join( [parts[1] * string(i), parts[2:end]], "_")
+end
+
+function get_colnames(f, df::DataFrame)
+  filter(colnames(df)) do c
+    ismatch(Regex(colpattern(field(f))), c)
+  end
+end

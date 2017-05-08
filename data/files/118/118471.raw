@@ -1,0 +1,415 @@
+module Graphics2D
+
+import Base.show,
+       Cairo
+
+export Line,
+       Point,
+       Circle,
+       Arc,
+       Text,
+       showgraphics,
+       GraphicElement,
+       boundingbox,
+       listplot,
+       red,
+       green,
+       blue,
+       yellow, 
+       purple,
+       orange,
+       white,
+       black,
+       gray,
+       COLORS
+       
+
+red =    [1.0, 0.0, 0.0]
+green =  [0.0, 1.0, 0.0]
+blue =   [0.0, 0.0, 1.0]
+yellow = [1.0, 1.0, 0.0] 
+purple = [0.5, 0.0, 0.5]
+orange = [1.0, 0.4, 0.0] 
+white =  [1.0, 1.0, 1.0]
+black =  [0.0, 0.0, 0.0]
+gray =   [0.5, 0.5, 0.5]
+
+COLORS = ["red","green","blue","yellow","purple","orange","white","black","gray"]
+
+abstract GraphicElement
+
+immutable BoundingBox
+    xmin::Real
+    xmax::Real
+    ymin::Real
+    ymax::Real
+end
+
+immutable Point <: GraphicElement
+    x::Real
+    y::Real
+    pointsize::Real
+    color::Array{Float64,1}
+end
+
+immutable Line{T<:Real} <: GraphicElement
+    coords::Array{T,2}
+    linesize::Real
+    color::Array{Float64,1}
+    fill::Bool
+    fillcolor::Array{Float64,1}
+end
+
+immutable Circle <: GraphicElement
+    center::Array{Float64,1}
+    radius::Float64
+    linesize::Real
+    color::Array{Float64,1}
+    fill::Bool
+    fillcolor::Array{Float64,1}
+end
+
+immutable Arc <: GraphicElement
+    center::Array{Float64,1}
+    radius::Real
+    theta1::Real
+    theta2::Real
+    linesize::Real
+    color::Array{Float64,1}
+    fill::Bool
+    fillcolor::Array{Float64,1}
+end
+
+immutable Text <: GraphicElement
+    location::Array{Float64,1}
+    text::AbstractString
+    textsize::Real
+    color::Array{Float64,1}
+end
+
+function Point(x::Real, y::Real; pointsize::Real=0.005, color::Array{Float64,1}=[0.0,0.0,0.0])
+    return Point(x,y,pointsize,color)
+end
+
+function Point{T<:Real}(z::Complex{T}; args...)
+    return Point(real(z),imag(z); args...)
+end
+
+function Point{T<:Real}(p::Tuple{T,T}; args...)
+    return Point(p[1],p[2]; args...)
+end
+
+function Point{T<:Real}(a::Array{T,1}; args...)
+    return Point(a[1],a[2]; args...)
+end
+
+function Line{T<:Real}(A::Array{T,2};
+                       linesize::Real=1.0,
+                       color::Array{Float64,1}=[0.0,0.0,0.0],
+                       fill::Bool=false,
+                       fillcolor::Array{Float64,1}=[1.0,1.0,1.0])
+    return Line(A,linesize,color,fill,fillcolor)
+end
+
+function Line{T}(a::Array{T,2};args...)
+    return Line(map(float,a);args...)
+end
+
+function Line{T}(a::Array{Complex{T},1};args...)
+    return Line(hcat(real(a),imag(a));args...)
+end
+
+function Line{T}(a::Array{Array{T,1},1};args...)
+    return Line(hcat(T[a[k][1] for k=1:length(a)],T[a[k][2] for k=1:length(a)]);args...)
+end
+
+function Line{T}(a::Array{Tuple{T,T},1};args...)
+    return Line(hcat(T[a[k][1] for k=1:length(a)],T[a[k][2] for k=1:length(a)]);args...)
+end
+
+function Circle{T,U}(center::Array{T,1},
+                     radius::U;
+                     linesize::Real=1.0,
+                     color::Array{Float64,1}=[0.0,0.0,0.0],
+                     fill::Bool=false,
+                     fillcolor::Array{Float64,1}=[1.0,1.0,1.0]
+                     )
+    return Circle(map(float,center),float(radius),linesize,color,fill,fillcolor)
+end
+
+function Circle{T,U}(x::T,
+                     y::T,
+                     radius::U;
+                     args...
+                     )
+    return Circle(T[x,y],radius;args...)
+end
+
+function Circle{T,U}(p::Tuple{T,T},
+                     radius::U;
+                     args...
+                     )
+    return Circle(p[1],p[2],radius;args...)
+end
+
+function Arc{T}(center::Array{T,1},
+                radius,
+                theta1,
+                theta2;
+                linesize::Real=1.0,
+                color::Array{Float64,1}=[0.0,0.0,0.0],
+                fill::Bool=false,
+                fillcolor::Array{Float64,1}=[1.0,1.0,1.0]
+                )
+    return Arc(map(float,center),float(radius),float(theta1),float(theta2),linesize,color,fill,fillcolor)
+end
+
+function Text{T}(location::Array{T,1},
+                text::AbstractString;
+                textsize::Float64=0.2,
+                color::Array{Float64,1}=[0.0,0.0,0.0]
+                )
+    return Text(location,text,textsize,color)
+end
+
+function show(io::IO,line::Line)
+    print(io,"Line(coordinates =\n")
+    show(io,line.coords)
+    print(io,",\nlinesize = ",line.linesize)
+    if line.fill
+        print(io,",\nfillcolor = ")
+        print(io,"[",line.fillcolor[1],",",line.fillcolor[2],",",line.fillcolor[3],"]")
+    else
+        print(io,",\nfill = ",line.fill)
+    end
+    print(io,")")
+end
+
+function show(io::IO,point::Point)
+    print(io,"Point(")
+    print(io,point.x)
+    print(io,",")
+    print(io,point.y)
+    print(io,")")
+end
+
+function boundingbox(l::Line)
+    # Coordinates are returned in the order xmin, xmax, ymax, ymin
+    return BoundingBox(minimum(l.coords[:,1]), maximum(l.coords[:,1]), minimum(l.coords[:,2]),maximum(l.coords[:,2]))
+end
+
+function boundingbox(c::Circle)
+    return BoundingBox(c.center[1] - c.radius, c.center[1] + c.radius, c.center[2] - c.radius, c.center[2] + c.radius)
+end
+
+function boundingbox(p::Point)
+    return BoundingBox(p.x,p.x,p.y,p.y)
+end
+
+function boundingbox(a::Arc)
+    return BoundingBox(a.center[1] - a.radius, a.center[1] + a.radius, a.center[2] - a.radius, a.center[2] + a.radius)
+end
+
+function boundingbox(t::Text)
+    return BoundingBox(t.location[1],t.location[1],t.location[2],t.location[2])
+end
+
+function boundingbox(A::Array)
+    a = minimum([bb.xmin for bb in A])
+    b = maximum([bb.xmax for bb in A])
+    c = maximum([bb.ymax for bb in A])
+    d = minimum([bb.ymin for bb in A])
+    if a == b || c == d
+        error("Bounding box has empty interior")
+    end
+    return BoundingBox(a - 0.05*(b-a), b + 0.05*(b-a), d - 0.05*(c-d), c + 0.05*(c-d))
+end
+
+function sketch(cr::Cairo.CairoContext,
+                l::Line,
+                bb::BoundingBox;
+                fill::Array{Float64,1}=Float64[1.0,1.0,1.0])
+
+    Cairo.set_line_width(cr,l.linesize)
+
+    Cairo.move_to(cr,l.coords[1,1],l.coords[1,2]);
+    for i=1:size(l.coords)[1]-1
+        Cairo.line_to(cr,l.coords[i+1,1],l.coords[i+1,2]);
+    end
+
+    if l.coords[end,:] == l.coords[1,:]
+        Cairo.close_path(cr)
+    end
+
+    if l.coords[end,:] == l.coords[1,:] && l.fill
+        Cairo.set_source_rgb(cr,l.fillcolor[1], l.fillcolor[2], l.fillcolor[3])
+        Cairo.fill_preserve(cr)
+        Cairo.set_source_rgb(cr,l.color[1], l.color[2], l.color[3])
+        Cairo.stroke(cr)
+    else
+        Cairo.set_source_rgb(cr,l.color[1], l.color[2], l.color[3])
+        Cairo.stroke(cr)
+    end
+end
+
+function sketch(cr::Cairo.CairoContext,
+                c::Circle,
+                bb::BoundingBox)
+
+    Cairo.arc(cr, c.center[1], c.center[2], c.radius, 0, 2*pi)
+
+    if c.fill
+        Cairo.set_source_rgb(cr,c.fillcolor[1], c.fillcolor[2], c.fillcolor[3])
+        Cairo.fill_preserve(cr)
+    end
+
+    Cairo.set_source_rgb(cr,c.color[1], c.color[2], c.color[3])
+    Cairo.stroke(cr)
+end
+
+function sketch(cr::Cairo.CairoContext,
+                a::Arc,
+                bb::BoundingBox)
+    Cairo.arc(cr, a.center[1], a.center[2], a.radius, a.theta1, a.theta2);
+    Cairo.set_source_rgb(cr,a.color[1], a.color[2], a.color[3])
+    Cairo.stroke(cr)
+end
+
+function sketch(cr::Cairo.CairoContext,
+                p::Point,
+                bb::BoundingBox)
+    Cairo.arc(cr, p.x, p.y, p.pointsize*max(bb.xmax-bb.xmin,bb.ymax-bb.ymin), 0, 2*pi);
+    Cairo.set_source_rgb(cr,p.color[1], p.color[2], p.color[3])
+    Cairo.fill(cr)
+end
+
+function sketch(cr::Cairo.CairoContext,
+                t::Text,
+                bb::BoundingBox)
+
+    Cairo.save(cr)
+
+    Cairo.set_font_size(cr,t.textsize)
+    Cairo.set_source_rgb(cr,t.color[1], t.color[2], t.color[3])
+
+    x_bearing, y_bearing, width, height = Cairo.text_extents(cr,t.text)
+
+    Cairo.move_to(cr,t.location[1] - width/2 - x_bearing, t.location[2] + height/2 + y_bearing)
+  
+    Cairo.scale(cr,1,-1)
+    Cairo.show_text(cr,t.text)
+    Cairo.restore(cr)
+end
+
+function draw(A::Array,
+              c::Cairo.CairoSurface,
+              cr::Cairo.CairoContext;
+              dim::Integer=512)
+    bb = boundingbox(map(boundingbox,A))
+    asp_ratio = (bb.xmax - bb.xmin)/(bb.ymax - bb.ymin)
+
+    Cairo.set_coords(cr, 0, 0, dim, round(Int,asp_ratio\dim), bb.xmin, bb.xmax, bb.ymax, bb.ymin)
+    Cairo.set_source_rgb(cr, 1, 1, 1)  # set color to white
+    Cairo.paint(cr) 
+
+    Cairo.set_line_width(cr,1)
+    Cairo.set_line_join(cr, Cairo.Cairo.CAIRO_LINE_JOIN_ROUND)
+    
+    for i=1:length(A)
+        sketch(cr,A[i],bb)
+    end
+end
+
+
+function showgraphics(A::Array;
+                      dim::Integer=512)
+    bb = boundingbox(map(boundingbox,A))
+    asp_ratio = (bb.xmax - bb.xmin)/(bb.ymax - bb.ymin)
+    c = Cairo.CairoRGBSurface(dim,round(Int,asp_ratio\dim)) 
+    cr = Cairo.CairoContext(c) 
+    draw(A,c,cr,dim=dim)
+    return c
+end
+
+function showgraphics(g::GraphicElement;
+                      dim::Integer=512)
+    showgraphics([g];dim=dim)
+end
+
+function showgraphics(filename::AbstractString,
+                      A::Array;
+                      dim::Integer=512)
+    bb = boundingbox(map(boundingbox,A))
+    asp_ratio = (bb.xmax - bb.xmin)/(bb.ymax - bb.ymin)
+    if contains(filename,".pdf")
+        c = Cairo.CairoPDFSurface(filename,dim,round(Int,asp_ratio\dim))
+    elseif contains(filename,".png")
+        c = Cairo.CairoRGBSurface(dim,round(Int,asp_ratio\dim))
+    else
+        error("File name must end in .pdf or .png")
+    end
+    cr = Cairo.CairoContext(c);
+    draw(A,c,cr;dim=dim)
+    if contains(filename,".png")
+        Cairo.write_to_png(c,filename)
+    end
+    Cairo.finish(c)
+end
+
+function showgraphics(filename::AbstractString,
+                      g::GraphicElement;
+                      dim::Integer=512)
+    showgraphics(filename,[g];dim=dim)
+end
+
+function listplot(v::Array{Float64,1};args...)
+    return listplot(Array{Float64,1}[v];args...)
+end
+
+function listplot(vectorlist::Array{Array{Float64,1},1};plotmin::Real=-Inf,plotmax::Real=Inf)
+    if plotmax == Inf
+        M = maximum(map(maximum,vectorlist))
+    else
+        M = plotmax
+    end
+    if plotmin == -Inf
+        m = minimum(map(minimum,vectorlist))
+    else
+        m = plotmin
+    end
+    colors = Array{Float64,1}[blue,red,orange,green]
+    graphicslist = GraphicElement[
+        Line([0 0; 2.1 0]),
+        Line([0 0; 0 1.1]),
+        Line([-0.05 1; 0.05 1]),
+        Text([-0.15,0.0],format(m);textsize=0.07),
+        Text([-0.15,1.0],format(M);textsize=0.07),
+        Point(-0.2,0.5;color=white)
+        ]
+    if m < 0.0 < M && 0.1 < -m / (M-m) < 0.9
+        push!(graphicslist,Line([-0.05 -m/(M-m); 0.05 -m/(M-m)]))
+        push!(graphicslist,Text([-0.15,-m/(M-m)],"0";textsize=0.07))
+    end
+    for i = 1:length(vectorlist)
+        vscaled = (vectorlist[i]-m)./(M-m)
+        if i < 5
+            push!(graphicslist,Line(hcat(linspace(0,2,length(vscaled)),vscaled);
+                                    color=colors[i]))
+        else
+            push!(graphicslist,Line(hcat(linspace(0,2,length(vscaled)),vscaled);
+            color=[rand(),rand(),rand()]
+            ))
+        end
+    end
+    return graphicslist
+end
+
+function format(x::Float64)
+    if 0.01 < abs(x) < 100.0 
+        return string(round(x,2))
+    else
+        return @sprintf("%1.2e",x)
+    end
+end
+
+end # module

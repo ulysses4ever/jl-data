@@ -1,0 +1,51 @@
+#!/usr/bin/env julia4
+
+using Mesos
+using Logging
+
+Logging.configure(level=DEBUG)
+Logging.configure(output=open("ClusterManager.log", "a"))
+
+
+#-------------------------------------------------------------------------------
+# Callbacks
+#-------------------------------------------------------------------------------
+function scheduler_registered(driver::SchedulerDriver, config::SchedulerConfig,
+                              frameworkId::Proto.FrameworkID, masterInfo::Proto.MasterInfo)
+    debug("Registering ClusterManager...")
+end
+
+function scheduler_resourceOffers(driver::SchedulerDriver, config::SchedulerConfig, offers::Vector{Proto.Offer})
+    for offer in offers
+        offerCpus = 0
+        offerMem = 0
+        for resource in offer.resources
+            if resource.name == "cpus"
+                offerCpus += resource.scalar.value
+            elseif resource.name == "mem"
+                offerMem += resource.scalar.value
+            end
+        end
+
+        debug("Received offer $(offer.id.value) with cpus: $offerCpus and mem: $offerMem")
+    end
+    stop(driver)
+end
+
+if length(ARGS) == 0
+    println("Usage: $(ENV["_"]) master")
+    exit(1)
+end
+
+# Create & setup scheduler
+scheduler = Scheduler(registered = scheduler_registered,
+                      resourceOffers = scheduler_resourceOffers)
+
+#run(scheduler, Mesos.createFramework("Mesos Cluster Manager"), ARGS[1])
+
+sd = Mesos.init(scheduler, Mesos.createFramework("Mesos Cluster Manager"), ARGS[1])
+println(sd)
+status = run(sd)
+println("SchedulerDriver status: $status")
+Mesos.release(sd)
+exit(status == Proto.Status.DRIVER_STOPPED ? 0 : 1)

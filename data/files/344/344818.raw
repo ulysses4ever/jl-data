@@ -1,0 +1,27 @@
+using Gadfly, PyPlot
+
+include("../src/saddle_point_solve.jl") 
+include("laplacian2d.jl")
+
+ntimings = 10
+timings = zeros(ntimings)
+sizes = ceil(logspace(1,3,ntimings))
+
+for i = 1:length(sizes)
+	println("==================")
+	n = Int64(sizes[i])
+	F = laplacian2d(n,n)
+	H = spzeros(n*n,0)
+	G = spzeros(0,0)
+	f = randn(n*n,1)
+	g = zeros(0,1) 	
+	tic()
+	(x,y) = saddle_point_solve(F,G,H,f,g)
+	timings[i] = toq()
+end
+
+PyPlot.loglog(sizes, timings, color="red", linewidth=2.0, linestyle="--")
+PyPlot.xlabel("Size n of the nxn grid")
+PyPlot.ylabel("Time in s.")
+PyPlot.title("Timing of the complete solve on the 2d laplacian")
+PyPlot.grid("on")

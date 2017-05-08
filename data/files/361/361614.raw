@@ -1,0 +1,81 @@
+# Basic routines for exact decimal arithmetic (ref. IEEE 754-2008)
+# @author jack@tinybike.net (Jack Peterson), 7/3/2014
+
+# numerical value = (-1)^s * c * 10^q
+type Decimal
+    s::Integer  # sign can be 0 (+) or 1 (-)
+    c::Integer  # coefficient (or significand)
+    q::Integer  # exponent
+end
+
+# Addition
+# To add, convert both decimals to the same exponent.
+# (If the exponents are different, use the smaller exponent
+# to make sure we're adding integers.)
+function add(x::Decimal, y::Decimal)
+    cx = x.c * 10^max(x.q - y.q, 0)
+    cy = y.c * 10^max(y.q - x.q, 0)
+    s = (cx > cy) ? x.s : y.s
+    Decimal(s, cx + cy, min(x.q, y.q))
+end
+
+# Negation
+negative(x::Decimal) = Decimal((x.s == 1) ? 0 : 1, x.c, x.q)
+
+# Subtraction
+subtract(x::Decimal, y::Decimal) = add(x, -y)::Decimal
+
+# Overload the + and - operators
++(x::Decimal, y::Decimal) = add(x, y)::Decimal
+-(x::Decimal) = negative(x)::Decimal
+-(x::Decimal, y::Decimal) = subtract(x, y)::Decimal
+
+# Multiplication
+function multiply(x::Decimal, y::Decimal)
+    s = (x.s == y.s) ? 0 : 1
+    Decimal(s, x.c * y.c, x.q + y.q)
+end
+
+# Overload the * operator
+*(x::Decimal, y::Decimal) = multiply(x, y)::Decimal
+
+# Convert a string to a decimal, e.g. "0.01" -> Decimal(0, 1, -2)
+function from_string(str::ASCIIString)
+    s = (str[1] == '-') ? 1 : 0
+    c = ""
+    index = 0
+    after = 0
+    for chr in str
+        index += 1
+        if chr == '.'
+            after = int(length(str) - index)
+        else
+            c *= string(chr)
+        end
+    end
+    Decimal(s, abs(int(c)), -after)
+end
+
+# Convert a number to a decimal, using from_string
+from_float(f::Number) = from_string(string(f))::Decimal
+
+# Convert a decimal to a string
+function to_string(x::Decimal)
+    c = string(x.c)
+    if x.q > 0
+        for i in 1:x.q
+            c *= "0"
+        end
+    elseif x.q < 0
+        shift = x.q + length(c)
+        if shift > 0
+            c = c[1:shift] * "." * c[shift+1:end]
+        else
+            c = "0." * repeat("0", -shift) * c            
+        end
+    end
+    ((x.s == 1) ? "-" : "") * c
+end
+
+# Convert a decimal to a float, using to_string to keep the value exact
+to_float(x::Decimal) = float(to_string(x)::ASCIIString)

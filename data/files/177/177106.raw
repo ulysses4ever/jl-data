@@ -1,0 +1,33 @@
+#extract_spectrograms.jl
+#This script takes audio recordings and dumps the corresponding spectrograms
+#into specpath, defined in the config file.
+#author: Timothy Evans
+#date: 30/07/15
+
+importall signalprocessing, config
+using Images
+
+if path_rel
+  projdir = pwd()[1:end-3]; #remove src directory
+  labelledpath = string(projdir,labelleddir)
+  specpath = string(projdir,specdir)
+else
+  labelledpath = labelleddir
+  specpath = specdir
+end
+
+for spec in  readdir(labelledpath)
+  imgmask = imread(string(labelledpath,spec))
+  img = imread(string(specpath,spec))
+  sepimg = data(separate(imgmask))
+  if (colorspace(imgmask) == "BGRA")
+    (featuredata,label) = imgfeature(img, imgmask)
+  else
+    cs = colorspace(img)
+    #if this error is thrown consider adding elseif conditions for other
+    # potential colorspaces
+    error("Currently extract_features.jl only considers images with colorspace
+    BRGA: received image of type $cs.")
+  end
+
+end

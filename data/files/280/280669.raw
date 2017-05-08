@@ -1,0 +1,5 @@
+using RAD, Base.Test
+
+@autodiff (theta,) function myfun(theta,x)
+	theta + x
+end

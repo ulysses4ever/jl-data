@@ -1,0 +1,61 @@
+module ModelInterface
+
+abstract Model
+abstract ModelConfig
+
+function fit(c::ModelConfig,x,y)
+  error("fit() not implemented for $c")
+end
+
+# function predict(m::Model,x)
+#   error("predict() not implemented for $m")
+# end
+
+
+end
+
+module Inner
+  export InnerModel,InnerModelConfig,fit
+  import ModelInterface.fit,ModelInterface.Model,ModelInterface.ModelConfig
+  type InnerModel <: Model
+    foo::Int
+  end
+  type InnerModelConfig <: ModelConfig
+
+  end
+  function fit(c::InnerModelConfig,x,y)
+    return InnerModel(1)
+  end
+
+end
+
+module Outer
+  import ModelInterface.fit,ModelInterface.Model,ModelInterface.ModelConfig
+  export OuterModel,OuterModelConfig,fit
+  type OuterModel <: Model
+    inner::Model
+  end
+
+  type OuterModelConfig <: ModelConfig
+    inner_config::ModelConfig
+  end
+  function fit(c::OuterModelConfig,x,y)
+    m=OuterModel(fit(c.inner_config,x,y))
+  end
+
+end
+
+using Outer
+using Inner
+
+inner_config=InnerModelConfig()
+println(inner_config)
+inner=fit(inner_config,1,1)
+println(inner)
+
+outer_config=OuterModelConfig(inner_config)
+println(outer_config)
+println(outer_config.inner_config)
+outer=fit(outer_config,1,1)
+println(outer)
+#println(outer.inner)

@@ -1,0 +1,14 @@
+module SudokuTests
+
+using FactCheck
+using Sudoku3
+using SudokuTestSamples
+
+facts("Cells are checked for errors and converted to 0") do
+  @fact replaceCellErrors(solved1) => solved1
+  @fact replaceCellErrors(unsolved1) => unsolved1
+  @fact replaceCellErrors(unsolvedError1) => unsolved1
+end
+
+
+end

@@ -1,0 +1,32 @@
+#############################################################################
+# InteriorPoint.jl
+# Pure-Julia interior point solver for linear programs
+# By Iain Dunning
+# http://github.com/IainNZ/InteriorPoint.jl
+#############################################################################
+
+module InteriorPoint
+
+    ## Model data structure
+    type InteriorPointModel    
+        A::Matrix{Float64}
+        collb::Vector{Float64}
+        colub::Vector{Float64}
+        obj::Vector{Float64}
+        rowlb::Vector{Float64}
+        rowub::Vector{Float64}
+        sense::Symbol
+
+        objval::Float64
+        x::Vector{Float64}
+        dual::Vector{Float64}
+    end
+
+    ## The solver itself
+    include("solver.jl")
+
+    ## MathProgBase interface
+    require(joinpath(Pkg.dir("MathProgBase"),"src","MathProgSolverInterface.jl"))
+    importall MathProgSolverInterface
+    include("InteriorPointSolverInterface.jl")
+end

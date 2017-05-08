@@ -1,0 +1,104 @@
+###################################################
+## Generating input for JuMP
+###################################################
+
+type Edges
+  n_nodes::Int64
+  list::Array{Tuple{Int64,Int64}, 1}
+  outgoing::Array{Array{Int64,1},1}
+  ingoing::Array{Array{Int64,1},1}
+  impacted_nodes::Array{Int64,1}
+
+  function Edges(am::Array{Int64,2})
+    obj = new()
+    obj.list = []
+    obj.n_nodes = size(am)[1]
+    obj.outgoing = [[] for i in 1:obj.n_nodes]
+    obj.ingoing = [[] for i in 1:obj.n_nodes]
+    obj.impacted_nodes = [i for i in 1:obj.n_nodes]
+    for i in 1:obj.n_nodes
+        for j in 1:obj.n_nodes
+            if am[i,j] == 1
+                push!(obj.list, (i,j))
+                push!(obj.outgoing[i], j)
+                push!(obj.ingoing[j], i)
+            end
+        end
+    end
+    return obj
+  end
+
+  "# returns a list of all the edges,
+  # and two lists of the ingoing and outgoing edges to each of the vertices"
+  function Edges(pool::InstanceGraph, p::Params)
+    obj = new()
+    obj.list = []
+    obj.n_nodes = length(pool.present_nodes)
+    obj.outgoing = [[] for i in 1:obj.n_nodes]
+    obj.ingoing = [[] for i in 1:obj.n_nodes]
+    obj.impacted_nodes = impacted_nodes(pool) #list_non_isolated(pool)
+
+    g = pool.type_graph.graph
+    for i in obj.impacted_nodes
+      id_i = pool.present_nodes[i].node_type.id
+      for j in obj.impacted_nodes
+        id_j = pool.present_nodes[j].node_type.id
+        if p.techno == "2_cycles"
+          if has_edge(g, id_i, id_j) == 1 && i != j && has_edge(g, id_j, id_i) == 1
+            push!(obj.list, (i,j))
+            push!(obj.outgoing[i], j)
+            push!(obj.ingoing[j], i)
+          end
+        else
+          if has_edge(g, id_i, id_j) == 1 && i != j
+            push!(obj.list, (i,j))
+            push!(obj.outgoing[i], j)
+            push!(obj.ingoing[j], i)
+          end
+        end
+      end
+    end
+    return obj
+  end
+
+end
+
+function am_generator(pool::InstanceGraph)
+  n = length(pool.present_nodes)
+  adjacency_matrix = zeros(Int64, (n,n))
+  g = pool.type_graph.graph
+  for i =1:n
+    id_i = pool.present_nodes[i].node_type.id
+    for j =(i+1):n
+      id_j = pool.present_nodes[j].node_type.id
+      if has_edge(g, id_i, id_j) == 1
+        adjacency_matrix[i,j] = 1
+      end
+      if has_edge(g, id_j, id_i) == 1
+        adjacency_matrix[j,i] = 1
+      end
+    end
+  end
+  return adjacency_matrix
+end
+
+function impacted_nodes(pool::InstanceGraph)
+  n = length(pool.present_nodes)
+  impacted = []
+  g = pool.type_graph.graph
+  for k in 1:n
+    id_k = pool.present_nodes[k].node_type.id
+    if pool.present_nodes[k] in pool.recent_arrivals
+      push!(impacted, k)
+      continue
+    end
+    for i in pool.recent_arrivals
+      id_i = i.node_type.id
+      if has_edge(g, id_i, id_k) == 1 || has_edge(g, id_k, id_i) == 1
+        push!(impacted, k)
+        break
+      end
+    end
+  end
+  return impacted
+end

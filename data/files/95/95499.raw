@@ -1,0 +1,5 @@
+include("common.jl")
+
+OUTFILE = joinpath(OUTDIR, "sucohcsk_ber.txt")
+
+compute_ber(SDATAFILE, RDATAFILE, 2:25, OUTFILE; s_has_header=true, r_has_header=true)

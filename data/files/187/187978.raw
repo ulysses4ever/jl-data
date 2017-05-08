@@ -1,0 +1,134 @@
+;; for debugging
+(define (print-debug fmt &rest arguments)
+  (apply format (stderr-file) fmt arguments))
+
+;; write errors to stderr, not a pop-up window
+(define-special-variable error-destination 'standard-error)
+
+;; pager options
+(setq pager-tooltips-enabled nil)
+
+;; viewport / workspace options
+
+(require 'sawfish.wm.viewport)
+
+(define-special-variable viewport-dimensions '(1 . 1)
+  "Size of each virtual workspace.")
+
+(define-special-variable uniconify-to-current-viewport t
+  "Windows uniconify to the current viewport.")
+
+(define-special-variable workspace-boundary-mode 'wrap-around
+  "How to act when passing the first or last workspace, one of
+`stop', `wrap-around' or `keep-going'")
+
+;; doesn't exist.  :(
+(define-special-variable viewport-boundary-mode 'wrap-around
+  "How to act when passing the first or last viewport, one of
+`stop', `wrap-around' or `keep-going'")
+
+;;  (define-special-variable workspace-send-boundary-mode 'stop
+;;    "How to act when passing the first or last workspace, while
+;;moving a window, one of `stop', `keep-going', `wrap-around'")
+
+;; edge flip options
+
+(require 'sawfish.wm.ext.edge-flip)
+
+(define-special-variable edge-flip-enabled nil
+  "Select the next desktop when the pointer hits screen edge.")
+
+(define-special-variable edge-flip-type 'workspace
+  "Control what hitting the screen edge selects, workspace or viewport.")
+
+(define-special-variable edge-flip-only-when-moving t
+  "Only flip when interactively moving a window.")
+
+(define-special-variable edge-flip-delay 100
+  "Milliseconds to delay before edge flipping.")
+
+;; other
+
+(define-special-variable customize-command-classes '(default viewport)
+    "Also include commands of these classes the key bindings panel.
+Add the `viewport' keyword to make viewport commands show up.")
+
+(define-special-variable configure-auto-gravity t
+  "Automatically select window gravity from position on screen.")
+
+;(define-special-variable place-window-mode 'first-fit)
+(define-special-variable place-window-mode 'best-fit)
+;;  (define-special-variable place-window-mode 'top-left
+;;    "Method of placing windows. Standard modes include: randomly,
+;;interactively, centered, centered-on-parent, under-pointer, none,
+;;top-left, off-center, first-fit, best-fit.")
+
+(define-special-variable ignore-program-positions nil
+   "Ignore program-specified window placements.")
+
+;; window history options
+
+;;(require 'sawfish.wm.ext.window-history)
+;;
+;;(define-special-variable window-history-file "~/.sawfish/window-history"
+;;  "Name of the file used to store persistent window state.")
+;;
+;;(define-special-variable window-history-states
+;;  '(sticky ignored never-focus type maximized frame-style
+;;    cycle-skip window-list-skip)
+;;  "List of states in window-state-change-hook that should be tracked.")
+;;
+;;(define-special-variable window-history-key-property 'WM_CLASS
+;;  "Window property matched on.")
+;;
+;;(define-special-variable window-history-menu)
+;;
+;;(define-special-variable window-history-auto-save-position t
+;;  "Automatically remember window positions.")
+;;
+;;(define-special-variable window-history-auto-save-dimensions nil
+;;  "Automatically remember window sizes.")
+;;
+;;(define-special-variable window-history-auto-save-state nil
+;;  "Automatically remember other window attributes.")
+;;
+;;(define-special-variable window-history-ignore-transients t
+;;  "Don't automatically remember details of transient windows.")
+
+;; smart placement modes
+
+;;  (define-special-variable sp-avoided-windows-weight 100)
+;;  (define-special-variable sp-normal-windows-weight 1)
+
+(define-special-variable sp-padding 20)
+;;  (define-special-variable sp-padding 0
+;;    "Try to leave at least this many pixels between window edges in
+;;first/best-fit.")
+
+;;  (define-special-variable sp-max-points 10
+;;    "The maximum number of points to keep in each grid dimension.")
+
+;;  (define-special-variable sp-max-queued-events 256
+;;    "Only when there's fewer X events than this pending do we try to
+;;do smart placement.")
+
+(defun resize-by-factor (win amount)
+  "Multiply win's dimensions by amount"
+  ;(print-debug "(resize-by-factor %s %s)" win amount)
+  (let* (
+	 (orig-wid (car (window-dimensions win)))
+	 (orig-hgt (cdr (window-dimensions win)))
+	 (new-wid (inexact->exact (floor (* amount orig-wid))))
+	 (new-hgt (inexact->exact (floor (* amount orig-hgt))))
+	 )
+    ; this expects integers ("800 600") and fails on floats ("800. 600.")
+    ;(resize-window-to win new-wid new-hgt)
+    (resize-window-with-hints* win new-wid new-hgt)
+    )
+  )
+
+(define-command 'resize-by-factor-cmd resize-by-factor #:spec "%W")
+
+(require 'sawfish.wm.tabs.tab)
+
+(require 'my-config-local)

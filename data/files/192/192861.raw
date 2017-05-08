@@ -1,0 +1,29 @@
+module Foo
+	export frizz
+	function frizz()
+	end
+	function mine()
+	end
+end
+
+module Bar
+	export frizz
+	function frizz()
+	end
+	function yours()
+	end
+end
+
+# module Zoo
+	using Include
+	using Base.Test
+	@inc Foo mine frizz>ffrizz
+	@inc(Bar, frizz > bfrizz, yours)
+	@test isdefined(:Foo)
+	@test isdefined(:Bar)
+	@test isdefined(:ffrizz)
+	@test isdefined(:bfrizz)
+	@test isdefined(:mine)
+	@test isdefined(:yours)
+	@test !isdefined(:frizz)
+# end

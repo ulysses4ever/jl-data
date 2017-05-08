@@ -1,0 +1,37 @@
+import Graphs
+import Base.Test
+
+"""
+Load some representative graphs and test them in various ways against data from the Matlab BCT
+"""
+function test_BCTGraph()
+    # Directed graph without attributes
+    g = fve30();
+    Base.Test.@test typeof(g) <: Graphs.GenericGraph; # in case of silent failure
+    Base.Test.@test Graphs.num_vertices(g) == 30;
+    Base.Test.@test Graphs.num_edges(g) == 311;
+    Base.Test.@test Graphs.is_directed(g);
+    # test that in and out degrees are not reversed.
+    Base.Test.@test [Graphs.in_degree(v,g) for v in g.vertices[1:5]] == [8,9,13,9,11];
+    
+    # Directed graph with edge attributes
+    g = catct();
+    Base.Test.@test typeof(g) <: Graphs.GenericGraph;
+    Base.Test.@test Graphs.is_directed(g);
+    Base.Test.@test Graphs.num_vertices(g) == 52;
+    Base.Test.@test Graphs.num_edges(g) == 818; # 820, as given on BCBase.Test website, is incorrect.
+    Base.Test.@test findfirst(fieldnames(g.edges[1]),:attributes) > 0;
+    Base.Test.@test findfirst(collect(keys(g.edges[1].attributes)), "weight") > 0;
+    
+    # Undirected graph with vertex attributes 
+    g = coactivation();
+    Base.Test.@test typeof(g) <: Graphs.GenericGraph;
+    Base.Test.@test !Graphs.is_directed(g);
+    Base.Test.@test Graphs.num_vertices(g) == 638;
+    Base.Test.@test Graphs.num_edges(g) == 18625;
+    Base.Test.@test findfirst(fieldnames(g.vertices[1]),:attributes) > 0;
+    Base.Test.@test findfirst(collect(keys(g.vertices[1].attributes)), "coordinates") > 0;
+
+end
+
+test_BCTGraph();

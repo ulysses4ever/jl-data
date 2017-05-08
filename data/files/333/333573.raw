@@ -1,0 +1,20 @@
+import EulerUtil
+
+multiplicand = collect(1:99)
+multiplier = collect(1:9999)
+results = []
+
+for md in multiplicand
+  for ml in multiplier
+    result = md * ml
+    digit_str = join([string(md), string(ml), string(result)])
+    if length(digit_str) == 9
+      if EulerUtil.is_pandigital(digit_str)
+        #println(md, " * ", ml, " = ", result)
+        push!(results, result)
+      end
+    end
+  end
+end
+
+println(sum(unique(results)))

@@ -1,0 +1,54 @@
+function clean_email(email_content, utf8_check::Bool)
+
+  # check if email in utf8
+  if (utf8_check && is_valid_utf8(email_content) == false) return "" end
+
+  # to lower case
+  email_content = lowercase(email_content)
+
+  # strip all HTML
+  # Looks for any expression that starts with < and ends with > and replaces it with a space
+  html_pattern = r"<[^<>]+>"
+  email_content = replace(email_content, html_pattern, ' ')
+
+  # Handle Numbers
+  # Look for one or more charachers between 0-9
+  numbers_pattern = r"[0-9]+"
+  email_content = replace(email_content, numbers_pattern, "number")
+
+  # Handle URLS
+  # Look for strings starting with http:// or https://
+  urls_pattern = r"(http|https)://[^\s]*"
+  email_content = replace(email_content, urls_pattern, "httpaddr")
+
+  # Handle Email Addresses
+  # Look for strings with @ in the middle
+  email_pattern = r"[^\s]+@[^\s]+"
+  email_content = replace(email_content, email_pattern, "emailaddr")
+
+  # Handle dollar sign
+  dollar_pattern = r"[$]+"
+  email_content = replace(email_content, dollar_pattern, "dollar")
+
+  # --- per-word pre-processing ---
+  # split the content of the email into sperate words there by getting rid of any punctuation
+  splitting_chars = [' ', '@', '$', '/', '#', '.', '-', ':', '&', '*', '+',
+                     '=', '[', ']', '?', '!', '(', ')', '{', '}', ',', '\'', '"',
+                     '>', '_', '<', ';', '%', char(10), char(13)]
+  raw_words = split(email_content, splitting_chars)
+
+  # remove all words that are too short
+  cleaned_words = filter( x -> length(x) > 1, raw_words)
+
+  # remove all non alphanumeric characters from each word
+  alpha_numeric_pattern = r"[^a-zA-Z0-9]"
+  cleaned_words = map( x -> replace(x, alpha_numeric_pattern, ""), cleaned_words)
+
+  # stem the word
+  string_doc = StringDocument(join(cleaned_words, ' '))
+  stem!(string_doc)
+  stemed_words = split(text(string_doc), ' ')
+
+  return stemed_words
+end
+

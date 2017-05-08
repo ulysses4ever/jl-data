@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:33 GMT
+Date: Wed, 03 May 2017 21:01:46 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5116
+Content-Length: 5674
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2800
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3923
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "386044b455624e1f82536d63dc14e4a5"
-Last-Modified: Wed, 22 Mar 2017 19:51:14 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "55cde2cfdaa8a913f35ad1ad5cca38c3"
+Last-Modified: Sat, 11 Mar 2017 18:19:36 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,96 +22,96 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 62cdcc2d03a2f173f1c58590d1a90077
-X-GitHub-Request-Id: 7DA1:6634:1347A3B:18EBC8B:590231FD
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: 04D8:5CA3:FFB2AC:148C815:590A453A
 
 {
-  "id": 48492487,
-  "name": "LogReg-Crowds",
-  "full_name": "fmpr/LogReg-Crowds",
+  "id": 47996804,
+  "name": "ChoroplethMaps.jl",
+  "full_name": "penntaylor/ChoroplethMaps.jl",
   "owner": {
-    "login": "fmpr",
-    "id": 15234576,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/15234576?v=3",
+    "login": "penntaylor",
+    "id": 6378937,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/6378937?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/fmpr",
-    "html_url": "https://github.com/fmpr",
-    "followers_url": "https://api.github.com/users/fmpr/followers",
-    "following_url": "https://api.github.com/users/fmpr/following{/other_user}",
-    "gists_url": "https://api.github.com/users/fmpr/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/fmpr/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/fmpr/subscriptions",
-    "organizations_url": "https://api.github.com/users/fmpr/orgs",
-    "repos_url": "https://api.github.com/users/fmpr/repos",
-    "events_url": "https://api.github.com/users/fmpr/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/fmpr/received_events",
+    "url": "https://api.github.com/users/penntaylor",
+    "html_url": "https://github.com/penntaylor",
+    "followers_url": "https://api.github.com/users/penntaylor/followers",
+    "following_url": "https://api.github.com/users/penntaylor/following{/other_user}",
+    "gists_url": "https://api.github.com/users/penntaylor/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/penntaylor/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/penntaylor/subscriptions",
+    "organizations_url": "https://api.github.com/users/penntaylor/orgs",
+    "repos_url": "https://api.github.com/users/penntaylor/repos",
+    "events_url": "https://api.github.com/users/penntaylor/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/penntaylor/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/fmpr/LogReg-Crowds",
-  "description": "Logistic Regression from Crowds",
+  "html_url": "https://github.com/penntaylor/ChoroplethMaps.jl",
+  "description": "Easy thematic mapping using Gadfly and datasets such as US Census Bureau's TIGER data.",
   "fork": false,
-  "url": "https://api.github.com/repos/fmpr/LogReg-Crowds",
-  "forks_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/forks",
-  "keys_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/teams",
-  "hooks_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/hooks",
-  "issue_events_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/events",
-  "assignees_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/tags",
-  "blobs_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/languages",
-  "stargazers_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/stargazers",
-  "contributors_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/contributors",
-  "subscribers_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/subscribers",
-  "subscription_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/subscription",
-  "commits_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/merges",
-  "archive_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/downloads",
-  "issues_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/labels{/name}",
-  "releases_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/fmpr/LogReg-Crowds/deployments",
-  "created_at": "2015-12-23T13:44:00Z",
-  "updated_at": "2017-03-22T19:51:14Z",
-  "pushed_at": "2017-01-15T17:19:49Z",
-  "git_url": "git://github.com/fmpr/LogReg-Crowds.git",
-  "ssh_url": "git@github.com:fmpr/LogReg-Crowds.git",
-  "clone_url": "https://github.com/fmpr/LogReg-Crowds.git",
-  "svn_url": "https://github.com/fmpr/LogReg-Crowds",
+  "url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl",
+  "forks_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/forks",
+  "keys_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/teams",
+  "hooks_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/events",
+  "assignees_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/tags",
+  "blobs_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/subscription",
+  "commits_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/merges",
+  "archive_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/downloads",
+  "issues_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/penntaylor/ChoroplethMaps.jl/deployments",
+  "created_at": "2015-12-14T19:33:31Z",
+  "updated_at": "2017-03-11T18:19:36Z",
+  "pushed_at": "2016-05-07T05:33:08Z",
+  "git_url": "git://github.com/penntaylor/ChoroplethMaps.jl.git",
+  "ssh_url": "git@github.com:penntaylor/ChoroplethMaps.jl.git",
+  "clone_url": "https://github.com/penntaylor/ChoroplethMaps.jl.git",
+  "svn_url": "https://github.com/penntaylor/ChoroplethMaps.jl",
   "homepage": null,
-  "size": 26,
-  "stargazers_count": 1,
-  "watchers_count": 1,
+  "size": 83,
+  "stargazers_count": 3,
+  "watchers_count": 3,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
-  "has_pages": false,
+  "has_pages": true,
   "forks_count": 0,
   "mirror_url": null,
   "open_issues_count": 0,
   "forks": 0,
   "open_issues": 0,
-  "watchers": 1,
+  "watchers": 3,
   "default_branch": "master",
   "permissions": {
     "admin": false,

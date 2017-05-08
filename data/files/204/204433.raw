@@ -1,0 +1,278 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+### binning
+
+# get the bin boundaries vector
+function generate_bin_bounds(minx::Float64,maxx::Float64,decade::Float64,log_scale::Bool=false)
+	bin_bounds = Float64[]
+	push!(bin_bounds,minx)
+	sup = minx
+	while sup < maxx
+		if log_scale
+			if sup > 0
+				sup = exp(log(sup)+decade)
+			else
+				sup = exp(decade)
+			end
+		else
+			sup += decade
+		end
+		push!(bin_bounds,sup)
+	end
+	return bin_bounds
+end
+
+# get the n centers for a (n+1) dimensional bin bounds vector
+function get_bin_centers(bin_bounds::Array{Float64,1},log_scale=false)
+	if log_scale
+		return [exp((log(bin_bounds[i])+log(bin_bounds[i+1]))/2) for i in 1:(length(bin_bounds)-1)]
+	else
+		return [(bin_bounds[i]+bin_bounds[i+1])/2 for i in 1:(length(bin_bounds)-1)]
+	end
+end
+
+### 1D distributions
+
+# NB: A has one entry per vertex 
+# return two arrays (e.g. X:degree -> Y:# vertices)
+function get_1d_discrete_distribution{T<:Int}(A::Array{T,1})
+	d = Dict{Int64,Int64}()
+	for a in A
+		if haskey(d,a)
+			d[a] += 1
+		else
+			d[a] = 1
+		end
+	end
+	X = Int64[]
+	Y = Int64[]
+	ks = sort(collect(keys(d)))
+	minks = ks[1]
+	maxks = ks[end]
+	for k in minks:maxks
+		if haskey(d,k)
+			push!(X,k)
+			push!(Y,d[k])
+		else
+			push!(X,k)
+			push!(Y,0)
+		end
+	end
+	return X,Y
+end
+
+# get 1-dimensional bin average values
+function get_1d_bin_avgs(X::Array{Int64,1},Y::Array{Int64,1},bin_bounds::Array{Float64,1})
+	# binned data
+	nX = Float64[]
+	nY = Float64[]
+	# start binning
+	for i in 1:(length(bin_bounds)-1)
+		xmin = bin_bounds[i]
+		xmax = bin_bounds[i+1]
+		sumx = 0.
+		sumy = 0.
+		count = 0
+		for j in 1:length(X)
+			x = X[j]
+			y = Y[j]
+			if x >= xmin && x < xmax
+				sumx += x
+				sumy += y
+				count += 1
+			end
+		end
+		push!(nX,sumx/count)
+		if sumy == 0
+			push!(nY,0.)
+		else
+			push!(nY,sumy/count)
+		end
+	end
+	return nX,nY
+end
+
+# implement partial binning (start binning above a certain threshold)
+function get_1d_unbinned_data(X::Array{Int64,1},Y::Array{Int64,1},minx::Float64)
+	# unbinned data
+	pX = Float64[]
+	pY = Float64[]
+	# below minx, add the points without binning
+	for i in 1:length(X)
+		x = X[i]
+		y = Y[i]
+		if x < minx
+			push!(pX, float64(x))
+			push!(pY, float64(y))
+		else
+			break
+		end
+	end
+	return pX,pY
+end
+
+### 2D distributions
+
+# NB: A is an array of array and has two entries per vertex
+# return two arrays (e.g. X:(in_degree,out_degree) -> Y:# vertices)
+#
+# NB: return a sparse representation (null entries are not returned, 
+# except for upper left corner (min entries) and lower right corner (max entries) of the grid
+function get_2d_discrete_distribution(A::Array{Array{Int64,1}})
+	d = Dict{Array{Int64,1},Int64}()
+	for a in A
+		if haskey(d,a)
+			d[a] += 1
+		else
+			d[a] = 1
+		end
+	end
+	X = (Array{Int64,1})[]
+	Y = Int64[]
+	ks = sort([tuple(k...) for k in collect(keys(d))])
+	ks1 = [k[1] for k in ks]
+	ks2 = [k[2] for k in ks]
+	minks1 = minimum(ks1)
+	maxks1 = maximum(ks1)
+	minks2 = minimum(ks2)
+	maxks2 = maximum(ks2)
+	for k1 in minks1:maxks1
+		for k2 in minks2:maxks2
+			k = [k1,k2]
+			if haskey(d,k)
+				push!(X,k)
+				push!(Y,d[k])
+			else
+				if k1 == minks1 && k2 == minks2 || k1 == maxks1 && k2 == maxks2
+					push!(X,k)
+					push!(Y,0)
+				end
+			end
+		end
+	end
+	return X,Y
+end
+
+# get 2-dimensional bin average values
+function get_2d_bin_avgs(X::Array{Array{Int64,1}},Y::Array{Int64,1},x_bin_bounds::Array{Float64,1},y_bin_bounds::Array{Float64,1})
+	# binned data
+	nX = (Array{Float64,1})[]
+	nY = Float64[]
+	# start binning
+	for i in 1:(length(x_bin_bounds)-1)
+		xmin = x_bin_bounds[i]
+		xmax = x_bin_bounds[i+1]
+		for j in 1:(length(y_bin_bounds)-1)
+			ymin = y_bin_bounds[j]
+			ymax = y_bin_bounds[j+1]
+			sumx = [0.,0.]
+			sumy = 0.
+			count = 0
+			for z in 1:length(X)
+				x = X[z]
+				y = Y[z]
+				if x[1] >= xmin && x[1] < xmax && x[2] >= ymin && x[2] < ymax
+					sumx += x
+					sumy += y
+					count += 1
+				end
+			end
+			# NB: nX is an array of array
+			push!(nX,sumx/count)
+			if sumy == 0
+				push!(nY,0.)
+			else
+				push!(nY,sumy/count)
+			end
+		end
+	end
+	return nX,nY
+end
+
+# implement partial binning (start binning above a certain threshold)
+function get_2d_unbinned_data(X::Array{Array{Int64,1}},Y::Array{Int64,1},minx::Float64=None,miny::Float64=None)
+	# unbinned data
+	pX = (Array{Float64,1})[]
+	pY = Float64[]
+	# below (minx,miny), add the points without binning
+	for i in 1:length(X)
+		x = X[i]
+		y = Y[i]
+		# NB: X is sorted
+		if x[1] < minx && x[2] < miny
+			push!(nX, float64(x))
+			push!(nY, float64(y))
+		else
+			break
+		end
+	end
+	return pX,pY
+end
+
+### metrics
+
+# get the (binary) entropy of the specified vector
+function get_entropy(P::Array{Float64,1},normalized::Bool=false)
+	sum = 0.
+	for p in P
+		if p > 0
+			sum = sum - p*log(2,p)
+		end
+	end
+
+	if normalized
+		return sum/(log(2,length(P))-1)
+	else
+		return sum
+	end
+end
+
+# Kullback-Leibler divergence
+# NB: Q should not have 0 entries
+function get_KL_divergence(P::Array{Float64,1},Q::Array{Float64,1},normalized::Bool=false)
+	sum = 0.
+	for i in 1:length(P)
+		if P[i] > 0
+			sum = sum + P[i]*log(2,P[i]/Q[i])
+		end
+	end
+
+	if normalized
+		# apply non-linear normalization
+		return 1-exp(-sum)
+	else
+		return sum
+	end
+end
+
+# Renyi divergence
+
+# Chi2 divergence
+function chi2_divergence(P::Array{Float64,1},Q::Array{Float64,1})
+	return sum((P-Q).^2 ./Q)
+end
+
+function euclidean_distance(P::Array{Float64,1},Q::Array{Float64,1})
+	return sqrt(sum((P-Q).^2))
+end
+
+function hellinger_distance(P::Array{Float64,1},Q::Array{Float64,1})
+	return (1/sqrt(2))*euclidean_distance(sqrt(P),sqrt(Q))
+end
+
+function total_variation(P::Array{Float64,1},Q::Array{Float64,1})
+	return (1/2)*sum(abs(P-Q))
+end

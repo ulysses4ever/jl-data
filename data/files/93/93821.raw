@@ -1,0 +1,93 @@
+# Players properties structure
+type Player{P,N,UF}
+  name::String
+  nodes::Array{N,1}
+  examines::Dict{P,Bool}
+  utilityfunctions::Array{UF,1}
+end
+
+# Nodes properties structure
+type Node{P,N,M}
+  name::String
+  owningplayer::P
+  parentnodeplayer::Nullable{P}
+  parentnode::Nullable{N}
+  parentmove::Nullable{M}
+  timeposistion::Int
+  examinedby::Dict{P,Bool}
+  moves::Array{M,1}
+end
+
+# Moves properties structure
+type Move{P,N,R,V}
+  name::String
+  length::Int
+  parentplayer::P
+  parentnode::N
+  childnode::Nullable{N}
+  examinedby::Dict{P,Bool}
+  payoffset::Dict{R,V}
+end
+
+allplayers = Player{Player,Node,Int}[]
+
+# add a player 
+function addplayer()
+	if length(allplayers) == 0 
+		push!(allplayers, Player{Player,Node,Int}("Player 1", Node{Player,Node,Move}[], Dict{Player,Bool}(), Int[]))
+		allplayers[1].examines[allplayers[1]] = 1
+	else
+		x = length(allplayers) + 1
+		name::String = string("Player ",x)
+		push!(allplayers, Player{Player,Node,Int}(name, Node{Player,Node,Move}[], Dict{Player, Bool}(), Int[]))
+		for p1 in allplayers
+			allplayers[x].examines[p1] = 1 
+			p1.examines[allplayers[x]] = 1 
+		end
+	end
+end
+
+# add root node for a specified player based on its index
+function addnode(pindex::Int)
+	name::String = "PX:N1"
+	if length(allplayers[pindex].nodes) == 0
+		name = string("P",pindex,":N1")
+		push!(allplayers[pindex].nodes, Node{Player,Move}(name, allplayers[pindex], nothing, nothing, nothing, 0, Dict{Player, Bool}(), Move{Player, Node, Int, Int}[]))
+	else
+		x = length(allplayers[pindex].nodes) + 1 
+		name = string("P",pindex,":N",x)
+		push!(allplayers[pindex].nodes, Node{Player,Move}(x, name, pindex, nothing, 0, Dict{Player, Bool}(), Move{Player, Node, Int, Int}[]))
+	end
+end
+
+#delete a player based on its index
+function delete(pindex::Int)
+	splice!(allplayers,pindex)
+	x::Int = 1 
+	for p in allplayers
+		p.index = x
+		if p.index >= pindex 
+			for n in p.nodes
+				for m in n.moves
+					m.parentplayerindex = x
+				end
+				n.parentplayerindex = x
+			end
+		end
+		x=x+1
+	end
+end
+
+addplayer()
+addplayer()
+addplayer()
+addplayer()
+addplayer()
+addnode(3)
+addnode(3)
+addnode(3)
+addnode(2)
+addnode(2)
+addnode(2)
+addnode(2)
+delete(2)

@@ -1,0 +1,43 @@
+
+function decode(ex::Expr,state)
+	initial_exprs = Expr[]
+	if ex.head in [:(=),:(+=), :(.*=), :(*=), :(/=)] && isa(ex.args[1],Overwriting)
+		push!(initial_exprs,storeit(ex.args[1],state))
+	end
+	decoded = Expr(ex.head,map(x->decode(x,state),ex.args)...)
+	#[initial_exprs, Expr(ex.head,reduce(vcat,[decode(x,state) for x in ex.args])...)]
+	length(initial_exprs)>0 ? Expr(:block, initial_exprs..., decoded) : decoded
+end
+
+storeit(a::Active,state) = :(storeIntermediate!($(state["tape1"]),$(state["tape2"]),$(sym(a))))
+
+decode(a::Active,state) = sym(a)
+
+@debug function decode(a::AFor,state)
+	decoded_block = decode(a.block,state)
+	#store everything that was used in the loop in case we need to recall it
+	#this is quite conservative
+	for arg in a.s["loop_local_vars"]
+		var = arg[2]::Active
+		@bp
+		push!(decoded_block.args, :(push!($(state["tape2"]),$(sym(var)) )))
+	end
+	Expr(:for,decode(a.loop,state),decoded_block)
+end
+
+function decode(a::AIf,state)
+	ifcond = gensym("ifcond")
+	arg1 = :($ifcond = $(a.ifcond))
+	arg2 = :(push!($(state["ifstack"]),$ifcond))
+	arg3 = Expr(:if,ifcond,decode(a.ifTrue,state), decode(a.ifFalse,state))
+	Expr(:block, arg1, arg2, arg3)
+end
+
+decode(ex_list::Array,state) = map(x->decode(x,state),ex_list)
+decode(s::Symbol,state) = s
+decode(a::Any,state) = a
+
+@debug function sym(x::(Symbol,ASymbol))
+	@bp
+	x
+end

@@ -1,0 +1,21 @@
+println(map(x->begin
+            if x < 0 && iseven(x)
+                return 0
+            elseif x == 0
+                return 1
+            else
+                return x
+            end
+        end,
+    [1, 2, 3, 4, 5]))
+
+# Alternate way of writing the above thing
+println(map([1, 2, 3, 4, 5]) do x
+    if x < 0 && iseven(x)
+        return 0
+    elseif x == 0
+        return 1
+    else
+        return x
+    end
+end)

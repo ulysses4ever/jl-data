@@ -1,0 +1,46 @@
+
+# Framework for Market Risk calculation
+
+module MarketRisk
+
+using Base.Dates
+using InterestRates
+using ForwardDiff
+
+export
+	HistoricalData,
+		HDIndex, HDSpreadCurve,
+	RiskFactor,
+		RFStock, RFSpotCurrency, RFIRCurve, RFIRCurveVertex,
+	PricingModel,
+		PMFixedIncome, PMDerivative, PMCash, PMStock, PMBullet, PMForwardCurrency, PMFutureCurrency,
+	FinancialContract,
+	Scenario,
+	getname, price
+
+import Base: hash, isequal, ==
+
+include("types.jl")
+
+# TODO: generate code for getname function
+getname(rf::RFSpotCurrency) = rf.name
+getname(rf::RFIRCurve) = rf.name
+getname(rf::RFStock) = rf.name
+getname(hd::HDIndex) = hd.name
+getname(hd::HDSpreadCurve) = hd.name
+
+hash(pd::PricingData) = hash(getname(pd))
+isequal(x::PricingData, y::PricingData) = getname(x) == getname(y)
+==(x::PricingData, y::PricingData) = isequal(x,y)
+
+getfunctionalcurrency() = error("Function getfunctionalcurrency should be overloaded.")
+projectCashFlows(c::FinancialContract, s::Scenario) = error("projectCashFlows not defined for $(p) and $(s)")
+
+_currencyvalue(c::RFSpotCurrency, s::Scenario) = getfunctionalcurrency() == c ? 1.0 : s.data[c]
+
+# Let's multiple-dispatch on pricing models
+price(c::FinancialContract, s::Scenario) = _price(c.model, c, s)
+
+include("pricing.jl")
+
+end # module MarketRisk

@@ -1,0 +1,54 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function walk()
+
+    NUM_GENOTYPES = 2000000
+    NUM_MUTANTS = 10000
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    population = Population.make_population(config_vals)
+    genotype = Genotype.make_random_genotype(config_vals)
+    dummy_genotype = Genotype.make_random_genotype(config_vals)
+    best_genotype = Genotype.make_random_genotype(config_vals)
+
+    target_number = 1
+
+    for i = 1:NUM_GENOTYPES
+
+        
+        #best_genotype.fitness = 0
+        if i % 10 == 0
+            temp = target_number
+            while temp == target_number
+                temp = rand(1:8)
+            end
+            target_number = temp
+            best_genotype.evaluated = false
+            Genotype.evaluate(best_genotype, config_vals, target_number, 1, population.preallocation)
+        end
+
+        for j = 1:NUM_MUTANTS
+            Genotype.copy_into(dummy_genotype, genotype)
+            Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+            dummy_genotype.evaluated = false
+            Genotype.evaluate(dummy_genotype, config_vals, target_number, 1, population.preallocation)
+            if dummy_genotype.fitness >= best_genotype.fitness
+                Genotype.copy_into(best_genotype, dummy_genotype)
+            end
+        end
+        println(target_number, " ", i, " ", best_genotype.fitness)
+        Genotype.copy_into(genotype, best_genotype)
+    end
+end
+
+walk()

@@ -1,0 +1,43 @@
+###############################################################
+#                     -=Metodo de Newton=-                    #
+#                      Douglas do Amaral                      #
+#                    v3.14159_r3 / 02.05.15                   #
+###############################################################
+function newton(f,fd,x0)
+  x = x0                             #Muda variavel da raiz aproximada
+  fx = 0                             #Inicializa valor de funcao
+  xn = 0                             #Inicializa a aproximacao
+  k = 0                              #Numero de iteracoes
+  eps = 10e-9                        #Epsilon (calculo erro)
+  func = 10e4                        #Inicializa valor de modulo (x1-x0)
+  ef = 0                             #Variavel de controle (convergencia)
+  while(func>=eps)                   #Enquanto o modulo de |x1-x0| for maior que o erro
+    if f(x)==0                       #Caso x0 informado seja uma raiz
+      xn=x0
+      fx=f(x)
+      return xn, fx, k, ef
+      break
+    end
+    if fd(x) == 0                    #Caso derivada seja == 0
+      ef=1
+      fx=f(x)
+      return xn, fx, k, ef
+      break
+    end
+    if k>=10e3                       #Limite maximo de iteracoes (10.000)
+      ef=1
+      fx=f(x)
+      return xn, fx, k, ef
+      break
+    end
+    xn = x - f(x)/fd(x)              #Metodo de Newton
+    func = abs(xn-x)                 #Modulo de "x1-x0"
+    x=xn                             #Troca variavel para proxima iteracao
+    k=k+1                            #Implementa contador de iteracoes
+    if (-1e-6 < f(xn) < 1e-6)        #Checa se o valor da raiz esta muito proximo de zero
+      return xn, fx, k, ef
+      break
+    end
+  end
+return xn, fx, k, ef
+end

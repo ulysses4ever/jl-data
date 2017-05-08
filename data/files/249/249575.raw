@@ -1,0 +1,745 @@
+using Compat
+using ProtoBuf
+import ProtoBuf.meta
+
+type __enum_Status <: ProtoEnum
+    DRIVER_NOT_STARTED::Int32
+    DRIVER_RUNNING::Int32
+    DRIVER_ABORTED::Int32
+    DRIVER_STOPPED::Int32
+    __enum_Status() = new(1,2,3,4)
+end #type __enum_Status
+const Status = __enum_Status()
+
+type __enum_TaskState <: ProtoEnum
+    TASK_STAGING::Int32
+    TASK_STARTING::Int32
+    TASK_RUNNING::Int32
+    TASK_FINISHED::Int32
+    TASK_FAILED::Int32
+    TASK_KILLED::Int32
+    TASK_LOST::Int32
+    TASK_ERROR::Int32
+    __enum_TaskState() = new(6,0,1,2,3,4,5,7)
+end #type __enum_TaskState
+const TaskState = __enum_TaskState()
+
+type FrameworkID
+    value::String
+    FrameworkID() = (o=new(); fillunset(o); o)
+end #type FrameworkID
+const __req_FrameworkID = Symbol[:value]
+meta(t::Type{FrameworkID}) = meta(t, __req_FrameworkID, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type OfferID
+    value::String
+    OfferID() = (o=new(); fillunset(o); o)
+end #type OfferID
+const __req_OfferID = Symbol[:value]
+meta(t::Type{OfferID}) = meta(t, __req_OfferID, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type SlaveID
+    value::String
+    SlaveID() = (o=new(); fillunset(o); o)
+end #type SlaveID
+const __req_SlaveID = Symbol[:value]
+meta(t::Type{SlaveID}) = meta(t, __req_SlaveID, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type TaskID
+    value::String
+    TaskID() = (o=new(); fillunset(o); o)
+end #type TaskID
+const __req_TaskID = Symbol[:value]
+meta(t::Type{TaskID}) = meta(t, __req_TaskID, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ExecutorID
+    value::String
+    ExecutorID() = (o=new(); fillunset(o); o)
+end #type ExecutorID
+const __req_ExecutorID = Symbol[:value]
+meta(t::Type{ExecutorID}) = meta(t, __req_ExecutorID, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ContainerID
+    value::String
+    ContainerID() = (o=new(); fillunset(o); o)
+end #type ContainerID
+const __req_ContainerID = Symbol[:value]
+meta(t::Type{ContainerID}) = meta(t, __req_ContainerID, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type FrameworkInfo
+    user::String
+    name::String
+    id::FrameworkID
+    failover_timeout::Float64
+    checkpoint::Bool
+    role::String
+    hostname::String
+    principal::String
+    webui_url::String
+    FrameworkInfo() = (o=new(); fillunset(o); o)
+end #type FrameworkInfo
+const __req_FrameworkInfo = Symbol[:user,:name]
+const __val_FrameworkInfo = @compat Dict(:failover_timeout => 0, :checkpoint => false, :role => "*")
+meta(t::Type{FrameworkInfo}) = meta(t, __req_FrameworkInfo, ProtoBuf.DEF_FNUM, __val_FrameworkInfo, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type MasterInfo
+    id::String
+    ip::Uint32
+    port::Uint32
+    pid::String
+    hostname::String
+    MasterInfo() = (o=new(); fillunset(o); o)
+end #type MasterInfo
+const __req_MasterInfo = Symbol[:id,:ip,:port]
+const __val_MasterInfo = @compat Dict(:port => 5050)
+meta(t::Type{MasterInfo}) = meta(t, __req_MasterInfo, ProtoBuf.DEF_FNUM, __val_MasterInfo, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type __enum_Value_Type <: ProtoEnum
+    SCALAR::Int32
+    RANGES::Int32
+    SET::Int32
+    TEXT::Int32
+    __enum_Value_Type() = new(0,1,2,3)
+end #type __enum_Value_Type
+const Value_Type = __enum_Value_Type()
+
+type Value_Scalar
+    value::Float64
+    Value_Scalar() = (o=new(); fillunset(o); o)
+end #type Value_Scalar
+const __req_Value_Scalar = Symbol[:value]
+meta(t::Type{Value_Scalar}) = meta(t, __req_Value_Scalar, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Value_Range
+    _begin::Uint64
+    _end::Uint64
+    Value_Range() = (o=new(); fillunset(o); o)
+end #type Value_Range
+const __req_Value_Range = Symbol[:_begin,:_end]
+meta(t::Type{Value_Range}) = meta(t, __req_Value_Range, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Value_Ranges
+    range::Array{Value_Range,1}
+    Value_Ranges() = (o=new(); fillunset(o); o)
+end #type Value_Ranges
+
+type Value_Set
+    item::Array{String,1}
+    Value_Set() = (o=new(); fillunset(o); o)
+end #type Value_Set
+
+type Value_Text
+    value::String
+    Value_Text() = (o=new(); fillunset(o); o)
+end #type Value_Text
+const __req_Value_Text = Symbol[:value]
+meta(t::Type{Value_Text}) = meta(t, __req_Value_Text, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Value
+    _type::Int32
+    scalar::Value_Scalar
+    ranges::Value_Ranges
+    set::Value_Set
+    text::Value_Text
+    Value() = (o=new(); fillunset(o); o)
+end #type Value
+const __req_Value = Symbol[:_type]
+meta(t::Type{Value}) = meta(t, __req_Value, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Attribute
+    name::String
+    _type::Int32
+    scalar::Value_Scalar
+    ranges::Value_Ranges
+    set::Value_Set
+    text::Value_Text
+    Attribute() = (o=new(); fillunset(o); o)
+end #type Attribute
+const __req_Attribute = Symbol[:name,:_type]
+const __fnum_Attribute = Int[1,2,3,4,6,5]
+meta(t::Type{Attribute}) = meta(t, __req_Attribute, __fnum_Attribute, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type PerfStatistics
+    timestamp::Float64
+    duration::Float64
+    cycles::Uint64
+    stalled_cycles_frontend::Uint64
+    stalled_cycles_backend::Uint64
+    instructions::Uint64
+    cache_references::Uint64
+    cache_misses::Uint64
+    branches::Uint64
+    branch_misses::Uint64
+    bus_cycles::Uint64
+    ref_cycles::Uint64
+    cpu_clock::Float64
+    task_clock::Float64
+    page_faults::Uint64
+    minor_faults::Uint64
+    major_faults::Uint64
+    context_switches::Uint64
+    cpu_migrations::Uint64
+    alignment_faults::Uint64
+    emulation_faults::Uint64
+    l1_dcache_loads::Uint64
+    l1_dcache_load_misses::Uint64
+    l1_dcache_stores::Uint64
+    l1_dcache_store_misses::Uint64
+    l1_dcache_prefetches::Uint64
+    l1_dcache_prefetch_misses::Uint64
+    l1_icache_loads::Uint64
+    l1_icache_load_misses::Uint64
+    l1_icache_prefetches::Uint64
+    l1_icache_prefetch_misses::Uint64
+    llc_loads::Uint64
+    llc_load_misses::Uint64
+    llc_stores::Uint64
+    llc_store_misses::Uint64
+    llc_prefetches::Uint64
+    llc_prefetch_misses::Uint64
+    dtlb_loads::Uint64
+    dtlb_load_misses::Uint64
+    dtlb_stores::Uint64
+    dtlb_store_misses::Uint64
+    dtlb_prefetches::Uint64
+    dtlb_prefetch_misses::Uint64
+    itlb_loads::Uint64
+    itlb_load_misses::Uint64
+    branch_loads::Uint64
+    branch_load_misses::Uint64
+    node_loads::Uint64
+    node_load_misses::Uint64
+    node_stores::Uint64
+    node_store_misses::Uint64
+    node_prefetches::Uint64
+    node_prefetch_misses::Uint64
+    PerfStatistics() = (o=new(); fillunset(o); o)
+end #type PerfStatistics
+const __req_PerfStatistics = Symbol[:timestamp,:duration]
+meta(t::Type{PerfStatistics}) = meta(t, __req_PerfStatistics, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ResourceStatistics
+    timestamp::Float64
+    processes::Uint32
+    threads::Uint32
+    cpus_user_time_secs::Float64
+    cpus_system_time_secs::Float64
+    cpus_limit::Float64
+    cpus_nr_periods::Uint32
+    cpus_nr_throttled::Uint32
+    cpus_throttled_time_secs::Float64
+    mem_rss_bytes::Uint64
+    mem_limit_bytes::Uint64
+    mem_file_bytes::Uint64
+    mem_anon_bytes::Uint64
+    mem_mapped_file_bytes::Uint64
+    disk_limit_bytes::Uint64
+    disk_used_bytes::Uint64
+    perf::PerfStatistics
+    net_rx_packets::Uint64
+    net_rx_bytes::Uint64
+    net_rx_errors::Uint64
+    net_rx_dropped::Uint64
+    net_tx_packets::Uint64
+    net_tx_bytes::Uint64
+    net_tx_errors::Uint64
+    net_tx_dropped::Uint64
+    net_tcp_rtt_microsecs_p50::Float64
+    net_tcp_rtt_microsecs_p90::Float64
+    net_tcp_rtt_microsecs_p95::Float64
+    net_tcp_rtt_microsecs_p99::Float64
+    net_tcp_active_connections::Float64
+    net_tcp_time_wait_connections::Float64
+    ResourceStatistics() = (o=new(); fillunset(o); o)
+end #type ResourceStatistics
+const __req_ResourceStatistics = Symbol[:timestamp]
+const __fnum_ResourceStatistics = Int[1,30,31,2,3,4,7,8,9,5,6,10,11,12,26,27,13,14,15,16,17,18,19,20,21,22,23,24,25,28,29]
+meta(t::Type{ResourceStatistics}) = meta(t, __req_ResourceStatistics, __fnum_ResourceStatistics, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ResourceUsage
+    slave_id::SlaveID
+    framework_id::FrameworkID
+    executor_id::ExecutorID
+    executor_name::String
+    task_id::TaskID
+    statistics::ResourceStatistics
+    ResourceUsage() = (o=new(); fillunset(o); o)
+end #type ResourceUsage
+const __req_ResourceUsage = Symbol[:slave_id,:framework_id]
+meta(t::Type{ResourceUsage}) = meta(t, __req_ResourceUsage, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type __enum_TaskStatus_Source <: ProtoEnum
+    SOURCE_MASTER::Int32
+    SOURCE_SLAVE::Int32
+    SOURCE_EXECUTOR::Int32
+    __enum_TaskStatus_Source() = new(0,1,2)
+end #type __enum_TaskStatus_Source
+const TaskStatus_Source = __enum_TaskStatus_Source()
+
+type __enum_TaskStatus_Reason <: ProtoEnum
+    REASON_COMMAND_EXECUTOR_FAILED::Int32
+    REASON_EXECUTOR_TERMINATED::Int32
+    REASON_EXECUTOR_UNREGISTERED::Int32
+    REASON_FRAMEWORK_REMOVED::Int32
+    REASON_GC_ERROR::Int32
+    REASON_INVALID_FRAMEWORKID::Int32
+    REASON_INVALID_OFFERS::Int32
+    REASON_MASTER_DISCONNECTED::Int32
+    REASON_MEMORY_LIMIT::Int32
+    REASON_RECONCILIATION::Int32
+    REASON_SLAVE_DISCONNECTED::Int32
+    REASON_SLAVE_REMOVED::Int32
+    REASON_SLAVE_RESTARTED::Int32
+    REASON_SLAVE_UNKNOWN::Int32
+    REASON_TASK_INVALID::Int32
+    REASON_TASK_UNAUTHORIZED::Int32
+    REASON_TASK_UNKNOWN::Int32
+    __enum_TaskStatus_Reason() = new(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)
+end #type __enum_TaskStatus_Reason
+const TaskStatus_Reason = __enum_TaskStatus_Reason()
+
+type TaskStatus
+    task_id::TaskID
+    state::Int32
+    message::String
+    source::Int32
+    reason::Int32
+    data::Array{Uint8,1}
+    slave_id::SlaveID
+    executor_id::ExecutorID
+    timestamp::Float64
+    uuid::Array{Uint8,1}
+    healthy::Bool
+    TaskStatus() = (o=new(); fillunset(o); o)
+end #type TaskStatus
+const __req_TaskStatus = Symbol[:task_id,:state]
+const __fnum_TaskStatus = Int[1,2,4,9,10,3,5,7,6,11,8]
+meta(t::Type{TaskStatus}) = meta(t, __req_TaskStatus, __fnum_TaskStatus, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Filters
+    refuse_seconds::Float64
+    Filters() = (o=new(); fillunset(o); o)
+end #type Filters
+const __val_Filters = @compat Dict(:refuse_seconds => 5)
+meta(t::Type{Filters}) = meta(t, ProtoBuf.DEF_REQ, ProtoBuf.DEF_FNUM, __val_Filters, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Environment_Variable
+    name::String
+    value::String
+    Environment_Variable() = (o=new(); fillunset(o); o)
+end #type Environment_Variable
+const __req_Environment_Variable = Symbol[:name,:value]
+meta(t::Type{Environment_Variable}) = meta(t, __req_Environment_Variable, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Environment
+    variables::Array{Environment_Variable,1}
+    Environment() = (o=new(); fillunset(o); o)
+end #type Environment
+
+type CommandInfo_URI
+    value::String
+    executable::Bool
+    extract::Bool
+    CommandInfo_URI() = (o=new(); fillunset(o); o)
+end #type CommandInfo_URI
+const __req_CommandInfo_URI = Symbol[:value]
+const __val_CommandInfo_URI = @compat Dict(:extract => true)
+meta(t::Type{CommandInfo_URI}) = meta(t, __req_CommandInfo_URI, ProtoBuf.DEF_FNUM, __val_CommandInfo_URI, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type CommandInfo_ContainerInfo
+    image::String
+    options::Array{String,1}
+    CommandInfo_ContainerInfo() = (o=new(); fillunset(o); o)
+end #type CommandInfo_ContainerInfo
+const __req_CommandInfo_ContainerInfo = Symbol[:image]
+meta(t::Type{CommandInfo_ContainerInfo}) = meta(t, __req_CommandInfo_ContainerInfo, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type CommandInfo
+    container::CommandInfo_ContainerInfo
+    uris::Array{CommandInfo_URI,1}
+    environment::Environment
+    shell::Bool
+    value::String
+    arguments::Array{String,1}
+    user::String
+    CommandInfo() = (o=new(); fillunset(o); o)
+end #type CommandInfo
+const __val_CommandInfo = @compat Dict(:shell => true)
+const __fnum_CommandInfo = Int[4,1,2,6,3,7,5]
+meta(t::Type{CommandInfo}) = meta(t, ProtoBuf.DEF_REQ, __fnum_CommandInfo, __val_CommandInfo, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type HealthCheck_HTTP
+    port::Uint32
+    path::String
+    statuses::Array{Uint32,1}
+    HealthCheck_HTTP() = (o=new(); fillunset(o); o)
+end #type HealthCheck_HTTP
+const __req_HealthCheck_HTTP = Symbol[:port]
+const __val_HealthCheck_HTTP = @compat Dict(:path => "/")
+const __fnum_HealthCheck_HTTP = Int[1,2,4]
+meta(t::Type{HealthCheck_HTTP}) = meta(t, __req_HealthCheck_HTTP, __fnum_HealthCheck_HTTP, __val_HealthCheck_HTTP, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type HealthCheck
+    http::HealthCheck_HTTP
+    delay_seconds::Float64
+    interval_seconds::Float64
+    timeout_seconds::Float64
+    consecutive_failures::Uint32
+    grace_period_seconds::Float64
+    command::CommandInfo
+    HealthCheck() = (o=new(); fillunset(o); o)
+end #type HealthCheck
+const __val_HealthCheck = @compat Dict(:delay_seconds => 15, :interval_seconds => 10, :timeout_seconds => 20, :consecutive_failures => 3, :grace_period_seconds => 10)
+meta(t::Type{HealthCheck}) = meta(t, ProtoBuf.DEF_REQ, ProtoBuf.DEF_FNUM, __val_HealthCheck, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Parameter
+    key::String
+    value::String
+    Parameter() = (o=new(); fillunset(o); o)
+end #type Parameter
+const __req_Parameter = Symbol[:key,:value]
+meta(t::Type{Parameter}) = meta(t, __req_Parameter, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Parameters
+    parameter::Array{Parameter,1}
+    Parameters() = (o=new(); fillunset(o); o)
+end #type Parameters
+
+type Credential
+    principal::String
+    secret::Array{Uint8,1}
+    Credential() = (o=new(); fillunset(o); o)
+end #type Credential
+const __req_Credential = Symbol[:principal]
+meta(t::Type{Credential}) = meta(t, __req_Credential, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Credentials
+    credentials::Array{Credential,1}
+    Credentials() = (o=new(); fillunset(o); o)
+end #type Credentials
+
+type __enum_ACL_Entity_Type <: ProtoEnum
+    SOME::Int32
+    ANY::Int32
+    NONE::Int32
+    __enum_ACL_Entity_Type() = new(0,1,2)
+end #type __enum_ACL_Entity_Type
+const ACL_Entity_Type = __enum_ACL_Entity_Type()
+
+type ACL_Entity
+    _type::Int32
+    values::Array{String,1}
+    ACL_Entity() = (o=new(); fillunset(o); o)
+end #type ACL_Entity
+const __val_ACL_Entity = @compat Dict(:_type => ACL_Entity_Type.SOME)
+meta(t::Type{ACL_Entity}) = meta(t, ProtoBuf.DEF_REQ, ProtoBuf.DEF_FNUM, __val_ACL_Entity, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ACL_RegisterFramework
+    principals::ACL_Entity
+    roles::ACL_Entity
+    ACL_RegisterFramework() = (o=new(); fillunset(o); o)
+end #type ACL_RegisterFramework
+const __req_ACL_RegisterFramework = Symbol[:principals,:roles]
+meta(t::Type{ACL_RegisterFramework}) = meta(t, __req_ACL_RegisterFramework, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ACL_RunTask
+    principals::ACL_Entity
+    users::ACL_Entity
+    ACL_RunTask() = (o=new(); fillunset(o); o)
+end #type ACL_RunTask
+const __req_ACL_RunTask = Symbol[:principals,:users]
+meta(t::Type{ACL_RunTask}) = meta(t, __req_ACL_RunTask, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ACL_ShutdownFramework
+    principals::ACL_Entity
+    framework_principals::ACL_Entity
+    ACL_ShutdownFramework() = (o=new(); fillunset(o); o)
+end #type ACL_ShutdownFramework
+const __req_ACL_ShutdownFramework = Symbol[:principals,:framework_principals]
+meta(t::Type{ACL_ShutdownFramework}) = meta(t, __req_ACL_ShutdownFramework, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ACL
+    ACL() = (o=new(); fillunset(o); o)
+end #type ACL
+
+type ACLs
+    permissive::Bool
+    register_frameworks::Array{ACL_RegisterFramework,1}
+    run_tasks::Array{ACL_RunTask,1}
+    shutdown_frameworks::Array{ACL_ShutdownFramework,1}
+    ACLs() = (o=new(); fillunset(o); o)
+end #type ACLs
+const __val_ACLs = @compat Dict(:permissive => true)
+meta(t::Type{ACLs}) = meta(t, ProtoBuf.DEF_REQ, ProtoBuf.DEF_FNUM, __val_ACLs, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type RateLimit
+    qps::Float64
+    principal::String
+    capacity::Uint64
+    RateLimit() = (o=new(); fillunset(o); o)
+end #type RateLimit
+const __req_RateLimit = Symbol[:principal]
+meta(t::Type{RateLimit}) = meta(t, __req_RateLimit, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type RateLimits
+    limits::Array{RateLimit,1}
+    aggregate_default_qps::Float64
+    aggregate_default_capacity::Uint64
+    RateLimits() = (o=new(); fillunset(o); o)
+end #type RateLimits
+
+type __enum_Volume_Mode <: ProtoEnum
+    RW::Int32
+    RO::Int32
+    __enum_Volume_Mode() = new(1,2)
+end #type __enum_Volume_Mode
+const Volume_Mode = __enum_Volume_Mode()
+
+type Volume
+    container_path::String
+    host_path::String
+    mode::Int32
+    Volume() = (o=new(); fillunset(o); o)
+end #type Volume
+const __req_Volume = Symbol[:container_path,:mode]
+meta(t::Type{Volume}) = meta(t, __req_Volume, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Resource_DiskInfo_Persistence
+    id::String
+    Resource_DiskInfo_Persistence() = (o=new(); fillunset(o); o)
+end #type Resource_DiskInfo_Persistence
+const __req_Resource_DiskInfo_Persistence = Symbol[:id]
+meta(t::Type{Resource_DiskInfo_Persistence}) = meta(t, __req_Resource_DiskInfo_Persistence, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Resource_DiskInfo
+    persistence::Resource_DiskInfo_Persistence
+    volume::Volume
+    Resource_DiskInfo() = (o=new(); fillunset(o); o)
+end #type Resource_DiskInfo
+
+type Resource
+    name::String
+    _type::Int32
+    scalar::Value_Scalar
+    ranges::Value_Ranges
+    set::Value_Set
+    role::String
+    disk::Resource_DiskInfo
+    Resource() = (o=new(); fillunset(o); o)
+end #type Resource
+const __req_Resource = Symbol[:name,:_type]
+const __val_Resource = @compat Dict(:role => "*")
+meta(t::Type{Resource}) = meta(t, __req_Resource, ProtoBuf.DEF_FNUM, __val_Resource, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Request
+    slave_id::SlaveID
+    resources::Array{Resource,1}
+    Request() = (o=new(); fillunset(o); o)
+end #type Request
+
+type Offer_Operation_Create
+    volumes::Array{Resource,1}
+    Offer_Operation_Create() = (o=new(); fillunset(o); o)
+end #type Offer_Operation_Create
+
+type Offer
+    id::OfferID
+    framework_id::FrameworkID
+    slave_id::SlaveID
+    hostname::String
+    resources::Array{Resource,1}
+    attributes::Array{Attribute,1}
+    executor_ids::Array{ExecutorID,1}
+    Offer() = (o=new(); fillunset(o); o)
+end #type Offer
+const __req_Offer = Symbol[:id,:framework_id,:slave_id,:hostname]
+const __fnum_Offer = Int[1,2,3,4,5,7,6]
+meta(t::Type{Offer}) = meta(t, __req_Offer, __fnum_Offer, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Offer_Operation_Destroy
+    volumes::Array{Resource,1}
+    Offer_Operation_Destroy() = (o=new(); fillunset(o); o)
+end #type Offer_Operation_Destroy
+
+type Offer_Operation_Reserve
+    resources::Array{Resource,1}
+    Offer_Operation_Reserve() = (o=new(); fillunset(o); o)
+end #type Offer_Operation_Reserve
+
+type Offer_Operation_Unreserve
+    resources::Array{Resource,1}
+    Offer_Operation_Unreserve() = (o=new(); fillunset(o); o)
+end #type Offer_Operation_Unreserve
+
+type SlaveInfo
+    hostname::String
+    port::Int32
+    resources::Array{Resource,1}
+    attributes::Array{Attribute,1}
+    id::SlaveID
+    checkpoint::Bool
+    SlaveInfo() = (o=new(); fillunset(o); o)
+end #type SlaveInfo
+const __req_SlaveInfo = Symbol[:hostname]
+const __val_SlaveInfo = @compat Dict(:port => 5051, :checkpoint => false)
+const __fnum_SlaveInfo = Int[1,8,3,5,6,7]
+meta(t::Type{SlaveInfo}) = meta(t, __req_SlaveInfo, __fnum_SlaveInfo, __val_SlaveInfo, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type __enum_ContainerInfo_Type <: ProtoEnum
+    DOCKER::Int32
+    MESOS::Int32
+    __enum_ContainerInfo_Type() = new(1,2)
+end #type __enum_ContainerInfo_Type
+const ContainerInfo_Type = __enum_ContainerInfo_Type()
+
+type __enum_ContainerInfo_DockerInfo_Network <: ProtoEnum
+    HOST::Int32
+    BRIDGE::Int32
+    NONE::Int32
+    __enum_ContainerInfo_DockerInfo_Network() = new(1,2,3)
+end #type __enum_ContainerInfo_DockerInfo_Network
+const ContainerInfo_DockerInfo_Network = __enum_ContainerInfo_DockerInfo_Network()
+
+type ContainerInfo_DockerInfo_PortMapping
+    host_port::Uint32
+    container_port::Uint32
+    protocol::String
+    ContainerInfo_DockerInfo_PortMapping() = (o=new(); fillunset(o); o)
+end #type ContainerInfo_DockerInfo_PortMapping
+const __req_ContainerInfo_DockerInfo_PortMapping = Symbol[:host_port,:container_port]
+meta(t::Type{ContainerInfo_DockerInfo_PortMapping}) = meta(t, __req_ContainerInfo_DockerInfo_PortMapping, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ContainerInfo_DockerInfo
+    image::String
+    network::Int32
+    port_mappings::Array{ContainerInfo_DockerInfo_PortMapping,1}
+    privileged::Bool
+    parameters::Array{Parameter,1}
+    force_pull_image::Bool
+    ContainerInfo_DockerInfo() = (o=new(); fillunset(o); o)
+end #type ContainerInfo_DockerInfo
+const __req_ContainerInfo_DockerInfo = Symbol[:image]
+const __val_ContainerInfo_DockerInfo = @compat Dict(:network => ContainerInfo_DockerInfo_Network.HOST, :privileged => false)
+meta(t::Type{ContainerInfo_DockerInfo}) = meta(t, __req_ContainerInfo_DockerInfo, ProtoBuf.DEF_FNUM, __val_ContainerInfo_DockerInfo, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ContainerInfo
+    _type::Int32
+    volumes::Array{Volume,1}
+    hostname::String
+    docker::ContainerInfo_DockerInfo
+    ContainerInfo() = (o=new(); fillunset(o); o)
+end #type ContainerInfo
+const __req_ContainerInfo = Symbol[:_type]
+const __fnum_ContainerInfo = Int[1,2,4,3]
+meta(t::Type{ContainerInfo}) = meta(t, __req_ContainerInfo, __fnum_ContainerInfo, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Label
+    key::String
+    value::String
+    Label() = (o=new(); fillunset(o); o)
+end #type Label
+const __req_Label = Symbol[:key]
+meta(t::Type{Label}) = meta(t, __req_Label, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Labels
+    labels::Array{Label,1}
+    Labels() = (o=new(); fillunset(o); o)
+end #type Labels
+
+type Port
+    number::Uint32
+    name::String
+    protocol::String
+    Port() = (o=new(); fillunset(o); o)
+end #type Port
+const __req_Port = Symbol[:number]
+meta(t::Type{Port}) = meta(t, __req_Port, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Ports
+    ports::Array{Port,1}
+    Ports() = (o=new(); fillunset(o); o)
+end #type Ports
+
+type __enum_DiscoveryInfo_Visibility <: ProtoEnum
+    FRAMEWORK::Int32
+    CLUSTER::Int32
+    EXTERNAL::Int32
+    __enum_DiscoveryInfo_Visibility() = new(0,1,2)
+end #type __enum_DiscoveryInfo_Visibility
+const DiscoveryInfo_Visibility = __enum_DiscoveryInfo_Visibility()
+
+type DiscoveryInfo
+    visibility::Int32
+    name::String
+    environment::String
+    location::String
+    version::String
+    ports::Ports
+    labels::Labels
+    DiscoveryInfo() = (o=new(); fillunset(o); o)
+end #type DiscoveryInfo
+const __req_DiscoveryInfo = Symbol[:visibility]
+meta(t::Type{DiscoveryInfo}) = meta(t, __req_DiscoveryInfo, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type ExecutorInfo
+    executor_id::ExecutorID
+    framework_id::FrameworkID
+    command::CommandInfo
+    container::ContainerInfo
+    resources::Array{Resource,1}
+    name::String
+    source::String
+    data::Array{Uint8,1}
+    discovery::DiscoveryInfo
+    ExecutorInfo() = (o=new(); fillunset(o); o)
+end #type ExecutorInfo
+const __req_ExecutorInfo = Symbol[:executor_id,:command]
+const __fnum_ExecutorInfo = Int[1,8,7,11,5,9,10,4,12]
+meta(t::Type{ExecutorInfo}) = meta(t, __req_ExecutorInfo, __fnum_ExecutorInfo, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type TaskInfo
+    name::String
+    task_id::TaskID
+    slave_id::SlaveID
+    resources::Array{Resource,1}
+    executor::ExecutorInfo
+    command::CommandInfo
+    container::ContainerInfo
+    data::Array{Uint8,1}
+    health_check::HealthCheck
+    labels::Labels
+    discovery::DiscoveryInfo
+    TaskInfo() = (o=new(); fillunset(o); o)
+end #type TaskInfo
+const __req_TaskInfo = Symbol[:name,:task_id,:slave_id]
+const __fnum_TaskInfo = Int[1,2,3,4,5,7,9,6,8,10,11]
+meta(t::Type{TaskInfo}) = meta(t, __req_TaskInfo, __fnum_TaskInfo, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+type Offer_Operation_Launch
+    task_infos::Array{TaskInfo,1}
+    Offer_Operation_Launch() = (o=new(); fillunset(o); o)
+end #type Offer_Operation_Launch
+
+type __enum_Offer_Operation_Type <: ProtoEnum
+    LAUNCH::Int32
+    RESERVE::Int32
+    UNRESERVE::Int32
+    CREATE::Int32
+    DESTROY::Int32
+    __enum_Offer_Operation_Type() = new(1,2,3,4,5)
+end #type __enum_Offer_Operation_Type
+const Offer_Operation_Type = __enum_Offer_Operation_Type()
+
+type Offer_Operation
+    _type::Int32
+    launch::Offer_Operation_Launch
+    reserve::Offer_Operation_Reserve
+    unreserve::Offer_Operation_Unreserve
+    create::Offer_Operation_Create
+    destroy::Offer_Operation_Destroy
+    Offer_Operation() = (o=new(); fillunset(o); o)
+end #type Offer_Operation
+const __req_Offer_Operation = Symbol[:_type]
+meta(t::Type{Offer_Operation}) = meta(t, __req_Offer_Operation, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, true, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES)
+
+export Status, TaskState, FrameworkID, OfferID, SlaveID, TaskID, ExecutorID, ContainerID, FrameworkInfo, HealthCheck_HTTP, HealthCheck, CommandInfo_URI, CommandInfo_ContainerInfo, CommandInfo, ExecutorInfo, MasterInfo, SlaveInfo, Value_Type, Value_Scalar, Value_Range, Value_Ranges, Value_Set, Value_Text, Value, Attribute, Resource_DiskInfo_Persistence, Resource_DiskInfo, Resource, ResourceStatistics, ResourceUsage, PerfStatistics, Request, Offer_Operation_Type, Offer_Operation_Launch, Offer_Operation_Reserve, Offer_Operation_Unreserve, Offer_Operation_Create, Offer_Operation_Destroy, Offer_Operation, Offer, TaskInfo, TaskStatus_Source, TaskStatus_Reason, TaskStatus, Filters, Environment_Variable, Environment, Parameter, Parameters, Credential, Credentials, ACL_Entity_Type, ACL_Entity, ACL_RegisterFramework, ACL_RunTask, ACL_ShutdownFramework, ACL, ACLs, RateLimit, RateLimits, Volume_Mode, Volume, ContainerInfo_Type, ContainerInfo_DockerInfo_Network, ContainerInfo_DockerInfo_PortMapping, ContainerInfo_DockerInfo, ContainerInfo, Labels, Label, Port, Ports, DiscoveryInfo_Visibility, DiscoveryInfo

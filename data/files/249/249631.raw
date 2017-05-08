@@ -1,0 +1,28 @@
+module Mesos
+
+using ProtoBuf
+
+depsfile = Pkg.dir("Mesos","deps","deps.jl")
+if isfile(depsfile)
+    include(depsfile)
+else
+    error("Mesos not properly installed. Please run Pkg.build(\"Mesos\")")
+end
+
+include("proto/Proto.jl")
+include("utils.jl")
+include("upid.jl")
+include("executor_driver.jl")
+include("executor.jl")
+include("scheduler_driver.jl")
+include("scheduler.jl")
+include("clustermanager/manager.jl")
+
+export UPID, Proto,
+       Executor, ExecutorDriver, ExecutorConfig,
+       Scheduler, SchedulerDriver, SchedulerConfig,
+       start, stop, run, abort,
+       sendStatusUpdate, sendFrameworkMessage, acceptOffers, acknowledgeStatusUpdate,
+       @proto
+
+end # module

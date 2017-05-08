@@ -1,0 +1,44 @@
+include("Auction.jl") # load auction model code
+include("SMIL.jl") # the adaptive importance sampling algorithm
+include(Pkg.dir()"/MPI/examples/montecarlo.jl")
+
+function AuctionWrapper()
+    # true theta
+    theta = [0.5, 0.5]
+    # generate 'true' aux. stat.
+    Zn = aux_stat(theta, "")
+    S = 5000
+    randdraws = rand(80,7,S) # these need to be fixed for the SMIL iterations
+    thetahatsmil = smil_or_cuii_estimate(Zn, randdraws, S, true) # true for SMIL, false for CU-II
+    thetahatcuii = smil__or_cuii_estimate(Zn, randdraws, S, false) # true for SMIL, false for CU-II
+    return [thetahatsmil thetahatcuii]
+end
+
+# the monitoring function
+function AuctionMonitor(sofar, results)
+    if mod(sofar,1) == 0
+        m = mean(results[1:sofar,1:end],1)
+        theta = [0.5 0.5]
+        theta = [theta theta]
+        er = theta - m; # theta defined at top level, so ok to use
+        b = mean(er,1)
+        s = std(results[1:sofar,:],1) 
+        mse = s.^2 + b.^2
+        rmse = sqrt(mse)
+        println()
+        println("reps so far: ", sofar)
+        println("mean: ", m)
+        println("bias: ", b)
+        println("std.dev: ", s)
+        println("rmse.: ",rmse)
+    end
+end
+
+function main()
+    reps = 1000   # desired number of MC reps
+    n_returns = 4
+    pooled = 1  # do this many reps b
+    montecarlo(AuctionWrapper, AuctionMonitor, reps, n_returns, pooled)
+end
+
+main()

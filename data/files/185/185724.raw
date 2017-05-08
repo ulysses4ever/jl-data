@@ -1,0 +1,65 @@
+using Willow
+
+# matlab estimate of isi = 0.0177
+# julia/glfw estimate of isi = 0.0166 (monitor is at 60Hz. 1/60 = 0.016666...)
+#
+# fastest matlab roundtrip time = 0.007860
+# fastest julia roundtrip time = 0.002186743
+# "test.tsv" contains timing data for Willow.jl that was generated
+# by the script below.
+#
+# julia is faster (3.59x at worst, usually >15x faster) and its timing
+# fluctuates much less than matlab's. plus, it appears that julia accurately
+# syncs to vertical refresh, even on OS X.
+# however, i'm not sure if this is an illusion or a mistake on my part...
+#
+# anyway, all of this here is without any of the special psychtoolbox tricks
+# that try to make stuff sync with the monitor via tweaks. its just standard
+# opengl and glfw commands, although we are using the commands that are some
+# of the fastest for rendering.
+#
+# the julia code also produces nicer looking images and is easier to write,
+# understand, and maintain.
+
+window = Willow.screen()
+ft = zeros(600)
+x = 1
+while x < 600
+	st = time_ns()
+	Willow.background(0.94, 0.92, 0.9, 1.0)
+	Willow.strokecol(0, 0, 0, 1)
+	Willow.fillcol(0.7, 0.7, 0.7, 1.0)
+	Willow.ellipse(0, 0, 0.3, 0.5)
+	Willow.ellipse(-.5, .5, 0.2, 0.2)
+	Willow.triangle(.3, .75, .58, .20, .86, .75)
+	Willow.triangle(.3, .6, .58, .40, .86, .7)
+	Willow.strokeWeight(5)
+	Willow.point(randn(10), randn(10))
+	Willow.strokeWeight(1)
+	Willow.fillcol(1, 0, 0, 1)
+	Willow.quad(-.3, -.75, -.58, -.20, -.86, -.75, -.2, -.4)
+	Willow.noFill()
+	Willow.rect(-.6, -.6, .2, .5)
+	Willow.line(.5, -.4, .7, -.5)
+	Willow.line(.7, -.4, .5, -.5)
+	Willow.strokecol(0.9, 0, 0, 1)
+	Willow.arc(-.6, .6, .3, .3, 0.4pi, pi)
+	Willow.fillcol(sin(x)/2+0.5, cos(x)/2+0.5, (sin(x)*cos(x))/2+0.5, 1.0)
+	Willow.ellipse(0, 0, 0.2, 0.2)
+	Willow.point(0, 0)
+	Willow.animate(window)
+	ft[x] = time_ns() - st
+	x += 1
+	# if keyPress(w, GLFW.KEY_SPACE)
+	#	save("screenshot.tiff")
+	#	println("key pressed and screenshot saved.")
+	#	beep()
+	# end
+	# if mousePress(w, GLFW.MOUSE_BUTTON_LEFT)
+	#	println("bye!")
+	#	endDrawing(w)
+	#	beep()
+	# end
+end
+
+Willow.endDrawing(window)

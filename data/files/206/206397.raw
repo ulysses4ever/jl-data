@@ -1,0 +1,254 @@
+using Iterators, JLD
+
+#####################################################################
+### Parsing a single LibSVM line (both dense and sparse variants) ###
+#####################################################################
+
+type ParserState
+    line::ASCIIString
+    position::Int
+end
+
+ParserState(line) = ParserState(line, 1)
+
+finished(ps::ParserState) = ps.position > length(ps.line)
+
+peek(ps::ParserState) = ps.line[ps.position]
+
+function skip_whitespace!(ps::ParserState)
+    while !finished(ps) && (peek(ps) == ' ' || peek(ps) == '\t')
+        advance!(ps)
+    end
+end
+
+function advance!(ps::ParserState, δ = 1)
+    ps.position += δ
+end
+
+function parse_int!(ps::ParserState)
+    value = 0
+    if !finished(ps) && peek(ps) == '-'
+        sign = -1
+        advance!(ps)
+    else
+        sign = 1
+    end
+    while !finished(ps) && (48 <= peek(ps) <= 57)
+        value = value*10 + Int(peek(ps)) - 48
+        advance!(ps)
+    end
+    return sign*value
+end
+
+function parse_fpart!(ps::ParserState)
+    value = 0.0
+    power = 0.1
+    while !finished(ps) && (48 <= peek(ps) <= 57)
+        value += power*(Int(peek(ps)) - 48)
+        power *= 0.1
+        advance!(ps)
+    end
+    return value
+end
+
+function parse_float!(ps::ParserState)
+    ipart = parse_int!(ps)
+    if !finished(ps) && peek(ps) == '.'
+        advance!(ps)
+        fpart = parse_fpart!(ps)
+    else
+        fpart = 0.0
+    end
+    return ipart + fpart
+end
+
+function parse_libsvm_line!(ps::ParserState, dim)
+    x = zeros(dim)
+    y = parse_int!(ps)
+    skip_whitespace!(ps)
+    while !finished(ps)
+        if !(48 <= peek(ps) <= 57)
+            break
+        end
+        ix = parse_int!(ps)
+        advance!(ps)
+        val = parse_float!(ps)
+        x[ix] = val
+        skip_whitespace!(ps)
+    end
+    return x, y
+end
+
+"""
+Parses a string of the form `y i1:x1 i2:x2 ... in:xn` and returns the pair `x,y`
+where `x` is a `dim`-dimensional vector whose ijth entry is xj for `i` in `1:n`.
+"""
+parse_libsvm_line(s, dim) = parse_libsvm_line!(ParserState(s), dim)
+
+function parse_libsvm_line_sparse!(ps::ParserState)
+    ks = Array(Int, 0)
+    vs = Array(Float64, 0)
+    all_ones = true
+    y = parse_int!(ps)
+    skip_whitespace!(ps)
+    while !finished(ps)
+        if !(48 <= peek(ps) <= 57)
+            break
+        end
+        push!(ks, parse_int!(ps))
+        if !finished(ps) && peek(ps) == ':'
+            advance!(ps)
+            push!(vs, parse_float!(ps))
+            if abs(vs[end] - 1.0) > 1e-9
+                all_ones = false
+            end
+        else
+            push!(vs, 1.0)
+        end
+        skip_whitespace!(ps)
+    end
+    # If all the values were 1 then return an empty vs array
+    if all_ones
+        vs = Array(Float64, 0)
+    end
+    return (ks, vs), y
+end
+
+"""
+Parses a string of the form `y i1:x1 i2:x2 ... in:xn` and returns `ks,vs,y`
+where `ks = [i1, i2, ..., in]` and `vs = [x1, x2, ..., xn]`. In the case that
+`xi = 1` for all `i`, `vs = []`.
+"""
+parse_libsvm_line_sparse(s) = parse_libsvm_line_sparse!(ParserState(s))
+
+###################################################################
+### Various iterators for reading and partitioning LibSVM files ###
+###################################################################
+
+import Base: start, next, done, eltype, length
+
+"""
+An iterator for efficiently enumerating the (x,y) pairs in a subset of a libsvm
+file. `start_pos` is the byte-position of the first character of the first
+example to be read.
+"""
+type LibSVMFileIterator
+    path::ASCIIString
+    dim::Int
+    start_pos::Int
+    num_examples::Int
+    read_prob::Float64
+    sparse::Bool
+    function LibSVMFileIterator(path,
+                                dim;
+                                start_pos = 0,
+                                num_examples = typemax(Int),
+                                read_prob = 1.0,
+                                sparse=false)
+        new(path, dim, start_pos, num_examples, read_prob, sparse)
+    end
+end
+
+function start(i::LibSVMFileIterator)
+    fh = open(i.path, "r")
+    seek(fh, i.start_pos)
+    return skip_lines(i, (fh, 0))
+end
+
+function skip_lines(i::LibSVMFileIterator, s)
+    fh, count = s
+    while !done(i, (fh, count)) && rand() >= i.read_prob
+        readline(fh)
+        count += 1
+    end
+    return (fh, count)
+end
+
+function next(i::LibSVMFileIterator, s)
+    fh, count = s
+    if i.sparse
+        x, y = parse_libsvm_line_sparse(readline(fh))
+    else
+        x, y = parse_libsvm_line(readline(fh), i.dim)
+    end
+    count += 1
+    fh, count = skip_lines(i, (fh, count))
+    return (x,y), (fh, count)
+end
+
+function done(i::LibSVMFileIterator, s)
+    fh, count = s
+    return eof(fh) || count >= i.num_examples
+end
+
+function eltype(i::LibSVMFileIterator)
+    if i.sparse
+        Tuple{Dict{Int, Float64}, Int}
+    else
+        Tuple{Vector{Float64}, Int}
+    end
+end
+
+get_dimension(i::LibSVMFileIterator) = i.dim
+
+get_cache_filename(path, stride) = replace(path, r"\.[^.]+$", "_index_$stride.jld")
+
+"""
+Returns an array of positions such that position[i] is the byte-position of the
+first character of the ith example.
+"""
+function make_libsvm_index(path, stride=1)
+    ixs = zeros(Int, 1)
+    steps = 0
+    open(path, "r") do fh
+        while !eof(fh)
+            readuntil(fh, '\n')
+            steps += 1
+            if steps == stride
+                push!(ixs, position(fh))
+                steps = 0
+            end
+        end
+    end
+    pop!(ixs) # remove the final new line
+    return ixs
+end
+
+"""
+An iterator that returns instances of `LibSVMFileIterator` that iterate through
+consecutive chunks of a libsvm file. After initialization, retrieving each
+`LibSVMFileIterator` runs in constant time.
+"""
+type LibSVMChunkIterator
+    path::ASCIIString
+    dim::Int
+    chunk_size::Int
+    read_prob::Float64
+    sparse::Bool
+    index::Vector{Int}
+end
+
+function LibSVMChunkIterator(path, dim, chunk_size; read_prob = 1.0, sparse=false, cache=true)
+    if cache == true
+        cache_file = replace(path, r"\.[^.]+$", "_index_$(chunk_size).jld")
+        if isfile(cache_file)
+            index = load(cache_file, "index")
+        else
+            index = make_libsvm_index(path, chunk_size)
+            save(cache_file, "index", index)
+        end
+    else
+        index = make_libsvm_index(path, stride)
+    end
+    return LibSVMChunkIterator(path, dim, chunk_size, read_prob, sparse, index)
+end
+
+start(i::LibSVMChunkIterator) = 1
+next(i::LibSVMChunkIterator, s) =
+    (LibSVMFileIterator(i.path, i.dim;
+                        start_pos = i.index[s], num_examples = i.chunk_size,
+                        read_prob = i.read_prob, sparse=i.sparse),
+     s+1)
+done(i::LibSVMChunkIterator, s) = s > length(i.index)
+eltype(i::LibSVMChunkIterator) = LibSVMFileIterator
+length(i::LibSVMChunkIterator) = length(i.index)

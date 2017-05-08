@@ -1,0 +1,222 @@
+##### Data types #####
+
+### InputVector
+# InputVector is a placeholder to store a vector of values associated to a given input, along with
+# conversion coefficients to translate units and the names of the inputs.
+type InputVector{T <: Any} <: AbstractArray{T,1}
+  Values::Vector{T}
+  Coefs::Vector{Float64}
+  Names::Dict{ASCIIString, Uint32}
+  function InputVector{T <: Any}(values::Vector{T}, coefs::Vector{Float64}, names::Vector{ASCIIString})
+    namesdict = Dict{ASCIIString, Uint32}()
+    c = zero(Uint32)
+    for i in names
+      c += one(Uint32)
+      namesdict[i] = c
+    end
+    new(values, coefs, namesdict)
+  end
+end
+
+# Overload the subset operator to extract by position or by name with scalar and vector indices
+# The internal store value will be converted to the corresponding units
+getindex(input::InputVector, index::Integer) =
+        input.Values[index]/input.Coefs[index]
+getindex{T <: Integer}(input::InputVector, indices::Vector{T}) =
+        input.Values[indices]./input.Coefs[indices]
+getindex{T <: Integer}(input::InputVector, indices::UnitRange{T}) =
+        input.Values[indices]./input.Coefs[indices]
+getindex(input::InputVector, name::String) =
+        (index = input.Names[name]; input[index])
+getindex{T <: String}(input::InputVector, names::Vector{T}) =
+        (indices = Uint32[input.Names[i] for i in names]; input[indices])
+
+# Overload the subset operator to assign values to assign to elements selected by position or name
+# Works for ranges, scalar and vectors. Unit conversion is performed
+setindex!(input::InputVector, value::Number, index::Integer) =
+          input.Values[index] = value*input.Coefs[index]
+setindex!{T1 <: Number, T2 <: Integer}(input::InputVector, values::Vector{T1}, index::Vector{T2}) =
+          input.Values[index] = values.*input.Coefs[index]
+setindex!{T1 <: Number, T2 <: Integer}(input::InputVector, values::Vector{T1}, index::UnitRange{T2}) =
+          input.Values[index] = values.*input.Coefs[index]
+setindex!(input::InputVector, value::Number, name::String) =
+          (index = input.Names[name]; input.Values[index] = value*input.Coefs[index])
+setindex!{T1 <: Number, T2 <: String}(input::InputVector, values::Vector{T1},names::Vector{T2}) =
+          (indices = Uint32[input.Names[i] for i in names]; input.Values[indices] = values.*input.Coefs[indices])
+
+# Basic vector behaviour
+size{T <: Any}(input::InputVector{T}) = size(input.Values)
+
+### InputMatrix
+# InputMatrix is a placeholder to store a matrix of values associated to a given input, along with
+# conversion coefficients to translate units and the names of the inputs.
+# The names and conversion coefficients are defined for the columns
+type InputMatrix{T <: Any} <: AbstractArray{T,2}
+  Values::Matrix{T}
+  Coefs::Vector{Float64}
+  Names::Dict{ASCIIString, Uint32}
+  function InputMatrix{T <: Number}(values::Matrix{T}, coefs::Vector{Float64}, names::Vector{ASCIIString})
+    namesdict = Dict{ASCIIString, Uint32}()
+    c = zero(Uint32)
+    for i in names
+      c += one(Uint32)
+      namesdict[i] = c
+    end
+    new(values, coefs, namesdict)
+  end
+end
+
+# Operator for empty InputMatrix
+InputMatrix() = InputMatrix{Float64}(zeros(Float64, (1,1)), Float64[], ASCIIString[])
+
+# Overload the subset operator to extract by position or by name with scalar and vector indices
+# The row index must always be a number...the column one may be a number or a name.
+# Multiply/Divide the column by the coefficient
+# Integer: scalars, vectors and ranges (all possible combinations)
+getindex(input::InputMatrix, i::Integer, j::Integer) =
+        input.Values[i,j]/input.Coefs[j]
+getindex{T1, T2 <: Integer}(input::InputMatrix, i::Vector{T1}, j::Vector{T2}) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T <: Integer}(input::InputMatrix, i::Vector{T}, j::Integer) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T <: Integer}(input::InputMatrix, i::Integer, j::Vector{T}) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T <: Integer}(input::InputMatrix, i::UnitRange{T}, j::Integer) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T <: Integer}(input::InputMatrix, i::Integer, j::UnitRange{T}) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T1, T2 <: Integer}(input::InputMatrix, i::UnitRange{T1}, j::UnitRange{T2}) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T1, T2 <: Integer}(input::InputMatrix, i::UnitRange{T1}, j::Vector{T2}) =
+        input.Values[i,j]./input.Coefs[j]'
+getindex{T1, T2 <: Integer}(input::InputMatrix, i::Vector{T1}, j::UnitRange{T2}) =
+        input.Values[i,j]./input.Coefs[j]'
+# String: same as before, but the string is only used for columns
+getindex(input::InputMatrix, i::Integer, name::String) =
+        (j = input.Names[name]; input[i,j])
+getindex{T <: Integer}(input::InputMatrix, i::Vector{T}, name::String) =
+        (j = input.Names[name]; input[i,j])
+getindex{T <: Integer}(input::InputMatrix, i::UnitRange{T}, name::String) =
+        (j = input.Names[name]; input[i,j])
+getindex{T <: String}(input::InputMatrix, i::Integer, names::Vector{T}) =
+        (j = Uint32[input.Names[i] for i in names]; input[i,j])
+getindex{T1 <: Integer, T2 <: String}(input::InputMatrix, i::Vector{T1}, names::Vector{T2}) =
+        (j = Uint32[input.Names[i] for i in names]; input[i,j])
+getindex{T1 <: Integer, T2 <: String}(input::InputMatrix, i::UnitRange{T1}, names::Vector{T2}) =
+        (j = Uint32[input.Names[i] for i in names]; input[i,j])
+
+# Overload the subset operator to assign values to assign to elements selected by position or name
+# Works for ranges, scalar and vectors. Unit conversion is performed
+# Integer: scalars, vectors and ranges (all possible combinations)
+setindex!(input::InputMatrix, value::Number, i::Integer, j::Integer) =
+        input.Values[i,j] = value*input.Coefs[j]
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::Vector{T1}, j::Vector{T1}) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::Vector{T1}, j::T1) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::T1, j::Vector{T1}) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::UnitRange{T1}, j::T1) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::T1, j::UnitRange{T1}) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::UnitRange{T1}, j::UnitRange{T1}) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::UnitRange{T1}, j::Vector{T1}) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2}, i::Vector{T1}, j::UnitRange{T1}) =
+        input.Values[i,j] = values.*input.Coefs[j]'
+
+# String: same as before, but the string is only used for columns
+setindex!(input::InputMatrix, value::Number, i::Integer, name::String) =
+        (j = input.Names[name]; input.Values[i,j] = value*input.Coefs[j])
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2},i::Vector{T1}, name::String) =
+        (j = input.Names[name]; input.Values[i,j] = values.*input.Coefs[j]')
+setindex!{T1 <: Integer, T2 <: Number}(input::InputMatrix, values::Vector{T2},i::UnitRange{T1}, name::String) =
+        (j = input.Names[name]; input.Values[i,j] = values.*input.Coefs[j]')
+setindex!{T1 <: String, T2 <: Number}(input::InputMatrix, values::Vector{T2},i::Integer, names::Vector{T1}) =
+        (j = Uint32[input.Names[i] for i in names]; input.Values[i,j] = values.*input.Coefs[j]')
+setindex!{T1 <: Integer, T2 <: String, T3 <: Number}(input::InputMatrix, values::Vector{T3},i::Vector{T1}, names::Vector{T2}) =
+        (j = Uint32[input.Names[i] for i in names]; input.Values[i,j] = values.*input.Coefs[j]')
+setindex!{T1 <: Integer, T2 <: String, T3 <: Number}(input::InputMatrix, values::Vector{T3},i::UnitRange{T1}, names::Vector{T2}) =
+        (j = Uint32[input.Names[i] for i in names]; input.Values[i,j] = values.*input.Coefs[j]')
+
+# Basic matrix behaviour
+size{T <: Any}(input::InputMatrix{T}) = size(input.Values)
+
+
+
+### Forcing
+# A forcing is just a shallow wrapper around the Spline1D function from the Dierckx package
+# It implements subsetting to extract values (i.e. it wraps evaluate(spl,xout))
+# It also defines what it means to * by a scalar (for unit conversion when setting)
+type Forcing
+  spl::Spline1D
+  Forcing(spl::Spline1D) = (spl2 = deepcopy(spl); new(spl2))
+end
+
+function *(f::Forcing, s::Number)
+  new_f = deepcopy(f)
+  new_f.spl.c *= s
+  new_f
+end
+
+function /(f::Forcing, s::Number)
+  new_f = deepcopy(f)
+  new_f.spl.c /= s
+  new_f
+end
+
+getindex(f::Forcing, xout::Number) = evaluate(f.spl, xout)
+getindex{T <: Number}(f::Forcing, xout::Vector{T}) = evaluate(f.spl, xout)
+
+### OdeModel
+# Type that contains the data and code associated to a model
+type OdeModel
+    States::InputVector{Float64}
+    Parameters::InputVector{Float64}
+    Forcings::InputVector{Forcing}
+    Observed_names::Vector{ASCIIString}
+    Observed_Coefs::Vector{Float64}
+    Settings::Vector{Any}
+    Time::Vector{Float64}
+    Model::Function
+    Observed::Function
+    Jacobian::Function
+    Output::InputMatrix{Float64}
+end
+
+function ODEModel(States, Parameters, Forcings, Observed_names, Observed_coefs, Settings, Time, Model, Observed, Jacobian)
+  # Check settings (if anything missing assign default value)
+  !haskey(settings, "method") && (settings["method"] = "bdf")
+  !haskey(settings, "rtol") && (settings["rtol"] = 1e-6)
+  !haskey(settings, "atol") && (settings["atol"] = 1e-6)
+  !haskey(settings, "maxsteps") && (settings["maxsteps"] = 1e5)
+  !haskey(settings, "maxord") && (settings["maxord"] = 5)
+  !haskey(settings, "hini") && (settings["hini"] = 0)
+  !haskey(settings, "hmin") && (settings["hmin"] = 0)
+  !haskey(settings, "hmax") && (settings["hmax"] = 0)
+  !haskey(settings, "maxerr") && (settings["maxerr"] = 12)
+  !haskey(settings, "maxnonlin") && (settings["maxnonlin"] = 12)
+  !haskey(settings, "maxconvfail") && (settings["maxconvfail"] = 12)
+  !haskey(settings, "jacobian") && (settings["jacobian"] = false)
+  settings["nobs"] = length(model.Observed_names)
+  # Need to generate a default matrix
+  Output = InputMatrix()
+  OdeModel(States, Parametes, Forcings, Observed_names, Observed_coefs, Settings, Time, Model, Observed, Jacobian, Output)
+end
+
+
+# Add a struct for calculations with analytical Jacobian
+ @struct type J_DlsMat
+   typ::Int32
+   M::Int
+   N::Int
+   ldim::Int
+   mu::Int
+   ml::Int
+   s_mu::Int
+   data::Ptr{Float64}
+   ldata::Int
+   cols::Ptr{Ptr{Float64}}
+end

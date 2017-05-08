@@ -1,0 +1,245 @@
+module MonetDB
+
+using PyCall, Nettle
+export monetdbconn
+
+#### mapi - low-level inteface, written in Julia to remove Python dependency
+type MonetDBConnection
+	MAX_PACKAGE_LENGTH::Int
+	MSG_PROMPT::AbstractString
+	MSG_MORE::AbstractString
+	MSG_INFO::AbstractString
+	MSG_ERROR::AbstractString
+	MSG_Q::AbstractString
+	MSG_QTABLE::AbstractString
+	MSG_QUPDATE::AbstractString
+	MSG_QSCHEMA::AbstractString
+	MSG_QTRANS::AbstractString
+	MSG_QPREPARE::AbstractString
+	MSG_QBLOCK::AbstractString
+	MSG_HEADER::AbstractString
+	MSG_TUPLE::AbstractString
+	MSG_TUPLE_NOSLICE::AbstractString
+	MSG_REDIRECT::AbstractString
+	MSG_OK::AbstractString
+	STATE_INIT::Int
+	STATE_READY::Int
+    STATE::Int
+	hostname::AbstractString
+	port::Int
+	username::AbstractString
+	password::AbstractString
+	database::AbstractString
+	language::AbstractString
+	unix_socket::Any
+	monetdb_socket::TCPSocket
+end
+
+function login!(m::MonetDBConnection; iteration::Int = 1)
+    
+        challenge = getblock_inet(m)
+        response = challenge_response(m, challenge)
+        putblock_inet(m, response)
+        prompt = getblock_inet(m)
+    
+        if length(prompt) == 0 || prompt == m.MSG_OK
+            # Empty response, server is happy
+            return "Login Successful"
+
+        elseif startswith(prompt, m.MSG_ERROR)
+            error(split(prompt, ":")[3])
+
+        elseif startswith(prompt, m.MSG_REDIRECT)
+            # a redirect can contain multiple redirects, only use the first
+            redirect = split(prompt[2:end], ":")
+            
+            if redirect[2] == "merovingian"
+                
+                if iteration <= 10
+                    login!(m,iteration = iteration + 1)
+                else
+                    error("Maximum number of redirects reached (10)")
+                end
+                
+            elseif redirect[2] == "monetdb"
+                 m.hostname = redirect[3][3:end]
+                 m.port, m.database = redirect[4].split('/')
+                 typeof(m.port) <: AbstractString ?  m.port = parse(Int,m.port) : m.port
+                 close(m.monetdb_socket)
+                 connect(m.hostname, m.port, m.username, m.password, m.database, m.language)
+            else
+                error(split(prompt, ":")[3])
+            end
+
+        else
+            error(split(prompt, ":")[3])
+        end
+    
+end
+
+# Needs getbytes implemented, swap with Julia built-in readbytes
+# Needs IOBuffer too?
+@pyimport struct
+function getblock_inet(m::MonetDBConnection)
+    length = last = 0
+    while last != 1
+        flag = readbytes(m.monetdb_socket,2) #implement getbytes
+        unpacked = struct.unpack("<H", flag)[1] # little endian short, needs a Julia replacement
+        length = unpacked >> 1
+        last = unpacked & 1
+    end
+    return bytestring(readbytes(m.monetdb_socket, length)) #convert array of length 'length' bytes to string, returns colon-separated
+end
+
+function challenge_response(m::MonetDBConnection, challenge::AbstractString)
+
+    challenges = split(challenge, ':')
+    salt, identity, protocol, hashes, endian = challenges[1:5]
+    
+    if protocol in ("9", '9')
+        algo = challenges[6] #sha512
+        password_hex = hexdigest(lowercase(algo), m.password)
+    else
+        error("We only speak protocol v9")
+    end
+    
+    h = split(hashes, ',')
+    if "SHA1" in h
+        pwhash = "{SHA1}" * hexdigest("sha1", password_hex * salt)
+    elseif "MD5" in h
+        pwhash = "{MD5}" * hexdigest("md5", password_hex * salt)
+    else
+        error("Unsupported hash algorithms required")
+    end
+    
+    loopstr = ""
+    for val in ["BIG", m.username, pwhash, m.language, m.database]
+        loopstr *= val * ":"
+    end
+    return loopstr #Ex: 'BIG:voc:{MD5}211a6fca6f4b3c979970e4bfd9c22f17:sql:voc:'
+    
+end
+
+# needs Julia replacement for struct.pack
+function putblock_inet(m::MonetDBConnection, block::AbstractString)
+    pos = 1
+    last = 0
+    while last != 1
+        l = length(block)
+        if l <= m.MAX_PACKAGE_LENGTH
+            data = block[pos:end]
+            last = 1
+        else
+            data = block[pos:pos+m.MAX_PACKAGE_LENGTH]
+        end
+        flag = struct.pack("<H", (l << 1) + last) #need a Julia replacement
+        #flag = bytestring(reinterpret(UInt8, Int16[(l << 1) + last]))
+        write(m.monetdb_socket, flag)
+        write(m.monetdb_socket, block)
+        pos += l
+    end
+end
+
+
+#### 
+#### user-facing API
+####
+function connect(;
+				hostname::AbstractString = "localhost", 
+				port::Int = 50000, 
+				username::AbstractString = "monetdb",
+				password::AbstractString = "monetdb",
+				database::AbstractString = "demo",
+				language::AbstractString = "sql",
+				unix_socket::Any = nothing
+				)
+
+	#Julia function opens connection first, then you pass messages for authentication
+	conn = try
+		Base.connect(hostname, port)
+	catch 
+		error("Could not connect to given hostname/port")
+	end
+
+    #Create global to hold constants, remove finicky need for everyone to name 
+	global monetdbconn = MonetDBConnection(
+	(1024 * 8) - 2, 	#MAX_PACKAGE_LENGTH::Int
+	"", 				#MSG_PROMPT::AbstractString
+	"\1\2\n", 			#MSG_MORE::AbstractString
+	"#", 				#MSG_INFO::AbstractString
+	"!", 				#MSG_ERROR::AbstractString
+	"&", 				#MSG_Q::AbstractString
+	"&1", 				#MSG_QTABLE::AbstractString
+	"&2", 				#MSG_QUPDATE::AbstractString
+	"&3", 				#MSG_QSCHEMA::AbstractString
+	"&4", 				#MSG_QTRANS::AbstractString
+	"&5", 				#MSG_QPREPARE::AbstractString
+	"&6", 				#MSG_QBLOCK::AbstractString
+	"%", 				#MSG_HEADER::AbstractString
+	"[", 				#MSG_TUPLE::AbstractString
+	"=", 				#MSG_TUPLE_NOSLICE::AbstractString
+	"^", 				#MSG_REDIRECT::AbstractString
+	"=OK", 				#MSG_OK::AbstractString
+	0, 					#STATE_INIT::Int
+	1, 					#STATE_READY::Int
+    0,                  #STATE::Int
+	hostname, 			#hostname::AbstractString
+	port,				#port::Int
+	username,			#username::AbstractString
+	password,			#password::AbstractString
+	database,			#database::AbstractString
+	language,			#language::AbstractString
+	unix_socket,		#unix_socket::Any
+	conn				#monetdb_socket::TCPSocket
+	)
+
+    login!(monetdbconn)
+    monetdbconn.STATE = monetdbconn.STATE_READY
+
+	return "Connected to MonetDB: $(hostname):$(port)"
+end
+
+function disconnect(;m::MonetDBConnection = monetdbconn)
+
+	try 
+        Base.close(m.monetdb_socket)
+        return("MonetDB connection closed")
+    catch
+        error("An error has occurred")
+    end
+
+end
+
+# function cmd(operation::AbstractString=""; m::MonetDBConnection = monetdbconn)
+    
+#     MonetDB.putblock_inet(m, operation)
+#     response = MonetDB.getblock_inet(m)
+    
+#     if length(response) == 0
+#         return ""
+#     elseif startswith(response, m.MSG_OK)
+#         return response[4:end] || ""
+#     end
+        
+#     if response == m.MSG_MORE
+#         # tell server it isn't going to get more
+#         return cmd("")
+#     end
+        
+#     if response[1] in [m.MSG_Q, m.MSG_HEADER, m.MSG_TUPLE]
+#         return response
+#     elseif response[1] == m.MSG_ERROR
+#         error(response)
+#     elseif m.language == "control" && length(m.hostname) == 0 
+#         if startswith(response, "OK")
+#             return response[3:end] || ""
+#         else
+#             return response
+#         end
+#     else
+#         error(response)
+#     end
+    
+# end
+
+end # module

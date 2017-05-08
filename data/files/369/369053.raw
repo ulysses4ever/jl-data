@@ -1,0 +1,72 @@
+println("Initializing shared parser...")
+
+#Start timing of initialization
+before = time()
+
+#Preload files on all processes
+require("shared_cky.jl")
+
+#Check if a grammar was specified
+if length(ARGS) < 1
+    error("Please specify a grammar as an argument.")
+end
+
+grammar_file = ARGS[1]
+
+#Parse grammar file into array of Rule Types
+grammar = parse_grammar(grammar_file)
+
+#Receive sentence to parse
+#print("Please enter a sentence: ")
+#sentence = readline(STDIN)
+
+#Test sentences for larger_dense.grammar
+sentence = "he is a man she is a woman he is he is a man she is a woman he is"
+#sentence = "she is a woman"
+
+#Split sentence into words
+tokens = split(replace(sentence, "\n", ""), " ")
+n = length(tokens)
+
+#Check if grammar can parse sentence
+check_coverage(tokens, grammar)
+
+#Build lookup table for string-to-int (stoi) and int-to-string (itos)
+#for the terminals and nonterminals in the grammar
+(stoi_table, itos_table) = build_lookup_tables(grammar, tokens)
+
+#Convert Rule array into shared arrays for grammar and its associated probabilities
+(shared_grammar, shared_probs) = share_grammar(grammar, stoi_table)
+
+@printf "Parser initialized in %.4f seconds\n" (time() - before) 
+
+println("Parsing...")
+
+#Start timing of parsing
+before = time()
+
+#Assumes start symbol is nonterminal of first rule in grammar - i.e. it is itos_table[1]
+(table_ints, table_floats) = parse(grammar, shared_grammar, shared_probs, tokens, n, stoi_table)
+@printf "Sentence parsed in %.4f seconds\n" (time() - before) 
+
+#Optional printing of parse table
+#print_table(table_ints, itos_table, n)
+
+#LARGE BATCH TESTING
+#x = 100
+
+#while x > 0
+#	#Begin timing current iteration
+#	iter_begin = time()
+
+#	(table_ints, table_floats) = parse(grammar, shared_grammar, shared_probs, tokens, n, stoi_table) 
+#	@printf "Iteration %d finished in %.4f seconds\n" (101-x) (time() - iter_begin)
+#	x -= 1
+#end
+#@printf "100 sentences of length %d parsed in %.4f seconds\n" length(tokens) (time() - before) 
+println("done!")
+
+#Close worker processes - still faulty
+if nprocs() > 1
+	rmprocs([x for x in 2:nprocs()])
+end

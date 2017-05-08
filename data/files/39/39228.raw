@@ -1,0 +1,26 @@
+#khypot - julia 0.3.x
+import Base.hypot
+# compute k dimensional hypot
+# @param v - Array [x,y,z,....]
+# @returns FloatinPoint
+function hypot{T<:Real}(v::Vector{T}, dim::Integer=2)
+    mag = NaN
+    if length(v) == 1
+      mag = hypot(0.0, v[1])
+    elseif length(v) >= 2
+      mag = hypot(v[1], v[2]);
+      #higher dimensions
+      for vi in v[3:dim]
+          mag = hypot(mag, vi)
+      end
+    end
+    return mag
+end
+
+#identity
+hypot(v::Real) = hypot(0.0, v);
+#tuples :: 2 methods hypot(tuple), hypot(tuple,dim)
+hypot(v::(Real...,), dim::Integer = 2)  = hypot([v...],dim);
+#multidimentional array by column
+# call as hypot(array) -> hypot(array,col=1, dim=2) ->hypot(v, dim)
+hypot(v::Array ; col::Integer = 1, dim::Integer = 2) = hypot(v[:,col],dim);

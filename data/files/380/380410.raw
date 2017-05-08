@@ -1,0 +1,68 @@
+# unit tests for grammar
+include("../src/trees/grammar.jl")
+
+function test_productions()
+    s_node = ContextFreeProduction("S -> NP VP")
+    @test(s_node.symbol == "S")
+    @test(s_node.children[1] == "NP")
+    @test(s_node.children[2] == "VP")
+    @test(is_binary(s_node) == true)
+    @test(is_unary(s_node) == false)
+    n_node  = ContextFreeProduction("NP -> Nom")
+    @test(n_node.symbol == "NP")
+    @test(n_node.children == ["Nom"])
+    @test(is_binary(n_node) == false)
+    @test(is_unary(n_node) == true)
+end
+
+function test_grammar()
+    g = load_cfg("data/toy.cfg")
+    @test(length(productions(g)) == 11)
+    @test(length(productions(g, lhs="N")) == 3)
+    @test(length(productions(g, rhs="NP")) == 2)
+    @test(length(productions(g, lhs="V")) == 1)
+    @test(length(productions(g, rhs="VP")) == 0)
+    @test(length(productions(g, rhs="NP")) == 2)
+    @test(length(productions(g, rhs="V")) == 1)
+    @test(length(terminals(g)) == 6)
+    @test(length(nonterminals(g)) == 5)
+end
+
+function test_cnf()
+    cnf_g = load_cfg("data/cnf.cfg")
+    @test(is_chomsky_normal_form(cnf_g) == true)
+    notcnf_g = load_cfg("data/notcnf1.cfg")
+    @test(is_chomsky_normal_form(notcnf_g) == false)
+end
+
+function test_cnf_conversion()
+    ## cnf_g = load_cfg(joinpath(datapath, "cnf.cfg"))
+
+    unit_prod1 = ContextFreeProduction("NP -> Nom")
+    unit_prod2 = ContextFreeProduction("Nom -> \"cat\"")
+    #@test(length(collapse_unit_productions([unit_prod1, unit_prod2])) == 1)
+
+    lexical_prod = ContextFreeProduction("Nom -> \"cat\"")
+    @test(lexical_prod.is_lexical == true)
+
+    mixed_prod = ContextFreeProduction("NP -> DT \"cat\"")
+    @test(mixed_prod.is_lexical == true)
+    @test(is_binary(mixed_prod) == true)
+    mixed_converted = convert_mixed_production(mixed_prod)
+    @test(length(mixed_converted) == 2)
+
+    mixed_prod2 = ContextFreeProduction("INF-VP -> \"to\" VP")
+    mixed_converted2 = convert_mixed_production(mixed_prod2)
+    @test(length(mixed_converted2) == 2)
+          
+    
+    triplet_prod = ContextFreeProduction("NP -> DT NP PP")
+    quad_prod = ContextFreeProduction("NP -> DT NP PP PP")
+end
+
+test_productions()
+test_grammar()
+test_cnf()
+test_cnf_conversion()
+
+info("Tests pass [CFG]")

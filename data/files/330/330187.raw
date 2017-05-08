@@ -1,0 +1,21 @@
+function featureize_email(email_content, vocab::DataFrame)
+
+  # get a index vector of all the word indexes that are in the vocab list and the word list
+  vocab_count = size(vocab, 1)
+  indexed_words = []
+
+  for i = 1:vocab_count
+    found_index = findfirst(email_content, vocab[:word][i])
+    if (found_index == 0) continue end
+
+    indexed_words = [ indexed_words; i ]
+  end
+
+  # create a feature vector
+  binary_words = eye(vocab_count)
+  #println("Size ->\tindexed_words:$(size(indexed_words))")
+  #println("Size ->\tbinary_words:$(size(binary_words))")
+  feature_words = maximum(binary_words[indexed_words, :], 1)'
+
+end
+

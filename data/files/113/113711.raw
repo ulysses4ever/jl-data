@@ -1,0 +1,154 @@
+
+module Metropolis
+export model, mcmc_sample
+
+
+using Distributions
+using Gadfly
+
+# Observed Data.
+type ObservedData{T}
+    data::Vector{T}
+    loglik::Function
+end
+
+
+# One-parameter probability model
+immutable ModelNode
+    name::Symbol
+    prior::Distribution
+    proposal::Distribution
+end
+
+
+immutable MCMCTrace
+    params::Union(Symbol, Vector{Symbol})
+    trace::Array
+end
+
+
+
+# Proposing a value for a ModelNode's parameter.
+propose(n::ModelNode) = rand(n.proposal)
+
+
+# Computing the log prior of a ModelNode's parameter
+logprior(n::ModelNode, x) =
+    isa(f, DiscreteDistribution) ? logpmf(f, x) : logpdf(x)
+
+
+
+# The Metropolis Algorithm
+#
+#
+#
+
+# Acceptance function.
+function accept(node::ModelNode, obs::ObservedData, current, proposal)
+    logp_current = obs.loglik(obs.data, c) +  logprior(node, current)
+    logp_proposed = obs.loglik(obs.data, p) + logprior(m, proposal)
+    dlogp = min(0, logp_proposed - logp_current)
+    accepted = rand(Bernoulli(exp(dlogp))) == 1 ? true: false
+end
+
+# MCMC sampling with the Metropolis algorithm
+function mcmc_sample(node::ModelNode, obs::ObservedData,
+                     n::Int, burnin::Int, thin::Int = 1)
+
+    # The Metropolis algorithm
+    current = propose(node)
+    samples = fill(NaN, n)
+    for i = 1:n
+        proposal = propose(m)
+        current = accept(node, current, proposal) ? proposal : current
+        samples[i] = current
+    end
+
+    # Return a trace object with the sampled values,
+    # ignoring the burn-in samples and thinning.
+    MCMCTrace(:param, samples[(burnin + 1):thin:end])
+end
+
+
+# A probability model is made up of one or more ModelNodes,
+# one for each parameter we want to estimate the posterior
+# distribution of.
+type Model
+    nodes::Vector{ModelNode}
+end
+
+
+# The multivariate case
+model(names::Vector{Symbol},
+      priors::Vector{Distribution},
+      proposals::Vector{Distribution}) =
+    Model([ModelNode(n, p, q) for (n, p, q) in zip(names, prior, proposals)])
+
+# We can construct the univariate model with scalar arguments.
+# Just coerce them into length-1 vectors
+model(name::Symbol, prior::Distribution, proposal::Distribution) =
+    model([name], [prior], [proposal])
+
+
+# Propose parameter values by drawing from the
+# proposal distribution(s). For multiparameter processes
+# the proposals are indedepent of each other.
+propose(m::Model) = [propose(n) for n in m.nodes]
+
+# Log of joint prior probability
+# Always returns a scalar
+
+
+logprior(m::Model, xs) =
+    sum([logprior(n, x) for (n,x) in zip(m.nodes, xs)])
+
+# The acceptance rule for the Metropolis algorithm.
+# Given a proposed value for parameter(s) `p`, compare
+# the log value of the posterior at the proposal value
+# to that of the current value(s), `c`. If the proposal has
+# a higher probability, we accept it for sure. if not,
+# we accept it with probability f(p|D) / f(c|D) < 1.
+
+accept(model::Model, obs::ObservedData, current, proposal) =
+    [accept(node, obs, current, proposal) for node in model.nodes]
+
+
+# MCMC sampling with Metropolis-Hastings.
+# 1. Generate proposal values for the paramter(s).
+# 2. Accept or reject the proposal.
+# 3. Repeat.
+
+
+# Multiparameter version
+function mcmc_sample(m::Model, n::Int, burnin::Int, thin::Int = 1)
+    c = propose(m)
+    samples = fill(NaN, n, length(m.params))
+    for i = 1:n
+        p = propose(m)
+        c = accept(m, c, p) ? p : c
+        samples[i, :] = c
+    end
+    MCMCTrace(m.params, samples)
+end
+
+function mcmcplot(trace::MCMCTrace, path::ASCIIString = "graphs/")
+    function drawplot(param, graphlab, plt)
+        fpath = path * string(param) * "_" * graphlab * ".svg"
+        draw(SVG(fpath, 1200px, 800px), plt)
+    end
+
+    nsims = size(trace.trace, 1)
+    for i = 1:nparams
+        ts = plot(x=1:nsims, y=trace.trace[:, i], Geom.line)
+        drawplot(trace.params[i], "ts", ts)
+        hist = plot(x=trace.trace[:, i], Geom.histrogram)
+        drawplot(trace.params[i], "hist", hist)
+    end
+
+end
+
+end # module
+
+
+
+

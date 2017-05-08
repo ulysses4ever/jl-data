@@ -1,0 +1,29 @@
+## =============================================================================
+## 01_boxplot.jl - boxplot sample julia script with Gadfly
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+singer = dataset("lattice", "singer")
+
+showcols(singer)
+
+# 235×2 DataFrames.DataFrame
+# │ Col # │ Name      │ Eltype     │ Missing │
+# ├───────┼───────────┼────────────┼─────────┤
+# │ 1     │ Height    │ Int32      │ 0       │
+# │ 2     │ VoicePart │ UTF8String │ 0       │
+
+
+set_default_plot_size(24cm, 10cm)
+p = plot(singer, x="VoicePart", y="Height", Geom.boxplot)
+
+# #Gadfly.set_default_plot_size(14cm, 8cm)
+# p = plot(df_n, x="date", y="value", color="variable",
+#          Guide.xlabel("日付"),
+#          Guide.ylabel("販売量(ml)"),
+#          Guide.title("クリアアサヒ 350x6缶"),
+#          Geom.point, Geom.line)
+
+display(p)

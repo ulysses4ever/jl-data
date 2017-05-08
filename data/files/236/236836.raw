@@ -1,0 +1,41 @@
+# 3D operators for averaging and gradients
+
+# sparse diagonal matrix
+function sdiag(v)
+	spdiagm(v,0);
+end
+
+# gradient
+function gradient(hx,hy,hz)
+	n1 = length(hx);
+	n2 = length(hy);
+	n3 = length(hz);
+	
+	ddx(n) = spdiagm((-1./hx,1./hx),(0,1));
+	ddy(n) = spdiagm((-1./hy,1./hy),(0,1));
+	ddz(n) = spdiagm((-1./hz,1./hz),(0,1));
+
+	G1 = kron(speye(n3+1),kron(speye(n2+1),ddx(n1)));
+	G2 = kron(speye(n3+1),kron(ddy(n2),speye(n1+1)));
+	G3 = kron(ddz(n3),kron(speye(n2+1),speye(n1+1)));
+
+	[G1;G2;G3];
+end
+
+# average node to cell center
+function averageNode(n1,n2,n3)
+	av(n) = spdiagm((0.5.*ones(n,1),0.5.*ones(n,1)),(0,1));
+	kron(av(n3),kron(av(n2),av(n1)));
+end
+
+# average edge to cell center
+function averageEdge(n1,n2,n3)
+	av(n) = spdiagm((0.5.*ones(n,1),0.5.*ones(n,1)),(0,1));
+
+	A1 = kron(av(n3),kron(av(n2),speye(n1)));
+	A2 = kron(av(n3),kron(speye(n2),av(n1)));
+	A3 = kron(speye(n3),kron(av(n2),av(n3)));
+
+	[A1 A2 A3]
+end
+

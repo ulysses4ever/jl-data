@@ -1,0 +1,25 @@
+require("custom_types.jl")
+
+function ret_array(num1::Entry, num2::Entry)
+	return [num1, num2]
+end
+
+function ret_array(num1::Array, num2::Entry)
+	ret_arr = [ x for x in num1 ]
+	push!(ret_arr, num2)
+	return ret_arr
+end
+
+function ret_array(num1::Entry, num2::Array)
+	ret_arr = [ y for y in num2 ]
+	push!(ret_arr, num1)
+	return ret_arr
+end
+
+function ret_array(num1::Array, num2::Array)
+	ret_arr = [ x for x in num1 ]
+	for y in num2
+		push!(ret_arr, y)
+	end
+	return ret_arr
+end

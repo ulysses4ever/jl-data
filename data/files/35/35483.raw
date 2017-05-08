@@ -1,0 +1,25 @@
+using Debug
+@debug function convEnc(state::Array{Int64,2},output::Array{Bool,3},
+                ibits::AbstractArray{Bool})
+
+    (nStates,nInputs)  = size(state);
+    (nStates,temp,nOutputs) = size(output);
+    obits = zeros(Bool,length(ibits)*nOutputs,1);
+    currState = 0;
+    currOpCtr = 1;
+    
+    for n = 1:length(ibits)
+        currBit   = ibits[n];
+        if(currBit == true)
+            idx = 2;
+        else
+            idx = 1;
+        end
+        for m = 1:nOutputs
+            obits[currOpCtr]  = output[currState+1,idx,m];
+            currOpCtr = currOpCtr + 1;
+        end
+        currState = state[currState+1,idx];
+    end
+    return(obits);
+end

@@ -1,0 +1,17 @@
+include("common.jl")
+
+print_with_color(:white, "Simulating signals:\n")
+
+signals = [
+  "signal_simulation_ar2.jl",
+  "signal_simulation_curved_binary.jl",
+  "signal_simulation_logistic.jl"
+]
+
+nsignals = length(signals)
+
+for i = 1:nsignals
+  print_with_color(:white, "  * signal $i of $nsignals...")
+  include(signals[i])
+  print_with_color(:green, " done\n")
+end

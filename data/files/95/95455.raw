@@ -1,0 +1,40 @@
+function mean_spectrum(s, p; stepsize=5000, header=true)
+  sstream = open(s, "r")
+  if header; stitle = readline(sstream); end
+
+  outdir = dirname(p)
+  tmpoutfile = joinpath(outdir, "tmp."*basename(OUTFILE))
+  tmpstream = open(tmpoutfile, "w")
+
+  nlines = header ? countlines(s)-1 : countlines(s)
+  nseqs = div(nlines, stepsize)
+
+  f = 0:(1/stepsize):0.5
+  nf = length(f)
+  writedlm(tmpstream, f', ' ')
+
+  stot = zeros(Float64, nf)
+  siter = Array(Float64, nf)
+  x = Array(Float64, stepsize)
+
+  for i = 1:nseqs
+    for j = 1:stepsize
+      x[j] = float64(readline(sstream))
+    end
+    siter = periodogram(x).power
+    writedlm(tmpstream, siter', ' ')
+    stot += siter
+  end
+  stot /= nseqs
+  writedlm(tmpstream, stot', ' ')
+
+  close(sstream)
+  close(tmpstream)
+
+  pstream = open(p, "w")
+  writedlm(pstream, ["freq", ["s"*string(i) for i = 1:nseqs], "smean"]', ' ')
+  writedlm(pstream, readdlm(tmpoutfile, ' ')', ' ')
+  close(pstream)
+
+  rm(tmpoutfile)
+end

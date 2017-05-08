@@ -1,0 +1,56 @@
+#######################################################################
+# Contains functions for calculating the mean, median and mode values #
+#######################################################################
+
+function dmean(x::AbstractArray)
+  # Calculates the mean of the array
+  if NaN in x
+    return NaN
+  end
+  if length(x) == 0
+    throw(ArgumentError("Error! Empty array given!"))
+  else
+    return sum(x)/length(x)
+  end
+end
+
+
+function dmedian(x::AbstractArray)
+  # Calculates the median of the array
+  if NaN in x
+    return NaN
+  end
+  if length(x) == 0
+    throw(ArgumentError("Error! Empty array given!"))
+  end
+  center_element = length(x)/2
+  if (length(x)%2) != 0
+    return x[convert(Int, round(center_element) + 1)]
+  else
+    med = (x[convert(Int, center_element)] + x[convert(Int, center_element + 1)])/2
+    return med
+  end
+end
+
+
+function freq(x::AbstractArray)
+  # Calculates the frequency of elements in an array
+  ret = zeros(Int64, maximum(x))
+  for k in x
+    ret[k] += 1
+  end
+  return return
+end
+
+
+function dmode(x::AbstractArray)
+  # Calculates the mode of the array (WIP)
+  freq_list = freq(x)
+  maximum_element = maximum(freq_list)
+  for i in freq_list
+    if  freq_list[i] == maximum_element
+      index_of_max = i
+    end
+  end
+  return x[index_of_max]
+end

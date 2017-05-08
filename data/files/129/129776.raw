@@ -1,0 +1,44 @@
+### Functions for expanding expressions that contain local variables
+
+function fullexpand(exprn::Expr, vars::Array{Symbol, 1})
+  dict = Dict{Symbol, Expr}(vars, fill(:(), length(vars)))
+
+  for arg in exprn.args
+    if arg.head == :(=)
+      queue = Array(Union(Number, Symbol, Expr), 0)
+      unshift!(queue, arg.args[2])
+      
+      while length(queue)!=0
+        node = shift!(queue)
+        
+        for i in 2:length(node.args)
+          if isa(node.args[i], Expr)
+            unshift!(queue, node.args[i])
+          elseif isa(node.args[i], Symbol) && get(dict, node.args[i], :()) != :()
+            node.args[i] = dict[node.args[i]]
+          end
+        end
+      end
+      
+      dict[arg.args[1]] = arg.args[2]
+    elseif arg.head == :line
+      continue
+    else
+      error("The given exprn can not be handled")
+    end
+  end
+  
+  exprn
+end
+
+function fullexpand(exprn::Expr)
+  vars = Array(Symbol, 0)
+
+  for arg in exprn.args
+    if arg.head == :(=)
+      unshift!(vars, arg.args[1])
+    end
+  end
+  
+  fullexpand(exprn, vars)
+end

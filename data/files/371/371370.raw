@@ -1,0 +1,51 @@
+function gauss(x)
+    # variabile gaussiana standard, è il default per MarkovChain.p
+    return exp(-dot(x,x)/2)
+end
+
+function gauss{T<:Array}(x::T)
+    return exp(-sum(map(y->dot(y,y), x)))
+end
+
+function NR(f, x, dx, h; verbose=false)
+    # così controlla la qualità dello zero e non la precisione
+    count = 1
+    x0 = x
+    x_old = x + 1
+    x_new = x
+    while abs(x_new-x_old) > dx
+        x_old = x_new
+        x_new = x_old - 2h*f(x_old)/(f(x_old+h)-f(x_old-h))
+        if verbose
+            println(x, "\t",abs(f(x)))
+        else
+            write(".")
+        end
+        count += 1
+        if isinf(x_new) || isnan(x_new) || count > 15 
+            println("")
+            warn("Non è stata raggiunta la convergenza, restituisco la stima iniziale")
+            return x0
+        end
+    end
+    return x_new
+end
+
+
+function regola_acc_rate!(target_rate::Float64, catena::MarkovChain)
+    # aggiusta delta in place finché accepted/steps non fa target_rate
+    function acceptance_rate(delta::Float64)
+        catena.accepted = 0
+        catena.proposed = 0
+        catena.delta    = delta
+        for val in catena # è vuoto perchè deve solo produrre i valori e non farci niente
+        end
+        return catena.accepted/catena.proposed - target_rate
+    end
+    print("Regolo delta: ")
+    catena.delta    = try Roots.fzero(acceptance_rate, catena.delta) catch; catena.delta end
+    catena.accepted = 0
+    catena.proposed = 0
+    println(catena.delta)
+    return catena.delta
+end

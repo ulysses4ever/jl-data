@@ -1,0 +1,10 @@
+function Run()
+	i = 10001
+	p = primes(i)
+	while length(p) < 10001
+		i = i * 10
+		p = primes(i)
+	end
+	return p[10001]
+end
+

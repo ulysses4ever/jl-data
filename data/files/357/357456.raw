@@ -1,0 +1,10 @@
+using Jules
+
+all = ["StreamingTests", "CARTTests"]
+
+run = isempty(ARGS) ? all : filter(x -> x in ARGS, all)
+
+for x in run
+  println("running $(x)")
+  include("$(x).jl")
+end

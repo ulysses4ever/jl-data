@@ -1,0 +1,17 @@
+#test julia operators
+
+include("operators.jl")
+
+v = [1,2,4,5];
+
+V = sdiag(v);
+
+println(full(V));
+
+hx = [2,2,2];
+
+G = gradient(hx,hx,hx)
+
+#println(full(G))
+
+println(size(G))

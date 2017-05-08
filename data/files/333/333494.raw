@@ -1,0 +1,119 @@
+# clone GreatCMakeCookOff
+module TBB
+using Debian: debian_file, control
+using Docker
+using Convenience
+
+export prepare, make
+const filename = "tbb43_20150424oss_src.tgz"
+const homepage = "https://www.threadingbuildingblocks.org"
+const url = "https://www.threadingbuildingblocks.org/sites/default/files/software_releases/source/"
+const email = "rc-softdev@ucl.ac.uk"
+const maintainer = "Research Software Development Team"
+const version = "4.3.5"
+const package = lowercase("Intel-Thread-Building-Blocks")
+const license = "mit"
+const build_deps = "make", "gcc", "g++"
+
+function locations(workdir)
+  const name = "$package-$version"
+  const sourcedir = abspath(joinpath(workdir, name))
+  const builddir = abspath(joinpath(workdir, "build", name))
+  const tarfile = joinpath(builddir, "$(package)_$version.orig.tar.gz")
+  name, sourcedir, builddir, tarfile
+end
+
+function prepare(workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(workdir)
+
+  create_or_use_directory(builddir)
+
+  isfile(tarfile) || download(url * filename, joinpath(builddir, tarfile))
+  cd(builddir) do
+    if !isdir(name)
+       run(`tar -xvf $tarfile`)
+       mv(replace(filename, "_src.tgz", ""), name)
+    end
+  end
+
+  cd(joinpath(builddir, name)) do
+    control(package, version;
+      build_depends=build_deps, homepage=homepage,
+      description="Library to do threads the intel way",
+
+      package="$package-dev",
+      architecture="all",
+      depends="$package",
+      description="Headers for intel threading library",
+
+      package="$package-dbg",
+      description="Debug libraries for intel threading"
+    )
+    debian_file("rules",
+          "#!/usr/bin/make -f",
+          "include /usr/share/cdbs/1/rules/debhelper.mk",
+          "include /usr/share/cdbs/1/class/makefile.mk",
+          "build/$package::",
+          "\tmkdir -p debian/tmp/usr/lib",
+          "\tcp build/*_release/libtbb*.so debian/tmp/usr/lib",
+          "build/$package-dbg::",
+          "\tmkdir -p debian/tmp/usr/lib",
+          "\tcp build/*_debug/libtbb*_debug.so debian/tmp/usr/lib",
+          "build/$package-dev::",
+          "\tmkdir -p debian/tmp/usr/include",
+          "\tcp -r include/tbb debian/tmp/usr/include"
+    )
+    debian_file("$package.install",
+      "usr/lib/libtbb.so",
+      "usr/lib/libtbbmalloc.so",
+      "usr/lib/libtbbmalloc_proxy.so"
+    )
+    debian_file("$package-dbg.install",
+      "usr/lib/libtbb_debug.so",
+      "usr/lib/libtbbmalloc_debug.so",
+      "usr/lib/libtbbmalloc_proxy_debug.so"
+    )
+    debian_file("$package-dev.install", "usr/include")
+  end
+end
+
+function make(machine; image::String="packaging", workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(workdir)
+  machine = deepcopy(machine)
+
+  machine.volumes[builddir] = "/$name"
+  machine.workdir = "/$name/$name"
+
+  env = {:LOGNAME => :RSDT, :DEBFULLNAME => maintainer, :EMAIL => email, :MAKEFLAGS => "-j2"}
+  create_image = Docker.image(machine, package, build_deps; image=image, env=env)
+
+  cmd = "dh_make -i -a -r cdbs -l -e \"$email\" -c $license -f /$name/$(basename(tarfile))"
+  dhmake = command(machine, STDOUT, cmd; image=package, rm=true) do
+    ""
+  end
+  dhbuild = command(machine, "dpkg-buildpackage -tc"; image=package, rm=true)
+  [create_image, dhmake, dhbuild]
+end
+function test(machine; workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(workdir)
+
+  machine = deepcopy(machine)
+  machine.volumes[builddir] = "/$name"
+  machine.workdir = "/$name"
+
+  std = package * "_" * version
+  dbg = package * "-dbg_" * version
+  dev = package * "-dev_" * version
+  command(machine, STDOUT; image=package, rm=true) do
+    "dpkg -i $std-1_*.deb\n" *
+    "dpkg -i $dbg-1_*.deb\n" *
+    "dpkg -i $dev-1_*.deb\n" *
+    "dpkg-query -L $package\n" *
+    "dpkg-query -L $package-dbg\n" *
+    "dpkg-query -L $package-dev\n" *
+    "test -e /usr/lib/libtbb.so\n" *
+    "test -e /usr/lib/libtbb_debug.so\n" *
+    "test -e /usr/include/tbb/tbb.h\n"
+  end
+end
+end

@@ -1,0 +1,677 @@
+#!/usr/bin/env julia
+
+###################################################
+# Granular dynamics simulator by Anders Damsgaard #
+###################################################
+
+#=
+Add Sphere to your julia path by:
+    push!(LOAD_PATH, "~/src/julia/sphere/")
+
+If this statement is added to `~/.juliarc.jl`, it will become persistent between
+julia sessions. Note that the `~` symbol for the home folder does not seem to
+work (julia v. 0.4.1) in the `.juliarc.jl` file.
+
+Import package contents with:
+    import Sphere
+
+If this file is changed, reimport it with:
+    reload("Sphere")
+
+=#
+
+
+module Sphere
+
+# Define floating point data types
+const float = Float64
+const vector = Array{Float64, 1}
+
+#export addGrain
+#export getPosition
+
+#include("vectors.jl")
+#include("grain.jl")
+#include("contact_search.jl")
+#include("interaction.jl")
+
+
+## Global arrays for general simulation data
+# TODO: Variables should be local, or passed as arguments to functions whenever
+# possible
+g_position = vector[]
+g_velocity = vector[]
+g_acceleration = vector[]
+g_force = vector[]
+
+g_rotational_position = vector[]
+g_rotational_velocity = vector[]
+g_rotational_acceleration = vector[]
+g_torque = vector[]
+
+g_radius = float[]
+
+g_density = float[]
+g_volume = float[]
+g_mass = float[]
+g_rotational_inertia = float[]
+
+g_time_iteration = 0
+g_time = 0.0
+g_time_total = 0.0
+g_time_step = 0.0
+g_file_time_step = 0.0   # <= 0.0: no output files
+g_file_number = 0
+
+g_contact_stiffness_normal = 1.16e9
+g_contact_stiffness_tangential = 0.0
+g_contact_viscosity_normal = 1.16e9
+g_contact_viscosity_tangential = 0.0
+
+g_gravitational_acceleration = zeros(3)
+
+g_contact_pairs = Array{Integer, 1}[]
+#g_positions = float[]
+g_overlaps = float[]
+g_wall_contacts = Array{Integer, 1}[]
+
+g_simulation_id = "unnamed"
+
+g_origo = zeros(3)
+g_world_size = zeros(3)
+
+## General simulation functions
+
+function id(identifier::ASCIIString)
+    g_simulation_id = identifier
+end
+
+function id()
+    return g_simulation_id
+end
+
+function run(verbose::Bool = true,
+    status_interval = 100.,
+    show_file_output = true)
+
+    checkTimeParameters()
+    if g_file_time_step > 0.0
+        writeVTK(verbose = show_file_output)
+    end
+
+    time_since_output_file = 0.0
+
+    while g_time <= g_time_total
+
+        if g_file_time_step > 0.0 && time_since_output_file >= g_file_time_step
+            writeVTK(verbose = show_file_output)
+            time_since_output_file = 0.0
+        end
+
+        if verbose && g_time_iteration % status_interval == 0
+            print("\r  t = $g_time/$g_time_total s            ")
+        end
+
+        findContacts()
+        interact()
+        updateKinematics()
+
+        # Update time variables
+        global g_time_iteration = g_time_iteration::Integer + 1
+        incrementCurrentTime(g_time_step::float)
+        time_since_output_file = time_since_output_file + g_time_step::float
+
+    end
+
+    if g_file_time_step > 0.0
+        writeVTK(verbose = show_file_output)
+    end
+end
+
+
+## Set temporal parameters
+function setTotalTime(t::float)
+    if t <= 0.0
+        error("Total time should be a positive value (t = $t s)")
+    end
+    global g_time_total = t
+end
+
+function setCurrentTime(t::float)
+    if t <= 0.0
+        error("Current time should be a positive value (t = $t s)")
+    end
+    global g_time = t
+end
+
+function incrementCurrentTime(t::float)
+    if t <= 0.0
+        error("Current time increment should be a positive value (t = $t s)")
+    end
+    global g_time = g_time::float + t
+end
+
+function setOutputFileInterval(t::float)
+    if t <= 0.0
+        info("The output file interval should be a positive value (t = $t s)")
+    end
+    global g_file_time_step = t
+end
+
+function disableOutputFiles()
+    global g_file_time_step = 0.0
+end
+
+function checkTimeParameters()
+    if g_time_total <= 0.0 || g_time_total <= g_time
+        error("Total time should be positive and larger than current time. " *
+            "t_total = $g_time_total s, t = $g_time s")
+    end
+    if g_time_step <= 0.0
+        error("Time step should be positive (Δt = $g_time_step)")
+    end
+end
+
+
+"""
+Find the computational time step length suitable given the grain radii, contact
+stiffnesses, and grain density. Uses the scheme by Radjaii et al. 2011.
+"""
+function findTimeStep(epsilon::float=0.07, verbose::Bool=true)
+
+    if length(g_radius) < 1
+        error("At least 1 grain is needed to find the computational time step.")
+    end
+
+    global g_time_step = epsilon / (sqrt(
+        maximum([g_contact_stiffness_normal::float,
+        g_contact_stiffness_tangential::float]) /
+        minimum(g_mass)))
+
+    if g_time_step <= 1.0e-20
+        error("Time step too small or negative ($g_time_step s)")
+    end
+
+    if verbose
+        info("Time step length Δt = $g_time_step s")
+    end
+end
+
+
+## Manage grains in the model
+
+#export addSphericalGrain
+"""
+Adds a grain to the simulation. Example:
+
+    Sphere.addSphericalGrain([1.0, 2.0, 3.0], 1.0)
+"""
+function addSphericalGrain(
+    position::vector,
+    radius::float = 1.0;
+    velocity::vector = [0., 0., 0.],
+    acceleration::vector = [0., 0., 0.],
+    force::vector = [0., 0., 0.],
+    rotational_position::vector = [0., 0., 0.],
+    rotational_velocity::vector = [0., 0., 0.],
+    rotational_acceleration::vector = [0., 0., 0.],
+    torque::vector = [0., 0., 0.],
+    density::float = 2600.,
+    verbose::Bool = true)
+
+    # Check input values
+    if radius <= 0.0
+        error("Grain radius must be greater than 0.0 (radius = $radius m)")
+    elseif density <= 0.0
+        error("Grain density must be greater than 0.0 (density = $density
+            kg/m^3)")
+    end
+
+    # Save grain in global arrays
+    push!(g_radius, radius)
+
+    push!(g_position, position)
+    push!(g_velocity, velocity)
+    push!(g_acceleration, acceleration)
+    push!(g_force, force)
+
+    push!(g_rotational_position, rotational_position)
+    push!(g_rotational_velocity, rotational_velocity)
+    push!(g_rotational_acceleration, rotational_acceleration)
+    push!(g_torque, torque)
+
+    push!(g_density, density)
+    volume = 4.0 / 3.0 * pi * radius^3.0
+    push!(g_volume, volume)
+    push!(g_mass, density*volume)
+    push!(g_rotational_inertia, 2.0 / 5.0 * density * volume * radius^2.0)
+
+    if verbose
+        info("Added grain $(length(g_radius))")
+    end
+
+    min_position = position - radius
+    max_position = position + radius
+
+    # Update world boundaries
+    for i = 1:3
+        if min_position[i] < g_origo[i]
+            g_origo[i] = min_position[i]
+        end
+
+        if max_position[i] > g_world_size[i]
+            g_world_size[i] = max_position[i]
+        end
+    end
+end
+
+function removeGrain(i::Integer)
+    if i < 1
+        error("Grain index must be greater than 0 (i = $i)")
+    end
+
+    delete!(g_radius, i)
+
+    delete!(g_position, i)
+    delete!(g_velocity, i)
+    delete!(g_acceleration, i)
+    delete!(g_force, i)
+
+    delete!(g_rotational_position, i)
+    delete!(g_rotational_velocity, i)
+    delete!(g_rotational_acceleration, i)
+    delete!(g_torque, i)
+
+    delete!(g_density, i)
+    delete!(g_volume, i)
+    delete!(g_mass, i)
+    delete!(g_rotational_inertia, i)
+end
+
+function initializeUniformSphericalGrainsInRandomGridPositions(
+    nx::Integer = 6,
+    ny::Integer = 6,
+    nz::Integer = 36,
+    radius::float = 0.1,
+    spacing::float = 0.05,
+    verbose::Bool = true)
+
+    g_world_size = [float(nx), float(ny), float(nz)] *
+        (2.0 * spacing + 2.0 * radius)
+
+    for iz = 1:nz
+        for iy = 1:ny
+            for ix = 1:nx
+                position = [
+                    radius + (2.0 * spacing + 2.0 * radius) * (ix - 1),
+                    radius + (2.0 * spacing + 2.0 * radius) * (iy - 1),
+                    radius + (2.0 * spacing + 2.0 * radius) * (iz - 1)] .+
+                    2.0 * spacing * rand(3)
+
+                addSphericalGrain(position, radius, verbose = verbose)
+            end
+        end
+    end
+end
+
+function fitWorldSize(margin::vector = zeros(3))
+
+    if length(g_radius) < 1
+        error("At least a single grain must be added before setting world
+        size.")
+    end
+
+    minpos = [Inf, Inf, Inf]
+    maxpos = [-Inf, -Inf, -Inf]
+    for i = 1:length(g_radius)
+
+        min_position = g_position[i]::vector - g_radius[i]::float
+        max_position = g_position[i]::vector + g_radius[i]::float
+
+        for i = 1:3
+            if min_position[i] < g_origo[i]
+                g_origo[i] = min_position[i]
+            end
+
+            if max_position[i] > g_world_size[i]
+                g_world_size[i] = max_position[i]
+            end
+        end
+    end
+
+    g_origo[:] = minpos[:] - margin[:]
+    g_world_size[:] = maxpos[:] + margin[:]
+end
+
+
+## Time integration functions
+
+"""
+Perform temporal integration for all grains.
+"""
+function updateKinematics()
+    for i = 1:length(g_radius)
+        updateGrainKinematics(i)
+    end
+end
+
+"""
+Update the grain kinematic parameters using a temporal integration scheme,
+the current force and torque balance, and gravitational acceleration.
+"""
+function updateGrainKinematics(i::Integer;
+    method::ASCIIString = "Three-term Taylor")
+
+    if method == "Two-term Taylor"
+        updateGrainKinematicsTwoTermTaylor(i)
+    elseif method == "Three-term Taylor"
+        updateGrainKinematicsThreeTermTaylor(i)
+    else
+        error("Unknown integration method '$method'")
+    end
+end
+
+function updateGrainKinematicsTwoTermTaylor(i::Integer)
+
+    # Translational components
+    g_acceleration[i] =
+        g_force[i]::vector / g_mass[i]::vector +
+        g_gravitational_acceleration::vector
+
+    velocity_new::vector =
+        g_velocity[i]::vector +
+        g_acceleration[i]::vector * g_time_step::float
+
+    g_position[i] = g_position[i]::vector +
+        g_velocity[i]::vector * g_time_step::float +
+        0.5 * g_acceleration[i]::vector * g_time_step::float^2.0
+
+    g_velocity[i] = velocity_new
+
+    # Rotational components
+    g_rotational_acceleration[i] =
+        g_torque[i]::vector / g_rotational_inertia[i]::vector
+
+    rotational_velocity_new::vector =
+        g_rotational_velocity[i]::vector +
+        g_rotational_acceleration[i]::vector * g_time_step::float
+
+    g_rotational_position[i] = g_rotational_position[i]::vector +
+        g_rotational_velocity[i]::vector * g_time_step::float +
+        0.5 * g_rotational_acceleration[i]::Array{float, 1} *
+        g_time_step::float^2.0
+
+    g_rotational_velocity[i] = rotational_velocity_new
+end
+
+function updateGrainKinematicsThreeTermTaylor(i::Integer)
+    
+    if g_time_iteration == 0
+        acceleration_0 = zeros(3)
+        rotational_acceleration_0 = zeros(3)
+    else
+        acceleration_0 = g_acceleration[i]::vector
+        rotational_acceleration_0 = g_rotational_acceleration[i]::vector
+    end
+
+    # Temporal gradient in acceleration using backwards differences
+    dacceleration_dt::vector =
+            (g_acceleration[i]::vector - acceleration_0::vector) /
+            g_time_step::float
+
+    drotational_acceleration_dt::vector =
+            (g_rotational_acceleration[i]::vector -
+            rotational_acceleration_0::vector) /
+            g_time_step::float
+
+    # Translational components
+    g_acceleration[i] = g_force[i]::vector / g_mass[i]::float +
+        g_gravitational_acceleration::vector
+
+    velocity_new::vector =
+        g_velocity[i]::vector +
+        g_acceleration[i]::vector * g_time_step::float +
+        0.5 * dacceleration_dt::vector * g_time_step::float^2.0
+
+    g_position[i] = g_position[i]::vector +
+        g_velocity[i]::vector * g_time_step::float +
+        0.5 * g_acceleration[i]::vector * g_time_step::float^2.0 +
+        1.0 / 6.0 * dacceleration_dt * g_time_step::float^3.0
+
+    g_velocity[i] = velocity_new
+
+    # Rotational components
+    g_rotational_acceleration[i] =
+        g_torque[i]::vector / g_rotational_inertia[i]::float
+
+    rotational_velocity_new::vector = g_rotational_velocity[i] +
+        g_rotational_acceleration[i] * g_time_step::float +
+        0.5 * drotational_acceleration_dt * g_time_step::float^2.0
+
+    g_rotational_position[i] = g_rotational_position[i]::vector +
+        g_rotational_velocity[i] * g_time_step::float +
+        0.5 * g_rotational_acceleration[i] * g_time_step::float^2.0 +
+        1.0 / 6.0 * drotational_acceleration_dt * g_time_step::float^3.0
+
+    g_rotational_velocity[i] = rotational_velocity_new
+end
+
+
+## Interaction functions
+
+"""
+Resolve mechanical interaction between all grain pairs and walls.
+"""
+function interact()
+    contact_pair = Array{Integer, 1}
+    #overlap_ij = float
+
+    # Grain to grain collisions
+    while !isempty(g_contact_pairs)
+        contact_pair = pop!(g_contact_pairs)
+        interactGrains(contact_pair[1], contact_pair[2])
+    end
+
+    # Grain to wall collisions
+    while !isempty(g_wall_contacts)
+        contact_pair = pop!(g_wall_contacts)
+        interactGrainWall(contact_pair[1], contact_pair[2])
+    end
+
+    #for k=1:length(g_contact_pairs)
+    #end
+end
+
+"""
+Resolve an grain-to-grain interaction using a prescibed contact law.
+"""
+function interactGrains(i::Integer, j::Integer,
+    overlap_vector::vector;
+    contact_normal::ASCIIString = "LinearElastic")
+
+    if contact_normal == "None"
+        # do nothing
+
+    elseif contact_normal == "LinearElastic"
+        interactNormalLinearViscous(i, j, overlap_vector)
+
+    else
+        error("Unknown contact_normal interaction model '$contact_normal'")
+    end
+
+end
+
+function interactNormalLinearElastic(i::Integer, j::Integer,
+    overlap_vector::vector)
+
+    force = -g_contact_stiffness_normal * overlap_vector
+
+    g_force[i] = g_force[i]::vector + force;
+    g_force[j] = g_force[j]::vector - force;
+end
+
+
+## Contact mapping
+function findContacts(method::ASCIIString = "all to all")
+
+    if method == "all to all"
+        findContactsAllToAll()
+    else
+        error("Unknown contact search method '$method'")
+    end
+end
+
+function interGrainPositionVector(i::Integer, j::Integer)
+    return g_position[j]::vector - g_position[i]::vector
+end
+
+"""
+position_ij is the inter-grain position vector, and can be found with
+interGrainPositionVector().
+"""
+function findOverlap(i::Integer, j::Integer, position_ij::vector)
+    return norm(position_ij) - (g_radius[i]::float + g_radius[j]::float)
+end
+
+function findContactsAllToAll()
+
+    for i = 1:length(g_radius)
+
+        # Check contacts with other grains
+        for j = 1:length(g_radius)
+            if i < j
+
+                # Inter-grain position vector and grain overlap
+                position_ij = interGrainPositionVector(i, j)
+                overlap_ij = findOverlap(i, j, position_ij)
+
+                # Check if grains overlap (overlap when negative)
+                if overlap_ij < 0.0
+                    push!(g_contact_pairs, [i, j])
+                    #push!(g_positions, position_ij)
+                    push!(g_overlaps, overlap_ij)
+                end
+            end
+        end
+    end # `i` grain loop end
+end
+
+"""
+Check contacts with world boundaries (walls). Contacts are stored in
+g_wall_contacts with the format [i, w], where i is the grain number and w is the
+wall number. The walls are orthorectangular. The wall at negative x is called
+-1, and 1 at positive x. For negative y it is called -2, and 2 at positive y.
+For negative z it is called -3, and 3 at positive z.
+"""
+function findGrainWallContacts()
+
+    for i = 1:length(g_radius)
+
+        # Overlap with origo
+        if g_position[i][1]::float - g_radius[i]::float - g_origo[1] < 0.0
+            push!(g_wall_contacts, [i, -1])
+        end
+
+        if g_position[i][2]::float - g_radius[i]::float - g_origo[2] < 0.0
+            push!(g_wall_contacts, [i, -2])
+        end
+
+        if g_position[i][3]::float - g_radius[i]::float - g_origo[3] < 0.0
+            push!(g_wall_contacts, [i, -3])
+        end
+
+        # Overlap with world_size
+        if g_world_size[1] - g_position[i][1]::float - g_radius[i]::float < 0.0
+            push!(g_wall_contacts, [i, 1])
+        end
+
+        if g_world_size[2] - g_position[i][2]::float - g_radius[i]::float < 0.0
+            push!(g_wall_contacts, [i, 2])
+        end
+
+        if g_world_size[3] - g_position[i][3]::float - g_radius[i]::float < 0.0
+            push!(g_wall_contacts, [i, 3])
+        end
+
+    end
+end
+
+
+## IO functions
+
+function writeVTK(folder::ASCIIString = ".", verbose::Bool = true)
+
+    global g_file_number += 1
+    filename = "$(folder)/$(g_simulation_id).$(g_file_number).t=$(g_time)s.vtu"
+
+    if verbose
+        println("Output file: $filename")
+    end
+
+    f = open(filename, "w")
+
+    write(f, "<?xml version=\"1.0\"?>\n" * # XML header
+        "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" " *
+        "byte_order=\"LittleEndian\">\n" * # VTK header
+        "  <UnstructuredGrid>\n" *
+        "    <Piece NumberOfPoints=\"$(length(g_radius))\" " *
+        "NumberOfCells=\"0\">\n")
+
+    # Coordinates for each point (positions)
+    write(f, "      <Points>\n" *
+        "        <DataArray name=\"Position [m]\" type=\"Float32\" " *
+        "NumberOfComponents=\"3\" format=\"ascii\">\n" *
+        "          ")
+
+    for i=1:length(g_radius)
+        #=write(f, "%f %f %f " %
+            g_position[i][1]::float,
+            g_position[i][2]::float,
+            g_position[i][3]::float)=#
+        write(f, "$(g_position[i][1]::float)
+            $(g_position[i][2]::float)
+            $(g_position[i][3]::float) ")
+    end
+
+    write(f, "\n" *
+        "        </DataArray>\n" *
+        "      </Points>\n")
+
+    ### Data attributes
+    write(f, "      <PointData Scalars=\"Diameter [m]\" " *
+        "Vectors=\"vector\">\n")
+
+    # Radii
+    write(f, "        <DataArray type=\"Float32\" Name=\"Diameter\" " *
+        "format=\"ascii\">\n" *
+        "          ")
+    for i=1:length(g_radius)
+        #write(f, "%f " % g_radius[i]::float*2.0)
+        write(f, "$(g_radius[i]::float*2.0) ")
+    end
+    write(f, "\n" *
+        "        </DataArray>\n")
+
+    # Footer
+    write(f, "      </PointData>\n" *
+        "      <Cells>\n" *
+        "        <DataArray type=\"Int32\" Name=\"connectivity\" " *
+        "format=\"ascii\">\n" *
+        "        </DataArray>\n" *
+        "        <DataArray type=\"Int32\" Name=\"offsets\" " *
+        "format=\"ascii\">\n" *
+        "        </DataArray>\n" *
+        "        <DataArray type=\"UInt8\" Name=\"types\" " *
+        "format=\"ascii\">\n" *
+        "        </DataArray>\n" *
+        "      </Cells>\n" *
+        "    </Piece>\n" *
+        "  </UnstructuredGrid>\n" *
+        "</VTKFile>")
+
+    close(f)
+
+    println()
+end
+
+end # module end

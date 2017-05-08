@@ -1,0 +1,28 @@
+# Unit tests for decimal.jl
+
+include("decimal.jl")
+
+# Decimal constructor
+d = [
+    Decimal(0, 2, -1),
+    Decimal(0, 1, -1),
+    Decimal(0, 100, -4),
+    Decimal(0, 1512, -2),
+]
+@assert typeof(d) == Array{Decimal,1}
+
+# Equality
+@assert equals(Decimal(0, 2, -3), Decimal(0, 2, -3))
+@assert equals(Decimal(0, 2, -3), 0.002)
+@assert equals(Decimal(1, 2, 0), -2)
+@assert triple_equals(Decimal(0, 2, -3), Decimal(0, 2, -3))
+
+# Normalization
+@assert Decimal(1, 151100, -4) == Decimal(1, 1511, -2)
+@assert Decimal(0, 100100, -5) == Decimal(0, 1001, -3)
+
+# Addition and subtraction
+@assert d[1] + d[2] == Decimal(0, 3, -1)
+@assert d[1] - d[2] == Decimal(0, 1, -1)
+@assert d[3] - d[4] == Decimal(1, 1511, -2)
+@assert d[4] - d[3] == Decimal(0, 1511, -2)

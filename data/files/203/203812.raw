@@ -1,0 +1,580 @@
+import Base:+
+import Base:-
+import Base:*
+import Base:inv
+import Base:dot
+
+using PyPlot
+
+#ion()
+
+type Vec4f
+  e1::Float32
+  e2::Float32
+  e3::Float32
+  e4::Float32
+end
+
+type Mat4f
+  v1::Vec4f
+  v2::Vec4f
+  v3::Vec4f
+  v4::Vec4f
+end
+
+function +(v1::Vec4f,v2::Vec4f)
+  return Vec4f(v1.e1+v2.e1,v1.e2+v2.e2,v1.e3+v2.e3,v1.e4+v2.e4)
+end
+
+function -(v1::Vec4f,v2::Vec4f)
+  return Vec4f(v1.e1-v2.e1,v1.e2-v2.e2,v1.e3-v2.e3,v1.e4-v2.e4)
+end
+
+function *(a::Float32,v::Vec4f)
+  return Vec4f(a*v.e1,a*v.e2,a*v.e3,a*v.e4)
+end
+
+function *(M::Mat4f,v::Vec4f)
+  return Vec4f(v.e1*M.v1+v.e2*M.v2+v.e3*M.v3+v.e4*M.v4)
+end
+
+type Object
+  vertices::Vector{Vec4f}
+  # Type constructor which allows to use Object(vec1,vec2,...)
+  Object(x::Vector{Vec4f}) = new(x)
+  Object(x...) = new(collect(Vec4f,x))
+end
+
+function render(Object; figNum=1, figAxis=[-1,1,-1,1])
+  x = [v.e1 for v in Object.vertices]
+  y = [v.e2 for v in Object.vertices]
+  figure(figNum)
+  clf()
+  axis(figAxis)
+  plot(x,y)
+  #draw()
+  #show()
+end
+
+#v1 = Vec4f(0,0,0,1)
+#v2 = Vec4f(1,0,0,1)
+#ing these 2D coordinates draw the object by connecting neighbouring verticesriangle = Object(v1,v2,v3,v1)
+#render(triangle)
+
+v1 = Vec4f(-1,-1,0,1)
+v2 = Vec4f(1,-1,0,1)
+v3 = Vec4f(-1,1,0,1)
+v4 = Vec4f(0,2,0,1)
+v5 = Vec4f(1,1,0,1)
+v6 = Vec4f(-1,-1,0,1)
+v7 = Vec4f(-1,1,0,1)
+v8 = Vec4f(1,1,0,1)
+v9 = Vec4f(1,-1,0,1)
+houseOfSantaClaus = Object(v1,v2,v3,v4,v5,v6,v7,v8,v9)
+#render(houseOfSantaClaus, figAxis=[-2,2,-2,2])
+
+type Transformation
+  M::Mat4f
+  Transformation(M::Mat4f) = new(M)
+  Transformation(v1,v2,v3,v4) = new(Mat4f(v1,v2,v3,v4))
+end
+
+function *(T::Transformation,v::Vec4f)
+  return T.M*v
+end
+
+function *(T::Transformation,O::Object)
+  return Object(map(x->T.M*x,O.vertices))
+end
+
+function translation(x,y,z)
+  return Transformation(Vec4f(1,0,0,0),Vec4f(0,1,0,0),Vec4f(0,0,1,0),Vec4f(x,y,z,1))
+end
+
+function rotx(phi)
+  return Transformation(Vec4f(1,0,0,0),Vec4f(0,cos(phi),sin(phi),0),Vec4f(0,-sin(phi),cos(phi),0),Vec4f(0,0,0,1))
+end
+
+function roty(phi)
+  return Transformation(Vec4f(cos(phi),0,-sin(phi),0),Vec4f(0,1,0,0),Vec4f(+sin(phi),0,cos(phi),0),Vec4f(0,0,0,1))
+end
+
+function rotz(phi)
+  return Transformation(Vec4f(cos(phi),+sin(phi),0,0),Vec4f(-sin(phi),cos(phi),0,0),Vec4f(0,0,1,0),Vec4f(0,0,0,1))
+end
+
+function scaling(sx,sy,sz)
+  return Transformation(Vec4f(sx,0,0,0),Vec4f(0,sy,0,0),Vec4f(0,0,sz,0),Vec4f(0,0,0,1))
+end
+
+#println(translation(2,2,2))
+
+#T = translation(1,0,0)
+#TranslatedHouseOfSantaClaus = T*houseOfSantaClaus
+#render(TranslatedHouseOfSantaClaus, figAxis=[-2,2,-2,2])
+
+#T = rotx(pi/4)
+#RotatedHouseOfSantaClaus = T*houseOfSantaClaus
+#render(RotatedHouseOfSantaClaus, figAxis=[-2,2,-2,2])
+
+#T = scaling(1.25,0.75,1)
+#ScaledHouseOfSantaClaus = T*houseOfSantaClaus
+#render(ScaledHouseOfSantaClaus, figAxis=[-2,2,-2,2])
+
+#tranHouseOfSantaClaus = houseOfSantaClaus
+#j = 180
+#for i = 1:j
+##println(i)
+#t = i/j
+#T = translation(cos(2*pi*t),sin(2*pi*t),0)
+#render(T*tranHouseOfSantaClaus, figAxis=[-2,2,-2,2])
+#sleep(0.001)
+#end
+
+function dotproduct(v1::Vec4f,v2::Vec4f)
+  return v1.e1*v2.e1+v1.e2*v2.e2+v1.e3*v2.e3+v1.e4*v2.e4
+end
+
+function *(M1::Mat4f,M2::Mat4f)
+  return Mat4f(M1*M2.v1,M1*M2.v2,M1*M2.v3,M1*M2.v4)
+end
+
+function *(T1::Transformation,T2::Transformation)
+  return Transformation(T1.M*T2.M)
+end
+
+function rotateObject(O::Object)
+  for i = 0:60
+    T = rotz(2*pi*i/60)
+    render(T*O,figAxis=[-4,4,-4,4])
+    sleep(0.001)
+  end
+end
+
+function rotateAndZoomObject(O::Object)
+  for i = 0:60
+    T1 = rotz(2*pi*i/60)
+    T2 = scaling(i/30,i/30,i/30)
+    T = T1*T2
+    render(T*O,figAxis=[-4,4,-4,4])
+    sleep(0.001)
+  end
+end
+
+function rotateObject2(O::Object)
+  for i = 1:60
+    T = rotz(2*pi*i/60)
+    T = translation(-1,-1,0) * T
+    render(T*O,figAxis=[-4,4,-4,4])
+    T = translation(1,1,0) * T
+    sleep(0.001)
+  end
+end
+
+#rotateObject(houseOfSantaClaus)
+#rotateAndZoomObject(houseOfSantaClaus)
+#rotateAndZoomObject(houseOfSantaClaus)
+
+function eulermatrix(α,β,δ)
+  cosh = cos(α); sinh = sin(α);
+  cosp = cos(β); sinp = sin(β);
+  cosr = cos(δ); sinr = sin(δ);
+  v1 = Vec4f(cosr*cosh-sinr*sinp*sinh,sinr*cosh+cosr*sinp*sinh,-cosp*sinh,0.0f0)
+  v2 = Vec4f(-sinr*cosp,cosr*cosp,sinp,0.0f0)
+  v3 = Vec4f(cosr*sinh+sinr*sinp*cosh,sinr*sinh-cosr*sinp*cosh,cosp*cosh,0.0f0)
+  v4 = Vec4f(0,0,0,1.0f0)
+  return Transformation(v1,v2,v3,v4)
+end
+
+#pangle = pi/4
+#render(eulermatrix(pangle,pangle,pangle)*houseOfSantaClaus)
+#sleep(3)
+
+function inv(M::Mat4f)
+  m = zeros(4,4)
+  m[1,1] = M.v1.e1; m[1,2] = M.v2.e1; m[1,3] = M.v3.e1; m[1,4] = M.v4.e1;
+  m[2,1] = M.v1.e2; m[2,2] = M.v2.e2; m[2,3] = M.v3.e2; m[2,4] = M.v4.e2;
+  m[3,1] = M.v1.e3; m[3,2] = M.v2.e3; m[3,3] = M.v3.e3; m[3,4] = M.v4.e3;
+  m[4,1] = M.v1.e4; m[4,2] = M.v2.e4; m[4,3] = M.v3.e4; m[4,4] = M.v4.e4;
+  minv = inv(m)
+  v1 = Vec4f(minv[1:4,1]...)
+  v2 = Vec4f(minv[1:4,2]...)
+  v3 = Vec4f(minv[1:4,3]...)
+  v4 = Vec4f(minv[1:4,4]...)
+  return Mat4f(v1,v2,v3,v4)
+end
+
+function inv(T::Transformation)
+  return Transformation(Mat4f(inv(T.M)))
+end
+
+type OrthoCamera
+  camToWorld::Transformation
+  worldToCam::Transformation
+end
+
+function OrthoCamera(rc::Vector{Float32},rv::Vector{Float32},ru::Vector{Float32})
+  a = [rv[2]*ru[3]-rv[3]*ru[2],rv[3]*ru[1]-rv[1]*ru[3],rv[1]*ru[2]-rv[2]*ru[1]]
+  b = ru
+  c = -rv
+
+  v1 = Vec4f(a[1], a[2], a[3], 0)
+  v2 = Vec4f(b[1], b[2], b[3], 0)
+  v3 = Vec4f(c[1], c[2], c[3], 0)
+  v4 = Vec4f(rc[1], rc[2], rc[3], 1)
+  T = Transformation(Mat4f(v1,v2,v3,v4))
+  Tinv = inv(T)
+
+  return OrthoCamera(T,Tinv)
+end
+
+function render(object::Object,camera::OrthoCamera;figNum=1,figAxis=[-1,1,-1,1])
+  render(camera.worldToCam*object,figNum,figAxis)
+end
+
+# scale down the houseOfSantaClaus to fit into the canonical view volume
+scaledHouseOfSantaClaus = scaling(0.5,0.5,0.5)*houseOfSantaClaus
+
+# canonical view direction
+camera = OrthoCamera(Float32[0,0,1],Float32[0,0,-1],Float32[0,1,0])
+#render(scaledHouseOfSantaClaus,camera;figNum=4)
+
+camera = OrthoCamera(Float32[0,0,10],Float32[0,0,-1],Float32[0,1,0])
+#render(scaledHouseOfSantaClaus,camera;figNum=5)
+
+# rotate screen clockwise
+#j=6
+#for t=0:j
+#camera = OrthoCamera(Float32[0,0,1],Float32[0,0,-1],Float32[sin(2*pi*t/j),cos(2*pi*t/j),0])
+#render(scaledHouseOfSantaClaus,camera;figNum=6)
+#end
+
+abstract Camera
+
+type PinholeCamera <: Camera
+  camToWorld::Transformation
+  worldToCam::Transformation
+  # screen resolution in x direction
+  nx::Int
+  # screen resulution in y direction
+  ny::Int
+  # screen width
+  w::Float32
+  # screen height
+  h::Float32
+  # distance eye screen
+  d::Float32
+  PinholeCamera(camToWorld::Transformation,worldToCam::Transformation) = new(camToWorld,worldToCam,800,800,2.0f0,2.0f0,2.0f0)
+end
+
+function PinholeCamera(rc::Vector{Float32},rv::Vector{Float32},ru::Vector{Float32})
+  a = [rv[2]*ru[3]-rv[3]*ru[2],rv[3]*ru[1]-rv[1]*ru[3],rv[1]*ru[2]-rv[2]*ru[1]]
+  b = ru
+  c = -rv
+
+  v1 = Vec4f(a[1], a[2], a[3], 0)
+  v2 = Vec4f(b[1], b[2], b[3], 0)
+  v3 = Vec4f(c[1], c[2], c[3], 0)
+  v4 = Vec4f(rc[1], rc[2], rc[3], 1)
+  T = Transformation(Mat4f(v1,v2,v3,v4))
+  Tinv = inv(T)
+  return PinholeCamera(T,Tinv)
+end
+
+type Ray
+  origin::Vec4f
+  direction::Vec4f
+end
+
+unitize(v::Vec4f) = (1.0f0 / sqrt(dotproduct(v, v)) * v)
+
+function generateRay(camera::PinholeCamera,i::Int,j::Int)
+  u = -camera.w/2 + camera.w*(i-0.5)/camera.nx
+  v = camera.h/2 - camera.h*(j-0.5)/camera.ny
+  point = Vec4f(u,v,0,1)
+  origin = Vec4f(0,0,camera.d,1)
+  return Ray(camera.camToWorld*origin,camera.camToWorld*(unitize(point-origin)))
+end
+
+abstract SceneObject
+
+type Sphere <: SceneObject
+  center::Vec4f
+  radius::Float32
+end
+
+function Sphere(center::Vector{Float32},r::Float32)
+  return Sphere(Vec4f(center[1],center[2],center[3],1),r)
+end
+
+type AABB <: SceneObject
+  center::Vec4f
+  # positive half length from center to face of box
+  hx::Float32
+  hy::Float32
+  hz::Float32
+end
+
+function AABB(center::Vector{Float32},hx::Float32,hy::Float32,hz::Float32)
+  return AABB(Vec4f(center[1],center[2],center[3],1),hx,hy,hz)
+end
+
+function intersect(ray::Ray,sphere::Sphere)
+  ec = ray.origin-sphere.center
+  A = dotproduct(ray.direction,ray.direction)
+  B = 2*dotproduct(ray.direction,ec)
+  C = dotproduct(ec,ec)-sphere.radius*sphere.radius
+  statement = B*B-4*A*C
+  if(statement < 0)
+    return false,0
+  elseif(statement == 0)
+    return true,-B/(2*A)
+  else
+    u = -B/(2*A)
+    v = sqrt(((B*B)/(4*A*A))-(C/A))
+    return true,(u-v)<(u+v)?(u-v):(u+v)
+  end
+end
+
+function intersect(ray::Ray,aabb::AABB)
+  tmin::Float32 = -Inf32
+  tmax::Float32 = Inf32
+  p = aabb.center-ray.origin
+  # reduce hiting problem to 1D
+  # for each axis aligned band calculate the intersection points
+  for (f,g,h) in [(p.e1,ray.direction.e1,aabb.hx),(p.e2,ray.direction.e2,aabb.hy),(p.e3,ray.direction.e3,aabb.hz)]
+    t₁ = (f+h)/g
+    t₂ = (f-h)/g
+    if t₁ > t₂
+      tmp = t₁
+      t₁ = t₂
+      t₂ = tmp
+    end
+    t₁ > tmin && (tmin=t₁)
+    t₂ < tmax && (tmax=t₂)
+    # if cube hit this wont hold true
+    if tmin > tmax
+      return false, 0.0f0
+      # if tmax < 0 cube is behind camera
+    elseif tmax < 0
+      return false, 0.0f0
+    end
+  end
+  # cube is in front of us
+  if tmin > 0
+    return true, tmin
+    # cam is inside the cube
+  else
+    return true, tmax
+  end
+end
+
+type Scene
+  sceneObjects::Vector{SceneObject}
+end
+
+function intersect(ray::Ray,scene::Scene)
+  hit = false
+  tin = Inf
+  objhit = nothing
+  tmp_hit = false
+  tmp_tin = Inf
+  for object in scene.sceneObjects
+    (tmp_hit, tmp_tin) = intersect(ray,object)
+    if (tmp_hit && (tmp_tin < tin))
+      hit = true
+      tin = tmp_tin
+      objhit = object
+    end
+  end
+  return hit,tin,objhit
+end
+
+function hitShader(ray::Ray,scene::Scene)
+  hit = false
+  for object in scene.sceneObjects
+    (hit,tin) = intersect(ray,object)
+    if (hit)
+      return 1.0f0
+    end
+  end
+  return 0.0f0
+end
+
+abstract Lights
+type PointLight <: Lights
+  position::Vec4f
+end
+
+function positions(pointLight::PointLight)
+  return Vec4f[pointLight.position]
+end
+
+type SceneLights
+  lights::Vector{Lights}
+end
+
+function tracerays(scene::Scene,camera::Camera,shader::Function,sceneLights::SceneLights)
+  nx = camera.nx
+  ny = camera.ny
+  screen = Array(Float32,nx,ny)
+  for i=1:nx
+    for j=1:ny
+      # generate ray for pixel i,j
+      ray = generateRay(camera, i, j)
+      # use shader function to calculate pixel value
+      screen[i,j] = shader(ray, scene, sceneLights)
+    end
+  end
+  # final visualization of image
+  figure()
+  gray()
+  imshow(screen')
+  colorbar()
+  show()
+end
+
+function surfaceNormal(ray::Ray,t::Float32,sphere::Sphere)
+  return unitize((ray.origin+t*ray.direction)-sphere.center)
+end
+
+function surfaceNormal(ray::Ray,t::Float32,aabb::AABB)
+  # center of cube
+  c = aabb.center
+  #point ray hits on aabb
+  h = ray.origin+t*ray.direction
+  ch = h-c
+  x = abs(ch.e1/aabb.hx)
+  y = abs(ch.e2/aabb.hy)
+  z = abs(ch.e3/aabb.hz)
+  if x > y
+    if x > z
+      return sign(ch.e1/aabb.hx)*Vec4f(1,0,0,0)
+    else
+      return sign(ch.e3/aabb.hz)*Vec4f(0,0,1,0)
+    end
+  else
+    if y > z
+      return sign(ch.e2/aabb.hy)*Vec4f(0,1,0,0)
+    else
+      return sign(ch.e3/aabb.hz)*Vec4f(0,0,1,0)
+    end
+  end
+end
+
+# return zero vector if no object is hit
+function surfaceNormal(ray::Ray,t::Float32,void::Void)
+  return Vec4f(0,0,0,0)
+end
+
+function lambertShader(ray::Ray, scene::Scene, lights::Lights)
+  shade = 1.0f0
+  kd = 1
+  I = 1
+  (hit, tin,object) = intersect(ray,scene)
+  if(hit)
+    n = surfaceNormal(ray,tin,object)
+    p = ray.origin+tin*ray.direction
+    for lp in lights.positions
+      l = unitize(lp-p)
+      nl = dotproduct(n,l)
+      shade += kd * I * max(0,nl)
+    end
+    return shade
+  else
+    return 0.0f0
+  end
+end
+
+function lambertShader(ray::Ray, scene::Scene, sceneLights::SceneLights)
+  shade = 1.0f0
+  kd = 1
+  I = 10
+  (hit, tin,object) = intersect(ray,scene)
+  if(hit)
+    n = surfaceNormal(ray,tin,object)
+    p = ray.origin+tin*ray.direction
+    for light in sceneLights.lights
+      l = unitize(light.position-p)
+      nl = dotproduct(n,l)
+      shade += kd * I * max(0,nl)
+    end
+    return shade
+  else
+    return 0.0f0
+  end
+end
+function lightShader(ray::Ray,scene::Scene,sceneLights::SceneLights)
+  hitpoints = 1
+  (hit,tin,object) = intersect(ray,scene)
+  if(hit)
+    n = surfaceNormal(ray,tin,object)
+    p = ray.origin+tin*ray.direction
+    for light in sceneLights.lights
+      l = unitize(light.position-p)
+      nl = dotproduct(n,l)
+      if(nl>0)
+        hitpoints+=1
+      end
+    end
+    return hitpoints
+  end
+  return 0.0f0
+end
+
+function shadowShader(ray::Ray,scene::Scene,sceneLights::SceneLights)
+  #shade = 1.0f0
+  hitpoints = 1
+  #kd = 1
+  #I = 1
+  (hit, tin, object) = intersect(ray,scene)
+  if(hit)
+    p = ray.origin+tin*ray.direction
+    n = surfaceNormal(ray,tin,object)
+    for light in sceneLights.lights
+      for pos in positions(light)
+        l = unitize(pos-p)
+        nl = dotproduct(n,l)
+        if(nl>0)
+          shadowRay = Ray(p+1.0f-5*l,l) #do not intersect again with yourself
+          (shit, stin, sobject) = intersect(shadowRay, scene)
+          #if !shit #sherlock
+          if !shit || stin*stin > dotproduct(l,l)
+            hitpoints+=1
+          end
+        end
+      end
+    end
+    #return shade
+    return hitpoints
+  else
+    return 0.0f0
+  end
+end
+
+# return zero vector if no object is hit
+surfaceNormal(ray::Ray,t::Float32,void::Void) = Vec4f(0,0,0,0)
+# set up individual objects
+sphere1 = Sphere(Float32[-0.5,0.5,0],0.25f0)
+sphere2 = Sphere(Float32[-0.5,-0.5,0],0.5f0)
+aabb1 = AABB(Float32[0.5,-0.5,0],0.25f0,0.25f0,0.25f0)
+aabb2 = AABB(Float32[0.5,0.5,0],0.5f0,0.5f0,0.5f0)
+# set up scene
+scene = Scene(SceneObject[sphere1,sphere2,aabb1,aabb2])
+# set up camera
+camera = PinholeCamera(Float32[0,0,1],Float32[0,0,-1],Float32[0,1,0])
+# set up lights
+#lights = SceneLights(Lights[PointLights(Vec4f(0.5,-0.5,0.3,1)),PointLights(Vec4f(0,0,5,1))])
+pointLight1 = PointLight(Vec4f(0.5,-0.5,0.3,1))
+pointLight2 = PointLight(Vec4f(0,0,5,1))
+sceneLights1 = SceneLights(Lights[pointLight1, pointLight2])
+# render scene
+#tracerays(scene, camera, lambertShader, lights)
+#tracerays(scene, camera, lightShader, lights)
+tracerays(scene, camera, shadowShader, sceneLights1)
+
+#step_size = 36
+#for step = 0:step_size-1
+#camera = PinholeCamera(Float32[2*sin(2*pi*step/step_size),0,2*cos(2*pi*step/step_size)], Float32[2*sin(2*pi*step/step_size),0,2*cos(2*pi*step/step_size)], Float32[0,1,0])
+#tracerays(scene, camera, lambertShader, lights)
+#end

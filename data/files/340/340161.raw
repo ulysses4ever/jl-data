@@ -1,0 +1,12 @@
+Pkg.add("NumericExtensions");
+Pkg.add("JSON");
+Pkg.add("MNIST");
+Pkg.add("HTTPClient");
+Pkg.add("Datetime");
+Pkg.add("StatsBase");
+Pkg.add("Codecs");
+Pkg.add("DataFrames");
+Pkg.add("HDF5");
+Pkg.add("Gadfly");
+Pkg.add("PyCall");
+Pkg.update();

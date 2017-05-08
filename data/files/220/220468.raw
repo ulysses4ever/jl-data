@@ -1,0 +1,58 @@
+#Library containing functions related to IO, e.g., readProblem, print, initialize structs
+
+include( "MCITW-1P.jl" )
+
+function readProblem( fData )
+  include( fData )
+  
+  prob = Problem( cardC, cardD, cardP, cardT, CCap, CCost, DA, DS, DE, DD, PA, PS, PE, PD )
+  
+  return prob
+end
+
+function initializeSol( cardC, cardD, cardP, cardT )
+  sol = Solution( 0, 0, 0, 0, zeros( Int, cardD, cardC, cardT), zeros( Int, cardP, cardC, cardT ), zeros( Int, cardC, cardT ) )
+
+  return sol
+end
+
+function printSol ( prob, sol )
+
+  aux = sol.feas
+  println( "feasible: $aux" )
+  aux = sol.trspCost
+  println( "transpCost: $aux" )
+  aux = sol.invCost
+  println( "invCost: $aux" )
+  aux = sol.penCost
+  println( "penCost: $aux" )
+  println( "" )
+  println( "solX" )
+  for i in 1:(prob.cardD)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solX[ i,k,t ] == 1 )
+          println( "...D", i, " - C", k, " - ", t, "T" )
+        end
+      end
+    end
+  end
+  println( "" )
+  
+  println( "solY" )
+  for j in 1:(prob.cardP)
+    for k in 1:(prob.cardC)
+      for t in 1:(prob.cardT)
+        if ( sol.solY[ j,k,t ] == 1 )
+          println( "...P", j, " - C", k, " - ", t, "T" )
+        end
+      end
+    end
+  end
+  println( "" )
+  
+  println( "solZ" )
+  aux = sol.solZ
+  println( "$aux" )
+  
+end

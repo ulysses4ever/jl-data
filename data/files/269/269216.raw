@@ -1,0 +1,108 @@
+module DCI
+
+using NLP
+using TrustNLS
+using QuadProg
+
+const phi1 = 1.0
+const eta1 = 0.1
+const eta2 = 0.2
+
+function solve (nlp::NLPModelMeta, f::Function, g!::Function, W!::Function, c!::Function,
+    J!::Function, x0::Vector; kmax = 3, verbose = false)
+
+  if nlp.ncon == 0
+    error("DCI currently only works with constrained problems")
+  end
+  x = copy(x0)
+  xc = copy(x)
+
+  normgp = 1.0;
+  normc = 1.0;
+  rhomax = 1.0;
+  Delta = 100.0;
+  c = zeros(nlp.ncon)
+  g = zeros(nlp.nvar)
+  gp = zeros(nlp.nvar)
+  W = zeros(nlp.nvar, nlp.nvar)
+  J = zeros(nlp.ncon, nlp.nvar)
+  y = zeros(nlp.ncon)
+  c!(xc, c)
+  normc = norm(c);
+  Lref = Inf
+  DLH = Inf
+  DLV = 0.0
+  Ln = f(xc)
+  
+  k = 0
+  while normgp >= 1e-6 || normc >= 1e-6
+    # Normal step
+    xc = copy(x)
+    g!(xc, g);
+    y = -J'\g
+    gp = g + J'*y;
+    normgp = norm(gp)
+    rho = min(phi1*rhomax*normgp, 0.75*rhomax)
+    while normc > rho
+      (xc,kn,c,J) = TrustNLS.solve(nlp.ncon, c!, J!, xc; normheps = rho)
+      g!(xc, g);
+      y = -J'\g
+      gp = g + J'*y;
+      normgp = norm(gp)
+      rho = min(phi1*rhomax*normgp, 0.75*rhomax)
+      normc = norm(c);
+    end
+
+    # Update rhomax
+    Lc = f(xc) + dot(y,c);
+    DLV = Lc - Ln;
+
+    if DLV >= 0.5*(Lref - Ln)
+      rhomax /= 2.0;
+    end
+    if DLV > -0.5*DLH
+      Lref = Lc;
+    end
+
+    verbose && println("Cond: (|gp|, |c|) = ", (normgp,normc))
+    # Tangent step
+    if normgp < 1e-6 && normc < 1e-6
+      break
+    end
+    (Q,R) = qr(J', thin=false)
+    Z = Q[:,nlp.ncon+1:nlp.nvar]
+    normcplus = 2*rho+1
+    cplus = copy(c)
+    W!(x, y, W)
+    while normcplus > 2*rho || DLH > eta1*qd
+      d, qd, kt = QuadProg.solve(W, gp, Z, Delta; null_matrix = true, ortho_null = true)
+      x = xc + d;
+      c!(x, cplus)
+      Ln = f(x) + dot(y,cplus)
+      DLH = Ln - Lc;
+      normcplus = norm(cplus)
+      if normcplus > 2*rho || DLH > eta1*qd
+        Delta = 0.25*Delta
+      elseif DLH <= eta2*qd
+        Delta *= 1.5
+      end
+      if Delta < 1e-12
+        println("Delta too small")
+        break
+      end
+    end
+    normc = normcplus
+    if Delta < 1e-4
+      Delta = 1e-4
+    end
+    k += 1
+    if k > kmax
+      break
+    end
+  end
+
+  return xc, k
+
+end
+
+end

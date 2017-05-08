@@ -1,0 +1,8 @@
+## Time-stamp: <2013-07-24 11:05:26 chl>
+
+##
+## Sample commands for reading/writing, and manipulating data structures.
+##
+
+using DataFrames
+d = readtable("birthwt.dat", header=false, separator=' ')

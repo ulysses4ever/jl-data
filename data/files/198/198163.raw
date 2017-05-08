@@ -1,0 +1,9 @@
+module Jml
+export Clusters, centroids, length
+export kmeans
+export plot_clusters
+
+include("datasets.jl")
+include("kmeans.jl")
+include("plotting.jl")
+end

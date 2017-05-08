@@ -1,0 +1,57 @@
+abstract AbstractSymmetricTensor <: AbstractArray
+
+
+"""
+Symmetric tensor stored in a dense array.
+
+Storage format analogous to `Symmetric` for symmetric matrices.
+"""
+immutable SymmetricTensor{T<:Number,N,A<:AbstractArray} 
+    data::AbstractArray{A{T,N},N}
+    uplo::Char
+end
+
+"""
+Symmetric tensor stored with Blocked Compact Symmetric Storage (BCSS)
+
+Schatz et al. (2013) Exploiting Symmetry in Tensors for High Performance.
+http://www.cs.utexas.edu/~flame/pubs/SymTensorSISC.pdf
+"""
+immutable SymmetricTensorBCSS{T<:Number,N,A<:AbstractArray} 
+    data::AbstractArray{A{T,N},N}
+end
+
+
+# TODO:
+
+# - efficient change of basis operation for symmetric tensors (Schatz et al., 2013)
+# - eigenvalues and eigenvectors
+
+
+
+# """
+#     C = sstm(A,B::Matrix)
+
+# Change-of-basis operation. Multiply tensor A by matrix B along
+# each mode. If A is a matrix, this is equal to C = B⋅A⋅Bᵀ.
+# """
+# function sstm(...)
+# end
+
+
+# """
+#    λ,v = eig(::SSHOPM, A)
+
+# Compute an eigenvalue (λ) and eigenvector (v) by shifted symmetric higher-order
+# power method (SSHOPM).
+
+# T. G. Kolda and J. R. Mayo (2011), Shifted Power Method for Computing Tensor
+# Eigenpairs. SIAM Journal on Matrix Analysis and Applications 32(4):1095-1124,
+# http://dx.doi/org/10.1137/100801482
+
+# T. G. Kolda and J. R. Mayo (2014), An Adaptive Shifted Power Method for
+# Computing Generalized Tensor Eigenpairs. SIAM Journal on Matrix Analysis and
+# Applications 35(4):1563-1582, http://dx.doi.org/0.1137/140951758  
+# """
+# function eig(...)
+# end

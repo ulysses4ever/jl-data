@@ -1,0 +1,25 @@
+# TODO: complete
+
+function findpandigital(x::Int)
+    prods = IntSet()
+
+    digits = IntSet()
+    for x in 1:10000, y in 1:x
+        digits = IntSet()
+        prod = x*y
+        while x != 0
+            if 
+    end
+
+    while x != 0
+        sum += x % 10
+        x = div(x, 10)
+    end
+end
+
+
+@time res = prod(findbestquadrprimeformula(-1000:1000, -1000:1000))
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

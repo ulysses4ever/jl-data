@@ -1,0 +1,14 @@
+using RAD, Base.Test
+
+@autodiff (theta,) function f1(theta,x)
+	g=sin(theta)
+	dot(g,x)
+end
+f1(Seed(1.0),WRT([1.1,1.2]),[0.1,0.2])
+
+
+@autodiff (theta,x) function mysum(theta,x)
+	theta + x
+end
+@test mysum(Seed(1.0),WRT(1.5),2.0) === (3.5,1.0)
+@test mysum(Seed(1.0),WRT(1.5),WRT(2.0)) === (3.5,1.0,1.0)

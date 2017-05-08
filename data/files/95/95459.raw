@@ -1,0 +1,24 @@
+include("common.jl")
+
+grid = [-1, -0.9, -0.75, -0.5, -0.25, -0.1, 0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0]
+a = repeat(grid, inner=[length(grid)])[2:end]
+b = repeat(grid, outer=[length(grid)])[2:end]
+
+OUTFILE = joinpath(OUTDIR, "suncohcsk_ber_with_artificial_noise.txt")
+outstream = open(OUTFILE, "a+")
+
+DATAFILE = joinpath(OUTDIR, "suncohcsk_ber_with_a-1.00_and_b-0.90.txt")
+data = readdlm(DATAFILE)
+header = "a,b,"
+for i = 1:length(data[1, :])
+  header *= "N="*string(int(data[1, i]))*(i != length(data[1, :]) ? "," : "\n")
+end
+@printf(outstream, "%s", header)
+
+for i = 1:length(a)
+  DATAFILE = joinpath(OUTDIR, "suncohcsk_ber_with_a"*@sprintf("%.2f", a[i])*"_and_b"*@sprintf("%.2f", b[i])*".txt")
+  data = readdlm(DATAFILE)
+  writedlm(outstream, [a[i] b[i] data[2, :]], ',')
+end
+
+close(outstream)

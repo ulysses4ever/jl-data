@@ -1,0 +1,4 @@
+function mean_spectrum(s, p; step=5000, header=TRUE)
+  sstream = open(s, "r")
+  close(sstream)
+end

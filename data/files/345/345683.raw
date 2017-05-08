@@ -1,0 +1,548 @@
+module SortedVectors
+#-----------------------------------------------------------
+#PURPOSE
+#	Colin T. Bowers module for the SortedVector type
+#NOTES
+#LICENSE
+#	MIT License (see github repository for more detail: https://github.com/colintbowers/DependentBootstrap.jl.git)
+#-----------------------------------------------------------
+
+#Load any entire modules that are needed (use using ModuleName1, ModuleName2, etc)
+#(none currently needed)
+
+#Load any specific functions that are needed (use import ModuleName1.FunctionName1, ModuleName2.FunctionName2, etc)
+import 	Base.string,
+		Base.show,
+		Base.copy,
+		Base.deepcopy,
+		Base.getindex,
+		Base.size,
+		Base.sizeof,
+		Base.first,
+		Base.last,
+		Base.in,
+		Base.issorted,
+		Base.push!,
+		Base.pop!,
+		Base.unshift!,
+		Base.shift!,
+		Base.insert!,
+		Base.deleteat!,
+		Base.append!,
+		Base.prepend!,
+		Base.intersect!
+		Base.intersect
+		Base.union!
+		Base.union
+		Base.unique
+		Base.setdiff
+		Base.setdiff!
+
+
+# intersectindex
+# unionindex
+# unique!
+# isunique
+# trimRange
+# trim
+# trim!
+
+#Specify the variables/functions to export (use export FunctionName1, FunctionName2, etc)
+# export  intersectIndexSort, #Return two indices that yield the sorted intersection of two sorted vectors
+# 		intersectSort, #Return the sorted intersection of two sorted vectors
+# 	   	unionIndexSort, #Return two indices that can create a sorted union of two sorted vectors
+# 	   	unionSort, #Return a sorted union of two sorted vectors
+# 		complementSort, #Return the complement of a sorted vector of integers, given a start and end point
+# 		complement, #Return the complement of a possibly un-sorted vector of integers, given a start and end point
+# 		uniqueSort, #Return a unique version of the input, given that the input is sorted
+# 		uniqueSort!, #Reduce the input in-place until it is unique, given that the input is sorted
+# 		isuniqueSort, #Check whether a sorted vector is sorted
+# 	   	trimRange, #Return a range that can trim a sorted vector to observations that lie between two points
+# 	   	trim, #Return a sorted vector that has been trimmed to observations between two points
+# 	   	trim! #Trim a sorted vector in place to observations that lie between two points
+
+
+#----------------------------------------------------------
+#TYPE
+#	SortedVector
+#FIELDS
+#	x::Vector{T}: This field contains the sorted vector of element type T<:Any
+#PURPOSE
+#	This type implements a vector whose elements are guaranteed to be sorted. Methods defined on this type exploit this feature for performance gains
+#INNER CONSTRUCTOR
+#	{T<:Any}(x::Vector{T}, alreadySorted::Bool=false): Inner constructor checks whether the input vector is sorted, and sorts it if it is not. This check can be skipped (if you know for sure the input vector is sorted) by setting the second optional input to true (default is false)
+#OUTER CONSTRUCTOR
+#	{T<:Any}(x::Vector{T}, alreadySorted::Bool=false): Identical to inner constructor but allows the user to skip the step of specifying T.
+#	(T::DataType): Initiates an empty SortedVector of type T
+#METHODS
+#NOTES
+#----------------------------------------------------------
+#-------- TYPE DEFINITION -----------
+immutable SortedVector{T}
+	x::Vector{T}
+	function SortedVector{T<:Any}(x::Vector{T}, alreadySorted::Bool=false)
+		if alreadySorted == false
+			if issorted(x) == false
+				sort!(x)
+			end
+		end
+		new(x)
+	end
+end
+SortedVector{T<:Any}(x::Vector{T}, alreadySorted::Bool=false) = SortedVector{eltype(x)}(x, alreadySorted)
+SortedVector(T::DataType) = SortedVector(Array(T, 0), true)
+#-------- ONE-LINE METHODS -----------
+Base.string(s::SortedVector) = string(s.x)
+Base.show(s::SortedVector) = show(s.x)
+Base.copy(s::SortedVector) = SortedVector(copy(s.x), true)
+Base.deepcopy(s::SortedVector) = SortedVector(deepcopy(s.x), true)
+Base.getindex(s::SortedVector, i::Int) = s.x[i]
+Base.getindex(s::SortedVector, r::UnitRange) = s.x[r]
+Base.getindex(s::SortedVector, iVec::Vector{Int}) = s.x[iVec]
+Base.getindex(s::SortedVector, iAny) = s.x[iAny] #Duck-typing for other cases
+Base.length(s::SortedVector) = length(s.x)
+Base.size(s::SortedVector) = length(s)
+Base.size(s::SortedVector, i::Int) = (i != 1) ? error("SortedVector is a vector") : length(s)
+Base.sizeof(s::SortedVector) = sizeof(s.x)
+Base.first(s::SortedVector) = first(s.x)
+Base.last(s::SortedVector) = last(s.x)
+Base.issorted(s::SortedVector) = issorted(s.x) #Useful in case there is potential for someone to have messed with the internals
+Base.searchsorted{T}(s::SortedVector{T}, a::T; by::Function=identity, lt::Function=isless, rev::Bool=false) = searchsorted(s.x, a, by=by, lt=lt, rev=rev)
+Base.searchsortedfirst{T}(s::SortedVector{T}, a::T; by::Function=identity, lt::Function=isless, rev::Bool=false) = searchsortedfirst(s.x, a, by=by, lt=lt, rev=rev)
+Base.searchsortedlast{T}(s::SortedVector{T}, a::T; by::Function=identity, lt::Function=isless, rev::Bool=false) = searchsortedlast(s.x, a, by=by, lt=lt, rev=rev)
+Base.search{T}(s::SortedVector{T}, a::T; by::Function=identity, lt::Function=isless, rev::Bool=false) = searchsorted(s, a, by=by, lt=lt, rev=rev)
+Base.searchfirst{T}(s::SortedVector{T}, a::T; by::Function=identity, lt::Function=isless, rev::Bool=false) = searchsortedfirst(s, a, by=by, lt=lt, rev=rev)
+Base.searchlast{T}(s::SortedVector{T}, a::T; by::Function=identity, lt::Function=isless, rev::Bool=false) = searchsortedlast(s, a, by=by, lt=lt, rev=rev)
+Base.in{T}(s::SortedVector{T}, a::T) = !isempty(search(s, a))
+Base.pop!(s::SortedVector) = pop!(s.x)
+Base.shift!(s::SortedVector) = shift!(s.x)
+Base.deleteat!(s::SortedVector, i::Int) = deleteat!(s.x, i)
+Base.deleteat!(s::SortedVector, r::UnitRange) = deleteat!(s.x, r)
+Base.deleteat!(s::SortedVector, iVec::Vector{Int}) = deleteat!(s.x, iVec)
+Base.deleteat!(s::SortedVector, iAny) = deleteat!(s.x, iAny) #Duck-typing for other cases
+Base.deleteat!(s::SortedVector) = (length(s) == 0) ? return(s) : deleteat!(s, UnitRange(1, length(s)))
+Base.insert!{T}(s::SortedVector{T}, a::T) = insert!(s.x, )
+
+#-------- MULTI-LINE METHODS -----------
+#Don't bother specialising on first and last inserts and deletes
+
+
+x = [1,2,3,4,5,6,7,8]
+deleteat!(x, [3,4])
+x
+
+#LIST OF METHODS TO IMPLEMENT
+# Base.insert!,
+# Base.intersect!
+# Base.intersect
+# Base.union!
+# Base.union
+# Base.unique
+# Base.setdiff
+# Base.setdiff!
+# intersectindex
+# unionindex
+# unique!
+# isunique
+# trimRange
+# trim
+# trim!
+
+
+
+
+
+
+
+
+
+
+#******************************************************************************
+#	intersectIndexSort
+#	intersectSort
+#INPUT
+#	Function accepts
+#		(x::Vector{T}, y::Vector{T}): Comparison functions, e.g. ==, <, >, are assumed to be defined for T (i.e. duck-typing). x and y are both assumed sorted. Results are unpredictable if inputs are not sorted.
+#	Keyword arguments
+#		allowDuplicates::Bool=true: This keyword argument determines whether the output will contain duplicates. Note, the case of allowDuplicates=false is currently not coded up (as I haven't needed it yet), although is in my opinion the more natural case, hence the default.
+#OUTPUT
+#	intersectSortIndex returns the tuple (ix::Vector{Int64, iy::Vector{Int64}), such that x[ix] or y[iy] will yield the appropriate intersection
+#	intersectSort returns a Vector{T} that is the appropriate intersection of x and y. Output will be sorted.
+#PURPOSE
+#	Find the intersection between two arrays when both arrays are known beforehand to be sorted in ascending order.
+#NOTES
+#----------------------------------------------------------
+function intersectIndexSort{T}(x::Vector{T}, y::Vector{T}; allowDuplicates::Bool=false)
+	if allowDuplicates == true
+		error("Function cannot currently allow for duplicates [ctb]")
+	else
+		N1 = length(x)
+		N2 = length(y)
+		n1 = 1
+		n2 = 1
+		Index1 = Array(Int64, min(N1, N2))
+		Index2 = copy(Index1)
+		c1 = 1
+		while n1 <= N1 && n2 <= N2
+			if x[n1] < y[n2]
+				n1 = n1 + 1
+			elseif x[n1] > y[n2]
+				n2 = n2 + 1
+			else
+				if c1 == 1
+					Index1[c1] = n1
+					Index2[c1] = n2
+					n1 = n1 + 1
+					n2 = n2 + 1
+					c1 = c1 + 1
+				else
+					if x[n1] == x[Index1[c1-1]] #We don't want duplicates in the output
+						n1 = n1 + 1
+						n2 = n2 + 1
+					else
+						Index1[c1] = n1
+						Index2[c1] = n2
+						n1 = n1 + 1
+						n2 = n2 + 1
+						c1 = c1 + 1
+					end
+				end
+			end
+		end
+		if c1 == 1
+			return((Index1[1:0], Index2[1:0]))
+		else
+			return((Index1[1:c1-1], Index2[1:c1-1]))
+		end
+	end
+end
+function intersectSort{T}(x::Vector{T}, y::Vector{T}; allowDuplicates::Bool=false)
+	(Ix, Iy) = intersectIndexSort(x, y, allowDuplicates=allowDuplicates)
+	return(x[Ix])
+end
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	unionIndexSort
+#	unionSort
+#INPUT
+#	Function accepts
+#		(x::Vector{T}, y::Vector{T}): Comparison functions, e.g. ==, <, >, are assumed to be defined for T (i.e. duck-typing). x and y are both assumed sorted. Results are unpredictable if inputs are not sorted.
+#	Keyword arguments
+#		allowDuplicates::Bool=true: This keyword argument determines whether the output will contain duplicates. Note, for the case where allowDuplicates=false, I currently throw an error if x or y contain duplicates, because this is a hard case to deal with and I haven't needed it yet.
+#OUTPUT
+#	unionSortIndex returns the tuple (ix::Vector{Int64, iy::Vector{Int64}), such that for some z::Vector{Int64}, z[ix] = x and z[iy] = y
+#	unionSort returns a Vector{T} that is the appropriate union of x and y. Output will be sorted.
+#PURPOSE
+#	Find the union between two arrays when both arrays are known beforehand to be sorted in ascending order.
+#NOTES
+#	When allowDuplicates=false, I currently force both inputs to be unique. Ideally, this requirement will be removed in the future.
+#----------------------------------------------------------
+function unionIndexSort{T}(x::Vector{T}, y::Vector{T}; allowDuplicates::Bool=true)
+	Nx = length(x)
+	Ny = length(y)
+	if Nx == 0 || Ny == 0
+		ix = [1:Nx]
+		iy = [1:Ny]
+	else
+		if allowDuplicates == true
+			if x[1] >= y[end] #special case where union is a simple append operation
+				ix = [Ny+1:Nx+Ny]
+				iy = [1:Ny]
+			elseif x[end] <= y[1] #special case where union is a simple append operation
+				ix = [1:Nx]
+				iy = [Nx+1:Nx+Ny]
+			else #append not possible
+				ix = Array(Int64, 0)
+				iy = Array(Int64, 0)
+				nx = 1
+				ny = 1
+				c = 1
+				while nx <= length(x) && ny <= length(y)
+					if x[nx] < y[ny]
+						push!(ix, c)
+						c += 1
+						nx += 1
+					elseif x[nx] > y[ny]
+						push!(iy, c)
+						c += 1
+						ny += 1
+					else
+						push!(ix, c)
+						c += 1
+						nx += 1
+						push!(iy, c)
+						c += 1
+						ny += 1
+					end
+				end
+				if nx <= length(x) #If above loop broke on ny only, we need to finish going through x
+					while nx <= length(x)
+						push!(ix, c)
+						c += 1
+						nx += 1
+					end
+				elseif ny <= length(y) #If above loop broke on nx only, we need to finish going through y
+					while ny <= length(y)
+						push!(iy, c)
+						c += 1
+						ny += 1
+					end
+				end
+			end
+		else
+			if isuniqueSort(x) == false
+				error("allowDuplicates flag set to false but x contains duplciates")
+			end
+			if isuniqueSort(y) == false
+				error("allowDuplicates flag set to false but y contains duplciates")
+			end
+			if x[1] > y[end] #special case where union is a simple append operation
+				ix = [Ny+1:Nx+Ny]
+				iy = [1:Ny]
+			elseif x[end] < y[1] #special case where union is a simple append operation
+				ix = [1:Nx]
+				iy = [Nx+1:Nx+Ny]
+			else #append not possible
+				ix = Array(Int64, 0)
+				iy = Array(Int64, 0)
+				nx = 1
+				ny = 1
+				c = 1
+				while nx <= length(x) && ny <= length(y)
+					if x[nx] < y[ny]
+						push!(ix, c)
+						c += 1
+						nx += 1
+					elseif x[nx] > y[ny]
+						push!(iy, c)
+						c += 1
+						ny += 1
+					else #Duplicate, hence same index given for both x and y
+						push!(ix, c)
+						push!(iy, c)
+						c += 1
+						nx += 1
+						ny += 1
+					end
+				end
+				if nx <= length(x) #If above loop broke on ny only, we need to finish going through x
+					while nx <= length(x)
+						push!(ix, c)
+						c += 1
+						nx += 1
+					end
+				elseif ny <= length(y) #If above loop broke on nx only, we need to finish going through y
+					while ny <= length(y)
+						push!(iy, c)
+						c += 1
+						ny += 1
+					end
+				end
+
+			end
+		end
+	end
+	return(ix, iy)
+end
+function unionSort{T}(x::Vector{T}, y::Vector{T}; allowDuplicates::Bool=true)
+	if length(x) == 0
+		return(y)
+	end
+	if length(y) == 0
+		return(x)
+	end
+	(ix, iy) = unionIndexSort(x, y, allowDuplicates=allowDuplicates)
+	z = Array(T, max(ix[end], iy[end]))
+	z[iy] = y #NOTE: We allocate y first because in the allowDuplicates=false case we want to over-write y obs with x obs
+	z[ix] = x
+	return(z)
+end
+
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	complementSort
+#	complement
+#INPUT
+#	Function accepts
+#		(x::Vector{Int}, xSt::Int, xEnd::Int): x is a sorted or unsorted (depending on function called) vector of integers that you wish to find the complement of, restricting the complement to values between xSt and xEnd  (inclusive)
+#	All methods accept keyword arguments:
+#		indsUnique::Bool=false: Set to true if you are certain that x is unique
+#OUTPUT
+#	Both functions output Vector{Int} of appropriate complement
+#PURPOSE
+#	Find the complement of a vector (set) of integers
+#NOTES
+#----------------------------------------------------------
+function complementSort(x::Vector{Int}, xSt::Int, xEnd::Int; indsUnique::Bool=false)
+	if xSt > xEnd
+		error("xSt must be <= xEnd [ctb]")
+	end
+	if length(x) == 0 || x[1] > xEnd || x[end] < xSt
+		return([xSt:xEnd])
+	end
+	if indsUnique == false
+		x = uniqueSort(x)
+	end
+	if x[1] < xSt
+		c = searchsortedfirst(x, xSt)
+	else
+		c = 1
+	end
+	xOut = Array(Int, 0)
+	n = xSt
+	while n <= xEnd && c <= length(x)
+		if n != x[c]
+			push!(xOut, n)
+			n += 1
+		else
+			c += 1
+			n += 1
+		end
+	end
+	if n <= xEnd
+		for i = n:xEnd
+			push!(xOut, i)
+		end
+	end
+	return(xOut)
+end
+complement(x::Vector{Int}, xSt::Int, xEnd::Int; indsUnique::Bool=false) = complementSort(sort(x), xSt, xEnd, indsUnique=indsUnique)
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	uniqueSort!
+#	uniqueSort
+#INPUT
+#	Function accepts:
+#		(x::Vector{T}): x is assumed to be sorted in ascending order.
+#OUTPUT
+#	A unique version of x (still sorted)
+#PURPOSE
+#	Obtain a unique version of x when x is known to be sorted
+#NOTES
+#----------------------------------------------------------
+function uniqueSort!{T}(x::Vector{T})
+	for n = length(x):-1:2
+		if x[n] == x[n-1]
+			deleteat!(x, n)
+		end
+	end
+	return(x)
+end
+uniqueSort{T}(x::Vector{T}) = uniqueSort!(deepcopy(x))
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	isuniqueSort
+#INPUT
+#	Function accepts:
+#		(x::Vector{T}): x is assumed to be sorted in ascending order.
+#OUTPUT
+#	A boolean indicating whether x is unique (ie return true if no duplicates, false if duplicates)
+#PURPOSE
+#	Efficiently determine whether input (assumed sorted) contains duplicates.
+#NOTES
+#----------------------------------------------------------
+function isuniqueSort{T}(x::Vector{T})
+	for n = 2:length(x)
+		if x[n] == x[n-1]
+			return(false)
+		end
+	end
+	return(true)
+end
+
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	trimRange
+#	trim
+#INPUT
+#	Function accepts:
+#		(x::Vector{T}, xSt::T, xEnd::T): x is assumed to be sorted in ascending order.
+#OUTPUT
+#	trimRange returns a UnitRange containing indices of x corresponding values that lie between xSt and xEnd (inclusive)
+#	trim returns a trim of x to all values that lie between xSt and xEnd (inclusive)
+#PURPOSE
+#	Trim a sorted input array down to values that lie between an input start and end point
+#NOTES
+#----------------------------------------------------------
+function trimRange{T}(x::Vector{T}, xSt::T, xEnd::T)
+	if length(x) == 0
+		return(1:0)
+	end
+	if xSt > xEnd
+		error("xSt greater than xEnd for trimRange method [ctb]")
+	end
+	xRange = UnitRange(searchsortedfirst(x, xSt), searchsortedlast(x, xEnd))
+	if xRange.start > length(x) || xRange.stop < 1
+		return(1:0)
+	end
+	return(xRange)
+end
+trim{T}(x::Vector{T}, xSt::T, xEnd::T) = x[trimRange(x, xSt, xEnd)]
+function trim!{T}(x::Vector{T}, xSt::T, xEnd::T)
+	if length(x) == 0
+		return(x)
+	end
+	trim!(x, trimRange(x, xSt, xEnd))
+	return(x)
+end
+function trim!{T<:Any}(x::Vector{T}, r::UnitRange)
+	if r.start > r.stop
+		return(x)
+	end
+	for n = 1:(length(x) - r.stop)
+		pop!(x)
+	end
+	for n = 1:(r.start - 1)
+		shift!(x)
+	end
+	return(x)
+end
+
+
+
+
+
+#******************************************************************************
+#******************************************************************************
+#******************************************************************************
+#******************************************************************************
+# FUNCTIONS BELOW THIS POINT ARE NOT EXPORTED
+#******************************************************************************
+#******************************************************************************
+#******************************************************************************
+#******************************************************************************
+
+
+
+end # module

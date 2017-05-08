@@ -1,0 +1,78 @@
+function test()
+#	arr = zeros(Complex{Float64}, d, d)
+	n = 1600
+	d = 2*n + 1
+	arr = zeros(Float64, d, d)
+#	npts = 3000
+#	posx = [200*cos(2*pi*k/npts) for k in 1:npts]
+#	posy = [200*sin(2*pi*k/npts) for k in 1:npts]
+#	theta = [2*pi*k/npts for k in 1:npts]
+#	mass = [0.2*exp(2*pi*im*k/npts) for k in 1:npts]
+
+#	npts = 30
+#	posx = vcat([200*cos(2*pi*k/npts) for k in 1:npts],[200*cos(2*pi*k/npts) for k in 1:npts])
+#	posy = vcat([200*sin(2*pi*k/npts) - 500 for k in 1:npts],[200*sin(2*pi*k/npts) + 500 for k in 1:npts])
+#	theta = vcat([2*pi*k/npts for k in 1:npts],[2*pi*k/npts for k in 1:npts])
+#	mass = vcat([10.0*exp(2*pi*im*k/npts) for k in 1:npts],[10.0*exp(2*pi*im*k/npts) for k in 1:npts])
+
+	for j in 1:200
+			countList = Int64[]
+	deltaV = 1
+	deltaT = 0.03
+	branchT = 0.0
+	splitFactor = 0.62
+	count = 1
+	tempx = 0
+	tempy = 0
+	cutOff = 0.01
+	splitProb = 0.01
+	posx = [10.0-n]
+	posy = [0.0]
+	theta = [0.0]
+	mass = [30.0]
+
+	while count != 0
+
+		pruneList = Int64[]
+		count = length(theta)
+		numPruned = 0
+		for i in 1:count
+			tempx = iround(n + 1 + posx[i])
+			tempy = iround(n + 1 + posy[i])
+			if 1 <= tempx <= d && 1 <= tempy <= d && abs(mass[i]) > cutOff
+				arr[tempx, tempy] += mass[i]
+				posx[i] += deltaV*cos(theta[i])
+				posy[i] += deltaV*sin(theta[i])
+				theta[i] += (rand() - 0.5)*deltaT
+				if rand() < splitProb
+					mass[i] *= splitFactor
+					push!(mass, mass[i])
+					push!(theta, theta[i] - branchT)
+					theta[i] += branchT
+					push!(posx, posx[i])
+					push!(posy, posy[i])
+				end
+			else
+				push!(pruneList, i - numPruned)
+				numPruned += 1
+			end
+		end
+		for i in pruneList
+			splice!(mass, i)
+			splice!(posx, i)
+			splice!(posy, i)
+			splice!(theta, i)
+		end
+		push!(countList, count)
+	end
+	end
+	println("hello")
+	#IPM.ExportImage(arr, string(randstring(), ".png"), ColorFunction = "Orangescale")
+	#IPM.ExportImage(Images.imfilter_gaussian(arr, [1,1]), string(randstring(), ".png"), ColorFunction = "Orangescale")
+	#writecsv("counts.csv", countList)
+	return scale(arr, 0.005)
+end
+#dat=fft(IPM.LorentzKernel(d,d,0.3).^1.1);
+#dat=rfft(IPM.LorentzKernel(3201,3201,0.3).^1.1);
+IPM.ExportImage(fftshift(irfft(rfft(test()).*dat, 3201)), string(randstring(), ".png"), ColorFunction = "Orangescale")
+#IPM.ExportImage(fftshift(ifft(fft(test()).*dat)), string(randstring(), ".png"))

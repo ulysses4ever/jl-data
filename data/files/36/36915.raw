@@ -1,0 +1,132 @@
+# Referências:
+# Pontos Sigma (Merwe)
+# [1] http://www.gatsby.ucl.ac.uk/~byron/nlds/merwe2003a.pdf
+
+#Vale a pena dar uma olhada no seguinte link
+# [2] https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/10-Unscented-Kalman-Filter.ipynb
+
+# [3] Implementação em matlab
+#http://www.mathworks.com/matlabcentral/fileexchange/18217-learning-the-unscented-kalman-filter/content/ukf.m
+
+
+	function UKF(
+			x::Array,
+			P::Array,
+			z::Array,
+			alpha::Number, 
+			dt::Number,
+			f::Function,
+			h::Function,
+			R::Array,
+			Q::Array,
+			beta=2)
+
+		#retorna um novo x e um novo P
+
+
+		#predict
+		# n é o tamanho da entrada por exemplo: [x y teta] ===> n = 3
+		n = length(x)
+
+		#k é um número de ponto flutuante
+		k = 3 - n
+
+		#lambda é um número de ponto flutuante
+		lambda = alpha^2*(n+k)-n
+
+		#begin e end começam e terminam um bloco, entenda bloco como uma função
+
+		sigma_points = begin
+			points = zeros(2n+1,n)
+			points[1,:] = x
+			M = Array(chol((n + lambda)*P))				
+			for i = 1:n
+				points[i+1,:] = x + M[i,:]
+				points[n+i+1,:] = x - M[i,:]
+			end			
+			points
+		end
+
+
+		(weight_mean, weight_cov) = begin
+			W_mean = zeros(1,2n+1)
+			W_cov = zeros(1,2n+1)
+			W_mean[1,1] = lambda/(n+lambda)			
+			W_cov[1,1] = (lambda/(n+lambda))+1-alpha^2+beta
+			for i = 2:2*n+1
+				W_mean[1,i] = W_cov[1,i] = 1/(2*(n*lambda))
+			end
+			(W_mean,W_cov)
+		end
+
+		Y = begin
+			Y = zeros(2n+1,n)
+			for i = 1:2n+1
+				#f é uma função passada por parâmetro, geralmente a função de movimento
+				Y[i,:] = f(sigma_points[i,:],dt)
+			end
+			Y
+		end
+		
+		x_ = begin
+			result = zeros(1,n)
+			for i = 1:2n+1
+				result[1,:] += weight_mean[i]*Y[i,:]
+			end
+			result
+		end
+
+		P_ = begin
+			result = zeros(n,n)
+			for i = 1:2n+1
+				result += weight_cov[i]*transpose(Y[i,:] - x_)*(Y[i,:] - x_)
+			end
+			result + Q
+		end
+
+		#update
+		num_z = length(z)
+
+
+		Z = begin
+			Z = zeros(2n+1,num_z)
+			for i = 1:2n+1
+				Z[i,:] = h(Y[i,:])
+			end
+			Z
+		end
+
+		z_mean = begin
+			result = zeros(1,num_z)
+			for i = 1:2n+1
+				result += weight_mean[i]*Z[i,:]
+			end
+			result
+		end
+
+		y_ = z - z_mean
+
+	
+		z_cov = begin
+			result = zeros(num_z,num_z)
+			for i = 1:2n+1
+				result += weight_cov[i]*transpose(Z[i,:] - z_mean)*(Z[i,:] - z_mean)
+			end
+			result + R
+		end
+	
+
+		cross_cov = begin			
+			result = zeros(n,num_z)
+			for i = 1:2n+1
+				result += weight_cov[i]*transpose(sigma_points[i,:] - x_)*(Z[i,:] - z_mean)
+			end
+			result
+		end
+
+
+		K = cross_cov*inv(z_cov)
+
+		(x_ + transpose(K*transpose(y_)), P_ - K*z_cov*transpose(K))
+		
+	end

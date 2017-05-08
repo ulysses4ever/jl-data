@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:40 GMT
+Date: Wed, 03 May 2017 21:00:50 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5633
+Content-Length: 5043
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3044
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4055
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "8ac6ef5ccb262cb129576b752418f3d0"
-Last-Modified: Fri, 26 Feb 2016 21:00:33 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "6bf82575262d75a45e73d93c76670fa2"
+Last-Modified: Fri, 31 Mar 2017 14:08:25 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 15bc4ab707db6d6b474783868c7cc828
-X-GitHub-Request-Id: B185:6634:1345036:18E86ED:590231C7
+X-Served-By: 7efb7ae49588ef0269c6a1c1bd3721d9
+X-GitHub-Request-Id: 6534:5C90:ABE45D:DCDBDF:590A4502
 
 {
-  "id": 52632402,
-  "name": "EllipsoidSimilarity.jl",
-  "full_name": "crbinz/EllipsoidSimilarity.jl",
+  "id": 37066342,
+  "name": "OEIS.jl",
+  "full_name": "MurrayT/OEIS.jl",
   "owner": {
-    "login": "crbinz",
-    "id": 3694987,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/3694987?v=3",
+    "login": "MurrayT",
+    "id": 1966357,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1966357?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/crbinz",
-    "html_url": "https://github.com/crbinz",
-    "followers_url": "https://api.github.com/users/crbinz/followers",
-    "following_url": "https://api.github.com/users/crbinz/following{/other_user}",
-    "gists_url": "https://api.github.com/users/crbinz/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/crbinz/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/crbinz/subscriptions",
-    "organizations_url": "https://api.github.com/users/crbinz/orgs",
-    "repos_url": "https://api.github.com/users/crbinz/repos",
-    "events_url": "https://api.github.com/users/crbinz/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/crbinz/received_events",
+    "url": "https://api.github.com/users/MurrayT",
+    "html_url": "https://github.com/MurrayT",
+    "followers_url": "https://api.github.com/users/MurrayT/followers",
+    "following_url": "https://api.github.com/users/MurrayT/following{/other_user}",
+    "gists_url": "https://api.github.com/users/MurrayT/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/MurrayT/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/MurrayT/subscriptions",
+    "organizations_url": "https://api.github.com/users/MurrayT/orgs",
+    "repos_url": "https://api.github.com/users/MurrayT/repos",
+    "events_url": "https://api.github.com/users/MurrayT/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/MurrayT/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/crbinz/EllipsoidSimilarity.jl",
-  "description": "Set of similarity measures between ellipsoids",
+  "html_url": "https://github.com/MurrayT/OEIS.jl",
+  "description": "A basic wrapper to allow access to OEIS from within Julia.",
   "fork": false,
-  "url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl",
-  "forks_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/forks",
-  "keys_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/teams",
-  "hooks_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/events",
-  "assignees_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/tags",
-  "blobs_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/subscription",
-  "commits_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/merges",
-  "archive_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/downloads",
-  "issues_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/crbinz/EllipsoidSimilarity.jl/deployments",
-  "created_at": "2016-02-26T21:00:10Z",
-  "updated_at": "2016-02-26T21:00:33Z",
-  "pushed_at": "2016-11-22T02:33:00Z",
-  "git_url": "git://github.com/crbinz/EllipsoidSimilarity.jl.git",
-  "ssh_url": "git@github.com:crbinz/EllipsoidSimilarity.jl.git",
-  "clone_url": "https://github.com/crbinz/EllipsoidSimilarity.jl.git",
-  "svn_url": "https://github.com/crbinz/EllipsoidSimilarity.jl",
+  "url": "https://api.github.com/repos/MurrayT/OEIS.jl",
+  "forks_url": "https://api.github.com/repos/MurrayT/OEIS.jl/forks",
+  "keys_url": "https://api.github.com/repos/MurrayT/OEIS.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/MurrayT/OEIS.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/MurrayT/OEIS.jl/teams",
+  "hooks_url": "https://api.github.com/repos/MurrayT/OEIS.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/MurrayT/OEIS.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/MurrayT/OEIS.jl/events",
+  "assignees_url": "https://api.github.com/repos/MurrayT/OEIS.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/MurrayT/OEIS.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/MurrayT/OEIS.jl/tags",
+  "blobs_url": "https://api.github.com/repos/MurrayT/OEIS.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/MurrayT/OEIS.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/MurrayT/OEIS.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/MurrayT/OEIS.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/MurrayT/OEIS.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/MurrayT/OEIS.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/MurrayT/OEIS.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/MurrayT/OEIS.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/MurrayT/OEIS.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/MurrayT/OEIS.jl/subscription",
+  "commits_url": "https://api.github.com/repos/MurrayT/OEIS.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/MurrayT/OEIS.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/MurrayT/OEIS.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/MurrayT/OEIS.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/MurrayT/OEIS.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/MurrayT/OEIS.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/MurrayT/OEIS.jl/merges",
+  "archive_url": "https://api.github.com/repos/MurrayT/OEIS.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/MurrayT/OEIS.jl/downloads",
+  "issues_url": "https://api.github.com/repos/MurrayT/OEIS.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/MurrayT/OEIS.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/MurrayT/OEIS.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/MurrayT/OEIS.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/MurrayT/OEIS.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/MurrayT/OEIS.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/MurrayT/OEIS.jl/deployments",
+  "created_at": "2015-06-08T12:47:06Z",
+  "updated_at": "2017-03-31T14:08:25Z",
+  "pushed_at": "2015-07-02T20:59:00Z",
+  "git_url": "git://github.com/MurrayT/OEIS.jl.git",
+  "ssh_url": "git@github.com:MurrayT/OEIS.jl.git",
+  "clone_url": "https://github.com/MurrayT/OEIS.jl.git",
+  "svn_url": "https://github.com/MurrayT/OEIS.jl",
   "homepage": null,
-  "size": 9,
-  "stargazers_count": 0,
-  "watchers_count": 0,
+  "size": 130,
+  "stargazers_count": 2,
+  "watchers_count": 2,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 0,
+  "forks_count": 2,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 0,
+  "forks": 2,
   "open_issues": 0,
-  "watchers": 0,
+  "watchers": 2,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 0,
-  "subscribers_count": 1
+  "network_count": 2,
+  "subscribers_count": 2
 }

@@ -1,0 +1,7 @@
+module Convenience
+export create_or_use_directory
+function create_or_use_directory(name::String)
+  ispath(name) || mkdir(name)
+  isdir(name) || error(name, " already exists and is not a directory")
+end
+end

@@ -1,0 +1,55 @@
+function chull(points)
+    #=Computes the convex hull of a set of 2D points.
+    Input: an iterable sequence of (x, y) pairs representing the points.
+    Output: a list of vertices of the convex hull in counter-clockwise order,
+      starting from the vertex with the lexicographically smallest coordinates.
+    Implements Andrew's monotone chain algorithm. O(n log n) complexity.
+    =#
+    T = eltype(points)
+    function lt2d(a, b) 
+        dx, dy =  a[1] - b[1], a[2] - b[2];
+        dx != 0 &&  (return <(dx, 0))
+        return <(dy, 0)
+    end
+    # Sort the points lexicographically (tuples are compared lexicographically).
+    # Remove duplicates to detect the case we have just one unique point.
+    pnts  = T[]
+    for x in Set(points)
+        push!(pnts, x)
+    end
+    points = sort(pnts, lt=lt2d)
+ 
+    # Boring case: no points less than 3 is not well formed.
+    if length(points) <= 3
+        return points
+    end
+ 
+    # 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
+    # Returns a positive value, if OAB makes a counter-clockwise turn,
+    # negative for clockwise turn, and zero if the points are collinear.
+    cross(o, a, b) = (a[1] - o[1]) * (b[2] - o[2]) - 
+                     (a[2] - o[2]) * (b[1] - o[1])
+ 
+    # Build lower hull 
+    lower = T[]
+    for p in points
+        while length(lower) >= 2 && cross(lower[end-1], lower[end], p) <= 0
+            pop!(lower)
+        end
+        push!(lower, p)
+    end
+ 
+    # Build upper hull
+    upper = T[]
+    for p in reverse(points)
+        while length(upper) >= 2 && cross(upper[end-1], upper[end], p) <= 0
+            pop!(upper)
+        end
+        push!(upper, p)
+    end
+ 
+    # Concatenation of the lower and upper hulls gives the convex hull.
+    # Last point of each list is omitted because it is repeated at the beginning of the other list. 
+    return [lower[1:end-1] , upper[1:end-1], [lower[1]]]
+ end
+ 

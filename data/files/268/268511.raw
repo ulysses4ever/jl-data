@@ -1,0 +1,57 @@
+###################################################
+## Run simulation
+###################################################
+
+"""
+Takes a Data object as an argument, and runs a simulation of dynamic matching where
+the matching policy and other parameters are defined a Params element.
+The length of the simulation is specified by the steps parameters
+
+Returns a DataFrame object with the statistics of the simulation run.
+"""
+function run_dynamic(d::Data, steps::Int64, brain::Brain, p::Params;
+        pool::InstanceGraph = InstanceGraph())
+  println("Running with steps = $steps, batch = $(p.batchSize), techno = $(p.techno), priorities= $(p.priorities)")
+
+  srand(p.seed)
+  l = Log(length(d.type_names), 1)
+  time_tot = []
+  for k in 1:steps
+    #prev_state_exp = [n.node_type.id for n in pool.present_nodes]
+    time_tot_tic = time()
+    arriving_node_id = rand(1:d.n)
+    arrival!(pool, arriving_node_id, d, k, l)
+    if k%p.batchSize == 0
+      time_tic = time()
+      w = generate_weights(brain, pool.nodes, p)
+      matched_nodes, value, solve_time = match(pool.graph, w, techno = p.techno, solver = p.solver)
+      matched_value = match_value(pool, matched_nodes)
+      if length(matched_nodes) > 0
+        remove_matched!(pool, matched_nodes, k, l)
+      end
+      update_weights(brain, float(value), pool.nodes)
+    end
+    departures!(pool, k, l)
+    push!(time_tot, time() - time_tot_tic)
+    if k%(steps/20) == 0
+      print_status(pool, k, p, time_tot)
+    end
+  end
+  return l
+  #return pool_summary(pool, steps, parameters)
+end
+
+function print_status(pool::InstanceGraph, k::Int64, p::Params, time_tot::Array{Any,1})
+  if p.verbose >= 0
+    println("It: $k,\t lp time: $(round(mean(time_tot),3)),\t pool size: $(pool.n)")
+  end
+end
+
+function match_value(pool::InstanceGraph, matched::Array{Float64})
+  ret = find(matched .>= 1 - 1e-6)
+  value = 0
+  for i in ret
+    value += pool.nodes[i].weight
+  end
+  return value
+end

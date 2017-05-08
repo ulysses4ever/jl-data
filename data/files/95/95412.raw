@@ -1,0 +1,11 @@
+include("common.jl")
+
+for i = 1:2
+  SIGNALFILE = joinpath(DATADIR, "signal"*@sprintf("%02d", i)*".txt")
+  OUTFILE = joinpath(OUTDIR, "mean_spectrum_signal"*@sprintf("%02d", i)*".txt")
+  mean_spectrum(SIGNALFILE, OUTFILE)
+end
+
+SIGNALFILE = joinpath(DATADIR, "signal03.txt")
+OUTFILE = joinpath(OUTDIR, "mean_spectrum_signal03.txt")
+mean_spectrum(SIGNALFILE, OUTFILE)

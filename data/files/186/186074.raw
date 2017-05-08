@@ -1,0 +1,67 @@
+function Poly(j::Integer,m::Integer,a::Integer)
+    sum=0
+    for i in 0:(j-1)
+       sum += m^i*2^(j-i-1)*a
+    end
+    sum += m^j
+    return(sum)
+end
+
+function findjs(mx::Integer, ml::Integer; maxexp::Int=20)
+    orig=3^mx*ml+3^(mx-1)
+    jarr=zeros(Int64,mx-1)
+    for i in 1:(mx-1)  jarr[i]=i; end
+#    for i in 1:(mx-1) println(i," ",jarr[i]); end
+
+    if (mx>maxexp)
+      error("mx too large! You must raise the maxexp and re-include the source")
+    end #if
+    limexp=zeros(Int64,mx-1)
+    for i in 1:(mx-1) limexp[i]=maxexp-(mx-1)+i; end
+#    for i in 1:(mx-1) println(i," ",limexp[i]); end
+
+#    limexp=[1 4 5 7 10 16] #test case for mx=7,ml=19
+#    jarr=[1 4 5 7 10 14]   #test case for mx=7,ml=19
+
+    while jarr!=limexp
+        ans=testarray(jarr,orig)
+    	if (isinteger(log(2,ans)))
+	       for i in 1:(mx-1) print("  ",jarr[i]); end
+	       println(" sum is ",ans)
+        end #if power of 2
+        jarr=update(jarr,limexp)
+#        for (i in 1:(mx-1)) print(" ",jarr[i]); end
+#        println() 
+     end #while
+end #function
+
+
+function testarray(arr::Array,orig::Integer)
+    sum=orig
+    len=length(arr)
+    for j=1:len
+       sum+=3^(len-j)*2^arr[j]
+    end
+    return(sum)
+end #function
+
+function update(arr::Array,final::Array)
+    len=length(arr)
+    flg=0
+    j=len
+    ptr=0
+    while ((flg<1) && (j>0))
+       if (arr[j]<final[j]) flg=1; ptr=j; 
+       else  j -= 1
+       end
+#       println("j is ",j," flg is ",flg," ptr is ",ptr)
+    end #while
+    if (flg==1)
+      arr[ptr]+=1
+      for i in ptr+1:len
+         arr[i]=arr[i-1]+1; 
+      end #for 
+    end #if
+    return(arr)
+end #function
+

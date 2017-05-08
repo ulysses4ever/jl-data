@@ -1,0 +1,21 @@
+### Usage: julia mean_spectrum.jl (signal)+,
+### where (.)+ denotes Kleene plus, i.e. one or more space-separated signals.
+### Example: mean_spectrum.jl curved_binary logistic
+
+include("common.jl")
+
+nargs = length(ARGS)
+
+for arg in ARGS
+  @assert in(arg, signals) "$arg not a valid signal."
+end
+
+print_with_color(:white, "Computing mean spectrum for simulated signals:\n")
+
+for i = 1:nargs
+  print_with_color(:white, "  * signal $i of $nargs...")
+  SIGNALFILE = joinpath(DATADIR, "simulated_signal_"*ARGS[i]*".txt")
+  OUTFILE = joinpath(OUTDIR, "mean_spectrum_signal_"*ARGS[i]".txt")
+  mean_spectrum(SIGNALFILE, OUTFILE)
+  print_with_color(:green, " done\n")
+end

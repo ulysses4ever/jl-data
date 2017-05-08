@@ -1,0 +1,143 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+include("modelling_functions.jl")
+include("nw_algorithm.jl")
+
+##################################################################################
+
+
+##################################################################################
+
+type ModifiedNWSystem
+    _matrix::NWMatrix
+
+    _seq1::Array{Char}
+    _seq2::Array{Char}
+
+    _pdaSeq1::RecognitionPDA
+    _pdaSeq2::RecognitionPDA
+end
+
+function getLengthOfSeq1(system::ModifiedNWSystem)
+  return length(system._seq1)
+edd
+
+function getLengthOfSeq2(system::ModifiedNWSystem)
+  return length(system._seq2)
+end
+
+function getNuclInSeq1(system::ModifiedNWSystem, i::Int64)
+    return system._seq1[i]
+end
+
+function getNuclInSeq2(system::ModifiedNWSystem, j::Int64)
+    return system._seq2[j]
+end
+
+function createModifiedNWSystem(seq1::Array{Char}, seq2::Array{Char})
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if lenOfSeq1 > lenOfSeq2
+        return ModifiedNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1, createRecognitionPDA(lenOfSeq1), createRecognitionPDA(lenOfSeq1))  
+    else
+        return ModifiedNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2, createRecognitionPDA(lenOfSeq2), createRecognitionPDA(lenOfSeq2))
+    end
+end
+
+##################################################################################
+
+##################################################################################
+
+
+function runNeedlemanWunsch(system::ModifiedNWSystem)
+  println("Running Modified Needleman Wunsch Algorithm")
+
+  matrix = system._matrix
+
+  numberOfRows = getNumOfRows(matrix)
+  numberOfCols = getNumOfCols(matrix)
+
+  println(numberOfRows)
+  println(numberOfCols)
+
+  j = 1
+  while j < numberOfCols
+    setMatrixValue(system._matrix, 1, j, 0.0)
+    j = j + 1
+  end
+
+  i = 1
+  while i < numberOfRows
+    setMatrixValue(system._matrix, i, 1, 0.0)
+    i = i + 1
+  end
+
+  i,j = 1, 1
+
+  drawMatrix(matrix)
+
+  while i < numberOfRows
+    while j < numberOfCols
+      # calculate the scores and costs for all options
+            
+      # initial debug...i.e. not what it should be
+      s1_curr = getNuclInSeq1(system, i)
+      s2_curr = getNuclInSeq2(system, j)
+
+      if s1_curr == s2_curr
+        setMatrixValue(matrix, i, j, 6.0)
+      end
+      print("Current Comparision { ")
+      print(s1_curr)
+      print(" ~= ")
+      print(s2_curr)
+      println(" }")
+
+      j = j + 1
+    end
+
+    i = i + 1
+  end
+
+  drawMatrix(matrix)
+end
+end
+
+##################################################################################
+
+println("Naive-Needleman-Wunsch")
+
+runHandWrittenQualitativeRecognitionTests()
+
+print("-----------------------------------------------------------\n")
+println("Creating Modified NeedlemanWunsch System (PDA+NWMatrix+etc)\n")
+
+theNWSystem = createModifiedNWSystem(['G','T','C'],['G','A','A','A','A','T','C'])
+
+println("\n-----------------------------------------------------------")
+println("Running...\n")
+runNeedlemanWunsch(theNWSystem)
+
+testRecognitionStackDataMap()

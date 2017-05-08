@@ -1,0 +1,335 @@
+# Dobro v1.1
+using Distributions: Normal, cdf
+using Gadfly
+
+function rms(v)
+  n = length(v)
+  sqrt(sum(v.*v)/n)
+end
+
+function correct_path(fpath::String)
+  print(fpath[end])
+  if fpath[end] != '/'
+    fpath = fpath * "/"
+  end
+  fpath
+end
+
+
+function write_vec(outpath, vec; msg = true)
+  f = open(outpath, "w")
+  for elem in vec
+    write(f, string(elem) * "\n")
+  end
+  close(f)
+  if msg
+    println("Write vector into $outpath")
+  end
+end
+
+function sign_changes(sig)
+    n = length(sig)
+    s_changes = Array(Int64, 0)
+    for i = 2:n
+        prev_sign    = sign(sig[i-1])
+        current_sign = sign(sig[i])
+        if current_sign != prev_sign
+            push!( s_changes, i )
+        end
+    end
+    s_changes
+end
+
+function ProbOfCorrection(r_hat; mu = 0.0, sigma = 1.0)
+    cdf_val = 0.5
+    d = Normal(mu, sigma)
+    if r_hat > 0
+        r_min = r_hat / 2.0
+        cdf_val = 1 - cdf(d, r_min)
+    elseif r_hat < 0
+        r_max = r_hat / 2.0
+        cdf_val = cdf(d, r_max)
+    end
+    cdf_val
+end
+
+function DecisionFunction(sig; h = 100, sliding_w = true, k_sigma = 1.0)
+    n = length(sig)
+    decision_f = ones(n) * 0.5
+    k = sqrt(h)
+    std_diff_global = std(diff(sig))
+    for i = 3:(n-h)
+        if sliding_w
+            std_sig_diff_sliding    = k_sigma * std(diff(sig[max(i-h,1):i]))
+            std_sig_diff            = std_sig_diff_sliding
+        else
+            std_sig_diff_cumulative = k_sigma * std(diff(sig[1:i]))
+            std_sig_diff            = std_sig_diff_cumulative
+        end
+        if std_sig_diff <= 0
+            std_sig_diff_cumulative = k_sigma * std(diff(sig[1:i]))
+            std_sig_diff            = std_sig_diff_cumulative
+            if std_sig_diff <= 0
+                std_sig_diff = std_diff_global
+            end
+        end
+        r_hat = sig[i]
+        p = ProbOfCorrection(r_hat, mu = r_hat, sigma = k * std_sig_diff)
+        decision_f[i+h] = p
+    end
+    decision_f
+end
+
+function ConditionOk(r::FloatingPoint, r_hat::FloatingPoint)
+    if r_hat > 0
+        r > r_hat / 2
+    elseif r_hat < 0
+        r < - r_hat / 2
+    else
+        true
+    end
+end
+
+function Dobro(r::Array{Float64,1}; h = 500, th = 0.99, f_correction = 1.0, k_sigma = 1.0)
+    n = length(r)
+    #
+    cont_corrected  = zeros(length(r))#copy(r)
+    smart_corrected = zeros(length(r))
+    rand_corrected  = zeros(length(r))
+    # dont_correct_idxs = Int64[] # don't do correction indices
+    #
+    c_b_wdl = Int64[0, 0, 0] # cont. <=> base wins draws looses
+    s_b_wdl = Int64[0, 0, 0] # smart <=> base wins draws looses
+    s_c_wdl = Int64[0, 0, 0] # smart <=> cont. wins draws looses
+    r_b_wdl = Int64[0, 0, 0] # random vs base
+    #
+    dec_function      = DecisionFunction(r, h = h, sliding_w = true, k_sigma = k_sigma)
+    TP_all            = Int64[]
+    FP_all            = Int64[]
+    TP                = Int64[]
+    FP                = Int64[]
+    TN                = Int64[]
+    FN                = Int64[]
+    #
+    for i = 1:(n-h)
+        # continuous correction
+        ConditionOk(r[i+h], r[i]) ? push!(TP_all, i+h) : push!(FP_all, i+h)
+        cont_corrected[i+h] = r[i+h] - r[i] * f_correction
+        # Cont. VS Base
+        if abs(cont_corrected[i+h] - r[i+h]) < abs(r[i+h])
+            c_b_wdl[1] += 1
+        elseif abs(cont_corrected[i+h] - r[i+h]) == abs(r[i+h])
+            c_b_wdl[2] += 1
+        else
+            c_b_wdl[3] += 1
+        end
+        # End Cont. VS Base
+        # Randon correction
+        rand_p = rand()
+        if rand_p >= 0.5
+            rand_corrected[i+h] = r[i+h] - r[i] * f_correction
+        end
+        # End Randon correction
+        # smart correction
+        p = dec_function[i+h]
+        if p >= th
+            # do correction
+            ConditionOk(r[i+h], r[i]) ? push!(TP, i+h) : push!(FP, i+h)
+            smart_corrected[i+h] = r[i+h] - r[i] * f_correction
+        else
+            # don't do correction
+            ConditionOk(r[i+h], r[i]) ? push!(FN, i+h) : push!(TN, i+h)
+            # push!(dont_correct_idxs, i + h) # indices where we don't do correction
+        end
+        # end smart correction
+        # Smart VS Base
+        if abs(smart_corrected[i+h] - r[i+h]) < abs(r[i+h])
+            s_b_wdl[1] += 1
+        elseif abs(smart_corrected[i+h] - r[i+h]) == abs(r[i+h])
+            s_b_wdl[2] += 1
+        else
+            s_b_wdl[3] += 1
+        end
+        # End Smart VS Base
+        # Smart VS Continuous
+        if abs(smart_corrected[i+h] - r[i+h])       < abs(cont_corrected[i+h] - r[i+h])
+            s_c_wdl[1] += 1
+        elseif  abs(smart_corrected[i+h] - r[i+h]) == abs(cont_corrected[i+h] - r[i+h])
+            s_c_wdl[2] += 1
+        elseif abs(smart_corrected[i+h] - r[i+h])   > abs(cont_corrected[i+h] - r[i+h])
+            s_c_wdl[3] += 1
+        end
+        # End Smart VS Continuous
+        # Random VS Base
+        if abs(rand_corrected[i+h] - r[i+h]) < abs(r[i+h])
+            r_b_wdl[1] += 1
+        elseif  abs(rand_corrected[i+h] - r[i+h]) == abs(r[i+h])
+            r_b_wdl[2] += 1
+        else
+            r_b_wdl[3] += 1
+        end
+        # End Random VS Base
+    end
+    sens_cont = 1.0; spec_cont = 1.0
+    sens_smart = length(TP) / (length(TP) + length(FN))
+    spec_smart = length(TN) / (length(TN) + length(FP))
+    c_b_wdl = map(x -> x / n, c_b_wdl)
+    s_b_wdl = map(x -> x / n, s_b_wdl)
+    s_c_wdl = map(x -> x / n, s_c_wdl)
+    r_b_wdl = map(x -> x / n, r_b_wdl)
+    # rms
+    rms_impr_cont  = (rms(r) - rms(cont_corrected)) / rms(r)
+    rms_impr_smart = (rms(r) - rms(smart_corrected)) / rms(r)
+    # end rms
+    return Dict("spec_smart" => spec_smart, "sens_smart" => sens_smart, "c_b_wdl" => c_b_wdl, "s_b_wdl" => s_b_wdl, "s_c_wdl" => s_c_wdl, "r_b_wdl" => r_b_wdl, "rms_impr_cont"=>rms_impr_cont,  "rms_impr_smart" => rms_impr_smart)
+end
+
+function DobroVarySigma(r_df; h = 500, th = 0.999, f_correction = 0.1, col_st = 1, col_en = 1, min_spec = 0.8, min_sens = 0.8, prefix = "")
+    results       = Dict()
+    output_folder = "./out/"
+    k_range       = 0.01 : 0.01 : 10.0 # for win - loose experimant
+    best_columns  = Int32[0]
+    best_sigmas   = Float64[0.0]
+    best_spec     = Float64[0.0]
+    best_sens     = Float64[0.0]
+    for column in col_st : col_en
+        println("... Column number: ", column )
+        sig        = r_df[:,column]
+        spec_smart = Float64[]
+        sens_smart = Float64[]
+        c_b_wdls   = []
+        s_b_wdls   = []
+        s_c_wdls   = []
+        r_b_wdls   = []
+        #
+        rms_impr_cont  = Float64[]
+        rms_impr_smart = Float64[]
+        #
+        for k_sigma in k_range
+            res = Dobro(sig, h = h, th = th, f_correction = f_correction, k_sigma = k_sigma)
+            push!(spec_smart, res["spec_smart"])
+            push!(sens_smart, res["sens_smart"])
+            push!(c_b_wdls, res["c_b_wdl"])
+            push!(s_b_wdls, res["s_b_wdl"])
+            push!(s_c_wdls, res["s_c_wdl"])
+            push!(r_b_wdls, res["r_b_wdl"])
+            #
+            push!(rms_impr_cont , res["rms_impr_cont"])
+            push!(rms_impr_smart, res["rms_impr_smart"])
+            #
+            if res["spec_smart"] >= min_spec &&  res["sens_smart"] >= min_sens
+                push!(best_columns, column)
+                push!(best_sigmas , k_sigma)
+                push!(best_spec   , res["spec_smart"])
+                push!(best_sens   , res["sens_smart"])
+            end
+        end
+        c_b_wdls = transpose(hcat(c_b_wdls ...))
+        s_b_wdls = transpose( hcat(s_b_wdls ...) )
+        s_c_wdls = transpose( hcat(s_c_wdls ...) )
+        r_b_wdls = transpose( hcat(r_b_wdls ...) )
+        results[column] = Dict("spec_smart" => spec_smart, "sens_smart" => sens_smart, "c_b_wdls" => c_b_wdls, "s_b_wdls" => s_b_wdls, "s_c_wdls" => s_c_wdls, "r_b_wdls" => r_b_wdls, "rms_impr_cont"=>rms_impr_cont,  "rms_impr_smart" => rms_impr_smart)
+    end
+    # print results
+    f = open( correct_path(output_folder) * "best_params" * prefix * ".txt", "w")
+    for i = 1:length(best_columns)
+        write(f, string(best_columns[i]) * "," * string(best_sigmas[i]) * "," * string(best_spec[i]) * "," * string(best_sens[i]) * "\n")
+    end
+    close(f)
+    write_vec( correct_path(output_folder) * "sigmas" * prefix * ".txt", collect(k_range) )
+    # end print results
+    return(results, collect(k_range), best_columns, best_sigmas)
+end
+
+function print_run_multi_columns_vary_sigma(res, col_st, col_en, output_folder; prefix = "", plt = true)
+    matrix_spec           = hcat([res[c]["spec_smart"     ] for c in col_st:col_en] ...)
+    matrix_sens           = hcat([res[c]["sens_smart"     ] for c in col_st:col_en] ...)
+
+    matrix_rms_impr_cont  = hcat([res[c]["rms_impr_cont"  ] for c in col_st:col_en] ...)
+    matrix_rms_impr_smart = hcat([res[c]["rms_impr_smart" ] for c in col_st:col_en] ...)
+
+    # AVERAGE WINS / DRAWS / LOOSES
+    avg_wins_c_b          = mean( hcat( [res[c]["c_b_wdls"][:,1] for c in col_st : col_en] ...), 2)
+    avg_draws_c_b         = mean( hcat( [res[c]["c_b_wdls"][:,2] for c in col_st : col_en] ...), 2)
+    avg_looses_c_b        = mean( hcat( [res[c]["c_b_wdls"][:,3] for c in col_st : col_en] ...), 2)
+
+    avg_wins_s_b          = mean( hcat( [res[c]["s_b_wdls"][:,1] for c in col_st : col_en] ...), 2)
+    avg_draws_s_b         = mean( hcat( [res[c]["s_b_wdls"][:,2] for c in col_st : col_en] ...), 2)
+    avg_looses_s_b        = mean( hcat( [res[c]["s_b_wdls"][:,3] for c in col_st : col_en] ...), 2)
+
+    # println(hcat( [res[c]["s_c_wdls"][:, 1] for c in col_st : col_en] ...))
+    avg_wins_s_c          = mean( hcat( [res[c]["s_c_wdls"][:, 1] for c in col_st : col_en] ...), 2)
+    avg_draws_s_c         = mean( hcat( [res[c]["s_c_wdls"][:, 2] for c in col_st : col_en] ...), 2)
+    avg_looses_s_c        = mean( hcat( [res[c]["s_c_wdls"][:, 3] for c in col_st : col_en] ...), 2)
+
+    # println( hcat( [res[c]["r_b_wdls"][:, 1] for c in col_st : col_en] ...) )
+    avg_wins_r_b          = mean( hcat( [res[c]["r_b_wdls"][:, 1] for c in col_st : col_en] ...), 2)
+    avg_draws_r_b         = mean( hcat( [res[c]["r_b_wdls"][:, 2] for c in col_st : col_en] ...), 2)
+    avg_looses_r_b        = mean( hcat( [res[c]["r_b_wdls"][:, 3] for c in col_st : col_en] ...), 2)
+
+    # AVARAGES
+    avg_c_b_wdl           = hcat(avg_wins_c_b, avg_draws_c_b, avg_looses_c_b)
+    avg_s_b_wdl           = hcat(avg_wins_s_b, avg_draws_s_b, avg_looses_s_b)
+    avg_s_c_wdl           = hcat(avg_wins_s_c, avg_draws_s_c, avg_looses_s_c)
+    avg_r_b_wdl           = hcat(avg_wins_r_b, avg_draws_r_b, avg_looses_r_b)
+    # END AVERAGE WINS / DRAWS / LOOSES
+
+    avg_spec              = mean(matrix_spec, 2)
+    avg_sens              = mean(matrix_sens, 2)
+
+    avg_rms_impr_cont    = mean(matrix_rms_impr_cont, 2)
+    avg_rms_impr_sens    = mean(matrix_rms_impr_smart, 2)
+
+    output_folder         = correct_path(output_folder)
+
+    out_spec              = output_folder * "spec"               * prefix * ".txt"
+    out_sens              = output_folder * "sens"               * prefix * ".txt"
+
+    out_avg_spec          = output_folder * "avg_spec"           * prefix * ".txt"
+    out_avg_sens          = output_folder * "avg_sens"           * prefix * ".txt"
+
+    out_avg_impr_cont     = output_folder * "_avg_rms_impr_cont"  * prefix * ".txt"
+    out_avg_impr_sens     = output_folder * "_avg_rms_impr_smart" * prefix * ".txt"
+
+    out_avg_c_b_wdl      = output_folder * "avg_c_b_wdl"         * prefix * ".txt"
+    out_avg_s_b_wdl      = output_folder * "avg_s_b_wdl"         * prefix * ".txt"
+    out_avg_s_c_wdl      = output_folder * "avg_s_c_wdl"         * prefix * ".txt"
+    out_avg_r_b_wdl      = output_folder * "avg_r_b_wdl"         * prefix * ".txt"
+
+    write_vec(out_avg_spec, avg_spec)
+    write_vec(out_avg_sens, avg_sens)
+
+    write_vec(out_avg_impr_cont, avg_rms_impr_cont)
+    write_vec(out_avg_impr_sens, avg_rms_impr_sens)
+
+    writedlm(out_spec     , matrix_spec , ",")
+    writedlm(out_sens     , matrix_sens, ",")
+
+    function writedlm_header(fpath, matrix, header::String)
+        f = open(fpath, "w")
+        write(f, header * "\n")
+        writedlm(f, matrix, ",")
+        close(f)
+    end
+
+    writedlm_header(out_avg_c_b_wdl, avg_c_b_wdl, "c.b.wins, c.b.draws, c.b.loses")
+    writedlm_header(out_avg_s_b_wdl, avg_s_b_wdl, "s.b.wins, s.b.draws, s.b.loses")
+    writedlm_header(out_avg_s_c_wdl, avg_s_c_wdl, "s.c.wins, s.c.draws, s.c.loses")
+    writedlm_header(out_avg_r_b_wdl, avg_r_b_wdl, "r.b.wins, r.b.draws, r.b.loses")
+
+    println("Print spec matrix into " * out_spec)
+    println("Print sens matrix into " * out_sens)
+    if plt
+        #myplot = plot( layer(x = m_spec[1], y = m_sens[1], Geom.point), layer(x = m_spec[2], y = m_sens[2], Geom.point))
+        #draw(SVG(output_folder*"ROCs.svg", 10inch, 10inch), myplot)
+    end
+end
+
+in_file = ARGS[1]
+hor     = parse(Int, ARGS[2])
+
+output_folder  ="./out/"
+println("Input residual's file : $in_file")
+residuals = readdlm(in_file)
+(res_sigma, sigmas, best_columns, best_sigmas) = DobroVarySigma(residuals, h = hor)
+print_run_multi_columns_vary_sigma(res_sigma, 1, 1, output_folder)

@@ -1,0 +1,185 @@
+N = 40
+#K_VALS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+K_VALS = [0]
+Q = 2
+A = 3
+
+max_map_value = N * (Q-1)
+TARGET_PHENOTYPES = [Int(max_map_value / 2)]
+
+
+NUM_MAPS = 1
+
+function convert_to_int(vals::Array{Int, 1})
+    return_int = 0
+    for i = 1:length(vals)
+        return_int += vals[i] * (A^(i-1))
+    end
+    return return_int
+end
+
+function recover_output(vals::Array{Int, 1}, function_int::UInt128)
+    index_required = convert_to_int(vals)
+    #println("first ", function_int)
+    for i = 1:index_required
+        #println(function_int)
+        function_int = floor(UInt128, function_int / (UInt128(Q)))
+    end
+    #println("second ", function_int)
+    # if function_int == 0
+    #     println("hoooo")
+    #     println(index_required)
+    # else
+    #     println("boooo")
+    # end
+    return function_int % UInt128(Q)
+end
+
+function evaluate(W::Array{UInt128, 1}, neighbours::Array{Int, 2}, w::Array{Int, 1}, K, subarray::Array{Int, 1})
+    return_int = 0
+    num_ones = 0
+    num_ones = 0
+    for i = 1:length(w)
+        #index = w[i] + 1
+        for j = 1:K
+            subarray[j] = w[neighbours[i, j]]
+            #index += w[neighbours[i, j]] * (A^j)
+        end
+        subarray[K + 1] = w[i]
+        #println(w)
+        #println(index)
+        #return_int += W[i, index]
+        #println(recover_output(subarray, W[i]))
+        return_int += recover_output(subarray, W[i])
+    end
+    return return_int
+end
+
+function robustness(N, K, Q, A, neighbours, W, w, subarray::Array{Int, 1})
+    returned_robustness = 0
+    parent_genotype = evaluate(W, neighbours, w, K, subarray)
+    w_copy = deepcopy(w)
+    for i = 1:N
+        for j = 0:(A - 1)
+            if w[i] != j
+                w_copy[i] = j
+                if evaluate(W, neighbours, w_copy, K, subarray) == parent_genotype
+                    returned_robustness += 1
+                end
+                w_copy[i] = w[i]
+            end
+        end
+    end
+    return returned_robustness
+end
+
+x = []
+y = []
+vertices = Dict{Array{Int, 1}, Int}()
+
+function sample(N, K, Q, A, neighbours, W, specified_genotype, w, subarray::Array{Int, 1}, depth)
+    println(length(vertices))
+    parent_robustness = vertices[w]
+    for j = 1:N
+        for k = 0:(A - 1)
+            if w[j] != k
+                for l = (j + 1):N
+                    for m = 0:(A - 1)
+                        if w[l] != m
+                            w_copy = zeros(Int, N)
+                            for i in length(w)
+                                w_copy[i] = w[i]
+                            end
+                            w_copy[j] = k
+                            w_copy[l] = m
+                            if evaluate(W, neighbours, w_copy, K, subarray) == specified_genotype
+                                if w_copy in keys(vertices)
+                                    push!(x, parent_robustness)
+                                    push!(y, vertices[w_copy])
+                                else
+                                    neighbour_robustness = robustness(N, K, Q, A, neighbours, W, w_copy, subarray)
+                                    vertices[w_copy] = neighbour_robustness
+                                    push!(x, parent_robustness)
+                                    push!(y, neighbour_robustness)
+                                    sample(N, K, Q, A, neighbours, W, specified_genotype, w_copy, subarray, depth + 1)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if depth == 0
+        println(length(vertices))
+        if length(x) > 0
+            println("foo")
+            #println(x[1:10])
+            #println(y[1:10])
+            println(cor(x, y))
+        else
+            println("not enough")
+        end
+    end
+    #return cor(x, y)
+end
+
+f = open(string("nk_output", ARGS[1]), "w")
+
+correlations = zeros(Float64, length(K_VALS), length(TARGET_PHENOTYPES), NUM_MAPS)
+
+for a = 1:length(K_VALS)
+    K = K_VALS[a]
+    subarray = zeros(Int, K + 1)
+    for m = 1:NUM_MAPS
+        neighbours = zeros(Int, N, K)
+        for i = 1:N
+            for j = 1:K
+                found = false
+                new_neighbour = 0
+                while !found
+                    found = true
+                    new_neighbour = rand(Int(1):Int(N))
+                    for k = 1:K
+                        if (new_neighbour == neighbours[i, k]) | (new_neighbour == i)
+                            found = false
+                        end 
+                    end
+                end
+                neighbours[i, j] = new_neighbour
+            end
+        end
+        q::UInt128 = UInt128(Q)^(UInt128(A)^(UInt128(K) + 1))
+        println("foo ", q)
+        W = rand(UInt128(0):q, N)
+        for l = 1:length(TARGET_PHENOTYPES)
+            println(K, " ", l, " foo")
+            #println(TARGET_PHENOTYPES[l])
+            #println(sample(N, K, Q, A, neighbours, W, TARGET_PHENOTYPES[l]))
+
+            
+            w = rand(0:(A - 1), N)
+            println("hoo")
+            while evaluate(W, neighbours, w, K, subarray) != TARGET_PHENOTYPES[l]
+                println(evaluate(W, neighbours, w, K, subarray))
+                #println(specified_genotype)
+                w = rand(0:(A - 1), N)
+            end
+            println("chou")
+            initial_robustness = robustness(N, K, Q, A, neighbours, W, w, subarray)
+            vertices[w] = initial_robustness
+            #correlations[a, l, m] = sample(N, K, Q, A, neighbours, W, TARGET_PHENOTYPES[l], w)
+            sample(N, K, Q, A, neighbours, W, TARGET_PHENOTYPES[l], w, subarray, 0)
+        end
+    end
+end
+
+for p = 1:length(TARGET_PHENOTYPES)
+    for k = 1:length(K_VALS)
+        for m = 1:NUM_MAPS
+            write(f, string(correlations[k, p, m]))
+            write(f, " ")
+        end
+        write(f, "\n")
+    end
+end

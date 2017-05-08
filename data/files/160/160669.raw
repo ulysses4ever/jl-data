@@ -1,0 +1,82 @@
+type binomial_HMM
+    # Model Parameters
+    n_states::Int       # Number of hidden states
+    A::Matrix{Float64}  # Estimated state-transition matrix A[i,j] = Pr[i->j]
+    B::Array{Float64,2} # Binomial parameters 
+    pmf::Function       # Binomial probability mass function
+    context_map::Vector{ASCIIString} # list of the nucleotide contexts
+    n_ctxt::Int        # Number of nucleotide contexts, i.e. length(context_map)
+    p::Vector{Float64} # Estimated initial state probabilities
+
+    # Have a parameter that is like the "time step"?
+
+    # Notes:
+    #   'A' is a NxN matrix, rows sum to one
+    #       N = the number of hidden states
+    #   'B' is a NxMx2 array, specifying the beta-binomial distributions
+    #       M = number of nucleotide contexts (CG, CA, CC, etc.)
+    #       B[i,j,1] is the 'alpha' parameter of the beta-binomial distribution for state i, context j
+    #       B[i,j,2] is the 'beta' parameter of the beta-binomial distribution for state i, context j
+
+    # Data associated with the model
+    k::Vector{Int}     # number of reads covering each site
+    o::Vector{Int}     # number of methylation events at each site
+    c::Vector{Int}     # nucleotide context at each site
+    n_sites::Int       # number of cytosine sites in the dataset
+
+    # Notes:
+    #   {'k', 'o', 'c'} are all length 'n_sites'
+    #   k[t] total number of reads covering site t
+    #   o[t] number of reads with methylation at site t
+    #   c[t] nucleotide context at site t is given by context_map[c[t]]
+end
+
+function binomial_HMM(n::Int, filename::ASCIIString; context_map=["CG","CA","CT","CC"], strand="+")
+    # Create a (randomized) HMM model with 'n' hidden states, loading data
+    # from the file specified by 'filename'
+
+    # Randomize state-transition matrix
+    A = rand(n,n)
+    A ./= sum(A,2) # normalize rows
+    
+    # Randomize binomial parameters
+    n_ctxt = length(context_map)
+    B = rand(n,n_ctxt)
+    
+    # Randomize initial state probabilities
+    p = rand(n)
+    p ./= sum(p)
+
+    k,o,c = load_allc(filename, strand, context_map)
+    n_sites = length(k)
+
+    return binomial_HMM(n,A,B,binomial_pmf,context_map,n_ctxt,p,k,o,c,n_sites)
+end
+
+# function binomial_HMM(hmm::binomial_HMM)
+#     # Create a new HMM model given an existing model. This is useful if you
+#     # want to re-fit the same data with a different number of hidden states,
+#     # or from different initial parameters. Specifically, this circumvents
+#     # re-loading data from a file and storing redundant copies of the same
+#     # dataset in memory.
+
+#     n = hmm.n_states
+
+#     # Randomize state-transition matrix
+#     A = rand(n,n)
+#     A ./= sum(A,2) # normalize rows
+    
+#     # Randomize binomial parameters
+#     n_ctxt = length(context_map)
+#     B = rand(n,n_ctxt)
+    
+#     # Randomize initial state probabilities
+#     p = rand(n)
+#     p ./= sum(p)
+
+#     # Pointers to the data
+#     k,o,c = hmm.k, hmm.o, hmm.c
+#     n_sites = length(k)
+
+#     binomial_HMM(n,A,B,binomial_pmf,context_map,n_ctxt,p,k,o,c,n_sites)
+# end

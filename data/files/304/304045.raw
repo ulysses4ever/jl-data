@@ -1,0 +1,21 @@
+module MyQuickSortTests
+
+using FactCheck
+using MyQuickSort
+
+# n(n-1)/2
+facts("quicksort should be correct") do
+  @fact myQuickSort(1, 8) => 1
+#   @fact myQuickSort([1,2]) => ([1,2], 1)
+#   @fact myQuickSort([2,1],2) => ([1,2], 1)
+#   @fact myQuickSort([1,2,3,4],4) => ([1,2,3,4], 6)
+#   @fact myQuickSort([1,2,3,4,5,6,7,8],8) => ([1,2,3,4,5,6,7,8], 28)
+end
+
+facts("pivotFirstElement should return first element of an array") do
+  @fact pivotFirstElement() => 1
+end
+
+
+
+end

@@ -1,0 +1,28 @@
+include("solvers.jl")
+
+###################
+
+(m,n) = (50,200) 
+p = 0.2 
+A = sprandn(m,n,p)
+b = rand(m)
+
+x = min_length(A,b)
+
+println("Norm(x) = ", norm(x)) 
+println("Residual = ", norm(A*x-b)/norm(b))
+
+###################
+
+(m,n1) = (50,100,100)
+n2 = m
+p = 0.2
+A = sprandn(m,n1,p)
+D = 0.1 * speye(m,m)
+b = rand(m)
+
+(x,s) = regularized_min_length(A,D,b)
+
+println("Norm(x) = ", norm(x)) 
+println("Norm(s) = ", norm(s))
+println("Residual = ", norm(A*x+D*s-b)/norm(b))

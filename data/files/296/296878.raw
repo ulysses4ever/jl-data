@@ -1,0 +1,115 @@
+using Jules
+
+module FPUtil
+
+export
+@bounce,
+append,
+concat,
+drop,
+dropright,
+dropwhile,
+firstopt,
+findwhere,
+flatmap,
+flatten,
+fmap,
+foreach,
+parforeach,
+indexwhere,
+lastopt,
+parmap,
+prepend,
+pairnext,
+take,
+takeright,
+takewhile,
+trampoline,
+zipwithindex
+
+
+#### Trampolines (from https://github.com/zachallaun/FunctionalUtils.jl)
+immutable Continue
+  thunk
+end
+macro bounce(ex)
+  :(Continue(() -> $(esc(ex))))
+end
+function trampoline(c::Continue)
+  while isa(c, Continue)
+    c = c.thunk()
+  end
+  c
+end
+trampoline(f::Function, args...) = trampoline(f(args...))
+trampoline(val) = val
+
+#### Sequences
+indexwhere = findfirst
+
+prepend(xs, x) = vcat([x], xs)
+append(xs, x) = vcat(xs,[x])
+concat(xs,ys) = vcat(vec(xs), vec(ys))
+
+firstopt(xs) = isempty(xs) ? nothing : first(xs)
+lastopt(xs) = isempty(xs) ? nothing : last(xs)
+
+Base.take(n::Int, xs) = xs[1:n]
+drop(n::Int, xs) = xs[(n+1):end]
+
+takeright(n::Int, xs) = drop(length(xs) - n, xs)
+dropright(n::Int, xs) = take(length(xs) - n, xs)
+
+takewhile(pred, xs) = xs[1:(findfirst(negate(pred), xs) - 1)]
+dropwhile(pred, xs) = xs[(findfirst(negate(pred), xs) + 1 - 1):end]
+
+function findwhere(xs)
+  i = indexwhere(xs)
+  i == 0 ? nothing : xs(i)
+end
+
+flatmap(f, xs) = foldl((y, x) -> concat(y,f(x)), [], xs)
+flatten(xs) = flatmap(identity, xs)
+function foreach(f, xs)
+  for x in xs
+    f(x)
+  end
+end
+
+function parforeach_(f, lst, np, save)
+  n = length(lst)
+  results = nothing
+  if save
+    results = cell(n)
+  end
+  i = 1
+  nextidx() = (idx=i; i+=1; idx)
+  @sync begin
+    for p in 1:np
+      @async begin
+        while true
+          idx = nextidx()
+          if idx > n
+            break
+          end
+          y = f(lst[idx])
+          if save
+            results[idx] = y
+          end
+        end
+      end
+    end
+  end
+  results
+end
+parforeach(f, lst, np) = parforeach_(f, lst, np, false)
+parmap(f, lst, np) = parforeach_(f, lst, np, true)
+
+pairnext(xs) = zip(xs, drop(1, xs))
+zipwithindex(xs) = zip(xs, 1:length(xs))
+
+fmap(f,xs) = map(f, xs)
+fmap(f,nothing) = nothing
+getorelse(x,default) = isnothing(x) ? default : x
+
+end ## end module

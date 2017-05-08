@@ -1,0 +1,20 @@
+#!/usr/bin/env julia
+using DebbyPacker
+using RudeOil
+
+const workspace = "workspace"
+const machine = Machine("bempp-machine"; cpucount=4, memory=4096)
+const python = "python"
+const pyver = if python == "python" "2.7" else error("Gotta find out version") end
+const distribution = "vivid"
+const publisher = Publisher("m-davezac", "bempp-vivid", "4FADF848")
+
+start_machine(machine)
+
+import DebbyPacker: publish
+publish(package::DebbyPacker.AbstractPackage) = publish(machine, publisher, package, workspace)
+
+include("Cookoff.jl");      publish(cookoff)
+include("DuneFoamgrid.jl"); publish(foamgrid)
+
+# include("Bempp.jl"); publish(bempp)

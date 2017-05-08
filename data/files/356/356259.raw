@@ -1,0 +1,68 @@
+Escher.external_setup()
+
+long_pi = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679"
+
+
+function test(x)
+  if x == long_pi[1:length(x)]
+    right
+    mark(recall)
+  else
+    wrong
+    reset(recall)
+  end
+end
+
+right = empty |> size(17em, 5em) |> fillcolor("lightgreen")
+wrong = empty |> size(17em, 5em) |> fillcolor("red")
+
+digit_button(i, s) = constant(i, button(string(i))) >>> s
+
+
+
+function main(window)
+
+  push!(window.assets, "widgets")
+
+  recall = Input(0)
+
+
+
+  digit_button(i, s) = constant(i, button(string(i))) >>> s
+
+  numpad(s) = vbox(intersperse(vskip(0.3em),
+    [hbox(
+      digit_button(1, s),
+      digit_button(2, s),
+      digit_button(3, s)),
+    hbox(
+      digit_button(4, s),
+      digit_button(5, s),
+      digit_button(6, s)),
+    hbox(
+      digit_button(7, s),
+      digit_button(8, s),
+      digit_button(9, s)),
+      hbox(flex(),digit_button(0, s),
+      link("http://localhost:5555/mentalmath.jl", button("<<<")))]))
+
+  progress = foldl((acc, dig) -> acc * string(dig), "3.", recall)
+
+  #form =
+  #    subscribe(textinput("", name=:name, label="How do you like your pie?",
+  #      multiline = true, charcounter = true), recall) |> size(17em,5em)
+
+  #check_tile = consume(still_right, recall)
+  #digit_tile = consume(right_digit, recall)
+  vbox(
+      title(1, "Get some π"),
+      vskip(1em),
+      inset(Escher.middle, consume(test, progress), progress),
+        #form,
+      vskip(1em),
+      numpad(recall)) |>
+    packacross(center) |> pad(3em)
+
+
+
+end

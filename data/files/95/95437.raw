@@ -1,0 +1,16 @@
+using DSP
+
+include("../mean_spectrum.jl")
+include("../signal_simulator.jl")
+include("./maps.jl")
+
+DATADIR = "../../../data/experiment02"
+OUTDIR = "../../output/experiment02"
+
+signals = [
+  "ar2_01",
+  "ar2_02",
+  "curved_bernoulli_3d",
+  "curved_binary",
+  "logistic"
+]

@@ -1,0 +1,4 @@
+{"business_profile":{"address":"x","business_name":"DPD Dublin SE","city":"Dublin","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"Alliance Property Maintenance Carpentry Services Dublin & Kildare","city":"Dublin","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"Mizzoni's Pizza & Pasta Co","city":"Kilkenny","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"Celtic Ross Hotel Conference & Leisure Centre","city":"Rosscarbery","id":"0a2f612192519bff","customer_id":9,"main_phone":"0","website":"http://www.xpto.fr/","zip_code":"","geo":[52.3396,4.96247]}}

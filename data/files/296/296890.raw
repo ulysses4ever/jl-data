@@ -1,0 +1,93 @@
+module Jules
+
+using JSON
+using Logging
+
+export
+btw,
+decr,
+eq,
+gt,
+gte,
+incr,
+isneg,
+isnothing,
+ispos,
+iszero,
+lt,
+lte,
+mul,
+negate,
+neq,
+pow,
+truthy,
+setloglevel
+
+ispos(n) = n >= 0
+isneg(n)  = n < 0
+iszero(n) = n == 0
+isnothing(x) = x == nothing
+Base.isempty(x :: Nullable) = isnull(x)
+
+truthy(val) = !is(val, nothing) && !is(val, false)
+negate(pred) = function(x) !pred(x) end
+
+incr(i) = function(x) x + i end
+decr(i) = function(x) x - i end
+mul(i) = function(x) x * i end
+pow(i) = function(x) x ^ i end
+lt(i) = function(x) x < i end
+lte(i) = function(x) x <= i end
+gt(i) = function(x) x > i end
+gte(i) = function(x) x >= i end
+eq(i) = function(x) x == i end
+neq(i) = negate(eq(i))
+eq(i :: FloatingPoint, tol) = function(x) abs(x - i) < tol end
+neq(i :: FloatingPoint, tol) = function(x) !eq(x, tol) end
+btw(a, b) = function(x)
+  (x >= a) && (x < b)
+end
+
+function loadproperties(propsfiles :: Vector{String})
+  read(p) = try JSON.parsefile(p, ordered=false) catch Dict{String,Any}() end
+  readandmerge(d,p) = merge(d, read(p))
+  foldl(readandmerge, Dict{String,Any}(), propsfiles)
+end
+
+function _setloglevel(props :: Dict{String,Any})
+  lprops :: Dict{String,Any} = get(props, "logging", Dict{String,Any}()) :: Dict{String,Any}
+  lvl = lowercase(get(lprops, "level", ""))
+
+  if lvl == "debug"
+    @Logging.configure(level=DEBUG)
+  elseif lvl == "info" || lvl == ""
+    @Logging.configure(level=INFO)
+  elseif lvl == "warn"
+    @Logging.configure(level=WARN)
+  elseif lvl == "error"
+    @Logging.configure(level=ERROR)
+  elseif lvl == "critical"
+    @Logging.configure(level=CRITICAL)
+  elseif lvl == "off"
+    @Logging.configure(level=OFF)
+  end
+end
+
+JULIA_PROPERTIES = begin
+  files = reverse(vcat(split(get(ENV,"JULIA_PROPS",""),":"), [join([get(ENV,"HOME",""), ".juliaprops"], "/")]))
+  println(STDERR, "JULIA_PROPERTIES files: $(JSON.json(files))")
+  props = loadproperties(convert(Vector{String}, files))
+  println(STDERR, "JULIA_PROPERTIES loaded: $(JSON.json(props))")
+  _setloglevel(props)
+  props
+end
+
+setloglevel() = _setloglevel(JULIA_PROPERTIES)
+
+end ## end module
+
+
+
+include("FPUtil.jl")
+include("Streaming.jl")
+include("Timing.jl")

@@ -1,0 +1,28 @@
+# This file is part of Maxima.jl. It is licensed under the MIT license
+#   Copyright (c) 2016 Nathan Smith
+
+module Maxima
+
+using Compat
+import Compat.String
+
+const deps_file = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+
+if isfile(deps_file)
+    include(deps_file)
+else
+    error("Maxima.jl is not properly configure. Run Pkg.build(\"Maxima\") before
+    importing the Maxima module")
+end
+
+include("server.jl")
+include("mexpr.jl")
+include("io.jl")
+include("repl.jl")
+include("simplify.jl")
+include("calculus.jl")
+include("plot.jl")
+include("setup.jl")
+include("equations.jl")
+
+end # module

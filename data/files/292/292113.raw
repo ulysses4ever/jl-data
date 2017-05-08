@@ -1,0 +1,8 @@
+module misc_julia
+	include("nansuite.jl");
+	include("polyfit.jl");
+	include("waveletba.jl");
+	searchdir(path,key) = filter(x->contains(x,key), readdir(path));
+
+	export nanmean, polyfit, waveletba,searchdir
+end

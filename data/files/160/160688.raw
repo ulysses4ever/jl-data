@@ -1,0 +1,27 @@
+function rand_binomial(p::Float64, k::Int)
+    # sample from binomial distribution with 'k' trials with probability 'p'
+    return sum(rand(k) .<= p)
+end
+
+function binomial_pmf(p::Float64, k::Int, o::Int)
+    # binomial distribution for 'o' occurences in 'k' trials with probability 'p'
+    return binomial(k,o) * p^o * (1-p)^(k-o)
+end
+
+function betabinomial_pmf(a::Float64, b::Float64, k::Int, o::Int)
+    # beta-binomial distribution for 'o' occurences in 'k' trials with params 'a' and 'b'
+    return binomial(k,o) * beta(k+a,n-k+b) / beta(a,b)
+end
+
+function sample(p)
+    # Sample from categorical distribution with probability vector p
+    v = rand()
+    s = 0.0
+    for i = 1:length(p)
+        s += p[i]
+        if v <= s
+            return i
+        end
+    end
+    return length(p)
+end

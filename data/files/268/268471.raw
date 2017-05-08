@@ -1,0 +1,17 @@
+###################################################
+## Defines the 'Params' type
+###################################################
+
+type Params
+  batchSize::Int64
+  techno::AbstractString
+  priorities::AbstractString
+
+  function Params()
+    obj = new()
+    obj.batchSize = 1
+    obj.techno = "greedy"
+    obj.priorities = "none"
+    return obj
+  end
+end

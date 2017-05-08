@@ -1,0 +1,10 @@
+###
+### stopwords.jl
+###
+
+const STOPWORDS_FILE = Pkg.dir("CompLing", "res", "stopwords.english.txt")
+
+function stopwords()
+    stopwds = [utf8(chomp(s)) for s in readlines(open(STOPWORDS_FILE))]
+    return Set(stopwds)
+end

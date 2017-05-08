@@ -1,0 +1,18 @@
+function do_send_real()
+
+    comm = MPI.COMM_WORLD
+
+    MPI.Barrier(comm)
+
+    rank = MPI.Comm_rank(comm)
+    size = MPI.Comm_size(comm)
+
+    if rank == 1
+      MPI.Send(0.5, 0, 32, comm)
+    else
+      x, status = MPI.Recv(Float64, 1, 32, comm)
+      println(x)
+    end
+
+    MPI.Barrier(comm)
+end

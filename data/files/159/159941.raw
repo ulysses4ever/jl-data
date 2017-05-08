@@ -1,0 +1,88 @@
+module BuzsakiAnalysis
+
+  using MAT
+  require("Gadfly")
+  require("GLM")
+
+  const field_mapping = [
+    "X" => "lfp",
+    "Xf" => "lfp_filtered",
+    "sp" => "spikes",
+    "spf" => "spikes_filtered",
+    "v" => "first_pc",  # principal component
+    "pos" => "position",
+    "type" => "cell_type"
+  ]
+
+  # return a dataframe containing the data, keyed by e$i for electrodes and n$i
+  # for neurons, where i is an index
+
+  # TODO figure out how to extract field names from a type
+
+  type Dataset
+    num_electrodes::Integer
+    num_time_points::Integer
+    num_neurons::Integer
+    frame::DataFrame
+
+    fields = [ "num_electrodes", "num_time_points", "num_neurons", "frame" ]
+
+    function Dataset(d::Dict) = tuple([ d[f] for f in fields ]...) | Dataset
+
+  end
+
+  # TODO look into using AbstractDataFrame to see if I can retain the structure
+  # of the data and not flatten spikes/LFP
+
+  function load(path)
+    dict = matread(path)
+    dict = rekey(dict, field_mapping)
+    num_electrodes = size(dict["lfp"],1)
+    num_time_points = size(dict["lfp"],2)
+    num_neurons = size(dict["spikes"],1)
+
+    #lfp = Array(Any, num_electrodes)
+    #for i = 1:num_electrodes
+    # lfp[i] = data["X"][i,:]
+    #end
+    #spikes = Array(Any, num_neurons)
+    #for i = 1:num_neurons
+    #    spikes[i] = data["sp"][i,:]
+    #end
+
+    lfp_dict = graph(1:num_electrodes) do i ("e$i", data["X"][i,:] ) end
+    spikes_dict = graph(1:num_spikes) do i ("n$i", data["sp"][i,:] ) end
+    df = merge(lfp_dict, spikes_dict) | DataFrame
+    Dataset( num_electrodes, num_time_points, num_neurons, df)
+  end
+
+  function fit(data)
+    models = Array(Any, data.num_neurons)
+    for i in 1:num_neurons
+      try
+        expr = Expr(:call, :~, symbol("n$i"), Expr(:call, :+, [ symbol("e$j") for j=1:num_electrodes ]...))
+        models[i] = glm(expr,df,Poisson())
+      catch
+        models[i] = "error"
+      end
+    end
+  end
+
+  function extract_time_ranges(center, spread, pos_vector)
+    range = center-spread : center + spread
+
+  end
+
+  function time_plot(data)
+
+    pos_range = 
+    pos_center = 
+
+    data.frame["time"]
+    # find time points when rat is at a given position
+
+    #
+
+  end
+
+end

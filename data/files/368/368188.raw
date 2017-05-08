@@ -1,0 +1,266 @@
+#==========================================================================
+  Implemented depth functions 
+==========================================================================#
+
+export
+	#depth methods
+	depth_halfspace, #calculation of random halfspace depth
+	depth_halfspace_bisectors, #calculation of bisector halfspace depth
+	depth_L2, #calculation of affine-invariant L^2 depth
+	depth_Lp, #calculation of L^p depth (not affine-invariant)
+	depth_mahalanobis, #calculation of mahalanobis depth
+	depth_projection, #calculation of random projection depth
+	depth_simplicial, #calculation of 2d simplicial depth
+	depth_spatial, #calcualtion of spatial depth
+	modified_band_depth, #calculation of modified band depth
+	depth_L2_new,
+	depth_halfspace_old,
+	
+	#helper-methods for bisector halfspace depth 
+	generateWeightVectors, #generation of all weight vectors for bisector halfspace depth 
+	preCalculateWeightProjections #calculation of weight projections
+	
+
+#Calculates the Mahalanobis depth of a vector 'x' w. r. t. a matrix 'data'
+function depth_mahalanobis{T<:Number}(x::AbstractArray{T,1}, data::AbstractArray{T,2}, mcd::Bool = false, invscatter_param = [])
+    location = (mean(data,1))'
+    
+	if(mcd == false && length(invscatter_param) == 0)
+		scatter = cov(data)
+		inv_scatter = pinv(scatter)
+    elseif(mcd == true && length(invscatter_param) == 0)
+		scatter = MCD(data)
+		inv_scatter = pinv(scatter)
+	else	
+		inv_scatter = invscatter_param
+	end
+	 
+    tmp = (1.0 + (x - location)' * inv_scatter * (x - location))[1]
+    return 1.0/tmp
+end 
+
+#Affine-invariant L^2 depth
+function depth_L2{T<:Number}(x::AbstractArray{T,1}, data::AbstractArray{T,2}, mcd::Bool = false, invscatter_param = [])
+    tmp = 0.0
+    n = length(data[:,1])
+	
+	if(mcd == false && length(invscatter_param) == 0)
+		scatter = cov(data)
+		inv_scatter = pinv(scatter)
+	elseif (mcd == true && length(invscatter_param) == 0) 
+		scatter = MCD(data)
+		inv_scatter = pinv(scatter)
+	else 
+		inv_scatter = invscatter_param
+	end
+	
+    for i in 1:n
+		tmp2 = ((x - data[i,:]')' * inv_scatter * (x - data[i,:]'))[1]
+		tmp = tmp + sqrt(tmp2)
+    end
+    return 1.0/(1.0+(1/n)*tmp)
+end
+
+#L^p depth, not affine invariant!
+function depth_Lp{T<:Number}(x::AbstractArray{T,1},data::AbstractArray{T,2},p::Int64=2)
+    tmp = 0.0
+    n = length(data[:,1])
+    
+    for i in 1:n
+        tmp = tmp + (norm(x - data[i,:]',p))
+    end
+    return 1.0/(1.0+(1/n)*tmp)
+end
+
+function depth_spatial{T<:Number}(x::AbstractArray{T,1},data::AbstractArray{T,2},mcd::Bool = false, lambda_param = [])
+		if(mcd == false && length(lambda_param) == 0)
+			scatter = cov(data)
+			lambda = scatter^(-0.5)
+		elseif (mcd == false && length(lambda_param) == 0)
+			scatter = MCD(data)
+			lambda = scatter^(-0.5)
+		else 
+			lambda = lambda_param
+		end
+        
+        depths = 0.0
+
+        for i in 1:length(data[:,1])
+            depths = depths + v(vec(lambda*(x - data[i,:]')))
+        end
+		
+    return (1.0 - (1/length(data[:,1]))*norm(depths))
+end
+
+#Random projection depth
+function depth_projection{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},k::Int64=1000,randvectors=[])
+	data_set = data_set'
+    return 1.0/(1.0 + o_projection(x,data_set,k,randvectors))
+end
+
+#Outlyingness of a point
+function o_projection{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},k::Int64,randvectors=[])
+    y = 0
+	if(length(randvectors) == 0)
+		randvectors = randn(length(data_set[:,1]),k)
+		for i in 1:k
+			randvectors[:,i] = v(randvectors[:,i])
+		end
+		randvectors = randvectors'
+	end
+		
+	for i in 1:length(randvectors[:,1])
+		p = randvectors[i,:]*x
+		medi = median(randvectors[i,:]*data_set)
+		p = abs(p - medi)
+		madi = mad(randvectors[i,:]*data_set)
+		if madi != 0
+			p = p/madi
+			y = max(y,p)
+		end
+	end
+    return y[1] #Returns {Float64,1} array with one entry
+end
+
+#Two-dimensional simplicial depth 
+function depth_simplicial{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2})
+    index_combinations = collect(combinations(1:length(data_set[:,1]),3))
+    tmp = 0
+    for i in index_combinations
+        if(isInsideTriangle(x,vec(data_set[i[1],:]),vec(data_set[i[2],:]),vec(data_set[i[3],:])))
+           tmp = tmp + 1 
+        end
+    end
+    return 1/(binomial(length(data_set[:,1]),3)) * tmp
+end
+
+#Random halfspace depth
+function depth_halfspace{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},k::Int64=1000,randvectors=[])
+	data_set = data_set'
+	
+	if(length(randvectors) == 0)
+		randvectors = randn(length(data_set[:,1]),k)
+		for i in 1:k
+			randvectors[:,i] = v(randvectors[:,i])
+		end
+		randvectors = randvectors'
+	end
+	
+	RD = randvectors*data_set 
+	Rz = randvectors*x
+	
+	sum_bit_vector = sum(RD .>= Rz,2)
+	
+	return (1/length(data_set[1,:])) * minimum(sum_bit_vector)
+end
+
+#Random halfspace depth as in Lange et al. 2013 (DDalpha-classification of asymmetric and fat-tailed data)
+function depth_halfspace_old(x,data_set,k=1000)
+	data_set = data_set'
+	y = typemax(Int64)
+	#Set seed
+	#srand(124)
+	for i in 1:k
+		r = randn(length(data_set[:,1]))
+		r = v(r)
+		tmp = 0
+		for j in 1:length(data_set[1,:])
+			#if(dot(vec(data_set[:,j]),r) >= dot(vec(x),r))
+			if((r'*data_set[:,j])[1] >= (r'*x)[1])
+				tmp = tmp + 1
+			end
+		end
+		y = min(y,tmp)
+	end
+	return (1/length(data_set[1,:])) * y
+end
+
+#This pre-calculates the weight vectors for the bisector halfspace depth
+function generateWeightVectors{T<:Number}(data_set::AbstractArray{T,2},k::Float64=1.0)
+	index_combinations = collect(combinations(1:length(data_set[:,1]),2)) #[[1,2],[1,3],...]
+	res = cell(length(index_combinations))
+	
+	#if k is smaller than 1.0, only a certain percentage of the index_combinations will be used for univariate projection
+	if(k==1.0)
+		for i in 1:length(index_combinations)
+			point_a = vec(data_set[index_combinations[i][1],:])
+			point_b = vec(data_set[index_combinations[i][2],:])
+			w = point_b - point_a
+			w = v(w)
+			w_0 = w*((point_a+point_b)./2)'
+			res[i] = (w,w_0[1])
+		end
+	else
+		shuffle!(index_combinations)
+		n = round(Int,length(index_combinations)*k)
+		index_combinations = index_combinations[1:n]
+		res = cell(length(index_combinations))
+		for i in 1:length(index_combinations)
+			point_a = vec(data_set[index_combinations[i][1],:])
+			point_b = vec(data_set[index_combinations[i][2],:])
+			w = point_b - point_a
+			w = v(w)
+			w_0 = w*((point_a+point_b)./2)'
+			res[i] = (w,w_0[1])
+		end
+	end
+	return res
+end
+
+#Pre-calculation of projected data points onto given weight vectors (w, w_0)
+#result is a matrix (length(w) x n)
+function preCalculateWeightProjections{T<:Number}(data_set::AbstractArray{T,2},w::AbstractArray)
+	proj = zeros(length(w),length(data_set[:,1]))
+	for j in 1:length(data_set[:,1])
+		for i in 1:length(w)
+			#proj[i,j] = (w[i][1]*data_set[j,:]' - w[i][2])[1]
+			proj[i,j] = (w[i][1]*data_set[j,:])[1]
+		end
+	end
+	return proj
+end
+
+#Bisector halfspace depth, w and proj are calculated in the two methods above
+function depth_halfspace_bisectors{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},w::AbstractVector,proj::AbstractArray{Float64,2})
+	wx = zeros(length(w))
+	for i in 1:length(w)
+		#wx[i] = (w[i][1]*x - w[i][2])[1]
+		wx[i] = (w[i][1]*x')[1]
+	end
+	
+	projn = zeros(length(proj[:,1]),length(proj[1,:]))
+	
+	for i in 1:length(proj[:,1])
+		projn[i,:] = proj[i,:] .> wx[i]
+	end
+	
+	#row wise sums
+	projn_sum = sum(projn,2)
+	
+	return (1/length(data_set[:,1])) * minimum(projn_sum)
+end
+
+#Modified band depth
+function modified_band_depth{T<:Number}(x::AbstractArray{T,1},data::AbstractArray{T,2})
+    x = x'
+    it_combinations = vec([(i,j) for i in 1:length(data[:,1]), j in 1:length(data[:,1])])
+    #make indices unique and i1 < i2
+    filter!((x -> x[1] < x[2]),it_combinations)
+    d = length(data[1,:])
+    
+    tmp = 0.0
+	tmp2 = 0.0
+	tmp3 = 0.0
+    
+    for i in it_combinations
+		tmp = 0.0
+        for k in 1:d
+            tmp = tmp + I(x[1,k] >= min(data[i[1],k],data[i[2],k]) && x[1,k] <= max(data[i[1],k],data[i[2],k]))
+        end
+        tmp2 = tmp2 + ((1/d) * tmp)
+    end
+    
+    tmp3 = (1/binomial(length(data[:,1]),2)) * tmp2
+    
+    return tmp3
+end

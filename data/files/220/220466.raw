@@ -1,0 +1,11 @@
+#Library containing functions related to IO, e.g., readProblem, print
+
+include( "MCITW-1P.jl" )
+
+function readProblem( fData )
+  include( fData )
+  
+  prob = Problem( cardC, cardD, cardP, cardT, CCap, CCost, DA, DS, DE, DD, PA, PS, PE, PD )
+  
+  return prob
+end

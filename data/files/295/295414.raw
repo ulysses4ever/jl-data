@@ -1,0 +1,50 @@
+#Provide utility functions for interoperability with Compose.jl
+#Define conversions from GeoInterface.jl objects to their Compose.jl counterparts
+
+composepoint{T <: Real}(obj::Vector{T}) = Compose.Point(obj[1:2]...) # ignores the third dimension
+composepoint(obj::AbstractPosition) = Compose.Point(x(obj),y(obj)) # ignores the third dimension
+composepoint(obj::AbstractPoint) = composepoint(coordinates(obj)) # ignores the third dimension
+
+composepoints{T <: Real}(obj::Vector{Vector{T}}) = map(composepoint, obj)
+composepoints{T <: AbstractPosition}(obj::Vector{T}) = map(composepoint, obj)
+composepoints{T <: AbstractPoint}(obj::Vector{T}) = map(composepoint, obj)
+composepoints(obj::AbstractMultiPoint) = map(composepoint, coordinates(obj))
+
+composeline{T <: Real}(obj::Vector{Vector{T}}) = Compose.LinePrimitive(composepoints(obj))
+composeline{T <: AbstractPosition}(obj::Vector{T}) = Compose.LinePrimitive(composepoints(obj))
+composeline{T <: AbstractPoint}(obj::Vector{T}) = Compose.LinePrimitive(composepoints(obj))
+composeline(obj::AbstractLineString) = composeline(coordinates(obj))
+
+composelines{T <: Real}(obj::Vector{Vector{Vector{T}}}) = map(composeline, obj)
+composelines{T <: AbstractPosition}(obj::Vector{Vector{T}}) = map(composeline, obj)
+composelines{T <: AbstractPoint}(obj::Vector{Vector{T}}) = map(composeline, obj)
+composelines{T <: AbstractLineString}(obj::Vector{T}) = map(composeline, obj)
+composelines(obj::AbstractMultiLineString) = map(composeline, coordinates(obj))
+
+# when we're dealing with just a single "line/ring"
+composepolygon{T <: Real}(obj::Vector{Vector{T}}) = Compose.PolygonPrimitive(composepoints(obj))
+composepolygon{T <: AbstractPosition}(obj::Vector{T}) = Compose.PolygonPrimitive(composepoints(obj))
+composepolygon{T <: AbstractPoint}(obj::Vector{T}) = Compose.PolygonPrimitive(composepoints(obj))
+composepolygon(obj::AbstractLineString) = Compose.PolygonPrimitive(composepoints(coordinates(obj)))
+
+# when we're dealing with (potentially) multiple "line/rings"
+composepolygon{T <: Real}(obj::Vector{Vector{Vector{T}}}) = composepolygon(obj[1]) # ignores holes (for now)
+composepolygon{T <: AbstractPosition}(obj::Vector{Vector{T}}) = composepolygon(obj[1])
+composepolygon{T <: AbstractPoint}(obj::Vector{Vector{T}}) = composepolygon(obj[1])
+composepolygon{T <: AbstractLineString}(obj::Vector{T}) =  composepolygon(obj[1])
+composepolygon(obj::AbstractPolygon) = composepolygon(coordinates(obj))
+
+composepolygons{T <: Real}(obj::Vector{Vector{Vector{Vector{T}}}}) = map(composepolygon, obj)
+composepolygons{T <: AbstractPosition}(obj::Vector{Vector{Vector{T}}}) = map(composepolygon, obj)
+composepolygons{T <: AbstractPoint}(obj::Vector{Vector{Vector{T}}}) = map(composepolygon, obj)
+composepolygons{T <: AbstractLineString}(obj::Vector{Vector{T}}) = map(composepolygon, obj)
+composepolygons{T <: AbstractPolygon}(obj::Vector{T}) = map(composepolygon, obj)
+composepolygons(obj::AbstractMultiPolygon) = composepolygons(coordinates(obj))
+
+composeform(obj::AbstractPosition) = Compose.Form([composepoint(obj)])
+composeform(obj::AbstractPoint) = Compose.Form([composepoint(obj)])
+composeform(obj::AbstractMultiPoint) = Compose.Form(composepoints(obj))
+composeform(obj::AbstractLineString) = Compose.Form([composeline(obj)])
+composeform(obj::AbstractMultiLineString) = Compose.Form(composelines(obj))
+composeform(obj::AbstractPolygon) = Compose.Polygon([composepolygon(obj)])
+composeform(obj::AbstractMultiPolygon) = Compose.Polygon(composepolygons(obj))

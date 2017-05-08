@@ -1,0 +1,45 @@
+include("jb2048.jl")
+include("dag2048.jl")
+# julia set working module
+
+ifrozen = [1,2,4]       # frozen indices
+ifree = [3;5:9]
+itarget = [3,5,7]    # target indices
+ixtarget = [3;5:9]  # extended (adjacent) target indices
+targetmin, targetmax = 4, 7
+b=[8 7 1; 7 2 1; 0 1 0]
+@time node=MaxNode(b)
+
+λ,μ=length(maxdag),length(meandag)
+exp(log(λ)/9)
+
+g=Game(b)
+    play!(g,display=true)
+
+i=0
+i-=1;plot(g.hist[i]...)
+    h=MaxNode(g.hist[i][1])
+i+=1;plot(g.hist[i]...)
+    h=MaxNode(g.hist[i][1])
+h.child
+jb2048.back!(g,i)
+jb2048.force!(g,2)
+
+@time r=repartition(b,100,verbose=4:7)
+@time r=repartition(b,1000)
+
+state=start(maxdag)
+(key,node),state=next(maxdag,state);state,node
+begin
+    while !done(maxdag,state)
+        (key,node),state=next(maxdag,state)
+        b=node.board
+        maximum(b[ifree])==3 && break
+    end
+    plot(node.board,0,node.height)
+    state,node
+end
+node.child
+
+empty!(maxdag);empty!(meandag)
+gc()

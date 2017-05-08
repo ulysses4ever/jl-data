@@ -1,0 +1,3 @@
+clusters = Clusters{2}(5)
+
+@assert size(centroids(clusters), 1) == 5

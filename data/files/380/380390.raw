@@ -1,0 +1,63 @@
+using Base.Test
+
+## include("../src/util/counter.jl")
+include("../src/ml/naive_bayes.jl")
+
+function test_naive_bayes()
+    training_data = [("ham",  ["company", "meeting", "today"]),
+                     ("ham",  ["bob", "is", "on", "vacation"]),
+                     ("ham",  ["company", "picnic", "tomorrow"]),
+                     ("spam", ["satisfy", "your", "partner"]),
+                     ("spam", ["cheap", "medication"])]
+
+    m = train_naive_bayes(training_data)
+    @test( m.examples["ham"] == 3 )
+    @test( m.examples["spam"] == 2 )
+    @test( m.class_counts["ham"] == 10 )
+    @test( m.class_counts["spam"] == 5 )
+    @test( m.feats["company"]["ham"] == 2 )
+    @test( m.feats["company"].total == 2 )
+
+    @test( p_feat_mle(m, "company")    == 2 / 15 )
+    @test( p_feat_mle(m, "partner")    == 1 / 15 )
+    @test( p_feat_mle(m, "unseenword") == 0 )
+
+    @test( p_feat_add1(m, "company")    == 3 / 16 )
+    @test( p_feat_add1(m, "partner")    == 2 / 16 )
+    @test( p_feat_add1(m, "unseenword") == 1 / 16 )
+
+    @test( p_class(m, "ham")  == 3 / 5 )
+    @test( p_class(m, "spam") == 2 / 5 )
+
+    @test( p_feat_gvn_class_mle(m, "company", "ham")     == 2 / 10 )
+    @test( p_feat_gvn_class_mle(m, "company", "spam")    == 0 / 5 )
+    @test( p_feat_gvn_class_mle(m, "partner", "ham")     == 0 / 10 )
+    @test( p_feat_gvn_class_mle(m, "partner", "spam")    == 1 / 5 )
+    @test( p_feat_gvn_class_mle(m, "unseenword", "ham")  == 0 / 10 )
+    @test( p_feat_gvn_class_mle(m, "unseenword", "spam") == 0 / 5 )
+
+    @test( p_feat_gvn_class_add1(m, "company", "ham")     == 3 / 11 )
+    @test( p_feat_gvn_class_add1(m, "company", "spam")    == 1 / 6 )
+    @test( p_feat_gvn_class_add1(m, "partner", "ham")     == 1 / 11 )
+    @test( p_feat_gvn_class_add1(m, "partner", "spam")    == 2 / 6 )
+    @test( p_feat_gvn_class_add1(m, "unseenword", "ham")  == 1 / 11 )
+    @test( p_feat_gvn_class_add1(m, "unseenword", "spam") == 1 / 6 )
+
+    @test_approx_eq( p_class_gvn_feat_mle(m, "ham", "company"), (2/10 * 3/5 / (2/15)) )
+    @test_approx_eq( p_class_gvn_feat_mle(m, "spam","company"), (0/5  * 2/5 / (2/15)) )
+    @test_approx_eq( p_class_gvn_feat_mle(m, "ham", "partner"), (0/10 * 3/5 / (1/15)) )
+    @test_approx_eq( p_class_gvn_feat_mle(m, "spam","partner"), (1/5  * 2/5 / (1/15)) )
+
+    @test_throws( ErrorException, p_class_gvn_feat_mle(m, "ham", "unseenword") )
+    @test_throws( ErrorException, p_class_gvn_feat_mle(m, "spam","unseenword") )
+    
+    @test_approx_eq( p_class_gvn_feat_add1(m, "ham", "company"), ((3/11) * (3/5))  / (3/16) )
+    @test_approx_eq( p_class_gvn_feat_add1(m, "spam","company"), ((1/6)  * (2/5))  / (3/16) )
+    @test_approx_eq( p_class_gvn_feat_add1(m, "ham", "partner"), ((1/11) * (3/5))  / (2/16) )
+    @test_approx_eq( p_class_gvn_feat_add1(m, "spam","partner"), ((2/6)  * (2/5))  / (2/16) )
+    @test_approx_eq( p_class_gvn_feat_add1(m, "ham", "unseenword"), ((1/11) * (3/5))  / (1/16) )
+    @test_approx_eq( p_class_gvn_feat_add1(m, "spam","unseenword"), ((1/6)  * (2/5))  / (1/16) )
+end
+
+test_naive_bayes()
+info("Tests pass [naive bayes]")

@@ -1,0 +1,209 @@
+#sset.jl
+import Base.length
+import Base.pop!
+import Base.shift!
+import Base.insert!
+import Base.push!
+import Base.size
+#=
+ * @module - sorted set
+ * @description - sorted set uses and internal bst
+ *  to search and find , maintains uniq based comparator
+ *  @after npm sset {0.0.4}
+ =#
+include("../bs.jl/bs.jl")
+
+#=
+ * @description default comparator
+ * @param a
+ * @param b
+ * @returns {number}
+ * @private
+ =#
+cmp(a, b)  = a - b;
+
+#=
+ * @description Sorted Set
+ * @param array
+ * @param comparator
+ * @constructor
+ =#
+ type SSet
+ 	items::Array
+ 	cmp::Function
+	function SSet(items=tuple(), comparator::Function=cmp)
+		this = new()
+		T = eltype(items)
+		# !isa(T, Tuple) && error("items must be tuple type")
+		this.items = T[]
+		this.cmp   = comparator;
+	  #init, pushall!
+	  pushall!(this, items)
+	  return this
+	end
+end
+
+#=
+ * @description
+ * Add items from an unsorted Array-like object
+ * (Note: #add() uses this method with it's arguments object)
+ * returns the index of the first item inserted
+ * @param items
+ * @returns {*}
+ =#
+function pushall!(this::SSet, items)
+  first = nothing
+  i = length(items)
+  while i >= 1
+    first = push!(this, items[i])
+    i -= 1
+  end
+  return first;
+end
+
+#=
+ * @description Adds a single item into the Array
+ * @param item
+ * @returns {number}
+ =#
+function push!(this::SSet, item)
+	item::eltype(this)
+  index = indexof(this, item);
+  if index <= 0
+    index = abs(index) - 1;
+    index < 0 && (index = 1) #1 based indexing
+    insert!(this.items, index, item)
+    # this.items=insert_append(this.items, index, item)
+  else #already exist replace
+  	splice!(this.items, index, [item])
+  end
+  return index;
+end
+
+
+function insert_append(a, index, value)
+  if index <= 1
+    return [value , a]
+  elseif index > length(a)
+    return [a, value]
+  end 
+  return [a[1:index-1], value, a[index:end]]
+end
+
+#=
+ * @description
+ * Checks for the presence of a value in the Array
+ * @param item
+ * @returns {boolean}
+ =#
+function contains(this::SSet,item)
+  return indexof(this, item) >= 1
+end
+
+#=
+ * @description returns a string summary of contents
+ * @returns {string}
+ =#
+function tostring(this::SSet)
+  string(this.items)
+end
+
+#=
+ * @description item by index from the Array
+ * @param index
+ * @returns {*}
+ =#
+get(this::SSet, index) = this.items[index]
+
+#=
+ * @description removes an item by value from the Array
+ * returns the item that was removed, or undefined if
+ * not found
+ * @returns {*|undefined}
+ =#
+rm(this::SSet, value) = rmat(this, indexof(this, value))
+
+#=
+ * @description removes an item at an index
+ * item rm'ed or undefined - array splice
+ * @param index
+ * @returns {*|undefined}
+ =#
+rmat(this::SSet, index)= splice!(this.items, index)
+
+#=
+ * @description  binary search for item.
+ * Returns the index if the item is found, if not, the index of the item
+ * that is the closest match + 1 will be returned as a minus value
+ * (that is decided by the binsearch module)
+ * @param key
+ * @returns {*}
+ =#
+function indexof(this::SSet, key)  
+  return bs(this.items, key, this.cmp)
+end
+
+#=
+ * @description
+ * @return{boolean}
+ =#
+isempty(this::SSet) = (length(this.items) == 0)
+
+#=
+ * @description
+ * @return{*}
+ =#
+first(this::SSet) = get(this, 1)
+
+#=
+ * @description
+ * @return{*}
+ =#
+last(this::SSet) = get(this, size(this))
+
+#=
+ * @description equivalent of Array#map
+ * @returns {*}
+ =#
+function map(fn::Function, this::SSet)
+  return map(fn, this.items);
+end
+
+#=
+ * @description equivalent of Array#filter
+ * @returns {*}
+ =#
+filter(fn::Function, this::SSet) = filter(fn, this.items)
+
+#=
+ * @description equivalent of Array#pop
+ * @returns {*}
+ =#
+pop!(this::SSet) = pop!(this.items)
+
+#=
+ * @description equivalent of Array#shift
+ * @returns {*}
+ =#
+shift!(this::SSet) = shift!(this.items);
+
+#=
+ * @description  size of the Array
+ * @returns {Number}
+ =#
+size(this::SSet)   =  length(this.items)
+length(this::SSet) = size(this::SSet)
+
+#=
+ * @description clear
+ =#
+function empty(this::SSet)
+		this.items = eltype(this.items)[]
+end
+clear(this::SSet) = empty(this::SSet)
+#=
+ * @description Export a copy of the internal Array.
+ * @returns {Array}
+ =#
+toarray(this::SSet) = deepcopy(this.items)
+values(this::SSet)  = toarray(this::SSet)

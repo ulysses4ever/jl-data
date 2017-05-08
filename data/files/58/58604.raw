@@ -1,0 +1,99 @@
+rows(x) = length(x[[1:end],1])
+columns(x) = length(x[1,[1:end]])
+
+import JSON
+import Distances
+
+# Create item type
+type ItemValue
+  element::Vector{Float32}
+end
+
+type Item
+  value::ItemValue
+  cluster_id::Int
+  id::Int
+end
+
+type Cluster
+  core::ItemValue
+  id::Int
+end
+
+# Read data from file
+function read_from_file (filename::String, delimiter::Char, items)
+  lines = readdlm(filename, delimiter)
+  try # column vector
+    convert(Array{String, 1}, lines[:,1]) # detect headers
+    map((x) -> push!(items, Item(ItemValue(lines[:,x]), 0, x - 1)), 2:columns(lines))
+  catch # row vector
+    map((x) -> push!(items, Item(ItemValue(vec(lines[x,:])), 0, x - 1)), 2:rows(lines))
+  end
+  #headers = lines[:,1]
+end
+
+# Distance function
+euclidian_distance(a,b) = sqrt((a.x - b.x)^2 + (a.y - b.y)^2)
+
+# Add to cluster function
+function set_related_cluster(new_cluster_id::Int, item_id::Int, items) 
+  items[item_id].cluster_id = new_cluster_id
+end
+
+# Select the random starting items for clusters
+function randomize_starting_cluster_cores (items, clusters, number_of_cores)
+  selected_cores = Int[]
+  while length(selected_cores) < number_of_cores
+    new_core = rand(1:length(items))
+    if(all((x) -> (x != new_core), selected_cores))
+      push!(selected_cores, new_core)
+      push!(clusters, Cluster(items[new_core].value, length(clusters) + 1)) 
+      set_related_cluster(length(clusters), new_core, items)
+    end
+  end
+end
+
+# Compute cluster core // Works only for continuous numeric values
+function compute_cluster_core(items, clusters, cluster_id) # Fonction modifiee non-testee
+  new_vector = zeros(items[1].value.element)
+  nb_items = 0
+  for item in items
+    if item.cluster_id == cluster_id
+      new_vector += item.value.element
+      nb_items += 1
+    end
+  end
+  clusters[cluster_id].core.element = map((x) -> x / nb_items, new_vector)
+end
+
+# Kmeans effective function
+function kmeans_iteration (items, clusters, distance_function)
+  for item in items
+    distances = Float64[]
+    for cluster in clusters
+      push!(distances, Distances.evaluate(distance_function, cluster.core.element, item.value.element))
+    end
+    # findmin(distances)[2] => index of the smallest distance
+    set_related_cluster(findmin(distances)[2], item.id, items)
+  end
+  map((cluster) -> compute_cluster_core(items, clusters, cluster.id), clusters)
+end
+
+# Kmeans Wrapper
+function kmeans (data_file_name, data_file_delimiter, number_of_cores, stop_after_iterations, distance_function)
+  items = Item[]
+  clusters = Cluster[]
+  read_from_file(data_file_name, data_file_delimiter, items)
+  randomize_starting_cluster_cores(items, clusters, number_of_cores)
+  for i in [1:stop_after_iterations]
+    kmeans_iteration(items, clusters, distance_function)
+  end
+  println(JSON.json(items))
+end
+
+# Results
+#kmeans(ARGS[1], ',', 3, 3, Distances.Euclidean())
+items = Item[]
+read_from_file(ARGS[1], ',', items)
+println(JSON.json(items))
+

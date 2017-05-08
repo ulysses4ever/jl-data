@@ -1,0 +1,19 @@
+module Mesos
+
+import Base: start, join, run, error
+
+include("Proto.jl")
+include("utils.jl")
+include("upid.jl")
+include("executor.jl")
+include("scheduler.jl")
+
+export ExecutorDriver, start, stop, abort, join, run, sendStatusUpdate, sendFrameworkMessage,
+       Executor, registered, reregistered, disconnected, launchTask, killTask, frameworkMessage, shutdown, error,
+       MesosExecutorDriver,
+       Scheduler, resourceOffers, offerRescinded, statusUpdate, slaveLost, executorLost,
+       SchedulerDriver, requestResources, launchTasks, acceptOffers, declineOffer, reviveOffers, acknowledgeStatusUpdate, reconcileTasks,
+       MesosSchedulerDriver,
+       UPID
+
+end # module

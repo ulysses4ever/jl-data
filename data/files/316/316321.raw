@@ -1,0 +1,61 @@
+using Distributions
+
+# Parameters
+function make_psuedotime_data(n_cells=1000,n_signal_genes=100,n_noise_genes=10000,snr=1.0)
+	n_genes = n_signal_genes + n_noise_genes
+
+	# Covariance kernel and mean for gaussian process
+	nt = 1000        # number of time points
+	μ = zeros(nt)    # mean function 
+	Σ = zeros(nt,nt) # covariance kernel
+	σ2 = 1.0         # unit variance (diagonal of Σ)
+	λ = nt/300       # length-scale of gaussian process
+	t_ax = linspace(t[1],t[end],nt)
+
+	# Fill in covariance matrix
+	for i = 1:nt
+	    for j = 1:nt
+	        d = t_ax[i]-t_ax[j]
+	        Σ[i,j] = σ2*exp(-(d^2)/(2*λ^2))
+	    end
+	end
+	Σ += 1e-5*eye(nt)
+
+	# Gaussian process (sample from multivariate normal)
+	gp = MultivariateNormal(μ,Σ)
+
+	# Random time profiles for each gene
+	G = zeros(nt,n_genes)
+
+	# Add (signal) genes that change expression
+	G[:,1:n_signal_genes] = rand(gp,n_signal_genes)
+
+	# Add (noise) genes that don't change expression
+	G[:,n_signal_genes+1:end] = ones(nt)*randn(n_noise_genes)
+
+
+	# pseudotime for each cell
+	t = sort(randn(n_cells))
+	# round time to nearest index
+	for c = 1:n_cells
+	    t[c] = indmin(abs(t[c]-t_ax))
+	end
+
+	# Create synthetic RNA sequencing dataset
+	A = zeros(n_cells,n_genes) # data matrix
+	for c = 1:n_cells
+	    for g = 1:n_genes
+	        A[c,g] = G[t[c],g] + (1./snr)*randn() # add noise
+	    end
+	end
+
+	## Exponentiate to get positive data? Hinge function? Step function?
+
+	return A
+end
+
+function make_clustered_data(cell_propotions=[0.5 0.5],n_cells=1000,n_signal_genes=100,n_noise_genes=10000)
+	error("not implemented")
+end
+
+

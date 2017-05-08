@@ -1,0 +1,24 @@
+type Field
+  code::String
+  meaning::String
+  abbreviation::String
+end
+
+# TODO abbrevs for transformed fields are temp hack
+
+const FIELDS = [
+  Field("X", "electrodes", "e"),
+  Field("Xf", "electrodes_transformed", "hef"),
+  Field("sp", "neurons", "n"),
+  Field("spf", "neurons_transformed", "hnf"),
+  Field("pos", "positions", "p")
+]
+
+function field(name)
+  index = find(FIELDS) do f f.meaning == name || f.code == name end[1]
+  FIELDS[index]
+end
+
+function colname_regex(field::Field)
+  Regex("^$(field.abbreviation)\\d+")
+end

@@ -1,0 +1,88 @@
+"""
+    Relaxed belief propagation for CS-like problems. See Guo and Wang (2006),
+        Rangan (2010) and Krzakala et al. (2011).
+"""
+function iterate_rbp(y, F, opts)
+    # Parameters
+    x = get(opts, "x", nothing)
+    prior_prmts = get(opts, "prior_prmts", nothing)
+    t_max = get(opts, "t_max", 100)
+    disp = get(opts, "disp", 1)
+    parallel = get(opts, "parallel", true)
+
+    if prior_prmts == nothing
+        error()
+    end
+
+    # Init vars, arrays and other structures
+    m, n = size(F)
+    sqrF = F.^2
+
+    A, B = zeros(n), zeros(n)
+    a, c = zeros(m, n), ones(m, n)
+    xhat = zeros(n)
+    Fa, F2c = zeros(m, n), ones(m, n)
+    sum_Fa, sum_F2c = zeros(m), n * ones(m)
+    d = 1.
+
+    mses = zeros(t_max)
+
+    # Run algorithm w/ parallel updates...
+    if parallel == true
+        tic()
+        for t = 1:t_max
+            w = repmat(y - sum_Fa, 1, n) + Fa
+            v = d + repmat(sum_F2c, 1, n) - F2c
+            dA = sqrF ./ v
+            dB = F .* w ./ v
+            A, B = sum(dA, 1), sum(dB, 1)
+            a, c = prior_gbc(repmat(A, m) - dA, repmat(B, m) - dB, prior_prmts)
+
+            # Update F * a and F^2 * c terms
+            Fa, F2c = F .* a, sqrF .* c
+            sum_Fa, sum_F2c = sum(Fa, 2), sum(F2c, 2)
+
+            xhat, _ = prior_gbc(A, B, prior_prmts)
+            w, v = y - sum_Fa, d + sum_F2c
+            d *= sum((w ./ v).^2) / sum(1 ./ v)
+
+            if x != nothing; mses[t] = norm(x - xhat')^2 / norm(x)^2; end
+            if disp == 1
+                @printf("t = %d; delta = %.4e, MSE = %.4e, RSS = %.4e\n", 
+                    t, d, mses[t], norm(y - F * xhat')^2 / m)
+            end
+        end
+        elapsed = toq()
+    # ... or with random sequential updates, see Caltagirone et al. (2014)
+    else
+        tic()
+        for t = 1:t_max
+            for i = randperm(n)
+                w = y - sum_Fa + Fa[:, i]
+                v = d + sum_F2c - F2c[:, i]
+                dA = sqrF[:, i] ./ v
+                dB = F[:, i] .* w ./ v
+                A[i], B[i] = sum(dA), sum(dB)
+                a[:, i], c[:, i] = prior_gbc(A[i] - dA, B[i] - dB, prior_prmts)
+
+                # Update F * a and F^2 * c terms
+                Fa_old, F2c_old = Fa[:, i], F2c[:, i]
+                Fa[:, i], F2c[:, i] = F[:, i] .* a[:, i], sqrF[:, i] .* c[:, i]
+                sum_Fa, sum_F2c = sum_Fa + (Fa[:, i] - Fa_old), sum_F2c + (F2c[:, i] - F2c_old)
+            end
+
+            xhat, _ = prior_gbc(A, B, prior_prmts)
+            w, v = y - sum_Fa, d + sum_F2c
+            d *= sum((w ./ v).^2) / sum(1 ./ v)
+
+            if x != nothing; mses[t] = norm(x - xhat)^2 / norm(x)^2; end
+            if disp == 1
+                @printf("t = %d; delta = %.4e, MSE = %.4e, RSS = %.4e\n", 
+                    t, d, mses[t], norm(y - F * xhat)^2 / m)
+            end
+        end
+        elapsed = toq()
+    end
+
+    return vec(xhat), mses, elapsed
+end

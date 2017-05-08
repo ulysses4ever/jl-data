@@ -1,0 +1,39 @@
+function findtripenthex(num::Int)
+    n_tri::Int = 1
+    n_pent::Int = 1
+    n_hex::Int = 1
+    ftri(n) = n*(n + 1)/2;
+    fpent(n) = n*(3*n - 1)/2;
+    fhex(n) = n*(2*n - 1);
+    tri::Int =  ftri(n_tri)
+    pent::Int = fpent(n_pent)
+    hex::Int =  fhex(n_hex)
+
+    n_found = 0
+    found_numbers = Int[]
+
+    while n_found < num
+        if tri == pent == hex
+            n_found += 1
+            push!(found_numbers, tri)
+            n_tri += 1
+        elseif tri <= pent && tri <= hex
+            n_tri += 1
+        elseif pent <= tri && pent <= hex
+            n_pent += 1
+        elseif hex <= tri && hex <= pent
+            n_hex += 1
+        end
+        tri = ftri(n_tri)
+        pent = fpent(n_pent)
+        hex = fhex(n_hex)
+    end
+
+    return found_numbers
+end
+
+@time res = findtripenthex(3)[3]
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

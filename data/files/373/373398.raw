@@ -1,0 +1,67 @@
+include("Utils.jl")
+
+# an iterator for an NxT matrix, N is number of features, T is number of time points
+type VectorTimeSeries
+  X::Array
+end
+
+
+Base.start(v::VectorTimeSeries) = 1
+Base.done(v::VectorTimeSeries, state) = size(v.X)[2] == state-1
+Base.next(v::VectorTimeSeries, state) = v.X[:, state], state+1
+
+
+# a vector of poisson processes, each with different rates
+type PoissonProcess
+  N::Integer
+  rate::Float64
+  dt::Float64
+  cumsum::Array
+  next_time::Array
+
+  function PoissonProcess(N, rate, dt)
+    this = new()
+
+    this.N = N
+    this.dt = dt
+    this.rate = rate
+    this.cumsum = zeros(N)
+    this.next_time = randexp(N, rate)
+
+    return this
+  end
+end
+
+
+# define the iterator methods for a PoissonProcess
+Base.start(g::PoissonProcess) = 1
+Base.done(g::PoissonProcess, state) = false
+function Base.next(g::PoissonProcess, state)
+
+  # check the cumulative sum to see which processes "spiked"
+  i = g.cumsum .> g.next_time
+
+  # increment the cumulative sum for processes that have not spiked
+  g.cumsum[!i] += g.dt
+
+  # reset the cumulative sum for processes that have spiked
+  g.cumsum[i] = 0
+
+  # generate new event times for processes that have spiked
+  g.next_time[i] = randexp(sum(i), g.rate)
+
+  # return a BitArray indicating which processes have spiked
+  return i
+end
+
+
+function construct_input_stream(cfg, num_inputs, dt)
+
+  istream = None
+  if cfg["name"] == "poisson"
+    istream = PoissonProcess(num_inputs, cfg["rate"], dt)
+  end
+
+  return istream
+end
+

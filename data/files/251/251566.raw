@@ -1,0 +1,74 @@
+# Line algorithms
+
+"""Naive implementation (based on PWLs) for path graphs, i.e. 1d fused LASSO"""
+function dp_line_naive(y, λ, μ)
+    n = length(y)
+    lb, ub = fill(∞, n), fill(-∞, n)
+    q(i) = PWL(0.0, -y[i]; slope=μ(i))
+    ∂f = q(1)
+    for i = 1:(n-1)
+        lb[i] = find_x(∂f, -λ(i))
+        ub[i] = find_x(∂f, +λ(i))
+        ∂f = q(i+1) + clip(∂f, -λ(i), +λ(i))
+    end
+    xn = find_x(∂f, 0)
+    return dp_line_backtrace(xn, lb, ub)
+end
+
+
+"""For convinience"""
+dp_line_naive(y::Vector{Float64}, λ::Float64) = dp_line_naive(y, i->λ, i->1.0)
+
+
+function dp_line_backtrace(xn, lb, ub)
+    n = length(lb)
+    x = zeros(n)
+    x[n] = xn
+    for i = n:-1:2
+        x[i-1] = clip(x[i], lb[i-1], ub[i-1])
+    end
+    return x
+end
+
+"""FLSA on a line, computed by Johnson's fast *dynamic programming* algorithm"""
+function dp_line(y, λ, μ)
+    n = length(y)
+    lb, ub = fill(∞, n), fill(-∞, n)
+    pq = DeQue{Event}()
+    push_front!(pq, Event(y[1]-λ(1), λ(1) - μ(1)*y[1], +μ(1)))
+    push_back! (pq, Event(y[1]+λ(1), λ(1) + μ(1)*y[1], -μ(1)))
+    for i = 2:n
+        lb[i-1] = min_event(pq, -λ(i))
+        ub[i-1] = max_event(pq, +λ(i))
+    end
+    xn = find_min(pq, 0)
+    return dp_line_backtrace(xn, lb, ub)
+end
+
+
+"""Position where the line with given `offset` and `slope` will have value `c`"""
+@inline find_x(offset, slope, c) = (c - offset)/slope
+
+"""Extract position of minimal `x` or `∞` if none exists"""
+@inline min_x{Q}(pq::Q) = try front(pq).x catch throw(∞) end
+
+"""Compute a new lower bound event for node `v`"""
+function min_event{Q}(pq::Q, v::Node, c::ℝ, y::Vector{ℝ})
+    local slope = 1.0
+    local offset = y[v] - c
+    local x = find_x(offset, slope, c)
+    xk = min_x(pq)
+    while x > xk
+        e = pop_front!(pq)
+        offset += e.offset
+        slope  += e.slope
+        xk = min_x(pq)
+        x = forecast(offset, slope, c)
+    end
+    push_front!(pq, Event(x, offset, slope))
+    return x
+end
+
+
+"""For convinience..."""
+dp_line(y::Vector{Float64}, λ::Float64) = dp_line(y, i->λ, i->1.0)

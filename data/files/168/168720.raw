@@ -1,0 +1,34 @@
+#include("arm_objects.jl")
+#Module-level scoping of Julia's "using" directive encourages overly verbose naming.
+#C++ relies on namespace hierarchy to keep *element* names succinct.
+#C++ "using namespace" directive effectively avoids name collisions.
+
+module Human
+	#HumanArm: Overly verbose given context:
+	export HumanArm
+	#...But who knows what other modules will want to export an "Arm"?
+
+	type HumanArm
+		name::String
+	end
+	HumanArm() = HumanArm("Human Arm")
+end
+
+module Processors
+	#ArmProcessor: Overly verbose given context.
+	export ArmProcessor
+	#...But who knows what other modules will want to export an "Arm"?
+
+	export ArmProcessor
+	type ArmProcessor
+		name::String
+	end
+	ArmProcessor() = ArmProcessor("ARM Processor")
+end
+
+using Human
+using Processors
+
+@show HumanArm().name
+@show ArmProcessor().name
+:Done

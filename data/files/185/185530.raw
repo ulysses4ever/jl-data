@@ -1,0 +1,33 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
+module Willow
+
+# AudioIO doesn't build on Windows yet
+@windows? nothing : using AudioIO
+# @osx_only begin using ObjectiveC end
+
+@windows? nothing : include("audio.jl")
+
+@windows? nothing : play([0]) # force AudioIO to initialize
+sleep(2)
+
+# i'm not actually sure if I am doing this right.
+# does it actually give the running Julia process high priority?
+# @osx_only begin
+    # it seems something changed with Julia's metaprogramming system...
+    #
+    # ObjectiveC.loadbundle("/System/Library/Frameworks/Foundation.framework")
+    # @classes NSProcessInfo
+
+    # NSActivityIdleDisplaySleepDisabled = Culonglong(1) << 40
+    # NSActivityIdleSystemSleepDisabled = Culonglong(1) << 20
+    # NSActivitySuddenTerminationDisabled = Culonglong(1) << 14
+    # NSActivityAutomaticTerminationDisabled = Culonglong(1) << 15
+    # NSActivityUserInitiated = Culonglong(0x00FFFFFF) | NSActivityIdleSystemSleepDisabled
+    # NSActivityLatencyCritical = Culonglong(0xFF00000000)
+    # options = NSActivityIdleDisplaySleepDisabled | NSActivityIdleSystemSleepDisabled | NSActivitySuddenTerminationDisabled | NSActivityAutomaticTerminationDisabled | NSActivityUserInitiated | NSActivityLatencyCritical
+
+    # activity = @objc [[NSProcessInfo processInfo] beginActivityWithOptions:options reason:"High priority for better stimulus timing."]
+# end
+
+end # module

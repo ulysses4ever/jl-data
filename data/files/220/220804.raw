@@ -1,0 +1,67 @@
+using HttpServer
+using WebSockets
+
+STATE_PLAY = true
+STATE_STOP = false
+state = STATE_PLAY
+
+function launchServer()
+    global sock
+    global server
+    sock = WebSocketHandler() do req,client
+        println("Conexión establecida")
+        #write(client, "m:Hola mundo ñ\n")
+        write(client, "mapTile:"*getStrMap("01"))
+        write(client, "mapObjects:"*getStrObj("01"))
+    end
+
+    server = Server(sock)
+    run(server,2007)
+end
+
+function getStrMap(strMap)
+    f = open("../map/"*strMap*".map")
+    arrFile = readlines(f)
+    close(f)
+    arrLine1 = split(strip(arrFile[1])," ")
+    maxX = parse(Int8, arrLine1[1])
+    maxY = parse(Int8, arrLine1[2])
+    strMap = ""
+    for i = 1:maxY+1
+        strMap *= strip(arrFile[i])*" "
+    end
+    return strMap
+end
+
+function getStrObj(strMap)
+    f = open("../map/"*strMap*".map")
+    arrFile = readlines(f)
+    close(f)
+    arrLine1 = split(strip(arrFile[1])," ")
+    maxX = parse(Int8, arrLine1[1])
+    maxY = parse(Int8, arrLine1[2])
+    strMap = ""
+    for i = maxY+2:length(arrFile)
+        arrObj = split(strip(arrFile[i])," ")
+        strMap *= arrObj[2]*" "*arrObj[3]*" "*arrObj[4]*" "
+    end
+    return strMap
+end
+
+function main()
+    global sock, client
+    launchServer()
+    #s = getStrMap("01"); println(s)
+    exit()
+    while state == STATE_PLAY
+        strInput = strip(readline(STDIN))
+        if strInput == "salir"
+            global state = STATE_STOP
+            close(sock)
+        else
+            write(client, "m:Segundo mensaje")
+        end
+    end
+end
+
+main()

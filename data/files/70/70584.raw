@@ -1,0 +1,31 @@
+module DSGE
+
+using DataFrames
+
+export KleinModel, REModel, solveKlein
+
+type KleinModel
+    A::UTF8String
+    B::UTF8String
+    C::UTF8String
+    Parameters::DataFrame
+    xt::UTF8String
+    zt::UTF8String
+    
+    KleinModel() = new()
+end;
+
+type REModel
+    A::Array{Float64}
+end
+
+function solveKlein(M::KleinModel)
+    println(M.A)
+end
+
+
+
+
+
+# End module
+end

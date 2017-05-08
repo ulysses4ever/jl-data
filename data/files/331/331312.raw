@@ -1,0 +1,48 @@
+###################################################
+## Find maximum matching in the graph
+###################################################
+
+using JuMP
+#using Mosek
+using Gurobi
+
+function match(am::Array{Int64, 2}, p::Params; verbose::Int64 = 0)
+
+  n = size(am)[1]
+  if p.solver == "gurobi"
+    m = Model(solver=GurobiSolver(OutputFlag = 0))
+  elseif p.solver == "mosek"
+    m = Model(solver=MosekSolver(LOG = 0))
+  else
+    println("Solver not supported")
+  end
+
+  @variable(m, 1 >= y[1:n] >= 0, Int)
+  @variable(m, 1 >= x[1:n, 1:n] >= 0, Int)
+
+  @objective(m, Max, sum(y[j] for j in 1:n))
+  @constraint(m, c2[k=1:n], sum(x[i,k] for i=1:n) == y[k])
+  @constraint(m, c1[k=1:n], sum(x[k,j] for j=1:n) == y[k])
+  @constraint(m, c3[i=1:n, j=1:n], x[i,j] <= am[i,j])
+  if p.techno == "23_cycles"
+    two_three_cycles_constraint(m, n, edges, x , y)
+  elseif p.techno == "2_cycles"
+    two_cycles_constraint(m, n, edges, x, y)
+  else
+    println("techno not implemented")
+  end
+  status = solve(m)
+  match_edges = getvalue(x)
+  match_vertices = getvalue(y)
+  solve_time = getsolvetime(m)
+
+  return  find(match_vertices .>= 1e-6)
+end
+
+function two_three_cycles_constraint(m, n, edges, x, y)
+  @constraint(m, c4[i=1:n, j=1:n, k=1:n], x[k,i] >= x[i,j] + x[j,k] - 1)
+end
+
+function two_cycles_constraint(m, n, edges, x, y)
+  @constraint(m, c4[i=1:n, j=1:n], x[i,j] == x[j,i])
+end

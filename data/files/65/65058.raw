@@ -1,0 +1,5 @@
+A = example4()
+
+L = cholesky(A)
+
+@test norm(A - L*L', 1) < 1e-14

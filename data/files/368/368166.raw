@@ -1,0 +1,22 @@
+using DataFrames
+#WARNING: DataFrames.colwise already exists in package Distances.colwise (see kNN.jl)
+
+export getData
+
+function getData(name::AbstractString)
+	if(name == "pancreas" || name == "Pancreas")
+		readPancreas()
+	else 
+	
+	end
+end
+
+function readPancreas()
+	basename = joinpath(dirname(@__FILE__), "..", "data")
+	filepath_data = joinpath(basename, string("pancreas_data", ".csv"))
+	filepath_labs = joinpath(basename, string("pancreas_labs", ".csv"))
+    df = readtable(filepath_data)[:,2:end]
+    classlabels = readtable(filepath_labs)[:,2]
+    
+    return (convert(Array{Float64,2},df)',convert(Array{Int64},classlabels))
+end

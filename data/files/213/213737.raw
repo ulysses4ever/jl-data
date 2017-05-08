@@ -1,0 +1,105 @@
+## ====================================================================
+## neural_network02.jl - yhat's example
+## http://blog.yhathq.com/posts/julia-neural-networks.html
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## ====================================================================
+using DataFrames
+using Gadfly
+
+train_df = readtable("./winequality-red.csv", separator=';')
+
+# Get value counts of "quality" classes
+_, count = hist(train_df[:quality])
+class = sort(unique(train_df[:quality]))
+value_counts = DataFrame(count=count, class=class)
+value_counts
+
+set_default_plot_size(14cm, 10cm)
+plot(value_counts, x="class", y="count",
+     Geom.bar(), Guide.title("Class distributions (\"quality\")"))
+
+
+## -------------------------------------------------------------------
+## good way to split data into training and test data sets.
+## -------------------------------------------------------------------
+
+y = Vector(train_df[:quality])
+x = Matrix(train_df[[names(train_df) .!= :quality]])
+
+n = length(y)
+
+is_train = shuffle(collect(1:n) .> floor(n * 0.25))
+
+x_train, x_test = x[is_train, :], x[!is_train, :]
+y_train, y_test = y[is_train, :], y[!is_train, :]
+
+##
+println("Total number of observations: ",n)
+println("Training set size: ", sum(is_train))
+println("Test set size: ", sum(!is_train))
+
+
+### --------------------------------------------------
+type StandardScalar
+    mean::Vector{Float64}
+    std::Vector{Float64}
+end
+
+# Helper function to initialize an empty scalar
+function StandardScalar()
+    StandardScalar(Array(Float64, 0), Array(Float64, 0))
+end
+
+# Compute mean and standard deviation of each column
+function fit_std_scalar!(std_scalar::StandardScalar, X::Matrix{Float64})
+    n_rows, n_cols = size(x_test)
+    std_scalar.std = zeros(n_cols)
+    std_scalar.mean = zeros(n_cols)
+
+    # for loops are fast again!
+    for i = 1:n_cols
+        std_scalar.mean[i] = mean(X[:, i])
+        std_scalar.std[i] = std(X[:, i])
+    end
+end
+
+
+##
+function transform(std_scalar::StandardScalar, X::Matrix{Float64})
+    (X .- std_scalar.mean') ./ std_scalar.std' # broadcasting fu
+end
+
+# fit and transform in one function
+function fit_transform!(std_scalar::StandardScalar, X::Matrix{Float64})
+    fit_std_scalar!(std_scalar, X)
+    transform(std_scalar, X)
+end
+
+
+### --------------------------------------------------
+## here we go.
+
+std_scalar = StandardScalar()
+
+n_rows, n_cols = size(x_test)
+
+# what do columns look like before scaling?
+println("Column means before scaling:")
+for i = 1:n_cols
+    @printf("%0.3f ", (mean(x_test[:, i])))
+end
+
+x_train = fit_transform!(std_scalar, x_train)
+x_test = transform(std_scalar, x_test)
+
+# ... and after scaling?
+println("\nColumn means after scaling:")
+for i = 1:n_cols
+    @printf("%0.3f ", (mean(x_test[:, i])))
+end
+
+## --------------------------------------------------
+using ANN
+
+ann = ArtificialNeuralNetwork(12)
+ANN.fit!(ann, x_train, y_train, epochs=30, alpha=0.1, lambda=1e-5)

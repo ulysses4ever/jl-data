@@ -1,0 +1,18 @@
+#=
+@author titus 
+=#
+using   Base.Test
+include("../twiddle.jl")
+
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_twiddle"] = function test_twiddle()
+	@test ==(mort2d(uint(5),uint(4)), 49) #49
+	@test  ispow2(uint(64))
+	@test !ispow2(uint(93))
+	@test  isopsign(4, -5)
+	@test !isopsign(4, 5)
+	@test ==([nextpow2(uint(i)) for i in -2:10], Uint64[0,0,0,0,2,4,4,8,8,8,8,16,16])
+	@test ==(nextpow2(uint(-32)),0) #0
+end

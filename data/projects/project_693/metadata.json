@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:07 GMT
+Date: Wed, 03 May 2017 21:01:16 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5176
+Content-Length: 5059
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2912
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3986
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "e1f689cfa0133d8f89d319543a61aa13"
-Last-Modified: Thu, 14 Jan 2016 22:39:08 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "486dce6d8e47dc32474369f1a6bf1c1b"
+Last-Modified: Mon, 17 Aug 2015 02:59:23 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
-X-GitHub-Request-Id: 3AAD:6631:8654E9:AD81DE:590231E2
+X-Served-By: 7b641bda7ec2ca7cd9df72d2578baf75
+X-GitHub-Request-Id: 9DAE:5CA5:FD3312:145B625:590A451B
 
 {
-  "id": 49678903,
-  "name": "SamIO.jl",
-  "full_name": "slundberg/SamIO.jl",
+  "id": 25974201,
+  "name": "julia2048",
+  "full_name": "kanhua/julia2048",
   "owner": {
-    "login": "slundberg",
-    "id": 3740613,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/3740613?v=3",
+    "login": "kanhua",
+    "id": 5557778,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/5557778?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/slundberg",
-    "html_url": "https://github.com/slundberg",
-    "followers_url": "https://api.github.com/users/slundberg/followers",
-    "following_url": "https://api.github.com/users/slundberg/following{/other_user}",
-    "gists_url": "https://api.github.com/users/slundberg/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/slundberg/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/slundberg/subscriptions",
-    "organizations_url": "https://api.github.com/users/slundberg/orgs",
-    "repos_url": "https://api.github.com/users/slundberg/repos",
-    "events_url": "https://api.github.com/users/slundberg/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/slundberg/received_events",
+    "url": "https://api.github.com/users/kanhua",
+    "html_url": "https://github.com/kanhua",
+    "followers_url": "https://api.github.com/users/kanhua/followers",
+    "following_url": "https://api.github.com/users/kanhua/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kanhua/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kanhua/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kanhua/subscriptions",
+    "organizations_url": "https://api.github.com/users/kanhua/orgs",
+    "repos_url": "https://api.github.com/users/kanhua/repos",
+    "events_url": "https://api.github.com/users/kanhua/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kanhua/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/slundberg/SamIO.jl",
-  "description": "A simple reader for SAM and BAM files.",
+  "html_url": "https://github.com/kanhua/julia2048",
+  "description": "An 2048 game implemeted in Julia language",
   "fork": false,
-  "url": "https://api.github.com/repos/slundberg/SamIO.jl",
-  "forks_url": "https://api.github.com/repos/slundberg/SamIO.jl/forks",
-  "keys_url": "https://api.github.com/repos/slundberg/SamIO.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/slundberg/SamIO.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/slundberg/SamIO.jl/teams",
-  "hooks_url": "https://api.github.com/repos/slundberg/SamIO.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/slundberg/SamIO.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/slundberg/SamIO.jl/events",
-  "assignees_url": "https://api.github.com/repos/slundberg/SamIO.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/slundberg/SamIO.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/slundberg/SamIO.jl/tags",
-  "blobs_url": "https://api.github.com/repos/slundberg/SamIO.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/slundberg/SamIO.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/slundberg/SamIO.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/slundberg/SamIO.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/slundberg/SamIO.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/slundberg/SamIO.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/slundberg/SamIO.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/slundberg/SamIO.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/slundberg/SamIO.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/slundberg/SamIO.jl/subscription",
-  "commits_url": "https://api.github.com/repos/slundberg/SamIO.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/slundberg/SamIO.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/slundberg/SamIO.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/slundberg/SamIO.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/slundberg/SamIO.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/slundberg/SamIO.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/slundberg/SamIO.jl/merges",
-  "archive_url": "https://api.github.com/repos/slundberg/SamIO.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/slundberg/SamIO.jl/downloads",
-  "issues_url": "https://api.github.com/repos/slundberg/SamIO.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/slundberg/SamIO.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/slundberg/SamIO.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/slundberg/SamIO.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/slundberg/SamIO.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/slundberg/SamIO.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/slundberg/SamIO.jl/deployments",
-  "created_at": "2016-01-14T22:16:42Z",
-  "updated_at": "2016-01-14T22:39:08Z",
-  "pushed_at": "2016-06-09T23:12:43Z",
-  "git_url": "git://github.com/slundberg/SamIO.jl.git",
-  "ssh_url": "git@github.com:slundberg/SamIO.jl.git",
-  "clone_url": "https://github.com/slundberg/SamIO.jl.git",
-  "svn_url": "https://github.com/slundberg/SamIO.jl",
+  "url": "https://api.github.com/repos/kanhua/julia2048",
+  "forks_url": "https://api.github.com/repos/kanhua/julia2048/forks",
+  "keys_url": "https://api.github.com/repos/kanhua/julia2048/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/kanhua/julia2048/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/kanhua/julia2048/teams",
+  "hooks_url": "https://api.github.com/repos/kanhua/julia2048/hooks",
+  "issue_events_url": "https://api.github.com/repos/kanhua/julia2048/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/kanhua/julia2048/events",
+  "assignees_url": "https://api.github.com/repos/kanhua/julia2048/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/kanhua/julia2048/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/kanhua/julia2048/tags",
+  "blobs_url": "https://api.github.com/repos/kanhua/julia2048/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/kanhua/julia2048/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/kanhua/julia2048/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/kanhua/julia2048/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/kanhua/julia2048/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/kanhua/julia2048/languages",
+  "stargazers_url": "https://api.github.com/repos/kanhua/julia2048/stargazers",
+  "contributors_url": "https://api.github.com/repos/kanhua/julia2048/contributors",
+  "subscribers_url": "https://api.github.com/repos/kanhua/julia2048/subscribers",
+  "subscription_url": "https://api.github.com/repos/kanhua/julia2048/subscription",
+  "commits_url": "https://api.github.com/repos/kanhua/julia2048/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/kanhua/julia2048/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/kanhua/julia2048/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/kanhua/julia2048/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/kanhua/julia2048/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/kanhua/julia2048/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/kanhua/julia2048/merges",
+  "archive_url": "https://api.github.com/repos/kanhua/julia2048/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/kanhua/julia2048/downloads",
+  "issues_url": "https://api.github.com/repos/kanhua/julia2048/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/kanhua/julia2048/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/kanhua/julia2048/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/kanhua/julia2048/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/kanhua/julia2048/labels{/name}",
+  "releases_url": "https://api.github.com/repos/kanhua/julia2048/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/kanhua/julia2048/deployments",
+  "created_at": "2014-10-30T14:20:14Z",
+  "updated_at": "2015-08-17T02:59:23Z",
+  "pushed_at": "2014-10-30T14:20:23Z",
+  "git_url": "git://github.com/kanhua/julia2048.git",
+  "ssh_url": "git@github.com:kanhua/julia2048.git",
+  "clone_url": "https://github.com/kanhua/julia2048.git",
+  "svn_url": "https://github.com/kanhua/julia2048",
   "homepage": null,
-  "size": 47,
-  "stargazers_count": 0,
-  "watchers_count": 0,
+  "size": 144,
+  "stargazers_count": 1,
+  "watchers_count": 1,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 0,
+  "forks_count": 1,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 0,
+  "forks": 1,
   "open_issues": 0,
-  "watchers": 0,
+  "watchers": 1,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 0,
-  "subscribers_count": 2
+  "network_count": 1,
+  "subscribers_count": 1
 }

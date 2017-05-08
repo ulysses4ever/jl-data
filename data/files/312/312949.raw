@@ -1,0 +1,13 @@
+#! /usr/bin/julia
+
+# Rosetta Code, Case-sensitivity of identifiers
+
+dog = "Benjamin"
+Dog = "Samba"
+DOG = "Bernie"
+
+if is(dog, Dog)
+    println("There is only one dog, ", DOG)
+else
+    println("The three dogs are:  ", dog, ", ", Dog, " and ", DOG)
+end

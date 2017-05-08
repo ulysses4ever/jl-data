@@ -1,0 +1,654 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Graphs, DataStructures, Logging
+
+### Basic stats ###
+
+# get # vertices, # of edges and density
+function get_basic_stats(g)
+	nvs = length(vertices(g))
+	nes = num_edges(g)
+	density = nes/(nvs*(nvs-1))
+	return nvs,nes,density
+end
+
+# get out degree stats (avg, max, array of sinks)
+function get_out_degree_stats{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	sum = 0
+	sinks = T[]
+	max_degree = 0
+	vs = vertices(g)
+	for v in vs
+		children = out_neighbors(v,g)
+		od = length(children)
+		sum += od
+		if od == 0
+			push!(sinks,v)
+		end
+		if od > max_degree
+			max_degree = od
+		end
+	end
+	return sum/length(vs),max_degree,sinks
+end
+
+# get array of sinks
+function get_sinks{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	sinks = T[]
+	vs = vertices(g)
+	for v in vs
+		children = out_neighbors(v,g)
+		od = length(children)
+		if od == 0
+			push!(sinks,v)
+		end
+	end
+	return sinks
+end
+
+# get array of sources 
+function get_sources{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	achildren = T[]
+	vs = vertices(g)
+	for v in vs
+		children = out_neighbors(v,g)
+		achildren = union(achildren,children)
+	end
+	return setdiff(vs,achildren)
+end
+
+### Subgraphs && SCCs
+
+# get the subgraph of g induced by the set of vertices sids
+function subgraph{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}}, sids::Array{T,1})
+	ng = adjlist(T, is_directed=true)
+	# nvs should be sorted in acending order
+	nvs = sort(sids)
+
+	# add vertices
+	for i in 1:length(nvs)
+        	add_vertex!(ng,convert(T,i))
+	end
+
+	# old id -> new id
+	oni = Dict{T,T}()
+
+	counter = convert(T,1)
+	for v in nvs
+		oni[v] = counter
+		counter += convert(T,1)
+	end
+
+	# add edges
+	for v in nvs
+		children = out_neighbors(v,g)
+		source = oni[v]
+		for c in children
+			#if index_sorted(nvs,c) != 0
+			if haskey(oni,c)
+				target = oni[c]
+				add_edge!(ng,source,target)
+			end
+		end
+	end
+
+	return ng,oni
+end
+
+# get the subgraph of g induced by the set of vertices sids
+# write the subgraph in MGS format v2
+function subgraph_streamed{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}}, sids::Array{T,1}, name::String)
+	ng = adjlist(T, is_directed=true)
+	# nvs should be sorted in acending order
+	nvs = sort(sids)
+
+	f1 = open("$name.index", "w") 
+	f2 = open("$name.data", "w") 
+
+	# old id -> new id
+	oni = Dict{T,T}()
+
+	counter = convert(T,1)
+	for v in nvs
+		oni[v] = counter
+		counter += convert(T,1)
+	end
+
+	pos = convert(T,1)
+	for v in nvs
+		children = out_neighbors(v,g)
+		bytes = reinterpret(Uint8, [pos])
+                write(f1, reverse(bytes))
+		for c in children
+			if haskey(oni,c)
+				target = oni[c]
+				bytes = reinterpret(Uint8, [target])
+                		write(f2, reverse(bytes))
+				# pos += convert(Uint32, 1) -> 8 bytes!?
+				pos = convert(T,pos+1)			
+			end
+		end
+	end
+
+	@debug("# vertices: ", length(nvs))
+	@debug("# edges: ", pos)
+
+	close(f1)
+	close(f2)
+
+	return oni
+end
+
+# Tarjan algorithm (recursive version)
+#
+# NB: successfully tested with FA core
+# NB: the recursive calls may create a stack overflow error
+function tarjan{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	sccs = Array(Array{T,1},0)
+	n = length(vertices(g))
+	indices = zeros(T,n)
+	lowlinks = zeros(T,n)
+	S = T[]
+	index = 1
+
+	# recursive function
+	function visit(v)
+		indices[v] = index
+		lowlinks[v] = index
+		index += 1
+		push!(S,v)
+		children = out_neighbors(v,g)
+		for w in children
+			# w was not visited yet
+			if indices[w] == 0
+				# recursive call
+				visit(w)
+				# back propagate the lowlink
+				lowlinks[v] = min(lowlinks[v], lowlinks[w])
+			# w is in S and hence in the current SCC
+			elseif findfirst(S,w) != 0
+				lowlinks[v] = min(lowlinks[v], indices[w])
+			end
+		end
+
+		if lowlinks[v] == indices[v]
+			component = T[]
+			while true
+				w = pop!(S)
+				push!(component,w)
+				w == v && break
+			end
+			push!(sccs,component)
+		end
+	end
+
+	for v in vertices(g)
+		indices[v] == 0 && visit(v)
+	end
+
+	return sccs
+end
+
+# Pearce version of Tarjan algorithm
+#
+# NB: successfully tested with FA core
+# NB: the recursive calls may create a stack overflow error
+function pearce{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	n = length(vertices(g))
+	rindex = zeros(T,n)
+	S = T[]
+	index = 1
+	c = n-1
+
+	# recursive function
+	function visit(v)
+		root = true
+		rindex[v] = index
+		index += 1
+		children = out_neighbors(v,g)
+		for w in children
+			rindex[w] == 0 && visit(w)
+			rindex[w] < rindex[v] && begin rindex[v] = rindex[w]; root = false end
+		end
+		if root
+			index -= 1
+			while !isempty(S) && rindex[v] <= rindex[S[end]]
+				w = pop!(S)
+				rindex[w] = c
+				index -= 1
+			end
+			rindex[v] = c
+			c -= 1
+		else
+			push!(S,v)
+		end
+	end
+
+	for v in vertices(g)
+		if rindex[v] == 0
+			visit(v)
+		end
+	end
+
+	return rindex
+end
+
+# Pearce algorithm state
+type state{T}
+	v::T
+	stage::T
+	root::Bool
+end
+
+# Pearce version of Tarjan algorithm - iterative version
+function pearce_iterative{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	n = length(vertices(g))
+	rindex = zeros(T,n)
+	S = T[]
+	index = 1
+	c = n-1
+
+	function visit(v)
+		states = state[]
+		current_state = state(v,convert(T,0),true)
+		push!(states, current_state)
+
+		@label start
+		while !isempty(states)
+			current_state = pop!(states)
+			active_loop = false
+
+			if current_state.stage == 0
+				rindex[current_state.v] = index
+				index += 1
+				active_loop = true
+			end
+			children = out_neighbors(current_state.v,g)
+			for w in children
+				if active_loop
+					if rindex[w] == 0
+						current_state.stage = w
+						push!(states,current_state)
+
+						new_state = state(w,convert(T,0),true)
+						push!(states,new_state)
+						@goto start
+					end
+					rindex[w] < rindex[current_state.v] && begin rindex[current_state.v] = rindex[w]; current_state.root = false end
+				elseif current_state.stage == w
+					active_loop = true
+					rindex[w] < rindex[current_state.v] && begin rindex[current_state.v] = rindex[w]; current_state.root = false end
+				end
+			end
+			if current_state.root
+				index -= 1
+				while !isempty(S) && rindex[current_state.v] <= rindex[S[end]]
+					w = pop!(S)
+					rindex[w] = c
+					index -= 1
+				end
+				rindex[current_state.v] = c
+				c -= 1
+			else
+				push!(S,current_state.v)
+			end
+		end
+	end
+
+	for v in vertices(g)
+		if rindex[v] == 0
+			visit(v)
+		end
+	end
+
+	return rindex
+end
+
+# get the main SCC and write it to the specified file (MGS format)
+# write the subgraph in MGS format v2
+function get_core_streamed{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},sccs::Array{T,1},name::String)
+	scc_ids = union(sccs,[])
+	id_size = Dict{T,T}()
+
+	for id in scc_ids
+		id_size[id] = 0
+	end
+
+	for id in sccs
+		id_size[id] += 1
+	end
+
+	sizes = collect(values(id_size))
+	sort!(sizes)
+	msize = sizes[end]
+
+	# find the max SCC id
+	mid = 0
+	for id in keys(id_size)
+		id_size[id] == msize && begin mid = id; break end
+	end
+
+	sids = T[]
+	counter = convert(T,1)
+	for id in sccs
+		id == mid && push!(sids,counter)
+		counter = convert(T,counter+1)
+	end
+
+	@debug("# core vids: ", length(sids))
+
+	subgraph_streamed(g,sids,name)
+end
+
+# get the reverse graph (same graph with all edge directions reversed)
+function get_reverse_graph{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	ng = adjlist(T, is_directed=true)
+	vs = vertices(g)
+
+	# same set of vertices
+	for v in vs
+		add_vertex!(ng,v)
+	end
+
+	# inverse the edge directions
+	for v in vs
+		children = out_neighbors(v,g)
+		for c in children
+			add_edge!(ng,c,v)
+		end
+	end
+
+	return ng
+end
+
+# get in-degree of g vertices
+function get_vertex_in_degrees{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	vin = Dict{T,T}()
+	for v in vertices(g)
+		ovs = out_neighbors(v,g)
+		for o in ovs
+			if !haskey(vin,o)
+				vin[o] = convert(T,1)
+			else
+				vin[o] = convert(T,vin[o]+1)
+			end
+		end
+	end
+	return vin
+end
+
+# get in- and out- degree sequences
+function get_in_out_degrees{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	vin = get_vertex_in_degrees(g)
+	in_degrees = T[]
+	out_degrees = T[]
+	for v in vertices(g)
+		push!(in_degrees,vin[v])
+		push!(out_degrees,convert(T,length(out_neighbors(v,g))))
+	end
+	return in_degrees,out_degrees
+end
+
+# get the avg out-degree of the set of visited nodes
+#
+# NB: to get the avg in-degree of visited nodes, one can use the reverse graph of g
+function get_avg_out_degree{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}}, visited::Array{T,1}, p_avg::Float64=float64(-1), np_steps::Int64=int64(-1))
+	sum = float64(0)
+	for v in visited
+		sum += length(out_neighbors(v,g))
+	end
+	if p_avg != -1
+		return (p_avg*np_steps+sum)/(np_steps+length(visited))
+	else
+		return sum/length(visited)
+	end
+end
+
+# get the list of colinks
+function list_colinks{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},rg::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},filename::String)
+	vs = vertices(g)
+	n = length(vs)
+	io = IOBuffer()
+	# actual number of colinks
+	anc = zeros(T,n)
+	count = 0
+	total = 0
+	ttotal = 0
+	bmax_size = 1000
+	for v in vs
+		# get greater children and parents
+		gc = filter(x->x>v,out_neighbors(v,g))
+		gp = filter(x->x>v,out_neighbors(v,rg))
+		inter = intersect(gc,gp)
+		for t in inter
+			write(io,string((v,t)),'\n')
+			ttotal += 1
+		end
+		anc[v] = length(inter)
+		total += 1	
+		count += 1
+		if count == bmax_size
+			@debug("writing $bmax_size computed vertices [total # colinks: $ttotal | total # of computed vertices: $total (", (total/n*100),"%)]")
+			f = open(filename, "a")
+			write(f,takebuf_string(io))
+			close(f)
+			count = 0
+		end
+	end
+	serialize_to_file(anc,"anc.jld")
+	f = open(filename, "a")
+	write(f,takebuf_string(io))
+	close(f)
+end
+
+# listing triangles - map
+function list_triangles_map{T<:Unsigned}(v::T,g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},rg::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},dpos::Dict{T,T}) 
+	candidates = (T,T,T)[]
+	gc = filter(x->dpos[x]>dpos[v],out_neighbors(v,g))
+	gp = filter(x->dpos[x]>dpos[v],out_neighbors(v,rg))
+	#@debug("# greater children: ", length(gc))
+	#@debug("# greater parents: ", length(gp))
+	for c in gc
+		# rank(child) > rank(v)
+		for p in gp
+			# child != parents && rank(parent) > rank(v)
+			c != p && push!(candidates,(v,c,p))
+		end
+	end
+	return candidates
+end
+
+# listing triangles - reduce
+function list_triangles_reduce{T<:Unsigned}(candidates::Array{(T,T,T),1},g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},io::IOBuffer)
+	count = convert(T,0)
+	for c in candidates
+		cc = out_neighbors(convert(T,c[2]),g)
+		sort!(cc)
+		if binary_search(cc,c[3]) != -1
+			write(io,string(sort!([c[1],c[2],c[3]]))[2:(end-1)],'\n')
+			count = convert(T,1+count)
+		end
+	end
+	return count
+end
+
+# listing triangles - map&reduce
+function list_triangles_mapreduce{T<:Unsigned}(v::T,g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},rg::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},dpos::Dict{T,T},io::IOBuffer) 
+	count = convert(T,0)
+	vpos = dpos[v]
+	gc = filter(x->dpos[x]>vpos,out_neighbors(v,g))
+	gp = filter(x->dpos[x]>vpos,out_neighbors(v,rg))
+	for c in gc
+		cc = out_neighbors(c,g)
+		sort!(cc)
+		for p in gp
+			if c != p
+				# NB: searchsortedfirst is unreliable!
+				#if searchsortedfirst(cc,p) <= length(cc)
+				if binary_search(cc,p) != -1
+					write(io,string(sort!([v,c,p]))[2:(end-1)],'\n')
+					count = convert(T,1+count)
+				end
+			end
+		end
+	end
+	return count
+end
+
+# initialize mnt (maximum # of triangles) array 
+function init_mnt_array{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},rg::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}})
+	@debug("initializing max # triangles array")
+	vs = vertices(g)
+	n = length(vs)
+	mnt = zeros(T,n)
+	for v in vs
+		parents = out_neighbors(v,rg)
+		children = out_neighbors(v,g)
+		p = length(parents)
+		c = length(children)
+		i = length(intersect(parents,children))
+		# maximum number of triangles:
+		# = (p_minus_c * c_minus_p) + i * (p_minus_c + c_minus_p + (i - 1))
+		# = p*c - i
+		mnt[v] = convert(T,p*c-i)
+	end
+	return mnt
+end
+
+# get the list of triangles
+function list_triangles{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},rg::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}},filename::String)
+	n = length(vertices(g))
+	io = IOBuffer()
+	# actual number of triangles
+	ant = zeros(T,n)
+	count = 0
+	total = 0
+	ttotal = 0
+	bmax_size = 1000
+	# maximum number of triangles
+	#mnt = load_serialized("mnt.jld")
+	mnt = init_mnt_array(g,rg)
+	#serialize_to_file(mnt,"mnt.jld")
+	@debug("sorting mnt array")
+	#smnt = load_serialized("smnt.jld")
+	smnt = bottom_up_sort!(mnt)
+	#serialize_to_file(smnt,"smnt.jld")
+	@debug("mnt array sorted")
+	@debug("loading position dictionary")
+	#dpos = load_serialized("dpos.jld")
+	dpos = Dict{T,T}()
+	pos = convert(T,1)
+	for v in smnt
+		dpos[v] = pos
+		pos = convert(T,1+pos)
+	end
+	#serialize_to_file(dpos,"dpos.jld")
+	@debug("dictionary loaded")
+	for v in smnt
+		#@debug("Checking vertex: $v")
+		#tic()
+		#candidates = list_triangles_map(v,g,rg,dpos)
+		#@debug("# candidates: ", length(candidates))
+		#nadded = list_triangles_reduce(candidates,g,io)
+		nadded = list_triangles_mapreduce(v,g,rg,dpos,io)
+		ant[v] = nadded
+		#@debug("# found triangles for vertex $v: $nadded")
+		#@debug(toc())
+		ttotal += nadded
+		count += 1
+		total += 1
+		if count == bmax_size
+			@debug("writing $bmax_size computed vertices [total # triangles: $ttotal | total # of computed vertices: $total (", (total/n*100),"%)]")
+			f = open(filename, "a")
+			write(f,takebuf_string(io))
+			close(f)
+			count = 0
+		end
+	end
+	serialize_to_file(ant,"ant.jld")
+	# write remaining triangles
+	f = open(filename, "a")
+	write(f,takebuf_string(io))
+	close(f)
+end
+
+# load the colinks distribution from the specified file
+function load_colinks_distribution{T<:Unsigned}(size::T,filename::String)
+	f = open(filename,"r")
+	d = Dict{T,T}()
+	while !eof(f)
+		te = split(readline(f)[2:(end-2)],',')
+		v1 = parseint(T,te[1])
+		v2 = parseint(T,te[2])
+		if haskey(d,v1)
+			d[v1] += 1
+		else
+			d[v1] = 1
+		end
+		if haskey(d,v2)
+			d[v2] += 1
+		else
+			d[v2] = 1
+		end
+	end
+	close(f)
+	c_stats = zeros(T,size)
+	for i in 1:size
+		if haskey(d,i)
+			c_stats[i] = d[i]
+		else
+			c_stats[i] = 0
+		end
+	end
+	return c_stats
+end
+
+# load the triangles distribution from the specified file
+function load_triangles_distribution{T<:Unsigned}(size::T,filename::String)
+	f = open(filename,"r")
+	d = Dict{T,T}()
+	while !eof(f)
+		te = split(readline(f)[2:(end-2)],',')
+		v1 = parseint(T,te[1])
+		v2 = parseint(T,te[2])
+		v3 = parseint(T,te[3])
+		if haskey(d,v1)
+			d[v1] += 1
+		else
+			d[v1] = 1
+		end
+		if haskey(d,v2)
+			d[v2] += 1
+		else
+			d[v2] = 1
+		end
+		if haskey(d,v3)
+			d[v3] += 1
+		else
+			d[v3] = 1
+		end
+	end
+	close(f)
+	t_stats = zeros(T,size)
+	for i in 1:size
+		if haskey(d,i)
+			t_stats[i] = d[i]
+		else
+			t_stats[i] = 0
+		end
+	end
+	return t_stats
+end

@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:57 GMT
+Date: Wed, 03 May 2017 21:02:17 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5383
+Content-Length: 7076
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2717
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3868
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "fc9b283cef4fc1329f5a49ebd5925579"
-Last-Modified: Wed, 09 Dec 2015 13:31:19 GMT
+ETag: "069b01838c7b1bdc87739fbbb57c9f15"
+Last-Modified: Tue, 12 Jan 2016 10:14:54 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,82 +22,82 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 02ea60dfed58b2a09106fafd6ca0c108
-X-GitHub-Request-Id: FD6C:6633:DD8C67:11EDC3D:59023215
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 2A6A:5CA3:FFC8A9:148E485:590A4559
 
 {
-  "id": 47693119,
-  "name": "ChaosQuantified.jl",
-  "full_name": "krcz/ChaosQuantified.jl",
+  "id": 43570972,
+  "name": "StatsBase.jl",
+  "full_name": "JuliaPackageMirrors/StatsBase.jl",
   "owner": {
-    "login": "krcz",
-    "id": 4975418,
-    "avatar_url": "https://avatars2.githubusercontent.com/u/4975418?v=3",
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/krcz",
-    "html_url": "https://github.com/krcz",
-    "followers_url": "https://api.github.com/users/krcz/followers",
-    "following_url": "https://api.github.com/users/krcz/following{/other_user}",
-    "gists_url": "https://api.github.com/users/krcz/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/krcz/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/krcz/subscriptions",
-    "organizations_url": "https://api.github.com/users/krcz/orgs",
-    "repos_url": "https://api.github.com/users/krcz/repos",
-    "events_url": "https://api.github.com/users/krcz/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/krcz/received_events",
-    "type": "User",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/krcz/ChaosQuantified.jl",
-  "description": "Julia utility lib for analysing nonlinear dynamic system, especially chaotic ones",
+  "html_url": "https://github.com/JuliaPackageMirrors/StatsBase.jl",
+  "description": "Julia package mirror.",
   "fork": false,
-  "url": "https://api.github.com/repos/krcz/ChaosQuantified.jl",
-  "forks_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/forks",
-  "keys_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/teams",
-  "hooks_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/events",
-  "assignees_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/tags",
-  "blobs_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/subscription",
-  "commits_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/merges",
-  "archive_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/downloads",
-  "issues_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/krcz/ChaosQuantified.jl/deployments",
-  "created_at": "2015-12-09T13:30:15Z",
-  "updated_at": "2015-12-09T13:31:19Z",
-  "pushed_at": "2015-12-14T12:30:12Z",
-  "git_url": "git://github.com/krcz/ChaosQuantified.jl.git",
-  "ssh_url": "git@github.com:krcz/ChaosQuantified.jl.git",
-  "clone_url": "https://github.com/krcz/ChaosQuantified.jl.git",
-  "svn_url": "https://github.com/krcz/ChaosQuantified.jl",
-  "homepage": null,
-  "size": 7,
+  "url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPackageMirrors/StatsBase.jl/deployments",
+  "created_at": "2015-10-02T19:04:08Z",
+  "updated_at": "2016-01-12T10:14:54Z",
+  "pushed_at": "2016-09-24T16:37:30Z",
+  "git_url": "git://github.com/JuliaPackageMirrors/StatsBase.jl.git",
+  "ssh_url": "git@github.com:JuliaPackageMirrors/StatsBase.jl.git",
+  "clone_url": "https://github.com/JuliaPackageMirrors/StatsBase.jl.git",
+  "svn_url": "https://github.com/JuliaPackageMirrors/StatsBase.jl",
+  "homepage": "https://github.com/JuliaStats/StatsBase.jl",
+  "size": 465,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",
@@ -117,6 +117,25 @@ X-GitHub-Request-Id: FD6C:6633:DD8C67:11EDC3D:59023215
     "admin": false,
     "push": false,
     "pull": true
+  },
+  "organization": {
+    "login": "JuliaPackageMirrors",
+    "id": 14939231,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/14939231?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPackageMirrors",
+    "html_url": "https://github.com/JuliaPackageMirrors",
+    "followers_url": "https://api.github.com/users/JuliaPackageMirrors/followers",
+    "following_url": "https://api.github.com/users/JuliaPackageMirrors/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPackageMirrors/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPackageMirrors/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPackageMirrors/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPackageMirrors/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPackageMirrors/repos",
+    "events_url": "https://api.github.com/users/JuliaPackageMirrors/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPackageMirrors/received_events",
+    "type": "Organization",
+    "site_admin": false
   },
   "network_count": 0,
   "subscribers_count": 1

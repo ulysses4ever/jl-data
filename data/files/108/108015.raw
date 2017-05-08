@@ -1,0 +1,82 @@
+function findStoechio(formula::String)
+	"""return an array with each chemical element and its stoechiometry"""
+	regexpElem = r"([A-Z][a-z]?)([0-9]*)" #1st capture the chemical element, 2nd capture the stoechiometry (empty if 0)
+	dictStoechio = Dict{String, Int64}() #empty dict : String (element) => integer (stoechiometry)
+	offset = 1
+	while offset < endof(formula)
+		m = match(regexpElem, formula, offset)
+		element, stoechio = m.captures
+		stoechio = stoechio != "" ? int(stoechio) : 1 #If the stoechio of an element is 1, there is no number in the formula
+		dictStoechio[element] = stoechio #stockage of the result
+		offset += endof(m.match) #add the length of : the element + stoechio
+	end
+	dictStoechio
+end
+
+function completeSoechio(stoechioFormula::Dict)
+	#add to the stochiometry calculated from the formula 0 for other elements used
+	base = ["C" => 0, "H" => 0, "Br" => 0, "Cl" => 0, "F" => 0, "N" => 0, "O" => 0, "P" => 0, "S" => 0, "Si" =>0] #elements used for the 7GR, excludes exotics elements in the formula
+	merge!(base, stoechioFormula)
+end
+
+function eminusCalc(e::Dict)
+	#TODO : need references
+	4 * e["C"] + e["H"] + 7 * e["Br"] + 7 * e["F"] + 5 * e["N"] + 6 * e["O"] + 5 * e["P"] + 6 * e["S"] + e["Si"]
+end
+
+function atomSum(e::Dict)
+	#return the number of atoms in the molecule
+	sum(values(e))
+end
+
+function LewisSum(e::Dict)
+	#TODO : need references
+	4 * e["C"] + e["H"] + e["Br"] + e["Cl"] + e["F"] + 3 * e["N"] + 2 * e["O"] + 2 * e["S"] + 4 * e["Si"]
+end
+
+
+function rat(num::Int64, den::Int64)
+	#ratios element/element
+	if num > 0 #what about molecules without Carbone
+		return num//den
+	else #NEED : dive in the original code and maybe contact authors, real problem
+		return 0
+	end
+end
+
+function NOPSCheck(e::Dict)
+	#TODO : need references/comment
+	0 <= rat(e["N"], e["C"]) <= 4 && 0 <= rat(e["O"], e["C"]) <= 3 && 0 <= rat(e["P"], e["C"]) <= 2 && 0 <= rat(e["S"], e["C"]) <= 2
+end
+
+function HNOPSCheck(e::Dict)
+	#TODO : need references/comment
+	println(rat(e["H"], e["C"]))
+	println(rat(e["N"], e["C"]))
+	println(rat(e["O"], e["C"]))
+	println(rat(e["P"], e["C"]))
+	println(rat(e["S"], e["C"]))
+	0 <= rat(e["H"], e["C"]) <= 3 && 0 <= rat(e["N"], e["C"]) <= 2 && 0 <= rat(e["O"], e["C"]) <= 2 && 0 <= rat(e["P"], e["C"]) <= 0.32 && 0 <= rat(e["S"], e["C"]) <= 0.65 #oc 1.2 instead of 2 ? Problem with CH3NO2
+end
+
+
+function SeniorMaxCheck(e::Dict)
+	#representing maximum valence state against number of atoms // can be checked with DU with maximum valencies
+	(4 * e["C"] + e["H"] + e["Br"] + e["Cl"] + e["F"] + 5 * e["N"] + 2 * e["O"] + 6 * e["S"] + 4 * e["Si"]) >= (2 * (atomSum(e) - 1))
+end
+
+#(ugly) tests
+dict = findStoechio("CH3NO2")
+dict = completeSoechio(dict)
+println(dict)
+println("e- :\t\t", eminusCalc(dict))
+println("sum :\t\t", atomSum(dict))
+println("lewissum :\t",LewisSum(dict))
+println("ratioHC :\t",rat(dict["H"], dict["C"]))
+println("ratioNC :\t",rat(dict["N"], dict["C"]))
+println("ratioPC :\t",rat(dict["P"], dict["C"]))
+println("ratioCP :\t",rat(dict["C"], dict["P"]))
+println("ratioZeros :\t",rat(0, 0))
+println("NOPSTest :\t",NOPSCheck(dict) ? "TRUE" : "FALSE")
+println("HNOPSTest :\t",HNOPSCheck(dict) ? "TRUE" : "FALSE")
+println("SeniorMaxTest :\t",SeniorMaxCheck(dict) ? "TRUE" : "FALSE")

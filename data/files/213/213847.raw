@@ -1,0 +1,19 @@
+## =============================================================================
+## xxxxx.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+type LSD
+    pounds::Int
+    shillings::Int
+    pence::Int
+
+    function LSD(l,s,d)
+        if l < 0 || s < 0 || d < 0
+            error("No negative numbers, please! We're British!")
+        end
+        if d > 12 || s > 20
+            error("That's too many pence or shillings!")
+        end
+        new(l,s,d)
+    end
+end

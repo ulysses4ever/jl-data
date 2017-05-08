@@ -1,0 +1,50 @@
+#=
+@author titus 
+=#
+include("../list.jl")
+using   Base.Test
+using   .List
+
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_list_items"] = function test_list()
+
+  A   = [1,2,3,4,5,6,7,8,9]
+  lst = LinkList{Integer}()
+  [push!(lst, x) for x in A ]
+
+  @test isequal(items(lst), A);
+  @test isequal(first(lst), 1);
+  @test isequal(last(lst), 9);
+  unshift!(lst,0)
+  @test isequal(first(lst), 0);
+  @test isequal(at(lst,1), first(lst));
+  @test isequal(at(lst,0), nothing);
+  @test isequal(last(lst), at(lst,lst.length));
+  @test isequal(shift!(lst), 0);
+  @test isequal(lst.length, 9);
+  x2(x) = x*x 
+  m1    = items(map(x2,lst))
+  println(m1)
+  m2    = map(x2,A)
+  @test isequal(m1, m2);
+
+
+end
+
+
+exports["test_list_map_filter"]= function test_map_filter()
+  A   = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  lst = LinkList{Integer}()
+  [push!(lst, x) for x in A ]
+
+  xsqr = x -> x*x 
+  m1   = items(map(xsqr,lst))
+  m2   = map(xsqr,A)
+  @test isequal(m1, m2)
+  f1 = filter(iseven, A)
+  f2 = items(filter(iseven, lst))
+  @test isequal(f1, f2)
+
+end

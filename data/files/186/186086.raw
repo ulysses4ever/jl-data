@@ -1,0 +1,24 @@
+#=
+Various numerical experiments vaguely related to reproducing kernel Hilbert spaces.
+=#
+
+#= Reference:
+Solak et. al., Derivative observations in Gaussian Process Models of Dynamic Systems. [link](http://eprints.gla.ac.uk/3119/) [ungated pdf](http://eprints.gla.ac.uk/3119/01/derivative.pdf)
+=#
+
+import PDMats
+import Distributions
+
+function solak_grammian{T1<:Real, T2<:Real}(x::Array{T1,2}, gamma::Array{T2,1}, alpha::Float64, nu::Float64)
+    d,n = size(x)
+    d==size(gamma,1) || error("x and gamma must have the same number of rows.")
+    temp = (nu + alpha)*eye(n)
+    if n == 1 return PDMats.PDMat(temp) end
+    for i in 1:n
+        for j in (i+1):n
+            temp[j,i] = temp[i,j] = 
+                alpha*exp(-.5*sum((gamma.*(x[:,i]-x[:,j])).^2))
+        end
+    end
+    return PDMats.PDMat(temp)
+end

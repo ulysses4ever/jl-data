@@ -1,0 +1,6 @@
+#=
+Reads the Group Average resting state fMRI data from BCT.
+TODO: Paths might need fixing if and when the repo becomes a real package.
+=#
+GroupAverage_Weight = readdlm("src/GroupAverage_Weight.txt");
+GroupAverage_Coord = readdlm("src/GroupAverage_Coord.txt");

@@ -1,0 +1,29 @@
+using Distributions
+using PyPlot
+using DataFrames
+# y_t = α + β_1y_t-1 + ... + β_py_t-p + ϵ_t
+type VAR
+  Y::Array{Float64,2}
+  p::Int64
+  VAR(Y,p) = p <= 0 ? error("Lag-length error: 'p' must be strictly positive") : new(Y,p)
+end
+
+VAR(Y) = VAR(Y,1)
+V=VAR(rand(100,4))
+
+function estimate_var(VAR::VAR)
+  (T,K) = size(VAR.Y)
+  y = (VAR.Y[VAR.p+1:T,:])'
+  X = ones(1,T-VAR.p)
+  for j in 1:VAR.p
+      X = [X; y[VAR.p+1-j:T-j,:]']
+  end
+  β = (y*X')/(X*X')
+  ϵ = y - β*X
+  Σ = ϵ*ϵ'
+  return β, ϵ, Σ
+end
+
+
+#Example
+estimate_var(V)

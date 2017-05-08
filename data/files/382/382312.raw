@@ -1,0 +1,531 @@
+module NETWORKS_MODULE
+
+using Distributions, Gadfly
+
+export pareto_rand,trunc_expo_rand,pareto_thinning,trunc_expo_thinning,adaptive_thinning,bound_uni,GGP,plot_process,
+emp_test, moments_epsilon_uni,comm_process,GGP_graph,bound_multi,emp_test_multi,moments_epsilon_multi
+
+
+function pareto_rand(sigma,epsilon,n)
+  U = rand(Uniform(),n)
+  X = epsilon ./ U.^(1/sigma)
+  return(X)
+end
+
+
+function pareto_thinning(alpha, sigma, tau, epsilon = 0)
+  indices = falses()
+
+  if epsilon == 0 || sigma < 0 || sigma == 0
+    error("You need to have correct input parameters ") 
+  else
+    function f_dens(w)
+      1./( w.^(1+sigma)).* exp(-w)
+    end    
+    par_log_rate = log(alpha) - tau*epsilon - log(gamma(1-sigma)) - log(sigma ) - sigma * log(epsilon)
+    N_J = rand(Poisson(exp( par_log_rate) ))  #number of jumps is poisson with rate the ingrated f_star
+    prop_jumps = pareto_rand( sigma, epsilon, N_J)
+    unif = rand(N_J) 
+    indices =  unif.< exp(-tau .*(prop_jumps- epsilon ))
+    jumps = prop_jumps[indices]  
+    fin_N_J = length(jumps)
+    times = rand(Uniform(0,alpha),fin_N_J )
+    emp_rate = fin_N_J/N_J
+    log_theo_rate =   log( sigma ) + tau *epsilon + sigma * log( tau*epsilon) + log(  quadgk(x -> f_dens(x), tau*epsilon, 10^5)[1]) 
+    theo_rate = exp( log_theo_rate )
+    #println("")
+    #println("empirical acceptance rate = , $emp_rate,  \n theoretical acceptance rate =, $theo_rate")
+    #println("$N_J, $fin_N_J")
+    return reshape(Array([jumps;times]),(fin_N_J ,2))
+  end
+end  
+
+
+
+function trunc_expo_rand(lambda,thres,n)
+  U = rand(Uniform(),n)
+  Y = thres - 1/lambda*log(U)
+  return(Y)
+end
+
+
+function trunc_expo_thinning(alpha, sigma, tau, epsilon = 0)
+  indices = falses()
+  if epsilon == 0 || tau < 0 || tau == 0
+    error("mpla mpla mpla")
+  else 
+    function f_dens(w)
+      1./( w.^(1+sigma)).* exp(-w)
+    end    
+    #pois_log_rate = log ( alpha * exp(-tau*epsilon )/gamma(1-sigma) /sigma/epsilon^(sigma) )
+    expo_log_rate = log(alpha) - tau*epsilon - log(gamma(1-sigma)) - log(tau ) - (1+sigma) * log(epsilon)
+    N_J = rand(Poisson(exp( expo_log_rate) ))  #number of jumps is poisson with rate the ingrated f_star
+    prop_jumps = rand(Exponential(tau),N_J) + epsilon
+    unif = rand(N_J) 
+    #M =  exp(-tau*epsilon)/epsilon^(sigma)/sigma/gamma(1-sigma)
+    indices =  unif.< (prop_jumps./epsilon ).^(-1-sigma)
+    jumps = prop_jumps[indices]  
+    fin_N_J = length(jumps)
+    times = rand(Uniform(0,alpha),fin_N_J )
+    emp_rate = fin_N_J/N_J
+    log_theo_rate =   tau *epsilon + (1 + sigma )* log( tau*epsilon) + log(  quadgk(x -> f_dens(x), tau*epsilon, 10^5)[1]) 
+    theo_rate = exp( log_theo_rate )
+    #println("")
+    println("empirical acceptance rate = , $emp_rate,  \n theoretical acceptance rate =, $theo_rate")
+    #println("$N_J, $fin_N_J")
+    return reshape(Array([jumps;times]),(fin_N_J ,2))
+  end
+end  
+
+
+
+function adaptive_thinning(alpha, sigma, tau, epsilon = 0)
+
+  if sigma < 0 || epsilon == 0
+    error("You need to have correct input parameters")
+  end
+  
+  function W(t, x)
+
+    if tau>0
+      log_out = log(alpha) +  log( 1-exp(-tau*(x-t)) ) + (-1-sigma)*log(t) + (-t*tau) - log(tau) - log( gamma(1-sigma) )
+    else
+      log_out = log(alpha) - log( gamma(1-sigma) ) - log(sigma) + log(t^(-sigma) - x^(-sigma))
+    end
+    return( exp(log_out) )
+
+  end
+
+  function inv_W(t, x)
+
+    if tau > 0
+      t - 1/tau*log(1-gamma(1-sigma)*x*tau/(alpha*t^(-1-sigma)*exp(-t*tau)))
+    else
+      log_out = -1/sigma * log(t^(-sigma) - sigma*gamma(1-sigma)/alpha*x)
+      exp(log_out)
+    end
+
+  end
+  
+    k = 1
+    jumps = zeros(1)
+    t = epsilon
+    count = 0
+  
+  
+    while(true)
+      r = rand(Exponential(1))
+      if r > W(t, Inf)
+        break
+      else 
+        t_new = inv_W(t, r)   
+      end
+  
+      if  ( tau == 0   || rand() < 1/ (t_new/t)^(1 + sigma) )  
+        push!(jumps,t_new)
+        k = k + 1
+      end
+      t = t_new
+      count = count + 1
+    end
+
+    fin_N_J = length(jumps)-1
+    times = rand(Uniform(0,alpha),fin_N_J )
+    out = reshape(Array([jumps[2:( fin_N_J+1)];times]),(fin_N_J ,2))
+    accep_rate = fin_N_J/count
+    #println("accept_rate is $accep_rate")
+    return( out)
+  
+end
+
+
+
+function bound_uni( M, alpha, sigma, tau, eps_seq= [1/10^i for i in 2:18], alt_epsilon = 1/10^18 )
+  distr = Gamma(1-sigma,1)
+  num_eps = length(eps_seq)
+  log_prob = zeros(num_eps)
+  for i in 1:num_eps
+    log_prob[i] = -2*alpha^2/tau^(2-2*sigma)*cdf(distr, tau*eps_seq[i])
+  end
+  fin_epsilon = 0
+  out = zeros(1)
+  flag = true
+  for i in 1 : (num_eps-1)
+    if ( log_prob[i] <= log(1-M) ) && (log_prob[i+1] > log(1-M))
+      fin_epsilon = eps_seq[ i+1 ]
+      probab = 1 - exp( log_prob[ i+1 ] )
+      out = fin_epsilon
+      flag = false
+    end
+  end
+  if flag 
+    println("The threshold cannot be calculated exactly because of compuational instabilities and is set to $alt_epsilon")
+    out = alt_epsilon
+  end
+  println("Empirical probability is $probab")
+  return(out)
+end
+
+
+function indicator(cond)
+	result = zeros(length(cond))
+	for (i in 1:length(cond))
+    	if cond[i]
+      		result[i] = 1
+    	else
+      		result[i] = 0
+    	end
+  	end
+  	return(result)
+end
+
+
+function GGP(alpha, sigma, tau, method = "pareto", M = 0.001, epsilon = 0)
+
+	jumps = zeros(Float64)
+	fin_N_J = 0
+	if sigma < 0  #sample a COMPOUND POISSON PROCESS
+		log_rate = log(alpha) + log(-sigma) + sigma*log(tau)
+    fin_N_J = rand( Poisson( exp( log_rate )))
+    jumps = rand( Gamma(-fin_N_J * sigma, tau ), fin_N_J )
+  else  #DILADI TO SIGMA EINAI > =0
+
+    if epsilon == 0  #if NO EPSILON WAS SPECIFIED calculate it now
+    	epsilon = bound_uni(M, alpha, sigma, tau)
+    end
+
+
+		if method == "pareto"  && sigma > 0 
+		    par_log_rate = log(alpha) - tau*epsilon - log(gamma(1-sigma)) - log(sigma ) - sigma * log(epsilon)
+		    N_J = rand(Poisson(exp( par_log_rate) ))  #number of jumps is poisson with rate the ingrated f_star
+		    prop_jumps = pareto_rand( sigma, epsilon, N_J)
+		    unif = rand(N_J) 
+		    indices =  unif.< exp(-tau .*(prop_jumps- epsilon ))
+		    jumps = prop_jumps[indices]  
+		    fin_N_J = length(jumps)
+
+	  	elseif ( method == "adaptive" || sigma == 0 )
+			function W(t, x)
+				if tau>0
+			    	log_out = log(alpha) +  log( 1-exp(-tau*(x-t)) ) + (-1-sigma)*log(t) + (-t*tau) - log(tau) - log( gamma(1-sigma) )
+				else
+			    	log_out = log(alpha) - log( gamma(1-sigma) ) - log(sigma) + log(t^(-sigma) - x^(-sigma))
+			    end
+			    return( exp(log_out) )
+			end
+
+			function inv_W(t, x)
+				if tau > 0
+			    	t - 1/tau*log(1-gamma(1-sigma)*x*tau/(alpha*t^(-1-sigma)*exp(-t*tau)))
+			    else
+			    	log_out = -1/sigma * log(t^(-sigma) - sigma*gamma(1-sigma)/alpha*x)
+			    	exp(log_out)
+			    end
+			end
+  
+			k = 1
+		    t = epsilon
+		    count = 0
+		    jumps = zeros(1)
+		  
+		    while(true)
+		    	r = rand(Exponential(1))
+		    	if r > W(t, Inf)
+		     		break
+		    	else 
+		    		t_new = inv_W(t, r)   
+		    	end
+		  
+		    	if  ( tau == 0   || rand() < 1/ (t_new/t)^(1 + sigma) )  
+		        	push!(jumps,t_new)
+		    		k = k + 1
+		      	end
+		      	t = t_new
+		      	count = count + 1
+
+		    end
+		    fin_N_J = length(jumps)-1
+		  end
+
+	end
+
+	return(jumps.*indicator(fin_N_J>0),epsilon)
+
+end
+
+
+
+function plot_process(jumps,locations,title=" Jump Process")
+	out=jumps
+	num_jumps = size(out)
+	times_temp = locations
+	jumps_temp = out
+	sort_ind = sortperm(times_temp)
+	jump_time = times_temp[sort_ind]
+	jump_size = jumps_temp[sort_ind]
+	x = jump_time
+	y = jump_size
+	plot(x=x,y=y,Geom.step,Stat.step,Guide.title("$title"),Guide.ylabel("weights"),Guide.xlabel("time") )
+end
+
+
+
+
+function transp(X)
+
+	dims = ndims(X)
+	if dims == 1
+		return(reshape(X,1,length(X)))
+	elseif dims == 2
+		Y = zeros()
+		nrow= size(X)[1]	
+		ncol= size(X)[2]
+		Y = zeros(ncol,nrow)
+			for i in 1:nrow
+				Y[i,:]=X[:,i]
+			end
+		return(Y)
+	end
+end	
+
+
+
+
+function GGP_graph(alpha, sigma, tau, method = "pareto ", M = 0.001, epsilon = 0)
+	#if epsilon == 0
+	#	weights = GGP(alpha,sigma,tau, method, M)[1]
+	#else
+#		weights = GGP(alpha,sigma,tau, epsilon)[1]
+	#end
+
+	weights=GGP(alpha,sigma,tau)[1]
+	# Samples using the conditional Poisson model
+	cumsum_w = [0; cumsum(weights)];
+	W_star = cumsum_w[end];  # Total mass of the GGP
+	D_star = rand(Poisson(W_star^2)) ; # Total number of directed edges
+
+	temp = W_star * rand(D_star, 2);
+	#sprand(D_star, 2)
+	num=length(cumsum_w)-1
+	ind_in = zeros(num)
+	ind_fin=zeros(num)
+	edges = zeros(Int64, (D_star,2))
+
+	for i in 1:D_star
+	  for j in 1:num
+	    if ( temp[i,1] >= cumsum_w[j]  && temp[i,1] < cumsum_w[j+1])
+	      edges[i,1] = j
+	      println("j=,$j")
+	    end
+	    if ( temp[i,2] >= cumsum_w[j]  && temp[i,2] < cumsum_w[j+1])
+	      edges[i,2] = j
+	      println("j=,$j")
+
+	    end
+	  end	
+	end
+
+	dist_nodes = sort( unique(edges) )   # this gives the nodes used
+	indices = zeros(Int64, (D_star,2))
+	n_dist_nodes = length(dist_nodes)
+
+	net_mat = zeros(Int64, (num,num))
+	G = SparseMatrixCSC{Int64,Int64} 
+	net_mat[dist_nodes,dist_nodes] = 1
+	w_rem = W_star - sum(weights[dist_nodes]);
+	weights = weights[dist_nodes]
+	G = sparse(net_mat)
+	nodes = collect(1:num)
+	nodes_lab = ["$i" for i in nodes]
+	dist_nodes_lab = ["$i" for i in dist_nodes]
+	final_nodes = reshape([nodes;nodes_lab],num,2)
+	final_dist_nodes = reshape([dist_nodes;dist_nodes_lab],n_dist_nodes,2)
+	return(G,final_nodes,final_dist_nodes, edges)
+end
+
+
+function emp_test(epsilon, epsilon_0, iter, alpha, sigma, tau)
+  count = 0
+  prop = 0
+  log_X_eps_min = zeros(iter)
+  log_X_eps_plus = zeros(iter)
+  all_weights = zeros()
+  small_weights = zeros()
+  big_weights = zeros()
+  for i in 1:iter
+
+    all_weights = pareto_thinning( alpha, sigma, tau, epsilon_0)[:,1]
+    big_weights = all_weights[ all_weights.>epsilon ]
+    small_weights = all_weights[ all_weights.<=epsilon ]
+    
+    log_X_eps_plus[i] = log( sum( big_weights ) )
+    log_X_eps_min[i]= log( sum( small_weights ) )
+
+    log_rate = log( 2* exp( log_X_eps_plus[i] ) * exp( log_X_eps_min[i] ) + (exp(log_X_eps_min[i]))^2 ) 
+    N_conn = rand(Poisson( exp(log_rate) ))
+    count = indicator(N_conn > 0) + count
+    #curr_rate = count/iter
+    #println("count = , $count, iter = $i, rate = $curr_rate"
+    prop = count/iter
+    #print("i = , $i")
+  end 
+  println("the proportion = , $prop")
+  return(exp( log_X_eps_min))
+
+end
+
+
+
+
+function moments_epsilon_uni(alpha,sigma,tau,epsilon)
+  distr_1 = Gamma(1-sigma,1)
+  distr_2 = Gamma(2-sigma,1)
+  mu_epsilon =  alpha/tau^(1-sigma)*cdf(distr_1, epsilon*tau)  
+  sigma_sq_epsilon = alpha * (1-sigma)/tau^(2-sigma)*cdf(distr_2,tau*epsilon)
+  return(mu_epsilon,sqrt( sigma_sq_epsilon) )
+end 
+
+
+function comm_process(alpha,sigma,tau,epsilon,a,b, method )
+	#process_multi = adaptive_thinning(alpha,sigma,tau,epsilon)
+	#result= zeros(K,(p+1))
+	if method == "pareto"
+		process_multi = pareto_thinning(alpha,sigma,tau,epsilon);
+	elseif method == "adaptive"
+		process_multi = adaptive_thinning(alpha,sigma,tau,epsilon);
+	end
+	#sum(process_multi[:,1])
+	w_0 = process_multi[:,1]
+	loc = process_multi[:,2]
+	K = length(w_0)
+	p = length(a)
+	betas = zeros(p)
+	weights = zeros(K,p)
+
+	for i in 1: K
+		betas = collect( [ rand(Gamma( a[k], 1/b[k] )) for k in 1:p ] )
+		weights[i,: ] = w_0[i]*betas
+	end
+	return( weights,loc)
+end
+
+function bound_multi(eps_seq, M, alpha, sigma, tau, a, b)
+	mean_betas = a./b
+	p = length(a)
+	num_eps  = length(eps_seq)
+	#mu_epsilon = zeros(num_eps,p)
+	#my_const_2 = zeros(num_eps)
+	log_prob_zero_conn = zeros(num_eps)
+	index = 0
+	#my_const= [ quadgk(x -> 1/x^(sigma)*exp(-x), tau*eps_seq[i], 10^5)[1] for i in 1:num_eps ]
+	#log_prob_zero_conn = -2*alpha^2/(tau^(2-2*sigma))*(1-my_const./gamma(1-sigma)).^2 *sum(mean_betas.^2)
+	flag = true
+	out = zeros(2)
+	distr = Gamma(1-sigma,1)
+		for i in 1:num_eps
+			#mu_epsilon[i,:] =  alpha /tau^(1-sigma)*cdf(distr, eps_seq[i]*tau)*mean_betas  
+			log_prob_zero_conn[i] = -2*alpha^2/ tau^(2-2*sigma)*cdf(distr, tau*eps_seq[i])* sum(mean_betas.^2)
+		end
+			#log_prob_zero_conn = -2*alpha/tau^(1-sigma)*mu_epsilon
+	for i in 1 : (num_eps-1)
+		if log_prob_zero_conn[i] <= log(1-M) && log_prob_zero_conn[i+1] > log(1-M)
+	    	fin_epsilon = eps_seq[ i+1 ]
+	     	probab = 1 - exp( log_prob_zero_conn[ i+1 ] )
+	    	out = [ probab, fin_epsilon]
+	    	#println("threshold $fin_epsilon gives probabilty bound $probab")
+	    	flag = false
+	    	index = i + 1
+		end
+	end
+	if flag 
+		println("need different range")
+	end
+	#return(mu_epsilon[index,:], out)
+	return(out)
+end
+
+
+
+function emp_test_multi(epsilon, epsilon_0, iter, alpha, sigma, tau, a, b)  
+
+	count = 0
+	prop = 0
+	p = length(a)
+	log_X = zeros(iter,p)
+	log_X_eps_min = zeros(iter,p)
+	log_X_eps_plus = zeros(iter,p)
+	sum_weights = zeros(p)
+	sum_small_weights = zeros(p)
+	sum_big_weights = zeros(p)
+	rate = zeros(iter)
+	small_weights = zeros()
+	big_weights = zeros()
+
+	big_w_0 = zeros()
+	small_w_0 = zeros()
+	for i in 1:iter
+
+		process_multi = pareto_thinning(alpha,sigma,tau,epsilon_0);
+
+		#sum(process_multi[:,1])
+		w_0 = process_multi[:,1]
+		loc = process_multi[:,2]
+		K = length(w_0)
+		p = length(a)
+		betas = zeros(p)
+		weights = zeros(K,p)
+
+		big_w_0 = w_0[ w_0.>epsilon ]
+		small_w_0 = w_0[ w_0.<=epsilon ]
+
+
+		for lu in 1: K
+			betas = collect( [ rand(Gamma( a[k], 1/b[k] )) for k in 1:p ] )
+			weights[lu,: ] = w_0[lu]*betas
+		end
+
+		big_weights = weights[ w_0.>epsilon,: ]
+		small_weights = weights[ w_0.<=epsilon,: ]
+		for j in 1:p 
+			sum_weights[j] = sum(weights[:,j]) 
+			sum_big_weights[j] = sum(big_weights[:,j])
+			#sum_small_weights[j] =  Float64(sum(all_weights[[all_weights[:,j].<epsilon],j]))
+		end
+
+		sum_small_weights = sum_weights -  sum_big_weights
+	    log_X_eps_plus[i,:] =  log( sum_big_weights )
+	    log_X_eps_min[i,: ]= log(  sum_small_weights )
+		rate[i] = 2* sum( exp(log_X_eps_plus[i,:] ).* exp(log_X_eps_min[i,: ]) ) +sum( exp( log_X_eps_min[i,: ]).*exp( log_X_eps_min[i,: ]) )
+		N_conn = rand(Poisson( rate[i] ))
+	    count = indicator(N_conn > 0) + count
+	    #curr_rate = count/iter
+	end
+	prop = count/iter
+  	println("the proportion =  $prop")
+  	return(exp( log_X_eps_min) )
+
+end
+
+
+
+function moments_epsilon_multi(alpha,sigma,tau,a,b,epsilon)
+	distr_1 = Gamma(1-sigma,1)
+	distr_2 = Gamma(2-sigma,1)
+	mean_betas = a./b
+	mu_epsilon =  alpha/tau^(1-sigma)*cdf(distr_1, epsilon*tau)*mean_betas  
+	term1 = mu_epsilon*transp(mu_epsilon)										  
+	term2= diagm(a./b./b)
+	sigma_epsilon = alpha * (1-sigma)/tau^(2-sigma)*cdf(distr_2,tau*epsilon)*( term1 + term2 )
+	#sigma_epsilon = alpha * (1-sigma)/tau^(2-sigma)*cdf(distr_2,tau*epsilon)*term1
+	return(mu_epsilon,sigma_epsilon)
+end 
+
+
+
+
+
+end
+
+
+
+

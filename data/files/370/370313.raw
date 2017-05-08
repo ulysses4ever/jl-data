@@ -1,0 +1,11 @@
+#! /usr/bin/julia
+
+# Rosetta Code, Symmetric difference
+
+a = Set(["John", "Bob", "Mary", "Serena"])
+b = Set(["Jim", "Mary", "John", "Bob"])
+c = symdiff(a, b)
+
+println("Set a is: ", a)
+println("Set b is: ", b)
+println("Their symmetric difference is: ", c)

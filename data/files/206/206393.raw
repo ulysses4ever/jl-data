@@ -1,0 +1,47 @@
+using sgd
+
+
+function do_learn(params)
+
+	test_size = Dict{Int, Int}()
+	test_correct = Dict{Int, Int}()
+	function update_accuracy(total, correct)
+		for k in keys(total)
+			test_size[k] = total[k]
+			test_correct[k] = correct[k]
+		end
+	end
+
+	function get_accuracy()
+		total = 0
+		correct = 0
+		for k in keys(test_size)
+			total += test_size[k]
+			correct += test_correct[k]
+		end
+		return correct / total
+	end
+
+	global_ps_rr = @spawn init_PS(params.lambda_l1_global, params.lambda_l2)
+	@sync for w in workers()
+		@async remotecall_wait( init_worker, params, global_ps_rr)
+	end
+
+	@sync for w in workers()
+		@async for i in 1:params.num_passes
+			correct, total = remotecall_fetch (run_sgd, params, 2)
+			update_accuracy(total, correct)
+			println("Accuracy = $(get_accuracy())")
+		end
+	end
+
+
+
+end
+
+
+
+
+
+
+

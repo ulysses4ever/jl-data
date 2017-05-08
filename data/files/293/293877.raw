@@ -1,0 +1,125 @@
+module MSHPCView
+
+using DataFrames
+
+
+function job_list(
+    scheduler::String
+    ;
+    state::String="*",
+    user::String="*",
+    remove_from_usernames::String=""
+    )
+  shout = readall(`job list /scheduler:$scheduler /state:$state /user:$user /format:list`)
+  shout = split(shout, "\n\r\n")
+  numjobs = length(shout) - 1
+
+  values = Array(Dict{String, String}, numjobs)
+  for i in 1:numjobs
+    dict::Dict{String, String} = Dict{String, String}()
+    for line in split(shout[i], "\n")
+      key, value = split(line, ":")
+      push!(dict, strip(key), strip(value))
+    end
+    values[i] = dict
+  end
+
+  incl_resourcerequest = false
+  if size(values, 1) > 0 && haskey(values[1], "Resource Request")
+    incl_resourcerequest = true
+  end
+
+  if incl_resourcerequest
+    return DataFrame(
+      id       = [ int(dict["Id"])  for dict in values ],
+      state    = [ dict["State"]    for dict in values ],
+      priority = [ dict["Priority"] for dict in values ],
+      user     = length(remove_from_usernames) > 0
+                   ? [ replace(dict["Owner"], remove_from_usernames, "") for dict in values ]
+                   : [ dict["Owner"] for dict in values ],
+      name     = [ dict["Name"]     for dict in values ],
+      resource_request = [ dict["Resource Request"] for dict in values ]
+      )
+  else
+    return DataFrame(
+      id       = [ int(dict["Id"])  for dict in values ],
+      state    = [ dict["State"]    for dict in values ],
+      priority = [ dict["Priority"] for dict in values ],
+      user     = length(remove_from_usernames) > 0
+                   ? [ replace(dict["Owner"], remove_from_usernames, "") for dict in values ]
+                   : [ dict["Owner"] for dict in values ],
+      name     = [ dict["Name"]     for dict in values ],
+      )
+  end
+end
+
+
+function job_grouped(
+    scheduler::String
+    ;
+    state::String="*",
+    user::String="*",
+    remove_from_usernames::String=""
+    )
+  alljobs = job_list(scheduler, state=state, user=user, remove_from_usernames=remove_from_usernames)
+
+  allstategroups::Dict{String, Vector{DataFrame}} = Dict{String, Vector{DataFrame}}()
+  by(alljobs, :state) do statejobs
+    stategroups = Array(DataFrame, 0)
+    first = 1
+    for row in 2:size(statejobs, 1)
+      if statejobs[row, :user            ] != statejobs[first, :user            ] ||
+         statejobs[row, :priority        ] != statejobs[first, :priority        ] ||
+         statejobs[row, :resource_request] != statejobs[first, :resource_request]
+        push!(stategroups, statejobs[first:(row - 1), :])
+        first = row
+      end
+    end
+    push!(stategroups, statejobs[first:size(statejobs, 1), :])
+    push!(allstategroups, statejobs[1, :state], stategroups)
+  end
+
+  states = Array(String, 0)
+  numjobs = Array(Integer, 0)
+  users = Array(String, 0)
+  priorities = Array(String, 0)
+  resource_requests = Array(String, 0)
+  for state in ["Running", "Queued", "Canceled", "Failed"]
+    if haskey(allstategroups, state)
+      stategroups = get(allstategroups, state, null)
+      for group in stategroups
+        push!(states, state)
+        push!(numjobs, size(group, 1))
+        push!(users, group[1, :user])
+        push!(priorities, group[1, :priority])
+        push!(resource_requests, group[1, :resource_request])
+      end
+    end
+  end
+
+  return DataFrame(state=states, numjobs=numjobs, user=users, priority=priorities, resource_request=resource_requests)
+end
+
+
+function job_info(
+    scheduler::String,
+    id::Integer
+    )
+  shout = readlines(`job view $id /scheduler:$scheduler`)
+  info = Dict{String, String}()
+  for line in shout
+    parts = split(line, ":")
+    info[strip(parts[1])] = strip(parts[2])
+  end
+  return info
+end
+
+
+function job_cancel(
+    scheduler::String,
+    id::Integer
+    )
+  run(`job cancel $id /scheduler:$scheduler`)
+end
+
+end # module

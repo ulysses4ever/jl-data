@@ -1,0 +1,30 @@
+N = 10
+K = 2
+Q = 3
+A = 4
+
+sample_size = 1000
+
+neighbours = zeros(Int, N, K)
+
+for i = 1:N
+    neighbours[i, 1] = i
+    for j = 2:K
+        found = false
+        new_neighbour = 0
+        while !found
+            found = true
+            new_neighbour = rand(Int(1):Int(N))
+            for k = 1:K
+                if new_neighbour == neighbours[i, k]
+                    found = false
+                end 
+            end
+        end
+        neighbours[i, j] = new_neighbour
+    end
+end
+
+println(neighbours)
+
+w_i = zeros(Int, N, A^(K + 1))

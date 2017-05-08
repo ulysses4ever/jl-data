@@ -1,0 +1,397 @@
+module Config
+
+type Type_Config_Values
+    use_reinitialization::Bool
+    num_generations::Int32
+    population_size::Int32
+    generations_per_target_switch::Int32
+    births_and_deaths_per_generation::Int32
+    extermination_tournament_size::Int32
+    breeding_tournament_size::Int32
+
+    max_threshold::Int32
+    min_threshold::Int32
+    max_weight::Int32
+    min_weight::Int32
+    max_num_connections::Int32
+    min_num_connections::Int32
+    GRN_timesteps::Int32
+    initial_max_num_connections::Int32
+    initial_min_num_connections::Int32
+    initial_num_nodes::Int32
+    max_num_nodes::Int32
+    min_num_nodes::Int32
+    mutate_dup_del_prob::Float32
+    max_num_dups_or_dels::Float32
+    min_num_dups_or_dels::Int32
+    mutate_conn_prob::Float32
+    max_num_conn_muts::Int32
+    min_num_conn_muts::Int32
+    mutate_activation_prob::Float32
+    max_num_activation_muts::Int32
+    min_num_activation_muts::Int32
+    mutate_truth_table_prob::Float32
+    max_num_tt_muts::Int32
+    min_num_tt_muts::Int32
+    delete_conn_prob::Float32
+    max_num_conn_dels::Int32
+    min_num_conn_dels::Int32
+    add_conn_prob::Float32
+    max_num_conn_adds::Int32
+    min_num_conn_adds::Int32
+    mutate_threshold_prob::Float32
+    max_num_thresh_muts::Int32
+    min_num_thresh_muts::Int32
+    mutate_weight_prob::Float32
+    max_num_weight_muts::Int32
+    min_num_weight_muts::Int32
+    use_global_mutation_rate::Bool
+    global_mutation_rate::Float32
+    global_weight_mutation_rate::Float32
+    
+    use_sim::Bool
+    wall_avoidance_objective::Bool
+    waypoint_collection_walls::Array{Float32, 1}
+    single_island_walls::Array{Float32, 1} 
+    double_island_walls::Array{Float32, 1}     
+    waypoints_1::Array{Float32, 1}
+    waypoints_2::Array{Float32, 1}
+    num_hidden_nn_nodes::Int32
+    num_input_nn_nodes::Int32
+    num_output_nn_nodes::Int32
+    simulation_iterations::Int32
+    bits_per_weight::Int32
+
+    target_length::Int32
+    use_randomised_targets::Bool
+    expression_1::Array{Float32, 1}
+    expression_2::Array{Float32, 1}
+
+    use_unbiasing::Bool
+    full_unbiasing::Bool
+    flatten::Bool
+    genotype_flattening::Bool
+    first_level_sample_size::Int32
+    second_level_sample_size::Int32
+    proportions_exponent::Float32
+
+    print_times::Array{Int32, 1}
+    num_experiment_repetitions::Int32
+    experiment_printing::Bool
+    generation_printing::Bool
+    interval_printing::Bool
+
+    use_alon::Bool
+    alon_inputs::Array{Bool, 2}
+    alon_outputs::Array{Bool, 2}
+    alon_transitions::Array{Int64, 2}
+
+    Type_Config_Values() = new(
+                               
+    #=GA parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=use_reinitialization=# false,
+    #=num_generations=# 50000,
+    #=population_size=# 1000,                               
+    #=generations_per_target_switch=# 50,
+    #=births_and_deaths_per_generation=# 500,
+    #=extermination_tournament_size=# 10,
+    #=breeding_tournament_size=# 25,
+    
+
+    #=GRN parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=max_threshold=# -1,
+    #=min_threshold=# -1,
+    #=max_weight=# -1,
+    #=min_weight=# -1,
+    #=max_num_connections=# 2,
+    #=min_num_connections=# 2,
+    #=GRN_timesteps=# 10,
+    #=initial_max_num_connections=# 2,
+    #=initial_min_num_connections=# 2,
+    #=initial_num_nodes=# 64,
+    #=max_num_nodes=# 64,
+    #=min_num_nodes=# 64,
+    #=mutate_dup_del_prob=# 0.0,
+    #=max_num_dups_or_dels=# 1,
+    #=min_num_dups_or_dels=# 1,
+    #=mutate_conn_prob=# 0.0,
+    #=max_num_conn_muts=# 1,
+    #=min_num_conn_muts=# 1,
+    #=mutate_activation_prob=# 0.2,
+    #=max_num_activation_muts=# 2,
+    #=min_num_activation_muts=# 1,
+    #=mutate_truth_table_prob=# 0.3,
+    #=max_num_tt_muts=# 1,
+    #=min_num_tt_muts=# 1,
+    #=delete_conn_prob=# 0.2,
+    #=max_num_conn_dels=# 2,
+    #=min_num_conn_dels=# 1,
+    #=add_conn_prob=# 0.2,
+    #=max_num_conn_adds=# 2,
+    #=min_num_conn_adds=# 1,
+    #=mutate_threshold_prob=# 0.2,
+    #=max_num_thresh_muts=# 2,
+    #=min_num_thresh_muts=# 1,
+    #=mutate_weight_prob=# 0.2,
+    #=max_num_weight_muts=# 2,
+    #=min_num_weight_muts=# 1,
+    #=use_global_mutation_rate=# true,
+    #=global_mutation_rate=# 0.05,
+    #=global_weight_rate=# 0.002,
+    
+
+    #=Simulation parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=use_sim=# false,
+    #=If not wall avoidance, then waypoint collection is performed=# 
+    #=wall_avoidance_objective=# false,
+    #=waypoint_collection_walls=# [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 0), convert(Float32, 0), convert(Float32, 200),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 200), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 200), convert(Float32, 200),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 400), 
+               convert(Float32, 400), convert(Float32, 400), convert(Float32, 0), convert(Float32, 200),],
+    #=single_island_walls=#  [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 0), convert(Float32, 0), convert(Float32, 200),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 200), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 200), convert(Float32, 200),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 400), 
+               convert(Float32, 400), convert(Float32, 400), convert(Float32, 0), convert(Float32, 200),
+    
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 100), 
+               convert(Float32, 100), convert(Float32, 100), convert(Float32, 50), convert(Float32, 150),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 300), 
+               convert(Float32, 300), convert(Float32, 300), convert(Float32, 50), convert(Float32, 150),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 50), 
+               convert(Float32, 100), convert(Float32, 300), convert(Float32, 50), convert(Float32, 50),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 150), 
+               convert(Float32, 100), convert(Float32, 300), convert(Float32, 150), convert(Float32, 150),],
+    #=double_island_walls=# [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 0), convert(Float32, 0), convert(Float32, 200),
+               convert(Float32, 0), convert(Float32, 1), convert(Float32, 200), 
+               convert(Float32, 0), convert(Float32, 400), convert(Float32, 200), convert(Float32, 200),
+               convert(Float32, 1), convert(Float32, 0), convert(Float32, 400), 
+               convert(Float32, 400), convert(Float32, 400), convert(Float32, 0), convert(Float32, 200),
+
+               convert(Float32, 200), convert(Float32, -200), convert(Float32, 0), 
+               convert(Float32, 0), convert(Float32, 200), convert(Float32, 0), convert(Float32, 200),],
+    
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 50), 
+               # convert(Float32, 50), convert(Float32, 50), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 150), 
+               # convert(Float32, 150), convert(Float32, 150), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 50), 
+               # convert(Float32, 50), convert(Float32, 150), convert(Float32, 50), convert(Float32, 50),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 150), 
+               # convert(Float32, 50), convert(Float32, 150), convert(Float32, 150), convert(Float32, 150),],
+
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 250), 
+               # convert(Float32, 250), convert(Float32, 250), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 1), convert(Float32, 0), convert(Float32, 350), 
+               # convert(Float32, 350), convert(Float32, 350), convert(Float32, 50), convert(Float32, 150),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 50), 
+               # convert(Float32, 250), convert(Float32, 350), convert(Float32, 50), convert(Float32, 50),
+               # convert(Float32, 0), convert(Float32, 1), convert(Float32, 150), 
+               # convert(Float32, 250), convert(Float32, 350), convert(Float32, 150), convert(Float32, 150),],
+    #=waypoints_1=# [250, 10,  
+                          300, 10,
+                          350, 10,
+                          390, 10,
+                          390, 50,
+                          390, 100,
+                          390, 150, 
+                          390, 190,],
+    #=waypoints_2=# [150, 10,  
+                          100, 10,
+                          50, 10,
+                          10, 10,
+                          10, 50,
+                          10, 100,
+                          10, 150, 
+                          10, 190,],
+    #=num_hidden_nn_nodes=# 3,
+    #=num_input_nn_nodes=# 2,
+    #=num_output_nn_nodes=# 2,
+    #=simulation_iterations=# 250,
+    #=bits_per_weight=# 5,
+
+                           
+    #=Bit-string matching parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=target_length=# 5,
+    #=use_randomised_targets=# false,
+    #=#=expression_1=# [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+                      0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1,],
+    #=expression_2=# [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0,
+                      2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,],=#
+    #=expression_1=# [0, 1, 1, 1, 0, 0, 1, 0],
+    #=expression_2=# [0, 0, 1, 1, 0, 1, 1, 1],
+    #=#=expression_1=# [1, 0, 0, 1],
+    #=expression_2=# [0, 1, 1, 0],=#
+    #=#=expression_1=# [1, 0, 0, 0, 1],
+    #=expression_2=# [1, 0, 0, 0, 1],=#
+
+    #=Mutation unbiasing parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=use_unbiasing=# false,
+    #=full_unbiasing=# false,
+    #=flatten=# false,
+    #=genotype_flattening=# true,
+    #=first_level_sample_size=# 50,
+    #=second_level_sample_size=# 50,
+    #=proportions_exponent=# 10,
+    
+    #=Other parameters=#
+    #=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=#
+    #=print_times=# [79, 79, 99, 199, 299, 499, 749, 999, 1999, 2999, 4000, 5000, 9999, 50000, 99999],
+    #=num_experiment_repetitions=# 1,
+    #=experiment_printing=# false,
+    #=generation_printing=# true,
+    #=interval_printing=# false,
+    
+    #=Alon boolean circuits params=#
+    #=use_alon=# true,
+    #=#=alon_inputs=# [0 0 0 0 0 0; 
+                0 0 0 0 0 1; 
+                0 0 0 0 1 0; 
+                0 0 0 0 1 1; 
+                0 0 0 1 0 0; 
+                0 0 0 1 0 1; 
+                0 0 0 1 1 0; 
+                0 0 0 1 1 1; 
+                0 0 1 0 0 0; 
+                0 0 1 0 0 1; 
+                0 0 1 0 1 0; 
+                0 0 1 0 1 1; 
+                0 0 1 1 0 0; 
+                0 0 1 1 0 1; 
+                0 0 1 1 1 0; 
+                0 0 1 1 1 1; 
+                0 1 0 0 0 0; 
+                0 1 0 0 0 1; 
+                0 1 0 0 1 0; 
+                0 1 0 0 1 1; 
+                0 1 0 1 0 0; 
+                0 1 0 1 0 1; 
+                0 1 0 1 1 0; 
+                0 1 0 1 1 1; 
+                0 1 1 0 0 0; 
+                0 1 1 0 0 1; 
+                0 1 1 0 1 0; 
+                0 1 1 0 1 1; 
+                0 1 1 1 0 0; 
+                0 1 1 1 0 1; 
+                0 1 1 1 1 0; 
+                0 1 1 1 1 1;
+                1 0 0 0 0 0; 
+                1 0 0 0 0 1; 
+                1 0 0 0 1 0; 
+                1 0 0 0 1 1; 
+                1 0 0 1 0 0; 
+                1 0 0 1 0 1; 
+                1 0 0 1 1 0; 
+                1 0 0 1 1 1; 
+                1 0 1 0 0 0; 
+                1 0 1 0 0 1; 
+                1 0 1 0 1 0; 
+                1 0 1 0 1 1; 
+                1 0 1 1 0 0; 
+                1 0 1 1 0 1; 
+                1 0 1 1 1 0; 
+                1 0 1 1 1 1; 
+                1 1 0 0 0 0; 
+                1 1 0 0 0 1; 
+                1 1 0 0 1 0; 
+                1 1 0 0 1 1; 
+                1 1 0 1 0 0; 
+                1 1 0 1 0 1; 
+                1 1 0 1 1 0; 
+                1 1 0 1 1 1; 
+                1 1 1 0 0 0; 
+                1 1 1 0 0 1; 
+                1 1 1 0 1 0; 
+                1 1 1 0 1 1; 
+                1 1 1 1 0 0; 
+                1 1 1 1 0 1; 
+                1 1 1 1 1 0; 
+                1 1 1 1 1 1],=#
+#=alon_inputs=# [0 0 0 0 0; 
+                0 0 0 0 1; 
+                0 0 0 1 0; 
+                0 0 0 1 1; 
+                0 0 1 0 0; 
+                0 0 1 0 1; 
+                0 0 1 1 0; 
+                0 0 1 1 1; 
+                0 1 0 0 0; 
+                0 1 0 0 1; 
+                0 1 0 1 0; 
+                0 1 0 1 1; 
+                0 1 1 0 0; 
+                0 1 1 0 1; 
+                0 1 1 1 0; 
+                0 1 1 1 1; 
+                1 0 0 0 0; 
+                1 0 0 0 1; 
+                1 0 0 1 0; 
+                1 0 0 1 1; 
+                1 0 1 0 0; 
+                1 0 1 0 1; 
+                1 0 1 1 0; 
+                1 0 1 1 1; 
+                1 1 0 0 0; 
+                1 1 0 0 1; 
+                1 1 0 1 0; 
+                1 1 0 1 1; 
+                1 1 1 0 0; 
+                1 1 1 0 1; 
+                1 1 1 1 0; 
+                1 1 1 1 1;], 
+   #=#=alon_outputs=# [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+                       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+                       0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0;
+                       0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0;
+                       0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0;
+                       0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0;
+                       0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0 0;
+                       0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 0 1 1 1 1 1 1 1 1 0 1 1 0;
+                ],=#
+                     
+   #=alon_outputs=# [1 0 0 1 1 0 0 0 1 1 1 0 0 0 1 1 0 1 0 1 0 0 0 0 0 1 1 0 1 0 1 0;
+                     1 1 0 1 1 0 1 0 1 1 1 0 0 0 0 1 0 1 1 1 0 0 0 0 0 1 1 0 1 0 1 0;
+                     1 0 0 1 0 1 0 0 1 1 1 0 0 0 1 0 0 1 0 1 0 0 0 0 0 1 1 0 1 0 0 0;
+                     1 0 0 1 1 1 0 0 1 1 1 0 0 0 1 1 1 1 0 0 0 0 0 0 0 1 1 0 1 0 1 1;
+                     1 0 0 1 1 0 0 0 1 1 1 0 0 0 1 1 0 1 0 1 0 0 0 0 0 1 1 0 1 0 1 0;
+                     1 0 0 1 1 0 0 0 1 1 1 0 0 0 1 1 0 1 0 1 0 0 0 0 0 1 1 0 1 0 1 0;
+                     1 0 0 1 1 0 0 0 1 1 1 0 0 0 1 1 0 1 0 1 0 0 0 0 0 1 1 0 1 0 1 0;
+                     1 0 0 1 1 0 0 0 1 1 1 0 0 0 1 1 0 1 0 1 0 0 0 0 0 1 1 0 1 0 1 0;
+                ],
+   #=#=alon_transitions=# [2 3 5;
+                    1 4 6;
+                    1 4 7;
+                    2 3 8;
+                    1 6 7;
+                    2 5 8;
+                    3 5 8;
+                    4 6 7;],=#
+   #=alon_transitions=# [2 3 4;
+                    1 3 4;
+                    1 2 4;
+                    1 2 3;
+                    1 6 7;
+                    2 5 8;
+                    3 5 8;
+                    4 6 7;],
+                    )
+    end
+
+
+end

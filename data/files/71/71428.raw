@@ -1,0 +1,49 @@
+"""
+Physics Research Project
+Devin Rose
+Last update: October 1, 2015
+Defines module for using as a package
+"""
+
+module dataAnalysis
+
+  #List packages used
+  using Gadfly, LsqFit, ProgressMeter
+
+  #export functions used in the module
+  export
+    #fileIO.jl
+    createDirectoryForReport,
+    findFilesToAnalyze,
+    importFile,
+    writeOutPlot,
+
+    #findError.jl
+    calculateBackgroundMinimumError,
+    errorIntervals,
+
+    #fullAnalysis.jl
+    fullAnalysis,
+
+    #utilities.jl
+    areaUnderCurveCentral,
+    areaUnderCurveRightSum,
+    arrayLayers,
+    findClosestMax,
+    findWaveRow,
+    layerPlots,
+    parseArray,
+    plotMeanValues,
+    wavelengthDifferetial,
+
+    #vectorStats.jl
+    vectorMean,
+    vectorStandardDeviation
+
+  #List files containing functions
+  include("fileIO.jl")
+  include("findError.jl")
+  include("fullAnalysis.jl")
+  include("utilities.jl")
+  include("vectorStats.jl")
+end

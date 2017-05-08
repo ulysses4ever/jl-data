@@ -1,0 +1,10 @@
+email_example = "$(path)/other_testing_data/emailSample5.txt"
+vocab_file = "$(path)/vocab.txt"
+
+email_features = process_email(email_example, vocab_file, false)
+pred, deci = svmpredict(model, email_features)
+
+println("Processed: $(email_example)")
+println("Spam Classification: $(pred)")
+println("(1 indicates spam, 0 indicates not spam)")
+

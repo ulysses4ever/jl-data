@@ -1,0 +1,26 @@
+function findbindecpalindromes(limit::Int)
+    palindromes = IntSet()
+
+    for x in 1:limit
+        xstring = string(x)
+        if xstring == reverse(xstring)
+            xbin = x
+            xbinstring = ""
+            while xbin != 0
+                xbinstring *= (xbin % 2 == 1) ? "1" : "0"
+                xbin >>= 1
+            end
+            if xbinstring == reverse(xbinstring)
+                push!(palindromes, x)
+            end
+        end
+    end
+
+    return palindromes
+end
+
+@time res = sum(findbindecpalindromes(1_000_000))
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

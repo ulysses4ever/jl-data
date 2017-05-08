@@ -1,0 +1,105 @@
+# Thu 27 Sep 2012 03:37:38 PM EDT
+#
+# This is a basic test of using the Bits++ via Julia-OpenGL-SDL.
+
+
+using SDL
+
+# initialize variables
+
+bpp       = 16
+wintitle  = "NeHe Tut 1"
+icontitle = "NeHe Tut 1"
+width     = 1280
+height    = 800
+
+theClut=256*ones(256,3)
+
+bitsPlusClutRow=zeros(524,3)
+bitsPlusClutRow[1:8,:]=[36 63 8 211 3 112 56 34;
+						106 136 19 25 115 68 41 159;
+						133 163 138 46 164 9 49 208]'
+high=floor(theClut/256)
+low=theClut-256*high
+bitsPlusClutRow[12+(1:512),1:3]=reshape([high';low'],3,512)'
+
+# open SDL window with an OpenGL context
+
+SDL_Init(SDL_INIT_VIDEO)
+#videoInfo = SDL_GetVideoInfo()
+videoFlags = (SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_HWPALETTE | SDL_NOFRAME | SDL_FULLSCREEN)
+#if videoInfo.hw_available
+    videoFlags = (videoFlags | SDL_HWSURFACE)
+#else
+    #videoFlags = (videoFlags | SDL_SWSURFACE)
+#end
+#if videoInfo.blit_hw
+    videoFlags = (videoFlags | SDL_HWACCEL)
+#end
+SDL_gl_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
+SDL_SetVideoMode(width, height, bpp, videoFlags)
+SDL_wm_SetCaption(wintitle, icontitle)
+
+glViewPort(0, 0, width, height)
+glClearColor(0.0, 0.0, 0.0, 0.0)
+glClearDepth(1.0)			 
+glDepthFunc(GL_LESS)	 
+glEnable(GL_DEPTH_TEST)
+glShadeModel(GL_SMOOTH)
+
+glMatrixMode(GL_PROJECTION)
+glLoadIdentity()
+
+gluPerspective(45.0,width/height,0.1,100.0)
+
+glMatrixMode(GL_MODELVIEW)
+
+# drawing routines
+
+done = false
+
+while done != true
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+
+    glMatrixMode(GL_PROJECTION)                        
+    glPushMatrix()                                    
+    glLoadIdentity()                
+    glOrtho( 0, width,height, 0, 0, 1 )
+    glMatrixMode(GL_MODELVIEW)                            
+    glLoadIdentity()
+
+    #draw the pixels
+    glActiveTextureArb(GL_TEXTURE0_ARB)
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glActiveTextureArb(GL_TEXTURE1_ARB)
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, 0)
+    glRasterPos2i(0,1)
+    glDrawPixels(524,1, GL_RGB, GL_SHORT, bitsPlusClutRow)
+
+    #return to 3D mode (go and pop the projection matrix)
+    glMatrixMode( GL_PROJECTION )                    
+    glPopMatrix()
+    glMatrixMode( GL_MODELVIEW )
+
+    glColor(1.0,1.0,1.0)
+    
+    glTranslate(-1.5,0.0,-6.0)
+
+    glBegin(GL_POLYGON)
+        glVertex(0.0,1.0,0.0)
+        glVertex(1.0,-1.0,0.0)
+        glVertex(-1.0,-1.0,0.0)
+    glEnd()
+
+    SDL_gl_SwapBuffers()
+
+    SDL_PumpEvents()
+    keystate = SDL_GetKeystate()
+
+    if keystate[SDLK_q] == true
+        break
+    end
+end

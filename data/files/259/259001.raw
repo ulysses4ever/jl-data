@@ -1,0 +1,28 @@
+module Chapter1
+##
+# Dependencies
+##
+using DataFrames
+using GZip
+
+##
+# Exported methods and types in addition to @reexport above
+##
+
+##
+# included files
+##
+
+for (dir, filename) in [
+                        ("","FixedWidthColumn.jl"),
+                        ("","ReadDataFile.jl")
+    ]
+
+    include(joinpath(dir,filename))
+end
+
+##
+# Run script
+#
+fempreg = readdatafile("2002FemPreg.dct", "2002FemPreg.dat.gz",x->x)
+end

@@ -1,0 +1,548 @@
+module SortedStructures
+#-----------------------------------------------------------
+#PURPOSE
+#	Colin T. Bowers module for sorted data structures
+#NOTES
+#LICENSE
+#	MIT License (see github repository for more detail: https://github.com/colintbowers/SortedVectors.jl.git)
+#-----------------------------------------------------------
+
+#Load any entire modules that are needed (use using ModuleName1, ModuleName2, etc)
+using SortedVectors
+
+#Load any specific functions that are needed (use import ModuleName1.FunctionName1, ModuleName2.FunctionName2, etc)
+import 	Base.string,
+		Base.show,
+		Base.getindex,
+		Base.length,
+		Base.size,
+		Base.sizeof,
+		Base.eltype,
+		Base.first,
+		Base.last,
+		Base.endof,
+		Base.copy,
+		Base.deepcopy,
+		Base.issorted,
+		Base.search,
+		Base.searchsorted,
+		Base.searchsortedfirst,
+		Base.searchsortedlast,
+		Base.in,
+		Base.==,
+		Base.!=,
+		Base.pop!,
+		Base.shift!,
+		Base.deleteat!,
+		Base.empty!,
+		Base.insert!,
+		Base.intersect,
+		Base.union,
+		Base.union!
+
+
+
+#Specify the variables/functions to export (use export FunctionName1, FunctionName2, etc)
+export 	SortedDataVector,
+		SortedUniqueDataVector,
+		SortedDataMatrix,
+		SortedUniqueDataMatrix,
+		getlist,
+		getx,
+		getheader,
+		searchfirst,
+		searchlast,
+		replace!,
+		deleteat,
+		deletenotat!
+		deletenotat,
+		trim!,
+		trim,
+		meshIndex,
+		mesh
+
+
+
+
+
+#----------------------------------------------------------
+#TYPE
+#	SortedDataVector
+#	SortedUniqueDataVector
+#	SortedDataMatrix
+#	SortedUniqueDataMatrix
+#FIELDS
+#	x::Vector{T}: This field contains the sorted vector (and unique in case of SortedUniqueVector) of element type T<:Any
+#PURPOSE
+#	This type implements a vector whose elements are guaranteed to be sorted, and a vector whose elements are guaranteed to be sorted and unique. Methods defined on this type exploit this feature for performance gains.
+#INNER CONSTRUCTOR
+#	(x::Vector{T}; alreadySorted::Bool=false): Inner constructor checks whether the input vector is sorted, and sorts it if it is not. This check can be skipped via a keyword argument.
+#	(x::Vector{T}; alreadySorted::Bool=false, alreadyUnique::Bool=false): Inner constructor checks whether the input vector is sorted and unique, and sorts it if it is not, and then forces uniqueness if not. These checks can be skipped via keyword arguments.
+#OUTER CONSTRUCTOR
+#	There are two outer constructors that match the inner constructors that allow the user to skip specifying the type explicitly (instead it is inferred from eltype of the input vector)
+#	(T::DataType): Initiates an empty SortedVector or SortedUniqueVector of type T
+#METHODS
+#	There are many
+#NOTES
+#----------------------------------------------------------
+#-------- TYPE DEFINITION -----------
+#Unique and NotUnique types used to leverage type hierarchy
+immutable Unique; end
+immutable NotUnique; end
+const UU = Union(Unique, NotUnique)::UnionType
+#Abstract super-type
+abstract SortedStructure{TU<:UU}
+abstract SortedVectorStructure{TU<:UU, T1, T2} <: SortedStructure{TU}
+abstract SortedMatrixStructure{TU<:UU, T1, T2, T3} <: SortedStructure{TU}
+#SortedDataVector
+immutable SortedDataVector{T1, T2} <: SortedVectorStructure{NotUnique, T1, T2}
+	list::SortedVector{T1}
+	x::Vector{T2}
+	function SortedDataVector{T1, T2}(list::SortedVector{T1}, x::Vector{T2})
+		length(list) != length(x) && error("Input vectors must have matching length")
+		new(list, x)
+	end
+end
+#SortedUniqueDataVector
+immutable SortedUniqueDataVector{T1, T2} <: SortedVectorStructure{Unique, T1, T2}
+	list::SortedUniqueVector{T1}
+	x::Vector{T2}
+	function SortedUniqueDataVector{T1, T2}(list::SortedUniqueVector{T1}, x::Vector{T2})
+		length(list) != length(x) && error("Input vectors must have matching length")
+		new(list, x)
+	end
+end
+#SortedDataMatrix
+immutable SortedDataMatrix{T1, T2, T3} <: SortedMatrixStructure{NotUnique, T1, T2, T3}
+	list::SortedVector{T1}
+	x::Matrix{T2}
+	header::Vector{T3}
+	function SortedDataMatrix{T1, T2, T3}(list::SortedVector{T1}, x::Array{T2}, header::Vector{T3})
+		length(list) != size(x, 1) && error("length of input list must match number of rows in x")
+		length(header) != size(x, 2) && error("length of input header must match number of columns in x")
+		new(list, x, header)
+	end
+end
+#SortedUniqueDataMatrix
+immutable SortedUniqueDataMatrix{T1, T2, T3} <: SortedMatrixStructure{Unique, T1, T2, T3}
+	list::SortedUniqueVector{T1}
+	x::Matrix{T2}
+	header::Vector{T3}
+	function SortedUniqueDataMatrix{T1, T2, T3}(list::SortedUniqueVector{T1}, x::Array{T2}, header::Vector{T3})
+		length(list) != size(x, 1) && error("length of input list must match number of rows in x")
+		length(header) != size(x, 2) && error("length of input header must match number of columns in x")
+		new(list, x, header)
+	end
+end
+#SortedDataVector Constructors
+SortedDataVector{T1, T2}(list::SortedVector{T1}, x::Vector{T2}) = SortedDataVector{eltype(list), eltype(x)}(list, x)
+SortedDataVector(T1::DataType, T2::DataType) = SortedDataVector(SortedVector(T1), Array(T2, 0))
+#SortedUniqueDataVector Constructors
+SortedUniqueDataVector{T1, T2}(list::SortedUniqueVector{T1}, x::Vector{T2}) = SortedUniqueDataVector{eltype(list), eltype(x)}(list, x)
+SortedUniqueDataVector(T1::DataType, T2::DataType) = SortedUniqueDataVector(SortedUniqueVector(T1), Array(T2, 0))
+#SortedDataMatrix Constructors
+SortedDataMatrix{T1, T2, T3}(list::SortedVector{T1}, x::Array{T2}, header::Vector{T3}) = SortedDataMatrix{eltype(list), eltype(x), eltype(header)}(list, x, header)
+function SortedDataMatrix{T1, T2}(list::SortedVector{T1}, x::Array{T2})
+	header = Array(ASCIIString, size(x, 2))
+	fill!(header, "")
+	return(SortedDataMatrix(list, x, header))
+end
+SortedDataMatrix(T1::DataType, T2::DataType, T3::DataType, N::Int) = SortedDataMatrix(SortedVector(T1), Array(T2, 0, N), Array(T3, N))
+function SortedDataMatrix(T1::DataType, T2::DataType, N::Int)
+	header = Array(ASCIIString, N)
+	fill!(header, "")
+	return(SortedDataMatrix(SortedVector(T1), Array(T2, 0, N), header))
+end
+#SortedUniqueDataMatrix Constructors
+SortedUniqueDataMatrix{T1, T2, T3}(list::SortedUniqueVector{T1}, x::Array{T2}, header::Vector{T3}) = SortedUniqueDataMatrix{eltype(list), eltype(x), eltype(header)}(list, x, header)
+function SortedUniqueDataMatrix{T1, T2}(list::SortedUniqueVector{T1}, x::Array{T2})
+	header = Array(ASCIIString, size(x, 2))
+	fill!(header, "")
+	return(SortedUniqueDataMatrix(list, x, header))
+end
+SortedUniqueDataMatrix(T1::DataType, T2::DataType, T3::DataType, N::Int) = SortedUniqueDataMatrix(SortedUniqueVector(T1), Array(T2, 0, N), Array(T3, N))
+function SortedDataMatrix(T1::DataType, T2::DataType, N::Int)
+	header = Array(ASCIIString, N)
+	fill!(header, "")
+	return(SortedUniqueDataMatrix(SortedUniqueVector(T1), Array(T2, 0, N), header))
+end
+#-------------------------------------
+#-------- ONE-LINE METHODS ----
+Base.string(d::SortedVectorStructure) = string(d.list)
+Base.string(d::SortedMatrixStructure) = "list = " * string(d.list) * ". header = " * string(d.header)
+Base.show(d::SortedVectorStructure) = begin show(d.list); show(d.x); end
+Base.show(d::SortedMatrixStructure) = begin show(d.list); show(d.x); show(d.header); end
+Base.getindex(d::SortedVectorStructure, i::Int) = d.x[i]
+Base.getindex(d::SortedVectorStructure, r::UnitRange) = d.x[r]
+Base.getindex(d::SortedVectorStructure, i::Vector{Int}) = d.x[i]
+Base.getindex(d::SortedVectorStructure, i::IntSet) = d.x[i]
+Base.getindex(d::SortedMatrixStructure, i::Int) = d.x[i, :]
+Base.getindex(d::SortedMatrixStructure, r::UnitRange) = d.x[r, :]
+Base.getindex(d::SortedMatrixStructure, i::Vector{Int}) = d.x[i, :]
+Base.getindex(d::SortedMatrixStructure, i::IntSet) = d.x[i, :]
+getlist(d::SortedStructure) = d.list
+getlist(d::SortedStructure, i::Int) = d.list[i]
+getlist(d::SortedStructure, r::UnitRange) = d.list[r]
+getlist(d::SortedStructure, i::Vector{Int}) = d.list[i]
+getlist(d::SortedStructure, i::IntSet) = d.list[i]
+getx(d::SortedVectorStructure) = d.x
+getx(d::SortedVectorStructure, i::Int) = d.x[i]
+getx(d::SortedVectorStructure, r::UnitRange) = d.x[r]
+getx(d::SortedVectorStructure, i::Vector{Int}) = d.x[i]
+getx(d::SortedVectorStructure, i::IntSet) = d.x[i]
+getx(d::SortedMatrixStructure) = d.x
+getx(d::SortedMatrixStructure, i::Int) = d.x[i, :]
+getx(d::SortedMatrixStructure, r::UnitRange) = d.x[r, :]
+getx(d::SortedMatrixStructure, i::Vector{Int}) = d.x[i, :]
+getx(d::SortedMatrixStructure, i::IntSet) = d.x[i, :]
+getheader(d::SortedMatrixStructure) = d.header
+getheader(d::SortedMatrixStructure, i::Int) = d.header[i]
+getheader(d::SortedMatrixStructure, r::UnitRange) = d.header[r]
+getheader(d::SortedMatrixStructure, i::Vector{Int}) = d.header[i]
+getheader(d::SortedMatrixStructure, i::IntSet) = d.header[i]
+Base.length(d::SortedStructure) = length(d.list)
+Base.sizeof(d::SortedVectorStructure) = sizeof(d.list) + sizeof(d.x)
+Base.sizeof(d::SortedMatrixStructure) = sizeof(d.list) + sizeof(d.x) + sizeof(d.header)
+Base.first(d::SortedStructure) = first(d.x)
+Base.last(d::SortedStructure) = last(d.x)
+Base.endof(d::SortedStructure) = endof(d.x)
+Base.copy(d::SortedDataVector) = SortedDataVector(copy(d.list), copy(d.x))
+Base.copy(d::SortedUniqueDataVector) = SortedUniqueDataVector(copy(d.list), copy(d.x))
+Base.copy(d::SortedDataMatrix) = SortedDataMatrix(copy(d.list), copy(d.x), copy(d.header))
+Base.copy(d::SortedUniqueDataMatrix) = SortedUniqueDataMatrix(copy(d.list), copy(d.x), copy(d.header))
+Base.deepcopy(d::SortedDataVector) = SortedDataVector(deepcopy(d.list), deepcopy(d.x))
+Base.deepcopy(d::SortedUniqueDataVector) = SortedUniqueDataVector(deepcopy(d.list), deepcopy(d.x))
+Base.deepcopy(d::SortedDataMatrix) = SortedDataMatrix(deepcopy(d.list), deepcopy(d.x), deepcopy(d.header))
+Base.deepcopy(d::SortedUniqueDataMatrix) = SortedUniqueDataMatrix(deepcopy(d.list), deepcopy(d.x), deepcopy(d.header))
+Base.issorted(d::SortedStructure) = issorted(d.list)
+Base.searchsorted{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = searchsorted(d.list, a)
+Base.searchsortedfirst{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = searchsortedfirst(d.list, a)
+Base.searchsortedlast{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = searchsortedlast(d.list, a)
+Base.searchsorted{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, a::T1) = searchsorted(d.list, a)
+Base.searchsortedfirst{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, a::T1) = searchsortedfirst(d.list, a)
+Base.searchsortedlast{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, a::T1) = searchsortedlast(d.list, a)
+Base.search{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = searchsorted(d, a)
+searchfirst{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = searchsortedfirst(d, a)
+searchlast{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = searchsortedlast(d, a)
+Base.search{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, a::T1) = searchsorted(d, a)
+searchfirst{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, a::T1) = searchsortedfirst(d, a)
+searchlast{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, a::T1) = searchsortedlast(d, a)
+Base.in{TU<:UU, T1, T2}(a::T1, d::SortedVectorStructure{TU, T1, T2}) = in(a, d.list)
+Base.in{TU<:UU, T1, T2, T3}(a::T1, d::SortedMatrixStructure{TU, T1, T2, T3}) = in(a, d.list)
+#-------------------------------------
+#-------- MULTI-LINE METHODS -----------
+#size
+function Base.size(d::SortedVectorStructure, i::Int)
+	if i == 1
+		return(length(d))
+	else
+		error("Invalid dimension")
+	end
+end
+function Base.size(d::SortedMatrixStructure, i::Int)
+	if i == 1
+		return(size(d.x, 1))
+	elseif i == 2
+		return(size(d.x, 2))
+	else
+		error("Invalid dimension")
+	end
+end
+#eltype
+function Base.eltype(d::SortedVectorStructure, i::Int)
+	if i == 1
+		return(eltype(d.list))
+	elseif i == 2
+		return(eltype(d.x))
+	else
+		error("Invalid dimension")
+	end
+end
+function Base.eltype(d::SortedMatrixStructure, i::Int)
+	if i == 1
+		return(eltype(d.list))
+	elseif i == 2
+		return(eltype(d.x))
+	elseif i == 3
+		return(eltype(d.header))
+	else
+		error("Invalid dimension")
+	end
+end
+#equal to
+function Base.=={TU<:UU, T1, T2}(d1::SortedVectorStructure{TU, T1, T2}, d2::SortedVectorStructure{TU, T1, T2})
+	if d1.list != d2.list
+		return(false)
+	elseif d1.x != d2.x
+		return(false)
+	end
+	return(true)
+end
+function Base.=={TU<:UU, T1, T2, T3}(d1::SortedMatrixStructure{TU, T1, T2, T3}, d2::SortedMatrixStructure{TU, T1, T2, T3})
+	if d1.list != d2.list
+		return(false)
+	elseif d1.x != d2.x
+		return(false)
+	elseif d1.header != d2.header
+		return(false)
+	end
+	return(true)
+end
+#not equal to
+Base.!={TU<:UU, T1, T2}(d1::SortedVectorStructure{TU, T1, T2}, d2::SortedVectorStructure{TU, T1, T2}) = !(d1 == d2)
+Base.!={TU<:UU, T1, T2, T3}(d1::SortedMatrixStructure{TU, T1, T2, T3}, d2::SortedMatrixStructure{TU, T1, T2, T3}) = !(d1 == d2)
+#pop! (not possible for SortedDataMatrix)
+function Base.pop!(d::SortedVectorStructure)
+	pop!(d.list)
+	pop!(d.x)
+end
+#shift! (not possible for SortedDataMatrix)
+function Base.shift!(d::SortedVectorStructure)
+	shift!(d.list)
+	shift!(d.x)
+end
+#deleteat! (not possible for SortedDataMatrix)
+function Base.deleteat!{T<:Union(Int, UnitRange, IntSet, Vector{Int})}(d::SortedVectorStructure, inds::T)
+	deleteat!(d.list, inds)
+	deleteat!(d.x, inds)
+end
+Base.deleteat!{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::T1) = deleteat!(d, search(d, a))
+Base.deleteat!{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, a::Vector{T1}) = [ deleteat!(d, a[n]) for n = 1:length(a) ]
+#empty! (not possible for SortedDataMatrix)
+Base.empty!(d:SortedVectorStructure) = deleteat!(d, 1:length(d))
+#insert! (not possible for SortedDataMatrix)
+function Base.insert!{TU<:UU, T1, T2}(d::SortedVectorStructure{T1, T2}, listItem::T1, xItem::T2)
+	i = insert!(d.list, listItem)
+	insert!(d.x, i, xItem)
+	return(i)
+end
+function Base.insert!{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, listItem::Vector{T1}, xItem::Vector{T2})
+	length(listItem) != length(xItem) && error("listItem and xItem must have matching length")
+	i = [ insert!(d, listItem[n], xItem[n]) for n = 1:length(listItem) ]
+	return(i)
+end
+Base.insert!{TU<:UU, T1, T2}(d1::SortedVectorStructure{TU, T1, T2}, d2::SortedVectorStructure{TU, T1, T2}) = insert!(d1, d2.list, d2.x)
+#replace!
+function Base.replace!{TU<:UU, T1, T2}(d::SortedDataVector{TU, T1, T2}, listItem::T1, xItem::T2)
+	r = search(d, listItem)
+	isempty(r) && error("Unable to find listItem in SortedDataVector")
+	d.x[r] = xItem
+	return(r)
+end
+function Base.replace!{TU<:UU, T1, T2}(d::SortedDataVector{TU, T1, T2}, listItem::Vector{T1}, xItem::Vector{T2})
+	length(listItem) != length(xItem) && error("listItem and xItem must have matching length")
+	i = [ replace!(d, listItem[n], xItem[n]) for n = 1:length(d) ]
+end
+function Base.replace!{TU<:UU, T1, T2, T3}(d::SortedDataMatrix{TU, T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != length(d.header) && error("length of xItem must match number of columns in SortedDataMatrix")
+	r = search(d, listItem)
+	isempty(r) && error("Unable to find listItem in SortedDataMatrix")
+	for i = r.start:r.stop
+		d.x[i, :] = xItem
+	end
+	return(r)
+end
+function Base.replace!{TU<:UU, T1, T2, T3}(d::SortedDataMatrix{TU, T1, T2, T3}, listItem::T1, xItem::Array{T2, 2})
+	size(xItem, 1) != 1 && error("xItem must be a row vector")
+	r = replace!(d, listItem, vec(xItem))
+	return(r)
+end
+function Base.replace!{TU<:UU, T1, T2, T3}(d::SortedDataMatrix{TU, T1, T2, T3}, listItem::Vector{T1}, xItem::Array{T2, 2})
+	size(xItem, 1) != length(listItem) && error("listItem and xItem must have matching number of rows")
+	r = [ replace!(d, listItem[n], vec(xItem[n, :])) for n = 1:length(listItem) ]
+	return(r)
+end
+#deletenotat!
+deletenotat!(d::SortedVectorStructure, r::UnitRange) = deleteat!(d, setdiffIndex(length(d), r))
+deletenotat!(d::SortedVectorStructure, inds::IntSet) = deleteat!(d, setdiffIndex(length(d), inds))
+deletenotat!(d::SortedVectorStructure, inds::Vector{Int}; alreadySorted::Bool=false) = deleteat!(d, setdiffIndex(length(d), inds, alreadySorted=alreadySorted))
+#deleteat
+function deleteat{T<:Union(UnitRange, IntSet, Vector{Int})}(d::SortedMatrixStructure, inds::T)
+	indsKeep = setdiffIndex(length(d), inds)
+	listNew = d.list[indsKeep]
+	xNew = d.x[indsKeep, :]
+	headerNew = deepcopy(d.header)
+	return(SortedDataMatrix(listNew, xNew, headerNew))
+end
+#deletenotat
+deletenotat(d::SortedMatrixStructure, r::UnitRange) = deleteat(d, setdiffIndex(length(d), r))
+deletenotat(d::SortedMatrixStructure, inds::IntSet) = deleteat(d, setdiffIndex(length(d), inds))
+deletenotat(d::SortedMatrixStructure, inds::Vector{Int}; alreadySorted::Bool=false) = deleteat(d, setdiffIndex(length(d), inds, alreadySorted=alreadySorted))
+#intersect (note there is currently no implementation of intersect!)
+function intersect{T1, T2}(dx::SortedDataVector{T1, T2}, dy::SortedDataVector{T1, T2}) #Implement
+	(inds1, inds2, inds1Rec, inds2Rec) = intersectIndex(d1.list, d2.list)
+	N = length(inds1) + length(inds2)
+	listNew = Array(T1, N)
+	xNew = Array(T2, N)
+	listNew[inds1Rec] = d1.list[inds1]
+	listNew[inds2Rec] = d2.list[inds2]
+	xNew[inds1Rec] = d1.x[inds1Rec]
+	xNew[inds2Rec] = d2.x[inds2Rec]
+	return(SortedDataVector(SortedVector(listNew, alreadySorted=true), xNew))
+end
+function intersect{T1, T2}(d1::SortedUniqueDataVector{T1, T2}, d2::SortedUniqueDataVector{T1, T2}) #Takes common elements from d1
+	(inds1, inds2) = intersectIndex(d1.list, d2.list)
+	return(SortedDataVector(SortedUniqueVector(d1.list[inds1]), d1.x[inds1]))
+end
+function intersect{T1, T2, T3}(d1::SortedDataMatrix{T1, T2, T3}, d2::SortedDataMatrix{T1, T2, T3})
+	size(d1, 2) != size(d2, 2) && error("Number of columns do not match")
+	(inds1, inds2, inds1Rec, inds2Rec) = intersectIndex(d1.list, d2.list)
+	N = length(inds1) + length(inds2)
+	listNew = Array(T1, N)
+	xNew = Array(T2, N, size(d1, 2))
+	headerNew = deepcopy(d1.header)
+	listNew[inds1Rec] = d1.list[inds1]
+	listNew[inds2Rec] = d2.list[inds2]
+	xNew[inds1Rec, :] = d1.x[inds1Rec, :]
+	xNew[inds2Rec, :] = d2.x[inds2Rec, :]
+	return(SortedDataMatrix(SortedVector(listNew, alreadySorted=true), xNew, headerNew))
+end
+function intersect{T1, T2, T3}(d1::SortedUniqueDataMatrix{T1, T2, T3}, d2::SortedUniqueDataMatrix{T1, T2, T3}) #Takes common elements from d1
+	size(d1, d2) != size(d2, 2) && error("Number of cols does not match")
+	(inds1, inds2) = intersectIndex(d1.list, d2.list)
+	headerNew = deepcopy(d1.header)
+	return(SortedDataMatrix(SortedUniqueVector(d1.list[inds1]), d1.x[inds1, :], headerNew))
+end
+#union! (not available for matrix types)
+function union!{TU<:UU, T1, T2}(d1::SortedVectorStructure{TU, T1, T2}, d2::SortedVectorStructure{TU, T1, T2})
+	for n = 1:length(d2)
+		i = insert!(d1.list, d2.list[n])
+		insert!(d1.x, i, d2.x[n])
+	end
+end
+#union
+function union{TU<:UU, T1, T2}(d1::SortedVectorStructure{TU, T1, T2}, d2::SortedVectorStructure{TU, T1, T2})
+	dNew = deepcopy(d1)
+	union!(dNew, d2)
+	return(dNew)
+end
+function union{T1, T2, T3}(d1::SortedDataMatrix{T1, T2, T3}, d2::SortedDataMatrix{T1, T2, T3})
+	size(d1, 2) != size(d2, 2) && error("Number of columns do not match")
+	(inds1Rec, inds2Rec) = unionIndex(d1.list, d2.list)
+	N = length(d1) + length(d2)
+	listNew = Array(T1, N)
+	xNew = Array(T2, N, size(d1, 2))
+	headerNew = deepcopy(d1.header)
+	listNew[inds1Rec] = deepcopy(d1.list)
+	listNew[inds2Rec] = deepcopy(d2.list)
+	xNew[inds1Rec, :] = deepcopy(d1.x)
+	xNew[inds2Rec, :] = deepcopy(d2.x)
+	return(SortedDataMatrix(SortedVector(listNew), xNew, headerNew))
+end
+function union{T1, T2, T3}(d1::SortedUniqueDataMatrix{T1, T2, T3}, d2::SortedUniqueDataMatrix{T1, T2, T3})
+	#This one is a bit tricky because we don't want duplicates in the output. I decided to implement the whole thing from scratch.
+	size(d1, 2) != size(d2, 2) && error("Number of columns do not match")
+	NMax = size(d1, 1) + size(d2, 1)
+	listNew = SortedUniqueVector(T1)
+	xNew = Array(T2, NMax, size(d1, 2))
+	headerNew = deepcopy(d1.header)
+	n1 = 1
+	n2 = 1
+	if d1.list[end] < d2.list[1] #Special case shortcut
+		c1 = 1
+		for n = 1:length(d1)
+			push!(listNew.x, d1.list[n])
+			xNew[c1, :] = d.x[n, :]
+			c1 += 1
+		end
+		for n = 1:length(d2)
+			push!(listNew.x, d2.list[n])
+			xNew[c1, :] = d2.x[n, :]
+			c1 += 1
+		end
+		return(SortedUniqueDataMatrix(listNew, xNew, headerNew))
+	elseif d2.list[end] < d1.list[1]  #Special case shortcut
+		c1 = 1
+		for n = 1:length(d2)
+			push!(listNew.x, d2.list[n])
+			xNew[c1, :] = d2.x[n, :]
+			c1 += 1
+		end
+		for n = 1:length(d1)
+			push!(listNew.x, d1.list[n])
+			xNew[c1, :] = d.x[n, :]
+			c1 += 1
+		end
+		return(SortedUniqueDataMatrix(listNew, xNew, headerNew))
+	end
+	c1 = 1
+	while n1 <= length(d1) && n2 <= length(d2)
+		if d1.list[n1] < d2.list[n2]
+			push!(listNew.x, d1.list[n1])
+			xNew[c1, :] = d1.x[n1, :]
+			c1 += 1
+			n1 += 1
+		elseif d1.list[n1] > d2.list[n2]
+			push!(listNew.x, d2.list[n2])
+			xNew[c1, :] = d2.x[n2, :]
+			c1= += 1
+			n2 += 1
+		else
+			push!(listNew.x, d1.list[n1]) #Only push x[nx] to avoid duplication
+			xNew[c1, :] = d1.x[n1, :]
+			c1 += 1
+			n1 += 1
+			n2 += 1
+		end
+	end
+	if n1 <= length(d1)
+		for n = n1:length(d1)
+			push!(listNew.x, d1.list[n])
+			xNew[c1, :] = d1.x[n, :]
+			c1 += 1
+		end
+	elseif n2 <= length(d2)
+		for n = n2:length(d2)
+			push!(listNew.x, d2.list[n])
+			xNew[c1, :] = d2.x[n, :]
+			c1 += 1
+		end
+	end
+	return(SortedUniqueDataMatrix(listNew, xNew, headerNew))
+end
+#trim!
+trim!{T1, T2}(d::SortedVectorStructure{T1, T2}, LB::T1, UB::T1) = deletenotat!(d, trimRange(d.list, LB, UB))
+#trim
+trim{T1, T2}(d::SortedVectorStructure{T1, T2}, LB::T1, UB::T1) = deletenotat(d, trimRange(d.list, LB, UB))
+trim{T1, T2, T3}(d::SortedMatrixStructure{T1, T2, T3}, LB::T1, UB::T1) = deletenotat(d, trimRange(d.list, LB, UB))
+#meshIndex
+meshIndex{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true) = meshIndex(d.list, m, allowForwardLooking=allowForwardLooking)
+meshIndex{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true) = meshIndex(d.list, m, allowForwardLooking=allowForwardLooking)
+#mesh
+mesh{TU<:UU, T1, T2}(d::SortedVectorStructure{TU, T1, T2}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true) = SortedUniqueDataVector(m, d.x[meshIndex(d, m, allowForwardLooking=allowForwardLooking)])
+mesh{TU<:UU, T1, T2, T3}(d::SortedMatrixStructure{TU, T1, T2, T3}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true) = SortedUniqueDataMatrix(m, d.x[meshIndex(d, m, allowForwardLooking=allowForwardLooking)])
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	setdiffIndex
+#INPUT
+#	Function accepts:
+#		(N::Int, inds::IntSet): Provides the complement of inds on 1:N
+#		(N::Int, inds::Vector{Int}; alreadySorted::Bool=false): ditto
+#		(N::Int, r::UnitRange): ditto
+#OUTPUT
+#	IntSet of the complement of the input
+#PURPOSE
+#	Function to find the complement of a set of indices. Massively simplifies the code in this module
+#NOTES
+#	Non-exported function used to find the complement of a set of indices
+#----------------------------------------------------------
+setdiffIndex(N::Int, inds::IntSet) = setdiff(IntSet(1:N), inds)
+function setdiffIndex(N::Int, inds::Vector{Int}; alreadySorted::Bool=false)
+	alreadySorted == false && sort!(inds)
+	return(setdiff(IntSet(1:N), IntSet(inds)))
+end
+function setdiffIndex(N::Int, r::UnitRange)
+	r.start < 1 && error("Bounds error on UnitRange")
+	r.stop > N && error("Bounds error on UnitRange")
+	return(setdiff(IntSet(1:N), IntSet([r.start:r.stop])))
+end
+
+
+
+
+end # module

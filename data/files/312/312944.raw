@@ -1,0 +1,15 @@
+#! /usr/bin/julia
+
+# Rosetta Code, File modification time
+
+fname = "fool.txt"
+tfmt = "%FT%T%z"
+
+println("The modification time of ", fname, " is ")
+println("    ", strftime(tfmt, mtime(fname)))
+
+println("\nTouch this file.")
+touch(fname)
+
+println("The modification time of ", fname, " is now ")
+println("    ", strftime(tfmt, mtime(fname)))

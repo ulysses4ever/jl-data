@@ -1,0 +1,9 @@
+include("../Network.jl")
+
+
+net,duration = construct("test/config_single_neuron.json")
+
+run(net, duration)
+
+println("This is a test!")
+

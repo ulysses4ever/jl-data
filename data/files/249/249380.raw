@@ -1,0 +1,99 @@
+module Manager
+
+    using Mesos
+
+    import Base: launch, manage, connect, kill
+    export MesosManager
+
+    const CMFramework = joinpath(Pkg.dir("Mesos"),"src","clustermanager","scheduler.jl")
+    const SchedulerPort = 5555
+    const ExecutorPort  = 31000
+
+    @doc """
+    # Mesos Cluster Manager
+
+    Mesos-based cluster manager implementation.
+    """ ->
+    type MesosManager <: ClusterManager
+        maxcpu::Int
+        master::String
+        launch_timeout
+
+        schd_io::Nullable{IO}
+        schd_stdio::IO
+        scheduler
+        launched::Bool
+
+        function MesosManager(maxcpu; master="127.0.0.1:5050", launch_timeout=60.0)
+            mgr = new(maxcpu, master, launch_timeout, Nullable{IO}())
+            (port, schd_server) = listenany(SchedulerPort)
+            @schedule begin
+                mgr.schd_io = accept(schd_server)
+            end
+            return mgr
+        end
+    end
+
+    Base.show(io::IO, manager::MesosManager) = print(io, "MesosManager(master='", manager.master, "')")
+
+    function launch(manager::MesosManager, params::Dict, launched::Array, c::Condition)
+        # Launch Mesos framework and receive offers
+        dir = params[:dir]
+        exename = params[:exename]
+        exeflags = params[:exeflags]
+        setup_cmds = "include(\"$CMFramework\"); launch(\"$(manager.master)\", \"$(string(getipaddr()))\", $(manager.maxcpu))"
+
+        io, pobj = open(detach(setenv(`$(Base.julia_cmd(exename)) -e "$setup_cmds"`, dir=dir)), "r")
+        manager.scheduler = pobj
+        manager.schd_stdio = io
+
+        # Wait for framework to launch
+        t0=time()
+        while (time() - t0) < manager.launch_timeout
+            (!isnull(manager.schd_io)) && break
+            sleep(1.0)
+        end
+        manager.launched = !isnull(manager.schd_io)
+
+        # Get worker connection information
+        schd_io = get(manager.schd_io)
+        wcount = manager.maxcpu
+        while wcount > 0 && manager.launched
+            wconfig = WorkerConfig()
+
+            while isopen(schd_io) && !eof(schd_io)
+                obj = deserialize(schd_io)
+                if isa(obj, Proto.TaskStatus)
+                    cnt_info = split(bytestring(obj.data), ":")
+                    wconfig.host = cnt_info[1]
+                    wconfig.port = parse(cnt_info[2])
+                    break
+                else
+                    println(obj)
+                end
+            end
+
+            push!(launched, wconfig)
+            wcount -= 1
+        end
+
+        notify(c)
+    end
+
+    function connect(manager::MesosManager, pid::Int, config::WorkerConfig)
+        println("PID: $pid, CFG: $config")
+
+        pubhost=get(config.host)
+        port=get(config.port)
+        bind_addr=get(config.bind_addr, pubhost)
+        s = connect(bind_addr, port)
+
+        (s, s)
+    end
+
+    function manage(manager::MesosManager, id::Int, config::WorkerConfig, op::Symbol)
+        if symbol == :finalize
+            kill(manager.scheduler)
+        end
+    end
+end

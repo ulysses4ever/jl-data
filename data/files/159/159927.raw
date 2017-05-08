@@ -1,0 +1,86 @@
+module BuzsakiAnalysis
+
+using Debug
+using MAT
+using DataFrames
+using JFacets
+using DimensionalityReduction
+
+export
+  colnames,
+  Dataset,
+  field,
+  colname_regex
+
+const TRACK_BOUNDS = (15,85)
+
+include("dataset.jl")
+include("field.jl")
+
+function average_across_bins_and_trials(df, cols...)
+  vals = [ (t,pb) for t in 1:max(df["t"]), pb in min(df["pb"]):max(df["pb"]) ]
+  vals = reshape(vals, *(size(vals)...))
+  avg_colnames = map(cols) do c "$(c)avg" end
+  data = mapreduce(hcat, vals) do v
+    print(v); print("\n")
+    rows = select( :( (t .== $(v[1])) & (pb .== $(v[2])) ), df)
+    avgs = [ size(rows,1) == 0 ? 0 : mean(rows[col]) for col in cols ]
+    [v..., avgs...]
+  end
+  DataFrame(data', ["t","pb",avg_colnames...])
+end
+
+# TODO look into using AbstractDataFrame to see if I can retain the structure
+# of the data and not flatten spikes/LFP
+
+    #function position_bin(num_bins::Integer, ds::Dataset)
+
+    #end
+
+
+#    @debug function extract_time_ranges(pos_bin_vector)
+#      @bp
+#      # find all transitions
+#      bins = unique(pos_bin_vector)
+#      time_table = Dict(bins, [ Range[] for x=1:length(bins) ])
+#      last_boundary = 1
+#      for i in 2:length(pos_bin_vector)
+#        if pos_bin_vector[i] != pos_bin_vector[i-1]
+#          push!(time_table[pos_bin_vector[i-1]], last_boundary:i)
+#          last_boundary = i
+#        end
+#      end
+#    end
+#
+#    function map_time_ranges_to_direction(time_ranges, dir_vector)
+#      value_by(time_ranges) do r
+#        dir_slice = dir_vector[r]
+#        count(dir_slice) do (x) x==1 end > length(r) / 2
+#      end
+#    end
+#
+#    #function time_plot(data)
+#
+#    #  pos_range = 
+#    #  pos_center = 
+#
+#    #  data.frame["time"]
+#    #  # find time points when rat is at a given position
+#
+#    #  #
+#
+#    #end
+#
+#function average_neurons(df, col)
+#  vals = [ (t,pb) for t in 1:max(df["t"]), pb in min(df["pb"]):max(df["pb"]) ]
+#  #vals = [ (t,pb) for t in 1:max(df["t"]), pb in 20:25 ]
+#  vals = reshape(vals, *(size(vals)...))
+#  data = mapreduce(hcat, vals) do v
+#    rows = select( :( (t .== $(v[1])) & (pb .== $(v[2])) ), df)
+#    avg = size(rows,1) == 0 ? 0 : mean(rows[col])
+#    [v..., avg]
+#  end
+#  DataFrame(data', ["t","pb","n"])
+#end
+
+end

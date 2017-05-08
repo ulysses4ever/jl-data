@@ -1,0 +1,2 @@
+{"business_profile": {"website": "http://www.auto-gruell.com", "city": "Sankt Willibald", "street_number": "59", "mobile": "", "email": "auto.gruell@gmail.com", "phone": "77622862", "address": "Nr.", "business_name": "Grüll Auto GmbH", "geo": [], "id": "66176", "zip_code": "4762"}}
+ {"business_profile": {"website": "http://www.reindl.at", "city": "Sankt Willibald", "street_number": "80", "mobile": "", "email": "office@reindl.at", "phone": "77622841", "address": "Nr.", "business_name": "Reindl Gesellschaft m b H", "geo": [], "id": "66190", "zip_code": "4762"}}

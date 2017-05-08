@@ -1,0 +1,48 @@
+isflat(ex::Expr) = ex.head==:block ? all(isflat,ex.args) :
+                   ex.head in [:for,:function] ? isflat(ex.args[2]) :
+                   ex.head in [:(=),:(+=), :(*=), :(/=), :(-=), :(.*=)] ? all(isflat,ex.args) : #all(x->!isa(x,Expr),ex.args) :
+                   ex.head==:call ? !any(x->isa(x,Expr) && !(x.head in [:ref, :(::)]) ,ex.args) :
+                   false
+isflat(ex::Any) = true
+
+function flatten(ex::Expr)
+    ex_list = {}
+    flatten!(ex,ex_list,true,:nothing,{})
+    length(ex_list)==1 ? ex_list[1] : Expr(:block,ex_list...)
+end
+
+function flatten!(ex::Expr, ex_list::Array, is_top::Bool, parent_head::Symbol, parent_args::Array)
+    if ex.head in [:function,:for]
+        f=Expr(ex.head,ex.args[1],flatten_block!(ex.args[2],ex_list,false))
+        is_top ? (push!(ex_list,f); f) : f
+    elseif ex.head == :block
+        f = flatten_block!(ex,ex_list,is_top)
+        is_top ? (push!(ex_list,f); f) : f
+    else
+        flatten_other!(ex,ex_list,is_top,parent_head,parent_args)
+    end
+end
+flatten!(s::Any,ex_list,is_top,parent_head,parent_args) = is_top ? (push!(ex_list,s); s) : s
+
+function flatten_block!(ex::Expr,ex_list::Array,is_top::Bool)
+    sublist = {}
+    map(x->flatten!(x,sublist,true,ex.head,ex.args),ex.args)
+    return Expr(:block,sublist...)
+end
+
+function flatten_other!(ex,ex_list, is_top,parent_head,parent_args)
+    #update ex_list with list of simple expressions comprising ex, and return simplified ex
+    newargs = map(x->flatten!(x,ex_list, false, ex.head, ex.args), ex.args)
+    ex_new = Expr(ex.head,newargs...)
+    if is_top
+        push!(ex_list, ex_new)
+        return ex_new
+    elseif  parent_head in [:(=), :(+=), :for, :(:), :(->), :(::)] ||
+            (ex.head ==symbol('\'') && isa(ex_new.args[1],Symbol) && parent_head == :call && parent_args[1]==:*)
+        return ex_new
+    else
+        t = gensym("temp")
+        push!(ex_list, Expr(:(=),t,ex_new))
+        return t
+    end
+end

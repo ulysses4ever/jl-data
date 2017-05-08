@@ -1,0 +1,10 @@
+importall signalprocessing, config
+using DSP, WAV, Winston
+
+wavfile = "0.wav";
+path = string(wavpath,wavfile);
+rec, fs = wavread(path);
+frec = hpfilter(rec,fs);
+spec = spectrogram(frec[14000:18000],442);
+A = spec.power;
+imagesc(1000*A)

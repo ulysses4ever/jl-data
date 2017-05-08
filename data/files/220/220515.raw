@@ -1,0 +1,105 @@
+#Library related to Generation of Initial Solution
+#Copyright(c) 2015: Kally Chung
+
+#01...orderD
+
+include( "IO_MCITW-1P.jl" )
+
+function orderD( cardD )
+#sort deliveries
+#===============#
+#    input: int cardD
+#   output: array sortedD
+
+  sortedD = zeros( Int, cardD)  #output
+
+  aux = zeros( Int, cardD)  #keep which number is available or not
+                            #{0-available, 1-already selected}
+  count = 0   #count how many numbers have been sorted
+  num = 0     #number selected
+
+  #checking process
+  if ( cardD <= 0 )
+    println( "cardD -> invalid number " )
+  end
+  
+  #selection process
+  while( count != (cardD-1) )
+    num = rand( 1:cardD )
+    if ( aux[ num ] == 0 )
+      count = count + 1
+      sortedD[ count ] = num
+      aux[ num ] = 1
+    end
+  end
+  
+  #selection process for the last number
+  for i in 1:cardD
+    if ( aux[i] == 0 )
+      sortedD[ cardD ] = i
+      break
+    else
+      continue
+    end
+  end
+
+  return sortedD
+end
+
+function findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd, valueBin )
+#findDemRec
+#==========#
+#    input: int offer -------------> DA
+#           array(int) valPA ------> array containing PA's from available pickups
+#           int cardValP ----------> number of available pickups
+#           array(bool) currValP --> array containing which pickups are being
+#                                    considered
+#           array(bool) optDem-----> array containing the pickups that will be 
+#                                    the demand
+#           int diff --------------> difference between offer and sum of PA's
+#           int currInd -----------> current index in the recursion
+#           bool valueBin ---------> which value is been considered {0,1}
+#
+#   output: array optDem-----------> array updated containing the solution
+#           int diff---------------> difference between offer and sum of PA's
+  
+  #update array currValP
+  currValP[ currInd ] = valueBin
+  
+  #check if array currValP is a better option than the current one
+  if ( currInd == cardValP )
+    aux = dot(currValP, valPA)
+    aux = offer - aux
+    
+    #update array currValP case a better option has been found
+    if ( ( aux < diff ) && ( aux >= 0 ) )
+      for i in 1:cardValP
+        optDem[i] = currValP[i]
+      end
+      diff = aux
+    end
+    
+    return optDem, diff
+  else
+    #proceeding with the recursion
+    (optDem, diff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd + 1, 0)
+    (optDem, diff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd + 1, 1)
+  end
+end
+
+function findDemand( offer, valPA, cardValP)
+#findDemand
+#==========#
+#    input: int offer -------------> DA
+#           array(int) valPA ------> array containing PA's from available pickups
+#           int cardValP ----------> number of available pickups
+#
+#   output: array(bool) solArray --> array with the pickups to fullfill offer
+
+  currValP = zeros( Int, cardValP)
+  (solArray, solDiff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, 1, 0)
+  (solArray, solDiff) = findDemRec( offer, valPA, cardValP, currValP, solArray, solDiff, 1, 1)
+  
+  return solArray
+end
+

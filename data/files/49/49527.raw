@@ -1,0 +1,19 @@
+"""
+Return a random set of points between a and b.
+"""
+function rand_pts(n, a::Float64=0.0, b::Float64=1.0)
+    a + (b-a)*rand(n);
+end
+
+"""
+If a and b are vectors return a random set of points in the k-dimensional interval [a,b]
+"""
+function rand_pts(n, a::Array{Float64,1}=[0.0,0.0], b::Array{Float64,1}=[1.0,1.0])
+    all(a .<= b) || all(a .>= b) || error("a and b must comperable in componentwise partial order.")
+    length(a)==length(b) || error("a and b must have the same length")
+    pts = Array(Float64,(length(a),n));
+    for i in 1:length(a)
+        pts[i,:] = rand_pts(n,a[i],b[i]);
+    end
+    return pts;
+end

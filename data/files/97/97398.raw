@@ -1,0 +1,13 @@
+module Chinese
+
+module Base简体
+include("Base.jl")
+end
+# package code goes here
+importall .Base简体
+
+include("Base.export.jl")
+
+include("Chinese_parse.jl")
+
+end # module

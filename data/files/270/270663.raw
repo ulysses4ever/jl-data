@@ -1,0 +1,101 @@
+# clone GreatCMakeCookOff
+module TBB
+export prepare, make, test, publish
+
+using Debian
+import Debian: make, publish
+
+using Docker
+using Convenience
+
+const filename = "tbb43_20150424oss_src.tgz"
+const homepage = "https://www.threadingbuildingblocks.org"
+const url = "https://www.threadingbuildingblocks.org/sites/default/files/software_releases/source/"
+const email = "rc-softdev@ucl.ac.uk"
+const maintainer = "Research Software Development Team"
+const version = "4.3.5"
+const package = lowercase("Intel-Thread-Building-Blocks")
+const license = "gpl"
+const build_depends = "gcc (>= 4.0)", "make (>= 3.0)", "g++ (>= 4.0)", "cdbs"
+
+function prepare(workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(package, version, workdir)
+
+  create_or_use_directory(builddir)
+
+  isfile(tarfile) || download(url * filename, joinpath(builddir, tarfile))
+  cd(builddir) do
+    if !isdir(name)
+       run(`tar -xvf $tarfile`)
+       mv(replace(filename, "_src.tgz", ""), name)
+    end
+  end
+
+  cd(joinpath(builddir, name)) do
+    control(package, version;
+      build_depends=build_depends, homepage=homepage,
+      description="Library to do threads the intel way",
+
+      package="$package-dev",
+      architecture="all",
+      depends="$package",
+      description="Headers for intel threading library",
+
+      package="$package-dbg",
+      description="Debug libraries for intel threading"
+    )
+    rules(:make,
+          "build/$package::",
+          "\tmkdir -p debian/tmp/usr/lib",
+          "\tcp build/*_release/libtbb*.so debian/tmp/usr/lib",
+          "build/$package-dbg::",
+          "\tmkdir -p debian/tmp/usr/lib",
+          "\tcp build/*_debug/libtbb*_debug.so debian/tmp/usr/lib",
+          "build/$package-dev::",
+          "\tmkdir -p debian/tmp/usr/include",
+          "\tcp -r include/tbb debian/tmp/usr/include"
+    )
+    debian_file("$package.install",
+      "usr/lib/libtbb.so",
+      "usr/lib/libtbbmalloc.so",
+      "usr/lib/libtbbmalloc_proxy.so"
+    )
+    debian_file("$package-dbg.install",
+      "usr/lib/libtbb_debug.so",
+      "usr/lib/libtbbmalloc_debug.so",
+      "usr/lib/libtbbmalloc_proxy_debug.so"
+    )
+    debian_file("$package-dev.install", "usr/include")
+    change(package, version, "See CHANGES in source package"; distribution="trusty")
+  end
+end
+
+make(machine; kwargs...) = make(machine, package, version; build_depends=build_depends,
+  license=license, kwargs...)
+
+function test(machine; workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(package, version, workdir)
+
+  machine = deepcopy(machine)
+  machine.volumes[builddir] = "/$name"
+  machine.workdir = "/$name"
+
+  std = package * "_" * version
+  dbg = package * "-dbg_" * version
+  dev = package * "-dev_" * version
+  command(machine, STDOUT; image=package, rm=true) do
+    "dpkg -i $std-1_*.deb\n" *
+    "dpkg -i $dbg-1_*.deb\n" *
+    "dpkg -i $dev-1_*.deb\n" *
+    "dpkg-query -L $package\n" *
+    "dpkg-query -L $package-dbg\n" *
+    "dpkg-query -L $package-dev\n" *
+    "test -e /usr/lib/libtbb.so\n" *
+    "test -e /usr/lib/libtbb_debug.so\n" *
+    "test -e /usr/include/tbb/tbb.h\n"
+  end
+end
+
+publish(machine; kwargs...) = publish(machine, package, version; kwargs...)
+
+end

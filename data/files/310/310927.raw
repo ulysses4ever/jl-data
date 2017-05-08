@@ -1,0 +1,29 @@
+using Distances
+
+export kNN #classification via kNN
+
+#Finds the kNN for one observation within a trained set
+function find_kNN{T<:Number}(input_array::Array{T,1}, set_array::Array{T,2}, labels::Array; k=3, prob=false)
+    dist = Distances.colwise(Euclidean(), set_array', input_array)
+
+    d = Dict{Any,Int}()                   
+    for i in labels[sortperm(dist)][1:k]   # key = label, value = counts among k nearest neighbors
+        d[i] = get(d, i, 0) + 1
+    end
+    
+    prob || return collect(keys(d))[indmax(collect(values(d)))]   # return the most frequent of neighbors
+                                                             # make k an odd value to save the democracy!
+    d_prob = Dict{Any, Float64}()
+    [ d_prob[i] = d[i]/sum(collect(values(d))) for i in keys(d) ]      # {label => probability} dict
+    return d_prob
+end
+
+#Returns the predicted labels for a test matrix
+function kNN(test_array::Matrix, train_array::Matrix, train_labels::Vector, k::Int64)
+    #count_correct = 0
+    kNN_label = cell(length(test_array[:,1]))
+    for i in 1:size(test_array,1)
+        kNN_label[i] = find_kNN(test_array[i,:][:], train_array, train_labels, k = k)
+    end    
+    return kNN_label
+end

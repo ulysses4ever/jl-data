@@ -1,0 +1,202 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+using Logging
+
+Logging.configure(level=DEBUG)
+Logging.configure(output=open("framework.log", "a"))
+
+const TOTAL_TASKS = 5
+const TASK_CPUS = 1.
+const TASK_MEM = 128.
+const EXECUTOR = joinpath(Pkg.dir("Mesos"),"examples","executor.jl")
+
+type TestSchedulerConfig <: SchedulerConfig
+    tasksLaunched::Int
+    tasksFinished::Int
+    messagesSent::Int
+    messagesReceived::Int
+    implicitAcknowledgements::Bool
+    taskData::Dict{String, (Proto.SlaveID, Proto.ExecutorID)}
+    executor::Proto.ExecutorInfo
+
+    function TestSchedulerConfig()
+        taskData = Dict{String, (Proto.SlaveID, Proto.ExecutorID)}()
+
+        # Setup executor
+        execInfo = @proto Proto.ExecutorInfo (
+            :name => "Test Executor (Julia)",
+            :source => "julia_test",
+            :executor_id => @proto(Proto.ExecutorID, :value => "default"),
+            :command => @proto(Proto.CommandInfo, :value => EXECUTOR),
+            :resources => [
+                #Mesos.createScalarResourse("cpus", TASK_CPUS),
+                Mesos.createScalarResourse("mem", TASK_MEM)
+            ]
+        )
+
+        return new(0, 0, 0, 0, true, taskData, execInfo)
+    end
+end
+
+#-------------------------------------------------------------------------------
+# Callbacks
+#-------------------------------------------------------------------------------
+function scheduler_registered(driver::SchedulerDriver, config::TestSchedulerConfig,
+                              frameworkId::Proto.FrameworkID, masterInfo::Proto.MasterInfo)
+    debug("Registered with framework ID $(frameworkId.value)")
+end
+
+function scheduler_reregistered(driver::SchedulerDriver, config::TestSchedulerConfig,
+                                masterInfo::Proto.MasterInfo)
+    debug("Re-registered with master: $(masterInfo.hostname)")
+end
+
+function scheduler_disconnected(driver::SchedulerDriver)
+    debug("Disconnected")
+end
+
+function scheduler_resourceOffers(driver::SchedulerDriver, config::TestSchedulerConfig, offers::Vector{Proto.Offer})
+    for offer in offers
+        tasks = Proto.TaskInfo[]
+        offerCpus = getScalarResourse(offer.resources, Mesos.CPU_RESOURSE)
+        offerMem = getScalarResourse(offer.resources, Mesos.MEM_RESOURSE)
+
+        debug("Received offer $(offer.id.value) with cpus: $offerCpus and mem: $offerMem")
+
+        remainingCpus = offerCpus
+        remainingMem = offerMem
+
+        while config.tasksLaunched < TOTAL_TASKS &&
+              remainingCpus >= TASK_CPUS  &&
+              remainingMem >= TASK_MEM
+
+            tid = config.tasksLaunched
+            config.tasksLaunched += 1
+
+            debug("Launching task $tid using offer $(offer.id.value)")
+            task = @proto Proto.TaskInfo (
+                :task_id => @proto(Proto.TaskID, :value => string(tid)),
+                :slave_id => @proto(Proto.SlaveID, :value => offer.slave_id.value),
+                :name => "task $tid",
+                :executor => config.executor,
+                :resources => [
+                    createScalarResourse(Mesos.CPU_RESOURSE, TASK_CPUS),
+                    createScalarResourse(Mesos.MEM_RESOURSE, TASK_MEM)
+                ]
+            )
+
+            push!(tasks, task)
+            config.taskData[task.task_id.value] = (offer.slave_id, task.executor.executor_id)
+
+            remainingCpus -= TASK_CPUS
+            remainingMem -= TASK_MEM
+        end
+
+        # Make operation for launch
+        operation = @proto Proto.Offer_Operation (
+            :_type  => Proto.Offer_Operation_Type.LAUNCH,
+            :launch => @proto(Proto.Offer_Operation_Launch, :task_infos => tasks)
+        )
+
+        acceptOffers(driver, [offer.id], [operation])
+    end
+end
+
+function scheduler_statusUpdate(driver::SchedulerDriver, config::TestSchedulerConfig, status::Proto.TaskStatus)
+    info("Task $(status.task_id.value) is in state $(status.state)")
+
+    # Ensure the binary data came through.
+    statusData = bytestring(status.data)
+    debug("Task $(status.task_id.value) status data: $statusData")
+    debug("Task $(status.task_id.value) status message: $(status.message)")
+    if statusData != "data with a \0 byte"
+        warn("""
+            StatusUpdate:
+            The returned message data did not match!
+                Expected: 'data with a \0 byte'
+                  Actual: '$statusData'
+            """)
+        exit(1)
+    end
+
+    if status.state == Proto.TaskState.TASK_FINISHED
+        config.tasksFinished += 1
+        if config.tasksFinished == TOTAL_TASKS
+            info("All tasks done, waiting for final framework message")
+        end
+        slave_id, executor_id = config.taskData[status.task_id.value]
+        config.messagesSent += 1
+        sendFrameworkMessage(driver, executor_id, slave_id, "data with a \0 byte")
+    end
+
+    if status.state == Proto.TaskState.TASK_LOST ||
+       status.state == Proto.TaskState.TASK_KILLED ||
+       status.state == Proto.TaskState.TASK_FAILED
+        warn("Aborting because task $(status.task_id.value) is in unexpected state $(status.state) with message '$(status.message)'")
+        abort(driver)
+    end
+
+    # Explicitly acknowledge the update if implicit acknowledgements are not being used.
+    if !config.implicitAcknowledgements
+        acknowledgeStatusUpdate(driver, status)
+    end
+end
+
+function scheduler_frameworkMessage(driver::SchedulerDriver, config::TestSchedulerConfig,
+                                    executorId::Proto.ExecutorID, slaveId::Proto.SlaveID, message::String)
+    config.messagesReceived += 1
+    if message != "data with a \0 byte"
+        warn("""
+            FrameworkMessage:
+            The returned message data did not match!
+                Expected: 'data with a \0 byte'
+                  Actual: '$message'
+            """)
+        exit(1)
+    end
+    info("Received message: '$message'")
+
+    if config.messagesReceived == TOTAL_TASKS
+        if config.messagesReceived != config.messagesSent
+            warn("Sent $(config.messagesSent) but received $(config.messagesReceived)")
+            exit(1)
+        end
+        info("All tasks done, and all messages received, exiting")
+        stop(driver)
+    end
+end
+
+function scheduler_error(driver::SchedulerDriver, error_msg::String)
+    error(error_msg)
+end
+
+#-------------------------------------------------------------------------------
+
+if length(ARGS) == 0
+    println("Usage: $(ENV["_"]) master")
+    exit(1)
+end
+
+# Create scheduler configuration
+config = TestSchedulerConfig()
+
+# Setup framework
+framework = createFramework("Test Framework (Julia)")
+if haskey(ENV, "MESOS_EXPLICIT_ACKNOWLEDGEMENTS")
+    println("Enabling explicit acknowledgements for status updates")
+    config.implicitAcknowledgements = false
+end
+
+# Create & setup scheduler
+scheduler = Scheduler(config,
+                      registered = scheduler_registered,
+                      reregistered = scheduler_reregistered,
+                      disconnected = scheduler_disconnected,
+                      resourceOffers = scheduler_resourceOffers,
+                      statusUpdate = scheduler_statusUpdate,
+                      frameworkMessage = scheduler_frameworkMessage,
+                      error = scheduler_error)
+
+info("Starting Scheduler Driver")
+run(scheduler, framework, ARGS[1])

@@ -1,0 +1,665 @@
+# glTF types
+
+"""
+Abstract top-level glTF type for multi-dispatching
+"""
+abstract AbstractGLTFObject
+
+
+# buffers & bufferViews & accessors
+"""
+# [Specification:](https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#buffer)
+
+> A buffer is data stored as a binary blob. The buffer can contain a combination of geometry, animation, and skins.
+> Binary blobs allow efficient creation of GL buffers and textures since they require no additional parsing,
+> except perhaps decompression. An asset can have any number of buffer files for flexibility for a wide array of applications.
+> Buffer data is little endian.
+> All buffers are stored in the asset's buffers dictionary property.
+
+# Fields:
+* id: the ID of the buffer.
+* uri: the uri of the buffer(use uri.path to load a local .bin file).
+* byteLength: the length of the buffer in bytes.
+* type: XMLHttpRequest `responseType`.
+* name: the user-defined name of this object.
+"""
+type GLTFBuffer{T<:AbstractString} <: AbstractGLTFObject
+    id::T
+    uri::URI
+    byteLength::Int
+    _type::T
+    name::Nullable{T}
+    function GLTFBuffer(id, uri, byteLength, _type, name)
+        @assert byteLength ≥ 0 "The length of the buffer should >= 0."
+        @assert _type ∈ ["arraybuffer", "text"] "Valid type names are \"arraybuffer\" and \"text\"."
+        new(id, uri, byteLength, _type, name)
+    end
+end
+GLTFBuffer{T<:AbstractString}(id::T, uri::URI; byteLength=0, _type="arraybuffer", name=Nullable{T}()) = GLTFBuffer{T}(id, uri, byteLength, _type, name)
+
+"""
+# [Specification:](https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#bufferview)
+
+> A bufferView represents a subset of data in a buffer, defined by an integer offset
+> into the buffer specified in the byteOffset property, a byteLength property to specify
+> length of the buffer view. The bufferView also defines a target property to indicate
+> the target data type, either ARRAY_BUFFER, ELEMENT_ARRAY_BUFFER, or an object describing
+> animation or skinning target data. This enables the implementation to readily create
+> and populate the buffers in memory.
+
+# Fields:
+* id: the ID of the bufferView.
+* buffer: the ID of the buffer.
+* byteOffset: the offset into the buffer in bytes.
+* byteLength: the length of the bufferView in bytes.
+* target: `bindBuffer()` target parameter.
+* name: the user-defined name of this object.
+"""
+type GLTFBufferView{T<:AbstractString} <: AbstractGLTFObject
+    id::T
+    buffer::T
+    byteOffset::Int
+    byteLength::Int
+    target::Nullable{GLenum}
+    name::Nullable{T}
+    function GLTFBufferView(id, buffer, byteOffset, byteLength, target, name)
+        @assert byteOffset ≥ 0 && error("The offset into the buffer should ≥ 0.")
+        @assert byteLength ≥ 0 && error("The length of the bufferView should ≥ 0.")
+        if !isnull(target)
+            @assert target ∈ [GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER] "Valid target values correspond to enums: GL_ARRAY_BUFFER(34962) and GL_ELEMENT_ARRAY_BUFFER(34963)."
+        end
+        new(id, buffer, byteOffset, byteLength, target, name)
+    end
+end
+GLTFBufferView{T<:AbstractString}(id::T, buffer::T, byteOffset::Int; byteLength=0,
+    target=Nullable{GLenum}(), name=Nullable{T}()) = GLTFBufferView{T}(id, buffer, byteOffset, byteLength, target, name)
+
+"""
+# [Specification:](https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#accessor)
+
+> A typed view into a bufferView. A bufferView contains raw binary data.
+> An accessor provides a typed view into a bufferView or a subset of a bufferView
+> similar to how WebGL's vertexAttribPointer() defines an attribute in a buffer.
+
+## Fields:
+* id: the ID of the accessor.
+* bufferView: the ID of the bufferView.
+* byteOffset: `vertexAttribPointer()` offset parameter.
+* byteStride: `vertexAttribPointer()` stride parameter.
+* componentType: the datatype of components in the attribute.
+* count: the number of attributes referenced by this accessor, not to be confused with the number of bytes or number of components.
+* type: specifies if the attribute is a scalar, vector, or matrix, and the number of elements in the vector or matrix.
+* max: maximum value of each component in this attribute.
+* min: minimum value of each component in this attribute.
+* name: the user-defined name of this object.
+"""
+type GLTFAccessor{T<:AbstractString} <: AbstractGLTFObject
+    id::T
+    bufferView::T
+    byteOffset::Int
+    byteStride::Int
+    componentType::GLenum
+    count::Int
+    _type::T
+    max::Nullable{Vector{Real}}
+    min::Nullable{Vector{Real}}
+    name::Nullable{T}
+    function GLTFAccessor(id, bufferView, byteOffset, byteStride, componentType, count, _type, max, min, name)
+        @assert byteOffset ≥ 0 "Accessor.byteOffset should ≥ 0."
+        @assert 0 ≤ byteStride ≤ 255 "Accessor.byteStride should ∈ [0,255]."
+        @assert componentType ∈ [GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_FLOAT] "Valid Accessor.componentType values are GL_BYTE(5120), GL_UNSIGNED_BYTE(5121), GL_SHORT(5122), GL_UNSIGNED_SHORT(5123), and GL_FLOAT(5126)."
+        @assert count ≥ 1 "Accessor.count should ≥ 1."
+        @assert _type ∈ ["SCALAR", "VEC2", "VEC3", "VEC4", "MAT2", "MAT3", "MAT4"] "Valid Accessor.type values are \"SCALAR\", \"VEC2\", \"VEC3\", \"VEC4\", \"MAT2\", \"MAT3\", \"MAT4\""
+        new(id, bufferView, byteOffset, byteStride, componentType, count, _type, max, min, name)
+    end
+end
+GLTFAccessor{T<:AbstractString}(id::T, bufferView::T, byteOffset::Int,
+    componentType::Int, count::Int, _type::T; byteStride=0, max=Nullable{Vector{Real}}(),
+    min=Nullable{Vector{Real}}(), name=Nullable{T}()) = GLTFAccessor{T}(id, bufferView, byteOffset, byteStride, GLenum(componentType), count, _type, max, min, name)
+
+
+
+# scenes, nodes, cameras & animations
+"""
+# [Specification:](https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#scene)
+
+> The glTF asset contains one or more scenes, the set of visual objects to render.
+> Scenes are defined in a dictionary object scenes.
+
+## Fields:
+* id: the ID of the scene.
+* nodes: the IDs of each root node.
+* name: the user-defined name of this object.
+"""
+type GLTFScene{T<:AbstractString} <: AbstractGLTFObject
+    id::T
+    nodes::Vector{T}
+    name::Nullable{T}
+end
+GLTFScene{T<:AbstractString}(id::T; nodes=Vector{T}(), name=Nullable{T}()) = GLTFScene(id, nodes, name)
+
+"""
+# [Specification:](https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#node)
+
+> The glTF asset defines one or more nodes, that is, the objects comprising the scene to render.
+> Each node can contain one or more meshes, a skin instance, a joint name, or a camera, defined
+> in the meshes, skeletons, skin, jointName, and camera properties, respectively.
+> Nodes have an optional name property.
+> Nodes also have transform properties, as described in the next section.
+> Nodes are organized in a parent-child hierarchy known informally as the node hierarchy.
+
+## Fields:
+* id: the ID of the node.
+* camera: the ID of the camera referenced by this node.
+* children: the IDs of this node's children.
+* skeletons: the IDs of skeleton nodes.
+* skin: the ID of the skin referenced by this node.
+* jointName: name used when this node is a joint in a skin.
+* matrix: a floating-point 4x4 transformation matrix stored in column-major order(`uniformMatrix4fv()`).
+* meshes: the IDs of the mesh objects in this node.
+* rotation: the node's unit quaternion rotation in the order (x, y, z, w), where w is the scalar.
+* scale: the node's non-uniform scale.
+* translation: the node's translation.
+* name: the user-defined name of this object.
+"""
+type GLTFNode{T<:AbstractString} <: AbstractGLTFObject
+    id::T
+    camera::Nullable{T}
+    children::Vector{T}
+    skeletons::Nullable{Vector{T}}
+    skin::Nullable{T}
+    jointName::Nullable{T}
+    matrix::Vector{GLfloat}
+    meshes::Nullable{Vector{T}}
+    rotation::Vector{GLfloat}
+    scale::Vector{GLfloat}
+    translation::Vector{GLfloat}
+    name::Nullable{T}
+end
+GLTFNode{T<:AbstractString}(id::T; children=Vector{T}(), matrix=GLfloat[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+    rotation=GLfloat[0,0,0,1], scale=GLfloat[1,1,1], translation=GLfloat[0,0,0], camera=Nullable{T}(),
+    skeletons=Nullable{Vector{T}}(), skin=Nullable{T}(), jointName=Nullable{T}(), meshes=Nullable{Vector{T}}(),
+    name=Nullable{T}()) = GLTFNode(id, camera, children, skeletons, skin, jointName, matrix, meshes, rotation, scale, translation,name)
+
+"""
+Abstract glTF animation type
+"""
+abstract AbstractGLTFAnimation <: AbstractGLTFObject
+
+"""
+Animation.sampler
+"""
+type GLTFAnimationSampler{T<:AbstractString} <: AbstractGLTFAnimation
+    input::T
+    output::T
+    interpolation::T
+    function GLTFAnimationSampler(input, output, interpolation)
+        @assert interpolation == "LINEAR" "glTF 1.0 animation samplers support only linear interpolation."
+        new(input, output, interpolation)
+    end
+end
+GLTFAnimationSampler{T<:AbstractString}(input::T, output::T; interpolation="LINEAR") = GLTFAnimationSampler{T}(input, output, interpolation)
+
+"""
+Animation.channel.target
+"""
+type GLTFAnimationChannelTarget{T<:AbstractString} <: AbstractGLTFAnimation
+    id::T
+    path::T
+    function GLTFAnimationChannelTarget(id, path)
+        @assert path ∈ ["translation", "rotation", "scale"] "Valid path names are \"translation\", \"rotation\", and \"scale.\""
+        new(id, path)
+    end
+end
+GLTFAnimationChannelTarget{T<:AbstractString}(id::T, path::T) = GLTFAnimationChannelTarget{T}(id, path)
+
+"""
+
+Animation.channel
+"""
+type GLTFAnimationChannel <: AbstractGLTFAnimation
+    sampler::GLTFAnimationSampler
+    target::GLTFAnimationChannelTarget
+end
+
+"""
+# [Specification:](https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#animation)
+
+> glTF supports articulated and skinned animation via key frame animations of nodes' transforms.
+> Key frame data is stored in buffers and referenced in animations using accessors.
+
+## Fields:
+* id: the ID of the animation.
+* channels: an array of channels, each of which targets an animation's sampler at a node's property.
+* parameters: a dictionary object of strings whose values are IDs of accessors with keyframe data.
+* samplers: A dictionary object of animation.sampler objects that combines input and output parameters with an interpolation algorithm to define a keyframe graph.
+* name: the user-defined name of this object.
+"""
+type GLTFAnimation{T<:AbstractString} <: AbstractGLTFAnimation
+    id::T
+    channels::Vector{GLTFAnimationChannel}
+    parameters::Dict{T, T}
+    samplers::Dict{T, GLTFAnimationSampler}
+    name::Nullable{T}
+end
+GLTFAnimation{T<:AbstractString}(id::T; channels=GLTFAnimationChannel[], parameters=Dict{T, T}(),
+    samplers=Dict{T, GLTFAnimationSampler}(), name=Nullable{T}()) = GLTFAnimation(id, channels, parameters, samplers, name)
+
+
+
+# asset
+type GLTFProfile
+    api::AbstractString
+    version::VersionNumber
+end
+GLTFProfile(api="WebGL", version="1.0.3") = GLTFProfile(api, version)
+
+"""
+GLTF root object for storing a glTF asset.
+"""
+type GLTFRootObject{T<:AbstractString, N<:AbstractGLTFObject}
+    rootDict::Dict{T, Any}
+    toplevelObjects::Dict{T, N}
+    scene::Nullable{T}
+    version::VersionNumber
+    premultipliedAlpha::Bool
+    profile::GLTFProfile
+    copyright::Nullable{AbstractString}
+    generator::Nullable{AbstractString}
+end
+GLTFRootObject{T<:AbstractString, N<:AbstractGLTFObject}(rootDict::Dict{T, Any}, toplevelObjects::Dict{T, N},
+    version::VersionNumber; scene=Nullable{T}(), premultipliedAlpha=false, profile=GLTFProfile(),
+    copyright=Nullable{T}(), generator=Nullable{T}()) = GLTFRootObject(rootDict, toplevelObjects, scene, version, premultipliedAlpha, profile, copyright, generator)
+
+
+
+# # camera
+# type GLTFCameraOrthographic
+#     xmag::Number
+#     ymag::Number
+#     zfar::Number
+#     znear::Number
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFCameraOrthographic(xmag::Number, ymag::Number, zfar::Number, znear::Number; extensions=Nullable{Dict}(), extras...) = GLTFCameraOrthographic(xmag, ymag, zfar, znear, extensions, extras)
+# function show(io::IO, x::GLTFCameraOrthographic)
+#     print(io, "GLTFCameraOrthographic:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFCameraPerspective
+#     yfov::Number
+#     zfar::Number
+#     znear::Number
+#     aspectRatio::Nullable{Number}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFCameraPerspective(yfov::Number, zfar::Number, znear::Number; aspectRatio=Nullable{Number}(),
+#                 extensions=Nullable{Dict}(), extras...) = GLTFCameraPerspective(yfov, zfar, znear, aspectRatio, extensions, extras)
+# function show(io::IO, x::GLTFCameraPerspective)
+#     print(io, "GLTFCameraPerspective:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFCamera
+#     _type::AbstractString
+#     orthographic::Nullable{GLTFCameraOrthographic}
+#     perspective::Nullable{GLTFCameraPerspective}
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFCamera(_type::AbstractString; orthographic=Nullable{GLTFCameraOrthographic}(), perspective=Nullable{GLTFCameraPerspective}(),
+#            name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFCamera(_type, orthographic, perspective, name, extensions, extras)
+# function show(io::IO, x::GLTFCamera)
+#     print(io, "GLTFCamera:")
+#     print(io, "\n  type: ", x._type)
+#     if !isnull(x.orthographic)
+#         print(io, "\n  orthographic: Nullable(GLTFCameraOrthographic)")
+#         for name in fieldnames(x.orthographic.value)
+#             value = eval(:($x.orthographic.value.$name))
+#             print(io, "\n    ", name, ": ", value)
+#         end
+#     end
+#     if !isnull(x.perspective)
+#         print(io, "\n  perspective: Nullable(GLTFCameraPerspective)")
+#         for name in fieldnames(x.perspective.value)
+#             value = eval(:($x.perspective.value.$name))
+#             print(io, "\n    ", name, ": ", value)
+#         end
+#     end
+#     print(io, "\n  name: $(x.name)")
+#     print(io, "\n  extensions: $(x.extensions)")
+#     print(io, "\n  extras: $(x.extras)")
+# end
+#
+#
+# # shader & program & technique & material
+# type GLTFShader
+#     uri::URI
+#     _type::Int
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFShader(uri::URI, _type::Int; name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFShader(uri, _type, name, extensions, extras)
+# function show(io::IO, x::GLTFShader)
+#     print(io, "GLTFShader:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         if name == :_type
+#             name = "type"
+#         end
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFProgram
+#     fragmentShader::GLTFShader
+#     vertexShader::GLTFShader
+#     attributes::Array{AbstractString, 1}  # names in shader
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFProgram(fragmentShader::GLTFShader, vertexShader::GLTFShader; attributes=AbstractString[],
+#             name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFProgram(fragmentShader, vertexShader, attributes, name, extensions, extras)
+# function show(io::IO, x::GLTFProgram)
+#     print(io, "GLTFProgram:")
+#     print(io, "\n  fragmentShader: GLTFShader")
+#     for name in fieldnames(x.fragmentShader)
+#         value = eval(:($x.fragmentShader.$name))
+#         if name == :_type
+#             name = "type"
+#         end
+#         print(io, "\n    ", name, ": ", value)
+#     end
+#     print(io, "\n  vertexShader: GLTFShader")
+#     for name in fieldnames(x.vertexShader)
+#         value = eval(:($x.vertexShader.$name))
+#         if name == :_type
+#             name = "type"
+#         end
+#         print(io, "\n    ", name, ": ", value)
+#     end
+#     print(io, "\n  attributes: $(x.attributes)")
+#     print(io, "\n  name: $(x.name)")
+#     print(io, "\n  extensions: $(x.extensions)")
+#     print(io, "\n  extras: $(x.extras)")
+# end
+#
+# # type GLTFTechniqueParameter{T<:Union{Number, Bool, AbstractString, Array{Number, 1}, Array{Bool, 1}, Array{AbstractString, 1}}}
+# type GLTFTechniqueParameter
+#     _type::Int
+#     count::Nullable{Int}
+#     node::Nullable{AbstractString}
+#     semantic::Nullable{AbstractString}
+#     # value::Nullable{T}
+#     value
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFTechniqueParameter(_type::Int; count=Nullable{Int}(), node=Nullable{AbstractString}(), semantic=Nullable{AbstractString}(), value=Nullable{Bool}(),
+#                        extensions=Nullable{Dict}(), extras...) = GLTFTechniqueParameter(_type, count, node, semantic, value, extensions, extras)
+# function show(io::IO, x::GLTFTechniqueParameter)
+#     print(io, "GLTFTechniqueParameter:")
+#     print(io, "\n  type: ", x._type)
+#     for name in fieldnames(x)[2:end]
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFTechniqueStatesFunctions
+#     blendColor
+#     blendEquationSeparate
+#     blendFuncSeparate
+#     colorMask
+#     cullFace
+#     depthFunc
+#     depthMask
+#     depthRange
+#     frontFace
+#     lineWidth
+#     polygonOffset
+#     scissor
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFTechniqueStatesFunctions(;blendColor=[0, 0, 0, 0], blendEquationSeparate=[32774, 32774],
+#               blendFuncSeparate=[1, 1, 0, 0], colorMask=[true, true, true, true],
+#               cullFace=[1029], depthFunc=[513], depthMask=[true], depthRange=[0, 1],
+#               frontFace=[2305], lineWidth=[1], polygonOffset=[0, 0], scissor=[0, 0, 0, 0],
+#               extensions=Nullable{Dict}(), extras...) = GLTFTechniqueStatesFunctions(blendColor, blendEquationSeparate, blendFuncSeparate, colorMask, cullFace, depthFunc,
+#                                                                                      depthMask, depthRange, frontFace, lineWidth, polygonOffset, scissor, extensions, extras)
+# function show(io::IO, x::GLTFTechniqueStatesFunctions)
+#     print(io, "GLTFTechniqueStatesFunctions:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFTechniqueStates
+#     enable::Array{Int, 1}
+#     functions::Nullable{GLTFTechniqueStatesFunctions}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFTechniqueStates(;enable=Int[], functions=Nullable{GLTFTechniqueStatesFunctions}(), extensions=Nullable{Dict}(), extras...) = GLTFTechniqueStates(enable, functions, extensions, extras)
+# function show(io::IO, x::GLTFTechniqueStates)
+#     print(io, "GLTFTechniqueStates:")
+#     print(io, "\n  enable: $(x.enable)")
+#     print(io, "\n  functions: Nullable{GLTFTechniqueStatesFunctions}...")
+#     print(io, "\n  extensions: $(x.extensions)")
+#     print(io, "\n  extras: $(x.extras)")
+# end
+#
+# type GLTFTechnique
+#     program::GLTFProgram
+#     parameters::Dict{AbstractString, GLTFTechniqueParameter}  # "modelViewMatrix" is a paramsinstance  "position" is a paramsinstance
+#     attributes::Dict{AbstractString, AbstractString}  # "a_position"=>position
+#     uniforms::Dict{AbstractString, AbstractString}  # "u_modelViewMatrix"=>"modelViewMatrix"
+#     states::GLTFTechniqueStates
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFTechnique(program::GLTFProgram; parameters=Dict{AbstractString, GLTFTechniqueParameter}(), attributes=Dict{AbstractString, AbstractString}(),
+#               uniforms=Dict{AbstractString, AbstractString}(), states=GLTFTechniqueStates(), name=Nullable{AbstractString}(), extensions=Nullable{Dict}(),
+#               extras...) = GLTFTechnique(program, parameters, attributes, uniforms, states, name, extensions, extras)
+# function show(io::IO, x::GLTFTechnique)
+#     print(io, "GLTFTechnique:")
+#     for name in fieldnames(x)
+#         if name == :program
+#             print(io, "\n  program: GLTFProgram...")
+#         elseif name == :states
+#             print(io, "\n  states: GLTFTechniqueStates...")
+#         else
+#             value = eval(:($x.$name))
+#             print(io, "\n  ", name, ": ", value)
+#         end
+#     end
+# end
+#
+# # type GLTFMaterial{T<:Union{Number, Bool, AbstractString, Array{Number, 1}, Array{Bool, 1}, Array{AbstractString, 1}}}
+# type GLTFMaterial
+#     values::Dict{AbstractString, Any}
+#     technique::Nullable{GLTFTechnique}
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFMaterial(;values=Dict{AbstractString, Any}(), technique=Nullable{GLTFTechnique}(),
+#              name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFMaterial(values, technique, name, extensions, extras)
+# function show(io::IO, x::GLTFMaterial)
+#     print(io, "GLTFMaterial:")
+#     print(io, "\n  values: $(x.values)")
+#     print(io, "\n  technique: Nullable(GLTFTechnique)...")
+#     print(io, "\n  name: $(x.name)")
+#     print(io, "\n  extensions: $(x.extensions)")
+#     print(io, "\n  extras: $(x.extras)")
+# end
+#
+# # mesh
+# type GLTFMeshPrimitive
+#     material::GLTFMaterial
+#     attributes::Dict{AbstractString, AbstractString}
+#     mode::Int
+#     indices::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFMeshPrimitive(material::GLTFMaterial; attributes=Dict{AbstractString, AbstractString}(), mode=4,
+#               indices=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFMeshPrimitive(material, attributes, mode, indices, extensions, extras)
+# function show(io::IO, x::GLTFMeshPrimitive)
+#     print(io, "GLTFMeshPrimitive:")
+#     print(io, "\n  material: GLTFMaterial...")
+#     for name in fieldnames(x)[2:end]
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFMesh
+#     primitives::Array{GLTFMeshPrimitive, 1}
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFMesh(;primitives=GLTFMeshPrimitive[], name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFMesh(primitives, name, extensions, extras)
+# function show(io::IO, x::GLTFMesh)
+#     print(io, "GLTFMesh:")
+#     print(io, "\n  primitives", ": ", typeof(x.primitives))
+#     print(io, "\n  name: $(x.name)")
+#     print(io, "\n  extensions: $(x.extensions)")
+#     print(io, "\n  extras: $(x.extras)")
+# end
+#
+# skin & node & scene
+# type GLTFSkin{T<:AbstractString}
+#     inverseBindMatrices::AbstractString
+#     jointNames::Array{T, 1}
+#     bindShapeMatrix
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFSkin{T<:AbstractString}(inverseBindMatrices::AbstractString, jointNames::Array{T, 1}; bindShapeMatrix=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+#          name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFSkin(inverseBindMatrices, jointNames, bindShapeMatrix, name, extensions, extras)
+# function show(io::IO, x::GLTFSkin)
+#     print(io, "GLTFSkin:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+
+
+
+
+
+
+# # sampler & image & texture
+# type GLTFSampler
+#     magFilter::Int
+#     minFilter::Int
+#     wrapS::Int
+#     wrapT::Int
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFSampler(;magFilter=9729, minFilter=9729, wrapS=10497, wrapT=10497, name=Nullable{AbstractString}(),
+#             extensions=Nullable{Dict}(), extras...) = GLTFSampler(magFilter, minFilter, wrapS, wrapT, name, extensions, extras)
+# function show(io::IO, x::GLTFSampler)
+#     print(io, "GLTFSampler:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFImage
+#     uri::URI
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFImage(uri::URI; name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFImage(uri, name, extensions, extras)
+# function show(io::IO, x::GLTFImage)
+#     print(io, "GLTFImage:")
+#     for name in fieldnames(x)
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+#
+# type GLTFTexture
+#     sampler::GLTFSampler
+#     source::GLTFImage
+#     format::Int
+#     internalFormat::Int
+#     target::Int
+#     _type::Int
+#     name::Nullable{AbstractString}
+#     extensions::Nullable{Dict}
+#     extras
+# end
+# GLTFTexture(sampler::GLTFSampler, source::GLTFImage; format=6408, internalFormat=6408, target=3553, _type=5121,
+#             name=Nullable{AbstractString}(), extensions=Nullable{Dict}(), extras...) = GLTFTexture(sampler, source, format, internalFormat, target, _type, name, extensions, extras)
+# function show(io::IO, x::GLTFTexture)
+#     print(io, "GLTFTexture:")
+#     print(io, "\n  sampler: GLTFSampler")
+#     for name in fieldnames(x.sampler)
+#         value = eval(:($x.sampler.$name))
+#         print(io, "\n    ", name, ": ", value)
+#     end
+#     print(io, "\n  source: GLTFImage")
+#     for name in fieldnames(x.source)
+#         value = eval(:($x.source.$name))
+#         print(io, "\n    ", name, ": ", value)
+#     end
+#     for name in fieldnames(x)[3:end]
+#         value = eval(:($x.$name))
+#         print(io, "\n  ", name, ": ", value)
+#     end
+# end
+
+
+
+export GLTFNode
+export GLTFScene
+export GLTFAnimationSampler
+export GLTFAnimationChannelTarget
+export GLTFAnimationChannel
+export GLTFAnimation
+export GLTFBuffer
+export GLTFBufferView
+export GLTFAccessor
+# export GLTFCameraOrthographic
+# export GLTFCameraPerspective
+# export GLTFCamera
+# export GLTFProgram
+# export GLTFTechniqueParameter
+# export GLTFTechniqueStatesFunctions
+# export GLTFTechniqueStates
+# export GLTFTechnique
+# export GLTFMaterial
+# export GLTFMeshPrimitive
+# export GLTFMesh
+# export GLTFSkin
+# export GLTFSampler
+# export GLTFImage
+# export GLTFTexture
+# export GLTFShader
+export GLTFProfile
+export GLTFRootObject

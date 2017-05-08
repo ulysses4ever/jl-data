@@ -1,0 +1,21 @@
+# if (length(ARGS) == 0 )
+#   println("length(ARGS) == 0")
+#   exit(1)
+# end
+
+# include( ARGS[1] )
+# include( "optProblem.jl" )
+
+# include( ARGS[1] )
+# include( "GIS.jl" )
+# s = GIS( 10000, "test_data.jl" )
+
+include( "GIS.jl" )
+prob = readProblem( ARGS[1] )
+s = GIS( prob )
+
+include( "neighbourhoods.jl" )
+s2 = rescheduleCdock( prob, s )
+println("swap")
+printSol( prob, s2 )
+printSol( prob, s )

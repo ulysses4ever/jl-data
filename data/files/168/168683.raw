@@ -1,0 +1,34 @@
+
+#Dispatchable keyword type (make short - expect heavy use)
+immutable KD{Symbol}; end #Not kraft dinner
+
+function dispatchable(kwargs::Vector{Any})
+	result = Any[]
+	for (k,v) in kwargs
+		push!(result, KD{k}())
+		push!(result, v)
+	end
+	return result
+end
+
+timespace() = throw("timespace requires arguments")
+timespace(;tstart=0, kwargs...) =
+	timespace(dispatchable(kwargs)..., tstart=tstart)
+
+function timespace(::KD{:ts}, ts, ::KD{:tfund}, tfund; tstart=0)
+	println("FUNCTION1 (priority on ts): ts=$ts, tfund=$tfund, tstart=$tstart")
+end
+
+#Similar to previous, but expects fs = 1/ts
+function timespace(::KD{:fs}, fs, ::KD{:tfund}, tfund; tstart=0)
+	println("FUNCTION1.1 (priority on fs): fs=$fs, tfund=$tfund, tstart=$tstart")
+end
+
+function timespace(::KD{:tfund}, tfund, ::KD{:ts}, ts; tstart=0)
+	println("FUNCTION2 (priority on tfund): tfund=$tfund, ts=$ts, tstart=$tstart")
+end
+
+
+t1=timespace(tstart = 2e-9, ts=1e-9, tfund=20e-9);
+t11=timespace(fs=1/1e-9, tfund=20e-9, tstart=3e-9);
+t2=timespace(tfund=20e-9, tstart=4e-9, ts=1e-9);

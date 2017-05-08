@@ -1,0 +1,8 @@
+###
+### stopwords.jl
+###
+
+function stopwords()
+    stopwds = [chomp(s) for s in readlines(open("../../res/stopwords.english.txt"))
+    return Set(stopwds)
+end

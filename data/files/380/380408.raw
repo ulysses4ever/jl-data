@@ -1,0 +1,40 @@
+###
+### ngrams.jl
+###
+
+function ngrams{S}(tokens::Array{S}, n::Int)
+    len = length(tokens)
+    grams = Array{S}[]
+    for (i, tkn) in enumerate(tokens)
+        if i <= len-n+1
+            push!(grams, tokens[i:i+n-1])
+        end
+    end
+    return grams
+end
+
+function unigrams(tokens::Array)
+    return tokens
+end
+
+function bigrams{S}(tokens::Array{S})
+    len = length(tokens)
+    grams = Array{S}[]
+    for (i, tkn) in enumerate(tokens)
+        if i<= len-1
+            push!(grams, tokens[i:i+1])
+        end
+    end
+    return grams
+end
+
+function trigrams{S}(tokens::Array{S})
+    len = length(tokens)
+    grams = Array{S}[]
+    for (i, tkn) in enumerate(tokens)
+        if i<= len-2
+            push!(grams, tokens[i:i+2])
+        end
+    end
+    return grams
+end

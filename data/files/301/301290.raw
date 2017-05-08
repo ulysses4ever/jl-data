@@ -1,0 +1,44 @@
+
+module ScenarioFactory
+
+using MarketRisk
+using InterestRates
+using BusinessDays
+
+# Memory buffer for scenarios
+const SCENARIO_DICT = Dict{Date, Scenario}()
+
+#=
+type Scenario
+	date :: Date
+	data :: Dict{Union{HistoricalData, RiskFactor}, Union{Float64, AbstractIRCurve}}
+end
+
+=#
+
+# Returns a fake scenario ...
+function getscenario(date::Date)
+	s = Scenario(date, Dict{Union{HistoricalData, RiskFactor}, Union{Float64, AbstractIRCurve}}())
+	s.data[SpotCurrency("USD")] = 3.5
+	s.data[SpotCurrency("EUR")] = 4.0
+
+	vert_x = [ 1 ]
+	vert_y = [ 0.10 ]
+	vert_y2 = [ 0.20 ]
+
+	curve_dixdol = InterestRates.IRCurve("DIxDOL", InterestRates.BDays252(BrazilBanking()), 
+	InterestRates.ExponentialCompounding(), InterestRates.Linear(), date,
+	vert_x, vert_y)
+
+	curve_pre = InterestRates.IRCurve("PRE", InterestRates.BDays252(BrazilBanking()), 
+	InterestRates.ExponentialCompounding(), InterestRates.Linear(), date,
+	vert_x, vert_y2)
+
+	s.data[IRCurveRisk("DIxDOL")] = curve_dixdol
+	s.data[IRCurveRisk("PRE")] = curve_pre
+	s.data[SpreadCurve("Riskless")] = InterestRates.NullIRCurve()
+
+	return s
+end
+
+end # module ScenarioFactory

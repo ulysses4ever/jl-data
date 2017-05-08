@@ -1,0 +1,20 @@
+
+
+module TestRandomHyperplaneClassifiers
+using TestUtils
+
+using RandomHyperplaneClassifiers
+using Classifiers
+
+
+x,y,labels=iris_dataset_binary()
+
+for i=1:10
+  c=RandomHyperplaneConfig()
+  m=fit(c,x,y)::RandomHyperplaneClassifier
+  predicted=predict(m,x)
+  l=mean_loss(m,x,y)
+  assert(l<=0.5)
+end
+
+end

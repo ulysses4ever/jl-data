@@ -1,0 +1,14 @@
+module signalprocessing
+export hpfilter
+using DSP
+
+function hpfilter(signal, fs)
+  #filter the wav recording using a high pass Butterworth filter
+  #with cutoff frequency 1250Hz
+  responsetype = Highpass(1250/fs)
+  designmethod = Butterworth(4)
+  signal=filt(digitalfilter(responsetype,designmethod),signal)
+  return  signal
+end
+
+end

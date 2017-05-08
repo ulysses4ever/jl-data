@@ -1,0 +1,23 @@
+#predict.jl
+#This script takes spectrograms and computes the corresponding predictions
+#author: Timothy Evans
+#date: 30/07/15
+
+push!(LOAD_PATH, pwd())
+importall signalprocessing, config
+using Images, DataFrames, BoundingBoxes
+
+# Define all relative paths from config.jl. Changes should only be made
+# to config.jl
+if path_rel
+  projdir = pwd()[1:end-3]; #remove src directory
+  labelledpath = string(projdir,labelleddir)
+  specpath = string(projdir,specdir)
+  modelpath = string(projdir,modeldir)
+else
+  labelledpath = labelleddir
+  specpath = specdir
+  modelpath = modeldir
+end
+
+for spec in readdir(specpath)

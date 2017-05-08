@@ -1,0 +1,83 @@
+module BinHeap
+
+import Base: length
+
+export
+  BinaryHeap,
+  parent,
+  left,
+  right
+
+#heap indexing
+parent(i) = div(i,2)
+left(i)   = i << 1
+right(i)  = (i << 1) | 1
+
+#heap functions
+
+#TODO: turn heapify into a loop
+#not sure if Julia has tailcall recursion (it doesn't)
+function heapify!(array,
+                  comp::Function,
+                  i::Int,
+                  size = length(array))
+  l = left(i)
+  r = right(i)
+
+  if (l <= size) && comp(array[l], array[i])
+    precedence = l
+  else
+    precedence = i
+  end
+
+  if r <= size && comp(array[r], array[precedence])
+    precedence = r
+  end
+
+  if precedence != i
+    (array[i], array[precedence]) =
+      (array[precedence], array[i])
+    heapify!(array, comp, precedence, size)
+  end
+end
+
+function buildheap!(array, comp::Function)
+  for i = fld(length(array), 2):-1:1
+    heapify!(array, comp, i)
+  end
+end
+
+################################################################
+################################################################
+################################################################
+
+lesser(x,y) = (x < y)
+greater(x,y) = (x > y)
+
+type BinaryHeap{T}
+  array::Array{T,1}
+  comp::Function
+
+  function BinaryHeap(array::AbstractArray{T},
+             compare::Function = lesser)
+    #TODO: maybe a key argument letting the user
+    #choose between a shallow copy and a deepcopy
+    carray = copy(array)
+    buildheap!(carray, compare)
+    new(carray, compare)
+  end
+
+  function BinaryHeap(compare::Function = lesser)
+    BinaryHeap(Array(T,0),compare)
+  end
+end
+
+################################################################
+################################################################
+################################################################
+
+#utility
+length(heap::BinaryHeap) = length(heap.array)
+
+#TODO: Heap functions push! and pop!
+end

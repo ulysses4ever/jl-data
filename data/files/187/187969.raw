@@ -1,0 +1,35 @@
+(custom-set-typed-variable (quote pager-shrink-factor) (quote 70) (quote number))
+
+;(custom-set-typed-variable 
+;  (quote match-window-profile) 
+;  (quote 
+;    ((((WM_NAME . "^pager$") (WM_CLASS . "^Pager/pager$")) (position 1837 . 0) (depth . -16) (never-focus . #t) (frame-type . none) (ignored . #t) (sticky . #t) (sticky-viewport . #t) (window-list-skip . #t) (task-list-skip . #t)) 
+;     (((WM_NAME . "^XMMS$") (WM_CLASS . "^xmms/XMMS_Player$")) (position 868 . 1010) (sticky . #t)) 
+;     (((WM_NAME . "^XMMS Playlist$") (WM_CLASS . "^xmms/XMMS_Playlist$")) (position 93 . 1010)) 
+;     (((WM_NAME . "^mt\\.py$") (WM_CLASS . "^Mt\\.py/mt\\.py$")) (position 1696 . 0) (depth . -16) (never-focus . #t) (frame-type . none) (ignored . #t) (sticky . #t) (sticky-viewport . #t) (window-list-skip . #t)) 
+;     (((WM_NAME . "^gkrellm$") (WM_CLASS . "^Gkrellm/gkrellm$")) (avoid . #t) (position 1858 . 107) (depth . -16) (never-focus . #t) (ignored . #t) (sticky . #t) (window-list-skip . #t)) 
+;     (((WM_NAME . "^log_tail$") (WM_CLASS . "^Eterm/log_tail$")) (position 0 . 0) (depth . -16) (never-focus . #t) (ignored . #t) (sticky . #t) (sticky-viewport . #t) (window-list-skip . #t)) 
+;     (((WM_NAME . "^wmMoonClock$") (WM_CLASS . "^wmMoonClock/wmMoonClock$")) (position 1861 . 1141) (dimensions 58 . 58) (depth . -16) (never-focus . #t) (frame-type . none) (ignored . #t) (sticky . #t) (window-list-skip . #t)) 
+;     (((WM_CLASS . "^Eterm/irctail$")) (position 456 . 0) (dimensions 101 . 6) (depth . -16) (never-focus . #t) (ignored . #t) (sticky . #t) (cycle-skip . #t) (window-list-skip . #t)))) 
+;  (quote match-window) (quote sawfish.wm.ext.match-window))
+
+;; (add-window-matcher 'WM_CLASS "^Pager/pager$"
+;; 		    '(position . (1891 . 0)))
+;; (add-window-matcher 'WM_CLASS "^xmms/XMMS_Player$"
+;; 		    '(position . (868 . 1010)))
+;; (add-window-matcher 'WM_CLASS "^xmms/XMMS_Playlist$"
+;; 		    '(position . (93 . 1010)))
+;; (add-window-matcher 'WM_CLASS "^Mt\\.py/mt\\.py$"
+;; 		    '(position . (1696 . 0)))
+;; (add-window-matcher 'WM_CLASS "^Gkrellm/gkrellm$"
+;; 		    '(position . (1858 . 107)))
+;; (add-window-matcher 'WM_CLASS "^wmMoonClock/wmMoonClock$"
+;; 		    '(position . (1861 . 1141))
+;; 		    '(dimensions 58 . 58)
+;; 		    '(depth . -16)
+;; 		    '(never-focus . #t)
+;; 		    '(frame-type . none)
+;; 		    '(ignored . #t)
+;; 		    '(sticky . #t)
+;; 		    '(window-list-skip . #t))
+

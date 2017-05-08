@@ -1,0 +1,81 @@
+function legalMove(board, pos, color)
+    # returns the truth value of playing a move for a given color and given position
+
+    if board[pos] != NaN
+        return false
+    end
+    if getKoi(board, pos, color)
+        return false
+    end
+    return true
+end
+
+
+function makeMove(board, pos, color)
+    # makes the move for the given color at the given position, only makes legal moves
+    
+    board[pos] = color
+    return board
+end
+
+
+function makeRandomMove(board, color)
+    # makes a random move
+
+    s = size(board)
+    pos = (rand(1:s[0]),rand(1:s[1]))
+    if legalMove(board, pos, color)
+        return makeMove(boad, pos, color)
+    end
+    else
+        return makeRandomMove(board, color)
+    end
+end
+
+
+function getLiberties(group, board)
+    # gets the liberties for a group
+
+    lib = 0
+    for pos in group
+        for mov in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+            n = mov + pos
+            if !(n[0] < 1 | n[1] < 1)
+                if board[n] == NaN
+                    lib += 1
+                end
+            end
+        end
+    end
+    return lib
+end
+
+
+function removeGroup(group, board)
+    # removes a group from the board
+
+    for pos in group
+        board[pos] = NaN
+    end
+    return board
+end
+
+
+function updateAll(board)
+    # does everything for each turn
+
+    groups = getGroups(board)
+    liberties = Int64[]
+    sizes = Int64[]
+    for g in groups
+        lib = getLiberties(g, board)
+        if lib == 0
+            removeGroup(g, board)
+        end
+        else
+            push!(liberties, lib)
+            push!(sizes, length(g))
+       end
+    end
+    return board
+end

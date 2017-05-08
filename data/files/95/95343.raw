@@ -1,0 +1,39 @@
+include("common.jl")
+
+npieces = 4
+gridstep = 0.025
+
+for i in 1:npieces
+  filename = joinpath(OUTDIR, @sprintf("simulated_signal_curved_bernoulli_3d_piece%02d.txt", i))
+  filestream = symbol(@sprintf("outstream%02d", i))
+  eval(:($filestream = open($filename, "w+")))
+end
+
+for x in 0:gridstep:0.5
+  for y in 0:gridstep:0.5
+    writedlm(outstream01, [x y (2*y)^(1+x)], ' ')
+  end
+  @printf(outstream01, "\n")
+
+  for y in 0.5:gridstep:1
+    writedlm(outstream02, [x y (2*y-1)^(1+x)], ' ')
+  end
+  @printf(outstream02, "\n")
+end
+
+for x in 0.5:gridstep:1
+  for y in 0:gridstep:0.5
+    writedlm(outstream03, [x y (2*y)^(2-x)], ' ')
+  end
+  @printf(outstream03, "\n")
+
+  for y in 0.5:gridstep:1
+    writedlm(outstream04, [x y (2*y-1)^(2-x)], ' ')
+  end
+  @printf(outstream04, "\n")
+end
+
+for i in 1:npieces
+  filestream = symbol(@sprintf("outstream%02d", i))
+  eval(:(close($filestream)))
+end

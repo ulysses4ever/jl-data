@@ -1,0 +1,59 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+type NWMatrixRow
+    row::Array{Float64}
+end
+
+type NWMatrix
+    rows::Array{NWMatrixRow}
+    pos_i::Int64
+    pos_j::Int64
+
+    numRows::Int64
+    numCols::Int64
+end
+
+function createMatrix(numRows, numColumns)
+    matrix = NWMatrix([NWMatrixRow(zeros(numColumns))], 0, 0)
+
+    # we need to add numRows - 1 more rows
+    for n=1:numRows-1
+        push(matrix.rows, NWMatrixRow(zeros(numColumns)))
+    end
+
+    return matrix
+end
+
+
+function runNeedlemanWunsch(matrix::NWMatrix)
+
+    for i=1:
+
+end
+
+
+
+mat = createMatrix(7,8)
+
+println(mat)

@@ -1,0 +1,57 @@
+using DataStructures: Stack, pop!, push!
+
+export cholesky
+
+"""
+Compute a lower triangular G such that A=GG'. 
+For all i >= j, G[i,j] overwrites A[i,j].
+"""
+function cholesky{T<:Real, S}(A::SparseMatrixCSC{T, S}, verbose::Bool=true)
+    m, n = size(A)
+    m == n || throw(DimensionMismatch(""))
+    parent, post = etree(A, true)       # elimination tree
+    A = A[post, post]                   # postordering A
+    ustack = Stack(UpdateMatrix)  # stack of update matrices
+    colptr, rowval = struct_L(A)
+    L_nzval = T[]                 # nzval  for L
+    L_rowval = S[]                 # rowval for L
+    L_colptr = S[1]                 # colptr for L
+
+    for j = 1:n 
+        
+        locs =  rowval[colptr[j]:colptr[j+1]-1]
+ 
+        m = length(locs)
+        Aj = zeros(T, m, m)       # part of the frontal matrix
+        for (i, k) in enumerate(locs) 
+            Aj[i,1] = A[k,j]
+            if i > 1; Aj[1,i] = Aj[i,1] end  
+        end
+        U = UpdateMatrix(Aj, locs)
+
+        children = findin(post, [j])
+        for child in children
+            if verbose
+                println("Eliminating node $(child) ...")
+            end
+            # form the update matrix
+            try
+                U = U + pop!(ustack)
+            catch
+                if verbose
+                    println("Stack of update matrices is empty ...")
+                end
+            end
+        end
+        # form the frontal matrix
+        F = FrontalMatrix(U)
+        # factorize F
+        l, U = factor(F)
+        println("l: ", l)
+        push!(ustack, U)
+        append!(L_nzval, l)
+        append!(L_rowval, locs)
+        push!(L_colptr, L_colptr[end]+length(l))
+    end
+    SparseMatrixCSC(n, n, L_colptr, L_rowval, L_nzval)
+end

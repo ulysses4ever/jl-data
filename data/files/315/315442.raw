@@ -1,0 +1,255 @@
+module dag2048
+
+using jb2048
+import Base.show
+export MeanNode, MaxNode, meandag, maxdag
+
+abstract DagNode
+
+nutrange(p::Vector{Float64}) = findfirst(p):findlast(p)
+const pal = 10  # probability array length
+tal = collect(Float64, [1<<i for i=1:pal])  # tiles array list
+ifrozen = []       # frozen indices
+ifree = 1:6
+itarget = 1    # target indices
+ixtarget = 1:3  # extended (adjacent) target indices
+targetmin, targetmax = 4, 7
+# ifrozen = [1]       # frozen indices
+# ifree = setdiff(1:9, ifrozen)
+# itarget = [2, 4]    # target indices
+# ixtarget = copy(itarget)  # extended (adjacent) target indices
+# append!(ixtarget, [3, 5, 7])
+# targetmin, targetmax = 4, 7
+
+meandag = Dict{UInt64,DagNode}()
+type MeanNode <: DagNode
+    board::Board
+    # child::Vector{DagNode}
+    proba::Vector{Float64}
+    height::Int
+
+    function MeanNode(b::Board)
+        global meandag::Dict{UInt64,DagNode}
+        bfree = b[ifree]
+        key = hash((ifrozen,bfree))
+        node = get(meandag, key, nothing)
+        node == nothing || return node
+        proba = zeros(pal)
+        height = 0
+        izero = find(b .== 0)  # empty cells (indices)
+        nz = length(izero)
+        p1 = 0.9/nz
+        p2 = 0.1/nz
+        for i in izero
+            b[i] = 1
+            c = MaxNode(copy(b))
+            proba += c.proba * p1
+            h = c.height + 1
+            h > height && (height = h)
+            b[i] = 2
+            c = MaxNode(copy(b))
+            proba += c.proba * p2
+            h = c.height + 1
+            h > height && (height = h)
+            b[i] = 0
+        end
+        # pprec > 0 && (proba = round(proba, pprec))
+        proba = round(proba, 6)
+        meandag[key] = new(b, proba, height)
+    end
+end
+
+maxdag = Dict{UInt64,DagNode}()
+type MaxNode <: DagNode
+    board::Board
+    child::Vector{DagNode}
+    proba::Vector{Float64}
+    best::Tuple{Int,Int}
+    height::Int
+
+    function MaxNode(b::Board)
+        global maxdag::Dict{UInt64,DagNode}
+        bfree = b[ifree]
+        key = hash((ifrozen,bfree))
+        node = get(maxdag, key, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        proba = zeros(pal)
+        # ip = collect(Float64, 1:pal)
+        best = (0,0)
+        height = 0
+        n = 0
+        sup = maximum(bfree)
+        local p::Float64
+        if sup < targetmax
+            for d = 1:4
+                bs, score, moved = slide(b, d)
+                if moved
+                    bs[ifrozen] == b[ifrozen] || continue
+                    # all(b[ifrozen] .≤ bs[ifrozen]) || continue
+                    sups = maximum(bs[ifree])
+                    isup = find(bs .== sups) ∩ ifree
+                    sups < targetmin || (sups in bs[itarget] && isup ⊆ ixtarget) || continue
+                    n += 1
+                    c = MeanNode(bs)
+                    push!(child, c)
+                    if n < 2
+                        best = (n,d)
+                        proba = c.proba
+                        p = sum(tal .* proba)
+                    else
+                        cp = sum(tal .* c.proba)
+                        cp > p && (p = cp; proba = c.proba; best = (n,d))
+                    end
+                    h = c.height
+                    h > height && (height=h)
+                end
+            end # for d = 1:4
+        end # if sup < targetmax
+        sup > 0 && n == 0 && (proba[sup] = 1.0)
+        if height > 0
+            k = nutrange(proba)
+            if length(k) == 1
+                leaf = true
+                for c in child
+                    proba == c.proba || (leaf = false; break)
+                end
+                leaf && (height = 0)
+            end
+        end
+        maxdag[key] = new(b, child, proba, best, height)
+    end
+end
+
+function newdag(b::Board)
+    empty!(meandag)
+    empty!(maxdag)
+    MaxNode(b)
+end
+
+# isleaf(d::DagNode) = length(d.child) == 0
+isleaf(d::DagNode) = (d.height == 0)
+
+function show(io::IO, d::DagNode)
+    b = d.board
+    m, n = size(b)
+    print(io, "[")
+    for i in 1:m
+        for j in 1:n
+            print(io, " ", b[i,j])
+        end
+        if i < m
+            print(io, ";")
+        else
+            print(io, "]")
+        end
+    end
+    k = nutrange(d.proba)
+    p = d.proba[k]
+    p = round(100*p,2)
+    # isleaf(d) && print(io, " leaf")
+    if isa(d, MeanNode)
+        print(io, " -> proba $k$p height $(d.height)")
+    else
+        print(io, " -> proba $k$p best $(d.best) height $(d.height)")
+    end
+end
+
+function play!(g::Game; moves=32768, display=false)
+    n = g.length
+    if n < 2
+        g.hist = History(128)
+        record(g.hist, g.board, 0, 0)
+    end
+    gf = g[ifrozen]
+    while g.length < n + moves
+        node = MaxNode(g.board)
+        isleaf(node) && break
+        c = node.child[node.best[1]]
+        g.board = copy(c.board)
+        g.board[ifrozen] = gf
+        g.newtile = tileinsert!(g.board)
+        g.length += 1
+        g.depth = node.height   # hack before plotting
+        display && plot(g)
+        record(g)
+    end
+    g.length
+end
+
+function xplay!(g::Game; display=false, verbose=false)
+    global ifrozen, ifree, itarget, ixtarget
+    # global ifree = 1:9
+    # global itarget = 1
+    # global ixtarget = [1, 2, 4]
+    jb2048.play!(g, moves=64, display=display)
+    while g[1] < 7
+        n = g.length
+        jb2048.play!(g, moves=1, display=display)
+        n == g.length && return n
+    end
+    ifrozen = [1]
+    ifree = 2:9
+    itarget = [2,4]
+    ixtarget = [2:5;7]
+    play!(g, display=display)
+    while g[1] < 8
+        n = g.length
+        jb2048.play!(g, moves=1, display=display)
+        n == g.length && return n
+    end
+    play!(g, display=display)
+    while 7 ∉ g[[2,4]]
+        n = g.length
+        jb2048.play!(g, moves=1, display=display)
+        n == g.length && return n
+    end
+
+    i7 = find(g.board.==7)
+    append!(ifrozen, i7)
+    ifree = setdiff(1:9, ifrozen)
+    itarget = setdiff([2,4,5,7,8], i7)
+    ixtarget = itarget
+    verbose && println("Phase 3, ifrozen=$ifrozen")
+    play!(g, display=display)
+    verbose && println("jb2048.play!")
+    while g[1] < 9
+        n = g.length
+        jb2048.play!(g, moves=1, display=display)
+        n == g.length && return n
+    end
+    g.length
+end
+
+function repartition(b::Board, n::Int; verbose=1:0)
+    hsup = zeros(Int, pal)
+    for i=1:n
+        g = Game(b)
+        play!(g)
+        sup = maximum(g.board[ifree])
+        sup ≤ pal && (hsup[sup] += 1)
+        if length(verbose) > 1
+            v = hsup[verbose]
+            println(i,": ",(g.length, 1<<sup), " -> $v")
+        end
+    end
+    hsup
+end
+
+function xrepartition(n::Int; verbose=1:0)
+    hsup = zeros(Int, pal)
+    # moves = zeros(Int, n)
+    for i=1:n
+        g = jb2048.initgame()
+        xplay!(g)
+        sup = maximum(g.board)
+        sup ≤ pal && (hsup[sup] += 1)
+        if length(verbose) > 1
+            v = hsup[verbose]
+            println(i,": ",(g.length, 1<<sup), " -> $v")
+        end
+    end
+    hsup
+end
+
+end

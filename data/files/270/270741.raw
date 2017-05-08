@@ -1,0 +1,106 @@
+# clone GreatCMakeCookOff
+module CookOff
+using Docker
+using Convenience
+
+export prepare, dh_make
+const url = "https://www.github.com/UCL/GreatCMakeCookOff.git"
+const email = "rc-softdev@ucl.ac.uk"
+const maintainer = "Research Software Development Team"
+const version = "2.0.4"
+const package = "great-cmake-cookoff"
+const license = "mit"
+
+function locations(workdir)
+  const name = "$(package)-$version"
+  const sourcedir = abspath(joinpath(workdir, name))
+  const builddir = abspath(joinpath(workdir, "build", name))
+  const tarfile = joinpath(builddir, "$(package)_$version.orig.tar.gz")
+  name, sourcedir, builddir, tarfile
+end
+
+function prepare(workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(workdir)
+
+  create_or_use_directory(sourcedir)
+  create_or_use_directory(builddir)
+
+  isdir(joinpath(sourcedir, ".git")) || run(`git clone $url $sourcedir`)
+  cd(sourcedir) do
+    run(`git checkout v$version`)
+  end
+  cd(workdir) do
+    run(`tar -czvf $tarfile --exclude .git* $name`)
+  end
+  cd(builddir) do
+    run(`tar -xvf $tarfile`)
+  end
+
+  cd(joinpath(builddir, name)) do
+    create_or_use_directory("debian")
+    open(joinpath("debian", "control"), "w") do file
+      println(file, "Source: ", package)
+      println(file, "Section: devel")
+      println(file, "Priority: optional")
+      println(file, "Maintainer: ", maintainer, "<", email, ">")
+      println(file, "Build-Depends: debhelper (>=9), cmake")
+      println(file, "Standards-Version: 3.9.4")
+      println(file, "Homepage: ", url, "\n")
+      println(file, "Package: GreatCMakeCookOff")
+      println(file, "Architecture: all")
+      println(file, "Depends: cmake (>= 2.8)")
+      println(file, "Description: CMake reciped")
+      println(file, "  - c++11 flags and features")
+      println(file, "  - macros to build/install python/cython package modules")
+      println(file, "  - lookup packages: recipes to find or install dependencies")
+      println(file, "  - lookup python packages: macros to find or install build dependencies")
+      println(file, "  - macros for in-build 'virtualenv'-like capabilities")
+      println(file, "  - various")
+    end
+
+    open(joinpath("debian", "rules"), "w") do file
+        println(file, "#!/usr/bin/make -f")
+        println(file, "include /usr/share/cdbs/1/rules/debhelper.mk")
+        println(file, "include /usr/share/cdbs/1/class/cmake.mk")
+        println(file, "DEB_CMAKE_EXTRA_FLAGS=-Dtests=OFF")
+    end
+    open(joinpath("debian", "$package-dev.install"), "w") do file
+        println(file, "usr/share/*")
+    end
+  end
+end
+
+
+function make(machine; image::String="packaging", workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(workdir)
+  machine = deepcopy(machine)
+
+  const cookoff_dev = ["cmake"]
+  machine.volumes[builddir] = "/$name"
+  machine.workdir = "/$name/$name"
+
+  env = {:LOGNAME => :RSDT, :DEBFULLNAME => maintainer, :EMAIL => email}
+  create_image = Docker.image(machine, package, cookoff_dev; image=image, env=env)
+
+  cmd = "dh_make -i -a -r cdbs -l -e \"$email\" -c $license -f /$name/$(basename(tarfile))"
+  dhmake = command(machine, STDOUT, cmd; image="cookoff", rm=true) do
+    ""
+  end
+  dhbuild = command(machine, "dpkg-buildpackage -tc"; image="cookoff", rm=true)
+  [create_image, dhmake, dhbuild]
+end
+
+function test(machine; workdir::String="workspace")
+  const name, sourcedir, builddir, tarfile = locations(workdir)
+
+  machine = deepcopy(machine)
+  machine.volumes[builddir] = "/$name"
+  machine.workdir = "/$name"
+
+  debname = replace(package, "-", "") * "_" * version
+  command(machine, STDOUT; image="cookoff", rm=true) do
+    "dpkg -i $debname-1_all.deb\n" *
+    "cmake --find-package -DMODE=EXIST -DCOMPILER_ID=GNU -DLANGUAGE=C -DNAME=GreatCMakeCookOff\n"
+  end
+end
+end

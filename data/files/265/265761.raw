@@ -1,0 +1,48 @@
+module Romeo
+
+include("Request.jl")
+include("Response.jl")
+
+export HttpServer,
+       run
+
+# exported
+
+type HttpServer
+    socket::Base.UVServer
+    port::Integer
+    handle::Function
+
+    HttpServer(port::Integer, handle::Function) = (
+        s = new();
+        s.handle = handle;
+        s.port = port;
+        s.socket = Base.TcpServer();
+        return s
+    )
+end
+
+function run(server::HttpServer)
+    bind(server.socket, Base.IPv4(uint32(0)), uint16(server.port))
+    listen(server.socket)
+
+    while true
+        socket = accept(server.socket)
+        @async process(server, socket)
+    end
+end
+
+# NOT exported
+
+function process(server::HttpServer, socket::TcpSocket)
+    local request, response
+
+    request = Request(socket)
+    response = Response(socket)
+
+    server.handle(request, response)
+
+    close(response.socket)
+end
+
+end # module Romeo

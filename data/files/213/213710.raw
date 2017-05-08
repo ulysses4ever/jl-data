@@ -1,0 +1,28 @@
+# ====================================================================
+# time_based.jl - DataTime based Gadfly
+# sample
+# Copyright(C). masaruna@ 2017.  All rights reserved.
+# ====================================================================
+using DataFrames
+using RDatasets
+using DecisionTree
+using ScikitLearn
+using Regression
+using GLM
+using Clustering
+using Distributions
+# using PyPlot
+using Gadfly
+
+# http://stackoverflow.com/questions/22536691/gadfly-jl-how-to-plot-date-time-based
+
+user_id = 2
+# date_given = Datetime.date(2014, 2, 3)
+date_given = Date(2014, 2, 3)
+biometric = "heart-rate"
+df = DataFrames.readtable(string("data/user_",userId,"/",date_given,"/",biometric,".csv"),
+                      colnames = ["Time", "Heart Rate"],
+                      coltypes = {Int,Int}  )
+
+df["Time"] = map((timestamp) -> Datetime.unix2datetime(timestamp, Datetime.UTC) , df["Time"])
+plot(df,x="Time",y="Heart Rate",Geom.line)

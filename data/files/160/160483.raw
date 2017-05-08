@@ -1,0 +1,66 @@
+function plot_qubittimeevo(time_vec,excited_prob)
+    p = scatter(;x=time_vec,y=excited_prob,mode="line")
+
+    l = Layout(;title="Qubit Excited State Probability",
+    xaxis=attr(title="Time (sec)", showgrid=false, zeroline=false),
+    yaxis=attr(title="Probability"))
+
+    plot(p,l)
+end
+
+
+function plot_photonnumbers(photons)
+    p = bar(;x=collect(0:length(photons)-1),y=photons)
+
+    l = Layout(;title="Photon Number Population",
+    xaxis=attr(title="n", showgrid=false, zeroline=false),
+    yaxis=attr(title="Amplitude"))
+
+    plot(p,l)
+end
+
+
+function plot_densitymatrix(densitymatrix)
+    kets = 0
+    for m = size(densitymatrix,1):-1:1
+        if sum(abs(densitymatrix[m,:]))>0.00001
+            kets = collect(0:m-1)
+            break
+        end
+    end
+
+    densitymatrix = densitymatrix[kets+1,kets+1]
+
+    p = heatmap(;z=abs(densitymatrix),
+    colorscale="Viridis")
+
+    l = Layout(;title="Magnitude of Density Matrix Elements |ρ_{mn}|",
+    width=750,
+    height=600,
+    autosize=false,
+    xaxis_title="n",
+    xaxis_ticktext=kets,
+    xaxis_tickvals=kets,
+    xaxis_side="top",
+    yaxis_title="m",
+    yaxis_ticktext=kets,
+    yaxis_tickvals=kets,
+    yaxis_autorange="reversed")
+
+    plot(p,l)
+end
+
+function plot_wignerfunction(matrix)
+    x = ((1:size(matrix,1))-size(matrix,1)/2)/10
+
+    p = heatmap(;x=x,y=x,z=matrix,
+    zsmooth="best",
+    colorscale="Viridis")
+
+    l = Layout(;title="Wigner Function",
+    width=750,
+    height=600,
+    autosize=false)
+
+    plot(p,l)
+end

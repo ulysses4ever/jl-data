@@ -1,0 +1,15 @@
+function fiboImparLessThan(limit)
+    prev = 0
+    next = 1
+    fibo = 1
+    suma = 0
+    while fibo < limit
+        if (fibo % 2 == 0) then
+              suma+=fibo
+        end
+        prev = next
+        next = fibo
+        fibo = prev + next
+    end
+    suma
+end

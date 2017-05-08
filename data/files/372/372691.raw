@@ -1,0 +1,30 @@
+include("/home/betrema/Julia/workspace/jb2048.jl")
+
+g=initgame()
+@time play!(g,moves=1000)
+play!(g,display=true)
+plot(g)
+                                    g
+
+careful
+shift!(careful)
+unshift!(careful,6)
+
+i=-16
+i+=1;plot(g.hist[i]...)
+i-=1;plot(g.hist[i]...)
+evals(g.hist[i][1],4)
+back!(g,i)
+force!(g,1)
+
+g[4]=2
+g=Game(g.board)
+
+@time repartition(10)
+
+typeof(gamma)
+
+versioninfo()
+Pkg.status()
+
+1024/1.1*[2^i for i in 0:4]

@@ -1,0 +1,24 @@
+function initialize_network(connections::Array{Int32, 1}, truth_table::Array{Int32, 1}, activations::Array{Int32, 1})
+  num_nodes::Int32 = 2000
+  num_iterations::Int32 = 20000
+  rand!(1:num_nodes, connections)
+  rand!(0:1, truth_table)
+  rand!(0:1, activations)
+  ccall((:run_network, "/home/david/TehzCodes/GRNEvolution/libboolnet"), Int32, (Int32, Int32, Ptr{Int32}, Ptr{Int32}, Ptr{Int32}),
+        num_iterations, num_nodes, activations, connections, truth_table)
+end
+
+function test_net()
+  num_nodes = 2000
+  num_connections = 2
+  connections = zeros(Int32, num_nodes * num_connections)
+  truth_table = zeros(Int32, num_nodes * 4)
+  activations = zeros(Int32, num_nodes)
+  dlopen("/home/david/TehzCodes/GRNEvolution/libboolnet")
+  for i in 1:100
+    initialize_network(connections, truth_table, activations)
+  end
+end
+@time test_net()
+
+

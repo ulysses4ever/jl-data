@@ -1,0 +1,36 @@
+function interp1d(vec_x, vec_y, new_vec_x)
+  new_vec_y = []
+  x1 = x2 = y1 = y2 = ind = 0
+  for i = 1:length(new_vec_x)
+    ind = sum(vec_x .< new_vec_x[i])
+    x1 = (ind == 0) ? new_vec_x[1] : vec_x[ind]
+    y1 = (ind == 0) ? 0 : vec_y[ind]
+    x2 = (ind == length(vec_x)) ? vec_x[ind] : vec_x[ind+1]
+    y2 = (ind == length(vec_x)) ? vec_y[ind] : vec_y[ind+1]
+    t = (x1 == x2) ? 1 : (new_vec_x[i] - x1) / (x2 - x1)
+    new_vec_y = [new_vec_y, lerp(t, y1, y2)]
+  end
+  return new_vec_y
+end
+
+# Linear-interpolation in [a, b] where t is in [0,1],
+# or coerced to be if not.
+function lerp(t, a, b)
+  a + (b - a) * max(min(t, one(t)), zero(t))
+end
+
+imls = [6, 7, 8, 9, 10, 11, 12]
+lrs = [0.000, 0.005, 0.050, 0.200, 0.450, 0.800, 1.000]
+dpm = [0.950 0.030 0.015 0.004 0.001 0.000 0.000;
+       0.490 0.380 0.080 0.020 0.015 0.010 0.005;
+       0.300 0.400 0.160 0.080 0.030 0.020 0.010;
+       0.140 0.300 0.240 0.160 0.100 0.040 0.020;
+       0.030 0.100 0.300 0.260 0.180 0.100 0.030;
+       0.010 0.030 0.100 0.300 0.300 0.180 0.080;
+       0.004 0.006 0.010 0.030 0.180 0.390 0.380]
+gmv = 11
+prs = [interp1d(imls, dpm[:, i], gmv)[1] for i in 1:length(lrs)]
+interp1d(imls, dpm[:, 7], 9.4)[1]
+cdf = cumsum(prs)
+lr = lrs[findfirst(cdf .> rand())]
+typeof(lr)

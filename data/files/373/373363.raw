@@ -1,0 +1,38 @@
+module FarrowLab
+
+using ArrayViews
+    using Distances
+
+    import Base: show
+    import StatsBase: IntegerVector, RealVector, RealMatrix
+
+    export
+
+    # reexport from ArrayViews
+    view,
+
+    # reexport from StatsBase
+    sample, sample!,
+
+    # Direction and Orientation Selective Indexes
+    DSI, OSI
+
+    # 2P Calcium Imaging
+    mip
+
+    # Spike Recordings
+    sta
+
+
+
+
+    ## source files
+    include("dsi.jl")
+    include("osi.jl")
+
+    include("sta.jl")
+    include("mip.jl")
+
+
+
+end # module

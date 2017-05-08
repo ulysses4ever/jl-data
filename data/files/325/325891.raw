@@ -1,0 +1,46 @@
+# -------------------------------------------------------------------- # 
+# Much of this code is based on TensorDecompositions.jl (which is
+# distributed under an MIT license)
+# https://github.com/yunjhongwu/TensorDecompositions.jl
+# -------------------------------------------------------------------- #
+
+import Base.Cartesian: @ntuple, @nloops, @nref
+
+immutable CPDecomp{T<:Number,N}
+    factors::NTuple{N,Matrix{T}}
+    λ::Vector{T}
+end
+
+@generated function CPDecomp{N}(r::Integer,dims::NTuple{N})
+    quote
+    f_ = @ntuple $N i->randn(r,dims[i])
+    CPDecomp(f_,randn(r))
+    end
+end
+
+@generated function Base.size{T,N}(cpd::CPDecomp{T,N})
+    :(@ntuple $N i->size(cpd.factors[i],2))
+end
+
+Base.rank(cpd::CPDecomp) = length(cpd.λ)
+ 
+@generated function compose!{T,N}(dest::Array{T,N}, cpd::CPDecomp{T,N})
+  quote
+    @nloops $N i dest begin
+        z = zero(T)
+        for r in 1:length(cpd.λ)
+            z += cpd.λ[r] * (*(@ntuple($N, n->cpd.factors[n][r,i_n])...))
+        end
+        @nref($N, dest, i) = z
+    end
+    dest
+  end
+end
+
+function compose{T}(cpd::CPDecomp{T})
+    dest=Array(T,size(cpd))
+    compose!(dest,cpd)
+end
+
+# function rand(cp::CPDecomp)
+# end

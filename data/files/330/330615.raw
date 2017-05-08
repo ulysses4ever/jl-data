@@ -1,0 +1,68 @@
+probs = [1/36, 2/36, 3/36, 4/36, 5/36, 6/36, 5/36, 4/36, 3/36, 2/36, 1/36]
+
+print("CATAN STATS BOX\n*******\nBy Keenon Werling\n")
+
+rolls = map(x->int(strip(x)), split(" 5,3,2", ","))
+expected = sum(map(x->probs[x]*5,rolls))
+
+f = open("setup.txt")
+
+expectedWood = 0
+expectedGrain = 0
+expectedBrick = 0
+expectedStone = 0
+expectedSheep = 0
+
+lines = readlines(f)
+
+numPeople = 0
+for s in lines
+  parts = split(s, ":")
+  if parts[1] == "PERSON"
+    numPeople += 1
+  end
+end
+
+for s in lines
+  parts = split(s, ":")
+  if length(parts) == 1
+    print("----Zero Arbitrage Value----\n")
+    print("Road - ", min(expectedBrick, expectedWood),"\n")
+    print("Settlement - ", min(expectedBrick, min(expectedWood, min(expectedGrain, expectedSheep))),"\n")
+    print("Dev Card - ", min(expectedStone, min(expectedGrain, expectedSheep)),"\n")
+    print("City - ", min(expectedStone/3, expectedGrain/2),"\n")
+    expectedWood = 0
+    expectedGrain = 0
+    expectedBrick = 0
+    expectedStone = 0
+    expectedSheep = 0
+    print("\n")
+  elseif length(parts) == 2
+    if (parts[1] == "PERSON")
+      print("\n*******\n", parts[2], "********\n")
+    else
+      print(parts[1])
+      parts[2] = strip(parts[2])
+      if length(parts[2]) > 0
+        rolls = map(x->int(strip(x)), split(parts[2],","))
+        expected = sum(map(x->probs[x]*numPeople,rolls))
+        print(" [", join(map(x->string(x),rolls), ","), "]")
+        print(" - ", expected, "\n")
+        if parts[1] == "Wood"
+          expectedWood = expected
+        elseif parts[1] == "Grain"
+          expectedGrain = expected
+        elseif parts[1] == "Brick"
+          expectedBrick = expected
+        elseif parts[1] == "Stone"
+          expectedStone = expected
+        elseif parts[1] == "Sheep"
+          expectedSheep = expected
+        end
+      else
+        print(" [] - 0.0\n")
+      end
+    end
+  end
+end
+

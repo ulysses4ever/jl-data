@@ -1,0 +1,95 @@
+include("config.jl")
+include("fixed_genotype.jl")
+
+import Fixed_Genotype
+import Config
+
+num_edges = 0
+num_nodes = 0
+dictionary = Dict{Fixed_Genotype.Type_Genotype, Int64}()
+file_lines = ["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", 
+                  "<gexf xmlns=\"http://www.gexf.net/1.2draft\" xmlns:viz=\"http://www.gexf.net/1.1draft/viz\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd\" version=\"1.2\">",
+        "<graph>\n",
+        "<nodes>\n",
+        "</nodes>\n",
+	"<edges>\n",
+        "</edges>\n",
+    "</graph>\n",
+"</gexf>\n"]
+
+function enumerate()
+    global num_edges
+    global num_nodes
+    global dictionary
+    global file_lines
+    
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    
+    start_genotype::Fixed_Genotype.Type_Genotype = Fixed_Genotype.make_random_genotype(config_vals)
+    dictionary[start_genotype] = num_nodes
+    add_node_xml(config_vals, start_genotype, num_nodes)
+    num_nodes += 1
+
+    make_graph(config_vals, start_genotype, 2)
+
+    outfile = open("out.gexf", "w")
+
+    for line in file_lines
+        write(outfile, line)
+    end
+end
+
+function make_graph(config_vals::Config.Type_Config_Values, parent::Fixed_Genotype.Type_Genotype, depth::Int64)
+    global num_edges
+    global num_nodes
+    global dictionary
+    global file_lines
+
+    parent_index = dictionary[parent]
+    for i = 1:50
+        temp = Fixed_Genotype.make_random_genotype(config_vals)
+        Fixed_Genotype.copy_into(temp, parent)
+        Fixed_Genotype.mutate(temp, config_vals)
+        index = get(dictionary, temp, -1)
+        if index == -1
+            dictionary[temp] = num_nodes
+            add_node_xml(config_vals, temp, num_nodes)
+            num_nodes += 1
+            add_edge_xml(config_vals, num_nodes - 1, parent_index, num_nodes, num_edges)
+            num_edges += 1
+            if depth > 0
+                make_graph(config_vals, temp, depth - 1)
+            end
+        else
+            println("yeeeha ", index)
+            add_edge_xml(config_vals, index, parent_index, num_nodes, num_edges)
+            num_edges += 1
+        end
+    end
+end
+
+function add_node_xml(config_vals::Config.Type_Config_Values, genotype::Fixed_Genotype.Type_Genotype, num_nodes)
+    Fixed_Genotype.simulate(genotype, config_vals, convert(Int32, 0))
+    color_value::Int64 = 0
+    for i = 1:config_vals.initial_num_nodes
+        color_value += genotype.activations[(config_vals.num_simulation_iterations * config_vals.max_num_nodes)  + i] * 2^(i - 1)
+    end
+    color_value *= 16
+
+    blue::Int64 = (color_value % 256)
+    color_value = round(color_value / 256)
+    green::Int64 = (color_value % 256)
+    color_value = round(color_value / 256)
+    red::Int64 = (color_value % 256)
+    color_value = round(color_value / 256)
+    insert!(file_lines, 5 + 3 * num_nodes, string("<node id=\"", num_nodes, "\" label=\"glossy\">\n"))
+    insert!(file_lines, 6 + 3 * num_nodes, string("<viz:color r=\"", red,"\" g=\"", green,"\" b=\"", blue,"\" a=\"0.6\"/>\n"))
+    insert!(file_lines, 7 + 3 * num_nodes, "</node>\n")
+end
+
+function add_edge_xml(config_vals::Config.Type_Config_Values, source::Int64, destination::Int64, 
+                      num_nodes::Int64, num_edges::Int64)
+    insert!(file_lines, 7  + 3 * num_nodes + num_edges, string("<edge id=\"", num_edges,"\" source=\"", source,"\" target=\"", destination,"\" />\n"))
+end
+
+enumerate()

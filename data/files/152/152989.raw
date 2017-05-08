@@ -1,0 +1,16 @@
+module OrderStatistics
+
+import Sorting: mergesort
+import Utility: partition!, lesser
+
+using DataStructures
+
+println("a")
+
+b = MinHeap([4,5,2,1,3,5,12,3,512])
+heapsort!([4,3,2,1])
+
+end
+
+map(println, LOAD_PATH)
+homedir()

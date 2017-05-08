@@ -1,0 +1,153 @@
+"""
+The Conda module provides access to the [conda](http://conda.pydata.org/) packages
+manager. Its main purpose is to be used as a BinDeps provider, to install binary
+dependencies of other Julia packages.
+
+The main functions in Conda are:
+
+- `Conda.add(package)`: install a package;
+- `Conda.rm(package)`: remove (uninstall) a package;
+- `Conda.update()`: update all installed packages to the latest version;
+- `Conda.list()`: list all installed packages.
+
+To use Conda as a binary provider for BinDeps, the `Conda.Manager` type is proposed. A
+small example looks like this:
+
+```julia
+# Declare dependency
+using BinDeps
+@BinDeps.setup
+netcdf = library_dependency("netcdf", aliases = ["libnetcdf","libnetcdf4"])
+
+using Conda
+# Use alternative conda channel.
+push!(Conda.CHANNELS, "https://conda.binstar.org/<username>")
+provides(Conda.Manager, "libnetcdf", netcdf)
+```
+"""
+module Conda
+using Compat
+using JSON
+
+"Prefix for installation of all the packages."
+const PREFIX = abspath(dirname(@__FILE__), "..", "deps", "usr")
+
+@unix_only const conda = joinpath(PREFIX, "bin", "conda")
+@windows_only const conda = joinpath(PREFIX, "Scripts", "conda")
+
+CHANNELS = AbstractString[]
+additional_channels() = ["--channel " * channel for channel in CHANNELS]
+
+"Get the miniconda installer URL."
+function _installer_url()
+    res = "http://repo.continuum.io/miniconda/Miniconda-3.9.1-"
+    if OS_NAME == :Darwin
+        res *= "MacOSX"
+    elseif OS_NAME in [:Linux, :Windows]
+        res *= string(OS_NAME)
+    else
+        error("Unsuported OS.")
+    end
+
+    if WORD_SIZE == 64
+        res *= "-x86_64"
+    else
+        res *= "-x86"
+    end
+
+    if OS_NAME in [:Darwin, :Linux]
+        res *= ".sh"
+    else
+        res *= ".exe"
+    end
+    return res
+end
+
+"Install miniconda"
+function _install_conda()
+    # Ensure PREFIX exists
+    mkpath(PREFIX)
+    info("Downloading miniconda installer ...")
+    @unix_only installer = joinpath(PREFIX, "installer.sh")
+    @windows_only installer = joinpath(PREFIX, "installer.exe")
+    download(_installer_url(), installer)
+
+    info("Installing miniconda ...")
+    @unix_only begin
+        chmod(installer, 33261)  # 33261 corresponds to 755 mode of the 'chmod' program
+        run(`$installer -b -f -p $PREFIX`)
+    end
+    @windows_only begin
+        run(`$installer /S /D=$PREFIX`)
+    end
+end
+
+"Install a new package."
+function add(pkg::AbstractString)
+    channels = additional_channels()
+    run(`$conda install -y $channels $pkg`)
+end
+
+"Uninstall a package."
+function rm(pkg::AbstractString)
+    run(`$conda remove -y $pkg`)
+end
+
+"Update all installed packages."
+function update()
+    channels = additional_channels()
+    for package in _installed_packages()
+        run(`$conda update $channels -y $package`)
+    end
+end
+
+"List all installed packages as an array."
+function _installed_packages()
+    packages = JSON.parse(readall(`$conda list --json`))
+    regex = r"([\w_-]*)-\d.*"
+    for i in 1:length(packages)
+        m = match(regex, packages[i])
+        if m != nothing
+            packages[i] = m.captures[1]
+        else
+            error("Failed parsing string: $(packages[i]). Please open an issue!")
+        end
+    end
+    return packages
+end
+
+"List all installed packages to standard output."
+function list()
+    run(`$conda list`)
+end
+
+"Get the exact version of a package."
+function version(name::AbstractString)
+    packages = JSON.parse(readall(`$conda list --json`))
+    for package in packages
+        if startswith(package, name)
+            return package
+        end
+    end
+    error("Could not find the $name package")
+end
+
+"Search packages for a string"
+function search(package::AbstractString)
+    channels = additional_channels()
+    return collect(keys(JSON.parse(readall(`$conda search $channels $package --json`))))
+end
+
+"Check if a given package exists."
+function exists(package::AbstractString)
+    if package in search(package)
+        # Found exactly this package
+        return true
+    else
+        return false
+    end
+end
+
+include("bindeps_conda.jl")
+
+end

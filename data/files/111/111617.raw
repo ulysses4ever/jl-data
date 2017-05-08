@@ -1,0 +1,178 @@
+# -*- coding: utf-8 -*-
+
+#=
+Created on Mon Nov 09 2015 11:56:22
+@author: William Herrera
+Julia 0.4 code to analyze sound and use as interface with ASUS G20 lighting
+Tk widgets GUI version
+IMPORTANT: run as administrator
+=#
+
+using Tk
+include("SoundLighting.jl")
+
+
+type GUIInputParameters 
+    dll_path::AbstractString
+    chunk_exponent::Integer
+    worker::Any
+    worker_running::Bool
+    rotation_interval::Integer
+    device_number::Integer
+    device_radio_button::Any
+    chunk_size_slider::Any
+    rotation_slider::Any
+end
+
+# default global parameters
+ paramTk = GUIInputParameters(LIGHTS.DLLPath, CHUNK_EXPONENT, Void, 
+                              false, LIGHT_ROTATION_INTERVAL, 
+                              DEVICE_NUMBER, Void, Void, Void)
+
+"""
+Start and set up app and its widgets.
+"""
+function SetupApp(WINDW, param=paramTk)
+
+    # Set SoundLighting globals.
+    param.dll_path = LightACPI.LIGHTS.DLLPath
+    param.chunk_exponent = CHUNK_EXPONENT
+    param.rotation_interval = LIGHT_ROTATION_INTERVAL
+    param.device_number = DEVICE_NUMBER
+
+    root = Frame(WINDW)
+    pack(root)
+    pack(Label(root, "ASUS ROG Desktop Audio Lighting Control"))
+    pack(Separator(root, orient="horizontal"))
+    
+    pack(Label(root, "Audio Device Choices"))
+    num_devices, aud_list = list_devices(false)
+    device_radio_button = Radio(root, [ i for i in aud_list])
+    for idx in 1:num_devices
+        if search(aud_list[idx], "Mix") != 0
+            set_value(device_radio_button, idx - 1)
+        end
+    end
+    pack(device_radio_button)
+    pack(Separator(root, orient="horizontal"))
+
+    pack(Label(root, string("Default Path to ACPIWMI.dll is ", 
+                             param.dll_path)))
+    directory_choice_button = Button(root, "Change Path to ACPIWMI.dll")
+    bind(directory_choice_button, "command", pick_dll_path, param)
+    pack(Separator(root, orient="horizontal"))
+
+    # choose the lighting color update interval
+    pack(Label(root, "Doubling increment for Update Interval",
+                     font="Verdana 12 bold"))
+    param.tick_interval_slider = Slider(root, 12:18, 
+                                       tickinterval=1,
+                                       sliderlength=10, 
+                                       orient="horizontal")
+    set(param.tick_interval_slider, 15)
+    pack(param.tick_interval_slider)
+    pack(Separator(root, orient="horizontal"))
+    
+    # rotation button
+    pack(Label(root, "Rotation Interval (0 for Off)",
+                     font="Verdana 12 bold"))
+    param.rotation_slider = Slider(root, 0:25, tickinterval=5,
+                                   sliderlength=10, orient="horizontal")
+    set(param.rotation_slider)
+    pack(param.rotation_slider)
+    pack(Separator(root, orient="horizontal"))
+
+    # start app button
+    start_button = Button(root, "Start", fg="green", font="Verdana 14")
+    bind(start_button, "command", audio_to_lighting, param)
+    pack(start_button)
+
+    # quit app button
+    quit_button = Button(root, "QUIT", fg="red", font="Verdana 14")
+    bind(quit_button, "command", quit_app, param)
+    pack(quit_button)
+end
+
+"""
+Begin sampling display thread
+"""
+function audio_to_lighting(param=paramTk)
+    # get and set the audio port number
+    param.device_number = get_value(param.device_radio_button)
+    DEVICE_NUMBER = param.device_number
+
+    # get and set the dll path directory and initialize lighting
+    new_dpath = param.dll_path
+    if new_path != LIGHTS.DLLPath
+        ENV["PATH"] = string(new_dpath, ";", ENV["PATH"])
+        LightACPI.initialize!()
+    end
+
+    # get and set the exponent for the chunk size
+    CHUNK_EXPONENT = Integer(get_value(param.chunk_size_slider))
+
+    # get and set the exponent for the rotation interval
+    LIGHT_ROTATION_INTERVAL = 
+        Integer(get_value(param.rotation_interval))
+
+    # restart task with the new parameters
+    restart_task(param)
+end
+
+"""
+Restart worker thread (needed if parameters update)
+"""
+function restart_task(param=paramTk)
+    iexcept = InterruptException()
+    if param.worker_running
+        Base.throwto(param.worker, iexcept)
+        sleep(0.1)
+    end
+    set_soundlighting(param)
+    param.worker = @async run(asus_soundlight, false)
+end
+
+"""
+Choose path to dll
+"""
+function pick_dll_path(param=paramTk)
+    path_chosen = ChooseDirectory(root,"Path to ACPIWMI.dll",
+                                  initialdir=param.dll_path)
+    if isfile(string(path_chosen, '/', LightACPI.DLLNAME))
+        param.dll_path = path_chosen
+    else
+        Messagebox(Void, path_chosen,
+                             "ACPIWMI.dll not found in this path")
+    end
+    param.dll_path
+end
+
+"""
+Choose path to dll only if needed, error checked
+"""
+function optional_choose_dll_path(param=paramTk)
+    if !isfile(string(param.dll_path, '/', LightACPI.DLLNAME))
+        param.dll_path = ChooseDirectory(root, "Path to ACPIWMI.dll",
+                                        initialdir=param.dll_path)
+        if !isfile(string(param.dll_path, '/', LightACPI.DLLNAME))
+            Messagebox(Void, "Looking for Path to dll",
+                             "ACPIWMI.dll not found in that path")
+        end
+    end
+    param.dll_path
+end
+
+"""
+End execution of app
+"""
+function quit_app(param=paramTk)
+    iexcept = InterruptException()
+    if param.worker_running
+        Base.throwto(param.worker, iexcept)
+    end
+end
+
+
+# Start program.
+WIN = Toplevel()
+APP = SetupApp(WIN)

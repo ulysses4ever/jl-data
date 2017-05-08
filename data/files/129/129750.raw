@@ -1,0 +1,35 @@
+function contains(exprn::Expr, operand::Symbol)
+  queue = Array(Union(Number, Symbol, Expr), 0)
+  unshift!(queue, exprn)
+      
+  while length(queue)!=0
+    node = shift!(queue)
+        
+    for i in 2:length(node.args)
+      if isa(node.args[i], Expr)
+        unshift!(queue, node.args[i])
+      elseif isa(node.args[i], Symbol) && node.args[i]==operand
+        return true
+      end
+    end
+  end
+  
+  return false
+end
+
+function replace(exprn::Expr, operand::Symbol, r::Union(Symbol, Expr))
+  queue = Array(Union(Number, Symbol, Expr), 0)
+  unshift!(queue, exprn)
+      
+  while length(queue)!=0
+    node = shift!(queue)
+        
+    for i in 2:length(node.args)
+      if isa(node.args[i], Expr)
+        unshift!(queue, node.args[i])
+      elseif isa(node.args[i], Symbol) && node.args[i]==operand
+        node.args[i] = r
+      end
+    end
+  end
+end

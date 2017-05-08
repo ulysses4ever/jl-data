@@ -1,0 +1,15 @@
+function loadColors!(vertexData, colorMat, vertexStride, shapeStride)
+	if size(colorMat, 1) == 1
+		vertexData[4:vertexStride:end] = colorMat[1].r
+		vertexData[5:vertexStride:end] = colorMat[1].g
+		vertexData[6:vertexStride:end] = colorMat[1].b
+		vertexData[7:vertexStride:end] = 1.0
+	else
+		for c = 1:size(colorMat, 1)
+			vertexData[(c-1)*shapeStride+4:vertexStride:c*shapeStride] = colorMat[c].r
+			vertexData[(c-1)*shapeStride+5:vertexStride:c*shapeStride] = colorMat[c].g
+			vertexData[(c-1)*shapeStride+6:vertexStride:c*shapeStride] = colorMat[c].b
+			vertexData[(c-1)*shapeStride+7:vertexStride:c*shapeStride] = 1.0
+		end
+	end
+end

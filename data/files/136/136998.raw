@@ -1,0 +1,1117 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+# Done.
+# Important addition to gameplan: We need a function that returns whether the previous recognition state
+#  is equal to the current. Or maybe just of pair of the two values (*this is probably). -- In order to
+#  give algorithm greater insight into whether there is likely to be a insertion or deletion. 
+#  i.e. 
+#    (1) is a deletion to S2 likely to happen following a LONG string of a simple sequence repeat? 
+#    (2) is a deletion to S2 likely to happen following a the shortest patterns our recognizer picks up?
+#          A: No, because are recognizer treats everything as a pattern. We may have several random 3
+#              nucleotide "patterns" immediately broken when th 4th character shows. This isn't what we'd
+#              classify as an SSR.
+#
+
+# Beginning to work on this
+#         ||
+#         \/
+# Gameplan for modifications to recognition.
+#  I don't consider this trivial.
+#    The pda will split into parts indexable by a pair of integers (i,j)
+#    representing the place in the NWMatrix. 
+#    (1) For each (i,j) if the pda is
+#    is being queried for the candidate patterns in both Seq1 and Seq2 it returns
+#    1 stack entry for each. The stack entry should tell us whether a pattern has
+#    just been broken, if a pattern has been determined etc.
+#    (2) The story is different when we're calculating the scores for choices at (i,j).
+#    The choices being (a) to accept(and use) score that matches nucleotides s1_i and s2_j | (i-1,j-1) 
+#                      (b) to accept score indicating a subst. is warranted(no indel needed) | (i-1,j-1)
+#                      (c) to accept score saying we should insert gap into seq1 | (i-1,j)
+#                           => this means we have evidence, a pattern in seq2, strong enough to justify
+#                              an indel instead of a substitution!
+#                      (d) to accept score saying we should insert gap into seq2  | (i,j-1)
+#                           => this means we have evidence, a pattern in SEQ1, strong enogh to justify
+#                              an indel in seq2, instead of writing it off as a substitution.
+#
+#     We're taking the max of these options. so for (c) and (d) to occur, it has to be scored HIGHER
+#     than a subst. Looking more deeply into how this works, at each index (i,j) it is presented with
+#     sometimes 6 different possibilities that would represent ongoing patterns (in the form of stack
+#     entries. When we're done sorting through those to find the optimum, we take that optimum stack
+#     as being representative of the best choice for index (i,j) so when quereied by (i,j+1) it returns
+#     only the one it thinks is best. (This is done for a couple of reasons, one being to prevent the
+#     space complexity from ballooming out of proportion -- making ~200-400 b.p. comparison impossible
+#     on a single machine, which is what we're going for)
+#       Note: We also consider a susbtitution as BREAKING the ongoing pattern. In some cases,
+#         because it isn't forward looking, it'll be a mistake -- maybe even a form cognitive
+#         dissidence because whether or not we DID interrupt a pattern (mistake) that continues or NOT
+#         we don't go back and correct ourselves, instead we stay with our decision as ultimately
+#         if theres a gap that is part of a relatvely long stretch of gaps and we treat it as sub, then its
+#         almost inconsequential (it doesn't matter as the rest it will be considered anew [0]). So here we can
+#         say we purposefully make mistakes and don't seek to correct them to prevent the algorithm
+#         from getting gap happy. I might be completely off on this, curious to see how it works.
+#         (we can always change it / compare it with alternative...)
+#
+#         [0] in some cases when considering it anew it wil be under a different circumstance that will
+#         definately give a different result - as it is characteristic of another context, it could be
+#         be a gap permissive context or something else.
+#
+#         => Its worth asking: so when would a subst be rated higher if we sort of want to be liberal
+#            with our gaps???
+#                A: very good question. for this we have think substitutions as being of two classes.
+#                     Conservative Substitutions, and Unlikely Subsitutions.
+#                         It might be best to think of conservative substitutions as being substitutions
+#                           that may not not likely interrupt a pattern of 1 or 2 or anywhere up to say
+#                           15 in most cases, but will if the pattern is, say, 20 core lengths long, 
+#                           depending on the constituents of the core pattern in question, we may be 
+#                           prompted to allow a subst so long as it, as stated previously, a conservative
+#                           one; potentially breaking a long line of gaps in two. Such a decision is based 
+#                           entirely on the configuration of the modelling functions employed. Which may
+#                           be set and changed through a file if needed. 
+#                           One thing to note, is that inside the algorithm(mealy automata) there is a case
+#                           in particular where the output of the MA is 0(zero); which is whenever we get
+#                           input like ABAA. Actually this one of the most ambiguous things the algorithm
+#                           can come accross, because it may be that what follows in seq is a B to make ABAAB -
+#                           rendering the situation harder to interpret in real time. Who's to say it
+#                           shouldn't be ABA(A)BAB=>ABA.BAB, and a mistake didn't occur duplicating A twice?
+#                           Or maybe the core pattern is BAA, noting that ABA and AAB would be equivalent
+#                           interpretations of BAA, just framed a bit differently. 
+#                           To dispell another thought, if the AB in ABAA were not part of some repeat,
+#                           but the trailing A's were part of some larger continuation of A's, we should see an
+#                           other A come right after it. This would break the pattern and prompt the MA
+#                           to follow the single nucleotide repetition line - the one passing through A' to be
+#                           absolutely correct. Likewise, if C were to follow it too would <i>break<i> the pattern 
+#                           because it would cease to be a tandem repeat with 3 nucleotides or less, in
+#                           the form (ABAAC)ABAAC or even (BAAC)BAAC; from here, only AAC would potentially
+#                           be valid but that road wasn't taken unfortunately; ABA was taken in place of
+#                           it. So now for AAC to be recognized, if it is indeed the correct core repeat
+#                           pattern, AA would have to immediately follow. Followed then by a C, then
+#                           subsequently by another AA. By this point, from the sequence CAACAA, the algorithm may
+#                           ascertain that the current pattern has a core repeat of (CAA) with certainty. Again
+#                           noting that (CAA) is equivalent to both (AAC) and (ACA).
+#                          
+#                           Overall, the /[(:|sequence just::)] described /[(:: |:sequence)] might look 
+#                            like this: 
+#                                  ...ABAACAACAACAACAACA...
+#                           output:   123012333333333333
+#
+#                           Zero was chosen as th output because nowhere else is the output ever zero 
+#                           -- that is the recognition system is always optimistic that there is a pattern
+#                           of length at least 1, except in the case just described, were it's zero. 
+#                           Two options were considered: to treat it like any other and make it
+#                           so a gap is always forced if needed, OR consider that a conservative subst.
+#                           might be better ~ with the assumption that a mistake wouldn't have very much 
+#                           long term effect. If there really is  a pattern like ABAABAABA then
+#                           the choice to choose a conservative subst over a gap, at worst, ignores,
+#                           initially, the possibility of ABAA|BAABA. The pattern is broken after four
+#                           nucleotides [1].
+#                           With the automata and stack now reset, if the pattern (ABA) is really there
+#                           the consequence is only one gap less where there should have been. Immediately
+#                           if theres no identity to match we're back to being very liberal with our
+#                           insertion fo gaps. Because everything is considered a pattern we return
+#                           at a decision point were we have (in the notation of the previous pattern schema)
+#                           the recogntion sees a B, if no match in NW, insert gap. BA, same thing. BAA,
+#                           ditto. BAAB, another gap there too. BAABA, BAABAA, the recognition system know
+#                           knows for certain there is a tandem repeat of (BAA) at least twice and can
+#                           then make sophisticated decisions with regards to flank based insertions, and
+#                           insertions based on pattern extension or trimming.  much is lost. Whereas
+#                           there is danger in being TOO permissive of gaps, inserting gaps everywhere
+#                           making they're occurrence far more common than you would expect biologically.
+#                           And we could question how relevant the algorithm would be for sequence
+#                           analysis if puts an ENTIRE class events(occurrences) above another that we
+#                           know to be far more common. Thats as far as I can go into the problem without
+#                           questioning why I'd even bother...so I dunno...I guess we'll keep the output
+#                           0 for that special case and pray for the best (or see if we cant find a 
+#                           nice configuration in the modelling function, unrelated to the output=0 case)
+#
+#                           [1] not done. should do this...
+
+#
+# Notes:The(pattern)recognition is pretty weird.It's kindof a push down automata in that
+#  we save information to a stack.Also instead of a regular automata, one where a landed
+#  state may represent an intermediate output or perhaps also an end state, we use 
+#  a Mealy automata. The major differences being that, in our case at least, a mealy 
+#  automata has NO end state, and the output is determined by the transition that
+#  leads into a particular state. This output serves as a "hint" to the core patterns 
+#  length and is hand coded - this keeps the algorithms approximation in check 
+#  the whole way.To clarify:because of the output hint, the algorithm may "instictively"
+#  know that there is a pattern whose core length is 3, even when its unsure what it is
+#  This may not be a universal rule, but for this algorithm in the WORST cases 
+#  it may take 6 or 7 characters before it can say with certainty what the pattern 
+#  actually is. This is the case whether the core pattern len is 3, 2, or 1.
+#  Until that point, when theres a grey area, the hint is there so we can make 
+#  assumptions without having full knowledge -- as long as the pattern is not broken
+#  the hint will at least be the best conservative estimate (with a cap of len 3)
+#  that we can make at that point. It will be wrong at times, but I think it does good
+#  for the fact it doesn't look ahead.  The importance of this cannot be stressed more 
+#  because this is probably the most common state of the algorithm and a point where 
+#  we're too make the most interventions in order to change the normal behaviour of the
+#  NW algorithm.
+#
+
+abstract IRecognitionMode
+
+type RecognitionModeK1 <: IRecognitionMode
+end
+
+type RecognitionModeK2 <: IRecognitionMode
+end
+
+type NoRecognitionMode <: IRecognitionMode
+end
+
+abstract IState
+
+type StateAndOutput
+    _state::IState
+    _output::Any
+end
+
+type State <: IState
+    _id::Int64
+    _transitions::Dict{Any,Any} # key will be StateAndOutput
+end
+
+type NullState <: IState
+end
+
+abstract IStateKey;
+
+# State A is the first character considered in a repetitive seq. eg: A in AAA
+type StateKeyA <: IStateKey
+end
+
+# State B is the second unique character considered in a repetitive seq. eg: B in ABABABAB
+type StateKeyB <: IStateKey
+end
+
+# State C is the third unique character considered in a repetitive seq. eg: C in BACBACBACBAC
+type StateKeyC <: IStateKey
+end
+
+# State A' is the first character considered in a repetitive seq. eg: A in AAA
+type StateKeyAprime <: IStateKey
+end
+
+# State B' is the second unique character considered in a repetitive seq. eg: B in ABABABAB
+type StateKeyBprime <: IStateKey
+end
+
+# State C' is the third unique character considered in a repetitive seq. eg: C in BACBACBACBAC
+type StateKeyCprime <: IStateKey
+end
+
+type StateKeyNull <: IStateKey
+end
+
+type RecognitionStackEntry
+    _previousRecognitionMode::IRecognitionMode
+    _recognitionMode::IRecognitionMode
+    _currentIndexInTarget::Int64
+    _target::Array{Char} #will:jan12, 2013 this needs to change at some point -- see gameplan.
+end
+
+abstract ProgressionInfoKey
+
+type VisitedStatesKey <: ProgressionInfoKey
+end
+
+type CurrentPatternKey <: ProgressionInfoKey
+end
+
+abstract MappableType
+
+# organized with entries containing {repitionLength,currentPlace,"AB"}
+type RecognitionStack <: MappableType 
+    _entries::Array{RecognitionStackEntry}
+end
+
+type NoMapValue <: MappableType
+end
+
+# will:jan12, 2013 slowly phasing in the "ArrayStack", which is actually a mapping, indexable
+#  by i,j integer pair -- see gameplan.
+#   => to be organized with entries containing:
+#       - {prevRecogMode,currRecogMode,currentOutput,automataStateInfo*,isCorePatternSet?,targetInfo(currentIndex,target)}
+#        * automataStateInfo is a map, dont like idea of dedicated instance variables, not used 90% o time
+#        Map Keys For ProgressionInfoMap: VisitedStatesKey,CurrentPatternKey
+#        ProgressionInfoMap
+#         {
+#             VisitedStatesKey->visitedStates,
+#             CurrentPatternKey->currentPattern
+#         }
+#
+#        TargetInfoMap
+#         {
+#             currentPositionInTarget
+#             target
+#         }
+#
+type RecognitionStackDataMap
+    _stackEntryMap::Dict{Any,Any} #(Int64,Int64)->RecognitionStackEntry
+end
+
+##################################################################################
+
+
+
+##################################################################################
+
+function deleteRecognitionStackEntryInDataMap(dataMap::RecognitionStackDataMap,indexPair::(Int64,Int64))
+    del(dataMap._stackEntryMap, indexPair)
+end
+
+function addToRecognitionStackDataMap(dataMap::RecognitionStackDataMap,indexPair::(Int64,Int64),stackEntry::RecognitionStackEntry)
+    merge!(dataMap._stackEntryMap, {indexPair=>stackEntry})
+end
+
+function getRecognitionStackEntry(dataMap::RecognitionStackDataMap,indexPair::(Int64,Int64))
+    get(dataMap._stackEntryMap, indexPair, NoMapValue())
+end
+
+function getRecognitionStackDataMapSize(dataMap::RecognitionStackDataMap)
+    return length(dataMap._stackEntryMap)
+end
+
+function getNumberOfStackEntries(dataMap::RecognitionStackDataMap)
+    return getRecognitionStackDataMapSize(dataMap)
+end 
+
+
+function getState(stateAndOutput::StateAndOutput)
+    return stateAndOutput._state
+end
+
+function getOutput(stateAndOutput::StateAndOutput)
+    return stateAndOutput._output
+end
+
+function hash(stateKey::StateKeyA)
+    return 1
+end
+
+function hash(stateKey::StateKeyB)
+    return 2
+end
+
+function hash(stateKey::StateKeyC)
+    return 3
+end
+
+function hash(stateKey::StateKeyAprime)
+    return 4
+end
+
+function hash(stateKey::StateKeyBprime)
+    return 5
+end
+
+function hash(stateKey::StateKeyCprime)
+    return 6
+end
+
+function hash(stateKey::StateKeyNull)
+    return 7
+end
+
+function pop(array::Array{RecognitionStackEntry})
+    if isempty(array)
+        return RecognitionStackEntry(NoRecognitionMode(),NoRecognitionMode(),0,[' '])
+    else
+        poppedElement = array[end]
+        ccall(:jl_array_del_end, Void, (Any, Uint), array, 1)
+        return poppedElement
+    end
+end
+
+##################################################################################
+
+
+##################################################################################
+
+function pop(recognitionStack::RecognitionStack)
+    return pop(recognitionStack._entries)
+end
+
+function nwstring(A::StateKeyA)
+    return "<StateKey:A>"
+end
+
+function nwstring(B::StateKeyB)
+    return "<StateKey:B>"
+end
+
+function nwstring(C::StateKeyC)
+    return "<StateKey:C>"
+end
+
+# this is an abuse of notation\repr, but its essentially accurate (I think)
+#  reason: mealy machine (MM) associates outputs to TRANSITIONS specifically
+function nwstring(stateAndOutput::StateAndOutput)
+    return strcat(nwstring(stateAndOutput._state),"/",stateAndOutput._output)
+end
+
+# we have to use this fn when printing State ob; to prevent print from trying recusrsively print 
+#  all the State obj's member field details - because some objects are self-referencing through dictionaries
+#  and type inference by default tries to evaluate the "whole type"...
+function nwstring(state::State)
+    return strcat("<State:",string(state._id),">")
+end
+
+function nwstring(state::NullState)
+    return "<State:NullState>"
+end
+
+abstract PushDownAutomata
+
+type RecognitionPDA <: PushDownAutomata
+    _stack::RecognitionStack
+    _startState::IState
+    _currentState::IState
+    _currentOutput::Any
+    _visitedStates::Array{State}
+    _corePattern::Array{State}
+    _isCorePatternSet
+end
+
+##################################################################################
+
+##################################################################################
+
+function getTransitionMap(state::State)
+    return state._transitions;
+end
+
+function createState(id::Int64)
+    return State(id, Dict())
+end
+
+function init(state::State,transitions::Array{Dict{Any,Any}})
+    del_all(getTransitionMap(state))
+
+# uncomment if need to inspect created states
+#    print("\nInit(")
+#    print(state)
+#    println(")")
+
+    for transition in transitions
+#        println(transition)
+        state._transitions = merge(getTransitionMap(state), transition)
+    end
+
+#    ## tests ##
+#    for transition in transitions
+#        ## for each dictionary check that the keys all address a value ##
+#        ## I think they call this a sanity check... ##
+#        for key in keys(transition)
+#            val = get(getTransitionMap(state), key, NullState())
+#            
+#            print("\t -- ")
+#            print(key)
+#            print(" => ")
+#            show(nwstring(val))
+#            print("\n")
+#        end
+#    end
+#
+#    print("\n")
+end
+
+function createRecognitionStack()
+    return RecognitionStack([RecognitionStackEntry(NoRecognitionMode(),NoRecognitionMode(),0,[' '])])
+end
+
+# note: maybe change the start output to be something that wont be mapped to a gap??
+function createRecognitionPDA(stack::RecognitionStack,startState::IState)
+    return RecognitionPDA(stack,startState,startState,0,[startState],[startState],false)
+end
+
+function addToVisitedStates(pda::RecognitionPDA,state::IState)
+    push(pda._visitedStates,state)
+end
+
+function clearVisitedStates(pda::RecognitionPDA)
+    del_all(pda._visitedStates)
+    push(pda._visitedStates, pda._startState)
+end
+
+function getVisitedStates(pda::RecognitionPDA)
+    return pda._visitedStates
+end
+
+function getEntries(stack::RecognitionStack)
+    return stack._entries
+end
+
+function isCorePatternSet(pda::RecognitionPDA)
+    return pda._isCorePatternSet
+end
+
+function getCurrentOutput(pda::RecognitionPDA)
+    return pda._currentOutput
+end
+
+function getLengthOfCurrentPattern(pda::RecognitionPDA)
+    if pda._isCorePatternSet
+        println("returning length determined by known core pattern")
+        return length(pda._)
+    else
+        println("returning length based on visited states, because we haven't yet determined a core pattern")
+        return length(pda._visitedStates) - 1
+    end
+end
+
+function pushToStack(pda::RecognitionPDA, entry::RecognitionStackEntry)
+    pdaStack = pda._stack
+    stackEntries = getEntries(pdaStack)
+    push(stackEntries, entry)
+end
+
+function popTopOfStack(pda::RecognitionPDA)
+    pdaStack = pda._stack
+    stackEntries = getEntries(pdaStack)
+    poppedEntry = pop(stackEntries)
+
+    return poppedEntry
+end
+
+function getTargetFromTopOfStack(pda::RecognitionPDA)
+    const topRecognitionStackEntry = popTopOfStack(pda)
+    const retTarget = topRecognitionStackEntry._target
+    pushToStack(pda, topRecognitionStackEntry)
+    return retTarget
+end
+
+function getRecognitionModeFromTopOfStack(pda::RecognitionPDA)
+    const topRecognitionStackEntry = popTopOfStatck(pda)
+    const retRecogitionMode = topRecognitionStackEntry._recognitionMode
+    pushToStack(pda, topRecogitionStackEntry)
+
+    return retRecognitionMode
+end
+
+function getPreviousRecognitionModeFromTopOfStack(pda::RecognitionPDA)
+    const topRecognitionStackEntry = popTopOfStatck(pda)
+    const retPrevRecogitionMode = topRecognitionStackEntry._previousRecognitionMode
+    pushToStack(pda, topRecogitionStackEntry)
+
+    return retPrevRecognitionMode
+end
+
+##################################################################################
+##################################################################################
+
+function getNextState(aState::IState, input::IStateKey)
+    nextState = get(getTransitionMap(aState), input, NullState())
+    return nextState
+end
+
+function getPatternInfo(pda::RecognitionPDA)
+    const currentTarget = getTargetFromTopOfStack(pda)
+    const lengthOfTarget = length(currentTarget)-1
+    const lengthOfCorePattern = getCurrentOutput(pda)
+
+    numberOfOccurences = 0
+    if lengthOfCorePattern != 0
+        numberOfOccurences = lengthOfTarget/lengthOfCorePattern
+    end
+
+    return (lengthOfTarget,lengthOfCorePattern,numberOfOccurences)
+end
+
+function isRecognitionStateEqualToLast(pda::RecognitionPDA)
+    const prevRecognitionMode = getPreviousRecognitionModeFromTopOfStack(pda)
+    const currRecognitionMode = getRecognitionModeFromTopOfStack(pda)
+
+    return prevRecognitionMode == currentRecognitionMode
+end
+
+function getCurrentAndPreviousRecognitionMode(pda::RecognitionPDA)
+    const prevRecognitionMode = getPreviousRecognitionModeFromTopOfStack(pda)
+    const currRecognitionMode = getRecognitionModeFromTopOfStack(pda)
+
+    return (prevRecognitionMode,currRecognitionMode)
+end
+
+# creates push down automata for pattern recognition 
+function createRecognitionPDA()
+    ## state definitions ##
+    s0 = createState(0)
+    s1 = createState(1)
+    s2 = createState(2)
+    s3 = createState(3)
+    s4 = createState(4)
+    s5 = createState(5)
+    s6 = createState(6)
+    s7 = createState(7)
+    s8 = createState(8)
+    s9 = createState(9)
+    s10 = createState(10)
+    s11= createState(11)
+    s12 = createState(12)
+    s13 = createState(13)
+    s14 = createState(14)
+    s15 = createState(15)
+    s16 = createState(16)
+    s17 = createState(17)
+    s18 = createState(18)
+    s19 = createState(19)
+    s20 = createState(20)
+    s21 = createState(21)
+    s22 = createState(22)
+    s23= createState(23)
+    s24 = createState(24)
+    s25 = createState(25)
+    s26 = createState(26)
+    s27 = createState(27)
+    s28 = createState(28)
+    s29 = createState(29)
+    s30 = createState(30)
+    s31 = createState(31)
+    s32 = createState(32)
+    s33 = createState(33)
+    s34 = createState(34)
+    s35 = createState(35)
+    s36 = createState(36)
+    s37 = createState(37)
+    s38 = createState(38)
+
+   #btw StateAndOutput is just the number of elements in core repetition
+   # we can also rework it so that it's something like ABC, or ABB to be
+   # much more descriptive
+   
+    ## transition defns for Mealy Automata ##
+   init(s0, [{StateKeyA()=>StateAndOutput(s1,1)}, {StateKeyAprime()=>StateAndOutput(s17,1)}])
+
+    ## k1 ##
+   init(s1, [{StateKeyA()=>StateAndOutput(s2,1)}, {StateKeyB()=>StateAndOutput(s7,2)}])
+     init(s2, [{StateKeyA()=>StateAndOutput(s3,1)}, {StateKeyB()=>StateAndOutput(s4,3)}])
+      init(s3, [{StateKeyA()=>StateAndOutput(s2,1)}])
+      init(s4, [{StateKeyA()=>StateAndOutput(s5,3)}])
+       init(s5, [{StateKeyA()=>StateAndOutput(s6,3)}])
+        init(s6, [{StateKeyB()=>StateAndOutput(s4,3)}])
+     init(s7, [{StateKeyA()=>StateAndOutput(s8,2)}, {StateKeyB()=>StateAndOutput(s33,3)}, {StateKeyC()=>StateAndOutput(s14,3)}])
+      init(s8, [{StateKeyB()=>StateAndOutput(s9,2)}, {StateKeyA()=>StateAndOutput(s11,0)}]) # for StateKeyA, I also thought about using 3. But I think this may say more...
+       init(s9, [{StateKeyA()=>StateAndOutput(s10,2)}])
+        init(s10, [{StateKeyB()=>StateAndOutput(s9,2)}])
+       init(s11, [{StateKeyB()=>StateAndOutput(s12,3)}])
+        init(s12, [{StateKeyA()=>StateAndOutput(s13,3)}])
+         init(s13, [{StateKeyA()=>StateAndOutput(s11,3)}])
+       init(s33, [{StateKeyA()=>StateAndOutput(s34,3)}])
+        init(s34, [{StateKeyB()=>StateAndOutput(s35,3)}])
+         init(s35, [{StateKeyB()=>StateAndOutput(s33,3)}])
+      init(s14, [{StateKeyA()=>StateAndOutput(s15,3)}])
+       init(s15, [{StateKeyB()=>StateAndOutput(s16,3)}])
+        init(s16, [{StateKeyC()=>StateAndOutput(s14,3)}])
+
+    ## k2 ##
+   init(s17,[{StateKeyAprime()=>StateAndOutput(s18,1)}, {StateKeyBprime()=>StateAndOutput(s23,1)}])
+    init(s18, [{StateKeyAprime()=>StateAndOutput(s19,1)}, {StateKeyBprime()=>StateAndOutput(s20,2)}])
+     init(s19, [{StateKeyAprime()=>StateAndOutput(s19,1)}])
+     init(s20, [{StateKeyAprime()=>StateAndOutput(s21,3)}])
+      init(s21, [{StateKeyAprime()=>StateAndOutput(s22,3)}])
+       init(s22, [{StateKeyBprime()=>StateAndOutput(s20,3)}])
+    init(s23, [{StateKeyAprime()=>StateAndOutput(s24,2)}, {StateKeyBprime()=>StateAndOutput(s36,3)}, {StateKeyCprime()=>StateAndOutput(s30,3)}]) 
+     init(s24, [{StateKeyBprime()=>StateAndOutput(s25,2)}, {StateKeyAprime()=>StateAndOutput(s27,0)}])
+      init(s25, [{StateKeyAprime()=>StateAndOutput(s26,2)}])
+       init(s26, [{StateKeyBprime()=>StateAndOutput(s25,2)}])
+      init(s27, [{StateKeyBprime()=>StateAndOutput(s28,3)}])
+       init(s28, [{StateKeyAprime()=>StateAndOutput(s29,3)}])
+        init(s29, [{StateKeyAprime()=>StateAndOutput(s27,3)}])
+     init(s36, [{StateKeyAprime()=>StateAndOutput(s37,3)}])
+      init(s37, [{StateKeyBprime()=>StateAndOutput(s38,3)}])
+       init(s38, [{StateKeyBprime()=>StateAndOutput(s36,3)}])
+     init(s30, [{StateKeyAprime()=>StateAndOutput(s31,3)}])
+      init(s31, [{StateKeyBprime()=>StateAndOutput(s32,3)}])
+       init(s32, [{StateKeyCprime()=>StateAndOutput(s30,3)}]) 
+
+    ## tests ##
+    testS0_1 = getNextState(s0, StateKeyC())
+    println(nwstring(testS0_1))
+
+    testS0_2 = getNextState(s0, StateKeyA())
+    println(nwstring(testS0_2))
+
+    if isa(typeof(testS0_1),Type{NullState})
+        println("S0_1 Test Succeeded")
+    else
+        println("S0_1 Test Failed")
+    end
+
+    if isa(typeof(testS0_2),Type{NullState})
+        println("S0_2 Test Failed\n")
+    else
+        println("S0_2 Test Succeeded\n")
+    end
+
+    recognitionStack = createRecognitionStack()
+
+    recognitionPDA = createRecognitionPDA(recognitionStack, s0)
+
+    # just testing out basic functionality of recognition stack
+    topOfRecognitionStack = popTopOfStack(recognitionPDA)
+    print("Test(1) - Top Of Recognition Stack: ")
+    println(topOfRecognitionStack)
+
+    topOfRecognitionStack._recognitionMode = RecognitionModeK1()
+    topOfRecognitionStack._currentIndexInTarget = topOfRecognitionStack._currentIndexInTarget + 1
+    topOfRecognitionStack._target = ['C']
+    pushToStack(recognitionPDA, topOfRecognitionStack)
+
+    topOfRecognitionStack1 = popTopOfStack(recognitionPDA)
+    print("Test(2) - Top Of Recognition Stack: ")
+    println(topOfRecognitionStack1)
+
+    push(topOfRecognitionStack1._target, 'G')
+    topOfRecognitionStack1._currentIndexInTarget = topOfRecognitionStack1._currentIndexInTarget + 1
+    pushToStack(recognitionPDA, topOfRecognitionStack1)
+
+    topOfRecognitionStack2 = popTopOfStack(recognitionPDA)
+    print("Test(3) - Top Of Recognition Stack: ")
+    println(topOfRecognitionStack2)
+
+    return recognitionPDA
+end
+
+
+# todo:will - (1) we need to extract length of core repeition string once we know it.  DONE.
+#  easiest way is to do this to keep a list of visited IStates, each time we comes accross
+#  one we check it against all those in list, if one is matched that is NOT s0 or NullState, we know that
+#  the core repition string is from the point  in the list matched and onward. Then we don't need to upate
+#  the list while pattern is still valid. Once we get NullState or s0, we know to clear the array and start 
+#  looking again.
+# todo:will - (2) we need to switch from k1 to k2, and sort of get rid of the concept of tracking different
+#  sequences, not sure what to call it - (we're really just creating two different contexts fro back to back
+#  patterns each different. DONE.
+function tickPDAGivenInput(pda::RecognitionPDA, input::Char)
+    print("Ticking '")
+    print(input)
+    println("'")
+
+    topRecognitionStackEntry = popTopOfStack(pda)
+
+    print("  ")
+    println(topRecognitionStackEntry)
+
+    # if top of stack is empty, then we know:
+    #   1) either PDA just initialized or reset due to non occurence
+    #       of expected value in target pattern.
+    #   2) _ index = 0 and _target=[] should be only StackEntry (if any).
+    #   3) the choices for StateKey will be {StateKeyA,StateKeyAprime}, which one
+
+    # Friday 11:00pm, new strategy.We choose StateKey(A_n) entirely by whether its the nth unique character
+    # where A_n = (char) 125 + n   (ASCII - so 1st unique is 126, 2nd is 127, 3rd is 128. -- and it takes
+    #                               no more than the target length to determine what n is. For our
+    #                               purposes we have 4 letters in the alphabet, and the actual automata
+    #                               currently only recognizes patterns only 3 letters at a time -
+    #                               a fourth unique character in the input will always break the pattern.
+    #                               More, generally another way of breaking the pattern would be to have
+    #                               out of place characters in input. So say StateKeyA and StateKeyB
+    #                               and StateKeyC are both valid and the pattern in some imaginary
+    #                               automata is ABBA. Already we have "toot", a 't' input is valid
+    #                               to make "toott", but after that we must have 2 "o"'s to keep with
+    #                               the pattern.  In other words we need query the transitions in the
+    #                               current state with  StateKeyB twice, each time setting the result
+    #                               to be the current state. Alternatvely, can follow "toot" with 'y'
+    #                               as the input, which would be the 3rd unique character in pattern,
+    #                               prompting us to query the system with StateKeyC. But of course,
+    #                               this should return the NullState b/c it doesn't conform to the pattern
+    #                               in the automata. For it to conform the automata would need to
+    #                               accept ABBAC. The final C allowing a third unique character, a 'y'
+    #                               'or anything else but a 't' or an 'o'
+
+    uniqueRank = 0
+    uniquenessMap = {' '=>0 }
+
+    del_all(uniquenessMap)
+
+    # building uniquenessMap (maps a character c to N, N meaning c is the Nth unique character encountered
+    place = 1
+    for c in topRecognitionStackEntry._target
+        if has(uniquenessMap, c) != true && c != ' ' 
+            merge!(uniquenessMap, { c => place })
+            place = place + 1     
+        end
+    end
+
+    print("  ")
+    println(uniquenessMap)
+
+    uniqueRank = get(uniquenessMap, input, length(uniquenessMap)+1)
+
+    print("    input: ")
+    print(input)
+    print(" is the ")
+    print(uniqueRank)
+    println(" unique character in target")
+
+    # doing switch on unique rank to get proper StateKey
+    stateKey = StateKeyA()
+
+    if uniqueRank == 1
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK1})
+            stateKey = StateKeyA()
+        elseif isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK2})
+            stateKey = StateKeyAprime()
+        end
+    elseif uniqueRank == 2
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK1})
+            stateKey = StateKeyB()
+        elseif isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK2})
+            stateKey = StateKeyBprime()
+        end
+    elseif uniqueRank == 3
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK1})
+            stateKey = StateKeyC()
+        elseif isa(typeof(topRecognitionStackEntry._recognitionMode),Type{RecognitionModeK2})
+            stateKey = StateKeyCprime()
+        end
+    else
+        # this sort of like insider knowledge, if were ever to accept MORE unique letters
+        # in a sequence then we'd probably keep going: uniqueRank=3 giving StateKeyD or StateKeyDprime
+        # and etc. Or use the @eval funtion...
+        stateKey = StateKeyNull()
+    end    
+
+    print("    Chose the state key: ")
+    println(stateKey)
+
+
+    theNextStateAndOutput = getNextState(pda._currentState, stateKey)
+
+
+    print("  The next state:")
+    println(nwstring(theNextStateAndOutput))
+
+    print("    Verdict: ")
+    if isa(typeof(theNextStateAndOutput), Type{NullState})
+        println("Pattern broken!")
+        pda._currentState = pda._startState
+        pda._currentOutput = 1;
+
+        clearVisitedStates(pda)
+        pda._isCorePatternSet = false
+
+        prevRecognitionMode = topRecognitionStackEntry._recognitionMode
+        stateKeyAfterReset = StateKeyNull()
+
+        # we switch between k1 and when patterns and broken (or dispelled)
+        if isa(typeof(prevRecognitionMode), Type{RecognitionModeK1})
+            recognitionMode = RecognitionModeK2()
+            stateKeyAfterReset = StateKeyAprime()
+        elseif isa(typeof(prevRecognitionMode), Type{RecognitionModeK2})
+            recognitionMode = RecognitionModeK1()
+            stateKeyAfterReset = StateKeyA()
+        else
+            recognitionMode = RecognitionModeK2() #k1 is the default, so a broken pattern means k2...not sure if this should ever happen 
+            stateKeyAfterReset = StateKeyAprime()
+        end
+
+        theNextStateAndOutput = getNextState(pda._currentState, stateKeyAfterReset)
+        pda._currentState = getState(theNextStateAndOutput)
+        addToVisitedStates(pda, getState(theNextStateAndOutput))
+
+        topRecognitionStackEntry._target = [' ', input]
+
+        pushToStack(pda, RecognitionStackEntry(prevRecognitionMode,recognitionMode, 1, topRecognitionStackEntry._target))
+    else
+        println("Pattern ALIVE")
+        pda._currentState = getState(theNextStateAndOutput)
+        pda._currentOutput = getOutput(theNextStateAndOutput)
+
+        if isa(typeof(topRecognitionStackEntry._recognitionMode),Type{NoRecognitionMode})
+            # This is intended only to happen at the beginning.
+            println("  Top of stack is empty, initializing...")
+
+            initialRecognitionStackEntry = RecognitionStackEntry(NoRecognitionMode(),RecognitionModeK1(), 1, [' ',input])
+            pushToStack(pda, initialRecognitionStackEntry)
+
+            print("  ")
+            println(initialRecognitionStackEntry)
+        else
+            println("  Top of stack NOT empty, appending new info to it...")
+
+            # so I think 'target' instance variable may be confusing. As long as a pattern exists the
+            # will always be appended to. We have another construct regarding core
+
+            prevRecognitionMode = topRecognitionStackEntry._recognitionMode
+            topRecognitionStackEntry._previousRecognitionMode = prevRecognitionMode
+              # here were don't need to touch the currentRecognitionMode as we know:
+              #  the pattern is ALIVE
+              #  and the current recognitionMode is NOT "NoRecognitionMode"
+
+            push(topRecognitionStackEntry._target,input)
+            topRecognitionStackEntry._currentIndexInTarget = topRecognitionStackEntry._currentIndexInTarget + 1
+            pushToStack(pda, topRecognitionStackEntry)        
+
+            print("    ")
+            println(topRecognitionStackEntry)
+
+            # if we haven;t already found the core pattern:
+            #  here we check for cycles. a cycle here would denote the bounds of core pattern + tell us its length
+
+            const theNextStateFromStateAndOutput = getState(theNextStateAndOutput)
+
+            if !isCorePatternSet(pda)
+                print("    Checking for core pattern: ")
+                print(nwstring(theNextStateFromStateAndOutput))
+                print(" | ")
+                visitedStates = getVisitedStates(pda)
+
+                coreStartIndexInTarget = 1
+
+                for aVisitedState in visitedStates
+                    print(nwstring(aVisitedState))
+                    print(", ")
+
+                    if theNextStateFromStateAndOutput == aVisitedState
+                        println("\n    Found Core Pattern!")
+
+                        del_all(pda._corePattern)
+ 
+                        isRecording = false
+
+                        # the following works because we know for sure the core
+                        # is from whenever bVisitedState is equal to getState(theNextStateAndOutput)
+                        # until the end of the list of visited states we've recorded.
+                        for bVisitedState in visitedStates
+                            if getState(theNextStateAndOutput) == bVisitedState
+                                isRecording = true
+                                push(pda._corePattern,bVisitedState)
+                            elseif isRecording
+                                push(pda._corePattern,bVisitedState)
+                            end
+                        end
+
+                        println("    Core pattern set!")
+                        pda._isCorePatternSet = true
+
+                        break
+                    end
+
+                    coreStartIndexInTarget = coreStartIndexInTarget + 1
+                end
+
+                if (pda._isCorePatternSet)
+                    print("    Core Pattern <")
+                    for stateInPattern in pda._corePattern
+                        print(nwstring(stateInPattern))
+                        print(",")
+                    end
+                    println(">")
+
+                    # we recorded the index for the start of the core pattern in _target
+                    print("    Core Pattern String \"")
+                    for index=coreStartIndexInTarget:topRecognitionStackEntry._currentIndexInTarget
+                        print(topRecognitionStackEntry._target[index])
+                        print("-")
+                    end
+                    println("\"")
+                else
+                    # for debug only
+                    print("\n")
+                end
+            end
+
+            if !isCorePatternSet(pda)
+                addToVisitedStates(pda,getState(theNextStateAndOutput))
+            end
+        end
+    end
+
+    #currentOutput = theNextStateAndOutput._output
+
+    #print("\n  Total Length Of Current Pattern ~= ")
+    #println((length(topRecognitionStackEntry._target)-1))
+    #print("  Length Of Core Pattern ~= ")
+    #println(currentOutput)
+
+    #print("  Number Of Occurences Of Pattern ~= ")
+    #if currentOutput != 0
+    #    println((length(topRecognitionStackEntry._target)-1)/currentOutput)
+    #else
+    #    println("0")
+    #end
+
+    (lenOfTarget,lenOfCorePattern,numOfOccurences) = getPatternInfo(pda)
+    print("  Len of target = ")
+    println(lenOfTarget)
+    print("  Len of core pattern = ")
+    println(lenOfCorePattern)
+    print("  Num of occurences = ")
+    println(numOfOccurences)
+
+end
+
+
+function runHandWrittenQualitativeRecognitionTests()
+    println("\nCreating Test Recognition PDA")
+
+    thePDA = createRecognitionPDA()
+
+    print("-----------------------------------------------------------\n")
+    print("Running tests for qualitative observation\n")
+
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'C')
+
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'B')
+
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'G')
+
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+
+    # Pretty sure w can correct this...
+    # here the first example of a tricky string to recognize. A-B-B here is
+    # recognized as B-A-B. I think generally this is fine...though I should
+    # check to see when they say (CA)_10 its sort of implicit that it may mean
+    # (AC)_10
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'B')
+
+    # Dec 29, 2012:will I think the following can be corrected:
+    # the following example is quirky in that my "intended" pattern is A-A-B, but the
+    # interpreted pattern will be seen as A-B-A. So whatever functional mapping we do
+    # to recognize a specific repeat string >= 2 we must consider the "isomerisms (correct word?)"
+    # and not just a specific string.
+    tickPDAGivenInput(thePDA, 'A') # a note here, because the first is congruent with the continuing character of the last set, we wont recognize this pattern as quickly!
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'C')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'C')
+
+    tickPDAGivenInput(thePDA, 'A') # a note here, because the first is congruent with the continuing character of the last set, we wont recognize this pattern as quickly!
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'B')
+    tickPDAGivenInput(thePDA, 'A')
+    tickPDAGivenInput(thePDA, 'A')
+
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'G')
+    tickPDAGivenInput(thePDA, 'T')
+   
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'T')
+    tickPDAGivenInput(thePDA, 'T')
+
+    println("\nFinished Testing!!!")
+end
+
+function testRecognitionStackDataMap()
+    recognitionStackDataMap = RecognitionStackDataMap({(-1,-1)=>NoMapValue()})
+
+    println("\nReconitionStackEntryMap Tests")
+    println("-----------------------------")
+
+    print("\nRecognitionStackDataMap size: ")
+    print(getRecognitionStackDataMapSize(recognitionStackDataMap))
+
+    addToRecognitionStackDataMap(recognitionStackDataMap,(0,1),RecognitionStackEntry(NoRecognitionMode(),RecognitionModeK1(), 1, [' ','M']))
+
+    print("\n(1) ")
+    print(getRecognitionStackEntry(recognitionStackDataMap,(0,1)))
+
+    deleteRecognitionStackEntryInDataMap(recognitionStackDataMap, (0,1))
+
+    print("\nRecognitionStackDataMap size: ")
+    print(getRecognitionStackDataMapSize(recognitionStackDataMap))
+
+    print("\n(2) ")
+    print(getRecognitionStackEntry(recognitionStackDataMap,(0,1)))
+
+    addToRecognitionStackDataMap(recognitionStackDataMap,(0,2),RecognitionStackEntry(NoRecognitionMode(),RecognitionModeK1(), 1, [' ','X']))
+    addToRecognitionStackDataMap(recognitionStackDataMap,(3,4),RecognitionStackEntry(NoRecognitionMode(),RecognitionModeK1(), 1, [' ','Y']))
+
+    print("\nRecognitionStackDataMap size: ")
+    print(getRecognitionStackDataMapSize(recognitionStackDataMap))
+
+    print("\n(3) ")
+    print(getRecognitionStackEntry(recognitionStackDataMap,(0,2)))
+    print("\n(4) ")
+    print(getRecognitionStackEntry(recognitionStackDataMap,(3,4)))
+
+    print("\n(5) ")
+    
+    println(getRecognitionStackEntry(recognitionStackDataMap,(0,1)))
+end

@@ -1,0 +1,179 @@
+# Players properties structure
+type Player{N,UF}
+  name::String
+  nodes::Array{N,1}
+  utilityfunctions::Array{UF,1}
+end
+
+# Nodes properties structure
+type Node{M}
+  name::String
+  timeposistion::Int
+  moves::Array{M,1}
+end
+
+# Moves properties structure
+type Move{N,R,V}
+  name::String
+  length::Nullable{Int}
+  childnode::Nullable{N}
+  payoffset::Dict{R,V}
+end
+
+# Environment variables
+allplayers = Player{Node,Int}[]
+playerexaminesplayers = Dict{Player, Dict{Player, Bool}}()
+playerexaminesnodes = Dict{Player, Dict{Node, Bool}}()
+playerexaminesmoves = Dict{Player, Dict{Move, Bool}}()
+
+# add a player 
+function addplayer()
+  if length(allplayers) == 0 
+    push!(allplayers, Player{Node,Int}("Player 1",Node{Move}[],Int[]))
+    playerexaminesplayers[allplayers[1]] = Dict(allplayers[1]=>1)
+  else
+    newplayerindex = length(allplayers) + 1
+    newplayer = allplayers[newplayerindex]
+    name::String = string("Player ",newplayerindex)
+    push!(allplayers, Player{Node,Int}(name,Node{Move}[],Int[]))
+    playerexaminesplayers[newplayer] = Dict(newplayer=>1)
+    for player in allplayers
+      for node in player.nodes
+        for move in node.moves
+          try
+            playerexaminesmoves[newplayer][move] = 1 
+          catch 
+            playerexaminesmoves[newplayer] = Dict(move=>1)
+          end
+        end
+        try 
+          playerexaminesnodes[newplayer][node] = 1
+        catch
+          playerexaminesnodes[newplayer] = Dict(node=>1)
+        end
+      end
+      playerexaminesplayers[player][newplayer] = 1 
+      playerexaminesplayers[newplayer][player] = 1
+    end
+  end
+end
+
+# add root node for a specified player based on its index
+function addnode(nodeplayerindex::Int)
+  name::String = "PX:N1"
+  if length(allplayers[nodeplayerindex].nodes) == 0
+    name = string("P",nodeplayerindex,":N1")
+    push!(allplayers[nodeplayerindex].nodes, Node{Move}(name,0,Move{Node,Int,Int}[]))
+    for player in allplayers
+      try 
+        playerexaminesnodes[player][allplayers[nodeplayerindex].nodes[1]] = 1 
+      catch
+        playerexaminesnodes[player] = Dict(allplayers[nodeplayerindex].nodes[1]=>1)
+      end
+    end
+  else
+    newnodeindex = length(allplayers[nodeplayerindex].nodes) + 1 
+    name = string("P",nodeplayerindex,":N",newnodeindex)
+    push!(allplayers[nodeplayerindex].nodes, Node{Move}(name,0,Move{Node,Int,Int}[]))
+    for player in allplayers
+      playerexaminesnodes[player][allplayers[nodeplayerindex].nodes[newnodeindex]] = 1	
+    end
+  end
+end
+
+# add a move to a node
+function addmove(moveplayerindex::Int,movenodeindex::Int)
+  name::String = "PX:NX:M1"
+  if length(allplayers[moveplayerindex].nodes[movenodeindex].moves) == 0
+    name = string("P",moveplayerindex,":N",movenodeindex,":M1")
+    push!(allplayers[moveplayerindex].nodes[movenodeindex].moves, Move{Node,Int,Int}(name,nothing,nothing,Dict{Int,Int}()))
+    for player in allplayers
+      try 
+        playerexaminesmoves[player][allplayers[moveplayerindex].nodes[movenodeindex].moves[1]] = 1
+      catch 
+        playerexaminesmoves[player] = Dict(allplayers[moveplayerindex].nodes[movenodeindex].moves[1]=>1)
+      end
+    end
+  else 
+    newmoveindex = length(allplayers[moveplayerindex].nodes[movenodeindex].moves) + 1
+    name = string("P",moveplayerindex,":N",movenodeindex,":M",newmoveindex)
+    push!(allplayers[moveplayerindex].nodes[movenodeindex].moves), Move{Node,Int,Int}(name,nothing,nothing,Dict{Int,Int}()))
+    for player in allplayers
+      playerexaminesmoves[player][allplayers[moveplayerindex].nodes[movenodeindex].moves[newmoveindex]] = 1
+    end
+  end
+end
+
+#delete a player based on its index
+function deleteplayer(playerindex::Int)
+  deletedplayer = allplayers[playerindex]
+  for player in allplayers
+    for node in deletedplayer.nodes
+      for move in node.moves
+        delete!(playerexaminesmoves[player], move)
+      end
+      delete!(playerexaminesnodes[player], node)
+    end
+    delete!(playerexaminesplayers[player], deletedplayer)
+  end
+  delete!(playerexaminesplayers, deletedplayer)
+  delete!(playerexaminesnodes, deletedplayer)
+  delete!(playerexaminesmoves, deletedplayer)
+  splice!(allplayers,playerindex)
+end
+
+function deletenode(nodeplayerindex::Int, nodeindex::Int)
+  deletednode = allplayers[nodeplayerindex].nodes[nodeindex]
+  for player in allplayers
+    for move in deletednode.moves
+      nextnode = move.childnode
+      nextmoves = nextnode.moves
+      while nextnode != nothing
+        for nextmove in nextmoves				
+        end
+      end
+    end
+  end
+end
+
+function deletemove(moveplayerindex::Int, movenodeindex::Int, moveindex::Int)
+
+end
+
+function showplayers()
+  for player in allplayers
+    println(player.name)
+  end
+end
+
+function shownodes()
+  for player in allplayers
+    for node in player.nodes
+      println(node.name)
+    end
+  end
+end
+
+function showmoves()
+  for player in allplayers
+    for node in p.nodes
+      for move in n.moves
+        println(move.name)
+      end
+    end
+  end
+end
+
+addplayer()
+addplayer()
+addplayer()
+addplayer()
+addplayer()
+addnode(3)
+addnode(3)
+addnode(3)
+addnode(2)
+addnode(2)
+addnode(2)
+addnode(2)
+addplayer()

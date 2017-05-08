@@ -1,0 +1,28 @@
+using ClassicalCiphers
+using Base.Test
+
+@test encrypt_solitaire("aaaaaaaaaaaaaaa", "") == "EXKYIZSGEHUNTIQ"
+@test encrypt_solitaire("aaaaaaaaaaaaaaa", "f") == "XYIUQBMHKKJBEGY"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "fo") == "TUJYMBERLGXNDIW"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "foo") == "ITHZUJIWGRFARMW"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "a") == "XODALGSCULIQNSC"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "aa") == "OHGWMXXCAIMCIQP"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "aaa") == "DCSQYHBQZNGDRUT"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "b") == "XQEEMOITLZVDSQS"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "bc") == "QNGRKQIHCLGWSCE"
+@test encrypt_solitaire("AAAAAAAAAAAAAAA", "bcd") == "FMUBYBMAXHNQXCJ"
+@test encrypt_solitaire("AAAAAAAAAAAAAAAAAAAAAAAAA", "cryptonomicon") == "SUGSRSXSWQRMXOHIPBFPXARYQ"
+@test encrypt_solitaire("SOLITAIREX", "cryptonomicon") == "KIRAKSFJAN"
+
+@test decrypt_solitaire("EXKYI ZSGEH UNTIQ", "") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("XYIUQ BMHKK JBEGY ", "f") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("TUJYM BERLG XNDIW", "fo") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("ITHZU JIWGR FARMW ", "foo") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("XODAL GSCUL IQNSC ", "a") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("OHGWM XXCAI MCIQP ", "aa") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("DCSQY HBQZN GDRUT ", "aaa") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("XQEEM OITLZ VDSQS ", "b") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("QNGRK QIHCL GWSCE ", "bc") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("FMUBY BMAXH NQXCJ", "bcd") == "aaaaaaaaaaaaaaa"
+@test decrypt_solitaire("SUGSR SXSWQ RMXOH IPBFP XARYQ", "cryptonomicon") == "aaaaaaaaaaaaaaaaaaaaaaaaa"
+@test decrypt_solitaire("KIRAK SFJAN", "cryptonomicon") == "solitairex"

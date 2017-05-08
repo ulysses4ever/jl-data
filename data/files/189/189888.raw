@@ -1,0 +1,96 @@
+using FactCheck
+
+facts("strings") do
+    include("strings.jl")
+
+    strings.string_parser("''")
+
+    # Empty strings should be empty in both modes:
+    @fact strings.string_parser("''") --> isempty
+    @fact strings.string_parser("''", true) --> isempty
+
+    @fact length(strings.string_parser("'asdf'")) --> 4
+
+    @fact strings.string_parser("'asdf'") --> ['a', 's', 'd', 'f'] #--> true
+
+    # Last quote missing
+    @fact_throws strings.string_parser("'asdf")
+
+    # First quote missing
+    @fact_throws strings.string_parser("asdf'")
+
+    # Both quotes missing
+    @fact_throws strings.string_parser("asdf")
+
+    @fact_throws strings.string_parser("'''")
+
+    #This should throw in regular mode...
+    @fact_throws strings.string_parser("''''")
+
+    # ... but not in legacy mode
+    @fact length(strings.string_parser("''''", true)) --> 1
+
+    # Unclosed escape on end
+    @fact_throws strings.string_parser("'asdf\\'")
+
+    # Unclosed legacy escape on end
+    @fact_throws strings.string_parser("'asdf''", true)
+
+    # Escapes
+    @fact strings.string_parser("'\\''") --> ['\'']
+
+    @fact strings.multistring_parser("'''foo'''") --> strings.string_parser("'foo'")
+
+    @fact_throws strings.multistring_parser("'''asdf'''", true)
+end
+
+facts("number_parser") do
+    include("numbers.jl")
+
+    @fact numbers.number_parser("10b123") --> 123
+
+    @fact numbers.number_parser("16bFF") --> 255
+
+    @fact numbers.number_parser("10b12.34") --> 12.34
+
+    @fact numbers.number_parser("16bff") --> 255
+
+    @fact_throws numbers.number_parser("16bff.ff.ff")
+
+    @fact_throws numbers.convert_base(16, "ff.ff.ff")
+    # General tests for the number parser
+    @fact numbers.number_parser("123") --> 123
+
+    @fact numbers.number_parser("1 2 3") --> [1,2,3]
+
+
+    @fact numbers.number_parser("_") --> Inf
+
+    @fact numbers.number_parser("__") --> -Inf
+
+    @fact numbers.number_parser("_12") --> -12
+
+    @fact numbers.number_parser("1e3") --> 1000
+
+    @fact numbers.number_parser("3x") --> BigInt(3)
+
+    @fact numbers.number_parser("3.0x") --> BigFloat(3)
+
+    @fact numbers.number_parser("__x") --> BigFloat(-Inf)
+
+    @fact numbers.number_parser("3r2") --> 3//2
+
+    @fact numbers.number_parser("3r2x") --> 3//BigInt(2)
+
+    @fact numbers.number_parser("1xπ") ≈ π --> true
+
+    @fact numbers.downgrade(1) |> typeof --> Bool
+
+    @fact numbers.downgrade(3.0) |> typeof --> Int
+
+    @fact numbers.downgrade(1.0) |> typeof --> Bool
+
+    @fact numbers.downgrade(BigInt(1)) |> typeof --> BigInt
+
+    @fact numbers.downgrade(BigFloat(1.0)) |> typeof --> BigFloat
+end

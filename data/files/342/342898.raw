@@ -1,0 +1,38 @@
+#Implementation of various concepts in Chapter 1
+
+
+function isTopology(X, T)
+	!(X in T) && return false
+	!(Set() in T) && return false
+	for x in T
+		for t in T
+			!(union(x,t) in T) && return false
+			!(intersect(x,t) in T) && return false
+		end
+	end
+	return true
+end
+
+A = Set([1,2,3])
+B = Set([
+	A, Set(), Set([1]), Set([2]), Set([1,2])
+	])
+C = Set([1,2])
+
+if (isTopology(A,B) && !isTopology(A,C))
+	println("isTopology is Functional")
+end
+
+function genPowerSet()
+	#coming Soon
+end
+
+function isDiscreteTopology{M}(X::Set{M}, T::Set{M})
+	testSet = genPowerSet(X)
+	!(isTopology(X,T)) && return false
+	!(T == tempSet) && return false
+	return true
+end
+
+
+

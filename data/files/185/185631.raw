@@ -1,0 +1,170 @@
+function initShaders()
+	# basicShapes
+	const vshBS = """
+	$(get_glsl_version_string())
+
+	in vec2 position;
+	in vec4 inColor;
+
+	out vec4 OUTColor;
+
+	void main() {
+		OUTColor = inColor;
+		gl_Position = vec4(position, 0.0, 1.0);
+	}
+	"""
+
+	const fshBS = """
+	$(get_glsl_version_string())
+
+	in vec4 OUTColor;
+
+	out vec4 outColor;
+
+	void main() {
+		outColor = OUTColor;
+	}
+	"""
+
+	# texturedShapes
+	const vshTS = """
+	$(get_glsl_version_string())
+
+	in vec2 position;
+	in vec4 inColor;
+	in vec2 texcoord;
+
+	out vec4 OUTColor;
+	out vec2 Texcoord;
+
+	void main() {
+		OUTColor = inColor;
+		Texcoord = texcoord;
+		gl_Position = vec4(position, 0.0, 1.0);
+	}
+	"""
+
+	const fshTS = """
+	$(get_glsl_version_string())
+
+	in vec4 OUTColor;
+	in vec2 Texcoord;
+
+	out vec4 outColor;
+
+	uniform sampler2D tex;
+
+	void main() {
+		outColor = texture(tex, Texcoord) * OUTColor;
+	}
+	"""
+
+	# fontDrawing
+	const vshFD = """
+	$(get_glsl_version_string())
+
+	in vec4 position;
+	in vec4 texcoord;
+
+	out vec2 TexCoord;
+
+	uniform mat4 projection;
+
+	void main()
+	{
+		gl_Position = projection * position;
+		TexCoord = texcoord.xy;
+	}
+	"""
+
+	const fshFD = """
+	$(get_glsl_version_string())
+
+	in vec2 TexCoord;
+
+	out vec4 color;
+
+	uniform sampler2D text;
+	uniform vec3 textColor;
+
+	void main()
+	{
+		vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoord).r);
+		color = vec4(textColor, 1.0) * sampled;
+	}
+	"""
+
+	vertexShader = createShader(vshBS, GL_VERTEX_SHADER)
+	fragmentShader = createShader(fshBS, GL_FRAGMENT_SHADER)
+	state.program = createShaderProgram(vertexShader, fragmentShader)
+	shaderBank["basicShapes"] = state.program
+
+	# assume that most people will want to draw basic shapes by default
+	glUseProgram(state.program)
+
+	positionAttribute = glGetAttribLocation(state.program, "position")
+	glEnableVertexAttribArray(positionAttribute)
+	glVertexAttribPointer(positionAttribute, 2, GL_FLOAT, false, 8*sizeof(GLfloat), 0)
+
+	colorAttribute = glGetAttribLocation(state.program, "inColor")
+	glEnableVertexAttribArray(colorAttribute)
+	glVertexAttribPointer(colorAttribute, 4, GL_FLOAT, false, 8*sizeof(GLfloat), 2*sizeof(GLfloat))
+
+	vertexShader = createShader(vshTS, GL_VERTEX_SHADER)
+	fragmentShader = createShader(fshTS, GL_FRAGMENT_SHADER)
+	shaderBank["texturedShapes"] = createShaderProgram(vertexShader, fragmentShader)
+
+	vertexShader = createShader(vshFD, GL_VERTEX_SHADER)
+	fragmentShader = createShader(fshFD, GL_FRAGMENT_SHADER)
+	shaderBank["fontDrawing"] = createShaderProgram(vertexShader, fragmentShader)
+end
+
+function switchShader(whichShader)
+	state.program = shaderBank[whichShader]
+	glUseProgram(shaderBank[whichShader])
+
+	if whichShader == "texturedShapes"
+		state.drawTexture = true
+	elseif whichShader == "basicShapes"
+		state.drawTexture = false
+	end
+
+	if whichShader == "basicShapes" || whichShader == "texturedShapes"
+		positionAttribute = glGetAttribLocation(state.program, "position")
+		glEnableVertexAttribArray(positionAttribute)
+		glVertexAttribPointer(positionAttribute, 2, GL_FLOAT, false, 8*sizeof(GLfloat), 0)
+
+		colorAttribute = glGetAttribLocation(state.program, "inColor")
+		glEnableVertexAttribArray(colorAttribute)
+		glVertexAttribPointer(colorAttribute, 4, GL_FLOAT, false, 8*sizeof(GLfloat), 2*sizeof(GLfloat))
+	end
+
+	if whichShader == "texturedShapes"
+		texAttrib = glGetAttribLocation(state.program, "texcoord")
+		glEnableVertexAttribArray(texAttrib)
+		glVertexAttribPointer(texAttrib, 2, GL_FLOAT, false, 8*sizeof(GLfloat), 6*sizeof(GLfloat))
+	end
+
+	if whichShader == "fontDrawing"
+		positionAttribute = glGetAttribLocation(state.program, "position")
+		glEnableVertexAttribArray(positionAttribute)
+		glVertexAttribPointer(positionAttribute, 4, GL_FLOAT, false, 8*sizeof(GLfloat), 0)
+
+		texAttrib = glGetAttribLocation(state.program, "texcoord")
+		glEnableVertexAttribArray(texAttrib)
+		glVertexAttribPointer(texAttrib, 4, GL_FLOAT, false, 8*sizeof(GLfloat), 4*sizeof(GLfloat))
+
+		glUniform3f(glGetUniformLocation(state.program, "textColor"), GLfloat(state.fillCol[1].r), GLfloat(state.fillCol[1].g), GLfloat(state.fillCol[1].b))
+
+		# by default, we always use texture 1 for fonts
+		glUniform1i(glGetUniformLocation(shaderBank["fontDrawing"], "text"), 1)
+
+		# text is rendered with an orthographic projection
+		projection = GLfloat[2/state.width 0 0 -1;
+				0 2/state.height 0 -1;
+				0 0 -1 0;
+				0 0 0 1]
+
+		glUniformMatrix4fv(glGetUniformLocation(shaderBank["fontDrawing"], "projection"), 1, false, projection)
+	end
+end

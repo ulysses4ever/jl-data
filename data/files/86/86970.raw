@@ -1,0 +1,29 @@
+abstract FormulaHelper
+
+
+immutable DataFrameRegressionModelPlus{M,T} <: RegressionModel
+    model::DataFrames.DataFrameRegressionModel{M,T}
+    fhelper::FormulaHelper
+end
+
+DataFrames.@delegate DataFrameRegressionModelPlus.model [StatsBase.coef, StatsBase.confint, StatsBase.deviance,
+                                 StatsBase.loglikelihood, StatsBase.nobs, StatsBase.stderr,
+                                 StatsBase.vcov]
+
+DataFrames.@delegate DataFrameRegressionModelPlus.model [StatsBase.residuals, StatsBase.model_response,
+                                          StatsBase.predict, StatsBase.predict!]
+
+
+function StatsBase.fit{T<:RegressionModel}(::Type{T}, fhelper::FormulaHelper, df::AbstractDataFrame,
+                                              args...; kwargs...)
+            f = Formula(fhelper)
+            augmenteddf = augment(fhelper, df)
+            dfmodel = fit(T, f, augmenteddf, args...; kwargs...)
+            DataFrameRegressionModelPlus(dfmodel, fhelper)
+end
+
+
+function StatsBase.predict(mm::DataFrameRegressionModelPlus, df::AbstractDataFrame)
+    augmenteddf = augment(mm.fhelper, df)
+    predict(mm.model, augmenteddf)
+end

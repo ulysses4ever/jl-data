@@ -1,0 +1,401 @@
+using ArgParse
+
+include("params.jl")
+
+const ps = Parameters(ARGS)
+
+#######################################
+### Spawn desired number of workers ###
+#######################################
+
+function parse_machine_file_line(line)
+	line = strip(line)
+	ix = findfirst(line, '*')
+	if ix == 0
+		return 1, line
+	else
+		mult = parse(Int, line[1:ix-1])
+		host = line[ix+1:end]
+		return mult, host
+	end
+end
+
+function parse_machine_file(path)
+	machines = Dict{ASCIIString, Int}()
+	open(path, "r") do fh
+		for line in eachline(fh)
+			mult, host = parse_machine_file_line(line)
+			machines[host] = mult
+		end
+	end
+	return machines
+end
+
+function launch_workers(ps::Parameters)
+	available_machines = parse_machine_file(ps.machine_file)
+	total_available = sum(values(available_machines))
+	@assert total_available >= ps.num_workers
+	workers_to_launch = Dict{ASCIIString, Int}()
+	remaining = ps.num_workers
+	for k in cycle(keys(available_machines))
+		if available_machines[k] > 0
+			workers_to_launch[k] = get(workers_to_launch, k, 0) + 1
+			available_machines[k] -= 1
+			remaining -= 1
+			if remaining <= 0
+				break
+			end
+		end
+	end
+	println("Starting workers: ", workers_to_launch)
+	addprocs([(host, num) for (host, num) in workers_to_launch])
+end
+
+if ps.num_workers > 1
+	if ps.machine_file == ""
+		println("Launching $(ps.num_workers) locally")
+		addprocs(ps.num_workers)
+	else
+		launch_workers(ps)
+	end
+end
+
+
+@show nworkers()
+
+@sync for w in workers()
+	@async @spawnat w include("./params.jl")
+end
+
+@everywhere push!(LOAD_PATH, "./julia-sgd/")
+import JLD; @everywhere using JLD
+import SimpleDDDML; @everywhere using SimpleDDDML
+
+
+import rowblock; @everywhere using rowblock
+import LossLocalGlobal; @everywhere using LossLocalGlobal
+import minibatch; @everywhere using minibatch
+import l1l2Penalty; @everywhere using l1l2Penalty
+import sgd; @everywhere using sgd
+@everywhere include("sgd_iterations.jl")
+
+
+###############################
+### Simple greedy scheduler ###
+###############################
+
+function schedule_jobs(do_job, workers, jobs)
+	s = start(jobs)
+	function next_job()
+		(job, s) = next(jobs, s)
+		return job
+	end
+	finished() = done(jobs, s)
+	@sync for worker in workers
+		@async while !finished()
+			job = next_job()
+			do_job(worker, job)
+		end
+	end
+end
+
+@everywhere function hash_to_dense(x, dim)
+	ks, vs = x
+	result = zeros(dim)
+	if length(vs) > 0
+		for i in 1:length(ks)
+			result[ks[i]%dim + 1] += vs[i]
+		end
+	else
+		for k in ks
+			result[k%dim + 1] += 1.0
+		end
+	end
+	return result
+end
+
+############################
+### Subsampling the data ###
+############################
+
+@everywhere function subsample_worker(chunk)
+	dim = get_dimension(chunk)
+	Xs = Array(Tuple{Vector{Int}, Vector{Float64}}, 0)
+	for (x,y) in chunk
+		push!(Xs, x)
+	end
+	return Xs
+end
+
+function subsample(ps::Parameters)
+	chunks = LibSVMChunkIterator(ps.train_path, 0, ps.chunk_size;
+	read_prob = ps.dispatch_frac, sparse = true)
+	sparse_chunks = vcat(pmap(subsample_worker, chunks)...)
+	dense_data = Array(Float64, ps.dim, length(sparse_chunks))
+	for (i,x) in enumerate(sparse_chunks)
+		dense_data[:,i] = hash_to_dense(x, ps.dim)
+	end
+	return dense_data
+end
+
+###################
+### Dispatching ###
+###################
+
+@everywhere function init_global_dispatcher(cache_file)
+	try
+		global global_dispatcher = load(cache_file, "dispatcher")
+	catch e
+		println(e)
+	end
+end
+
+@everywhere function get_global_dispatcher()
+	global global_dispatcher
+	return global_dispatcher
+end
+
+function dispatcher_cache_filename(ps::Parameters)
+	joinpath(dirname(ps.train_path), "sparse_dispatcher_d=$(ps.dim)_k=$(ps.k)_s=$(ps.seed).jld")
+end
+
+function cache_dispatcher(ps::Parameters, file)
+	sX = subsample(ps)
+	clustering = kpmeans(sX, ps.k, ps.p, ps.l, ps.L)
+	dispatcher = RPTDispatcher(sX, ps.n0, clustering)
+	save(file, "dispatcher", dispatcher)
+end
+
+# Building the dispatcher
+function make_dispatchers(ps::Parameters)
+	cache_file = dispatcher_cache_filename(ps)
+	if !isfile(cache_file)
+		cache_dispatcher(ps, cache_file)
+	end
+	@sync for w in workers()
+		@async remotecall_wait(w, init_global_dispatcher, cache_file)
+	end
+	dispatcher = load(cache_file, "dispatcher")
+	return cluster_keys(dispatcher)
+end
+
+# A map indicating which worker is responsible for each worker
+@everywhere function init_global_cluster_assignment(cluster_assignment)
+	global global_cluster_assignment = cluster_assignment
+	global global_my_clusters = Array(Int, 0)
+	for (k, w) in cluster_assignment
+		if w == myid()
+			push!(global_my_clusters, k)
+		end
+	end
+end
+
+@everywhere function get_global_cluster_assignment()
+	global global_cluster_assignment
+	return global_cluster_assignment
+end
+
+function make_cluster_assignment(keys)
+	cluster_assignment = Dict{Int,Int}()
+	for (w,k) in zip(cycle(workers()), keys)
+		cluster_assignment[k] = w
+	end
+	@sync for w in workers()
+		@async remotecall_wait(w, init_global_cluster_assignment, cluster_assignment)
+	end
+end
+
+# Dispatching the training data
+@everywhere function dispatch_data_worker(
+	chunk,
+	kind,
+	hash_dim,
+	dispatcher = get_global_dispatcher(),
+	cluster_assignment = get_global_cluster_assignment())
+	try
+		Xs = [k => Array(Tuple{Vector{Int}, Vector{Float64}}, 0) for k in cluster_keys(dispatcher)]
+		ys = [k => Array(Int, 0) for k in cluster_keys(dispatcher)]
+		# Dispatch the data locally
+		for (x,y) in chunk
+			for k in dispatch(dispatcher, hash_to_dense(x, hash_dim))
+				push!(Xs[k], x)
+				push!(ys[k], y)
+			end
+		end
+		# Send it to the learners
+		for k in keys(Xs)
+			X = Xs[k]
+			y = ys[k]
+			if length(X) > 0
+				w = cluster_assignment[k]
+				remotecall_wait(w, add_global_examples, k, kind, X, y)
+			end
+		end
+	catch e
+		println(e)
+	end
+end
+
+function dispatch_data(path, hash_dim, chunk_size, kind)
+	chunks = LibSVMChunkIterator(path, 0, chunk_size; sparse = true)
+	schedule_jobs(workers(), chunks) do w, chunk
+		remotecall_wait(w, dispatch_data_worker, chunk, kind, hash_dim)
+	end
+end
+
+####################
+### Data Dumping ###
+####################
+
+@everywhere function init_data_dumpers(output_path, cluster_assignment = get_global_cluster_assignment())
+	try
+		global global_file_handles = Dict{Tuple{Int,Symbol}, IOStream}()
+		me = myid()
+		if !ispath(output_path)
+			mkpath(output_path) # make sure the output path exists
+		end
+		for (k,w) in cluster_assignment
+			if w == me
+				global_file_handles[(k,:train)] = open(joinpath(output_path, "train_$(k).txt"), "w")
+				global_file_handles[(k,:test)] = open(joinpath(output_path, "test_$(k).txt"), "w")
+			end
+		end
+	catch e
+		println(e)
+	end
+end
+
+function make_data_dumpers(ps)
+	@sync for w in workers()
+		@async remotecall_wait(w, init_data_dumpers, ps.output)
+	end
+end
+
+@everywhere function add_global_examples(k, kind, xs, ys)
+	try
+		global global_file_handles
+		fh = global_file_handles[(k, kind)]
+		for i in 1:length(xs)
+			ks, vs = xs[i]
+			print(fh, ys[i], ' ')
+			if length(vs) == 0
+				for k in ks
+					print(fh, k, ' ')
+				end
+			else
+				for j in 1:length(ks)
+					print(fh, ks[j], ':', vs[j], ' ')
+				end
+			end
+			print(fh, '\n')
+		end
+	catch e
+		println(e)
+	end
+end
+
+function vtic(msg)
+	print(msg, "...")
+	tic()
+end
+
+function vtoc()
+	time = toq()
+	println("done. ($time sec.)")
+	return time
+end
+
+function run_experiment(ps::Parameters)
+	tic()
+
+	vtic("Initializing dispatchers")
+	keys = make_dispatchers(ps)
+	make_cluster_assignment(keys)
+	vtoc()
+
+	vtic("Initializing data dumpers")
+	learners = make_data_dumpers(ps)
+	vtoc()
+
+	vtic("Dispatching training data")
+	dispatch_data(ps.train_path, ps.dim, ps.chunk_size, :train)
+	vtoc()
+
+	vtic("Dispatching testing data")
+	dispatch_data(ps.test_path, ps.dim, ps.chunk_size, :test)
+	vtoc()
+
+	total_time = toq()
+	println("Total Time:", total_time, " sec.")
+end
+
+
+function generate_features(params)
+	num_f = params.local_features_size	
+	temp = readdlm(joinpath(dirname(params.train_path), "features"), UInt64)
+	if (num_f == 0)
+		features = Set{UInt64}()
+	elseif (num_f >= Base.size(temp, 1))
+		features = Set{UInt64}(0) # singleton  set means all features are local
+	else
+		features = Set{UInt64}(temp[1:min(num_f, size(temp, 1)), 1])
+	end
+	return features
+end
+
+
+function do_learn(params)
+
+	local_features = generate_features(params)
+	test_size = Dict{Int, Int}()
+	test_correct = Dict{Int, Int}()
+	function update_accuracy(total, correct)
+		for k in keys(total)
+			test_size[k] = total[k]
+			test_correct[k] = correct[k]
+		end
+	end
+
+	function get_accuracy()
+		total = 0
+		correct = 0
+		for k in keys(test_size)
+			total += test_size[k]
+			correct += test_correct[k]
+		end
+		return correct / total
+	end
+
+	global_ps_rr = @spawnat 1 init_PS(params.lambda_l1_global, params.lambda_l2)
+	@sync for w in workers()
+		@async remotecall_wait(w, init_worker, params, global_ps_rr, local_features)
+	end
+
+	@sync begin
+		for w in workers()
+			@async begin
+				for i in 1:params.num_passes
+					yield()
+					correct, total = remotecall_fetch(w, run_sgd , params, 2)
+					update_accuracy(total, correct)
+					println("Accuracy = $(get_accuracy())")
+					println("******************\nIteration $(i) done on Worker $(w)\n*********************")
+					flush(STDOUT); flush(STDERR)
+				end
+			end
+		end
+	end
+end
+
+function main()
+	# Set random seeds
+	srand(ps.seed)
+	for w in workers()
+		remotecall(w, srand, rand(Int))
+	end
+	run_experiment(ps)	
+
+	do_learn(ps)
+end
+
+main()

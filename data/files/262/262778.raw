@@ -1,0 +1,17 @@
+function countnchooseroverlim(N::Int, limit::Int)
+    narr = zeros(BigInt, N - 1)
+    numoverlimit = 0
+    for n in 2:N
+        for r in 1:(n - 1)
+            narr[r] = div(div(factorial(BigInt(n)), factorial(BigInt(r))), factorial(BigInt(n - r)))
+        end
+        numoverlimit += count(x -> x >= limit, narr[1:n - 1])
+    end
+    return numoverlimit
+end
+
+@time res = countnchooseroverlim(100, 1_000_000)
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

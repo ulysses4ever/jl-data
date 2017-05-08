@@ -1,0 +1,328 @@
+include( "allLibraries.jl" )
+# include( "IO_MCITW-1P.jl" )
+# include( "verification.jl" )
+# include( "searching.jl" )
+# include( "neighbourhoods.jl" )
+
+function compSol( penPar, solCurr, solNew )
+
+  currObj = solCurr.trspCost + solCurr.invCost + solCurr.penCost*penPar
+  newObj = solNew.trspCost + solNew.invCost + solNew.penCost*penPar
+  
+  if ( ( solCurr.feas < 0 ) && ( solNew.feas >= 0 ) )
+      error("Infeasible solution")
+#     println("( sol.feas < 0 ) && ( solNew.feas >= 0 ) - solNew chosen")
+#     printSol(prob,solNew)
+    return solNew, true #solNew is the best
+  elseif ( solNew.feas < 0 )
+#     println("( solNew.feas < 0 ) - solNew discarded")
+    return solCurr, false #solCurr is the best
+  else
+    if ( newObj < currObj )
+#       println("( sol.feas >= 0 ) && ( solNew.feas >= 0 ) - solNew chosen")
+#       printSol(prob,solNew)
+      return solNew, true
+    else
+#       println("( sol.feas >= 0 ) && ( solNew.feas >= 0 ) - solCurr chosen")
+#       println("currObj = $currObj ... newObj = $newObj")
+      return solCurr, false
+    end
+  end
+  
+end
+
+function VND( prob; penPar = 1000000, maxTime = 7200 )
+  #N1 swapPickups( prob, sol )
+  #N2 swapDelivs( prob, sol )
+  #N3 addDeliv( prob, sol )
+  #N4 removeDelivs( prob, sol )
+  #N5 addPickup( prob, sol )
+  #N6 changeTimeDeliv( prob, sol )
+  #N7 changeTimePickup( prob, sol )
+  #N8 swapCdocks( prob, sol )
+  #N9 rescheduleCdock( prob, sol )
+  
+  startTime = time()
+  
+  sol = GIS( prob )
+  solBest = copy(sol)
+  solAux = copy(solBest)
+  
+  println( "VND com penPar = $penPar, maxTime = $maxTime" )
+  
+  print("GIS * ... ")
+    printSolList( prob, sol ) 
+    
+  auxNeighb = 1
+  auxImprov = true
+  eTime = 0.0
+  
+  aFunct = [swapPickupsAll
+            swapDelivsAll
+            addDelivAll
+            removeDelivs 
+            addPickupAll
+            changeTimeDelivAll
+            changeTimePickupAll
+            swapCdocksAll
+            rescheduleCdockAll
+            ]
+  aOrder = randcycle(9)
+#   aOrder = 1:9
+  println("$aOrder")
+  
+  while ( auxImprov )
+    auxImprov = false
+    for fidx in aOrder
+      if ( eTime > maxTime )
+	break
+      end
+      
+      flag = true
+      while( flag )
+      
+	f = aFunct[fidx]
+	if ( fidx == 4 )
+	  solAux = f( prob, solBest)
+	else
+	  solAux = f( prob, solBest, penPar)
+	end
+      
+	solBest, flag = compSol( penPar, solBest, solAux )
+	if( flag )
+	  auxImprov = flag
+	end
+      end
+      eTime = time() - startTime
+      
+      print("bsltN$fidx ... ")
+      printSolList( prob, solBest ) 
+    end
+  end
+  println("eTimeVND = $eTime")
+  println("")
+  aux = solBest.trspCost + solBest.invCost + penPar*solBest.penCost
+  println("Total Cost: $aux")
+  return solBest
+  
+end
+
+function VNS( prob; penPar = 1000000, maxTime = 7200 )
+  #N1 swapPickups( prob, sol )
+  #N2 swapDelivs( prob, sol )
+  #N3 addDeliv( prob, sol )
+  #N4 removeDelivs( prob, sol )
+  #N5 addPickup( prob, sol )
+  #N6 changeTimeDeliv( prob, sol )
+  #N7 changeTimePickup( prob, sol )
+  #N8 swapCdocks( prob, sol )
+  #N9 rescheduleCdock( prob, sol )
+  
+  startTime = time()
+  
+  sol = GIS( prob )
+  solBest = copy(sol)
+  solAux = copy(solBest)
+  
+  println( "VNS com penPar = $penPar, maxTime = $maxTime" )
+  
+  print("GIS * ... ")
+    printSolList( prob, sol ) 
+    
+  auxNeighb = 1
+  auxImprov = true
+  eTime = 0.0
+  
+  aFunct = [swapPickupsAll
+            swapDelivsAll
+            addDelivAll
+            removeDelivs 
+            addPickupAll
+            changeTimeDelivAll
+            changeTimePickupAll
+            swapCdocksAll
+            rescheduleCdockAll
+            ]
+  aOrder = randcycle(9)
+#   aOrder = 1:9
+  println("$aOrder")
+  
+  while ( auxImprov )
+    auxImprov = false
+    for fidx in aOrder
+      if ( eTime > maxTime )
+	break
+      end
+      
+      
+      flag = true
+      while( flag )
+      
+	f = aFunct[fidx]
+	if ( fidx == 4 )
+	  solAux = f( prob, sol)
+	else
+	  solAux = f( prob, sol, penPar)
+	end
+      
+	solBest, flag = compSol( penPar, solBest, solAux )
+	if( flag )
+	  auxImprov = flag
+	end
+      end
+      eTime = time() - startTime
+      
+      print("bsltN$fidx ... ")
+      printSolList( prob, solBest )
+      
+      sol = GIS( prob )
+      solAux = copy(solBest)
+    end
+  end
+  println("eTimeVND = $eTime")
+  println("")
+  aux = solBest.trspCost + solBest.invCost + penPar*solBest.penCost
+  println("Total Cost: $aux")
+  return solBest
+  
+end
+
+function tabuSearch( prob, tabuTenure; penPar = 1000000, maxTime = 3600, iterMax = 100000, numNeigh = 5 )
+   
+  startTime = time()
+  
+  sol = GIS( prob )
+  solBest = copy(sol)
+  solStar = copy(sol)
+  solNew = copy(sol)
+  solList = [sol]
+  iterList = [0]
+
+  println( "TS com tabuTenure = $tabuTenure, penPar = $penPar, maxTime = $maxTime, iterMax = $iterMax, numNeigh = numNeigh" )
+    
+  print("GIS 0 ... ")
+  printSolList( prob, sol )
+  
+  aFunct = [swapPickups
+            swapDelivs
+            addDeliv
+            removeDelivs 
+            addPickup
+            changeTimeDeliv
+            changeTimePickup
+            swapCdocks
+            rescheduleCdock
+            ]
+#   aFunct = [swapPickupsAll
+#             swapDelivsAll
+#             addDelivAll
+#             removeDelivs 
+#             addPickupAll
+#             changeTimeDelivAll
+#             changeTimePickupAll
+#             swapCdocksAll
+#             rescheduleCdockAll
+#             ]
+  eTime = 0.0
+  iter = 0
+  flag = false
+  auxImprov = 0
+  auxIter = 0
+  
+  while ( eTime <= maxTime ) && (iter <= iterMax ) && ( auxImprov <= 1*iterMax )
+    iter += 1
+    
+    i = 0
+    neighbours = Solution[]
+    for f in aFunct      
+      i += 1
+      
+      if( i == 4 )
+        solNew = f( prob, solBest)
+      else
+        solNew = f( prob, solBest, penPar, numNeigh)
+  #       solNew = f( prob, solBest, penPar )
+      end
+        println("$i")      
+      for j in 1:prob.cardP
+        ansArray = searchPickupSol( prob, sol, j )
+
+      end
+      
+      if !( isIn( solNew, solList ) )
+        if ( length( neighbours ) == 0 )
+          neighbours = [solNew]
+        else
+          push!(neighbours, solNew)
+        end
+      end
+      
+#       aux = length( solList )
+#       print("solList = $aux ... ")
+#       aux = length( neighbours )
+#       println("neighbours = $aux ... iter = $iter ... N$i")
+    end  
+    
+#       aux = length( solList )
+#       print("solList = $aux ... ")
+#       aux = length( neighbours )
+#       println("neighbours = $aux ... iter = $iter")    
+    if ( length( neighbours ) > 0 )
+      if ( rand() < 0.1)
+        print("#")
+        i=rand(1:length(neighbours))
+        solBest = neighbours[i]
+      else
+        print("%")
+        solBest = neighbours[1]
+        for i in 2:length(neighbours)
+          solBest = compSol( penPar, solBest, neighbours[i] )[1]
+        end
+      end
+        
+      push!( solList, solBest )
+      push!( iterList, iter )
+      solStar, flag = compSol( penPar, solStar, solBest )
+        
+      if ( flag )
+        auxImprov = 0
+        auxIter = iter
+        print("iter $iter ... ")
+        printSolList( prob, solBest ) 
+      else
+        auxImprov +=1
+        print("iter $iter ... ")
+        printSolList( prob, solBest ) 
+      end
+    end
+    
+    flag = true
+    while (flag && (length(solList) > 0) )
+      for w in 1:length( solList )
+#         println("aux = $aux ... w = $w ... iter = $iter ... tabuTenure = $tabuTenure")
+        if ( iterList[w] < (iter - tabuTenure) )
+          shift!( solList )
+          shift!( iterList )
+          break
+        elseif ( w == length(solList) )
+          flag = false
+        end
+      end
+    end
+#     if ( length( solList ) > tabuTenure )
+#       shift!( solList )
+#     end
+    eTime = time() - startTime
+    
+  end
+  print("s sStar ... ")
+  printSolList( prob, solStar )
+  
+  println("s stariter = $auxIter")
+  println("eTimeTS = $eTime")
+  println("")
+  aux = solStar.trspCost + solStar.invCost + penPar*solStar.penCost
+  println("Total Cost: $aux")
+  return solStar
+end
+  

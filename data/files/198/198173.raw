@@ -1,0 +1,34 @@
+using DataFrames
+using Distributions
+
+function kmeans(clusters::Clusters)
+
+  # initialize centroids
+  k = subset(clusters.points, indices(clusters.K, length(clusters)))
+
+  # iterate once
+  assign()
+  move()
+
+  centroids(clusters)
+end
+
+# assign each point to it's nearest centroid
+function assign()
+
+end
+
+# move each centroid into the middle of it's assigned points
+function move()
+
+end
+
+# k-means cost function. sum of square distances to centroids
+function distortion()
+  0
+end
+
+# n non-repeating indices from m total
+function indices(n, m)
+  randperm(m)[1:n]
+end

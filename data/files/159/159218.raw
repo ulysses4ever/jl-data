@@ -1,0 +1,41 @@
+module TestSequentialPatternFit
+using SequentialPatterns
+
+max_iterations=20
+features=10
+max_frames=3
+
+is1_1=[4,5,7]
+is1_2=[4,5,7,9]
+is1_3=[4,5,6,7,9]
+
+sp1=SequentialPattern(IndicesFrame[is1_1,is1_2,is1_3],features)
+sp2=feature_extend(sp1,2)
+sp3=sequence_extend(sp1,is1_2)
+
+is4_1=[2,5,8]
+is4_2=[3,5,8]
+is4_3=[8,9]
+
+sp4=SequentialPattern(IndicesFrame[ is4_1,is4_2,is4_3],features)
+sp5=feature_extend(sp4,2)
+
+sp6=SequentialPattern(IndicesFrame[is4_2,is4_3],features)
+
+
+c=SequentialPatternConfig(features,max_frames,max_iterations)
+x= SequentialPattern[sp1,sp2,sp3,sp4,sp5,sp6]
+y=[-1,-1,-1,1,1,1]
+model=fit(c,x,y)
+
+# println("Training set")
+# println(x)
+# println(y)
+# println(model')
+predicted=predict(model,x)
+# println("Predicted: $predicted")
+errors=predicted.!=y
+errors= mean_loss(model,x,y)
+assert(errors==0)
+# println("Error: $errors")
+end

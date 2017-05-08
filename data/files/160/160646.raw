@@ -1,0 +1,193 @@
+#### HMM with Binomial Distributed Emissions ####
+
+type binomial_HMM
+    # Model Parameters
+    n_states::Int       # Number of hidden states
+    A::Matrix{Float64}  # Estimated state-transition matrix A[i,j] = Pr[i->j]
+    B::Array{Float64,2} # Binomial parameters 
+    pmf::Function       # Binomial probability mass function
+    context_map::Vector{ASCIIString} # list of the nucleotide contexts
+    n_ctxt::Int        # Number of nucleotide contexts, i.e. length(context_map)
+    p::Vector{Float64} # Estimated initial state probabilities
+
+    # Have a parameter that is like the "time step"?
+
+    # Notes:
+    #   'A' is a NxN matrix, rows sum to one
+    #       N = the number of hidden states
+    #   'B' is a NxMx2 array, specifying the beta-binomial distributions
+    #       M = number of nucleotide contexts (CG, CA, CC, etc.)
+    #       B[i,j,1] is the 'alpha' parameter of the beta-binomial distribution for state i, context j
+    #       B[i,j,2] is the 'beta' parameter of the beta-binomial distribution for state i, context j
+
+    # Data associated with the model
+    k::Vector{Int}     # number of reads covering each site
+    o::Vector{Int}     # number of methylation events at each site
+    c::Vector{Int}     # nucleotide context at each site
+    n_sites::Int       # number of cytosine sites in the dataset
+
+    # Notes:
+    #   {'k', 'o', 'c'} are all length 'n_sites'
+    #   k[t] total number of reads covering site t
+    #   o[t] number of reads with methylation at site t
+    #   c[t] nucleotide context at site t is given by context_map[c[t]]
+end
+
+function binomial_HMM(n::Int, filename::ASCIIString; context_map=["CG","CA","CT","CC"], strand="+")
+    # Create a (randomized) HMM model with 'n' hidden states, loading data
+    # from the file specified by 'filename'
+
+    n_ctxt = length(context_map)
+    A,B,p = randomize(n,n_ctxt,:Binom)
+
+    k,o,c = load_allc(filename, strand, context_map)
+    n_sites = length(k)
+
+    return binomial_HMM(n,A,B,binomial_pmf,context_map,n_ctxt,p,k,o,c,n_sites)
+end
+
+#### HMM with BetaBinomial Distributed Emissions ####
+
+type betabinom_HMM
+    # Model Parameters
+    n_states::Int       # Number of hidden states
+    A::Matrix{Float64}  # Estimated state-transition matrix A[i,j] = Pr[i->j]
+    B::Array{Float64,3} # Beta-Binomial parameters 
+    pmf::Function       # Beta-Binomial probability mass function
+    context_map::Vector{ASCIIString} # list of the nucleotide contexts
+    n_ctxt::Int        # Number of nucleotide contexts, i.e. length(context_map)
+    p::Vector{Float64} # Estimated initial state probabilities
+
+    # Have a parameter that is like the "time step"?
+
+    # Notes:
+    #   'A' is a NxN matrix, rows sum to one
+    #       N = the number of hidden states
+    #   'B' is a NxMx2 array, specifying the beta-binomial distributions
+    #       M = number of nucleotide contexts (CG, CA, CC, etc.)
+    #       B[i,j,1] is the 'alpha' parameter of the beta-binomial distribution for state i, context j
+    #       B[i,j,2] is the 'beta' parameter of the beta-binomial distribution for state i, context j
+
+    # Data associated with the model
+    k::Vector{Int}     # number of reads covering each site
+    o::Vector{Int}     # number of methylation events at each site
+    c::Vector{Int}     # nucleotide context at each site
+    n_sites::Int       # number of cytosine sites in the dataset
+
+    # Notes:
+    #   {'k', 'o', 'c'} are all length 'n_sites'
+    #   k[t] total number of reads covering site t
+    #   o[t] number of reads with methylation at site t
+    #   c[t] nucleotide context at site t is given by context_map[c[t]]
+end
+
+function betabinom_HMM(n::Int, filename::ASCIIString; context_map=["CG","CA","CT","CC"], strand="+", Bscale=1.0)
+    # Create a (randomized) HMM model with 'n' hidden states, loading data
+    # from the file specified by 'filename'
+
+    n_ctxt = length(context_map)
+    A,B,p = randomize(n,n_ctxt,:BetaBinom; Bscale=Bscale)
+
+    k,o,c = load_allc(filename, strand, context_map)
+    n_sites = length(k)
+
+    return betabinom_HMM(n,A,B,betabinomial_pmf,context_map,n_ctxt,p,k,o,c,n_sites)
+end
+
+#### Initializing HMM parameters ####
+
+# generate and return random HMM parameters
+function randomize(n_states::Int, n_ctxt::Int, hmm_type::Symbol; Bscale=1.0)
+	A = rand(n_states,n_states)
+	A ./= sum(A,2)
+
+	if hmm_type == :BetaBinom
+		B = Bscale * rand(n_states,n_ctxt,2)
+	elseif hmm_type == :Binom
+		B = rand(n_states,n_ctxt)
+	else
+		error("HMM type not recognized")
+	end
+
+	p = rand(n_states)
+    p ./= sum(p)
+
+    return A,B,p
+end
+
+# Randomize the parameters of an hmm
+function randomize!(hmm, Bscale)
+    # Randomize state-transition matrix
+    hmm.A = rand(hmm.n_states,hmm.n_states)
+    hmm.A ./= sum(hmm.A,2) # normalize rows
+    
+    # Randomize binomial parameters
+    if typeof(hmm) == betabinom_HMM
+        hmm.B = Bscale * rand(hmm.n_states,hmm.n_ctxt,2)
+    else
+        hmm.B = rand(hmm.n_states,hmm.n_ctxt) # binomial HMM
+    end
+    
+    # Randomize initial state probabilities
+    hmm.p = rand(hmm.n_states)
+    hmm.p ./= sum(hmm.p)
+end
+
+# Randomize the parameters of an hmm
+function randomize!(hmm, Bscale)
+    # Randomize state-transition matrix
+    hmm.A = rand(hmm.n_states,hmm.n_states)
+    hmm.A ./= sum(hmm.A,2) # normalize rows
+    
+    # Randomize binomial parameters
+    if typeof(hmm) == betabinom_HMM
+        hmm.B = Bscale * rand(hmm.n_states,hmm.n_ctxt,2)
+    else
+        hmm.B = rand(hmm.n_states,hmm.n_ctxt) # binomial HMM
+    end
+    
+    # Randomize initial state probabilities
+    hmm.p = rand(hmm.n_states)
+    hmm.p ./= sum(hmm.p)
+end
+
+#### Interface to draw samples from an HMM ####
+
+function generate(hmm, k::Vector{Int}, c::Vector{Int})
+    # Generate a sequence of observations (methylation events) given current HMM params
+    #   'k' -- coverage, k[t] provides number of reads that include site t
+    #   'c' -- nucleotide context, c[t] provides integer key for hmm.context_map for site t
+    # Returns:
+    #   'o' -- observations, o[t] provides number of methylation events at site t
+    n_obs = length(c)
+
+    # Sequence of states and observations
+    s = zeros(Int,n_obs) # states
+    o = zeros(Int,n_obs) # observations
+
+    # Choose initial state with probabilities weighted by 'hmm.p'
+    s[1] = sample(hmm.p)               # hmm.p are the initial state probabilities
+    o[1] = rand() <= hmm.B[s[1],c[1]]  # draw obs given initial state, s[1], and context, c[1]
+
+    # Iterate drawing observations and updating state
+    for t = 2:n_obs
+        # sample from appropriate row of state-transition matrix
+        s[t] = sample(hmm.A[s[t-1],:])
+
+        if typeof(hmm) == binomial_HMM
+            # B[s,c] is probability of being methylated in state 's' and context 'c'
+            prob = hmm.B[s[t],c[t]]
+            o[t] = rand(Binomial(k[t],prob))
+        elseif typeof(hmm) == betabinom_HMM
+            a = hmm.B[s[t],c[t],1]
+            b = hmm.B[s[t],c[t],2]
+            rand_prob = rand(Beta(a,b))
+            o[t] = rand(Binomial(k[t],rand_prob))
+        else
+            error("HMM type not recognized")
+        end
+    end
+
+    # return sequence of states and observations
+    return (s,o)
+end

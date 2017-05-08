@@ -1,0 +1,28 @@
+# before all else..
+sudo apt-get install hdf5-tools # this is needed for the package HDF5 which is needed for MAT. Julia should only be started after this command was executed
+sudo apt-get install build-essential # this includes some extra tools which are needed for LIBSVM
+
+# this may be required in order for it all to work porperly.
+Pkg.build("TextAnalysis")
+Pkg.build("HDF5")
+Pkg.build("LIBSVM") # throws a bunch of warnings.... :s
+
+# get the needed packages
+Pkg.add("DataFrames")
+Pkg.add("TextAnalysis")
+Pkg.add("MAT")
+Pkg.add("LIBSVM")
+# Pkg.add("PyCall") # not sure. Might be relevant for the TextAnalysis.jl as this might be a wrapper of python calles to NLTK
+
+Pkg.update()
+
+
+# using PyCall
+using DataFrames
+using TextAnalysis
+using MAT
+using LIBSVM
+
+# define global variables
+path = "Projects/Julia_SVM_Spam_Classifier"
+

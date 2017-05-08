@@ -1,0 +1,50 @@
+export applyMatrix, popMatrix, pushMatrix, resetMatrix
+export rotate, Scale, shearX, shearY, translate
+
+function applyMatrix(n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23, n30, n31, n32, n33)
+	m = [n00 n01 n02 n03;
+		n10 n11 n12 n13;
+		n20 n21 n22 n23;
+		n30 n31 n32 n33]
+	glMultMatrixf(float32(m))
+end
+
+function popMatrix()
+	glPopMatrix()
+end
+
+function pushMatrix()
+	glPushMatrix()
+end
+
+function resetMatrix()
+	glLoadIdentity()
+end
+
+function rotate(angle, x, y, z)
+	glRotatef(float32(angle), float32(x), float32(y), float32(z))
+end
+
+function Scale(x, y, z)
+	glScalef(float32(x), float32(y), float32(z))
+end
+
+function shearX(angle)
+	m = [1 tan(angle) 0 0;
+		0 1 0 0;
+		0 0 1 0;
+		0 0 0 1]
+	glMultMatrixf(float32(m))
+end
+
+function shearY(angle)
+	m = [1 0 0 0;
+		tan(angle) 1 0 0;
+		0 0 1 0;
+		0 0 0 1]
+	glMultMatrixf(float32(m))
+end
+
+function translate(x, y)
+	glTranslatef(float32(x), float32(y), float32(0.0))
+end

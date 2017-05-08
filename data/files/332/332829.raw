@@ -1,0 +1,54 @@
+include("config.jl")
+include("genotype.jl")
+include("population.jl")
+
+import Genotype
+import Config
+import Population
+
+function evolve()
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    
+    for repetition = 1:config_vals.num_experiment_repetitions
+
+        population::Population.Type_Population = Population.make_population(config_vals)    
+        
+        local_switch_ticker = 0
+
+        for generation = 1:config_vals.num_generations
+            
+            Population.evaluate(population, config_vals, repetition, generation, false)
+            Population.print_stats(population, config_vals, repetition, generation)
+
+            if population.finished 
+                break
+            end
+            if generation == config_vals.num_generations
+                println("failed")
+            end
+            if (generation % config_vals.generations_per_target_switch) == 0
+                Population.switch_target(population, config_vals, repetition, generation)
+            end
+            Population.breed_and_exterminate_with_crossover(population, config_vals)
+            #=if local_switch_ticker == 20
+                Population.switch_target(population, config_vals, repetition, generation)
+                local_switch_ticker = 0
+                population.switch_ticker = 20
+                population.marked_for_target_switch = false
+            elseif population.marked_for_target_switch
+                if population.switch_ticker == 0
+                    Population.switch_target(population, config_vals, repetition, generation)
+                    local_switch_ticker = 0
+                    population.marked_for_target_switch = false
+                    population.switch_ticker = 20
+                else
+                    population.switch_ticker -= 1
+                end
+            end
+            local_switch_ticker += 1=#
+        end
+    end
+end
+
+evolve()

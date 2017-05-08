@@ -1,0 +1,5 @@
+module Genomic
+
+# package code goes here
+
+end # module

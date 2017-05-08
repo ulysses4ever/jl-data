@@ -1,0 +1,6 @@
+module misc_julia
+	include("nansuite.jl");
+	include("polyfit.jl");
+	include("waveletba.jl");
+	export nanmean, polyfit, waveletba
+end

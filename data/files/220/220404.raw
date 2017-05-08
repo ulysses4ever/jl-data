@@ -1,0 +1,73 @@
+#Library related to Generation of Initial Solution
+#Copyright(c) 2015: Kally Chung
+
+#01...orderD( cardD )
+#02...findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd, 
+#                 valueBin )
+#03...
+#04...
+#05...
+#06...
+#07...
+
+include( "IO_MCITW-1P.jl" )
+include( "verification.jl" )
+include( "searching.jl" )
+
+function swapPickups( prob, sol )
+
+  aux1 = 0
+  aux2 = 0
+  
+  solNew = copy(sol)
+#   solNew = sol
+  
+  #choosing a pair of pickups
+  indP = rand( 1:prob.cardP, 2 )
+  while ( length(indP) != length( unique( indP ) ) ) 
+    indP[2] = rand( 1:prob.cardP )
+  end
+  println("indP = $indP")
+  
+  #swaping the crossdocks and the times of indP, updating varZ
+  aux1 = searchPickupSol( prob, solNew, indP[1] )
+  aux2 = searchPickupSol( prob, solNew, indP[2] )
+  
+  while ( aux1[1] == aux2[1] )
+    indP = rand( 1:prob.cardP, 2 )
+    while ( length(indP) != length( unique( indP ) ) ) 
+      indP[2] = rand( 1:prob.cardP )
+    end
+  end
+  
+  solNew.solY[ indP[1], aux1[1], aux1[2] ] = 0;
+  solNew.solY[ indP[2], aux2[1], aux2[2] ] = 0;
+  
+  if ( aux2[2] < PS[ indP[1] ] )
+    aux2[2] = PS[ indP[1] ]
+  elseif ( aux2[2] > PE[ indP[1] ] )
+    aux2[2] = PE[ indP[1] ]
+  end
+  
+  if ( aux1[2] < PS[ indP[2] ] )
+    aux1[2] = PS[ indP[2] ]
+  elseif ( aux1[2] > PE[ indP[2] ] )
+    aux1[2] = PE[ indP[2] ]
+  end
+
+  solNew.solY[ indP[1], aux2[1], aux2[2] ] = 1;
+  solNew.solY[ indP[2], aux1[1], aux1[2] ] = 1;
+  computeCosts!( prob, solNew )
+  
+  solNew.feas = checkFeas( prob, solNew )
+  
+  if ( solNew.feas < 1 )
+    solNew.feas = 0
+  end
+  
+  return solNew
+  #if necessary, repairing sol
+  
+  #checking sol factibility
+  
+end

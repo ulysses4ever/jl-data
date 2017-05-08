@@ -1,0 +1,111 @@
+# Basic routines for exact decimal arithmetic (ref. IEEE 754-2008)
+# @author jack@tinybike.net (Jack Peterson), 7/3/2014
+
+import Core: ===
+
+# numerical value = (-1)^s * c * 10^q
+type Decimal
+    s::Integer  # sign can be 0 (+) or 1 (-)
+    c::Integer  # coefficient (or significand)
+    q::Integer  # exponent
+end
+
+# Equality
+triple_equals(x::Decimal, y::Decimal) = ((x.s === y.s) &&
+                                         (x.c === y.c) &&
+                                         (x.q === y.q))::Bool
+
+function equals(x::Union(Decimal, Number), y::Union(Decimal, Number))
+    x_decimal = normalize((isa(x, Decimal)) ? x : from_number(x))
+    y_decimal = normalize((isa(y, Decimal)) ? y : from_number(y))
+    triple_equals(x_decimal, y_decimal)
+end
+
+# Overload the == and `is` operators
+is(x::Decimal, y::Decimal) = triple_equals(x, y)
+==(x::Decimal, y::Decimal) = equals(x, y)
+
+# Normalization: remove trailing zeros in coefficient
+function normalize(x::Decimal)
+    str = string(x.c)
+    q = x.q
+    while str[end] == '0'
+        str = str[1:end-1]
+        q += 1
+    end
+    Decimal(x.s, int(str), q)
+end
+
+# Addition
+# To add, convert both decimals to the same exponent.
+# (If the exponents are different, use the smaller exponent
+# to make sure we're adding integers.)
+function add(x::Decimal, y::Decimal)
+    cx = (-1)^x.s * x.c * 10^max(x.q - y.q, 0)
+    cy = (-1)^y.s * y.c * 10^max(y.q - x.q, 0)
+    s = (abs(cx) > abs(cy)) ? x.s : y.s
+    c = abs(cx + cy)
+    q = min(x.q, y.q)
+    normalize(Decimal(s, c, q))
+end
+
+# Negation
+negative(x::Decimal) = Decimal((x.s == 1) ? 0 : 1, x.c, x.q)
+
+# Subtraction
+subtract(x::Decimal, y::Decimal) = add(x, negative(y))
+
+# Overload the + and - operators
++(x::Decimal, y::Decimal) = add(x, y)
+-(x::Decimal) = negative(x)
+-(x::Decimal, y::Decimal) = subtract(x, y)
+
+# Multiplication
+function multiply(x::Decimal, y::Decimal)
+    s = (x.s == y.s) ? 0 : 1
+    Decimal(s, x.c * y.c, x.q + y.q)
+end
+
+# Overload the * operator
+*(x::Decimal, y::Decimal) = multiply(x, y)
+
+# Convert a string to a decimal, e.g. "0.01" -> Decimal(0, 1, -2)
+function from_string(str::ASCIIString)
+    s = (str[1] == '-') ? 1 : 0
+    c = ""
+    index = 0
+    q = 0
+    for chr in str
+        index += 1
+        if chr == '.'
+            q = int(length(str) - index)
+        else
+            c *= string(chr)
+        end
+    end
+    normalize(Decimal(s, abs(int(c)), -q))
+end
+
+# Convert a number to a decimal, using from_string
+from_number(f::Number) = from_string(string(f))
+
+# Convert a decimal to a string
+function to_string(x::Decimal)
+    c = string(x.c)
+    if x.q > 0
+        for i in 1:x.q
+            c *= "0"
+        end
+    elseif x.q < 0
+        shift = x.q + length(c)
+        if shift > 0
+            c = c[1:shift] * "." * c[shift+1:end]
+        else
+            c = "0." * repeat("0", -shift) * c            
+        end
+    end
+    ((x.s == 1) ? "-" : "") * c
+end
+
+# Convert a decimal to a number, using to_string to keep the value exact
+to_float(x::Decimal) = float(to_string(x))

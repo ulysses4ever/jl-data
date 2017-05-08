@@ -1,0 +1,32 @@
+@doc """
+# Mesos Cluster Manager
+
+Mesos-based cluster manager implemenataion.
+""" ->
+type MesosManager <: ClusterManager
+    mesosid::Dict{String, Tuple}
+    master::String
+
+    function MesosManager(res::Int, master::String)
+        return new(res, master)
+    end
+end
+
+function launch(manager::MesosManager, params::Dict, launched::Array, c::Condition)
+end
+
+function connect(manager::MesosManager, pid::Int, config::WorkerConfig)
+end
+
+function manage(manager::MesosManager, id::Int, config::WorkerConfig, op::Symbol)
+end
+
+function kill(manager::MesosManager, pid::Int, config::WorkerConfig)
+end
+
+function init_worker(manager::MesosManager)
+end
+
+
+
+

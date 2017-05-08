@@ -1,0 +1,102 @@
+######################################################
+##                   5. Types                       ##
+######################################################
+
+# Julia has a type system.
+# Every value has a type; variable do not have types themselves
+# You can use the `typeof` function to get the type of a value.
+typeof(5) # => Int64
+
+# Types are first-class values
+typeof(Int64) # => DataType
+typeof(DataType) # => DataType
+# DataType is the type that represents types, including itself.
+
+# Types are used for documentation, optimizations, and dispatch.
+# They are not statically checked.
+
+# Users can define types
+# They are like records or structs in other languages
+# New types are defined using the `type` keyword.
+
+# type Name
+#    field::OptionalType
+#    ...
+# end
+type Tiger
+    taillength::Float64
+    coatcolor # not including a type annotation is same as `::Any`
+end
+
+# The default construct's arguments are the properties of the
+# type, in order they are listed in the definition
+tigger = Tiger(3.5, "orange") # => Tiger(3.5, "orange")
+
+# The type doubles as the constructor function function for values of
+# that type
+sherekhan = typeof(tigger)(5.6, "fire") # => Tiger(5.6, "fire")
+
+# These struct-style types arecalled concrete types
+# They can be instantiated, but cannot have subtypes.
+# The other kind of types is abstract types.
+
+# Abstract Name
+abstract Cat # Just a name and point in the type hierarchy
+
+# Abstract types cannot be instantiated, but can have subtypes.
+# For examples, Number is an abstract type
+subtypes(Number) # => 6-element Array{Any, 1}:
+                 #     Complex{Float16}
+                 #     Complex{Float32}
+                 #     Complex{Float64}
+                 #     Complex{T<:Real}
+                 #     ImaginaryUnit
+                 #     Real
+subtypes(Cat) # => 0-element Array{Any, 1}
+
+# AbstractString, as the name implies, is also an abstract type
+subtypes(AbstractString)    # 8-element Array{Any, 1}:
+                            #  Base.SubstitutionString{T<:AbstractString}
+                            #  DirectIndexString
+                            #  RepString
+                            #  RevString{T<:AbstractString}
+                            #  RopeString
+                            #  SubString{T<:AbstractString}
+                            #  UTF16String
+                            #  UTF8String
+
+# Every type has a super type; use the `super` function to get it.
+typeof(5) # => Int64
+super(Int64) # => Signed
+super(Signed) # => Read
+super(Real) # => Number
+super(Number) # => Any
+super(Any) # => Any
+# All of these type, except for Int64, are abstract.
+typeof("fire") # => ASCIIString
+super(ASCIIString) # => DirectIndexString
+super(DirectIndexString) # => AbstractString
+# Likewise here with ASCIIString
+
+# <: is the subtyping operator
+type Lion <: Cat # Lion is a subtype of Cat
+    mane_color
+    roar::AbstractString
+end
+
+# You can define more constructors for your type
+# Just define a function of the same name as the type
+# and call an existing constructor to get a value of the correct type
+Lion(roar::AbstractString) = Lion("green", roar)
+# This is an outer constructor because it's outside the type definition
+
+type Panther <: Cat # Panther is also a subtype of Cat
+    eye_color
+    Panther() = new("green")
+    # Panthers will only have this constructor, and no default constructor.
+end
+
+# Using inner constructors, like Panther does, gives you control
+# over how value of the type can be created.
+# When possible, you should use other constructors rather than inner ones.
+

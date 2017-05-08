@@ -1,0 +1,118 @@
+#optProblem
+#==========
+#model the problem MCITW-1P and solve it
+#
+#Copyright(c) 2015: Kally Chung
+
+#calling libraries
+using JuMP, Cbc, MathProgBase
+
+#include ( "00-0instanceMCITW-1P.dat" )
+#include ( "test_data.jl" )
+
+#calling solver
+m = Model(solver=CbcSolver(seconds=7200, maxNodes=10000000, logLevel=1, ratioGap=0.0001))
+
+#defining variables
+@defVar( m, x[ 1:cardD, 1:cardC, 1:cardT ], Bin )
+@defVar( m, y[ 1:cardP, 1:cardC, 1:cardT ], Bin )
+@defVar( m, z[ 1:cardC, 1:cardT ] >= 0 ) #check this line
+@defVar( m, costTransp )
+@defVar( m, costInv )
+
+#setting objective function
+@setObjective( m, Min, costTransp + costInv )
+
+#adding constraints
+#...each delivery, if it occurs, must occur within its specified time window
+for i in 1:cardD
+  @addConstraint( m, sum{ x[i,k,t], k = 1:cardC, t = DS[i]:DE[i] } <= 1 )
+  @addConstraint( m, sum{ x[i,k,t], k = 1:cardC, t = 1:(DS[i]-1) } + sum{ x[i,k,t], k = 1:cardC, t = (1+DE[i]):cardT } == 0 )
+end
+
+#adding constraints
+#...each pickup is fullfilled within its specified time window
+for j in 1:cardP
+  @addConstraint( m, sum{ y[j,k,t], k = 1:cardC, t = PS[j]:PE[j] } == 1 )
+  @addConstraint( m, sum{ y[j,k,t], k = 1:cardC, t = 1:(PS[j]-1) } + sum{ y[j,k,t], k = 1:cardC, t = (PE[j]+1):cardT } == 0 )
+end
+
+#adding constraints
+#...inventory level and upper bound of z[k,t]
+for k in 1:cardC
+  for t in 1:cardT
+    if ( t == 1 )
+      @addConstraint( m, z[ k, 1] - sum{ DA[i]*x[i,k,1], i = 1:cardD } + sum{ PA[j]*y[j,k,1], j = 1:cardP } == 0 )
+    else
+      @addConstraint( m, z[k,t] - z[k, t-1] - sum{DA[i]*x[i,k,t], i = 1:cardD} + sum{ PA[j]*y[j,k,t], j = 1:cardP } == 0 )
+    end
+    
+    @addConstraint( m, z[k,t] <= CCap[k] )
+  end
+end
+
+#adding constraints
+#...transportation cost
+@addConstraint( m, sum{ DD[i]*x[i,k,t], i = 1:cardD, k = 1:cardC, t = 1:cardT } + sum{ PD[j]*y[j,k,t], j = 1:cardP, k = 1:cardC, t = 1:cardT } - costTransp == 0 )
+
+#adding constraints
+#...inventory cost
+@addConstraint( m, sum{ CCost[k] * z[k,t], k = 1:cardC, t = 1:cardT } - costInv == 0 )
+
+#if you want to check the model
+#print(m)
+
+#if you want export the model in MPS format file
+#writeMPS( m, "mpsmodel.mps" )
+
+#off to go
+tic()
+status = solve(m)
+eTime = toc()
+
+#printing the solution
+#use ">" in linux
+if status == :Infeasible
+  println("Solver couldn't find solution!")
+end
+
+bound = MathProgBase.getobjbound(getInternalModel(m))
+absolgap = getObjectiveValue(m) - bound
+relatgap = absolgap/getObjectiveValue(m)
+
+println( "elapsed Time: ", eTime )
+println( "Objective Value: ", getObjectiveValue(m) )
+println( "" )
+println( "lower bound: ", bound )
+println( "absol.gap: ", absolgap )
+println( "relat.gap: ", relatgap )
+println( "" )
+println( "costTransp =  ", getValue(costTransp) )
+println( "costInv: ", getValue(costInv) )
+println( "" )
+
+for i in 1:cardD
+  for k in 1:cardC
+    for t = 1:cardT
+      if ( getValue( x[i,k,t] ) > 0 )
+        println( "x[",i,",",k,",",t,"] = ", getValue(x[i,k,t]) )
+      end
+    end
+  end
+end
+println( "" )
+for j in 1:cardP
+  for k in 1:cardC
+    for t = 1:cardT
+      if ( getValue( y[j,k,t] ) > 0 )
+        println( "y[",j,",",k,",",t,"] = ", getValue(y[j,k,t]) )
+      end
+    end
+  end
+end
+println( "" )
+for k in 1:cardC
+  for t = 1:cardT
+    println( "z[",k,",",t,"] = ", getValue(z[k,t]) )
+  end
+end

@@ -1,0 +1,48 @@
+#=
+@author titus 
+=#
+using Base.Test
+include("../stack.jl")
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_stack_fn"] = function test_stack()
+  s =  Stack{Int64}(5)
+  push!(s, 200)
+  push!(s, 400)
+  push!(s, 800)
+
+  @test isequal(cap(s), 5);
+  @test isequal(size(s), 3);
+  @test isequal(top(s), 800);
+  push!(s, 500)
+  @test isequal(size(s), 4);
+  @test isequal(pop!(s), 500);
+  @test isequal(pop!(s), 800);
+  @test isequal(isempty(s), false);
+  @test isequal(is(empty!(s),s), true);
+  @test isequal(size(s), 0);
+  @test isequal(isempty(s), true);
+
+end
+
+exports["test_iter"] = function test_iter()
+  s =  Stack{Int64}(5)
+  push!(s,200)
+  push!(s,400)
+  push!(s,800)
+  push!(s,200)
+  push!(s,300)
+
+  hasnext, next = iter(s)
+  k = Int64[]
+  while(hasnext())
+    push!(k, next())
+  end
+  e = [200,400,800,200,300]
+  @test isequal(k, reverse(e));
+  @test_throws Exception push!(s,50) #max cap 5
+  @test_throws Exception push!(s,990) #max cap 5
+end
+
+

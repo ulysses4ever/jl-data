@@ -1,0 +1,64 @@
+const alpha = 0.0
+const Nx = 800
+const Ny = 800
+const hx = 1/(Nx - 2)
+const hy = 1/(Ny - 2)
+const K = 1.0
+const DeltaT = 0.0005*K
+const gamma = 0.00003
+function enforceDirichlet(A)
+	for y in 2:Ny-1
+		A[Nx, y] = 0.0
+	end
+end
+function enforcePeriodic(A)
+	for x in 1:Nx
+		A[x, 1] = A[x, Ny - 1]
+		A[x, Ny] = A[x, 2]
+	end
+end
+function enforceFree(A)
+	for y in 2:Ny-1
+		A[1, y] = A[3, y] + alpha*hx/hy*(A[2, y + 1] - A[2, y - 1])
+	end
+end
+function test()
+initialState = zeros(Nx, Ny);
+next = zeros(Nx, Ny);
+C = zeros(Nx, Ny);
+for i in 1:Nx
+	for j in 1:Ny
+		initialState[i,j]=exp(-0.02*((j - Ny/2)^2+(i - Nx/2)^2))
+	end
+end
+previousState = circshift(initialState,[1,0])
+enforceDirichlet(previousState)
+enforcePeriodic(previousState)
+enforceFree(previousState)
+for i in 1:iround(1000/K)
+	for y in 2:Ny-1
+		initialState[Nx, y] = 0.0
+	end
+	for x in 1:Nx
+		initialState[x, 1] = initialState[x, Ny - 1]
+		initialState[x, Ny] = initialState[x, 2]
+	end
+	for y in 2:Ny-1
+		initialState[1, y] = initialState[3, y] + alpha*hx/hy*(initialState[2, y + 1] - initialState[2, y - 1])
+	end
+	for j in 2:Ny-1
+		C[2, j] = (initialState[3,j] - 2*initialState[2,j] + initialState[1,j])/(hx^2) + (initialState[2,j+1] - 2*initialState[2,j] + initialState[2,j-1])/(hy^2) + 2*alpha*((initialState[3,j+1] - initialState[2,j+1]) + (initialState[3,j-1] - initialState[2,j-1]))/(2*hx*hy)
+	end
+	for j in 2:Ny-1
+		for i in 3:Nx-1
+			C[i, j] = (initialState[i+1,j] - 2*initialState[i,j] + initialState[i-1,j])/(hx^2) + (initialState[i,j+1] - 2*initialState[i,j] + initialState[i,j-1])/(hy^2) + 2*alpha*(initialState[i+1,j+1] - initialState[i-1,j+1] - initialState[i+1,j-1] + initialState[i-1,j-1])/(4*hx*hy)
+		end
+	end
+	next = 2*initialState - previousState + (DeltaT^2)*C
+	previousState = initialState
+	initialState = next
+end
+IPM.ExportImage(IPM.ColorizeReal(12*initialState),"initial2.png")
+end
+0.987390435956435
+0.987390435956435

@@ -1,0 +1,24 @@
+type UPID
+    ID::String
+    Host::String
+    Port::String
+end
+
+function UPID(input::String)
+    splits = split(input, "@")
+    if length(splits) != 2
+        return nothing, "Expect one `@' in the input"
+    end
+
+    ID = splits[1]
+    splits = split(splits[2], ":")
+    if length(splits) != 2
+        return nothing, "Port not found in the input"
+    end
+    return UPID(ID, splits[1], splits[2]), nothing
+end
+
+==(x::UPID, y::UPID) = x.ID == y.ID && x.Host == y.Host && x.Port == y.Port
+Base.isequal(x::UPID, y::UPID) = x == y
+Base.convert(::Type{String}, u::UPID) = "$(u.ID)@$(u.Host):$(u.Port)"
+Base.show(io::IO, u::UPID) = print("$(u.ID)@$(u.Host):$(u.Port)")

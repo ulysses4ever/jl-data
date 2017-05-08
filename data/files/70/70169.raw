@@ -1,0 +1,214 @@
+module MsgPackRpcClient
+
+include("sock_pool.jl")
+
+using MsgPack
+# using Reactive
+
+export Session, call, MsgPackRpcClientSockPool
+
+const REQUEST  = 0  # [0, msgid, method, param]
+const RESPONSE = 1  # [1, msgid, error, result]
+const NOTIFY   = 2  # [2, method, param]
+const NO_METHOD_ERROR = 0x01
+const ARGUMENT_ERROR  = 0x02
+
+const DEFAULT_PORT_NUMBER = 5000
+
+# type Transport
+#   address
+#   sock_pool :: MsgPackRpcClientSockPool
+# end
+
+type Session
+  sock          :: Union(Base.TcpSocket, Nothing)
+  sock_pool     :: Union(MsgPackRpcClientSockPool.SockPool, Nothing)
+  # transport :: Transport
+#  auto_coercing :: Bool
+  next_id       :: Int32
+end
+
+type Result
+  msg_id :: Int32
+  result :: Any
+  error  :: Any
+end
+
+type Future
+  is_set :: Bool
+  error  :: Any
+  result :: Any
+end
+
+# function coerce_uint()
+# end
+
+# Example:
+#   s = Session(socket, false, 0)
+#   call(s, "get", "foo", 0, [])
+function call(s::Session, method::String, params...)
+  if s.sock_pool == nothing
+    s.sock_pool = MsgPackRpcClientSockPool.new()
+  end
+  if s.sock == nothing
+    try
+      s.sock = MsgPackRpcClientSockPool.pop(s.sock_pool)
+    catch
+      MsgPackRpcClientSockPool.add_port_range(sock_pool, DEFAULT_PORT_NUMBER:DEFAULT_PORT_NUMBER)
+      s.sock = MsgPackRpcClientSockPool.pop(s.sock_pool)
+    end
+  # else
+  #   MsgPackRpcClientSockPool.push(s.sock_pool, s.sock)
+  end
+
+  msg_id = s.next_id
+  if s.next_id == 1<<31
+    s.next_id = 0
+  else
+    s.next_id += 1
+  end
+
+  send_request(s.sock, msg_id, method, params)
+  receive_response(s.sock, msg_id)
+end
+
+function send_request(sock::Base.TcpSocket, msg_id::Int32, method::String, args)
+  params = {}  # NOTE: Equal to ```params = Any[]```, which can grow.
+  for x in args
+    push!(params, x)
+  end
+  packed_data = MsgPack.pack([REQUEST, msg_id, method, params])
+  send_data(sock, packed_data)
+end
+
+function send_data(sock::Base.TcpSocket, data)
+  # TODO: Use sockpool
+  write(sock, data)
+end
+
+function receive_response(sock::Base.TcpSocket, msg_id::Int32)
+  future = Future(false, nothing, nothing)
+  packed_data = receive_data(sock, future)
+  if future.is_set == false
+  end
+  unpacked_data = MsgPack.unpack(packed_data)
+  # TODO: Error handlings
+  if unpacked_data[1] != RESPONSE  # type
+  end
+  if unpacked_data[2] != msg_id # msgid
+  end
+  if unpacked_data[3] != nothing  # error
+  end
+  if length(unpacked_data[4]) == 0  # result
+  end
+  unpacked_data[4]
+end
+
+function receive_data(sock::Base.TcpSocket, future::Future)
+#  data = join(sock, future)
+  data = readavailable(sock)
+end
+
+function join(sock::Base.TcpSocket, future::Future)
+  while future.is_set == false
+    data = readavailable(sock)
+    if length(data) > 0
+      future.is_set == true
+      return data
+    end
+    sleep(0.1)
+    # TODO: Implement timeout
+  end
+end
+
+end # module client
+
+
+# module client
+# 
+# export Client
+# 
+# type Client
+#   address::String
+#   timeout::Int
+#   loop::Bool
+#   builder::String
+#   reconnect_limit::Int
+#   pack_encoding::String
+#   unpack_encoding::String
+#   init::Function
+#   open::Function
+# 
+#   function Client(address, timeout, loop, builder, reconnect_limit, pack_encoding, unpack_encoding)
+#     this = new()
+#     this.address = address
+#     this.timeout = timeout
+#     this.loop = loop
+#     this.builder = builder
+#     this.reconnect_limit = reconnect_limit
+#     this.pack_encoding = pack_encoding
+#     this.unpack_encoding = unpack_encoding
+# 
+#     this.init = function() init(this) end
+#     this.open = function() open(args) end
+# 
+#     this
+#   end
+# 
+#   function init(self::Client)
+#   end
+# 
+#   function open(args)
+#     client = Client(args)
+#     return Client.Context(client)
+#   end
+# 
+#   type Context(object)
+#     client::Client
+#     init::Function
+#     enter::Function
+#     exit::Function
+# 
+#     function Context()
+#       this = new()
+#       this.init = function() init(this, client) end
+#       this.enter = function() enter(this) end
+#       this.exit = function() exit(this, _type, value, traceback) end
+# 
+#       this
+#     end
+# 
+#     function init(self::Context, client::Client)
+#       self._client = client
+#     end
+# 
+#     function enter(self::Context)
+#       return self._client
+#     end
+# 
+#     function exit(self::Context, _type::String, value::String, traceback::String)
+#       self.client.close()
+#       if _type
+#         return false
+#       end
+#       return true
+#     end
+# 
+#   end
+# end
+# 
+# # const PORT = 5000
+# 
+# # function connect()
+# #   connect(PORT)
+# # end
+# 
+# # function send()
+# #   return sendv()
+# # end
+# 
+# # function sendv()
+# 
+# # end
+# 
+# end # module client

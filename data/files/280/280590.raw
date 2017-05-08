@@ -1,0 +1,27 @@
+using Spike
+
+# create window instance: width 400, height 400, "title", xpos, ypos 
+window = WindowInstance(400,400,"Making a window with Spike", 0, 0)
+
+# create an instance of the mouse attached to the window, requires type WindowInstance
+mouse = Mouse(window)
+
+
+# bool of whether or not window is open, requires type WindowInstance
+while open(window)
+	# update mouse data
+	update(mouse)
+
+	# print mouse x and y data
+	println(mouse.x, mouse.y)
+
+	# requires type WindowInstance, clears window
+	clear(window)
+
+	# requires type WindowInstance, swaps buffer and polls events
+	update(window)
+
+end
+
+# end OpenGL
+terminate()

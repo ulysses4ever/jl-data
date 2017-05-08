@@ -1,0 +1,15 @@
+export random_walk
+
+"""
+`random_walk(A)`
+
+returns the rating over time of each active node on an evolving graph by 
+random walks. 
+"""
+function random_walk(A::SparseMatrixCSC)
+    n = A.n
+    D = one(eltype(A))./ (A*ones(n))
+    
+end
+random_walk(g::IntMatrixList) = random_walk(spmatrix(g))
+random_walk(g::EvolvingGraph) = random_walk(int_matrix_list(g))

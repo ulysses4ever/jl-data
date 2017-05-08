@@ -1,0 +1,42 @@
+module SudokuTests
+
+using FactCheck
+using Sudoku3
+using SudokuTestSamples
+
+facts("***** Cells are checked for errors and converted to 0 *****") do
+  @fact replaceCellErrors(solved1) => solved1
+  @fact replaceCellErrors(unsolved1) => unsolved1
+  @fact replaceCellErrors(unsolvedError1) => unsolved1
+end
+
+facts("***** Rows, columns and blocks are initialized with correct cell truth *****") do
+  row, col, blk = initRowsColsBlks(unsolved1)
+#   i.e. is the cell already solved?
+  facts("Checking Rows") do
+    @fact row[1] => [false true  true  true  true  true  true  true  true ]
+    @fact row[5] => [true  true  true  true  true  true  true  true  true ]
+    @fact row[9] => [true  false true  true  true  true  true  true  false]
+  end
+
+  facts("Checking Columns") do
+    @fact col[1] => [false true  true  true  true  true  true  true  true ]
+    @fact col[2] => [true  true  true  true  true  true  true  true  false]
+    @fact col[5] => [true  true  true  true  true  true  true  true  true ]
+    @fact col[9] => [true  true  true  true  true  true  true  true  false]
+  end
+
+  facts("Checking Blocks") do
+    @fact blk[1] => [false true  true  true  true  true  true  true  true ]
+    @fact blk[5] => [true  true  true  true  true  true  true  true  true ]
+    @fact blk[7] => [true  true  true  true  true  true  true  false true ]
+    @fact blk[9] => [true  true  true  true  true  true  true  true  false]
+  end
+
+end
+
+end
+arrarr = ([true true], [false false], [true false])
+@show arr = [1 2 3]
+arr[2] = 66
+@show arr

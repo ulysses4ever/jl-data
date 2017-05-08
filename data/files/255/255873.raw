@@ -1,0 +1,23 @@
+#!/usr/bin/julia
+
+using HTTPClient.HTTPC
+using ZipFile
+
+include ("utility.jl")
+
+## Generate filenames specific to BSE website
+function generateBSEEquityEODReportFileName (dateValue::TmStruct)
+	return String ( "EQ", lpad(dateValue.mday,2,0), lpad(dateValue.month+1,2,0), lpad(dateValue.year%100,2,0), "_CSV.ZIP" )
+end
+
+## fetch report or a date range
+function getEODReport(reportDate::TmStruct)
+	baseUrl = "http://www.bseindia.com/download/BhavCopy/Equity/"
+	
+	filename = generateBSEEquityEODReportFileName(reportDate)
+	zipFile	= downloadFile("$baseUrl$filename", filename)
+	csvFile = extractZip( zipFile )
+
+	# read csv files
+end
+

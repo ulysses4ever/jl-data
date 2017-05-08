@@ -1,0 +1,60 @@
+function circleDir(x::Float32, y::Float32)
+	return mod(x-y-0.5,1.0) - 0.5
+end
+
+function torus(arr, i, j, m, n)
+	iM = mod(i - 1, m) + 1
+	jM = mod(j - 1, n) + 1
+	return arr[iM, jM]
+end
+
+function mirror(arr, i, j, m, n)
+	if 1 <= j <= n
+		jM = j
+	elseif j <= 0 
+		jM = 1 - j
+	else
+		jM = 2*n - j
+	end
+	if 1 <= i <= m
+		iM = i
+	elseif i <= 0 
+		iM = 1 - i
+	else
+		iM = 2*m - i
+	end
+	return arr[iM, jM]
+end
+
+function klein(arr, i, j, m, n)
+	iM = 1 + mod(i - 1, m)
+	jM = mod(j - 1, n) + 1
+	if !(1 <= j <= n)
+		iM = 1 + mod(-i, m)
+	end
+	return arr[iM, jM]
+end
+
+function proj(arr, i, j, m, n)
+	iM = 1 + mod(i - 1, m)
+	jM = 1 + mod(j - 1, n)
+	if !(1 <= j <= n)
+		iM = 1 + mod(-i, m)
+	end
+	if !(1 <= i <= m)
+		jM = 1 + mod(-j, n)
+	end
+	return arr[iM, jM]
+end
+	
+function formatnumber(n)
+	if n < 10
+		return string("000", n)
+	elseif n < 100
+		return string("00", n)
+	elseif n < 1000
+		return string("0", n)
+	else
+		return string(n)
+	end
+end

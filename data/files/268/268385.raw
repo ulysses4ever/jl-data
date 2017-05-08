@@ -1,0 +1,19 @@
+using KidneyMatching: Params, Data, Brain
+
+techno="23_cycles"
+prio="auto"
+batch = 1
+data_folder = "NKR_dep800"
+solver = "gurobi"
+p = Params(batch = batch, techno = techno, prio = prio, solver = solver)
+
+a = [0.0 1.0 1.0; 1.0 0.0 0.0; 0.0 1.0 0.0]
+data = Data(a, [1,2,3], [0.0,0.0,0.0], ["1", "2", "3"])
+b = Brain(3)
+
+@time run_dynamic(data, 100, b, p)
+
+@time run_dynamic(data, 100, b, p)
+
+p.techno = "2_cycles"
+@time run_dynamic(data, 100, b, p)

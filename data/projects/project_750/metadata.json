@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:19 GMT
+Date: Wed, 03 May 2017 21:01:31 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5403
+Content-Length: 5929
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2860
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3942
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "e19dbfe103fb10558a7d2793c711ec32"
-Last-Modified: Thu, 30 Jun 2016 07:17:00 GMT
+ETag: "3b08341f51f95abdb3e87200fd05e20b"
+Last-Modified: Fri, 24 Mar 2017 15:32:12 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
-X-GitHub-Request-Id: 6E73:6637:1335896:18CB91A:590231EE
+X-Served-By: 0e17b94a265a427d9cafe798ceea7c02
+X-GitHub-Request-Id: 7B4F:5C87:662A70:8329D2:590A452B
 
 {
-  "id": 62288418,
-  "name": "julia_fhn_solver",
-  "full_name": "Omer80/julia_fhn_solver",
+  "id": 48516554,
+  "name": "RestrictedBoltzmannMachine",
+  "full_name": "jostmey/RestrictedBoltzmannMachine",
   "owner": {
-    "login": "Omer80",
-    "id": 3463905,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/3463905?v=3",
+    "login": "jostmey",
+    "id": 1855108,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/1855108?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/Omer80",
-    "html_url": "https://github.com/Omer80",
-    "followers_url": "https://api.github.com/users/Omer80/followers",
-    "following_url": "https://api.github.com/users/Omer80/following{/other_user}",
-    "gists_url": "https://api.github.com/users/Omer80/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/Omer80/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/Omer80/subscriptions",
-    "organizations_url": "https://api.github.com/users/Omer80/orgs",
-    "repos_url": "https://api.github.com/users/Omer80/repos",
-    "events_url": "https://api.github.com/users/Omer80/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/Omer80/received_events",
+    "url": "https://api.github.com/users/jostmey",
+    "html_url": "https://github.com/jostmey",
+    "followers_url": "https://api.github.com/users/jostmey/followers",
+    "following_url": "https://api.github.com/users/jostmey/following{/other_user}",
+    "gists_url": "https://api.github.com/users/jostmey/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/jostmey/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/jostmey/subscriptions",
+    "organizations_url": "https://api.github.com/users/jostmey/orgs",
+    "repos_url": "https://api.github.com/users/jostmey/repos",
+    "events_url": "https://api.github.com/users/jostmey/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/jostmey/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/Omer80/julia_fhn_solver",
-  "description": "A PDE solver for the FitzHugh–Nagumo model using Julia programming language",
+  "html_url": "https://github.com/jostmey/RestrictedBoltzmannMachine",
+  "description": "Neural network trained as a generative model on the MNIST dataset using Persistent Contrastive Divergence.",
   "fork": false,
-  "url": "https://api.github.com/repos/Omer80/julia_fhn_solver",
-  "forks_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/forks",
-  "keys_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/teams",
-  "hooks_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/hooks",
-  "issue_events_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/events",
-  "assignees_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/tags",
-  "blobs_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/languages",
-  "stargazers_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/stargazers",
-  "contributors_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/contributors",
-  "subscribers_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/subscribers",
-  "subscription_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/subscription",
-  "commits_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/merges",
-  "archive_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/downloads",
-  "issues_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/labels{/name}",
-  "releases_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/Omer80/julia_fhn_solver/deployments",
-  "created_at": "2016-06-30T07:14:38Z",
-  "updated_at": "2016-06-30T07:17:00Z",
-  "pushed_at": "2016-06-30T08:25:44Z",
-  "git_url": "git://github.com/Omer80/julia_fhn_solver.git",
-  "ssh_url": "git@github.com:Omer80/julia_fhn_solver.git",
-  "clone_url": "https://github.com/Omer80/julia_fhn_solver.git",
-  "svn_url": "https://github.com/Omer80/julia_fhn_solver",
-  "homepage": null,
-  "size": 858,
-  "stargazers_count": 0,
-  "watchers_count": 0,
+  "url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine",
+  "forks_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/forks",
+  "keys_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/teams",
+  "hooks_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/hooks",
+  "issue_events_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/events",
+  "assignees_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/tags",
+  "blobs_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/languages",
+  "stargazers_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/stargazers",
+  "contributors_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/contributors",
+  "subscribers_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/subscribers",
+  "subscription_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/subscription",
+  "commits_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/merges",
+  "archive_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/downloads",
+  "issues_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/labels{/name}",
+  "releases_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/jostmey/RestrictedBoltzmannMachine/deployments",
+  "created_at": "2015-12-24T00:17:19Z",
+  "updated_at": "2017-03-24T15:32:12Z",
+  "pushed_at": "2017-03-15T17:39:00Z",
+  "git_url": "git://github.com/jostmey/RestrictedBoltzmannMachine.git",
+  "ssh_url": "git@github.com:jostmey/RestrictedBoltzmannMachine.git",
+  "clone_url": "https://github.com/jostmey/RestrictedBoltzmannMachine.git",
+  "svn_url": "https://github.com/jostmey/RestrictedBoltzmannMachine",
+  "homepage": "",
+  "size": 3691,
+  "stargazers_count": 33,
+  "watchers_count": 33,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
   "has_wiki": true,
   "has_pages": false,
-  "forks_count": 0,
+  "forks_count": 8,
   "mirror_url": null,
   "open_issues_count": 0,
-  "forks": 0,
+  "forks": 8,
   "open_issues": 0,
-  "watchers": 0,
+  "watchers": 33,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 0,
-  "subscribers_count": 2
+  "network_count": 8,
+  "subscribers_count": 4
 }

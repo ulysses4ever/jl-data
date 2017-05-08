@@ -1,0 +1,30 @@
+#
+# MGS: Massive Graph Sampler
+# Copyright (C) 2014  Jimmy Dubuisson <jimmy.dubuisson@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+using Graphs
+
+# Random Walk
+# @return the list of visited nodes
+function RW{T<:Unsigned}(g::GenericAdjacencyList{T,Array{T,1},Array{Array{T,1},1}}, n_steps::T, starting_v=1)
+	visited_nodes =  T[]
+	v = convert(T,starting_v)
+	for i in 1:n_steps
+		nei = out_neighbors(v,g)
+		nv = nei[rand(1:length(nei))]
+		push!(visited_nodes,v)
+		v = nv
+	end
+	return visited_nodes
+end

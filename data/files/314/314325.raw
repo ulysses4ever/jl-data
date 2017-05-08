@@ -1,0 +1,101 @@
+# Oscillatore armonico 1D, il risultato deve essere (0.5,0.5,1.0,1.0)
+a    = 0.5 
+p(x) = exp(-2a*x^2) 
+
+en_kin(x) = 2a - 4a^2*x^2 # en. cinetica standard 
+en_pot(x) = x^2 # en. potenziale 
+en_loc(x) = en_kin(x)+en_pot(x) # en. locale, in queste unità deve fare 0 
+test(x)   = 1.0 # controllo che l'integrale faccia 1 
+stimatori = ["En. cinetica"=>en_kin, "En. potenziale"=>en_pot, "En. locale"=>en_loc, "Test"=> test] 
+
+catena = MarkovChain(steps=500000, p=p) 
+regola_acc_rate!(0.5, catena) 
+
+risultati = monte_carlo(stimatori, catena) 
+
+function E(a)
+    # calcola l'energia in unita hw/2 col parametro variazionale a
+    p(x)      = exp(-2*a*x*x)
+    en_loc(x) = 2a - 4a*a*x*x + x*x
+    stimatori = ["En. locale"=>en_loc]
+    catena    = MarkovChain(steps=500000, p=p)
+    regola_acc_rate!(0.5, catena)
+    # println("a = $(round(a,3))\tdelta = $(round(catena.delta, 2))")
+    return  monte_carlo(stimatori, catena)["En. locale"]
+end
+
+function minimizza_energia_braveness(a_iniz, braveness, da, tolerance)
+    a = a_iniz
+    while true
+        en_loc(x,a) = 2a - 4a^2*x^2 + x^2
+        p(x,a)      = exp(-2a*x^2)
+        grad        = gradiente(en_loc, p, a, da)
+        print("\r a = $(round(a, 5)) \t grad = $(round(grad, 5))")
+        if norm(grad)<tolerance
+            break
+        else
+            a = a - grad*braveness
+            println(" --> \ta_new = $(round(a, 5))")
+        end
+    end
+    println("")
+    return a
+end
+
+
+# oscillatore armonico 3D
+
+# Oscillatore armonico 3D, il risultato deve essere (1.5,1.5,1.0,3.0)
+# le unità sono ħ ω / 2, sqrt(ħ / m ω )   
+a = 1.0
+p(x) = exp(-sq(x)/a)
+
+en_kin(x) = (-sq(x)+3a*particles)/a^2   # en. cinetica locale
+en_pot(x) = sq(x)                       # en. potenziale
+en_loc(x) = en_kin(x)+en_pot(x)         # en. locale, in queste unità deve fare 3*particles
+stimatori = ["En. cinetica"=>en_kin, "En. potenziale"=>en_pot, "En. locale"=>en_loc]
+
+particles = 10
+# La configurazione è una tupla di array lunghi 3
+catena = MarkovChain(init = [zeros(3) for i in 1:particles], steps=1000000, p=p)
+regola_acc_rate!(0.5, catena)
+
+risultati = monte_carlo(stimatori, catena)
+
+function e(a)
+    # calcola l'energia di ho 3d in unita hw/2 col parametro variazionale a
+    p(x)      = exp(-sq(x)/a)
+    en_loc(x) = (-sq(x)+3a*particles)/a^2 + sq(x)
+    stimatori = ["en. locale"=>en_loc]
+    catena    = markovchain(init = [zeros(3) for i in 1:particles], steps=1000000, p=p)
+    regola_acc_rate!(0.5, catena)
+    println("a = $(round(a,3))\tdelta = $(round(catena.delta, 2))")
+    return  monte_carlo(stimatori, catena)["en. locale"]
+end
+# calcolo le energie per alcuni valori del parametro, per farmi un'idea di dove sta il minimo
+as      = linspace(0.7, 1.3, 64)
+energie = map(e, as)
+using pyplot
+plot(as, energie, linestyle="-", marker="")
+#= function minimizza_energia_braveness(a_iniz, braveness, da, tolerance) =#
+#=     # per l'oscillatore armonico 3d =#
+#=     a = a_iniz =#
+#=     while true =#
+#=         en_loc(x,a) = (-sq(x)+3a*particles)/a^2 + sq(x) =#
+#=         p(x,a)      = exp(-sq(x)/a) =#
+#=         distr(x)    = p(x,a) =#
+#=         catena = markovchain(init=[zeros(3) for i in 1:particles], steps=1000000, p=distr) =#
+#=         regola_acc_rate!(0.5, catena) =#
+#=         grad        = gradiente(en_loc, p, a, da, catena) =#
+#=         print("\r a = $(round(a, 5)) \t grad = $(round(grad, 5))") =#
+#=         if norm(grad)<tolerance =#
+#=             break =#
+#=         else =#
+#=             a = a - grad*braveness =#
+#=             println(" --> \ta_new = $(round(a, 5))") =#
+#=         end =#
+#=     end =#
+#=     println("") =#
+#=     return a =#
+#= end =#
+#= minimizza_energia_braveness(0.9, 0.02, 1e-6, 1e-3) =#

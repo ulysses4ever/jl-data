@@ -1,0 +1,5 @@
+function scenario_risk_workflow(assets, gmfs, tax_vf_map)
+  asset_losses, portfolio_losses = scenario_risk_portfolio(assets, gmfs, tax_vf_map)
+  asset_loss_moments, portfolio_loss_moments = scenario_risk_postprocess(asset_losses, portfolio_losses)
+  return asset_loss_moments, portfolio_loss_moments
+end

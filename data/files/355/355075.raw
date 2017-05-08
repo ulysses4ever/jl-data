@@ -1,0 +1,50 @@
+module Quaternions
+
+	import Base: +,-,*,/,conj,abs,abs2,norm,inv,convert,real,isreal,==,promote_rule,exp,log
+	export Quaternion
+
+	immutable Quaternion{T<:Real} <: Number
+		a::T
+		b::T
+		c::T
+		d::T
+	end
+
+	convert{T<:Real}(::Type{Quaternion{T}},x::Real) = Quaternion(convert(T,x),zero(T),zero(T),zero(T))
+	promote_rule{T<:Real,S<:Real}(::Type{Quaternion{T}},::Type{S}) = Quaternion{promote_type(T,S)}
+	promote_rule{T1<:Real,T2<:Real}(::Type{Quaternion{T1}},::Type{Quaternion{T2}}) = Quaternion{promote_type(T1,T2)}
+
+	real(q::Quaternion) = q.a
+	isreal(q::Quaternion) = q.b==0 && q.c==0 && q.d==0
+
+	==(q1::Quaternion,q2::Quaternion) = q1.a==q2.a && q1.b==q2.b && q1.c==q2.c && q1.d==q2.d
+	==(q::Quaternion,x::Real) = isreal(q) && q.a==x
+	==(x::Real,q::Quaternion) = ==(q,x)
+
+	+(q1::Quaternion,q2::Quaternion) = Quaternion(q1.a+q2.a,q1.b+q2.b,q1.c+q2.c,q1.d+q2.d)
+	-(q1::Quaternion,q2::Quaternion) = Quaternion(q1.a-q2.a,q1.b-q2.b,q1.c-q2.c,q1.d-q2.d)
+	*(q1::Quaternion,q2::Quaternion) = Quaternion(q1.a*q2.a-q1.b*q2.b-q1.c*q2.c-q1.d*q2.d,
+												  q1.a*q2.b+q1.b*q2.a+q1.c*q2.d-q1.d*q2.c,
+												  q1.a*q2.c-q1.b*q2.d+q1.c*q2.a+q1.d*q2.b,
+												  q1.a*q2.d+q1.b*q2.c-q1.c*q2.b+q1.d*q2.a)
+	/(q1::Quaternion,q2::Quaternion) = q1*inv(q2)
+
+	*(q::Quaternion,b::Bool) = ifelse(b,q,zero(q))
+	*(b::Bool,q::Quaternion) = ifelse(b,q,zero(q))
+	*(q::Quaternion,x::Real) = Quaternion(q.a*x,q.b*x,q.c*x,q.d*x)
+	*(x::Real,q::Quaternion) = Quaternion(x*q.a,x*q.b,x*q.c,x*q.d)
+	/(q::Quaternion,x::Real) = Quaternion(q.a/x,q.b/x,q.c/x,q.d/x)
+	/(x::Real,q::Quaternion) = x*inv(q)
+
+	-(q::Quaternion) = Quaternion(-q.a,-q.b,-q.c,-q.d)
+
+	conj(q::Quaternion) = Quaternion(q.a,-q.b,-q.c,-q.d)
+	abs2(q::Quaternion) = q.a*q.a+q.b*q.b+q.c*q.c+q.d*q.d
+	abs(q::Quaternion) = sqrt(abs2(q))
+	norm(q::Quaternion) = abs(q)
+	inv(q::Quaternion) = conj(q)/abs2(q)
+
+	exp(q::Quaternion) = (v = Quaternion(zero(q.a),q.b,q.c,q.d); absv=abs(v); exp(q.a)*(cos(absv)+v/absv*sin(absv)))
+	log(q::Quaternion) = (v = Quaternion(zero(q.a),q.b,q.c,q.d); absq = abs(q); log(absq) + v/abs(v)*acos(q.a/absq))
+
+end # module

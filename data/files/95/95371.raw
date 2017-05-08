@@ -1,0 +1,6 @@
+include("common.jl")
+
+SIGNALFILE = joinpath(DATADIR, "simulated_signal_curved_binary.txt")
+OUTFILE = joinpath(OUTDIR, "mean_spectrum_curved_binary.txt")
+
+mean_spectrum(SIGNALFILE, OUTFILE)

@@ -1,0 +1,41 @@
+module Validation
+
+export validateheap, validatesorting
+
+using BinHeap: left, right, leq
+importall BinHeap
+importall Sorting
+
+#These functions are meant to validate certain operations.
+#Later on these will be used in more rigorous tests.
+
+#Validates if a heap was constructed properly
+function validateheap(heap::BinaryHeap)
+  for i = 1:length(heap)
+    if left(i) <= length(heap)
+      if !heap.comp(heap.array[i], heap.array[left(i)])
+        return false
+      end
+    end
+
+    if right(i) <= length(heap)
+      if !heap.comp(heap.array[i], heap.array[right(i)])
+        return false
+      end
+    end
+  end
+  true
+end
+
+#Validates if an array is properly sorted by a comparison function.
+#TODO: return an union type {boolean, int}, where the int is the failure index
+function validatesorting(array, comp::Function = leq)
+  for i = 1:(length(array) - 1)
+    if !comp(array[i], array[i+1])
+      return false
+    end
+  end
+  true
+end
+
+end

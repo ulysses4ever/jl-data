@@ -1,0 +1,424 @@
+module GFFLevelLines
+
+import Cairo, Base.Graphics
+
+export DGFF,  on_edge, inside,  same_sign, initialize_graphic,  initialize_graphic_png,  exploration_step,  exploration_path, draw_path, draw_path_disk,  loop_orientation, zeroboundary,  shift_boundary_values!, surrounded_indices, color_spectrum, scaled_square_to_disk, square_to_disk, hypergeom2F1, scmap
+
+
+function DGFF(n::Int)
+    h = complex(zeros(n,n));
+    for j=1:n
+        for k=1:n
+            h[j,k] = 1/sqrt(2.0)*(j+k == 2 ? 0 : (randn() + im*randn()) * 1/sqrt(sin((j-1)*pi/n)^2+ sin((k-1)*pi/n)^2));
+        end
+    end
+    return real(n*1/sqrt(2)*ifft(h))
+end
+
+function on_edge(point,n::Int)
+    if point[1] == 1 || point[2] == 1 || point[1] == n || point[2] == n
+        return true
+    else
+        return false
+    end
+end
+
+function inside(p,gamma::Array{Float64,2})
+    if gamma[1,:] != gamma[length(gamma[:,1]),:] 
+        return false
+    end
+    cntr = 0; m = sqrt(2); # the slope is an arbitrary irrational number
+    for i=1:length(gamma[:,1])-1
+        (x1,y1,x2,y2) = (gamma[i,1],gamma[i,2],gamma[i+1,1],gamma[i+1,2])
+        if ((y2 - p[2] - m*(x2-p[1]))*(y1 - p[2] - m*(x1-p[1])) < 0) 
+            if (m*p[1]*x1 - p[2]*x1 - m*p[1]*x2 + p[2]*x2 - x2*y1 + x1*y2)/(m*x1 - m*x2 - y1 + y2)  - p[1] > 0
+                cntr += 1
+            end
+        end
+    end
+    return isodd(cntr)    
+end
+
+function same_sign(h::Array{Float64,2},i::Int,j::Int,k::Int) 
+    if k == 1
+        if h[i,j] > 0 && h[i+1,j] > 0 && h[i,j+1] > 0 
+            return true
+        end
+        if h[i,j] < 0 && h[i+1,j] < 0 && h[i,j+1] < 0 
+            return true  
+        end
+    end
+    if k == 2
+        if h[i+1,j+1] > 0 && h[i+1,j] > 0 && h[i,j+1] > 0 
+            return true
+        end
+        if h[i+1,j+1] < 0 && h[i+1,j] < 0 && h[i,j+1] < 0 
+            return true  
+        end
+    end
+    return false
+end
+
+function initialize_graphic(n::Int,dim=512,filename="level_lines.pdf")
+    c = Cairo.CairoPFSurface(filename,dim,dim);
+    cr = Cairo.CairoContext(c);
+
+    Cairo.set_coords(cr, 0, 0, dim, dim, int(1-0.02*n), n+int(0.02*n), n+int(0.02*n), int(1-0.02*n))
+    Cairo.set_source_rgb(cr, 1, 1, 1)   # set color to white
+    Cairo.paint(cr) 
+
+    Cairo.set_source_rgb(cr,0,0,0)
+    Cairo.set_line_width(cr,0.75)
+    return (c,cr)
+end
+
+function initialize_graphic_png(n::Int,dim=2048)
+    c = Cairo.CairoRGBSurface(dim,dim);
+    cr = Cairo.CairoContext(c);
+
+    Cairo.set_coords(cr, 0, 0, dim, dim, int(1-0.02*n), n+int(0.02*n), n+int(0.02*n), int(1-0.02*n))
+    Cairo.set_source_rgb(cr, 1, 1, 1)   # set color to white
+    Cairo.paint(cr) 
+
+    Cairo.set_source_rgb(cr,0,0,0)
+    Cairo.set_line_width(cr,0.75)
+    return (c,cr)
+end
+
+function exploration_step(h::Array{Float64,2},i::Int,j::Int,k::Int)
+    if k == 1
+        a = h[i,j] 
+        b = h[i+1,j]
+        c = h[i,j+1]
+        if a * b < 0 && a * c < 0 
+            if a < 0
+                return ((i-1,j,2),(i-a/(b-a),j,i,j-a/(c-a)))
+            else
+                return ((i,j-1,2),(i,j-a/(c-a),i-a/(b-a),j))
+            end
+        elseif a * b < 0 && b * c < 0 
+            if b > 0
+                return ((i,j,2),(i-a/(b-a),j,i+c/(c-b),j-b/(c-b)))
+            else
+                return ((i,j-1,2),(i+c/(c-b),j-b/(c-b),i-a/(b-a),j))
+            end
+        elseif a * c < 0 && b * c < 0 
+            if c < 0
+                return ((i,j,2),(i,j-a/(c-a),i+c/(c-b),j-b/(c-b)))
+            else
+                return ((i-1,j,2),(i+c/(c-b),j-b/(c-b),i,j-a/(c-a)))
+            end
+            counter +=1 
+        end
+    end
+    if k == 2
+        b = h[i+1,j]
+        c = h[i,j+1]
+        d = h[i+1,j+1]
+        if b * d < 0 && c * d < 0 
+            if d > 0
+                return ((i,j+1,1),(i+1,j-b/(d-b),i-c/(d-c),j+1))
+            else
+                return ((i+1,j,1),(i-c/(d-c),j+1,i+1,j-b/(d-b)))
+            end
+        elseif b * d < 0 && b * c < 0
+            if b < 0
+                return ((i,j,1),(i+1,j-b/(d-b),i+c/(c-b),j-b/(c-b)))
+            else
+                return ((i+1,j,1),(i+c/(c-b),j-b/(c-b),i+1,j-b/(d-b)))
+            end
+        elseif c * d < 0 && b * c < 0 
+            if c > 0
+                return ((i,j,1),(i-c/(d-c),j+1,i+c/(c-b),j-b/(c-b)))
+            else 
+                return ((i,j+1,1),(i+c/(c-b),j-b/(c-b),i-c/(d-c),j+1))
+            end
+        end
+    end
+    return ((0,0),(0,0,0))
+end
+
+function exploration_path(h::Array{Float64,2},i::Int,j::Int,k::Int,visited::Array{Int64,3})
+    if same_sign(h,i,j,k)
+        return nothing
+    end
+    n = size(h)[1]
+    len = int(5*n^(3/2))
+    edges = zeros(len,2)
+    (junk1,junk2) = (0.0,0.0)
+    ((inew,jnew,knew),(edges[1,1],edges[1,2],edges[2,1],edges[2,2])) = exploration_step(h,i,j,k)
+    m = 3
+    while abs(edges[m-1,1] - edges[1,1]) + abs(edges[m-1,2] - edges[1,2]) > 1e-9 && ~on_edge(edges[m-1,:],n)
+        if m == len-1
+            error("while loop did not terminate")
+        end
+        visited[inew,jnew,knew] = 1
+        ((inew,jnew,knew),(junk1,junk2,edges[m,1],edges[m,2])) = exploration_step(h,inew,jnew,knew)
+        m += 1
+    end
+    if abs(edges[m-1,1] - edges[1,1]) + abs(edges[m-1,2] - edges[1,2]) > 1e-9 && ~on_edge(edges[1,:],n)
+        return nothing
+    else
+        return edges[1:find(x->x==0.0,edges)[1]-1,:]
+    end
+end
+
+function hypergeom2F1(a::Real,b::Real,c::Real,z::Complex,tol=1e-14)
+    
+    if abs(z) >= 1.0
+        if abs(z/(z-1)) < 1
+            return (1-z)^(-a)*hypergeom2F1(a,c-b,c,z/(z-1))
+        elseif abs(1-z) < 1
+            return gamma(c)*gamma(c-a-b)/(gamma(c-a)*gamma(c-b))*
+            hypergeom2F1(a,b,a+b-c+1,1-z) + 
+            (1-z)^(c-a-b)*gamma(c)*gamma(a+b-c)/(gamma(a)*gamma(b))*
+            hypergeom2F1(c-a,c-b,c-a-b+1,1-z)
+        elseif abs(1/z) < 1
+            return gamma(c)*gamma(b-a)/(gamma(b)*gamma(c-a))*(-z)^(-a)*
+            hypergeom2F1(a,1-c+a,1-b+a,1/z) + 
+            gamma(c)* gamma(a-b)/(gamma(a)*gamma(c-b))*(-z)^(-b)*
+            hypergeom2F1(b,1-c+b,1-a+b,1/z)
+        else
+            error("Unable to transform to an evaluation value in the unit disk.")
+        end
+    end
+
+    # Calculate Gaussian hypergeometric function via summation of terms
+    if isempty(z)
+        h = z;
+    else
+        itermax = 2^15;
+    
+        h = 0.0 
+        for j = 1:1
+            Z = z;
+        
+            if a == 1
+                if b == c
+                    yi = Z;
+                    y = 1+yi;
+                    for i = 1:itermax
+                        yi = yi*Z;
+                        y = y+yi;
+                        if abs(yi) < tol
+                            break;
+                        end
+                    end
+                else
+                    yi = b*Z/c;
+                    y = 1+yi;
+                    for i = 1:itermax
+                        yi = yi*(b+i)*Z/(c+i);
+                        y = y+yi;
+                        if abs(yi) < tol
+                            break;
+                        end
+                    end
+                end
+            elseif b == 1
+                if a == c
+                    yi = Z;
+                    y = 1+yi;
+                    for i = 1:itermax
+                        yi = yi*Z;
+                        y = y+yi;
+                        if abs(yi) < tol
+                            break;
+                        end
+                    end
+                else
+                    yi = a*Z/c;
+                    y = 1+yi;
+                    for i = 1:itermax
+                        yi = yi*(a+i)*Z/(c+i);
+                        y = y+yi;
+                        if abs(yi) < tol
+                            break;
+                        end
+                    end
+                end
+            elseif a == c
+                yi = b*Z;
+                y = 1+yi;
+                for i = 1:itermax
+                    yi = yi*(b+i)*Z/(i+1);
+                    y = y+yi;
+                    if abs(yi) < tol
+                        break;
+                    end
+                end
+            elseif b == c
+                yi = a*Z;
+                y = 1+yi;
+                for i = 1:itermax
+                    yi = yi*(a+i)*Z/(i+1);
+                    y = y+yi;
+                    if abs(yi) < tol
+                        break;
+                    end
+                end
+            else 
+                yi = a*b*Z/c;
+                y = 1+yi;
+                for i = 1:itermax
+                    yi = yi*(a+i)*(b+i)*Z/((i+1)*(c+i));
+                    y = y+yi;
+                    if abs(yi) < tol
+                        break;
+                    end
+                end
+            end
+        
+            h = y;
+        end
+    end
+    return h
+end
+
+function newton(f::Function,df::Function,x0::Number)
+    x = x0; k = 1;  maxiter = 2^15; # y = x0; bouncing = 0;
+    while abs(f(x)) > 1e-14*max(abs(df(x)),1.0) && (k < maxiter || error("Maximum itertions in Newton's method"))
+        x = x - f(x)/df(x)
+        k += 1
+    end
+    return x
+end
+
+function scmap(z::Number) 
+    1/1.31102877714606*z*hypergeom2F1(1/2,1/4,5/4,complex(z)^4)
+end
+
+function square_to_disk(w::Number)
+#    if abs(w) > 0.7
+#        guess = (1-1e-6)*exp(im*pi*round(2imag(log(w)/pi))/2)
+#    else
+#        guess = w
+#    end
+    res = newton(z->scmap(z)-w,z->1/1.31102877714606/sqrt(1-z^4),w)
+    return [real(res),imag(res)]
+end
+
+
+function scaled_square_to_disk(x::Real,y::Real,n::Int;gap=0.005)
+    return (n-1)/2*square_to_disk((1-gap)*exp(im*pi/4)*(x-(n+1)/2+im*(y-(n+1)/2))/((n-1)/sqrt(2))) + (n+1)/2
+end
+
+function draw_path(cr::Cairo.CairoContext,path::Array{Float64,2},n::Int;color=[0.0 0.0 0.0],thickness=0.8,fill=false,disk=false)
+    Cairo.set_source_rgb(cr,color[1],color[2],color[3])
+    Cairo.set_line_width(cr,thickness)
+    Cairo.set_line_join(cr,1)
+    if disk
+        Cairo.move_to(cr,scaled_square_to_disk(path[1,1],path[1,2],n)...)
+        for i=2:length(path[:,1])
+            Cairo.line_to(cr,scaled_square_to_disk(path[i,1],path[i,2],n)...)
+        end
+    else
+        Cairo.move_to(cr,path[1,1],path[1,2])
+        for i=2:length(path[:,1])
+            Cairo.line_to(cr,path[i,1],path[i,2])
+        end
+    end
+    Cairo.close_path(cr)
+    if fill 
+        Cairo.fill(cr)
+    else
+        Cairo.stroke(cr)
+    end
+end
+
+#function draw_path(cr::Cairo.CairoContext,path::Array{Float64,2};color=[0 0 0],thickness=0.8)
+#    Cairo.set_source_rgb(cr,color[1],color[2],color[3])
+#    Cairo.set_line_width(cr,thickness)
+#    Cairo.set_line_join(cr,1)
+#    Cairo.move_to(cr,path[1,1],path[1,2])
+#    for i=2:length(path[:,1])
+#        Cairo.line_to(cr,path[i,1],path[i,2])
+#    end
+#    Cairo.close_path(cr)
+#    Cairo.stroke(cr)
+#end
+
+function draw_path(cr::Cairo.CairoContext,nothing::Nothing;color=[0,0,0])
+    return nothing
+end
+
+function fractional_part(x::Number)
+    return x - floor(x)
+end
+
+function loop_orientation(loop::Array{Float64,2},h::Array{Float64,2})
+    if norm(loop[1,:] - loop[size(loop)[1],:]) > 1e-10
+        return 0
+    end
+    point = map(floor,loop[1,:]) + (0.0 in map(fractional_part,loop[1,:]) ? [0.0 0.0] : [1.0 0.0])
+    if inside(point,loop) $ (h[point[1],point[2]] > 0)
+        return -1
+    else
+        return 1
+    end
+end
+
+function loop_orientation(nothing::Nothing)
+    return 0
+end
+
+function zeroboundary(h::Array{Float64,2})
+    n = size(h)[1]
+    A = sparse([1,n],[1,n],[1,1.0])
+    B = speye(n)
+    C = B - A
+    D = zeros(n,n); for i=1:n-1 D[i,i+1]=-1; D[i+1,i]=-1; D[i,i] = 4; end
+    D[1,1] = 1; D[1,2] = 0; D[n,n-1] = 0; D[n,n] = 1; D = sparse(D);
+    E = zeros(n,n); for i=1:n-1 E[i,i+1]=-1; E[i+1,i]=-1; end
+    E[n,n-1] = 0; E[1,2] = 0; E = sparse(E)
+    M = kron(A,B) + kron(C,D) + kron(E,C)
+    boundary = zeros(n^2)
+    for i in 1:n-1
+        boundary[i] = h[1,i]
+        boundary[n^2-n+i] = h[n,i] 
+        boundary[n*i+1] = h[i+1,1]
+        boundary[n*i] = h[i,n]
+    end
+    boundary[n^2] = h[n,n]
+    
+    return h - transpose(reshape(full(lufact(M) \ boundary),n,n))
+end
+
+function shift_boundary_values!(h::Array{Float64,2},r::Real)
+    n = size(h)[1]
+    for i=1:n
+        h[i,1] += r
+        h[i,n] += r
+        if i != 1 && i != n
+            h[1,i] += r
+            h[n,i] += r
+        end
+    end
+    return nothing
+end;
+
+function surrounded_indices(paths::Array{Array{Float64,2},1})
+    surr = [false for k=1:length(paths)]
+    for k=1:length(paths)
+        point = paths[k][1,:]
+        for j=1:length(paths)
+            if j != k && inside(point,paths[j])
+                surr[k] = true
+                break
+            end
+        end
+    end
+    return surr
+end
+
+function color_spectrum(t::Float64)
+   if 0 <= t <= 0.5
+       return [2*t, 0.0, 1 - 2*t]
+   end
+   if 0.5 < t <= 1
+       return [1 - 2*(t-0.5), 2*(t-0.5), 0.0]
+   end
+   return [0.0,0.0,0.0]
+end
+
+end # module

@@ -1,0 +1,435 @@
+# glTF loaders
+
+"""
+GLTF root object loader
+"""
+function loadobject(path::AbstractString)
+    rootDict = JSON.parsefile(path)
+    toplevelObjects = Dict{AbstractString, AbstractGLTFObject}()
+    for key in keys(rootDict)
+        if key ∉ ["asset", "scene", "extensionsUsed", "extensions", "extras"]
+            for id in keys(rootDict[key])
+                obj = load(rootDict[key][id])
+                push!(toplevelObjects, Pair(id, obj))
+            end
+        end
+    end
+
+    # load metadata
+    assetDict = rootDict["asset"]
+    version = assetDict["version"]
+    premultipliedAlpha = get(assetDict, "premultipliedAlpha", false)
+    if haskey(assetDict, "profile")
+        profileDict = rootDict["asset"]["profile"]
+        profile_api = get(profileDict, "api", "WebGL")
+        profile_version = get(profileDict, "version", v"1.0.3")
+        profile = GLTFProfile(profile_api, profile_version)
+    else
+        profile = GLTFProfile()
+    end
+    copyright = get(assetDict, "copyright", Nullable{AbstractString}())
+    generator = get(assetDict, "generator", Nullable{AbstractString}())
+    return GLTFRootObject(rootDict, toplevelObjects, scene, version, premultipliedAlpha, profile, copyright, generator)
+end
+
+# buffers & bufferViews & accessors
+"""
+GLTFBuffer loader
+"""
+function loadbuffer{T<:AbstractString}(bufferID::T, buffers::Dict{T, Any}, path::AbstractString)
+    bufferDict = buffers[bufferID]
+    uri = URI(joinpath(dirname(path), bufferDict["uri"]))
+    byteLength = get(bufferDict, "byteLength", 0)
+    _type = get(bufferDict, "type", "arraybuffer")
+    name = get(bufferDict, "name", Nullable{T}())
+    return GLTFBuffer(bufferID, uri, byteLength, _type, name)
+end
+
+"""
+GLTFBufferView loader
+"""
+function loadbufferview{T<:AbstractString}(viewID::T, bufferViews::Dict{T, Any})
+    viewDict = bufferViews[viewID]
+    bufferID = viewDict["buffer"]
+    byteOffset = viewDict["byteOffset"]
+    byteLength = get(viewDict, "byteLength", 0)
+    if haskey(viewDict, "target")
+        target = GLenum(viewDict["target"])
+    else
+        target = Nullable{GLenum}()
+    end
+    name = get(viewDict, "name", Nullable{T}())
+    return GLTFBufferView(viewID, bufferID, byteOffset, byteLength, target, name)
+end
+
+"""
+GLTFAccessor loader
+"""
+function loadaccessor{T<:AbstractString}(accessorID::T, accessors::Dict{T, Any})
+    accessorDict = accessors[accessorID]
+    bufferViewID = accessorDict["bufferView"]
+    byteOffset = accessorDict["byteOffset"]
+    byteStride = get(accessorDict, "byteStride", 0)
+    componentType = accessorDict["componentType"]
+    count = accessorDict["count"]
+    _type = accessorDict["type"]
+    max = get(accessorDict, "max", Nullable{Vector{Int}}())
+    min = get(accessorDict, "min", Nullable{Vector{Int}}())
+    name = get(accessorDict, "name", Nullable{T}())
+    return GLTFAccessor(accessorID, bufferViewID, byteOffset, byteStride, GLenum(componentType), count, _type, max, min, name)
+end
+
+
+# scenes, nodes, cameras & animations
+"""
+GLTFAnimation loader
+"""
+function loadanimation{T<:AbstractString}(animationID::T, animations::Dict{T, Any})
+    channelsDict = animations[animationID]["channels"]
+    parametersDict = animations[animationID]["parameters"]
+    samplersDict = animations[animationID]["samplers"]
+    # load Animation.samplers
+    samplers = Dict{T, GLTFAnimationSampler}()
+    for key in keys(samplersDict)
+        samplerDict = samplersDict[key]
+        interpolation = get(samplerDict, "interpolation", "LINEAR")
+        sampler = GLTFAnimationSampler(samplerDict["input"], samplerDict["output"], interpolation)
+        push!(samplers, key => sampler)
+    end
+    # load Animation.channels
+    channels = Vector{GLTFAnimationChannel}()
+    for channelDict in channelsDict
+        sampler = samplers[channelDict["sampler"]]
+        target = GLTFAnimationChannelTarget(channelDict["target"]["id"], channelDict["target"]["path"])
+        channel = GLTFAnimationChannel(sampler, target)
+        push!(channels, channel)
+    end
+    name = get(animations[animationID], "name", Nullable{T}())
+    return GLTFAnimation(animationID, channels, parametersDict, samplers, name)
+end
+
+
+
+
+
+
+
+
+
+
+
+# camera
+# function loadcameraorthograhic(cameraID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     orthographicDict = rootDict["cameras"][cameraID]["orthographic"]
+#     xmag = get(orthographicDict, "xmag", nothing)
+#     ymag = get(orthographicDict, "ymag", nothing)
+#     zfar = get(orthographicDict, "zfar", nothing)
+#     znear = get(orthographicDict, "znear", nothing)
+#     extensions = get(orthographicDict, "extensions", Nullable{Dict}())
+#     extras = get(orthographicDict, "extras", ())
+#     orthographic = GLTFCameraOrthographic(xmag, ymag, zfar, znear, extensions, extras)
+# end
+#
+# function loadcameraperspective(cameraID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     perspectiveDict = rootDict["cameras"][cameraID]["perspective"]
+#     yfov = get(perspectiveDict, "yfov", nothing)
+#     zfar = get(perspectiveDict, "zfar", nothing)
+#     znear = get(perspectiveDict, "znear", nothing)
+#     aspectRatio = get(perspectiveDict, "aspectRatio", Nullable{Number}())
+#     extensions = get(perspectiveDict, "extensions", Nullable{Dict}())
+#     extras = get(perspectiveDict, "extras", ())
+#     perspective = GLTFCameraPerspective(yfov, zfar, znear, aspectRatio, extensions, extras)
+# end
+#
+# function loadcamera(cameraID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     cameraDict = rootDict["cameras"][cameraID]
+#     @assert haskey(cameraDict, "type") "not a valid camera obj: cannot access property type."
+#     _type = get(cameraDict, "type", nothing)
+#     if _type == "orthographic"
+#         orthographic = loadcameraorthograhic(cameraID, rootDict)
+#     else
+#         orthographic = Nullable{GLTFCameraOrthographic}()
+#     end
+#     if _type == "perspective"
+#         perspective = loadcameraperspective(cameraID, rootDict)
+#     else
+#         perspective = Nullable{GLTFCameraPerspective}()
+#     end
+#     name = get(cameraDict, "name", Nullable{AbstractString}())
+#     extensions = get(cameraDict, "extensions", Nullable{Dict}())
+#     extras = get(cameraDict, "extras", ())
+#     camera = GLTFCamera(_type, orthographic, perspective, name, extensions, extras)
+# end
+
+
+
+# shader & program & technique & material
+# function loadshader(shaderID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     shaderDict = rootDict["shaders"][shaderID]
+#     uri = get(shaderDict, "uri", nothing)
+#     _type = get(shaderDict, "type", nothing)
+#     name = get(shaderDict, "name", Nullable{AbstractString}())
+#     extensions = get(shaderDict, "extensions", Nullable{Dict}())
+#     extras = get(shaderDict, "extras", ())
+#     shader = GLTFShader(uri, _type, name, extensions, extras)
+# end
+#
+#
+# function loadprogram(programID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     programDict = rootDict["programs"][programID]
+#     shadersDict = rootDict["shaders"]
+#     fragmentShaderID = get(programDict, "fragmentShader", nothing)
+#     fragmentShader = loadshader(fragmentShaderID, rootDict)
+#     vertexShaderID = get(programDict, "vertexShader", nothing)
+#     vertexShader = loadshader(vertexShaderID, rootDict)
+#     attributes = get(programDict, "attributes", AbstractString[])
+#     name = get(programDict, "name", Nullable{AbstractString}())
+#     extensions = get(programDict, "extensions", Nullable{Dict}())
+#     extras = get(programDict, "extras", ())
+#     program = GLTFProgram(fragmentShader, vertexShader, attributes, name, extensions, extras)
+# end
+#
+#
+#
+# function loadtechniqueparameter(parameterID::AbstractString, techniqueID::AbstractString , rootDict::Dict{AbstractString, Any})
+#     parameterDict = rootDict["techniques"][techniqueID]["parameters"][parameterID]
+#     _type = get(parameterDict, "type", nothing)
+#     count = get(parameterDict, "count", Nullable{Integer}())
+#     node = get(parameterDict, "node", Nullable{AbstractString}())
+#     semantic = get(parameterDict, "semantic", Nullable{AbstractString}())
+#     value = get(parameterDict, "value", Nullable{Bool}())
+#     extensions = get(parameterDict, "extensions", Nullable{Dict}())
+#     extras = get(parameterDict, "extras", ())
+#     parameter = GLTFTechniqueParameter(_type, count, node, semantic, value, extensions, extras)
+# end
+#
+# function loadtechniqueparameters(techniqueID::AbstractString , rootDict::Dict{AbstractString, Any})
+#     parametersDict = rootDict["techniques"][techniqueID]["parameters"]
+#     parameters = Dict{AbstractString, GLTFTechniqueParameter}()
+#     for key in keys(parametersDict)
+#         parameter = loadtechniqueparameter(key, techniqueID, rootDict)
+#         merge!(parameters, Dict([(key, parameter)]))
+#     end
+#     return parameters
+# end
+#
+# function loadtechniquestatesfuncs(techniqueID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     funcsDict = rootDict["techniques"][techniqueID]["states"]["functions"]
+#     blendColor = get(funcsDict, "blendColor", [0, 0, 0, 0])
+#     blendEquationSeparate = get(funcsDict, "blendEquationSeparate", [32774, 32774])
+#     blendFuncSeparate = get(funcsDict, "blendFuncSeparate", [1, 1, 0, 0])
+#     colorMask = get(funcsDict, "colorMask", [true, true, true, true])
+#     cullFace = get(funcsDict, "cullFace", [1029])
+#     depthFunc = get(funcsDict, "depthFunc", [513])
+#     depthMask = get(funcsDict, "depthMask", [true])
+#     depthRange = get(funcsDict, "depthRange", [0, 1])
+#     frontFace = get(funcsDict, "frontFace", [2305])
+#     lineWidth = get(funcsDict, "lineWidth", [1])
+#     polygonOffset = get(funcsDict, "polygonOffset", [0, 0])
+#     scissor = get(funcsDict, "scissor", [0, 0, 0, 0])
+#     extensions = get(funcsDict, "extensions", Nullable{Dict}())
+#     extras = get(funcsDict, "extras", ())
+#     funcs = GLTFTechniqueStatesFunctions(blendColor, blendEquationSeparate, blendFuncSeparate, colorMask, cullFace, depthFunc,
+#                                          depthMask, depthRange, frontFace, lineWidth, polygonOffset, scissor, extensions, extras)
+# end
+#
+# function loadtechniquestates(techniqueID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     statesDict = rootDict["techniques"][techniqueID]["states"]
+#     enable = get(statesDict, "enable", Integer[])
+#     if haskey(statesDict, "functions")
+#         functions = loadtechniquestatesfuncs(techniqueID, rootDict)
+#     else
+#         functions = Nullable{GLTFTechniqueStatesFunctions}()
+#     end
+#     extensions = get(statesDict, "extensions", Nullable{Dict}())
+#     extras = get(statesDict, "extras", ())
+#     states = GLTFTechniqueStates(enable, functions, extensions, extras)
+# end
+#
+# function loadtechnique(techniqueID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     techniqueDict = rootDict["techniques"][techniqueID]
+#     @assert haskey(techniqueDict, "program") "not a valid technique obj: cannot access property program."
+#     programID = get(techniqueDict, "program", nothing)
+#     program = loadprogram(programID, rootDict)
+#     parameters = loadtechniqueparameters(techniqueID, rootDict)
+#     attributes = get(techniqueDict, "attributes", Dict{AbstractString, AbstractString}())
+#     uniforms = get(techniqueDict, "uniforms", Dict{AbstractString, AbstractString}())
+#     states = loadtechniquestates(techniqueID, rootDict)
+#     name = get(techniqueDict, "name", Nullable{AbstractString}())
+#     extensions = get(techniqueDict, "extensions", Nullable{Dict}())
+#     extras = get(techniqueDict, "extras", ())
+#     GLTFTechnique(program, parameters, attributes, uniforms, states, name, extensions, extras)
+# end
+#
+#
+#
+# function loadmaterial(materialID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     materialDict = rootDict["materials"][materialID]
+#     values = get(materialDict, "values", Dict{AbstractString, Any}())
+#     if haskey(materialDict, "technique")
+#         techniqueID = get(materialDict, "technique", nothing)
+#         technique = loadtechnique(techniqueID, rootDict)
+#     else
+#         technique = Nullable{GLTFTechnique}()
+#     end
+#     name = get(materialDict, "name", Nullable{AbstractString}())
+#     extensions = get(materialDict, "extensions", Nullable{Dict}())
+#     extras = get(materialDict, "extras", ())
+#     material = GLTFMaterial(values, technique, name, extensions, extras)
+# end
+#
+#
+#
+#
+# # mesh
+# function loadmeshprimitives(meshID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     primitivesDict = rootDict["meshes"][meshID]["primitives"]
+#     primitives = Array{GLTFMeshPrimitive, 1}()
+#     for primitiveDict in primitivesDict
+#         @assert haskey(primitiveDict, "material") "not a valid primitive dict: cannot access property material."
+#         materialID = get(primitiveDict, "material", nothing)
+#         material = loadmaterial(materialID, rootDict)
+#         attributes = get(primitiveDict, "attributes", Dict{AbstractString, AbstractString}())
+#         mode = get(primitiveDict, "mode", 4)
+#         indices = get(primitiveDict, "indices", Nullable{AbstractString}())
+#
+#         primitive = GLTFMeshPrimitive(material, attributes, mode, indices)
+#         push!(primitives, primitive)
+#     end
+#     return primitives
+# end
+#
+# function loadmesh(meshID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     meshDict = rootDict["meshes"][meshID]
+#     primitives = loadmeshprimitives(meshID, rootDict)
+#     name = get(meshDict, "name", Nullable{AbstractString}())
+#     extensions = get(meshDict, "extensions", Nullable{Dict}())
+#     extras = get(meshDict, "extras", ())
+#     GLTFMesh(primitives, name, extensions, extras)
+# end
+#
+#
+#
+#
+# # skin & node & scene
+# function loadskin(skinID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     skinDict = rootDict["skins"][skinID]
+#     @assert haskey(skinDict, "inverseBindMatrices") "not a valid skin obj: cannot access property inverseBindMatrices."
+#     inverseBindMatrices = get(skinDict, "inverseBindMatrices", nothing)    # ?
+#     @assert haskey(skinDict, "jointNames") "not a valid skin obj: cannot access property jointNames."
+#     jointNames = convert(Array{AbstractString, 1}, get(skinDict, "jointNames", nothing))
+#     bindShapeMatrix = get(skinDict, "bindShapeMatrix", [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1])
+#     name = get(skinDict, "name", Nullable{AbstractString}())
+#     extensions = get(skinDict, "extensions", Nullable{Dict}())
+#     extras = get(skinDict, "extras", ())
+#     skin = GLTFSkin{eltype(jointNames)}(inverseBindMatrices, jointNames, bindShapeMatrix, name, extensions, extras)
+# end
+#
+# function loadnode{T<:AbstractString}(nodeID::T, nodes::Dict{T, Any})
+#     nodeDict = nodes[nodeID]
+#     children = get(nodeDict, "children", Vector{T}())
+#     matrix = get(nodeDict, "matrix", [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1])
+#     rotation = get(nodeDict, "rotation", [0,0,0,1])
+#     scale = get(nodeDict, "scale", [1,1,1])
+#     translation = get(nodeDict, "translation", [0,0,0])
+#     if haskey(nodeDict, "camera")
+#         cameraID = nodeDict["camera"]
+#     else
+#         cameraID = Nullable{T}()
+#     end
+#     skeletons = get(nodeDict, "skeletons", Vector{T}())
+#     if haskey(nodeDict, "skin")
+#         skinID = nodeDict["skin"]
+#     else
+#         skinID = Nullable{T}()
+#     end
+#     jointName = get(nodeDict, "jointName", Nullable{AbstractString}())
+#     meshes = Dict{AbstractString, GLTFMesh}()
+#     if haskey(nodeDict, "meshes")
+#         meshIDs = get(nodeDict, "meshes", nothing)
+#         for id in meshIDs
+#             mesh = loadmesh(id, rootDict)
+#             merge!(meshes, Dict([(id, mesh)]))
+#         end
+#     end
+#     name = get(nodeDict, "name", Nullable{T}())
+#     node = GLTFNode(children, matrix, rotation, scale, translation, camera, Nullable(skeletons), skin, jointName, meshes, name)
+# end
+#
+#
+# function loadscene(sceneID::AbstractString, nodes::Dict{T, Any})
+#     sceneDict = rootDict["scenes"][sceneID]
+#     nodes = Dict{AbstractString, GLTFNode}()
+#     if haskey(sceneDict, "nodes")
+#         nodeIDs = get(sceneDict, "nodes", nothing)
+#         for id in nodeIDs
+#             node = loadnode(id, rootDict)
+#             merge!(nodes, Dict([(id, node)]))
+#         end
+#     end
+#     name = get(sceneDict, "name", Nullable{T}())
+#     scene = GLTFScene(nodes, name)
+# end
+#
+#
+#
+# # sampler & image & texture
+# function loadsampler(samplerID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     samplerDict = rootDict["samplers"][samplerID]
+#     magFilter = get(samplerDict, "magFilter", 9729)
+#     minFilter = get(samplerDict, "minFilter", 9729)
+#     wrapS = get(samplerDict, "wrapS", 10497)
+#     wrapT = get(samplerDict, "wrapT", 10497)
+#     name = get(samplerDict, "name", Nullable{AbstractString}())
+#     extensions = get(samplerDict, "extensions", Nullable{Dict}())
+#     extras = get(samplerDict, "extras", ())
+#     sampler = GLTFSampler(magFilter, minFilter, wrapS, wrapT, name, extensions, extras)
+# end
+#
+# function loadsamplers(rootDict::Dict{AbstractString, Any})
+#     samplersDict = rootDict["samplers"]
+#     samplers = Dict{AbstractString, GLTFSampler}()
+#     for key in keys(samplersDict)
+#         sampler = loadsampler(key, rootDict)
+#         merge!(samplers, Dict([(key, sampler)]))
+#     end
+#     return samplers
+# end
+#
+# function loadimage(imageID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     imageDict = rootDict["images"][imageID]
+#     @assert haskey(imageDict, "uri") "not a valid image obj: cannot access property uri."
+#     uri = get(imageDict, "uri", nothing)
+#     name = get(imageDict, "name", Nullable{AbstractString}())
+#     extensions = get(imageDict, "extensions", Nullable{Dict}())
+#     extras = get(imageDict, "extras", ())
+#     image = GLTFImage(uri, name, extensions, extras)
+# end
+#
+# function loadimages(rootDict::Dict{AbstractString, Any})
+#     imagesDict = rootDict["images"]
+#     images = Dict{AbstractString, GLTFImage}()
+#     for key in keys(imagesDict)
+#         image = loadimage(key, rootDict)
+#         merge!(images, Dict([(key, image)]))
+#     end
+#     return images
+# end
+#
+# function loadtexture(textureID::AbstractString, rootDict::Dict{AbstractString, Any})
+#     textureDict = rootDict["textures"][textureID]
+#
+#     samplerID = get(textureDict, "sampler", nothing)
+#     sampler = loadsampler(samplerID, rootDict)
+#
+#     sourceID = get(textureDict, "source", nothing)
+#     source = loadimage(sourceID, rootDict)
+#     format = get(textureDict, "format", 6408)
+#     internalFormat = get(textureDict, "internalFormat", 6408)
+#     target = get(textureDict, "target", 3553)
+#     _type = get(textureDict, "type", 5121)
+#     name = get(textureDict, "name", Nullable{AbstractString}())
+#     extensions = get(textureDict, "extensions", Nullable{Dict}())
+#     extras = get(textureDict, "extras", ())
+#     GLTFTexture(sampler, source, format, internalFormat, target, _type, name, extensions, extras)
+# end

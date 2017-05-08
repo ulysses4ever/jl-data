@@ -1,0 +1,32 @@
+using JFinEALE
+using MaterialOrientationModule
+
+
+Rm1=[1.0 0.0; 0.0 1.0]
+function  computeRm(XYZ,tangents,felabel)
+    #println(" first")
+    return Rm1
+end
+
+
+function manytimes(n,mo::MaterialOrientation)
+    XYZ::JFFltMat=[0.0 0.0]
+    tangents::JFFltMat=eye(2)
+    felabel::JFInt=0
+    for k=1:n
+        mo=updateRm!(mo,XYZ,tangents,felabel)
+        #println("Rm=$(mo.Rm)")
+    end
+end
+
+mo=MaterialOrientation(computeRm)
+n=20000000
+@time  manytimes(n,mo)
+
+mo=MaterialOrientation()
+n=80000000
+@time  manytimes(n,mo)
+
+mo=MaterialOrientation(Rm1)
+n=80000000
+@time  manytimes(n,mo)

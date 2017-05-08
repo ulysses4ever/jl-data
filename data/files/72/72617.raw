@@ -1,0 +1,98 @@
+"""
+    `Wire`
+
+Represents a single hot-wire (or hot-film) sensor. 
+
+A hot-wire (or film) sensor has a resitance `R₀` at 
+ temperature `T₀` when the system is not operating. 
+
+Once the system is on, the system electronics will try
+to maitain the resistance of the wire at a value:
+
+R_w = R₀ ( 1 + a)
+
+where `a` is the overheat ratio. The resistance of the wire 
+varies with temperature and a simple linear relationship
+is used:
+
+R(T) = R₀[1 + α(T-T₀)]    
+
+"""
+immutable Wire
+    "Reference (cold) temperature of the wire"
+    T₀::Float64
+    "Reference resistance of the wire"
+    R₀::Float64
+    "Sensor temperature coefficient"
+    α::Float64
+    "Overheat ratio"
+    a::Float64
+end
+
+Wire(T0, R0, alpha) = Wire(T0, R0, alpha, 0.8)
+
+
+"Reference temperature `T₀` of the wire"
+tempref(w::Wire) = w.T₀
+"Reference Resistance `R₀` of the wire"
+resistref(w::Wire) = w.R₀
+
+    
+"Returns the overheat ratio of a hot-wire sensor"
+overheat(w::Wire) = w.a
+
+"Returns the overheat temperature of a hot-wire sensor"
+overtemp(w::Wire) = w.a/w.α
+
+"Returns the operating resistance of a hot-wire sensor"
+wireresist(w::Wire) = w.R₀ * (1.0 + w.a)
+
+"Returns the operating temperature of the wire"
+wiretemp(w::Wire) = overtemp(w) + w.T₀
+
+"Temperature correction"
+temp_corr(Ta, T0=25.0, Tw=245.0) = sqrt( (Tw-T0) / (Tw - Ta) )
+temp_corr(w::Wire, Ta) = w.a/w.α / (w.a/w.α + (w.T₀ - Ta))
+
+type WireCalibr{Fit}
+    w::Wire
+    E::Vector{Float64}
+    U::Vector{Float64}
+    Tc::Vector{Float64}
+    fit::Fit
+end
+
+function WireCalibr{Fit}(w::Wire, E, U, Tc, ::Type{Fit})
+
+    n1 = length(E)
+    
+    E1 = zeros(n1)
+    U1 = zeros(n1)
+    Tc1 = zeros(n1)
+    Ec = zeros(n1) 
+    for i = 1:n1
+        E1[i] = E[i]
+        U1[i] = U[i]
+        Tc1[i] = Tc[i]
+        Ec[i] = temp_corr(w, Tc[i]) * E[i]
+    end
+
+    fit = Fit(Ec, U1)
+
+    return WireCalibr(w, E1, U1, Tc1, fit)
+end
+
+
+import CurveFit
+function wire_calibr{T<:CurveFit.LeastSquares}(w::Wire, E, U, Tc, ::Type{T})
+
+    ef = tempCorr(w, Tc)
+
+    Ec = E .* ef
+
+    CurveFit.curve_fit(T, Ec, U)
+end
+
+
+    
+    

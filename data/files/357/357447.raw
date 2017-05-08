@@ -1,0 +1,49 @@
+using Jules, CART
+using Base.Test
+
+function gaussianLossTests()
+  n = 100
+
+  ys = map(i -> rand(rand(1:10)), 1:n)
+  as = cell(n)
+  for i in 1:n
+    y = ys[i]
+    mse1 = mean((y .- mean(y)).^2)
+
+    x = (gaussianinit, 0, 0)
+    for j in 1:length(y)
+      x = gaussianadd(x[1], y[j], j-1)
+    end
+    mse2 = x[2]
+
+    as[i] = x[1]
+
+    @test_approx_eq_eps(mse1, mse2, 0.01 * mse1)
+  end
+
+
+  for i in 1:n
+    y = ys[i]
+    a = as[i]
+    rm = 1
+
+    if length(y) > 1
+      x = (gaussianinit, 0, 0)
+      for j in 1:length(y)
+        passedrm = j >= rm
+        if j != rm
+          x = gaussianadd(x[1], y[j], passedrm ? (j - 2) : (j - 1))
+        end
+      end
+      mse3 = x[2]
+
+      d, mse4, e = gaussianremove(a,y[rm],length(y))
+
+      @test_approx_eq_eps(mse3, mse4, max(0.01 * mse3, 0.0001))
+    end
+  end
+
+
+end
+
+gaussianLossTests()

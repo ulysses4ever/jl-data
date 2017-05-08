@@ -1,0 +1,48 @@
+using JLD, HDF5
+
+jldopen(case_file, "w") do f
+  write(f, "calculation_mode", calculation_mode)
+  write(f, "time_h", time_h)
+  write(f, "time_r", time_r)
+  write(f, "num_ses", num_ses)
+  write(f, "loss_curve_res", loss_curve_res)
+  write(f, "insured_losses", insured_losses)
+
+  hm = g_create(f, "hazard")
+  for branch in branches
+    b = g_create(hm, branch)
+    b["gmf_csv"] = gmf_csvs[branch]
+  end
+
+  em = g_create(f, "exposure")
+  for asset in 1:num_assets
+    a = g_create(em, a_ref[asset])
+    a["a_loc"] = a_loc[asset]
+    a["a_tax"] = a_tax[asset]
+    a["a_num"] = a_num[asset]
+    a["a_occ"] = a_occ[asset]
+    a["a_val"] = a_val[asset]
+    a["a_ded"] = a_ded[asset]
+    a["a_lim"] = a_lim[asset]
+  end
+
+  vm = g_create(f, "vulnerability")
+  for vf_id in vf_ids
+    r = g_create(vm, vf_id)
+    r["vf_type"] = vf_type[vf_id]
+    r["vf_imls"] = vf_imls[vf_id]
+    if vf_type[vf_id] == "PM"
+      r["vf_lrs"] = vf_lrs[vf_id]
+      r["vf_probs"] = vf_probs[vf_id]
+    else
+      r["vf_mean_lrs"] = vf_mean_lrs[vf_id]
+      r["vf_cov_lrs"] = vf_cov_lrs[vf_id]
+    end
+  end
+
+  tm = g_create(f, "tax_vf_map")
+  for tax in taxonomies
+    tm[tax] = tax_vf_map[tax]
+  end
+
+end

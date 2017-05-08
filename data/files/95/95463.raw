@@ -1,0 +1,30 @@
+@everywhere include("common.jl")
+
+@everywhere function compute_ber_with_artificial_noise(a::Float64)
+  DATAFILE = joinpath(OUTDIR, "adjusted_driver_with_optical_noise_g"*@sprintf("%.2f", a)*".txt")
+  OUTFILE = joinpath(OUTDIR, "suncohcsk_ber_with_artificial_noise_g"*@sprintf("%.2f", a)*".txt")
+
+  xstream = open(XDATAFILE, "r")
+  noisestream = open(RNOISEDATAFILE, "r")
+  rstream = open(DATAFILE, "w+")
+
+  # Reading headers
+  readline(xstream)
+  readline(noisestream)
+
+  while !eof(xstream)
+    x = float64(readline(xstream))
+    noise = float64(readline(noisestream))
+    @printf(rstream, "%f\n", x+(1+a)*noise)
+  end
+
+  close(xstream)
+  close(noisestream)
+  close(rstream)
+
+  compute_ber(SDATAFILE, DATAFILE, 2:25, OUTFILE; s_header=true)
+end
+
+@everywhere a = [-0.9, -0.75, -0.5, -0.25, -0.1, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0]
+
+pmap(compute_ber_with_artificial_noise, a)

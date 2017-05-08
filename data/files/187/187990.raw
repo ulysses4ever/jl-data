@@ -1,0 +1,2 @@
+{"business_profile":{"address":"Århusvej 3 - 5,","business_name":"Skovshoved Hotel","city":"Charlottenlund","id":"","main_phone":"+43 732 670005-0","website":"http://www.alhartingerhof.at","zip_code":"2920","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"Islands Brygge 79 A","business_name":"STAY Apartment Hotel Copenhagen","city":"København","id":"","main_phone":"+43 732 670005-0","website":"http://www.alhartingerhof.at","zip_code":"2300","geo":[52.3396,4.96247]}}

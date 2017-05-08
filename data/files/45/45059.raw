@@ -1,0 +1,12 @@
+include("../pt2seg.jl")
+a = [-0.8, -2.6]
+b = [-1, 1]	# [6, 2]; [5, 2]
+c = [-2, 3]
+d = [7, -3]
+
+println(pt2seg(a, b, c))
+println(pt2seg(a, b, d))
+println(pt2seg(c, d, a))
+println(pt2seg(c, d, b))
+
+

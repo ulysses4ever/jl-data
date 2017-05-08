@@ -1,0 +1,10 @@
+include("../bs.jl")
+lst = [1, 2, 2, 2, 3, 5, 9]
+
+println(bs(lst, 3))
+println(bs(lst, 2))
+println(bs(Int64[], 42))
+println(bs([0.0, 0.1, 0.2, 0.3, 0.4], 0.25))
+println( bs([1, 2, 3, 4], 3))
+println( bs([1, 2, 4, 5], 3))
+

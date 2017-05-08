@@ -1,0 +1,29 @@
+const testprocs = 3
+nprocs() < testprocs && addprocs(testprocs - nprocs())
+
+using SharedBitArrays
+using Base.Test
+
+# write your own tests here
+
+const n1 = 123
+const n2 = 4321
+
+s1 = shfalses(n1, n2)
+b1 = sdata(s1)
+@test s1 == falses(n1, n2)
+@test b1 == falses(n1, n2)
+@test !any(s1)
+
+s1 = shtrues(n1, n2)
+b1 = sdata(s1)
+@test s1 == trues(n1, n2)
+@test b1 == trues(n1, n2)
+@test all(s1)
+
+s1 = shrandbool(n1, n2)
+b1 = copy(sdata(s1))
+@test s1 == b1
+
+@test bitunpack(s1) == bitunpack(b1)
+@test bitpack(bitunpack(s1)) == s1

@@ -1,0 +1,87 @@
+module MacroIterators
+
+export @zip, @enumerate
+
+# # # #
+#
+# @zip(for_loop_expression)
+#
+#   Replacement of `Base.zip` which uses inlining: instead of
+#
+#     for (x,y,z) in zip(a,b,c)
+#
+#   use:
+#
+#     @zip for (x,y,z) in (a,b,c)
+#
+#   Notes:
+#     * (x,y,z) and (a,b,c) must be explicit tuples, not tuple variables;
+#     * splicing is not supported;
+#     * contracted nested loops can be used, but @zip will only work in the top one.
+#
+
+macro zip(ex)
+    ex.head == :for || error("@zip macro expects a for loop")
+    ex.args[1].head == :(=) || error("malformed or unsupported for loop in @zip macro")
+    ex.args[1].args[1].head == :tuple || error("@zip macro needs explicit tuple arguments")
+    ex.args[1].args[2].head == :tuple || error("@zip macro needs explicit tuple arguments")
+    n = length(ex.args[1].args[1].args)
+    @assert length(ex.args[1].args[2].args) == n || error("unequal tuple sizes in @zip macro")
+    body = esc(ex.args[2])
+    vars = map(esc, ex.args[1].args[1].args)
+    iters = map(esc, ex.args[1].args[2].args)
+    states = [gensym("s") for i=1:n]
+    as = {Expr(:call, :(Base.start), iters[i]) for i=1:n}
+    startex = Expr(:(=), Expr(:tuple, states...), Expr(:tuple, as...))
+    ad = {Expr(:call, :(Base.done), iters[i], states[i]) for i = 1:n}
+    doneex = Expr(:call, :(!), Expr(:||, ad...))
+    nextex = Expr(:(=), Expr(:tuple, {Expr(:tuple, vars[i], states[i]) for i=1:n}...),
+                        Expr(:tuple, {Expr(:call, :(Base.next), iters[i], states[i]) for i=1:n}...))
+    Expr(:block,
+        startex,
+        Expr(:while, doneex, Expr(:block,
+            nextex,
+            body)))
+end
+
+# # # #
+#
+# @enumerate(for_loop_expression)
+#
+#   Replacement of `Base.enumerate` which uses inlining: instead of
+#
+#     for (i,x) in enumerate(a)
+#
+#   use:
+#
+#     @enumerate for (i,x) in a
+#
+#   Notes:
+#     * (i,x) must be an explicit tuple, not a tuple variable;
+#     * splicing is not supported;
+#     * contracted nested loops can be used, but @enumerate will only work in the top one.
+#
+
+macro enumerate(ex)
+    ex.head == :for || error("@enumerate macro expects a for loop")
+    ex.args[1].head == :(=) || error("malformed or unsupported for loop in @enumerate macro")
+    ex.args[1].args[1].head == :tuple || error("@enumerate macro needs an explicit tuple argument")
+    length(ex.args[1].args[1].args) == 2 || error("lentgh of tuple must be 2 in @enumerate macro")
+    body = esc(ex.args[2])
+    vars = map(esc, ex.args[1].args[1].args)
+    iter = esc(ex.args[1].args[2])
+    ind = gensym("i")
+    startex = Expr(:(=), ind, 1)
+    forex = Expr(:(=), vars[2], iter)
+    index = Expr(:(=), vars[1], ind)
+    increx = Expr(:(=), ind, Expr(:call, :(+), ind, 1))
+    Expr(:block,
+        startex,
+        Expr(:for, forex, Expr(:block,
+            index,
+            body,
+            increx)))
+end
+
+end
+

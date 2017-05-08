@@ -1,0 +1,141 @@
+##
+## ngrams and skipgrams
+##
+
+function bigrams{S}(tokens::Array{S})
+    len = length(tokens)
+    grams = Array{S}[]
+    for (i, tkn) in enumerate(tokens)
+        if i<= len-1
+            push!(grams, tokens[i:i+1])
+        end
+    end
+    return grams
+end
+
+function trigrams{S}(tokens::Array{S})
+    len = length(tokens)
+    grams = Array{S}[]
+    for (i, tkn) in enumerate(tokens)
+        if i<= len-2
+            push!(grams, tokens[i:i+2])
+        end
+    end
+    return grams
+end
+
+function ngrams{S}(n::Int, tokens::Array{S})
+    len = length(tokens)
+    grams = Array{S}[]
+    for (i, tkn) in enumerate(tokens)
+        if i <= len-n+1
+            push!(grams, tokens[i:i+n-1])
+        end
+    end
+    return grams
+end
+
+function skipgrams{T}(n::Int, skip::Int, tokens::Array{T})
+    grams = Array{T, 1}[]
+    pool = tuple(tokens...)
+    len = length(pool)
+    indices = [1:n]
+
+    if n > len
+        return grams
+    end
+
+    gram = [pool[i] for i in indices]
+    push!(grams, gram)
+
+    while true
+        broken = false
+        i_holder = n # placeholder
+        for i = n:-1:1
+            i_holder = i
+
+            if indices[i] != (i + len - n)
+                broken = true
+                break
+            end
+        end
+        if !broken
+            return grams
+        end
+
+        i = i_holder
+        indices[i] += 1
+
+        for j in i+1:n # previously: i+1, n
+            indices[j] = indices[j-1] + 1
+        end
+
+        nskips = 0
+        for idx = 1:n-1
+            nskips += (indices[idx+1] - indices[idx] - 1)
+        end
+        if nskips <= skip
+            push!(grams, [pool[i] for i in indices])
+        end
+    end
+
+    return grams
+end
+
+
+
+## ## { wi1,wi2,...,wiN | ∑[j=1..n] i_j - i_j-1 < k }
+## function skipgrams{T}(n::Int, skip::Int, tokens::Array{T})
+##     # combinations('ABCD', 2) --> AB AC AD BC BD CD
+##     # combinations(range(4), 3) --> 012 013 023 123
+##     grams = Array{T, 1}[]
+##     # first you create a tuple of the original input which you can refer
+##     # later with the corresponding indices
+##     pool = tuple(tokens...)
+##     len = length(pool)
+##     println("len in $len, n is $n")
+
+##     # if the length of the desired permutation is higher than the
+##     # length of the tuple, then it is not possible to create
+##     # permutations so return without doing something
+##     indices = [1:n]
+##     if n > len
+##         return grams
+##     end
+
+##     gram = [pool[i] for i in indices]
+##     push!(grams, gram)
+##     ## println("gram is $gram")
+
+##     while true
+##         println("top of loop, indices are $indices,")
+##         broken = false
+##         i_holder = n # placeholder
+##         for i = n:-1:1
+##             ## i goes from n,n-1,...,2,1
+##             println("in i for-loop, i = $i")
+##             i_holder = i
+
+##             if indices[i] != (i + len - n)
+##                 println("breaking loop, since indices[$i] ($(indices[i])) != $(i + len - n)")
+##                 broken = true
+##                 break
+##             end
+
+##         end
+##         if !broken
+##             return grams
+##         end
+##         i = i_holder
+##         indices[i] += 1
+##         println("indices are $indices,")
+##         println("looping from $(i+1) to $n")
+##         for j in range(i+1, n)
+##             println("i is $i, j is $j")
+##             indices[j] = indices[j-1] + 1
+##         end
+##         push!(grams, [pool[i] for i in indices])
+##     end
+
+##     return grams
+## end

@@ -1,0 +1,220 @@
+using MultiFrontalCholesky, Graphs
+
+# Estimate the 2-norm of a sparse matrix A
+# To do so, we carry a power-iteration of A'A where A is m x n with n << m
+# Stops when the difference between 2 iterations is, in a relative sense, less than tol
+function est_2norm(A::SparseMatrixCSC{Float64},tol=1e-1)	
+	tic()
+	if size(A,1) < size(A,2)
+		A = A' 
+	end
+	refValue = norm(A,Inf)
+	if refValue == 0.0
+		return 0.0
+	end
+	n = size(A,2)
+	x = randn(n,1)
+	err = Inf 
+	rq = Inf
+	Ax = A*x 
+	iteration = 0
+	while(err > tol)
+		x = A'*(Ax)   # Power iteration on A'*(Ax) (cheap :-))
+		x = x/norm(x) # Normalize to avoid horrible things
+		Ax = A*x
+		rqold = rq 
+		rq = norm(Ax)^2
+		err = abs(rq - rqold)/refValue
+		#println("Error ", err, " value ", rq) 
+		iteration = iteration + 1
+		if iteration > 10
+			println("2-norm estimate stopped after ", iteration, ".")
+			break
+		end
+	end
+	println("2-norm estimate ", sqrt(rq), " after ", iteration, " iteration in ", toq(), " s.")
+	return sqrt(rq)
+end
+
+# Returns x such that Ux = b with U upper-triangular
+# U should have a non-zero diagonal
+function backward_solve(U,b)
+	x = zeros(b) 
+	n = size(U,1) 
+	size(U,2) == n || error("U is not square")
+	length(b) == n || error("b has the wrong length")
+	for i = n:-1:1
+		x[i] = b[i]
+		for j = i+1:n
+			x[i] = x[i] - U[i,j]*x[j] 
+		end
+		x[i] = x[i] / U[i,i]
+	end
+	return x
+end
+
+# A is mxn sparse matrix
+function norm2(A)
+	(u,s,v) = svds(A; nsv=1)	
+	return s[1]
+end
+
+ # Solves
+ # [F    H] [x] = [f]
+ # [H'  -G] [y]   [g]
+function saddle_point_solve(F::SparseMatrixCSC{Float64},G::SparseMatrixCSC{Float64},H::SparseMatrixCSC{Float64},f::Array{Float64,2},g::Array{Float64,2},normH::Float64=est_2norm(H))
+
+	tic() ;
+	println("Starting saddle_point_solve")
+
+	##
+	## Input CHECKS
+	##
+	epsilon = eps()
+	(m,n) = size(H)
+	if size(F) != (m,m) || size(G) != (n,n) || length(f) != m || length(g) != n
+		error("Wrong sizes")
+	end
+	println("Problem of size (m,n) = (",m,",",n,")") 
+	println("Sparsity : ", (nnz(F)+nnz(G)+2*nnz(H))/(m+n)/(m+n)*100, "%")
+
+	##
+	## Rescaling
+	##
+	normRef = normH # norm2(H)
+	println("Norm2(H) : ", normRef)
+	if normRef == 0
+		println("NormH = 0. Using 1.")
+		normRef = 1
+	end
+	F = F/normRef 
+	G = G/normRef 
+	H = H/normRef 
+	f = f/normRef 
+	g = g/normRef 
+
+	##
+	## Regulization
+	##
+	delta = epsilon^(0.5) ; 
+	A = [F+delta*speye(m,m)   H                  ;  
+	     H' 				 -G-delta*speye(n,n) ]
+	realA = [F   H ;
+	         H' -G ]	
+	
+	b = [f ; g]   
+	
+	##
+	## Multifrontal LDLt factorization	
+	##
+	tic() ;
+	# graph = sparseToAdj(A);
+	graph = MultiFrontalCholesky.Graphs.simple_adjlist(A)
+	permA = collect(1:size(A,1))
+	# Bissect
+	root = Supernode(graph,permA)
+	# Build front
+	front = Front{Float64}(A[permA,permA],root)
+	# Factorize
+	MultiFrontalCholesky.Cholesky!(front)
+	println("Factorization took ", toq(), " s.")
+	
+	##
+	## Define preconditionner & operator
+	##
+
+	# Returns realA*x
+	function real_op(v)
+		return realA*v 
+	end 
+	# Returns A*x
+	function reg_op(v)
+		return A*v 
+	end
+	# Returns A\b
+	function reg_solve(rhs)
+		return MultiFrontalCholesky.Solve(front,root,permA,hcat(rhs))
+	end
+	function reg_prec(rhs)
+		tic() 
+		x = zeros(rhs)
+		iteration = 1 
+		error = Inf 
+		res = rhs - reg_op(x)	
+		while (error > 1e3*epsilon)
+			# d = A\r
+			dir = reg_solve(res) 	
+			# x = x + d
+			x = x + dir 
+			# Residue r = b - Ax
+			res = rhs - reg_op(x)	
+			# Error and stuff
+			iteration = iteration + 1
+			error = norm(res)/norm(rhs)
+			if iteration >= 10
+				println("   Precond stop after ", iteration, " iterations.")
+				break
+			end
+		end
+		println("   Precond quality (#", iteration, ") : ", error, " in ", toq(), " s.")
+		return x
+	end
+
+	##
+	## Run Flexible GMRES
+	##
+
+	# Flexible GMRES
+	probDim = m+n
+	krylovDim = 20 
+	r0 = b
+	beta = norm(r0)
+	V = zeros(probDim, krylovDim+1)
+	V[:,1] = r0/beta
+	H = zeros(krylovDim+1, krylovDim)
+	Z = zeros(probDim, krylovDim)
+	residual = inf
+	y = zeros(probDim)
+
+	# (F)GMRES
+	for j = 1:krylovDim
+		tic() ;
+		# Arnoldi		
+		Z[:,j] = reg_prec(V[:,j])
+		w = real_op(Z[:,j])
+		for i = 1:j
+			H[i,j] = dot(V[:,i],w)
+			w = w - H[i,j]*V[:,i]
+		end
+		H[j+1,j] = norm(w)
+		V[:,j+1] = w/H[j+1,j]
+		# Now we need to solve y = argmin|| beta * e1 - H y ||_2
+		# This is equivalent to solving 
+		# H = Q*R
+		# R y = beta * (e1 Q)'
+		(Q,R) = qr(H[1:j+1,1:j]) 
+		rhs = beta * (Q[1,:]')
+		y[1:j] = backward_solve(R,rhs)
+		# Check least square solution
+		residual = H[1:j+1,1:j]*y[1:j] 
+		residual[1] = residual[1]-beta 
+		println("#", j, " (F)GMRES residual : ", norm(residual), " in ", toq(), " s.")  
+		if norm(residual) < 1e3*epsilon
+			krylovDim = j 
+			break
+		end
+	end
+	println("(F)GMRES Stopped after ", krylovDim, " iterations with a residual of ", norm(residual))
+
+	# Thus, xm = Z*y
+	xGmres = Z[:,1:krylovDim]*y[1:krylovDim]
+	println("Final residual after (F)GMRES: ", norm(real_op(xGmres) - b)/norm(b)) 
+
+	# Return value
+	xx = xGmres[1:m]
+	xy = xGmres[m+1:m+n]
+
+	println("Total time: ", toq(), " s.") ;
+
+  	return xx, xy
+end

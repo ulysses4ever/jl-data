@@ -1,0 +1,35 @@
+
+
+
+function binsearch(haystack, needle, comparator, low::Integer=1, high::Integer=length(haystack))
+
+  (low < 1 || low >= length(haystack)) &&
+    error("invalid lower bound")
+
+
+  (high < low || high >= haystack.length) && 
+    error("invalid upper bound")
+
+  while(low <= high)
+    #= 
+    Note that "(low + high) >>> 1" may overflow, 
+      and results in a typecast to double (which gives the wrong results) 
+    =#
+    mid = low + (high - low >> 1);
+    cmp = float(comparator(haystack[mid], needle));
+
+    #Too low.
+    if cmp < 0.0   
+      low  = mid + 1
+    #Too high. 
+    elseif cmp > 0.0
+      high = mid - 1
+    #Key found. 
+    else
+      return mid
+    end
+  end
+
+  #Key not found. 
+  return ~low;
+end

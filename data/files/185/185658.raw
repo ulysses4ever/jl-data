@@ -1,0 +1,560 @@
+export arc, ellipse, line, point, quad, rect, triangle
+export ellipseMode, rectMode
+export strokeWeight, shapeMode
+export beginShape, vertex, vertices, endShape
+
+include("shapesaux.jl")
+
+#createShape
+#loadShape
+
+## 2D Primitives
+
+function arc(xc, yc, w, h, start, stop)
+	if state.ellipseMode == "CENTER"
+		w = w ./ 2
+		h = h ./ 2
+	elseif state.ellipseMode == "CORNER"
+		w = w ./ 2
+		h = h ./ 2
+		xc = xc .+ w
+		yc = yc .+ h
+	elseif state.ellipseMode == "CORNERS"
+		xc = (w .- xc)./2
+		yc = (h .- yc)./2
+		w = w ./ 2
+		h = h ./ 2
+	end
+
+	numSlices = 200
+	cs = Array{Float64}(2, length(xc), numSlices)
+	for x = 1:length(xc)
+		cs[1,x,:] = cos(linspace(start[x], stop[x], numSlices))
+		cs[2,x,:] = sin(linspace(start[x], stop[x], numSlices))
+	end
+
+	vertexData = zeros(GLfloat, numSlices*8*length(xc))
+	vertexStride = numSlices*8
+	for x = 1:length(xc)
+		cw = cs[1,x,:] .* w[x] .+ xc[x]
+		ch = cs[2,x,:] .* h[x] .+ yc[x]
+		vertexData[(x-1)*vertexStride+1:8:x*vertexStride] = cw
+		vertexData[(x-1)*vertexStride+2:8:x*vertexStride] = ch
+	end
+
+	if state.drawTexture
+		# texcoords
+		vertexData[7:vertexStride:end] = 0
+		vertexData[8:vertexStride:end] = 0
+
+		vertexData[15:vertexStride:end] = 1
+		vertexData[16:vertexStride:end] = 0
+
+		vertexData[23:vertexStride:end] = 1
+		vertexData[24:vertexStride:end] = 1
+	end
+
+	if state.fillStuff
+		loadColors!(vertexData, state.fillCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = numSlices
+		for x = 1:length(xc)
+			glDrawArrays(GL_TRIANGLE_FAN, (x-1)*dataStride, dataStride)
+		end
+	end
+	if state.strokeStuff
+		loadColors!(vertexData, state.strokeCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = numSlices
+		for x = 1:length(xc)
+			glDrawArrays(GL_LINE_STRIP, (x-1)*dataStride, dataStride)
+		end
+	end
+end
+
+function arc(xc, yc, w, h, start, stop, tex)
+	glActiveTexture(GL_TEXTURE0)
+	switchShader("texturedShapes")
+	arc(xc, yc, w, h, start, stop)
+	switchShader("basicShapes")
+end
+
+function ellipse(xc, yc, w, h)
+	if state.ellipseMode == "CENTER"
+		w = w ./ 2
+		h = h ./ 2
+	elseif state.ellipseMode == "CORNER"
+		w = w ./ 2
+		h = h ./ 2
+		xc = xc .+ w
+		yc = yc .+ h
+	elseif state.ellipseMode == "CORNERS"
+		xc = (w .- xc)./2
+		yc = (h .- yc)./2
+		w = w ./ 2
+		h = h ./ 2
+	end
+
+	numSlices = 200
+	c = cos(linspace(0, 2pi, numSlices))
+	s = sin(linspace(0, 2pi, numSlices))
+
+	vertexData = zeros(GLfloat, numSlices*8*length(xc))
+	vertexStride = numSlices*8
+	for x = 1:length(xc)
+		cw = c .* w[x] .+ xc[x]
+		ch = s .* h[x] .+ yc[x]
+		vertexData[(x-1)*vertexStride+1:8:x*vertexStride] = cw
+		vertexData[(x-1)*vertexStride+2:8:x*vertexStride] = ch
+	end
+
+	if state.drawTexture
+		# texcoords
+		vertexData[7:vertexStride:end] = 0
+		vertexData[8:vertexStride:end] = 0
+
+		vertexData[15:vertexStride:end] = 1
+		vertexData[16:vertexStride:end] = 0
+
+		vertexData[23:vertexStride:end] = 1
+		vertexData[24:vertexStride:end] = 1
+	end
+
+	if state.fillStuff
+		loadColors!(vertexData, state.fillCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = numSlices
+		for x = 1:length(xc)
+			glDrawArrays(GL_TRIANGLE_FAN, (x-1)*dataStride, dataStride)
+		end
+	end
+	if state.strokeStuff
+		loadColors!(vertexData, state.strokeCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = numSlices
+		for x = 1:length(xc)
+			glDrawArrays(GL_LINE_LOOP, (x-1)*dataStride, dataStride)
+		end
+	end
+end
+
+function ellipse(xc, yc, w, h, tex)
+	glActiveTexture(GL_TEXTURE0)
+	switchShader("texturedShapes")
+	ellipse(xc, yc, w, h)
+	switchShader("basicShapes")
+end
+
+function line(x1, y1, x2, y2)
+	vertexStride = 16
+	vertexData = zeros(GLfloat, 8*2*length(x1))
+	vertexData[1:vertexStride:end] = x1
+	vertexData[2:vertexStride:end] = y1
+
+	vertexData[7:vertexStride:end] = x2
+	vertexData[8:vertexStride:end] = y2
+
+	if size(state.strokeCol, 1) == 1
+		vertexData[3:vertexStride:end] = state.strokeCol[1].r
+		vertexData[4:vertexStride:end] = state.strokeCol[1].g
+		vertexData[5:vertexStride:end] = state.strokeCol[1].b
+		vertexData[6:vertexStride:end] = 1.0
+
+		vertexData[9:vertexStride:end] = state.strokeCol[1].r
+		vertexData[10:vertexStride:end] = state.strokeCol[1].g
+		vertexData[11:vertexStride:end] = state.strokeCol[1].b
+		vertexData[12:vertexStride:end] = 1.0
+	else
+		for c = 1:size(state.strokeCol, 1)
+			vertexData[(c-1)*vertexStride+3:vertexStride:c*vertexStride] = state.strokeCol[c].r
+			vertexData[(c-1)*vertexStride+4:vertexStride:c*vertexStride] = state.strokeCol[c].g
+			vertexData[(c-1)*vertexStride+5:vertexStride:c*vertexStride] = state.strokeCol[c].b
+			vertexData[(c-1)*vertexStride+6:vertexStride:c*vertexStride] = 1.0
+
+			vertexData[(c-1)*vertexStride+9:vertexStride:c*vertexStride] = state.strokeCol[c].r
+			vertexData[(c-1)*vertexStride+10:vertexStride:c*vertexStride] = state.strokeCol[c].g
+			vertexData[(c-1)*vertexStride+11:vertexStride:c*vertexStride] = state.strokeCol[c].b
+			vertexData[(c-1)*vertexStride+12:vertexStride:c*vertexStride] = 1.0
+		end
+	end
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+	glDrawArrays(GL_LINES, 0, 2*length(x1))
+end
+
+function line(x, y, tex)
+	println("does it make sense to map a texture to a line?")
+end
+
+function point(x, y)
+	vertexStride = 8
+	vertexData = zeros(GLfloat, 8*length(x))
+	vertexData[1:vertexStride:end] = x
+	vertexData[2:vertexStride:end] = y
+
+	loadColors!(vertexData, state.strokeCol, vertexStride)
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+	glDrawArrays(GL_POINTS, 0, length(x))
+end
+
+function point(x, y, tex)
+	println("does it make sense to map a texture to a point?")
+end
+
+function quad(x1, y1, x2, y2, x3, y3, x4, y4)
+	vertexStride = 8*4
+	vertexData = zeros(GLfloat, 8*4*length(x1))
+	# vertices
+	vertexData[1:vertexStride:end] = x1
+	vertexData[2:vertexStride:end] = y1
+
+	vertexData[9:vertexStride:end] = x2
+	vertexData[10:vertexStride:end] = y2
+
+	vertexData[17:vertexStride:end] = x3
+	vertexData[18:vertexStride:end] = y3
+
+	vertexData[25:vertexStride:end] = x4
+	vertexData[26:vertexStride:end] = y4
+
+	if state.drawTexture
+		# texcoords
+		vertexData[7:vertexStride:end] = 0
+		vertexData[8:vertexStride:end] = 0
+
+		vertexData[15:vertexStride:end] = 1
+		vertexData[16:vertexStride:end] = 0
+
+		vertexData[23:vertexStride:end] = 1
+		vertexData[24:vertexStride:end] = 1
+	end
+
+	elements = zeros(GLuint, 6*length(x1))
+
+	elements[1] = 0
+	elements[2] = 1
+	elements[3] = 2
+	elements[4] = 2
+	elements[5] = 3
+	elements[6] = 0
+
+	index = 7
+	for x = 2:length(x1)
+		elements[index] = elements[index-6] + 4
+		elements[index+1] = elements[(index-6)+1] + 4
+		elements[index+2] = elements[(index-6)+2] + 4
+		elements[index+3] = elements[(index-6)+3] + 4
+		elements[index+4] = elements[(index-6)+4] + 4
+		elements[index+5] = elements[(index-6)+5] + 4
+		index += 6
+	end
+
+	if state.fillStuff
+		loadColors!(vertexData, state.fillCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW)
+		glDrawElements(GL_TRIANGLES, 6*length(x1), GL_UNSIGNED_INT, C_NULL)
+	end
+	if state.strokeStuff
+		loadColors!(vertexData, state.fillCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = 4
+		for x = 1:length(x1)
+			glDrawArrays(GL_LINE_LOOP, (x-1)*dataStride, dataStride)
+		end
+	end
+end
+
+function quad(x1, y1, x2, y2, x3, y3, x4, y4, tex)
+	glActiveTexture(GL_TEXTURE0)
+	switchShader("texturedShapes")
+	quad(x1, y1, x2, y2, x3, y3, x4, y4)
+	switchShader("basicShapes")
+end
+
+function rect(xtopleft, ytopleft, width, height)
+	if state.rectMode == "CENTER"
+		xtopleft = xtopleft .- width./2
+		ytopleft = ytopleft .- height./2
+	elseif state.rectMode == "RADIUS"
+		xtopleft = xtopleft .- width
+		ytopleft = ytopleft .- height
+		width = 2 .* width
+		height = 2 .* height
+	elseif state.rectMode == "CORNERS"
+		width = width .- xtopleft
+		height = height .- ytopleft
+	end
+
+	x1 = xtopleft
+	y1 = ytopleft
+	x2 = xtopleft .+ width
+	y2 = ytopleft
+	x3 = xtopleft .+ width
+	y3 = ytopleft .- height
+	x4 = xtopleft
+	y4 = ytopleft .- height
+
+	vertexStride = 4*8
+	vertexData = zeros(GLfloat, 8*4*length(xtopleft))
+	# vertices
+	vertexData[1:vertexStride:end] = x1
+	vertexData[2:vertexStride:end] = y1
+
+	vertexData[9:vertexStride:end] = x2
+	vertexData[10:vertexStride:end] = y2
+
+	vertexData[17:vertexStride:end] = x3
+	vertexData[18:vertexStride:end] = y3
+
+	vertexData[25:vertexStride:end] = x4
+	vertexData[26:vertexStride:end] = y4
+
+	if state.drawTexture
+		# texcoords
+		vertexData[7:vertexStride:end] = 0
+		vertexData[8:vertexStride:end] = 0
+
+		vertexData[15:vertexStride:end] = 1
+		vertexData[16:vertexStride:end] = 0
+
+		vertexData[23:vertexStride:end] = 1
+		vertexData[24:vertexStride:end] = 1
+
+		vertexData[31:vertexStride:end] = 0
+		vertexData[32:vertexStride:end] = 1
+	end
+
+	elements = zeros(GLuint, 6*length(x1))
+
+	elements[1] = 0
+	elements[2] = 1
+	elements[3] = 2
+	elements[4] = 2
+	elements[5] = 3
+	elements[6] = 0
+
+	index = 7
+	for x = 2:length(x1)
+		elements[index] = elements[index-6] + 4
+		elements[index+1] = elements[(index-6)+1] + 4
+		elements[index+2] = elements[(index-6)+2] + 4
+		elements[index+3] = elements[(index-6)+3] + 4
+		elements[index+4] = elements[(index-6)+4] + 4
+		elements[index+5] = elements[(index-6)+5] + 4
+		index += 6
+	end
+
+	if state.fillStuff
+		loadColors!(vertexData, state.fillCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW)
+		glDrawElements(GL_TRIANGLES, 6*length(xtopleft), GL_UNSIGNED_INT, C_NULL)
+	end
+	if state.strokeStuff
+		loadColors!(vertexData, state.strokeCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = 4
+		for x = 1:length(x1)
+			glDrawArrays(GL_LINE_LOOP, (x-1)*dataStride, dataStride)
+		end
+	end
+end
+
+function rect(xtopleft, ytopleft, width, height, tex)
+	glActiveTexture(GL_TEXTURE0)
+	switchShader("texturedShapes")
+	rect(xtopleft, ytopleft, width, height)
+	switchShader("basicShapes")
+end
+
+function triangle(x1, y1, x2, y2, x3, y3)
+	vertexStride = 8*3
+	vertexData = zeros(GLfloat, 8*3*length(x1))
+	vertexData[1:vertexStride:end] = x1
+	vertexData[2:vertexStride:end] = y1
+
+	vertexData[9:vertexStride:end] = x2
+	vertexData[10:vertexStride:end] = y2
+
+	vertexData[17:vertexStride:end] = x3
+	vertexData[18:vertexStride:end] = y3
+
+	if state.drawTexture
+		# texcoords
+		vertexData[7:vertexStride:end] = 0
+		vertexData[8:vertexStride:end] = 0
+
+		vertexData[15:vertexStride:end] = 1
+		vertexData[16:vertexStride:end] = 0
+
+		vertexData[23:vertexStride:end] = 1
+		vertexData[24:vertexStride:end] = 1
+	end
+
+	if state.fillStuff
+		loadColors!(vertexData, state.fillCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = 3
+		for x = 1:length(x1)
+			glDrawArrays(GL_TRIANGLES, (x-1)*dataStride, dataStride)
+		end
+	end
+	if state.strokeStuff
+		loadColors!(vertexData, state.strokeCol, 8)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW)
+		dataStride = 3
+		for x = 1:length(x1)
+			glDrawArrays(GL_LINE_LOOP, (x-1)*dataStride, dataStride)
+		end
+	end
+end
+
+function triangle(x1, y1, x2, y2, x3, y3, tex)
+	glActiveTexture(GL_TEXTURE0)
+	switchShader("texturedShapes")
+	triangle(x1, y1, x2, y2, x3, y3)
+	switchShader("basicShapes")
+end
+
+## Curves
+
+# function bezier(x1, y1, x2, y2, x3, y3, x4, y4)
+#
+# end
+
+#Double quadratic Bezier curve (from Colors.jl)
+function Bezier{T<:Real}(t::T, p0::T, p2::T, q0::T, q1::T, q2::T)
+	B(t,a,b,c)=a*(1.0-t)^2.0+2.0b*(1.0-t)*t+c*t^2.0
+	if t <= 0.5
+		return B(2.0t, p0, q0, q1)
+    else #t > 0.5
+	return B(2.0(t-0.5), q1, q2, p2)
+    end
+end
+
+#bezierDetail
+#bezierPoint
+#bezierTangent
+#curve
+#curveDetail
+#curvePoint
+#curveTangent
+#curveTightness
+
+## Attributes
+
+function ellipseMode(eMode)
+	state.ellipseMode = eMode
+end
+
+function rectMode(rMode)
+	state.rectMode = rMode
+end
+
+# function strokeCap(capType)
+#
+# end
+
+# function strokeJoin(joinType)
+#
+# end
+
+function strokeWeight(newWeight)
+	glPointSize(newWeight)
+	state.strokeWeight = newWeight
+end
+
+## Vertex
+
+function beginShape(sType)
+	if sType == "POINTS"
+		shapeData.shapeType = GL_POINTS
+	elseif sType == "LINES"
+		shapeData.shapeType = GL_LINES
+	elseif sType == "TRIANGLES"
+		shapeData.shapeType = GL_TRIANGLES
+	elseif sType == "TRIANGLE_FAN"
+		shapeData.shapeType = GL_TRIANGLE_FAN
+	elseif sType == "TRIANGLE_STRIP"
+		shapeData.shapeType = GL_TRIANGLE_STRIP
+	elseif sType == "QUADS"
+		shapeData.shapeType = GL_QUADS
+	elseif sType == "QUAD_STRIP"
+		shapeData.shapeType = GL_QUAD_STRIP
+	end
+	shapeData.shapeVertices = zeros(GLfloat, 6)
+end
+
+function vertex(v)
+	vertexStride = 8
+	if size(shapeData.shapeVertices) > 8
+		push!(shapeData.shapeVertices, v[1])
+		push!(shapeData.shapeVertices, v[2])
+	else
+		shapeData.shapeVertices[1] = v[1]
+		shapeData.shapeVertices[2] = v[2]
+	end
+end
+
+function vertices(vs)
+	shapeData.nVertices = size(vs, 2)
+	shapeData.vertexStride = 8
+	shapeData.shapeVertices = zeros(GLfloat, 8*size(vs, 2))
+	shapeData.shapeVertices[1:shapeData.vertexStride:end] = vs[1, :]
+	shapeData.shapeVertices[2:shapeData.vertexStride:end] = vs[2, :]
+end
+
+function vertices(vs, ts)
+	shapeData.nVertices = size(vs, 2)
+	shapeData.vertexStride = 8
+	shapeData.shapeVertices = zeros(GLfloat, 8*size(vs, 2))
+	shapeData.shapeVertices[1:shapeData.vertexStride:end] = vs[1, :]
+	shapeData.shapeVertices[2:shapeData.vertexStride:end] = vs[2, :]
+
+	if state.drawTexture
+		# texcoords
+		vertexData[7:shapeData.vertexStride:end] = 0
+		vertexData[8:shapeData.vertexStride:end] = 0
+
+		vertexData[15:shapeData.vertexStride:end] = 1
+		vertexData[16:shapeData.vertexStride:end] = 0
+
+		vertexData[23:shapeData.vertexStride:end] = 1
+		vertexData[24:shapeData.vertexStride:end] = 1
+
+		vertexData[31:shapeData.vertexStride:end] = 0
+		vertexData[32:shapeData.vertexStride:end] = 1
+	end
+end
+
+function endShape()
+	if state.fillStuff && (shapeData.shapeType != GL_POINTS || shapeData.shapeType != GL_LINES || shapeData.shapeType != GL_LINE_LOOP || shapeData.shapeType != GL_LINE_STRIP)
+		loadColors!(vertexData, state.fillCol, vertexStride)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(shapeData.shapeVertices), shapeData.shapeVertices, GL_STATIC_DRAW)
+		glDrawArrays(shapeData.shapeType, 0, shapeData.nVertices)
+	end
+
+	if state.strokeStuff
+		loadColors!(vertexData, state.strokeCol, vertexStride)
+		if (shapeData.shapeType == GL_POINTS || shapeData.shapeType == GL_LINES || shapeData.shapeType == GL_LINE_LOOP || shapeData.shapeType == GL_LINE_STRIP)
+			glDrawArrays(shapeData.shapeType, 0, shapeData.nVertices)
+		else
+			glDrawArrays(GL_LINE_LOOP, 0, shapeData.nVertices)
+		end
+	end
+end
+
+#bezierVertex
+#curveVertex
+
+#quadraticVertex
+
+## Loading & Displaying
+
+#shape
+
+function shapeMode(mode)
+	state.shapeMode = mode
+end

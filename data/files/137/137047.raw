@@ -1,0 +1,102 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+#finds 6-mer of most likely upregulating promotor from data.
+# data consists of two sets of sequences identifying regions around binding sites,
+# the first known to be a list of positive promotors, while second being list of neg.
+#  -- method: find starting points for 6-tuples amoung each sequence
+#             to construct alignment matrix. From alignment matrix construct profile
+#             matrix. From profile matrix (representing variability of nucleotide
+#             composition at each point of a particular choice of l-mers (6-mers here))
+#             we choose consensus l-mer (the consensus string) representing
+#             most represented nucleotide.
+#             The score of each consens l-mer is the summation of the magnitudes 
+#             representing the most frequence nucleotide in each column.
+#             In other words, for each nucleotide in string, take sum of the numbers
+#             that led us to choose that particular nucleotide.
+
+#       eg: for t sequences S_1 .. S_t
+#               l-mer(S_1) ATCCAGCT
+#               l-mer(S_2) GGGCAACT
+#               l-mer(S_3) ATGGATCT
+#                   ..       ...
+#               l-mer(S_t) ATGGCACT
+#                       ||
+#                       \/
+#                alignment matrix
+#                       ||
+#                       \/
+#                profile matrix             
+#            j= 1 2 3 4 5 6 7 l=8
+#               - - - - - - - -
+#         i= A |5 1 0 0 5 5 0 0
+#            G |1 7 0 0 0 1 1 6
+#            C |1 1 6 3 0 1 0 0
+#            T |0 0 1 4 2 0 6 -
+#          
+#               A T G C A A C T
+
+
+positivePromotorFile = open("promotorPositive.fa","r")
+
+positivePromotorLines = readlines(positivePromotorFile)
+
+maxLengthOfPositivePromotorSeq = 0
+#convert input promotor sequences to array of characters, and place into array of seq.
+positivePromotorSequences = Array{Char}[]
+for line in positivePromotorLines
+    if !begins_with(line,'>')
+        lengthOfPositivePromotorSeq = length(line)
+
+        if (lengthOfPositivePromotorSeq > maxLengthOfPositivePromotorSeq)
+            maxLengthOfPositivePromotorSeq = lengthOfPositivePromotorSeq
+        end
+        push(positivePromotorSequences, chars(line))
+    end
+end
+
+println("Max length of positive promotor sequence: ")
+println(maxLengthOfPositivePromotorSeq)
+
+#now sequentially pick frames of 6 beginning from 1 to size of promotor sequences
+#and run algorithm
+t = length(positivePromotorSequences)
+l = 6
+for k=1:t
+    characterArray = positivePromotorSequences[k]
+
+    print("k=")
+    println(k)
+
+    #try out every start position for l-mer
+    for i=1:(length(characterArray) - l - 1)
+        print("\ti = ")
+        println(i)
+        println(" ")
+
+        startOflmer = i
+        lastIndexOflmer = startOflmer + l - 1
+
+        aligmentMatrix = zeros(t, l)
+    end
+end

@@ -1,0 +1,61 @@
+include("config.jl")
+include("fixed_genotype.jl")
+
+import Fixed_Genotype
+import Config
+
+function enumerate()
+    dictionary = Dict{Fixed_Genotype.Type_Genotype, Int64}()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    num_nodes = 0
+    file_lines = ["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", 
+                  "<gexf xmlns=\"http://www.gexf.net/1.2draft\" xmlns:viz=\"http://www.gexf.net/1.1draft/viz\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd\" version=\"1.2\">",
+        "<graph>\n",
+        "<nodes>\n",
+        "</nodes>\n",
+	"<edges>\n",
+        "</edges>\n",
+    "</graph>\n",
+"</gexf>\n"]
+
+    start_genotype::Fixed_Genotype.Type_Genotype = Fixed_Genotype.make_random_genotype(config_vals)
+    dictionary[start_genotype] = num_nodes
+    num_nodes += 1
+    
+    line1 = string(dec(num_nodes), ", ", "foo, ", "\'0 0 0\'"," \n")
+
+    insert!(file_lines, 2, line1)
+    temp = Fixed_Genotype.make_random_genotype(config_vals)
+    for i = 1:4
+        Fixed_Genotype.copy_into(temp, start_genotype)
+        Fixed_Genotype.mutate(temp, config_vals)
+        dictionary[temp] = num_nodes
+        num_nodes += 1
+
+        Fixed_Genotype.simulate(temp, config_vals, convert(Int32, 0))
+        color_value::Int64 = 0
+        for i = 1:config_vals.initial_num_nodes
+            color_value += temp.activations[(config_vals.num_simulation_iterations * config_vals.max_num_nodes)  + i] * 2^(i - 1)
+        end
+        color_value *= 16
+
+        blue::Int64 = (color_value % 256)
+        color_value = round(color_value / 256)
+        green::Int64 = (color_value % 256)
+        color_value = round(color_value / 256)
+        red::Int64 = (color_value % 256)
+        color_value = round(color_value / 256)
+        node_line = string(dec(num_nodes), ", ", "foo", ", \`", dec(red), " ", dec(green), " ", dec(blue), "\'", "\n")
+        edge_line = string(dec(1), ", ", dec(num_nodes), "\n")
+        insert!(file_lines, num_nodes, node_line)
+        push!(file_lines, edge_line)
+    end
+
+    outfile = open("graph.gdf", "w")
+
+    for line in file_lines
+        write(outfile, line)
+    end
+end
+
+enumerate()

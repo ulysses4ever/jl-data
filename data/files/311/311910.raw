@@ -1,0 +1,13 @@
+type Rule <: Any
+    nonterminal::ASCIIString
+    left_child::ASCIIString
+    right_child::ASCIIString
+    prob::Float64
+end
+
+type Entry <: Any
+    filled::Bool
+    prob::Float64
+    current_index::Int64
+    possibilities::Array{(Int64, Int64, Int64, Float64)}
+end

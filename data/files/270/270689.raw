@@ -1,0 +1,11 @@
+import EulerUtil
+
+ps = primes(987654321)
+
+println("Finished generating primes...")
+
+for p in ps
+	if EulerUtil.is_pandigital(p)
+		println(p, " is pandigital")
+	end
+end

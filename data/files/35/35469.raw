@@ -1,0 +1,15 @@
+using Debug
+@debug function addNoise(x::Array{Complex{Float64},2}, SNR)
+
+# y = addNoise(x::Array{Complex{Float64},2}, SNR)
+# 
+
+len = length(x);
+unscNoise = randn(len,1) + im*randn(len,1);
+scNoise = 10^(-SNR/20) * unscNoise / sqrt(2);
+
+measVar = (scNoise'*scNoise)/len;
+
+y = x + scNoise;
+return(y);
+end

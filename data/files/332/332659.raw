@@ -1,0 +1,135 @@
+module Config
+
+type Type_Config_Values
+    use_truth_table::Bool
+    use_fixed_arrays::Bool
+
+    max_threshold::Int32
+    min_threshold::Int32
+    max_weight::Int32
+    min_weight::Int32
+
+    population_size::Int32
+    num_generations::Int32
+    print_times::Array{Int32, 1}
+
+    generations_per_target_switch::Int32
+    target_length::Int32
+    use_randomised_targets::Bool
+    expression_1::Array{Int32, 1}
+    expression_2::Array{Int32, 1}
+
+    extermination_tournament_size::Int32
+    breeding_tournament_size::Int32
+    births_and_deaths_per_generation::Int32
+
+    mutate_dup_del_prob::Float32
+    max_num_dups_or_dels::Float32
+    min_num_dups_or_dels::Int32
+    mutate_conn_prob::Float32
+    max_num_conn_muts::Int32
+    min_num_conn_muts::Int32
+    mutate_activation_prob::Float32
+    max_num_activation_muts::Int32
+    min_num_activation_muts::Int32
+    mutate_truth_table_prob::Float32
+    max_num_tt_muts::Int32
+    min_num_tt_muts::Int32
+    delete_conn_prob::Float32
+    max_num_conn_dels::Int32
+    min_num_conn_dels::Int32
+    add_conn_prob::Float32
+    max_num_conn_adds::Int32
+    min_num_conn_adds::Int32
+    mutate_threshold_prob::Float32
+    max_num_thresh_muts::Int32
+    min_num_thresh_muts::Int32
+    mutate_weight_prob::Float32
+    max_num_weight_muts::Int32
+    min_num_weight_muts::Int32
+    mutate_node_weight_prob::Float32
+    max_num_node_weight_muts::Int32
+    min_num_node_weight_muts::Int32
+
+    max_num_connections::Int32
+    min_num_connections::Int32
+    num_simulation_iterations::Int32
+    initial_max_num_connections::Int32
+    initial_min_num_connections::Int32
+    initial_num_nodes::Int32
+    max_num_nodes::Int32
+    min_num_nodes::Int32
+    max_node_weight::Int32
+    min_node_weight::Int32
+
+    use_fitness_table::Bool
+    fitness_table_size::Int32
+    Type_Config_Values() = new(
+                               #=use_truth_table=# false, 
+                               #=use_fixed_arrays=# false,
+                               
+                               #=max_threshold=# 3,
+                               #=min_threshold=# -3,
+                               #=max_weight=# 2,
+                               #=min_weight=# -2,
+
+                               #=population_size=# 1000,
+    #=num_generations=# 100000,
+    #=print_times=# [1, 5, 20, 50, 70, 99, 199, 299, 499, 999, 5000, 9999, 50000, 99999],
+
+    #=generations_per_target_switch=# 51,
+    #=target_length=# 20, 
+    #=use_randomised_targets=# false,
+    #=expression_1=# [1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0],
+    #=expression_2=# [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0],
+    
+    #=extermination_tournament_size=# 4,
+    #=breeding_tournament_size=# 4,
+    #=births_and_deaths_per_generation=# 50,
+
+    #=mutate_dup_del_prob=# 0.0,
+    #=max_num_dups_or_dels=# 1,
+    #=min_num_dups_or_dels=# 1,
+    #=mutate_conn_prob=# 0.0,
+    #=max_num_conn_muts=# 2,
+    #=min_num_conn_muts=# 1,
+    #=mutate_activation_prob=# 0.2,
+    #=max_num_activation_muts=# 2,
+    #=min_num_activation_muts=# 1,
+    #=mutate_truth_table_prob=# 0.3,
+    #=max_num_tt_muts=# 2,
+    #=min_num_tt_muts=# 1,
+    #=delete_conn_prob=# 0.2,
+    #=max_num_conn_dels=# 2,
+    #=min_num_conn_dels=# 1,
+    #=add_conn_prob=# 0.3,
+    #=max_num_conn_adds=# 2,
+    #=min_num_conn_adds=# 1,
+    #=mutate_threshold_prob=# 1.0,
+    #=max_num_thresh_muts=# 2,
+    #=min_num_thresh_muts=# 1,
+    #=mutate_weight_prob=# 1.0,
+    #=max_num_weight_muts=# 2,
+    #=min_num_weight_muts=# 1,
+    #=mutate_node_weight_prob=# 0.0,
+    #=max_num_node_weight_muts=# 2,
+    #=min_num_node_weight_muts=# 1,
+
+    #=max_num_connections=# 19,
+    #=min_num_connections=# 1,
+    #=num_simulation_iterations=# 30,
+    #=initial_max_num_connections=# 3,
+    #=initial_min_num_connections=# 1,
+    #=initial_num_nodes=# 20,
+    #=max_num_nodes=# 20,
+    #=min_num_nodes=# 20,
+    #=max_node_weight=# 1,
+    #=min_node_weight=# 1,
+
+    #=use_fitness_table=# false,
+    #=fitness_table_size=# 256,
+    )
+end
+
+
+end

@@ -1,0 +1,31 @@
+function sumoffactofdigits(x::Int)
+    sum = 0
+
+    while x != 0
+        sum += factorial(x % 10)
+        x = div(x, 10)
+    end
+
+    return sum
+end
+
+sumoffactofdigits(143)
+function findeqsumoffactofdigits(items)
+    matches = IntSet()
+    for x in items
+        if x == sumoffactofdigits(x)
+            push!(matches, x)
+        end
+    end
+
+    return matches
+end
+
+
+# 40585 seems to be the highest (and second) such number. TODO: Find out an upper
+# bound so that we don't need to rely on 100000000.
+@time res = sum(findeqsumoffactofdigits(3:100000000))
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

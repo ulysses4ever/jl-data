@@ -1,0 +1,68 @@
+using ApproxSets, FactCheck
+
+facts("Construction") do
+    s = ApproxSet()
+    @fact length(s) => 0
+    @fact eltype(s) => Any 
+    
+    s = ApproxSet(5.0)
+    @fact length(s) => 1
+    @fact eltype(s) => Float64
+    s = ApproxSet('a')
+    @fact length(s) => 1
+    @fact eltype(s) => Char
+    s = ApproxSet([1.2,3.0])
+    @fact length(s) => 1
+    @fact eltype(s) => Vector{Float64}
+
+    ApproxSets.issetapprox(i::Real,j::Real,tol=1e-6) = abs(i-j) <= tol
+    
+    s = ApproxSet(5.0, 6.0, 7.0)
+    @fact length(s) => 3
+    @fact eltype(s) => Float64
+    s = ApproxSet(5, 7.0)
+    @fact length(s) => 2
+    @fact eltype(s) => Real
+    s = ApproxSet(5.0, nextfloat(5.0), tol=0.0)
+    @fact length(s) => 2
+    @fact eltype(s) => Float64
+    s = ApproxSet(5.0, nextfloat(5.0), tol=1e-6)
+    @fact length(s) => 1
+    @fact eltype(s) => Float64
+    s = ApproxSet(5.0, nextfloat(5.0))
+    @fact length(s) => 1
+    @fact eltype(s) => Float64
+end
+
+facts("Pushing") do
+    ApproxSets.issetapprox(
+        i::Vector{Float64},
+        j::Vector{Float64}, tol=1e-6) = norm(i-j) <= tol
+    
+    s = ApproxSet([0.0,0.0],tol=1e-6)
+    @fact length(s) => 1
+    # Test using inbuilt tolerance
+    push!(s, [1.0,1.0])
+    @fact length(s) => 2
+    # Test overriding tolerance
+    push!(s, [0.5,0.5], tol=10)
+    @fact length(s) => 2
+
+    ApproxSets.issetapprox(
+        i::ASCIIString,
+        j::ASCIIString, tol=0) = abs(length(i) - length(j)) <= tol
+    s = ApproxSet("AB","BC","CDA")
+    @fact length(s) => 2
+    # Test using inbuilt tolerance (there is none)
+    push!(s, "FEDA")
+    @fact length(s) => 3
+    push!(s, "FED")
+    @fact length(s) => 3
+    # Test providing a tolerance when there is no default one
+    push!(s, "FEDAF", tol=1)
+    @fact length(s) => 3
+    push!(s, "FEDAFG", tol=1)
+    @fact length(s) => 4
+end
+
+FactCheck.exitstatus()

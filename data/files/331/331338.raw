@@ -1,0 +1,20 @@
+###################################################
+## Defines the 'Params' type
+###################################################
+
+type Params
+  batchSize::Int64
+  techno::AbstractString
+  priorities::AbstractString
+  solver::AbstractString
+
+  function Params(;batch::Int64 = 1, techno::AbstractString = "2_cycles",
+          prio::AbstractString = "greedy", solver::AbstractString = "gurobi")
+    obj = new()
+    obj.batchSize = batch
+    obj.techno = techno
+    obj.priorities = prio
+    obj.solver = solver
+    return obj
+  end
+end

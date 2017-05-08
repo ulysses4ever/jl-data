@@ -1,0 +1,108 @@
+include("config.jl")
+include("fixed_genotype.jl")
+
+import Fixed_Genotype
+import Config
+
+function evolve()
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    start_genotype::Fixed_Genotype.Type_Genotype = Fixed_Genotype.make_random_genotype(config_vals)
+    genotypes::Array{Fixed_Genotype.Type_Genotype, 1} = []
+    for i = 1:10000
+        push!(genotypes, Fixed_Genotype.make_random_genotype(config_vals))
+    end
+    for genotype in genotypes
+        Fixed_Genotype.copy_into(genotype, start_genotype)
+    end
+    
+    dummy::Array{Float64, 1} = []
+    j = 1
+    for i = convert(Int32, 1):config_vals.num_generations
+        if i % 5 == 0
+            println("generation ", i)
+        end
+        for genotype in genotypes
+            Fixed_Genotype.mutate(genotype, config_vals)
+            if j == 1
+                Fixed_Genotype.evaluate(genotype, config_vals.expression_1, config_vals, dummy)
+            else
+                Fixed_Genotype.evaluate(genotype, config_vals.expression_2, config_vals, dummy)
+            end
+            if genotype.fitness == 13.0
+                println("target switch ", j)
+                fitness_values::Array{Float64, 1} = []
+                temp = Fixed_Genotype.make_random_genotype(config_vals)
+                for i = 1:500
+                    Fixed_Genotype.copy_into(temp, genotype)
+                    Fixed_Genotype.mutate(temp, config_vals)
+                    if j == 2
+                        Fixed_Genotype.evaluate(temp, config_vals.expression_1, config_vals, dummy)
+                    else
+                        Fixed_Genotype.evaluate(temp, config_vals.expression_2, config_vals, dummy)
+                    end
+                    push!(fitness_values, temp.fitness)
+                end
+                fitness_values = sort(fitness_values)
+                println("mutattions ", fitness_values)
+                if j == 1
+                    j = 2
+                else
+                    j = 1
+                end
+                for dead_genotype in genotypes
+                    Fixed_Genotype.copy_into(dead_genotype, genotype)
+                end
+            end
+        end 
+    end
+end
+
+evolve()
+
+        
+#=        if (i % config_vals.generations_per_target_switch) in config_vals.print_times
+            print("gen ", i % config_vals.generations_per_target_switch, " ")
+            if i % config_vals.generations_per_target_switch == 1
+                Fixed_Population.print_stats(population, config_vals, true)
+            else
+                Fixed_Population.print_stats(population, config_vals, false)
+            end
+        end
+        Fixed_Population.breed_and_exterminate(population, config_vals)
+        if i % config_vals.generations_per_target_switch == 0
+            println("\n target switch ", j, " ", i / config_vals.generations_per_target_switch, "\n")
+            if j == 1
+                j = 2
+            else
+                j = 1
+            end
+            Fixed_Population.switch_target(population, config_vals)
+        end
+    end=#
+
+
+    #=best = population.genotypes[1]
+    max_fitness::Float32 = 0
+    for genotype in population.genotypes
+        if genotype.fitness > max_fitness
+            max_fitness = genotype.fitness
+            best = genotype
+        end
+    end
+    println("connections")
+    for i = 1:config_vals.max_num_nodes
+        print("node ", i, " ")
+        println(best.connections[((i - 1) * config_vals.max_num_connections + 1):(i * config_vals.max_num_connections)])
+    end
+    println("thresholds")
+    println(best.thresholds)
+    println("weights")
+    for i = 1:config_vals.max_num_nodes
+        print("node ", i, " ")
+        println(best.weights[((i - 1) * config_vals.max_num_connections + 1):(i * config_vals.max_num_connections)])
+    end
+    println("activations")
+    for i = 1:config_vals.num_simulation_iterations
+        println(best.activations[((i - 1) * best.num_nodes + 1):(i * best.num_nodes)])
+    end=#
+#end

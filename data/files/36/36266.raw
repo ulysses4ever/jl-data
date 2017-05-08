@@ -1,0 +1,16 @@
+include("FESetModule.jl")
+include("FENodeSetModule.jl")
+include("JFFoundationModule.jl")
+
+using JFFoundationModule: JFInt, JFFlt, JFFltVec, JFIntVec, JFFltMat, JFIntMat 
+
+
+            
+using FESetModule
+using FENodeSetModule
+
+ X=JFFlt[-1.0 -1.0; 0.0 -1.0; 0.0 0.0; -1.0 0.0]
+ fens1=FENodeSetModule.FENodeSet(xyz=[X[:,1] X[:,2]])
+FENodeSetModule.xyz3(fens1)                    
+
+

@@ -1,0 +1,11 @@
+export Route
+
+#exported
+
+type Route
+    method::String
+    path::String
+    handle::Function
+
+    Route(handle::Function, method::String, path::String) = new(method, path, handle)
+end

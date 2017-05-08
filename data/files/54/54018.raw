@@ -1,0 +1,19 @@
+using Romeo
+
+function handle(req::Request, res::Response)
+    local hw = "Hello World!"
+
+    write(res.socket, "HTTP/1.1 200 Ok\r\n",
+                      "Content-Length: ", string(length(hw)), "\r\n",
+                      "Content-Type: text/plain\r\n",
+                      "\r\n",
+                      hw, "\r\n")
+end
+
+server = HttpServer(6060, handle)
+
+Event(server, "listening") do server
+    println("listening on port $(server.port)")
+end
+
+run(server)

@@ -1,0 +1,38 @@
+using DataArrays
+
+test_case = "case_1c"
+calculation_mode = "scenario_damage"
+case_file = "test/$(calculation_mode)/data/$(test_case).jld"
+
+number_of_ground_motion_fields = 1000000
+
+gm_means = {"b1"=>[-0.64757464]}
+gm_stds  = {"b1"=>[0.564]}
+branches = keys(gm_means)
+
+a_ref = ["a1"]
+a_loc = [1]
+a_tax = ["tax1"]
+a_num = [1]
+a_occ = [1]
+a_val = [10000]
+a_ded = [NA]
+a_lim = [NA]
+num_assets = length(a_ref)
+
+ff_states = ["slight", "moderate", "extreme", "complete"]
+ff_type = {"ff1"=>"discrete"}
+ff_ids = keys(ff_type)
+ff1_imls = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0]
+ff1_poes = [0.000 0.152 0.846 0.993 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000;
+           0.000 0.014 0.129 0.350 0.576 0.747 0.857 0.921 0.957 0.977 0.987 0.993 0.996 0.998 0.999 0.999 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000;
+           0.000 0.008 0.085 0.196 0.325 0.450 0.561 0.653 0.728 0.787 0.833 0.870 0.898 0.920 0.937 0.950 0.960 0.968 0.975 0.980 0.984 0.987 0.989 0.991 0.993;
+           0.000 0.006 0.067 0.171 0.263 0.354 0.438 0.514 0.580 0.637 0.687 0.729 0.766 0.797 0.823 0.846 0.866 0.882 0.897 0.909 0.920 0.930 0.938 0.945 0.951]
+ff1_poes = transpose(ff1_poes)
+ff_imls = {"ff1"=>ff1_imls}
+ff_poes = {"ff1"=>ff1_poes}
+
+tax_ff_map = {"tax1"=>["ff1"]}
+taxonomies = keys(tax_ff_map)
+
+include("write_jld.jl")

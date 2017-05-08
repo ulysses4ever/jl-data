@@ -1,0 +1,165 @@
+function getSolver(url,token,name)
+	#url = 'https://192.168.80.2/sapi'
+	#token = '762b3f670c073c495203acb7a7f530b4456a09aa'
+	remote_connection = dwave_sapi.RemoteConnection(url,token)
+	#solver_names =  remote_connection[:solver_names]()
+	solver = remote_connection[:get_solver](name)
+	return solver
+end
+
+function getAdjacency(solver,M=8,N=8,dimV=4)
+  A=dwave_sapi.get_hardware_adjacency(solver)
+  things = (Int64,Int64)[]
+  for x in A
+    push!(things,x)
+  end
+  adjMatrix = zeros(Bool,2*M*N*dimV,2*M*N*dimV)
+  for x in things
+    adjMatrix[x[1]+1,x[2]+1]=true
+  end
+  return adjMatrix
+end
+
+
+function dw_find_embedding(dwi,solver)
+  h = dwi.h
+  J = cast_to_upper_triangular(dwi.J)
+  adjMat = int(J.!=0)
+  h2,J2 = ri_help.numpy2hJ(h,J)
+  adj = dwave_sapi.get_hardware_adjacency(solver)
+  adjMat_embed = getAdjacency(solver)
+  #nq = sum(getUsedQubits(zeros(Int64,size(adjMat_embed,1)),int(adjMat_embed)))
+  embedding = dwave_sapi.find_embedding(J2,size(J,1),adj,size(adjMat_embed,1))
+  jl_embedding = Vector{Int64}[]
+  for i=1:length(embedding)
+   push!(jl_embedding,[int(x)+1 for x in embedding[i]]) # +1 moves from 0 indexing in Python to 1 in Julia.
+  end
+  return SAPIEmbedding(jl_embedding,sparse(adjMat),sparse(adjMat_embed))
+end
+
+function solve_ising(solver,dwi;anneal_time_per_run=20,programming_thermalization_time=20000,
+                     readout_thermalization_time=10,answer_mode="raw",numreads = 10^4)
+  hmat=dwi.h
+  Jmat=full(dwi.J)
+  h,J=ri_help.numpy2hJ(hmat,Jmat)
+  answer=dwave_sapi.solve_ising(solver,h,J,num_reads=numreads, auto_scale=false,
+                                programming_thermalization_time=programming_thermalization_time,
+                                readout_thermalization_time=readout_thermalization_time,
+                                answer_mode=answer_mode,
+                                anneal_time_per_run=anneal_time_per_run)
+  energies=answer["energies"]
+  solutions=answer["solutions"]'
+  usedQubits = zeros(Bool,size(solutions,1))
+  usedQubits[find(solutions[:,1].!=3)] = true
+  solutions[solutions.==3]=0 # unused=0
+  solutions[solutions.<0]=0 # -1 = 0
+  timing = answer["timing"]
+  solutions=bitpack(solutions)
+  return energies,solutions,timing,usedQubits
+end
+
+function runProgrammingCycle(solver,dwi,tann,numReads)
+  energies = nothing
+  solutions = nothing
+  timing = nothing
+  usedQubits = nothing
+  while energies == nothing
+    try
+      energies,solutions,timing,usedQubits = solve_ising(solver,dwi;anneal_time_per_run = tann,numreads=numReads)
+    catch y
+      if isa(y,InterruptException)
+        throw(InterruptException())
+      else
+        println(y)
+      end
+    end
+  end
+  d = time() # d for date, meh.
+  return energies,solutions,timing,usedQubits,d
+end
+
+
+function runInstance(url,token,name,dwi,savepath,embeddings,rescale=false,skip=true,numReads=10^4,tanns=[20])
+  # embeddings is a vector of embeddings, for simplicity
+  solver = None #getSolver(url,token,name)
+  while solver == None
+    try
+      solver=getSolver(url,token,name)
+    catch y
+      if isa(y,InterruptException)
+        throw(InterruptException())
+      end
+    end
+  end
+  progcycles = (Union(Embedding,Vector{Embedding}),Int64)[]
+  run_progcycles = (Union(Embedding,Vector{Embedding}),Int64)[]
+  for embedding in embeddings
+    for tann in tanns
+      push!(progcycles,(embedding,tann))
+    end
+  end
+  if haskey(dwi.properties,:filename)
+    fn = savepath*dwi.properties[:filename]*".jld"
+  else
+    fn = savepath*string(hash(dwi))*".jld"
+  end
+  hasold = isfile(fn)
+  if hasold
+    progcycles_old = load(fn,"progcycles")
+    timing_old = load(fn,"timing")
+    Es_old = load(fn,"energies")
+    sols_old = load(fn,"solutions")
+    dates_old = load(fn,"dates")
+    for progcycle in progcycles
+      if sum(progcycle.==progcycles_old)==0
+        push!(run_progcycles,progcycle) #unique across all if skip
+        push!(progcycles_old,progcycle)
+      end
+    end
+  else
+    for progcycle in progcycles
+      if sum(progcycle.==run_progcycles)==0
+        push!(run_progcycles,progcycle) # unique if skip
+      end
+    end
+  end
+  if !skip
+    run_progcycles = copy(progcycles) # run everybody if not skip
+  end
+  if length(run_progcycles)>0
+    h=dwi.h
+    J=cast_to_upper_triangular(dwi.J)
+    props=dwi.properties
+    files = readdir(savepath)
+    embed1 = applyEmbedding(run_progcycles[1][1],dwi)
+    usedQubits = getUsedQubits(embed1)
+    nq = size(embed1.h,1)
+    num_cycles = length(run_progcycles)
+    Es = zeros(typeof(embed1.J[1]),numReads,num_cycles)
+    solutions = bitpack(zeros(Bool,nq,numReads,num_cycles))
+    timing = Dict[]
+    date_run = zeros(Float64,num_cycles)
+    index = 1
+    for progcycle in run_progcycles
+      embedding,tann = progcycle
+      dwi_g = applyEmbedding(embedding,dwi)
+      eg,sg,tg,ug,dg = runProgrammingCycle(solver,dwi_g,tann,numReads)
+      (usedQubits!=ug) && error("Mismatched qubits between problem and programming cycle, wtf?")
+      #eg2,sg2 = reverseEmbedding(embedding,dwi,eg,sg)
+      Es[:,index]=eg
+      solutions[:,:,index]=sg
+      push!(timing,tg)
+      date_run[index] = dg
+      index+=1
+    end
+    if hasold
+      progcycles = vcat(progcycles_old,run_progcycles)
+      Es = cat(2,Es_old,Es)
+      solutions = cat(3,sols_old,solutions)
+      date_run = vcat(dates_old,date_run)
+      timing = vcat(timing_old,timing)
+    end
+    save(fn,["progcycles"=>progcycles,"energies"=>Es,"solutions"=>solutions,"dates"=>date_run,"timing"=>timing,"instance"=>dwi])
+  end
+  return nothing
+end

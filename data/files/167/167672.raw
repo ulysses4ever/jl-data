@@ -1,0 +1,360 @@
+module Sudoku
+
+import Base: show, getindex, setindex!, ndims, size
+export SudokuBoard
+
+abstract SudokuStrategy
+immutable FindSingleStrategy <: SudokuStrategy end
+immutable FindHiddenSingleStrategy <: SudokuStrategy end
+immutable FindNakedPairStrategy <: SudokuStrategy end
+
+const FindSingle = FindSingleStrategy()
+const FindHiddenSingle = FindHiddenSingleStrategy()
+const FindNakedPair = FindNakedPairStrategy()
+
+type SudokuBoard
+    puzzle::Matrix{Int}
+    solution::Matrix{Int}
+    solutionround::Matrix{Int}
+    possibilities::Array{Int, 3}
+    round::Int
+
+    function SudokuBoard(puzzle::Matrix{Int})
+        size(puzzle) == (9, 9) || error("Only 9×9 boards are supported")
+        sb = new(copy(puzzle), zeros(puzzle), zeros(puzzle), zeros(Int, 9, 9, 9), 1)
+        markgiven!(sb)
+        sb
+    end
+end
+
+function convertpuzzle(puzzle::String)
+    puzzle = replace(replace(puzzle, r"[^0-9.]", ""), ".", "0")
+    reshape([parseint(c) for c in puzzle], 9, 9)'
+end
+
+function SudokuBoard(puzzle::String)
+    SudokuBoard(convertpuzzle(puzzle))
+end
+
+function _show(io::IO, board::Matrix{Int})
+    for i = 1:size(board, 1)
+        i in (4, 7) && println(io, join(["-"^7 for k=1:3], "+"))
+
+        row = board[i,:]
+        println(" "*replace(join([join(row[k:k+2], " ") for k=1:3:9], " | "), "0", ".")*" ")
+    end
+end
+
+function show(io::IO, sb::SudokuBoard)
+    _show(io, sb.solution)
+end
+
+function section(i::Int, j::Int)
+    return range(div(i-1, 3)*3 + 1, 3), range(div(j-1, 3)*3 + 1, 3)
+end
+
+function section(ind::Int)
+    return range(rem(ind-1, 3)*3 + 1, 3), range(div(ind-1, 3)*3 + 1, 3)
+end
+
+ndims(sb::SudokuBoard) = ndims(sb.solution)
+size(sb::SudokuBoard) = size(sb.solution)
+size(sb::SudokuBoard, d) = size(sb.solution, d)
+getindex(sb::SudokuBoard, inds...) = sb.solution[inds...]
+
+function setindex!(sb::SudokuBoard, v::Int, i::Int, j::Int)
+    s = sb.solution
+    sr = sb.solutionround
+    p = sb.possibilities
+
+    s[i,j] == v && return v
+    s[i,j] != 0 && error("Marking position ($i, $j) that already has been set to $(s[i, j])")
+    s[i,j] = v
+
+    sr[i,j] != 0 && error("Marking position ($i, $j) that was marked another round $(sr[i,j]).")
+    sr[i,j] = sb.round
+
+    # Perform elimination.
+    p[i,j,v] != 0 && error("Marking impossible position ($i, $j) to $v")
+    # Eliminate row.
+    for ri=1:9
+        if p[ri,j,v] == 0
+            p[ri,j,v] = sb.round
+        end
+    end
+
+    # Eliminate column.
+    for ci=1:9
+        if p[i,ci,v] == 0
+            p[i,ci,v] = sb.round
+        end
+    end
+
+    # Eliminate section.
+    ri, rj = section(i, j)
+    for si in ri, sj in rj
+        if p[si,sj,v] == 0
+            p[si,sj,v] = sb.round
+        end
+    end
+
+    # Eliminate itself.
+    for vi=1:9
+        if p[i,j,vi] == 0
+            p[i,j,vi] = sb.round
+        end
+    end
+end
+
+setindex!(sb::SudokuBoard, v::Int, ind::Int) = setindex!(sb, v, ind2sub(size(sb), ind)...)
+
+function markgiven!(sb::SudokuBoard)
+    for i=1:9, j=1:9
+        v = sb.puzzle[i,j]
+        if v != 0
+            sb[i,j] = v
+        end
+    end
+end
+
+issolved(sb::SudokuBoard) = findfirst(sb.solution, 0) == 0
+
+function isimpossible(sb::SudokuBoard)
+    s = sb.solution
+    p = sb.possibilities
+    for i=1:9, j=1:9
+        s[i,j] == 0 && findfirst(p[i,j,:], 0) == 0 && return true
+    end
+    return false
+end
+
+_ind2sub(ind) = ind2sub((9, 9), ind)
+_sub2ind(sub...) = sub2ind((9, 9), sub...)
+
+samerow(i1, j1, i2, j2) = i1 == i2
+samerow(ind1, ind2) = samerow(_ind2sub(ind1)..., _ind2sub(ind2)...)
+
+samecol(i1, j1, i2, j2) = j1 == j2
+samecol(ind1, ind2) = samecol(_ind2sub(ind1)..., _ind2sub(ind2)...)
+
+samesec(i1, j1, i2, j2) = section(i1, j1) == section(i2, j2)
+samesec(ind1, ind2) = samesec(_ind2sub(ind1)..., _ind2sub(ind2)...)
+
+countpossibilities(sb::SudokuBoard, i, j) = 9 - countnz(sb.possibilities[i,j,:])
+countpossibilities(sb::SudokuBoard, ind) = countpossibilities(sb, _ind2sub(ind)...)
+
+samepossibilities(sb::SudokuBoard, i1, j1, i2, j2) = (sb.possibilities[i1,j1,:] .== 0) == (sb.possibilities[i2,j2,:] .== 0)
+samepossibilities(sb::SudokuBoard, ind1, ind2) = samepossibilities(sb, _ind2sub(ind1)..., _ind2sub(ind2)...)
+
+function removepossibilities(sb::SudokuBoard, i1, j1, i2, j2)
+    p = sb.possibilities
+    ans = false
+    for k = 1:9
+        if p[i1,j1,k] == 0 && p[i2,j2,k] == 0
+            p[i1,j1,k] = sb.round
+            ans = true
+        end
+    end
+    ans
+end
+
+function solvewithstrategy!(sb::SudokuBoard, ::FindSingleStrategy)
+    s = sb.solution
+    p = sb.possibilities
+    for i=1:9, j=1:9
+        if s[i,j] == 0
+            v = findfirst(p[i,j,:], 0)
+            if v > 0 && findnext(p[i,j,:], 0, v+1) == 0
+                sb[i,j] = v
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function solvewithstrategy!(sb::SudokuBoard, ::FindHiddenSingleStrategy)
+    s = sb.solution
+    p = sb.possibilities
+    for v=1:9
+        # Section
+        for si=1:9
+            ri, rj = section(si)
+            k = findfirst(p[ri,rj,v], 0)
+            if k > 0 && findnext(p[ri,rj,v], 0, k+1) == 0
+                i, j = ind2sub((3, 3), k)
+                sb[ri.start+i-1, rj.start+j-1] = v
+                return true
+            end
+        end
+
+        # Row
+        for i=1:9
+            j = findfirst(p[i,:,v], 0)
+            if j > 0 && findnext(p[i,:,v], 0, j+1) == 0
+                sb[i,j] = v
+                return true
+            end
+        end
+
+        # Column
+        for j=1:9
+            i = findfirst(p[:,j,v], 0)
+            if i > 0 && findnext(p[:,j,v], 0, i+1) == 0
+                sb[i,j] = v
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function solvewithstrategy!(sb::SudokuBoard, ::FindNakedPairStrategy)
+    s = sb.solution
+    p = sb.possibilities
+    ans = false
+    for pos1 = 1:9*9
+        countpossibilities(sb, pos1) == 2 || continue
+
+        for pos2 = pos1+1:9*9
+            countpossibilities(sb, pos2) == 2 || continue
+            samepossibilities(sb, pos1, pos2) || continue
+
+            if samerow(pos1, pos2)
+                i, j1 = _ind2sub(pos1)
+                i, j2 = _ind2sub(pos2)
+                for j3 = 1:9
+                    if j3 != j1 && j3 != j2 && removepossibilities(sb, i, j3, i, j1)
+                        ans = true
+                    end
+                end
+                ans && return ans
+            elseif samecol(pos1, pos2)
+                i1, j = _ind2sub(pos1)
+                i2, j = _ind2sub(pos2)
+                for i3 = 1:9
+                    if i3 != i1 && i3 != i2 && removepossibilities(sb, i3, j, i1, j)
+                        ans = true
+                    end
+                end
+                ans && return ans
+            elseif samesec(pos1, pos2)
+                i1, j1 = _ind2sub(pos1)
+                i2, j2 = _ind2sub(pos2)
+                ri, rj = section(i1, j1)
+                for i3 in ri, j3 in rj
+                    pos3 = _sub2ind(i3, j3)
+                    if pos3 != pos1 && pos3 != pos2 && removepossibilities(sb, i3, j3, i1, j1)
+                        ans = true
+                    end
+                end
+                ans && return ans
+            end
+        end
+    end
+    return ans
+end
+
+function solvewithstrategies!(sb::SudokuBoard)
+    solvewithstrategy!(sb, FindSingle) && return true
+    solvewithstrategy!(sb, FindHiddenSingle) && return true
+    # solvewithstrategy!(sb, FindNakedPair) && return true
+    return false
+end
+
+function findcellwithminimumpossibilities(sb::SudokuBoard)
+    s = sb.solution
+    p = sb.possibilities
+    bestcount = -1
+    besti, bestj = 0, 0
+    for i=1:9, j=1:9
+        if s[i,j] == 0
+            c = countnz(p[i,j,:])
+            if c > bestcount
+                bestcount = c
+                besti, bestj = i, j
+            end
+        end
+    end
+    return besti, bestj
+end
+
+function rollback!(sb::SudokuBoard)
+    s = sb.solution
+    sr = sb.solutionround
+    p = sb.possibilities
+
+    for i=1:length(sr)::Int
+        if sr[i] == sb.round
+            sr[i] = 0
+            s[i] = 0
+        end
+    end
+
+    p[p.==sb.round] = 0
+
+    sb.round -= 1
+end
+
+function solve!(sb::SudokuBoard)
+    while solvewithstrategies!(sb)
+        issolved(sb) && return true
+        isimpossible(sb) && return false
+    end
+
+    s = sb.solution
+    p = sb.possibilities
+    while true
+        i, j = findcellwithminimumpossibilities(sb)
+        i == 0 && j == 0 && return true
+        for k=1:9
+            if p[i,j,k] == 0
+                # Set (i,j) to k is possible.
+                sb.round += 1
+                sb[i,j] = k
+                if !isimpossible(sb) && solve!(sb)
+                    return true
+                else
+                    rollback!(sb)
+                end
+            end
+        end
+        return false
+    end
+end
+
+function solve(puzzle)
+    sb = SudokuBoard(puzzle)
+    solve!(sb) ? sb : nothing
+end
+
+function verify(sb::SudokuBoard)
+    s = sb.solution
+    issolved(sb) || return false
+
+    # Verify rows
+    for i=1:9
+        slots = falses(9)
+        slots[s[i,:]] = true
+        all(slots) || return false
+    end
+
+    # Verify columns
+    for j=1:9
+        slots = falses(9)
+        slots[s[:,j]] = true
+        all(slots) || return false
+    end
+
+    # Verify sections
+    for si=1:9
+        ri, rj = section(si)
+        slots = falses(9)
+        slots[s[ri,rj]] = true
+        all(slots) || return false
+    end
+
+    return true
+end
+
+end

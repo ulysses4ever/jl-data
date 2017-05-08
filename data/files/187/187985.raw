@@ -1,0 +1,6 @@
+{"business_profile":{"address":"x","business_name":"Vincensini Jean-Jacques","city":"Aix en Provence","id":"","main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13100","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"La Belle Epoque","city":"Bordeaux","id":"","main_phone":"0","website":"http://www.xpto.fr/","zip_code":"33000","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"A.R.C.P.G","city":"AIX EN PROVENCE","id":"","main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13851","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"Les Molanès","business_name":"Chalet Hôtel Les Blancs","city":"Pra Loup","id":"","main_phone":"0","website":"http://www.xpto.fr/","zip_code":"04400","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"x","business_name":"Aix Conseil Expertise Comptable","city":"AIX EN PROVENCE","id":"","main_phone":"0","website":"http://www.xpto.fr/","zip_code":"13090","geo":[52.3396,4.96247]}}
+{"business_profile":{"address":"16 Rue Lamartine","business_name":"ESPACES VERTS JCC","city":"Champingy Sur Marne","id":"","main_phone":"0","website":"http://www.xpto.fr/","zip_code":"94500","geo":[52.3396,4.96247]}}

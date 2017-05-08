@@ -1,0 +1,55 @@
+using DataFrames, EventWindows
+using Base.Test
+
+
+bounds_windows = DataFrame(
+  window_start = [ -3, -2, 0, 0,  0,  5 ],
+  window_stop  = [ -1, -1, 1, 2, 10, 10 ]
+  )
+@test EventWindows.outofbounds(bounds_windows, -5, -4) == [ 1, 1, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows, -4, -2) == [ 1, 1, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows, -3, -2) == [ 1, 1, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows, -4, -1) == [ 0, 0, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows, -3, -1) == [ 0, 0, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows, -4,  2) == [ 0, 0, 0, 0, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows,  0,  2) == [ 1, 1, 0, 0, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows,  1,  2) == [ 1, 1, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows,  1, 10) == [ 1, 1, 1, 1, 1, 0 ]
+@test EventWindows.outofbounds(bounds_windows,  5, 10) == [ 1, 1, 1, 1, 1, 0 ]
+@test EventWindows.outofbounds(bounds_windows,  6, 10) == [ 1, 1, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows,  5, 12) == [ 1, 1, 1, 1, 1, 0 ]
+@test EventWindows.outofbounds(bounds_windows,  6, 12) == [ 1, 1, 1, 1, 1, 1 ]
+@test EventWindows.outofbounds(bounds_windows, -3, 10) == [ 0, 0, 0, 0, 0, 0 ]
+
+
+overlaps_windows = DataFrame(
+  window_start = [-5, -4, -4, -6, -8, -8, -1, 3, 5, 6],
+  window_stop  = [-3, -2, -3, -2, -5, -4,  3, 4, 5, 9],
+  overlaps     = [ 1,  1,  1,  1,  1,  1,  1, 1, 0, 0]
+  )
+@test EventWindows.overlaps(overlaps_windows) == overlaps_windows[:overlaps]
+
+avoid_windows = DataFrame(
+  window_start = [ -10, -6, -2, 3, 10 ],
+  window_stop  = [  -9, -6, -1, 4, 20 ]
+  )
+@test EventWindows.overlaps(overlaps_windows, avoid_windows) == [ 0, 1, 0, 1, 0, 0, 1, 1, 0, 0]
+
+
+tooclose_windows_1 = DataFrame(
+  window_start = [ 5 ],
+  window_stop  = [ 6 ]
+  )
+@test EventWindows.tooclose(tooclose_windows_1, 0) == [ 0 ]
+
+tooclose_windows_2 = DataFrame(
+  window_start = [ -5, -2, 6, 20, 206, 209 ],
+  window_stop  = [ -4,  0, 9, 25, 208, 211 ]
+  )
+@test EventWindows.tooclose(tooclose_windows_2, 0) == [ 0, 0, 0, 0, 0, 0 ]
+@test EventWindows.tooclose(tooclose_windows_2, 1) == [ 0, 0, 0, 0, 1, 1 ]
+@test EventWindows.tooclose(tooclose_windows_2, 2) == [ 1, 1, 0, 0, 1, 1 ]
+@test EventWindows.tooclose(tooclose_windows_2, 3) == [ 1, 1, 0, 0, 1, 1 ]
+@test EventWindows.tooclose(tooclose_windows_2, 5) == [ 1, 1, 0, 0, 1, 1 ]
+@test EventWindows.tooclose(tooclose_windows_2, 6) == [ 1, 1, 1, 0, 1, 1 ]
+@test EventWindows.tooclose(tooclose_windows_2, 12) == [ 1, 1, 1, 1, 1, 1 ]

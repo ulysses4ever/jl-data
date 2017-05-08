@@ -1,0 +1,108 @@
+# === NOTES =================================
+
+# -- 1 ---------------------------
+# additional steps that might be required
+
+# > sudo apt-get install hdf5-tools
+# --- restart the Julia environment
+# Pkg.build("HDF5")
+
+# -- ERRORS ---------------------
+# --- error: with method missing
+# Pkg.add("Gtk")
+# see --> https://github.com/timholy/ImageView.jl/issues/62
+
+
+
+# === Packages needed =========================
+Pkg.add("MAT")
+Pkg.add("Images")
+Pkg.add("ImageView")
+Pkg.add("Optim")
+
+# === Usings ==================================
+using MAT
+using Images
+using ImageView
+using Optim
+
+# === MAIN ====================================
+
+input_layer_size = 400 # 20 x 20 images
+hidden_layer_size = 25 # 25 hidden units
+num_labels = 10        # 10 labels, digits from 0 - 9 where 0 is indexed by 10. (Array indexs in Julia start from 1 not 0)
+
+# --- load data from the given matlab files ---
+path = "/media/sf_JuliaScripts/ex4/"
+
+raw_data = matread("$(path)ex4data1.mat")
+raw_weights = matread("$(path)ex4weights.mat")
+
+# get the data from the matlab file variables
+X = raw_data["X"]
+y = raw_data["y"]
+Theta1 = raw_weights["Theta1"]
+Theta2 = raw_weights["Theta2"]
+params = [Theta1[:], Theta2[:]]
+
+m = size(X, 1)
+
+# randomly select 100 data points to display
+random_selection = randperm(m)[1:100]
+
+X_display = X[random_selection, :]
+displayData(X_display)
+
+# simple test of the computeCost function.
+# This is just to see if the feedforward part works.
+lambda = 0
+J = costFunction(params, input_layer_size, hidden_layer_size, num_labels, X, y, lambda)
+println("Expected: 0.287629\nResult: $(J)")
+
+# next test of the computeCost function.
+# This checks if the feedforward regularization works correctly
+lambda = 1
+J = costFunction(params, input_layer_size, hidden_layer_size, num_labels, X, y, lambda)
+println("Expected: 0.383770\nResult: $(J)")
+
+# evaluate the sigmoid gradient
+sig_grad_test = [1 -0.5 0 0.5 1]
+g = sigmoidGradient(sig_grad_test)
+println("Sigmoid gradient of $(sig_grad_test) : $(g)")
+
+# checking neural network implementation without regularization
+checkNNGradients(0)
+
+# checking neural network implementation with regularization
+checkNNGradients(3)
+
+
+# initialize the weights(theta values) for the hidden layers
+initial_Theta1 = randInitializeWeights(input_layer_size, hidden_layer_size)
+initial_Theta2 = randInitializeWeights(hidden_layer_size, num_labels)
+
+initial_params = [initial_Theta1[:], initial_Theta2[:]]
+output_params = zeros(size(initial_params))
+
+# train the neural network
+lambda = 0.1
+f = (p) -> costFunction(p, input_layer_size, hidden_layer_size, num_labels, X, y, lambda)
+g = (p_in, p_storage) -> gradientFunction(p_in, p_storage, input_layer_size, hidden_layer_size, num_labels, X, y, lambda)
+
+opt_result = optimize(f, g, initial_params, method = :cg, iterations = 30)
+
+min_params = opt_result.minimum
+
+Theta1 = reshape(min_params[1:hidden_layer_size * (input_layer_size + 1)],
+                   hidden_layer_size, (input_layer_size + 1))
+
+Theta2 = reshape(min_params[1 + (hidden_layer_size * (input_layer_size + 1)):end],
+                   num_labels, (hidden_layer_size + 1))
+
+# display the hidden layer
+displayData(Theta1[:, 2:end])
+displayData(Theta2[:, 2:end])
+
+# calculate the prediction based on the training data
+pred = predict(Theta1, Theta2, X)
+accuracy = mean(pred .== y ) * 100

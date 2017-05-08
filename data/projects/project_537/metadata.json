@@ -1,15 +1,18 @@
-HTTP/1.1 301 Moved Permanently
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:45 GMT
+Date: Wed, 03 May 2017 20:53:41 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 168
-Status: 301 Moved Permanently
+Content-Length: 5393
+Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3034
-X-RateLimit-Reset: 1493318926
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
-X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo_deployment, write:repo_hook
-Location: https://api.github.com/repositories/52822399
+X-RateLimit-Remaining: 4713
+X-RateLimit-Reset: 1493848245
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "fca1715e614864339c88b5098395a0f8"
+Last-Modified: Fri, 29 Jan 2016 23:36:04 GMT
+X-OAuth-Scopes: repo
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
@@ -18,12 +21,101 @@ Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
 X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
-Vary: Accept-Encoding
-X-Served-By: 77fbfb53269bbb85f82f23584d59f7c1
-X-GitHub-Request-Id: B548:6631:864A6C:AD7431:590231CD
+X-GitHub-Request-Id: 2213:5CA3:FE5707:1470415:590A4355
 
 {
-  "message": "Moved Permanently",
-  "url": "https://api.github.com/repositories/52822399",
-  "documentation_url": "https://developer.github.com/v3/#http-redirects"
+  "id": 50698600,
+  "name": "simple-ml-model",
+  "full_name": "dwd31415/simple-ml-model",
+  "owner": {
+    "login": "dwd31415",
+    "id": 7027000,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/7027000?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dwd31415",
+    "html_url": "https://github.com/dwd31415",
+    "followers_url": "https://api.github.com/users/dwd31415/followers",
+    "following_url": "https://api.github.com/users/dwd31415/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dwd31415/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dwd31415/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dwd31415/subscriptions",
+    "organizations_url": "https://api.github.com/users/dwd31415/orgs",
+    "repos_url": "https://api.github.com/users/dwd31415/repos",
+    "events_url": "https://api.github.com/users/dwd31415/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dwd31415/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/dwd31415/simple-ml-model",
+  "description": null,
+  "fork": false,
+  "url": "https://api.github.com/repos/dwd31415/simple-ml-model",
+  "forks_url": "https://api.github.com/repos/dwd31415/simple-ml-model/forks",
+  "keys_url": "https://api.github.com/repos/dwd31415/simple-ml-model/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/dwd31415/simple-ml-model/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/dwd31415/simple-ml-model/teams",
+  "hooks_url": "https://api.github.com/repos/dwd31415/simple-ml-model/hooks",
+  "issue_events_url": "https://api.github.com/repos/dwd31415/simple-ml-model/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/dwd31415/simple-ml-model/events",
+  "assignees_url": "https://api.github.com/repos/dwd31415/simple-ml-model/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/dwd31415/simple-ml-model/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/dwd31415/simple-ml-model/tags",
+  "blobs_url": "https://api.github.com/repos/dwd31415/simple-ml-model/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/dwd31415/simple-ml-model/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/dwd31415/simple-ml-model/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/dwd31415/simple-ml-model/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/dwd31415/simple-ml-model/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/dwd31415/simple-ml-model/languages",
+  "stargazers_url": "https://api.github.com/repos/dwd31415/simple-ml-model/stargazers",
+  "contributors_url": "https://api.github.com/repos/dwd31415/simple-ml-model/contributors",
+  "subscribers_url": "https://api.github.com/repos/dwd31415/simple-ml-model/subscribers",
+  "subscription_url": "https://api.github.com/repos/dwd31415/simple-ml-model/subscription",
+  "commits_url": "https://api.github.com/repos/dwd31415/simple-ml-model/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/dwd31415/simple-ml-model/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/dwd31415/simple-ml-model/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/dwd31415/simple-ml-model/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/dwd31415/simple-ml-model/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/dwd31415/simple-ml-model/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/dwd31415/simple-ml-model/merges",
+  "archive_url": "https://api.github.com/repos/dwd31415/simple-ml-model/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/dwd31415/simple-ml-model/downloads",
+  "issues_url": "https://api.github.com/repos/dwd31415/simple-ml-model/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/dwd31415/simple-ml-model/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/dwd31415/simple-ml-model/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/dwd31415/simple-ml-model/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/dwd31415/simple-ml-model/labels{/name}",
+  "releases_url": "https://api.github.com/repos/dwd31415/simple-ml-model/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/dwd31415/simple-ml-model/deployments",
+  "created_at": "2016-01-29T23:35:28Z",
+  "updated_at": "2016-01-29T23:36:04Z",
+  "pushed_at": "2016-01-31T12:39:26Z",
+  "git_url": "git://github.com/dwd31415/simple-ml-model.git",
+  "ssh_url": "git@github.com:dwd31415/simple-ml-model.git",
+  "clone_url": "https://github.com/dwd31415/simple-ml-model.git",
+  "svn_url": "https://github.com/dwd31415/simple-ml-model",
+  "homepage": null,
+  "size": 62,
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": false,
+  "forks_count": 0,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 0,
+  "open_issues": 0,
+  "watchers": 0,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 0,
+  "subscribers_count": 1
 }

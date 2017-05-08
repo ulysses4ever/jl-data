@@ -1,0 +1,22 @@
+#! /usr/bin/julia
+
+# Rosetta Code, Handle a signal
+
+ccall(:jl_exit_on_sigint, Void, (Cint,), 0)
+tic()
+ticks = 0
+try
+    while true
+        sleep(0.5)
+        ticks += 1
+        println(ticks)
+    end
+end
+println()
+toc()
+
+
+    
+
+
+    

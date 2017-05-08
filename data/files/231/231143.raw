@@ -1,0 +1,121 @@
+function generate_reads(;N=100,W=21,L=100,Cprob=[0.3, 0.7],alpha=1,beta=1,targ_dist=NaN)
+	# Generate synthetic data of overlapping reads
+    # -----------------------------
+    # N = number of reads
+    # W = methylation sites per read
+    # L = number of methylation-eligible sites
+    # Cprob = array listing the proportions of cell types
+    # alpha/beta = parameters for beta distribution (prior)
+    A = fill(NaN,(N,L))
+    c = zeros(Int,N)
+    nC = length(Cprob) # number of cell types
+    cumC = cumsum(Cprob) - Cprob[1]
+
+    if isnan(targ_dist)
+        # generate random methylation probabilities
+        #P = rand(Beta(alpha,beta),(nC,L))
+        P = rand((nC,L))
+    else
+        # generate probabilities that have specified distance
+        assert(nC == 2) 
+        P = generate_patterns_JSdist(L,targ_dist)
+    end
+
+    if floor(W/2) == W/2
+    	W += 1 # make sure W is odd
+    end
+
+    for i = 1:N
+    	m = rand(1:L) # middle point of read
+    	c[i] = find((i/N) .> cumC)[end] # current cluster
+    	s1 = maximum([1,m-floor(W/2)])
+    	s2 = minimum([L,m+floor(W/2)])
+
+    	for w = s1:s2
+    		if rand(Bernoulli(P[c[i],w])) == 1
+    			A[i,w] = 1.0
+    		else
+    			A[i,w] = -1.0
+    		end
+    	end
+    end
+
+    A,c = sort_reads(A,c)
+    obs = find_observations(A)
+    return A,P,c,obs
+end
+
+function find_observations(A)
+    # Return list of indices of non-Nan elements in A
+    # -----------------------------
+    # A = N x L matrix of reads (with missing entries)
+    # returns 
+    m,n = size(A)
+    obs = (Int64,Int64)[]
+    for i = 1:m
+        for j = 1:n
+            if ~isnan(A[i,j])
+                push!(obs,(i,j))
+            end
+        end
+    end
+    return obs
+end
+
+function sort_reads(A,c::Vector{Int})
+    # Sort rows of A based on cluster assignment c
+    # -----------------------------
+    # A = N x L matrix of reads (with missing entries)
+    # c = Vector holding cluster assignments for each row of A
+    nc = int(maximum(c)) # number of clusters
+    N,W = size(A)
+    ind = sortperm(c)
+    #A = A[ind,:]
+    #c = c[ind]
+
+    # sort by position
+    ind = Int64[]
+    n = 1
+    for ic = 1:nc
+        J = Int64[] # array holding first non-NaN element of each row
+        while n <= N && c[n] == ic
+            push!(J,find(!isnan(A[n,:]))[1])
+            n += 1
+        end
+        ind = vcat(ind,sortperm(J,rev=true)+length(ind))
+    end
+
+    return A[ind,:],c[ind]
+end
+
+function generate_patterns_JSdist(n,targ_dist;max_iter=20)
+    ## n = number of methylation sites
+    ## targ_dist = target Jensen-Shannon divergence
+    ## returns two vectors, p1 and p2 with target Jensen-Shannon divergence
+    function f(x::Vector)
+        impose_bounds!(x)
+        return abs(d_js_multivar_bern(x[1:end/2],x[1+end/2:end]))
+    end
+    df = Optim.autodiff(x->abs(f(x)-targ_dist), Float64, n*2)
+    
+    converged = false
+    iter = 0
+    y = NaN
+    while !converged && iter < max_iter
+        try
+            y = fminbox(df,rand(n*2),zeros(n*2),ones(n*2))
+            converged = true
+        catch
+            println("didnt converge, trying again")
+            iter +=1
+        end
+    end
+    if converged
+        p1,p2 = y.minimum[1:end/2],y.minimum[1+end/2:end]
+        return [p1'; p2']
+    else
+        error("Unable to find solution")
+    end
+end
+
+

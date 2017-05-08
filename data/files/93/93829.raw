@@ -1,0 +1,30 @@
+type UtilityFunction
+	def::String
+end
+
+type Move
+	id::Int
+	name::String 
+end
+
+type Node 
+	id::Int 
+	name::String 
+	moves::Array{Move, 1}
+end
+
+type Player
+	id::Int
+	name::String 
+	nodes::Array{Node,1}
+	utilityfunctions::Array(UtilityFunction, 1)
+end
+
+Players = Player[]
+
+push!(Players, Player(1,"Mike", Node[]))
+push!(Players[1].nodes, Node(1,"Node1",Move[]))
+
+Players[1].name = "Alex"
+Players[1]
+Players[1].nodes[1].name

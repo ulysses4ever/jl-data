@@ -1,0 +1,14 @@
+#using Collections
+
+d= Dict{ASCIIString, Any}()
+postprocessing=get!(d, "postprocessing", Dict{ASCIIString, Any}())
+show(postprocessing)
+gv=get(postprocessing, "gv", nothing)
+if (gv== nothing)
+    gv=1
+    setindex!(postprocessing, gv, "gv")
+end
+gv=get(postprocessing, "gv", nothing)
+show(gv)
+
+missing=get(error("Must get fens!"), postprocessing, "nothere")

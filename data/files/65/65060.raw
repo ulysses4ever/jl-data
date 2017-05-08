@@ -1,0 +1,5 @@
+A = example4()
+
+L = cholesky(A)
+
+@test A ≈ L*L'

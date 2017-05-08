@@ -1,0 +1,88 @@
+#include("config.jl")
+#include("preallocation.jl")
+#include("genotype.jl")
+#include("population.jl")
+include("evolution_driver.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function walk()
+
+    SEARCH_DEPTH = 200
+    NUM_MUTANTS = 100000
+
+    (config_vals, best_genotype) = evolve(parse(Int, ARGS[1]))
+    println("walking")
+    population::Population.Type_Population = Population.make_population(config_vals)    
+    dummy_genotype = Genotype.make_random_genotype(config_vals)
+    dummy_genotype2 = Genotype.make_random_genotype(config_vals)
+    target_number = 1
+
+    frequencies = zeros(Int, length(config_vals.logic_network_outputs[:,1]), 4)
+    
+    for i = 1:10000
+        Genotype.copy_into(dummy_genotype, best_genotype)
+        Genotype.mutate_at_global_rate(dummy_genotype, config_vals)
+        Genotype.evaluate(dummy_genotype, config_vals, 1, 1, population.preallocation)
+        
+        for j = 1:length(dummy_genotype.all_targets_fitnesses)
+            if dummy_genotype.all_targets_fitnesses[j] >= 13.0
+                frequencies[j, round(Int, dummy_genotype.all_targets_fitnesses[j] - 12)] += 1
+            end
+        end
+        
+    end
+    
+    println(frequencies)
+
+    fitness_level = 0
+    for i = 1:4
+        level_good = true
+        for j = 1:length(config_vals.logic_network_outputs[:, 1])
+            if frequencies[j, i] < 1
+                level_good = false
+            end
+        end
+        if level_good
+            fitness_level = i
+        end
+    end
+
+    println("level ", fitness_level)
+
+    target_number = 2
+    fitness_level += 12
+    Genotype.copy_into(dummy_genotype2, best_genotype)
+
+    for k = 1:SEARCH_DEPTH
+        if target_number == 2
+            target_number = 1
+        else
+            target_number = 2
+        end
+        Genotype.copy_into(dummy_genotype, dummy_genotype2)
+        l = 0
+        for l = 1:NUM_MUTANTS
+            Genotype.copy_into(dummy_genotype2, dummy_genotype)
+            Genotype.mutate_at_global_rate(dummy_genotype2, config_vals)
+            Genotype.evaluate(dummy_genotype2, config_vals, target_number, 1, population.preallocation)
+            if dummy_genotype2.fitness == fitness_level
+                break
+            end
+        end
+        if l == NUM_MUTANTS
+            println("failed mutants")
+            break
+        else
+            println(l)
+        end
+    end
+
+end
+
+walk()

@@ -1,0 +1,28 @@
+abstract RDD
+abstract TranslateRDD <: RDD
+abstract ActionRDD <: RDD
+abstract SourceRDD <: RDD
+
+abstract Split
+
+type ListRDD <: SourceRDD
+    splits:: Vector
+    dependencies:: Vector
+    preferred_locations:: Vector
+
+    function ListRDD(vec_data:: Vector, split_num:: UInt = 1)
+        new()
+    end
+end
+
+type TextFileRDD <: SourceRDD
+end
+
+type MappedRDD <: TranslateRDD
+end
+
+type FilterRDD <: TranslateRDD
+end
+
+type FlatMappedRDD <: TranslateRDD
+end

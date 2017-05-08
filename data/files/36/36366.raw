@@ -1,0 +1,325 @@
+"""
+Represents a sample stream, which could be a physical device like a sound card,
+or a network audio stream, audio file, etc.
+"""
+abstract SampleStream{T}
+
+"""
+Represents a source of samples, such as an audio file or microphone input.
+
+Subtypes should implement the `samplerate`, `nchannels`, and `unsafe_read!`
+methods. `unsafe_read!` can assume that the samplerate, channel count, and
+element type are all matching.
+"""
+abstract SampleSource{T <: Real} <: SampleStream{T}
+
+"""
+unsafe_read!(source::SampleSource, buf::SampleBuf)
+
+Reads samples from the given source to the given buffer, assuming that the
+channel count, sampling rate, and element types are matching. This isn't called
+from user code, but is called by the `read!` (and likewise `read`) implementions
+in SampleTypes after it verifies that the buffer and sink are compatible, or
+possibly adds a conversion wrapper.
+"""
+function unsafe_read! end
+
+"""
+Represents a sink that samples can be written to, such as an audio file or
+headphone output.
+
+Subtypes should implement the `samplerate`, `nchannels`, and `unsafe_write`
+methods. `unsafe_write` can assume that the samplerate, channel count, and
+element type are all matching.
+"""
+abstract SampleSink{T <: Real} <: SampleStream{T}
+
+"""
+unsafe_write(sink::SampleSink, buf::SampleBuf)
+
+Writes the given buffer to the given sink, assuming that the channel count,
+sampling rate, and element types are matching. This isn't called from user code,
+but is called by the `write` implemention in SampleTypes after it verifies that
+the buffer and sink are compatible, or possibly adds a conversion wrapper.
+"""
+function unsafe_write end
+
+# audio interface methods
+
+Base.eltype{T}(stream::SampleStream{T}) = T
+
+# TODO: probably generalize to all units...
+toindex(stream::SampleSource, t::RealTime) = round(Int, t.val*samplerate(stream)) + 1
+
+# subtypes should only have to implement the `unsafe_read!` and `unsafe_write` methods, so
+# here we implement all the converting wrapper methods
+
+# when used as an amount of time to read, subtract one from the result of `toindex`
+Base.read(stream::SampleSource, t::RealTime) = read(stream, toindex(stream, t)-1)
+
+function Base.read(src::SampleSource, nframes::Integer)
+    buf = SampleBuf(eltype(src), samplerate(src), nframes, nchannels(src))
+    n = read!(src, buf)
+
+    buf[1:n, :]
+end
+
+const DEFAULT_BUFSIZE=4096
+
+function Base.write(sink::SampleSink, source::SampleSource, bufsize=DEFAULT_BUFSIZE)
+    if samplerate(sink) != samplerate(source)
+        sink = ResampleSink(sink, samplerate(source), bufsize)
+        # return write(srwrapper, source, bufsize)
+    end
+    
+    if eltype(sink) != eltype(source)
+        sink = ReformatSink(sink, eltype(source), bufsize)
+        # return write(fmtwrapper, source, bufsize)
+    end
+    
+    if nchannels(sink) != nchannels(source)
+        if nchannels(sink) == 1
+            sink = DownMixSink(sink, nchannels(source), bufsize)
+            # return write(downwrapper, source, bufsize)
+        elseif nchannels(source) == 1
+            sink = UpMixSink(sink, bufsize)
+            # return write(upwrapper, source, bufsize)
+        else
+            error("General M-to-N channel mapping not supported")
+        end
+    end
+    # looks like everything matches, now we can actually hook up the source
+    # to the sink
+    unsafe_write(sink, source, bufsize)
+end
+
+function unsafe_write(sink::SampleSink, source::SampleSource, bufsize=DEFAULT_BUFSIZE)
+    total = 0
+    buf = SampleBuf(eltype(source), samplerate(source), bufsize, nchannels(source))
+    while true
+        n = unsafe_read!(source, buf)
+        total += n
+        if n < bufsize
+            # this currently allocates a temporary buffer, so only do it when
+            # we need to
+            unsafe_write(sink, buf[1:n, :])
+            break
+        end
+        unsafe_write(sink, buf)
+    end
+    
+    total
+end
+
+function Base.write(sink::SampleSink, buf::SampleBuf)
+    if nchannels(sink) != nchannels(buf)
+        error("Channel count mismatch while writing buffer to sink")
+    end
+    if eltype(sink) != eltype(buf)
+        error("Element Type mismatch while writing buffer to sink")
+    end
+    if samplerate(sink) != samplerate(buf)
+        error("Sample rate mismatch while writing buffer to sink")
+    end
+    
+    unsafe_write(sink, buf)
+end
+
+function Base.read!(source::SampleSource, buf::SampleBuf)
+    if nchannels(source) != nchannels(buf)
+        error("Channel count mismatch while reading sink to buffer")
+    end
+    if eltype(source) != eltype(buf)
+        error("Element Type mismatch while reading sink to buffer")
+    end
+    if samplerate(source) != samplerate(buf)
+        error("Sample rate mismatch while reading sink to buffer")
+    end
+    
+    unsafe_read!(source, buf)
+end
+
+"""UpMixSink provides a single-channel sink that wraps a multi-channel sink.
+Writing to this sink copies the single channel to all the channels in the
+wrapped sink"""
+immutable UpMixSink{T, W <: SampleSink} <: SampleSink{T}
+    wrapped::W
+    buf::TimeSampleBuf{T}
+end
+
+function UpMixSink{W <: SampleSink}(wrapped::W, bufsize=DEFAULT_BUFSIZE)
+    N = nchannels(wrapped)
+    SR = samplerate(wrapped)
+    T = eltype(wrapped)
+    buf = SampleBuf(T, SR, bufsize, N)
+    
+    UpMixSink{T, W}(wrapped, buf)
+end
+
+samplerate(sink::UpMixSink) = samplerate(sink.wrapped)
+nchannels(sink::UpMixSink) = 1
+
+function unsafe_write(sink::UpMixSink, buf::SampleBuf)
+    bufsize = nframes(sink.buf)
+    total = nframes(buf)
+    written = 0
+    
+    while written < total
+        n = min(bufsize, total - written)
+        for ch in 1:nchannels(sink.wrapped)
+            sink.buf[1:n, ch] = sub(buf, (1:n) + written)
+        end
+        actual = write(sink.wrapped, sink.buf[1:n, :])
+        written += actual
+        if actual != n
+            # write stream closed early
+            break
+        end
+    end
+    
+    written
+end
+
+"""DownMixSink provides a multi-channel sink that wraps a single-channel sink.
+Writing to this sink mixes all the channels down to the single channel"""
+immutable DownMixSink{T, W <: SampleSink} <: SampleSink{T}
+    wrapped::W
+    buf::TimeSampleBuf{T}
+    channels::Int
+end
+
+function DownMixSink{W <: SampleSink}(wrapped::W, channels, bufsize=DEFAULT_BUFSIZE)
+    SR = samplerate(wrapped)
+    T = eltype(wrapped)
+    buf = SampleBuf(T, SR, bufsize, 1)
+    
+    DownMixSink{T, W}(wrapped, buf, channels)
+end
+
+samplerate(sink::DownMixSink) = samplerate(sink.wrapped)
+nchannels(sink::DownMixSink) = sink.channels
+
+function unsafe_write(sink::DownMixSink, buf::SampleBuf)
+    bufsize = nframes(sink.buf)
+    total = nframes(buf)
+    written = 0
+    if nchannels(buf) == 0
+        error("Can't do channel conversion from a zero-channel source")
+    end
+    
+    while written < total
+        n = min(bufsize, total - written)
+        # initialize with the first channel
+        sink.buf[1:n] = buf[(1:n) + written, 1]
+        for ch in 2:nchannels(buf)
+            sink.buf[1:n] += buf[(1:n) + written, ch]
+        end
+        actual = write(sink.wrapped, sink.buf[1:n])
+        written += actual
+        if actual != n
+            # write stream closed early
+            break
+        end
+    end
+    
+    written
+end
+
+immutable ReformatSink{T, W <: SampleSink, WT} <: SampleSink{T}
+    wrapped::W
+    buf::TimeSampleBuf{WT}
+end
+
+function ReformatSink{W <: SampleSink}(wrapped::W, T, bufsize=DEFAULT_BUFSIZE)
+    SR = samplerate(wrapped)
+    WT = eltype(wrapped)
+    N = nchannels(wrapped)
+    buf = SampleBuf(WT, SR, bufsize, N)
+    
+    ReformatSink{T, W, WT}(wrapped, buf)
+end
+
+samplerate(sink::ReformatSink) = samplerate(sink.wrapped)
+nchannels(sink::ReformatSink) = nchannels(sink.wrapped)
+
+function unsafe_write(sink::ReformatSink, buf::SampleBuf)
+    bufsize = nframes(sink.buf)
+    total = nframes(buf)
+    written = 0
+    
+    while written < total
+        n = min(bufsize, total - written)
+        # copy to the buffer, which will convert to the wrapped type
+        sink.buf[1:n, :] = buf[(1:n) + written, :]
+        actual = write(sink.wrapped, sink.buf[1:n, :])
+        written += actual
+        if actual != n
+            # write stream closed early
+            break
+        end
+    end
+    
+    written
+end
+
+type ResampleSink{T, W <: SampleSink} <: SampleSink{T}
+    wrapped::W
+    samplerate::SampleRate
+    buf::TimeSampleBuf{T}
+    phase::Float64
+    last::Array{T, 1}
+end
+
+function ResampleSink{W <: SampleSink}(wrapped::W, SR, bufsize=DEFAULT_BUFSIZE)
+    WSR = samplerate(wrapped)
+    T = eltype(wrapped)
+    N = nchannels(wrapped)
+    buf = SampleBuf(T, WSR, bufsize, N)
+
+    ResampleSink{T, W}(wrapped, SR, buf, 0.0, zeros(T, N))
+end
+
+samplerate(sink::ResampleSink) = sink.samplerate
+nchannels(sink::ResampleSink) = nchannels(sink.wrapped)
+
+function unsafe_write(sink::ResampleSink, buf::SampleBuf)
+    bufsize = nframes(sink.buf)
+    # total is in terms of samples at the wrapped sink rate
+    ratio = samplerate(sink) / samplerate(sink.wrapped)
+    total = trunc(Int, (nframes(buf) - 1) / ratio + sink.phase) + 1
+    written::Int = 0
+
+    nframes(buf) == 0 && return 0
+
+    while written < total
+        n = min(nframes(sink.buf), total-written)
+        for i in 1:n
+            bufidx = (written + i-1 - sink.phase)*ratio + 1
+            leftidx = trunc(Int, bufidx)
+            offset = bufidx - leftidx
+            right = sub(buf, leftidx+1, :)
+            # note we have to use `.*` here because devectorize doesn't recognize
+            # that our multiplier is scalar. I don't think it makes a difference
+            # though
+            if leftidx == 0
+                @devec sink.buf[i, :] = (1-offset) .* sink.last + offset .* right
+            else
+                left = sub(buf, leftidx, :)
+                @devec sink.buf[i, :] = (1-offset) .* left + offset .* right
+            end
+        end
+        actual::Int = write(sink.wrapped, sink.buf[1:n, :])
+        written += actual
+        actual == n || break
+    end
+
+    # return the amount written in terms of the buffer's samplerate
+    read = (written == total ? nframes(buf) : trunc(Int, written * ratio))
+    read > 0 && (sink.last[:] = sub(buf, read, :))
+    sink.phase = read / ratio + sink.phase - written
+
+    read
+end
+
+# TODO: bufsize should probably be a keyword arg, this positional argument
+# should probably allow the user to limit how much is written.

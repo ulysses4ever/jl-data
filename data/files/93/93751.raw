@@ -1,0 +1,79 @@
+using Gadfly
+using DataFrames
+using Cairo
+using RDatasets
+
+ac50u = readtable("Data/acr3k_ac_db", separator='\t', header=true)
+ac50uv = DataFrame(xval = ac50u[:,1], yval = ac50u[:,2], name = "gm=50u")
+ac200n = readtable("Data/gm200n_ac", separator='\t', header=true)
+ac200nv = DataFrame(xval = ac200n[:,1], yval = ac200n[:,2], name = "gm=200n")
+AC = DataFrame(input = [ac50uv, ac200nv], Name = ["gm=50u", "gm=200n"])
+
+noise50uv = DataFrame(xval = ac50u[1:33,1], outnoise = ac50u[1:33,4], innoise = ac50u[1:33,5], name = "gm=50u")
+noise200nv = DataFrame(xval = ac200n[1:33,1], outnoise = ac200n[1:33,4], innoise = ac200n[1:33,5], name = "gm=200n")
+Noise = DataFrame(input = [noise50uv, noise200nv], Name = ["gm=50u", "gm=200n"])
+
+tran50u = readtable("Data/gm50u_tran", separator='\t', header=false)
+tran50uv = DataFrame(xval = tran50u[:,1], vout = tran50u[:,2], yval2 = tran50u[:,3], vin = tran50u[:,4], name = "gm=50u")
+tran200n = readtable("Data/gm200n_tran", separator='\t', header=false)
+tran200nv = DataFrame(xval = tran200n[:,1], vout = tran200n[:,2], yval2 = tran200n[:,3], vin = tran200n[:,4], name = "gm=200n")
+Tran = DataFrame(input = [tran50uv, tran200nv], Name = ["gm=50u", "gm=200n"])
+longdf50u = stack(tran50uv, [:vout, :vin])
+# ticks = [log10(ac50u[1,2]), 2, 1, 0, -1, -2]
+
+
+ticks = [ac50u[1, 2], ac200n[1, 2], 20, 0 , -20, -40]
+ticksf = [1, 3, 5, 7, 9]
+ticksf2 = [0, 3, 6]
+p1 = plot(layer(AC[:input][1], x = "xval", y = "yval", color="name", Geom.line, Theme(line_width=3px)),
+        layer(AC[:input][2], x = "xval", y = "yval", color="name", Geom.line, Theme(line_width=5px)),      #, default_color=colorant"blue"
+        Guide.yticks(ticks= ticks),
+        Guide.xticks(ticks= ticksf),
+        Guide.ylabel("Gain(db)"), Guide.xlabel("f(Hz)"),
+        Scale.x_log10
+        )
+p2a = plot(layer(Noise[:input][1], x = "xval", y = "outnoise", color="name", Geom.line, Theme(line_width=3px)),
+        layer(Noise[:input][2], x = "xval", y = "outnoise", color="name", Geom.line, Theme(line_width=5px)),      #, default_color=colorant"blue"
+        Guide.xticks(ticks= ticksf2),
+        Guide.ylabel("output referred noise(V)"), Guide.xlabel("f(Hz)"),
+        Scale.x_log10,
+        Scale.y_log10
+        )
+p2b = plot(layer(Noise[:input][1], x = "xval", y = "innoise", color="name", Geom.line, Theme(line_width=3px)),
+        layer(Noise[:input][2], x = "xval", y = "innoise", color="name", Geom.line, Theme(line_width=5px)),      #, default_color=colorant"blue"
+        Guide.xticks(ticks= ticksf2),
+        Guide.ylabel("input referred noise(V)"), Guide.xlabel("f(Hz)"),
+        Scale.x_log10,
+        Scale.y_log10
+        )
+p3 = plot(longdf50u, ygroup = "variable", x = "xval", y = "value", color="name", Guide.xlabel("Time(s)"), Geom.subplot_grid(free_y_axis=true, Geom.line, ))
+
+tickst = [0.0, 1.0, 1.5, 2.0
+        , Tran[:input][1][:vout][1], Tran[:input][1][:vout][22]
+        , Tran[:input][2][:vout][1], Tran[:input][2][:vout][22]]
+p3a = plot(layer(Tran[:input][1], x = "xval", y = "vout", color="name", Geom.line, Theme(line_width=4px)),
+        layer(Tran[:input][2], x = "xval", y = "vout", color="name", Geom.line, Theme(line_width=2px)),      #, default_color=colorant"blue"
+        Guide.ylabel("Vout(v)"), Guide.xlabel(nothing), Guide.xticks(label=false), Guide.yticks(ticks=tickst)
+        )
+p3b = plot(Tran[:input][1], x = "xval", y = "vin", Geom.line, Theme(line_width=5px),
+        Guide.ylabel("Vin"), Guide.xlabel("Time(s)"),
+        )
+# p4 = plot(layer(longdf50u, ygroup = "variable", x = "xval", y = "value")
+#         , layer(longdf50u, ygroup = "variable", x = "xval", y = "value")
+#         , Guide.xlabel("Time(s)"), Geom.subplot_grid(free_y_axis=true, Geom.line, ))
+
+
+# p2 = plot(layer(tran50uv, x = "xval", y = "yval", color="name", Geom.line, Theme(line_width=5px)),
+#         # layer(ac200nv, x = "xval", y = "yval", color="name", Geom.line, Theme(line_width=3px)),
+#         Guide.yticks(ticks= ticks),
+#         Guide.xticks(ticks= ticksf),
+#         Guide.ylabel("Gain(db)"), Guide.xlabel("f(Hz)"),
+#         Scale.x_log10,
+#         )
+
+
+draw(SVG("./AcGain.svg", 12cm, 12cm), p1)
+draw(SVG("./Noise_out.svg", 8cm, 12cm), p2a)
+draw(SVG("./Noise_in.svg", 8cm, 12cm), p2b)
+draw(SVG("./Tran_out.svg", 12cm, 4cm), p3a)
+draw(SVG("./Tran_in.svg", 12cm, 4cm), p3b)

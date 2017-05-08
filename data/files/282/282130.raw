@@ -1,0 +1,71 @@
+using Gumbo
+
+function getInnerText(elem)
+    if is(typeof(elem), HTMLText)
+        return text(elem)
+    elseif length(children(elem)) != 0
+        return getInnerText(children(elem)[1])
+    end
+
+    return ""
+end
+
+function parseBox(text)
+    semicolon = search(text, ';')
+    return map(x -> parse(Int, x), split(text[6:semicolon-1]))
+end
+
+function parseHocrFile(path)
+    words :: Array{AbstractString} = []
+    positions :: Array{Array{Int}} = []
+
+    open(path) do file
+        document = parsehtml(readall(file))
+
+        for elem in breadthfirst(document.root)
+            if is(typeof(elem), HTMLElement{:span})
+                attributes = attrs(elem)
+                if haskey(attributes, "class") && attributes["class"] == "ocrx_word"
+                    text = getInnerText(elem)
+                    if !isempty(text)
+                        push!(words, getInnerText(elem))
+                        push!(positions, parseBox(attributes["title"]))
+                    end
+                end
+            end
+        end
+    end
+
+    return (words, positions)
+end
+
+function buildProbabilityFunction(words :: Array{AbstractString})
+    count = Dict{AbstractString, Int}()
+    totWords = 0
+    for word in words
+        if haskey(count, word)
+            count[word] += 1
+        else
+            count[word] = 1
+        end
+        totWords += 1
+    end
+
+    return [w => c/totWords for (w,c) in count]
+end
+
+function readProbabilityFunction(path)
+    dict = Dict{AbstractString, Int}()
+    wordCount = 0
+    open(path) do file
+        for line in readlines(file)
+            (word, occurrences, _) = split(line)
+            dict[word] = parse(Int, occurrences)
+            wordCount += 1
+        end
+    end
+
+    return convert(Dict{AbstractString, Float64}, [w => c/wordCount for (w, c) in dict])
+end
+
+

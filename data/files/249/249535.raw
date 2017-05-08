@@ -1,0 +1,32 @@
+using BinDeps
+
+@BinDeps.setup
+
+mesos_root = haskey(ENV, "MESOS_ROOT") ? ENV["MESOS_ROOT"] : "/usr"
+
+libmesosjl = library_dependency("libmesosjl")
+
+mesosbuilddir = BinDeps.builddir(libmesosjl)
+mesossrcdir = joinpath(BinDeps.depsdir(libmesosjl),"src","wrapper")
+protosrcdir = joinpath(BinDeps.depsdir(libmesosjl),"src","proto")
+protodir = joinpath(BinDeps.pkgdir(libmesosjl),"src","proto")
+mesoslib = joinpath(BinDeps.libdir(libmesosjl), libmesosjl.name*"."*BinDeps.shlib_ext)
+
+provides(Sources, URI(mesossrcdir), libmesosjl)
+provides(BuildProcess,
+        (@build_steps begin
+            ChangeDirectory(mesossrcdir)
+            FileRule(mesoslib, @build_steps begin
+                MakeTargets(env=Dict(utf8("MESOS_ROOT")=>utf8(mesos_root)))
+                `make`
+                `make install`
+            end)
+            @build_steps begin
+                ChangeDirectory(protosrcdir)
+                FileRule(protodir*"/Proto.jl", @build_steps begin
+                    `make`
+                end)
+            end
+        end), libmesosjl, os = :Unix)
+
+@BinDeps.install [ :libmesosjl => :libmesosjl]

@@ -1,0 +1,7 @@
+module Symbolic  
+  include("expand_expr.jl")
+  
+  export
+    breadth_first,
+    depth_first_pre_order
+end

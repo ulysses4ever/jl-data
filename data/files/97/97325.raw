@@ -1,0 +1,217 @@
+export 英译中
+
+function 英译中(input::String)
+
+	if isfile(input) 
+		base_names = replace(input, r"\.[^\.]*$","")
+		extnames   = replace(input, base_names, "")
+		output = string(base_names, ".chinese", extnames)
+		output_io = open(output,"w")
+		try
+			println(output_io," 中文\"\"\" ")
+			temp_s = readall(input)
+			temp_s = trans_words_1(temp_s)
+			println(output_io, temp_s)
+			println(output_io,"\"\"\"")
+		finally
+			close(output_io)
+		end
+	else
+		error("不是一个文件。")
+	end
+end
+
+function trans_words_1(s::String)
+
+  s = replace(s,r"""(?=\s*)((^| )for)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 循环")
+  s = replace(s,r"""(?=\s*)((^| )end)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 结束")
+  s = replace(s,r"""(?=\s*)((^| )while)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 当")
+  s = replace(s,r"""(?=\s*)((^| )in)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 在")
+  s = replace(s,r"""(?=\s*)((^| )else)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 或者")
+  s = replace(s,r"""(?=\s*)((^| )elseif)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 或者如果")
+  s = replace(s,r"""(?=\s*)((^| )if)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 如果")
+  s = replace(s,r"""(?=\s*)((^| )return)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 返回")
+  s = replace(s,r"""(?=\s*)((^| )begin)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 开始")
+  s = replace(s,r"""(?=\s*)((^| )quote)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 引用")
+  s = replace(s,r"""(?=\s*)((^| )try)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 尝试")
+  s = replace(s,r"""(?=\s*)((^| )catch)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 捕获")
+  s = replace(s,r"""(?=\s*)((^| )local)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 局部")
+  s = replace(s,r"""(?=\s*)((^| )abstract)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 抽象")
+  s = replace(s,r"""(?=\s*)((^| )function)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 方程")
+  s = replace(s,r"""(?=\s*)((^| )stagedfunction)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 缓存方程")
+  s = replace(s,r"""(?=\s*)((^| )macro)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 宏")
+  s = replace(s,r"""(?=\s*)((^| )finally)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 最终")
+  s = replace(s,r"""(?=\s*)((^| )typealias)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 类型别名")
+  s = replace(s,r"""(?=\s*)((^| )break)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 中断")
+  s = replace(s,r"""(?=\s*)((^| )continue)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 继续")
+  s = replace(s,r"""(?=\s*)((^| )type)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 类型")
+  s = replace(s,r"""(?=\s*)((^| )global)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 全局")
+  s = replace(s,r"""(?=\s*)((^| )module)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 模块")
+  s = replace(s,r"""(?=\s*)((^| )using)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 使用")
+  s = replace(s,r"""(?=\s*)((^| )import)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 引入")
+  s = replace(s,r"""(?=\s*)((^| )importall)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 引入全部")
+  s = replace(s,r"""(?=\s*)((^| )export)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 导出")
+  s = replace(s,r"""(?=\s*)((^| )const)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 常量")
+  s = replace(s,r"""(?=\s*)((^| )let)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 让")
+  s = replace(s,r"""(?=\s*)((^| )bitstype)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 二进制类型")
+  s = replace(s,r"""(?=\s*)((^| )do)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 做")
+  s = replace(s,r"""(?=\s*)((^| )baremodule)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 空模块")
+  s = replace(s,r"""(?=\s*)((^| )immutable)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 不可变类型")
+
+  s = replace(s,r"""(?=\s*)(; *for)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 循环")
+  s = replace(s,r"""(?=\s*)(; *end)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 结束")
+  s = replace(s,r"""(?=\s*)(; *while)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 当")
+  s = replace(s,r"""(?=\s*)(; *in)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 在")
+  s = replace(s,r"""(?=\s*)(; *else)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 或者")
+  s = replace(s,r"""(?=\s*)(; *elseif)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 或者如果")
+  s = replace(s,r"""(?=\s*)(; *if)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 如果")
+  s = replace(s,r"""(?=\s*)(; *return)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 返回")
+  s = replace(s,r"""(?=\s*)(; *begin)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 开始")
+  s = replace(s,r"""(?=\s*)(; *quote)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 引用")
+  s = replace(s,r"""(?=\s*)(; *try)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 尝试")
+  s = replace(s,r"""(?=\s*)(; *catch)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 捕获")
+  s = replace(s,r"""(?=\s*)(; *local)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 局部")
+  s = replace(s,r"""(?=\s*)(; *abstract)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 抽象")
+  s = replace(s,r"""(?=\s*)(; *function)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 方程")
+  s = replace(s,r"""(?=\s*)(; *stagedfunction)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 缓存方程")
+  s = replace(s,r"""(?=\s*)(; *macro)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 宏")
+  s = replace(s,r"""(?=\s*)(; *finally)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 最终")
+  s = replace(s,r"""(?=\s*)(; *typealias)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 类型别名")
+  s = replace(s,r"""(?=\s*)(; *break)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 中断")
+  s = replace(s,r"""(?=\s*)(; *continue)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 继续")
+  s = replace(s,r"""(?=\s*)(; *type)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 类型")
+  s = replace(s,r"""(?=\s*)(; *global)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 全局")
+  s = replace(s,r"""(?=\s*)(; *module)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 模块")
+  s = replace(s,r"""(?=\s*)(; *using)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 使用")
+  s = replace(s,r"""(?=\s*)(; *import)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 引入")
+  s = replace(s,r"""(?=\s*)(; *importall)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 引入全部")
+  s = replace(s,r"""(?=\s*)(; *export)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 导出")
+  s = replace(s,r"""(?=\s*)(; *const)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 常量")
+  s = replace(s,r"""(?=\s*)(; *let)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 让")
+  s = replace(s,r"""(?=\s*)(; *bitstype)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 二进制类型")
+  s = replace(s,r"""(?=\s*)(; *do)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 做")
+  s = replace(s,r"""(?=\s*)(; *baremodule)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 空模块")
+  s = replace(s,r"""(?=\s*)(; *immutable)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 不可变类型")
+
+  s = replace(s,r"""(?=\s*)(; *end\s*\#+)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; 结束 #")
+  s = replace(s,r"""(?=\s*)((^|\s+)end\s*\#+)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " 结束 #")
+
+  s = replace(s,r"""end\s*$""", "结束")
+  # s = replace(s,r"""; *\n""","""; """)
+  # s = replace(s,r"""end\n\n*(?<!,)""","""end;""")
+  # s = replace(s,r"""\n\n*global""",""";global""")
+  # s = replace(s,r"""\n\n*function""",""";function""")
+  # s = replace(s,r"""\n\n*const""",""";const""")
+  # s = replace(s,r"""\n\n*immutable""",""";immutable""")
+  # print(s)
+end
+
+# "if" "else" "elseif" "while" "for" "begin" "end" "quote"
+# "try" "catch" "return" "local" "abstract" "function" "stagedfunction" "macro" "ccall"
+# "finally" "typealias" "break" "continue" "type" "global"
+# "module" "using" "import" "export" "const" "let" "bitstype" "do" "in"
+# "baremodule" "importall" "immutable"
+
+# Built-in Type
+# "Number" "Real" "BigInt" "Integer"
+# "UInt" "UInt8" "UInt16" "UInt32" "UInt64" "UInt128"
+# "Int" "Int8" "Int16" "Int32" "Int64" "Int128"
+# "BigFloat" "FloatingPoint" "Float16" "Float32" "Float64"
+# "Complex128" "Complex64"
+# "Bool"
+# "Cuchar" "Cshort" "Cushort" "Cint" "Cuint" "Clonglong" "Culonglong" "Cintmax_t" "Cuintmax_t"
+# "Cfloat" "Cdouble" "Cptrdiff_t" "Cssize_t" "Csize_t"
+# "Cchar" "Clong" "Culong" "Cwchar_t"
+# "Char" "ASCIIString" "UTF8String" "ByteString" "SubString"
+# "Array" "DArray" "AbstractArray" "AbstractVector" "AbstractMatrix" "AbstractSparseMatrix" "SubArray" "StridedArray" "StridedVector" "StridedMatrix" "VecOrMat" "StridedVecOrMat" "DenseArray" "SparseMatrixCSC" "BitArray"
+# "Range" "OrdinalRange" "StepRange" "UnitRange" "FloatRange"
+# "Tuple" "NTuple"
+# "DataType" "Symbol" "Function" "Vector" "Matrix" "Union" "Type" "Any" "Complex" "String" "Ptr" "Void" "Exception" "Task" "Signed" "Unsigned" "Associative" "Dict" "IO" "IOStream" "Rational" "Regex" "RegexMatch" "Set" "IntSet" "Expr" "WeakRef" "ObjectIdDict"
+# "AbstractRNG" "MersenneTwister"
+
+# replace(string, pat, r [ , n ] )
+# Search for the given pattern pat, and replace each occurrence with r. If n is provided, replace at most n
+# occurrences. As with search, the second argument may be a single character, a vector or a set of characters, a
+# string, or a regular expression. If r is a function, each occurrence is replaced with r(s) where s is the matched
+# substring
+
+# function 解析结果(s,t=:Main)
+#   s = replace(s,r"""(?=\s*)((^| )循环)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " for")
+#   s = replace(s,r"""(?=\s*)((^| )结束)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " end")
+#   s = replace(s,r"""(?=\s*)((^| )当)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " while")
+#   s = replace(s,r"""(?=\s*)((^| )在)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " in")
+#   s = replace(s,r"""(?=\s*)((^| )或者)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " else")
+#   s = replace(s,r"""(?=\s*)((^| )或者如果)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " elseif")
+#   s = replace(s,r"""(?=\s*)((^| )如果)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " if")
+#   s = replace(s,r"""(?=\s*)((^| )返回)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " return")
+#   s = replace(s,r"""(?=\s*)((^| )开始)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " begin")
+#   s = replace(s,r"""(?=\s*)((^| )引用)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " quote")
+#   s = replace(s,r"""(?=\s*)((^| )尝试)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " try")
+#   s = replace(s,r"""(?=\s*)((^| )捕获)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " catch")
+#   s = replace(s,r"""(?=\s*)((^| )局部)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " local")
+#   s = replace(s,r"""(?=\s*)((^| )抽象)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " abstract")
+#   s = replace(s,r"""(?=\s*)((^| )方程)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " function")
+#   s = replace(s,r"""(?=\s*)((^| )缓存方程)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " stagedfunction")
+#   s = replace(s,r"""(?=\s*)((^| )宏)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " macro")
+#   s = replace(s,r"""(?=\s*)((^| )最终)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " finally")
+#   s = replace(s,r"""(?=\s*)((^| )类型别名)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " typealias")
+#   s = replace(s,r"""(?=\s*)((^| )中断)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " break")
+#   s = replace(s,r"""(?=\s*)((^| )继续)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " continue")
+#   s = replace(s,r"""(?=\s*)((^| )类型)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " type")
+#   s = replace(s,r"""(?=\s*)((^| )全局)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " global")
+#   s = replace(s,r"""(?=\s*)((^| )模块)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " module")
+#   s = replace(s,r"""(?=\s*)((^| )使用)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " using")
+#   s = replace(s,r"""(?=\s*)((^| )引入)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " import")
+#   s = replace(s,r"""(?=\s*)((^| )引入全部)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " importall")
+#   s = replace(s,r"""(?=\s*)((^| )导出)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " export")
+#   s = replace(s,r"""(?=\s*)((^| )常量)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " const")
+#   s = replace(s,r"""(?=\s*)((^| )让)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " let")
+#   s = replace(s,r"""(?=\s*)((^| )二进制类型)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " bitstype")
+#   s = replace(s,r"""(?=\s*)((^| )做)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " do")
+#   s = replace(s,r"""(?=\s*)((^| )空模块)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " baremodule")
+#   s = replace(s,r"""(?=\s*)((^| )不可变类型)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", " immutable")
+
+#   s = replace(s,r"""(?=\s*)(; *循环)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; for")
+#   s = replace(s,r"""(?=\s*)(; *结束)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; end")
+#   s = replace(s,r"""(?=\s*)(; *当)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; while")
+#   s = replace(s,r"""(?=\s*)(; *在)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; in")
+#   s = replace(s,r"""(?=\s*)(; *或者)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; else")
+#   s = replace(s,r"""(?=\s*)(; *或者如果)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; elseif")
+#   s = replace(s,r"""(?=\s*)(; *如果)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; if")
+#   s = replace(s,r"""(?=\s*)(; *返回)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; return")
+#   s = replace(s,r"""(?=\s*)(; *开始)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; begin")
+#   s = replace(s,r"""(?=\s*)(; *引用)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; quote")
+#   s = replace(s,r"""(?=\s*)(; *尝试)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; try")
+#   s = replace(s,r"""(?=\s*)(; *捕获)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; catch")
+#   s = replace(s,r"""(?=\s*)(; *局部)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; local")
+#   s = replace(s,r"""(?=\s*)(; *抽象)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; abstract")
+#   s = replace(s,r"""(?=\s*)(; *方程)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; function")
+#   s = replace(s,r"""(?=\s*)(; *缓存方程)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; stagedfunction")
+#   s = replace(s,r"""(?=\s*)(; *宏)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; macro")
+#   s = replace(s,r"""(?=\s*)(; *最终)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; finally")
+#   s = replace(s,r"""(?=\s*)(; *类型别名)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; typealias")
+#   s = replace(s,r"""(?=\s*)(; *中断)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; break")
+#   s = replace(s,r"""(?=\s*)(; *继续)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; continue")
+#   s = replace(s,r"""(?=\s*)(; *类型)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; type")
+#   s = replace(s,r"""(?=\s*)(; *全局)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; global")
+#   s = replace(s,r"""(?=\s*)(; *模块)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; module")
+#   s = replace(s,r"""(?=\s*)(; *使用)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; using")
+#   s = replace(s,r"""(?=\s*)(; *引入)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; import")
+#   s = replace(s,r"""(?=\s*)(; *引入全部)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; importall")
+#   s = replace(s,r"""(?=\s*)(; *导出)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; export")
+#   s = replace(s,r"""(?=\s*)(; *常量)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; const")
+#   s = replace(s,r"""(?=\s*)(; *让)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; let")
+#   s = replace(s,r"""(?=\s*)(; *二进制类型)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; bitstype")
+#   s = replace(s,r"""(?=\s*)(; *做)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; do")
+#   s = replace(s,r"""(?=\s*)(; *空模块)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; baremodule")
+#   s = replace(s,r"""(?=\s*)(; *不可变类型)(?=\s)(?=(?:[^"]|"[^"]*")*$)""", "; immutable")
+
+#   s = replace(s,r"""结束$""", "end")
+#   s = replace(s,r"""; *\n""","""; """)
+#   # s = replace(s,r"""end\n\n*(?<!,)""","""end;""")
+#   # s = replace(s,r"""\n\n*global""",""";global""")
+#   # s = replace(s,r"""\n\n*function""",""";function""")
+#   # s = replace(s,r"""\n\n*const""",""";const""")
+#   # s = replace(s,r"""\n\n*immutable""",""";immutable""")
+#   print(s)
+# end

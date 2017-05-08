@@ -1,0 +1,311 @@
+module Intervalos
+  using Base
+
+  import Base.exp, Base.log, Base.sin, Base.cos, Base.tan, Base.length, Base.contains
+  importall Base.Operators
+
+  export Interval, +, -, *, /, ^, ExtendedDivision, contains, midpoint, length, Intersection, sin, cos, tan, exp, log
+
+
+  type Interval #DEFINICIÓN DE INTERVALO
+        left::Real
+        right::Real
+
+        function Interval(left::Real, right::Real) #EN CASO DE NO ESTAR EN ORDEN, LO PONE
+            if left > right
+                left, right = right, left
+            end
+            new(left, right)
+        end
+
+        function Interval(n::Real)
+          m=Interval(n,n)
+        end
+
+  end
+
+  show(io::IO, a::Interval) = print(io::IO, "[$(a.left), $(a.right)]") #MUESTRA LOS INTERVALOS COMO [A,B]
+
+
+
+  function Interval(x::Rational)
+      left = with_rounding(RoundDown) do
+          with_bigfloat_rounding(RoundDown) do
+              num(x) / den(x)
+          end
+      end
+      right = with_rounding(RoundUp) do
+          with_bigfloat_rounding(RoundUp) do
+              num(x) / den(x)
+          end
+      end
+      Interval(left, right)
+  end
+
+
+  function Redondeo(f, redondeo, x::Real, y::Real) #Redondea
+        with_rounding(Float64,redondeo) do
+            f(x, y)
+        end
+  end
+
+  function Redondeo(f, x::Interval, y::Interval, s::String) #redondea las maximizaciones o minimizaciones de las posibles operaciones...
+        if s=="min"                                           #...entre los elementos de dos intervalos
+            a = Redondeo(f, RoundDown, x.left, y.left)
+            b = Redondeo(f, RoundDown, x.left, y.right)
+            c = Redondeo(f, RoundDown, x.right, y.left)
+            d = Redondeo(f, RoundDown, x.right, y.right)
+            min(a,b,c,d)
+        else
+            a = Redondeo(f, RoundUp, x.left, y.left)
+            b = Redondeo(f, RoundUp, x.left, y.right)
+            c = Redondeo(f, RoundUp, x.right, y.left)
+            d = Redondeo(f, RoundUp, x.right, y.right)
+            max(a,b,c,d)
+        end
+  end
+
+
+
+#SUMAS
+  function +(x::Interval, y::Interval) #Suma de intervalos
+        l = Redondeo(+, RoundDown, x.left, y.left)
+        r = Redondeo(+, RoundUp, x.right, y.right)
+        Interval(r, l)
+  end
+
+  function +(x::Interval, n::Real)
+        l = Redondeo(+, RoundDown, x.left, n)
+        r = Redondeo(+, RoundUp, x.right, n)
+        Interval(r, l)
+  end
+
+  function +(n::Real, x::Interval)
+        l = Redondeo(+, RoundDown, x.left, n)
+        r = Redondeo(+, RoundUp, x.right, n)
+        Interval(r, l)
+  end
+
+
+
+#RESTAS
+  function -(x::Interval, y::Interval) #Resta de intervalos
+        l = Redondeo(-, RoundDown, x.left, y.left)
+        r = Redondeo(-, RoundUp, x.right, y.right)
+        Interval(r, l)
+  end
+
+  function -(x::Interval, n::Real)
+        l = Redondeo(-, RoundDown, x.left, n)
+        r = Redondeo(-, RoundUp, x.right, n)
+        Interval(r, l)
+  end
+
+  function -(n::Real, x::Interval)
+        l = Redondeo(-, RoundDown, x.left, n)
+        r = Redondeo(-, RoundUp, x.right, n)
+        Interval(r, l)
+  end
+
+
+
+#MULTIPLICACIONES
+  function *(x::Interval, y::Interval) #Multiplicación de intervalos
+        l = Redondeo(*, x, y, "min")
+        r = Redondeo(*, x, y, "max")
+        Interval(r, l)
+  end
+
+  function *(x::Interval, n::Real)
+          l = Redondeo(*, x, Interval(n,n), "min")
+          r = Redondeo(*, x, Interval(n,n), "max")
+          Interval(r, l)
+  end
+
+  function *(n::Real, x::Interval)
+    Interval(x, n)
+  end
+
+
+
+#DIVISIONES
+  function /(x::Interval, y::Interval) #División de intervalos
+        if y.left<=0 && y.right>=0
+            error("ERROR: El denominador contiene al 0")
+        else
+            if y.left==0||y.right==0
+                error("ERROR: El denominador contiene al 0")
+            else
+                l = Redondeo(/, x, y, "min")
+                r = Redondeo(/, x, y, "max")
+                Interval(r, l)
+            end
+        end
+  end
+
+  function /(n::Float64, y::Interval)
+   m=Interval(0.0, 0.0)
+    with_rounding(RoundDown) do
+      m.left=n
+    end
+    with_rounding(RoundDown) do
+      m.right=n
+    end
+  return m/y
+  end
+
+  function ExtendedDivision(x::Interval, y::Interval)
+      if contains(y,0.0)==false
+          x/y
+      else
+          if y.left==0.0 && y.right>0.0
+              return Interval(1/y.right, +Inf)
+          else
+              if y.left<0.0 && y.right>0.0
+                  return [Interval(-Inf,1/y.left), Interval(1/y.right,+Inf)]
+              else
+                  if y.right==0.0 && y.left<0.0
+                      return Interval(-Inf,1/y.left)
+                  end
+              end
+          end
+      end
+  end
+
+
+
+#MICELANEA
+  function contains(x::Interval, n::Real)
+      if x.left<=n && x.right>=n
+          true
+      else
+          false
+      end
+  end
+
+
+  function ^(x::Interval, n::Int)
+    if iseven(n)==true
+      if x.left>=0.0
+        Interval(x.left^n, x.right^n)
+      elseif x.right<0.0
+        Interval(x.right^n, x.left^n)
+      else
+        Interval(0.0, max(x.right^n, x.left))
+      end
+    else
+      Interval(x.left^n, x.right^n)
+    end
+  end
+
+  function sin(x::Interval)
+    y=Interval(0.0,0.0)
+    if sin(x.left)<sin(x.right)
+      with_rounding(RoundDown) do
+        y.left=sin(x.left)
+      end
+      with_rounding(RoundUp) do
+        y.right=sin(x.right)
+      end
+    else
+      with_rounding(RoundUp) do
+        y.right=sin(x.left)
+      end
+      with_rounding(RoundDown) do
+        y.left=sin(x.right)
+      end
+    end
+    return y
+  end
+
+  function cos(x::Interval)
+    y=Interval(0.0,0.0)
+    if cos(x.left)<cos(x.right)
+      with_rounding(RoundDown) do
+        y.left=cos(x.left)
+      end
+      with_rounding(RoundUp) do
+        y.right=cos(x.right)
+      end
+    else
+      with_rounding(RoundUp) do
+        y.right=cos(x.left)
+      end
+      with_rounding(RoundDown) do
+        y.left=cos(x.right)
+      end
+    end
+  return y
+  end
+
+  function tan(x::Interval)
+    y=Interval(0.0,0.0)
+    if tan(x.left)<tan(x.right)
+      with_rounding(RoundDown) do
+        y.left=tan(x.left)
+      end
+      with_rounding(RoundUp) do
+        y.right=tan(x.right)
+      end
+    else
+      with_rounding(RoundUp) do
+        y.right=tan(x.left)
+      end
+      with_rounding(RoundDown) do
+        y.left=tan(x.right)
+      end
+    end
+  return y
+  end
+
+
+  function exp(x::Interval)
+    y=Interval(0.0, 0.0)
+      with_rounding(RoundUp) do
+      y.right=exp(x.right)
+      end
+      with_rounding(RoundDown) do
+      y.left=exp(x.left)
+      end
+  return y
+  end
+
+  function log(x::Interval)
+    y=Interval(0.0, 0.0)
+        with_rounding(RoundUp) do
+        y.right=log(x.right)
+        end
+        with_rounding(RoundDown) do
+        y.left=log(x.left)
+        end
+    return y
+  end
+
+  function ==(x::Interval, y::Interval)
+    if x.right==y.right && x.left==y.left
+      true
+    else
+      false
+    end
+  end
+
+
+  function midpoint(N::Interval) #PuntoMedio
+      return (N.left+N.right)/2
+  end
+
+  function length(x::Interval)
+      return x.right-x.left
+  end
+
+  function Intersection(x::Interval, y::Interval)
+      if x.right>y.left
+          return Interval(max(x.left,y.left), min(x.right, y.right))
+      else
+          false
+      end
+end
+
+end
+
+

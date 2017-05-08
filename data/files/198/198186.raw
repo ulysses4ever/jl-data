@@ -1,0 +1,18 @@
+using Gadfly
+using DataFrames
+
+function plot_clusters(K::Int)
+  plot_clusters(Mixture{2}(K))
+end
+
+function plot_clusters(mix::Mixture{2})
+  plot(frame(mix), { :x => "x", :y => "y", :color => "k" }, Geom.point)
+end
+
+function frame(mix::Mixture{2})
+  xs = points(mix)[1, :]'
+  ys = points(mix)[2, :]'
+  zs = map(string, ones(length(mix)))
+  DataFrame({ "x" => xs, "y" => ys, "k" => zs })
+end
+

@@ -1,0 +1,26 @@
+immutable SchedulerDriver
+    handle::Ptr{Void}
+    SchedulerDriver(handle::Ptr{Void}) = new(handle)
+end
+
+# function sendStatusUpdate(driver::SchedulerDriver, status::Proto.TaskStatus)
+#     iob = IOBuffer()
+#     tsBufferSize = writeproto(iob, status)
+#     tsBuffer = takebuf_array(iob)
+#     return ccall((:sendStatusUpdate, Mesos.libmesosjl), Cint, (Ptr{Void}, Ptr{Uint8}, Cint),
+#             driver.handle, tsBuffer, tsBufferSize)
+# end
+
+# function sendFrameworkMessage(driver::SchedulerDriver, data::String)
+#     dataSize = length(data)
+#     return ccall((:sendFrameworkMessage, Mesos.libmesosjl), Cint, (Ptr{Void}, Ptr{Uint8}, Cint),
+#             driver.handle, data, dataSize)
+# end
+
+# function Base.run(driver::SchedulerDriver)
+#     return ccall((:run_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+# end
+
+# function abort(driver::SchedulerDriver)
+#     return ccall((:abort_driver, Mesos.libmesosjl), Cint, (Ptr{Void}, ), driver.handle)
+# end

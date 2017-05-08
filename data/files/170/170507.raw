@@ -1,0 +1,33 @@
+#!/usr/bin/julia
+
+using DataFrames
+using SimpleStats
+using SimpleStats.Comandline
+
+function main()
+  args = SimpleStats.Comandline.parse_commandline(["--column", "-c"],
+                           Dict(
+                             :help => "Column to describe.",
+                             :default => "1"
+                             ),
+                           ["--bins", "-b"],
+                           Dict(
+                             :help => "The approximate number of bins that should be used on the histogram",
+                             :default => "10"
+                             ))
+
+  file = args["FILE"]
+
+  data = SimpleStats.read_data(file !== Base.nothing ? file : Base.STDIN,
+                   delimiter=args["delimiter"][1],
+                   missing=args["missing"],
+                   skip=args["skip"])
+
+  col = DataFrames.getindex(data, :, Base.parse(Int, args["column"]))
+
+  Base.println("#\t", Base.now(), "\t", file !== nothing ? file : "STDIN", "\n")
+
+  SimpleStats.stats(col, bins=args["bins"], label="X")
+end
+
+main()

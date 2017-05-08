@@ -1,0 +1,24 @@
+
+undoubleTranspose(ex::Expr) =
+    (isexpr(ex,symbol('\'')) && isexpr(ex.args[1],symbol('\''))) ? ex.args[1].args[1] : ex
+undoubleTranspose(ex::Any) = ex
+
+function unnestBlocks(ex::Expr)
+	if isexpr(ex,:block)
+		newargs = {}
+		for arg in ex.args
+			isexpr(arg,:block) ? push!(newargs,arg.args...) : push!(newargs,arg)
+		end
+		Expr(:block,newargs...)
+	else
+		ex
+	end
+end
+unnestBlocks(ex::Any) = ex
+
+function cleanup(ex::Expr) 
+	for fun in [undoubleTranspose,unnestBlocks]
+		ex = walk(fun,ex)
+	end
+	ex
+end

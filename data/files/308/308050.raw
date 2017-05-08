@@ -1,0 +1,339 @@
+#Requires:
+#using Images #note this takes RAM
+#include("fftw.jl") 
+#using FFTW #Use the fftw.jl which has Tim Holy's RCpair construct.
+# using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+function LorentzKernel(m1::Int64, m2::Int64, a::Float32, b::Float32, g::Float32)
+	B = zeros(Float32, m1, m2)
+	for j in [1:m2]
+		for i in [1:m1]
+			B[i, j] = a*b/((i - 1)^2 + (j - 1)^2 + b)^g
+		end
+	end
+	return B
+end
+
+function SpectralMultiply_Real_RealEven(A::Array{Complex{Float32}, 2}, B::Array{Float32, 2})
+	(n1, n2) = size(A)
+	(m1, m2) = size(B)
+	#n1 and n2 must be even. B is be of dimensions (m1,m2) = (1+n1/2, 1+n2/2).
+	for j in [1:m2]
+		for i in [1:m1]
+			A[i, j] *= B[i, j]
+		end
+	end
+	for j in [(m2 + 1):n2]
+		for i in [1:m1]
+			A[i, j] *= B[i, n2 - j + 2]
+		end
+	end
+end
+
+function SpectralMultiply_Real_RealEven(A::RCpair{Float32, 2}, B::Array{Float32, 2})
+	(n1, n2) = size(A.C)
+	(m1, m2) = size(B)
+	#n1 and n2 must be even. B is be of dimensions (m1,m2) = (1+n1/2, 1+n2/2).
+	for j in [1:m2]
+		for i in [1:m1]
+			A.C[i, j] *= B[i, j]
+		end
+	end
+	for j in [(m2 + 1):n2]
+		for i in [1:m1]
+			A.C[i, j] *= B[i, n2 - j + 2]
+		end
+	end
+end
+
+function ElementwiseProduct(A::Array{Float32, 2}, B::Array{Float32, 2})
+	(n1, n2) = size(A)
+	for j in [1:n2]
+		for i in [1:n1]
+			A[i,j] *= B[i,j]
+		end
+	end 
+end
+
+function ImageWrite(A,name)
+	if (typeof(A) == Array{Float32, 2})
+		imwrite(convert(Image,A), string(name, ".png"))
+	elseif (typeof(A) == Array{Uint8, 3})
+		imwrite(colorim(A), string(name, ".png"))
+	else
+		print("Error: Type not supported.")
+	end
+end
+
+function CircularConvolve(A::Array{Float32, 2}, B::Array{Float32, 2})
+	n = size(A)[1]
+	return abs(irfft(rfft(A).*rfft(B),n))
+end
+
+function ColorizeFloat32(A::Array{Float32, 2}, B::Array{Float32, 3})
+	Rfactor::Float32 = 1.0
+	Gfactor::Float32 = 0.3
+	Bfactor::Float32 = 0.15
+	(n1,n2)=size(A)
+	temp::Float32 = 0.0
+	for j in [1:n2]
+		for i in [1:n1]
+			temp = A[i,j];
+			B[1,i,j] = Rfactor*temp
+			B[2,i,j] = Gfactor*temp
+			B[3,i,j] = Bfactor*temp
+		end
+	end
+end
+
+function ConvertFloat32ToUint8(a::Float32)
+	if (a >= 1)
+		return 0xff
+	elseif (a >= 0)
+		return uint8(255.9999f0*a - 0.499995f0)
+	else
+		return 0x00
+	end
+end
+
+function ColorizeUint8(A::Array{Float32, 2}, B::Array{Uint8, 3})
+	Rfactor::Float32 = 1.0;
+	Gfactor::Float32 = 0.3;
+	Bfactor::Float32 = 0.1;
+	(n1,n2)=size(A);
+	temp::Float32 = 0.0;
+	for j in [1:n2]
+		for i in [1:n1]
+			temp = A[i,j];
+			B[1,i,j] = ConvertFloat32ToUint8(Rfactor*temp);
+			B[2,i,j] = ConvertFloat32ToUint8(Gfactor*temp);
+			B[3,i,j] = ConvertFloat32ToUint8(Bfactor*temp);
+		end
+	end
+	#ColorizeUint8 seems to increase memory usage for some reason.
+	#Or not???
+end
+
+function ColorizeUint8(A::Array{Float32, 2}, B::Array{Uint8, 3}, C::Int64)
+	(n1,n2)=size(A);
+	for j in [1:n2]
+		for i in [1:n1]
+			B[C,i,j] = ConvertFloat32ToUint8(A[i,j]);
+		end
+	end
+end
+
+function ColorizeUint8(A::RCpair{Float32, 2}, B::Array{Uint8, 3})
+	Rfactor::Float32 = 1.0;
+	Gfactor::Float32 = 0.3;
+	Bfactor::Float32 = 0.1;
+	(n1,n2)=size(A.R);
+	temp::Float32 = 0.0;
+	RCpairNormalization::Float32 = FFTW.normalization(A);
+	for j in [1:n2]
+		for i in [1:n1]
+			temp = RCpairNormalization*A.R[i,j];
+			B[1,i,j] = ConvertFloat32ToUint8(Rfactor*temp);
+			B[2,i,j] = ConvertFloat32ToUint8(Gfactor*temp);
+			B[3,i,j] = ConvertFloat32ToUint8(Bfactor*temp);
+		end
+	end
+	#ColorizeUint8 seems to increase memory usage for some reason.
+	#Or not???
+end
+
+function ColorizeUint8Symmetric(A::Array{Float32, 2}, B::Array{Uint8, 3})
+	Rfactor::Float32 = 1.0;
+	Gfactor::Float32 = 0.3;
+	Bfactor::Float32 = 0.1;
+	(m1,m2)=size(A);
+	n1::Int64 = 2*(m1 - 1);
+	n2::Int64 = 2*(m2 - 1);
+	temp::Float32 = 0.0;
+	for j in [1:m2]
+		for i in [1:m1]
+			temp = A[i,j];
+			B[1,i+m1-1,j+m2-1] = ConvertFloat32ToUint8(Rfactor*temp);
+			B[2,i+m1-1,j+m2-1] = ConvertFloat32ToUint8(Gfactor*temp);
+			B[3,i+m1-1,j+m2-1] = ConvertFloat32ToUint8(Bfactor*temp);
+		end
+	end
+	for j in [1:(m2-1)]
+		for i in [1:(m1-1)]
+			temp = A[m1+1-i, m2+1-j];
+			B[1,i,j] = ConvertFloat32ToUint8(Rfactor*temp);
+			B[2,i,j] = ConvertFloat32ToUint8(Gfactor*temp);
+			B[3,i,j] = ConvertFloat32ToUint8(Bfactor*temp);
+		end
+	end
+	for j in [1:(m2-1)]
+		for i in [1:m1]
+			temp = A[i, m2+1-j];
+			B[1,i+m1-1,j] = ConvertFloat32ToUint8(Rfactor*temp);
+			B[2,i+m1-1,j] = ConvertFloat32ToUint8(Gfactor*temp);
+			B[3,i+m1-1,j] = ConvertFloat32ToUint8(Bfactor*temp);
+		end
+	end
+	for j in [1:m2]
+		for i in [1:(m1-1)]
+			temp = A[m1+1-i, j];
+			B[1,i,j+m2-1] = ConvertFloat32ToUint8(Rfactor*temp);
+			B[2,i,j+m2-1] = ConvertFloat32ToUint8(Gfactor*temp);
+			B[3,i,j+m2-1] = ConvertFloat32ToUint8(Bfactor*temp);
+		end
+	end
+end
+
+function ColorizeUint8Symmetric(A::Array{Float32, 2}, B::Array{Uint8, 3}, C::Int64)
+	(m1,m2)=size(A);
+	n1::Int64 = 2*(m1 - 1);
+	n2::Int64 = 2*(m2 - 1);
+	temp::Float32 = 0.0;
+	for j in [1:m2]
+		for i in [1:m1]
+			B[C,i+m1-1,j+m2-1] = ConvertFloat32ToUint8(A[i,j]);
+		end
+	end
+	for j in [1:(m2-1)]
+		for i in [1:(m1-1)]
+			B[C,i,j] = ConvertFloat32ToUint8(A[m1+1-i, m2+1-j]);
+		end
+	end
+	for j in [1:(m2-1)]
+		for i in [1:m1]
+			B[C,i+m1-1,j] = ConvertFloat32ToUint8(A[i, m2+1-j]);
+		end
+	end
+	for j in [1:m2]
+		for i in [1:(m1-1)]
+			B[C,i,j+m2-1] = ConvertFloat32ToUint8(A[m1+1-i, j]);
+		end
+	end
+end
+
+function ColorizeUint8(A::RCpair{Float32, 2}, B::Array{Uint8, 3}, C::Int64)
+	(n1,n2)=size(A.R);
+	temp::Float32 = 0.0;
+	RCpairNormalization = convert(Float32, FFTW.normalization(A));
+	for j in [1:n2]
+		for i in [1:n1]
+			temp = RCpairNormalization*A.R[i,j];
+			B[C,i,j] = ConvertFloat32ToUint8(temp);
+		end
+	end
+	#ColorizeUint8 seems to increase memory usage for some reason.
+	#Or not???
+end
+
+function ImportSparse(str::ASCIIString)
+	A = readcsv(string("C:\\Users\\Peter\\Documents\\", str, ".csv"), Float32);
+	(n1, n2) = size(A);
+	I = int(A[:, 1]);
+	J = int(A[:, 2]);
+	if (n2 == 3)
+		V1 = A[:, 3];
+		return (I, J, V1);
+	elseif (n2 == 4)
+		V1 = A[:, 3];
+		V2 = A[:, 4];
+		return (I, J, V1, V2);
+	elseif (n2 == 5)
+		V1 = A[:, 3];
+		V2 = A[:, 4];
+		V3 = A[:, 5];
+		return (I, J, V1, V2, V3);
+	else
+		print("Error, check file.")
+	end
+end
+
+function RescaleSparse(I0::Array{Int64, 1}, J0::Array{Int64, 1}, f::Float32, p::Int64)
+	I = int(I0/f);
+	J = int(J0/f);
+	maxN1 = maximum(I);
+	minN1 = minimum(I);
+	maxN2 = maximum(J);
+	minN2 = minimum(J);
+	shift1 = minN1 - p;
+	shift2 = minN2 - p;
+	N1 = maxN1 - minN1 + 2*p;
+	if (mod(N1, 2) == 1)
+		N1 += 1;
+	end
+	N2 = maxN2 - minN2 + 2*p;
+	if (mod(N2, 2) == 1)
+		N2 += 1;
+	end
+	return(I - shift1, J - shift2, N1, N2);
+end
+
+function FillMatrix(A::RCpair{Float32, 2}, I::Array{Int64, 1}, J::Array{Int64, 1}, V::Array{Float32, 1})
+	length = size(V)[1];
+	(n1, n2) = size(A.R);
+	for i in [1:length]
+		if (1 <= I[i] <= n1 && 1 <= J[i] <= n2)
+			A.R[I[i], J[i]] += V[i];
+		end
+	end
+end
+
+function FillMatrix(A::Array{Float32, 2}, I::Array{Int64, 1}, J::Array{Int64, 1}, V::Array{Float32, 1})
+	length = size(V)[1];
+	(n1, n2) = size(A);
+	for i in [1:length]
+		if (1 <= I[i] <= n1 && 1 <= J[i] <= n2)
+			A[I[i], J[i]] += V[i];
+		end
+	end
+end
+
+function SparseImage(str::ASCIIString, alpha::Float32, beta::Float32, gamma::Float32, f::Float32, p::Int64, outStr::ASCIIString)
+	println("\nImporting CSV file...");
+	@time (I, J, V) = ImportSparse(str);
+	println("\nRescaling sparse entries...");
+	@time (I, J, N1, N2) = RescaleSparse(I, J, f, p);
+	println("\nAllocating RCpair...");
+	M1 = div(N1, 2) + 1;
+	M2 = div(N2, 2) + 1;
+	@time A = RCpair(full(sparse(I, J, V, N1, N2)));
+	gc();
+	println("\nFourier transforming RCpair...");
+	@time rfft!(A);
+	println("\nAllocating Lorentz kernel...");
+	@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+	println("\nFourier transforming Lorentz kernel...");
+	@time FFTW.r2r!(B, FFTW.REDFT00);
+	println("\nSpectral multiplying...");
+	@time SpectralMultiply_Real_RealEven(A, B);
+	println("\nInverse Fourier transforming RCpair...");
+	@time irfft!(A);
+	B = 0; 
+	gc();
+	println("\nAllocating image space...");
+	@time B = zeros(Uint8, 3, N1, N2);
+	println("\nColoring image...");
+	@time ColorizeUint8(A, B);
+	A = 0;
+	gc();
+	A = 1;
+	gc();
+	gc();
+	ans = 1;
+	gc();
+	println("\nWriting Image...");
+	@time ImageWrite(B, outStr);
+	B = 0;
+	gc();
+	println("\nDone.");
+	gc();
+	#Memory management and garbage collection inside of functions is shit. Use out-of-function version for very large pictures.
+end
+
+
+# Might want to rewrite RescaleSparse so that it can have a target image dimensions, so that you can take advantage of whatever speedup is available from power-of-two sizes.
+
+
+function Testfunction()
+	A = rand(Float32, 20000, 20000);
+	A = 0;
+	gc();
+end

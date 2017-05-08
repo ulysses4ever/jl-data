@@ -1,0 +1,24 @@
+using Winston
+include("Auction.jl") # load auction model code
+
+function main()
+    # true theta
+    theta = [0.5, 0.5]
+    # generate 'true' aux. stat.
+    reps = 100000
+    Zs = zeros(reps, 6)
+    for i = 1:reps
+        Zs[i,:] = aux_stat(theta, "")
+    end
+
+    for i = 1:6
+        plothist(vec(Zs[:,i]), 100)
+        if i==1 savefig("figure1.png") end
+        if i==2 savefig("figure2.png") end
+        if i==3 savefig("figure3.png") end
+        if i==4 savefig("figure4.png") end
+        if i==5 savefig("figure5.png") end
+        if i==6 savefig("figure6.png") end
+    end    
+end
+main()

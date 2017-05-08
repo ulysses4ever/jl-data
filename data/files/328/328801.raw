@@ -1,0 +1,73 @@
+export Response
+
+# exported
+
+type Response
+    status::Int
+    headers::Dict{String, String}
+    data::String
+
+    socket::TcpSocket
+
+    Response(socket::TcpSocket) = new(200, (String=>String)[], "", socket)
+end
+
+function send(res::Response)
+    local buf
+
+    if !haskey(http_status_reason, res.status)
+        res.status = 500
+        res.data   = ""
+
+        empty!(res.headers)
+    end
+
+    # register default headers
+    if 0 < length(res.data) && !haskey(res.headers, "Content-Type")
+        res.headers["Content-Type"] = "text/plain; charset=UTF-8"
+    end
+
+    if 0 < length(res.data) && !haskey(res.headers, "Content-Length")
+        res.headers["Content-Length"] = string(length(res.data))
+    end
+
+    # send starting ling
+    buf = "HTTP/1.1 " * string(res.status) * " " * http_status_reason[res.status] * "\r\n"
+
+    # send headers
+    for (header, value) in res.headers
+        buf *= header * ": " * value * "\r\n"
+    end
+
+    buf *= "\r\n"
+
+    # send data
+    if 0 < length(res.data)
+        buf *= res.data
+    end
+
+    # write to socket and close
+    write(res.socket, buf)
+    close(res.socket)
+end
+
+# NOT exported
+
+const http_status_reason = (Int => String)[
+    200 => "OK",
+    204 => "No Content",
+    301 => "Moved Permanently",
+    302 => "Moved Temporarily",
+    303 => "See Other",
+    304 => "Not Modified",
+    307 => "Temporary Redirect",
+    400 => "Bad Request",
+    401 => "Unauthorized",
+    403 => "Forbidden",
+    404 => "Not Found",
+    405 => "Method Not Allowed",
+    500 => "Internal Server Error",
+    501 => "Not Implemented",
+    502 => "Bad Gateway",
+    503 => "Service Unavailable"
+]

@@ -1,0 +1,33 @@
+using Distributions
+
+function kmeans(K::Int, mix::Mixture)
+
+  # initialize centroids
+  k = points(mix)[indices(K, length(mix))]
+
+  # iterate once
+  assign()
+  move()
+
+  centroids(mix)
+end
+
+# assign each point to it's nearest centroid
+function assign()
+
+end
+
+# move each centroid into the middle of it's assigned points
+function move()
+
+end
+
+# k-means cost function. sum of square distances to centroids
+function distortion()
+  0
+end
+
+# K non-repeating indices from m total
+function indices(K, m)
+  randperm(m)[1:K]
+end

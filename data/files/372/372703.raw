@@ -1,0 +1,30 @@
+include("/home/betrema/Julia/workspace/jb2048.jl")
+include("/home/betrema/Julia/workspace/dag2048.jl")
+# julia set working module
+
+b=[20 19 2; 1 1 0; 0 0 0]
+@time tb=maxtree(b)
+
+length(maxdag),length(meandag)
+tb.val
+begin
+    g=Game(b)
+    play!(g,display=true)
+end
+
+b[1,3]=1
+b=[20 19 1; 1 0 0; 0 0 0]
+@time tb=MaxNode(b)
+plot(b)
+
+i=-8
+i+=1;plot(g.hist[i]...)
+i-=1;plot(g.hist[i]...)
+
+gc()
+
+i=1;g=Game(b)
+i+=1;play!(g,i,display=true)
+d=maxdag[g.board]
+
+jb2048

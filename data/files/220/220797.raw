@@ -1,0 +1,47 @@
+type PNJ
+    name::AbstractString
+    ac::Int8
+    hp::Int16
+    at::Int8
+    dmg1::Int8
+    dmg2::Int8
+    dmg3::Int8
+    str::Int8
+    dex::Int8
+    con::Int8
+    int::Int8
+    wis::Int8
+    cha::Int8
+end
+
+function getPNJFromFile(fileName)
+    f = open("data/$fileName")
+    arrFile = readlines(f)
+    close(f)
+    dicP = Dict()
+    for i in arrFile
+        arrLine = split(i," ")
+        arrField = split(arrLine[2],":")
+        if length(arrField)>1  # There is a range
+            i1 = parse(Int16, arrField[1])
+            i2 = parse(Int16, arrField[2])
+            i3 = rand(i1:i2)
+            dicP[arrLine[1]] = "$i3"
+        else
+            dicP[arrLine[1]] = strip(arrLine[2])
+        end
+    end
+    return PNJ(dicP["name"],
+                parse(Int8, dicP["ac"]),
+                parse(Int16,dicP["hp"]),
+                parse(Int8, dicP["at"]),
+                parse(Int8, dicP["dmg1"]),
+                parse(Int8, dicP["dmg2"]),
+                parse(Int8, dicP["dmg3"]),
+                parse(Int8, dicP["str"]),
+                parse(Int8, dicP["dex"]),
+                parse(Int8, dicP["con"]),
+                parse(Int8, dicP["int"]),
+                parse(Int8, dicP["wis"]),
+                parse(Int8, dicP["cha"]))
+end

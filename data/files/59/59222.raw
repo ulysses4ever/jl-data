@@ -1,0 +1,92 @@
+module FalseColor
+#include("colormaps.jl")
+
+# ColorMap type for regularly spaced colormaps
+immutable ColorMapRegular
+colors::Array{Float64, 2}
+end
+
+# Lookup colors in regularly spaced colormaps - assumes x is within (0,size(cmap.data, 2)-1)
+function lookupindex(cmap::ColorMapRegular, x::Float64)
+xi = ceil(x)
+w = xi - x
+(xi, w)
+end
+
+# ColorMap type for irregularly spaced colormaps
+immutable ColorMapIrregular
+colors::Array{Float64, 2}
+x::Vector{Float64}
+w::Vector{Float64}
+end
+
+# Lookup colors in irregularly spaced colormaps - assumes x is within (0,size(cmap.data, 2)-1)
+function lookupindex(cmap::ColorMapIrregular, x::Float64)
+xi = searchsortedlast(cmap.x, x)
+@inbounds begin
+w = (x - cmap.x[xi]) * cmap.w[xi]
+end
+(xi, w)
+end
+
+# A generic colormap constructor
+function ColorMap(table::Array{Float64, 2})
+if size(table, 2) < 2
+    error("Colormaps require at least 2 entries (2nd dimension");
+end
+n = size(table, 1)
+if n != 3 && n != 4
+    error("Colormaps require 2 or 3 channels (1st dimension)")
+end
+if n == 3
+   return ColorMapRegular(table)
+else
+   w = vec(table[end,1:end-1])
+   x = cumsum(w)
+   x = [0.0, (x[1:end-1] * (length(x) / x[end]))]
+   return ColorMapIrregular(table[1:end-1,:], x, 1.0./w)
+end
+end
+
+function real2rgb_(data::Array{Float64, 2}, cmap::Union(ColorMapRegular,ColorMapIrregular), low::Float64, high::Float64)
+out = Array(Float64, size(data, 1)*size(data, 2), 3)
+f = (size(cmap.colors, 2) - 1) / (high - low)
+# Go over each pixel
+@inbounds begin
+for i = 1:length(data)
+    if data[i] <= low
+        out[i,:] = cmap.colors[:,1]'
+    elseif data[i] >= high
+        out[i,:] = cmap.colors[:,end]'
+    else
+        (xi, w) = lookupindex(cmap, (data[i] - low) * f)
+        xi_ = xi + 1
+        w_ = 1.0 - w
+        out[i,1] = cmap.colors[1,xi] * w + cmap.colors[1,xi_] * w_
+        out[i,2] = cmap.colors[2,xi] * w + cmap.colors[2,xi_] * w_
+        out[i,3] = cmap.colors[3,xi] * w + cmap.colors[3,xi_] * w_
+    end
+end
+end
+return reshape(out, size(data, 1), size(data, 2), 3)
+end
+
+function real2rgb(data::Array{Float64, 2}, cmap::Array{Float64, 2}, range...)
+if length(range) > 0 && length(range[1]) == 2
+    low = range[1][1]
+    high = range[1][2]
+else
+    # Compute the range of the data
+    try
+        (low, high) = extremum(data)
+    catch
+        (low, high) = (minimum(data), maximum(data))
+    end
+end
+# Do the conversion
+real2rgb_(data, ColorMap(cmap), float64(low), float64(high))
+end
+
+# Functions to be visible outside
+export real2rgb
+end

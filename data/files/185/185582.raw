@@ -1,0 +1,27 @@
+function keyPress(window, button)
+	if GLFW.GetKey(window, button) == GLFW.PRESS
+		return true
+	else
+		return false
+	end
+end
+
+function mousePress(window, button)
+	if GLFW.GetMouseButton(window, button) == GLFW.PRESS
+		return true
+	else
+		return false
+	end
+end
+
+function mouseX(window)
+	GLFW.PollEvents()
+	x, y = GLFW.GetCursorPos(window)
+	return x
+end
+
+function mouseY(window)
+	GLFW.PollEvents()
+	x, y = GLFW.GetCursorPos(window)
+	return y
+end

@@ -1,0 +1,98 @@
+__precompile__()
+
+"""
+Barycentric
+===========
+
+This module implements the Barycentric formula for polynomial interpolation on
+equispaced points and Chebyshev points of the first and second kind. The
+formulae used are taken from the paper of Berrut and Trefethen, SIAM Review,
+2004.
+
+Written by David A.W. Barton (david.barton@bristol.ac.uk) 2016 and licensed
+under the MIT license <https://opensource.org/licenses/MIT>
+"""
+module Barycentric
+
+# Unless otherwise specified, equation references refer to Berrut and Trefethen, SIAM Review, 2004
+
+"Return an array of equispaced points with n intervals"
+function points_equispaced(n::Integer)
+    # For completeness only
+    collect(linspace(-1.0, 1.0, n+1))
+end
+
+"Return an array of Chebyshev points of the first kind"
+function points_chebyshev1(n::Integer)
+    cos([(2j + 1)*π/(2n + 2) for j = 0:n])
+end
+
+"Return an array of Chebyshev points of the second kind"
+function points_chebyshev2(n::Integer)
+    cos([j*π/n for j = 0:n])
+end
+
+"Return the Barycentric weights for arbitrary points"
+function weights{T <: Real}(x::Vector{T})
+    1./map(i -> prod(x[i] - x[[1:i-1; i+1:end]]), 1:length(x))
+end
+
+"Return the Barycentric weights for equispaced points with n intervals"
+function weights_equispaced(n::Integer)
+    # Eq. (5.1)
+    w = [Float64(binomial(n, j)) for j = 0:n]
+    w[2:2:end] = -w[2:2:end]
+    return w
+end
+
+"Return the Barycentric weights for Chebyshev points of the first kind"
+function weights_chebyshev1(n::Integer)
+    # Eq. (5.3)
+    w = [sin((2j + 1)*π/(2n + 2)) for j = 0:n]
+    w[2:2:end] = -w[2:2:end]
+    return w
+end
+
+"Return the Barycentric weights for Chebyshev points of the second kind"
+function weights_chebyshev2(n::Integer)
+    # Eq. (5.4)
+    w = ones(n+1)
+    w[2:2:end] = -1.0
+    w[1] = 0.5
+    w[end] *= 0.5
+    return w
+end
+
+"""
+Return the interpolation matrix from the points x to the points xnew using the
+Barycentric weights w
+"""
+function interpolation_matrix{T <: Real}(xnew::Vector{T}, x::Vector{T}, w::Vector{T})
+    # Eq. (4.2)
+    xdiff = broadcast(-, xnew, x')
+    M = broadcast(./, w', xdiff)
+    M = broadcast(./, M, sum(M, 2))
+    M[isnan(M)] = 0.0
+    M[xdiff .== 0] = 1.0
+    return M
+end
+
+"""
+Return the interpolated values from the points x with the values y to the
+points xnew using the Barycentric weights w
+"""
+function interpolate{T <: Real}(xnew::Vector{T}, x::Vector{T}, y::Vector{T}, w::Vector{T})
+    return interpolation_matrix(xnew, x, w)*y
+end
+
+"Return the differentiation matrix for the points x with the Barycentric weights w"
+function differentiation_matrix{T <: Real}(x::Vector{T}, w::Vector{T})
+    # Eqs. (9.4) and (9.5)
+    D = broadcast(./, w', w)./broadcast(-, x, x')
+    idx = diagind(D)
+    D[idx] = 0.0
+    D[idx] = -sum(D, 2)
+    return D
+end
+
+end

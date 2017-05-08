@@ -1,0 +1,142 @@
+module BinHeap
+
+import Base: length, pop!
+
+export
+  BinaryHeap,
+  parent,
+  left,
+  right
+
+#heap indexing
+parent(i) = div(i,2)
+left(i)   = i << 1
+right(i)  = (i << 1) | 1
+
+#heap functions
+
+#TODO: turn heapify into a loop
+#not sure if Julia has tailcall recursion (it doesn't)
+function heapify!(array,
+                  comp::Function,
+                  i::Int,
+                  size = length(array))
+  l = left(i)
+  r = right(i)
+
+  if (l <= size) && comp(array[l], array[i])
+    precedence = l
+  else
+    precedence = i
+  end
+
+  if r <= size && comp(array[r], array[precedence])
+    precedence = r
+  end
+
+  if precedence != i
+    (array[i], array[precedence]) =
+      (array[precedence], array[i])
+    heapify!(array, comp, precedence, size)
+  end
+end
+
+function buildheap!(array, comp::Function)
+  for i = fld(length(array), 2):-1:1
+    heapify!(array, comp, i)
+  end
+end
+
+################################################################
+################################################################
+################################################################
+
+lesser(x,y) = (x < y)
+greater(x,y) = (x > y)
+
+type BinaryHeap{T}
+  array::Array{T,1}
+  comp::Function
+
+  function BinaryHeap(array::AbstractArray{T},
+                      compare::Function = lesser)
+    #TODO: maybe a key argument letting the user
+    #choose between a shallow copy and a deepcopy
+    carray = copy(array)
+    buildheap!(carray, compare)
+    new(carray, compare)
+  end
+
+end
+
+function BinaryHeap(t::Type, compare::Function = lesser)
+  BinaryHeap{t}(Array(t,0),compare)
+end
+
+function BinaryHeap{T}(array::AbstractArray{T},
+                       compare::Function = lesser)
+  BinaryHeap{T}(array, compare)
+end
+
+################################################################
+################################################################
+################################################################
+
+#utility
+length(heap::BinaryHeap) = length(heap.array)
+peek(heap::BinaryHeap)   = heap.array[1]
+
+#TODO: Heap functions push!
+function pop!(heap::BinaryHeap)
+  len = length(heap.array)
+  if len < 1
+    error("Heap underflow.")
+  end
+
+  (heap.array[1], heap.array[len]) =
+    (heap.array[len], heap.array[1])
+  top = pop!(heap.array)
+  heapify!(heap.array, heap.comp, 1)
+
+  top
+end
+
+#going to need to make some changes to BinaryHeap
+#this works, but it is a ugly hack:
+#=
+  a = (Int,Int)[]
+  n = 5
+  for i = 1:n
+    push!(a, (i,n-i+1))
+  end
+
+  ls(a,b) = greater(a[2], b[2])
+
+  h = BinaryHeap(a,ls)
+  println(a)
+  println(h)
+
+  function swapkey(arr, i, key)
+    tmp = arr[i]
+    arr[i] = (arr[i][1], key[2])
+  end
+
+  changekey(h, 5, (0,6), swapkey)
+  println(h)
+=#
+function changekey!(heap::BinaryHeap, i, key, swapkey::Function)
+  if !heap.comp(key, heap.array[i])
+    println(key, heap.array[i])
+    error("New key doest not precede current key.")
+  end
+
+  swapkey(heap.array, i, key)
+  while i > 1 &&
+      heap.comp(heap.array[i], heap.array[parent(i)])
+
+    (heap.array[i], heap.array[parent(i)]) =
+      (heap.array[parent(i)], heap.array[i])
+    i = parent(i)
+  end
+end
+end

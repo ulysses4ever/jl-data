@@ -1,0 +1,60 @@
+function insertionSort!{T}(arr::Vector{T})
+  key = 0
+  for j = 2:length(arr)
+    key = arr[j]
+
+    i = j-1
+    @inbounds while i > 0 && arr[i] > key
+      @inbounds arr[i+1] = arr[i]
+      i = i-1
+    end
+
+    arr[i+1] = key
+  end
+end
+
+function mergeArrays{T}(arr1::Vector{T}, arr2::Vector{T})
+  l1 = length(arr1)
+  l2 = length(arr2)
+
+  arr3 = zeros(l1 + l2)
+
+  i = 1
+  j = 1
+
+  for k = 1:(l1+l2)
+    if i > l1
+      @inbounds arr3[k] = arr2[j]
+      j += 1
+      continue
+    end
+
+    if j > l2
+      @inbounds arr3[k] = arr1[i]
+      i += 1
+      continue
+    end
+
+    @inbounds if arr1[i] <= arr2[j]
+      @inbounds arr3[k] = arr1[i]
+      i += 1
+    else
+      @inbounds arr3[k] = arr2[j]
+      j += 1
+    end
+  end
+
+  arr3
+end
+
+function mergeSort{T}(arr::Vector{T})
+  if length(arr) > 1
+    mid = fld(length(arr),2)
+
+    left  = mergeSort(arr[1:mid])
+    right = mergeSort(arr[(mid+1):end])
+    mergeArrays(left,right)
+  else
+    arr
+  end
+end

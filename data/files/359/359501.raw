@@ -1,0 +1,86 @@
+
+# types for MarketRisk module
+
+###################
+# HISTORICAL DATA
+###################
+abstract HistoricalData
+
+type HDIndex <: HistoricalData
+	name::ASCIIString
+end
+
+# Not bound to maturity. Is bound to entire term structure.
+type HDSpreadCurve <: HistoricalData
+	name::ASCIIString
+end
+
+####################
+# RISK FACTORS
+####################
+abstract RiskFactor
+
+type RFStock <: RiskFactor
+	name::ASCIIString
+end
+
+type RFSpotCurrency <: RiskFactor
+	name::ASCIIString
+end
+
+# Not bound to maturity. Is bound to entire term structure.
+type RFIRCurve <: RiskFactor
+	name::ASCIIString
+end
+
+# Bound to specific maturity on a term structure
+type RFIRCurveVertex <: RiskFactor
+	name::ASCIIString
+	maturity::Date
+end
+
+RFIRCurveVertex(factor::RFIRCurve, maturity::Date) = RFIRCurveVertex(factor.name, maturity)
+
+##################
+# PRICING MODELS
+##################
+abstract PricingModel
+abstract FixedIncome <: PricingModel
+abstract Derivative <: PricingModel
+
+type Bullet <: FixedIncome
+	currency::RFSpotCurrency
+	basecurve::RFIRCurve
+	spreadcurve::HDSpreadCurve
+end
+
+type ForwardCurrency <: Derivative
+	currency::RFSpotCurrency
+	currencycurve::RFIRCurve
+	basecurve::RFIRCurve
+end
+
+type FutureCurrency <: Derivative
+	currency::RFSpotCurrency
+	currencycurve::RFIRCurve
+	basecurve::RFIRCurve
+end
+
+##################
+
+type Scenario
+	date :: Date
+	data :: Dict{Union{HistoricalData, RiskFactor}, Union{Float64, AbstractIRCurve}}
+end
+
+abstract AbstractFinancialContract
+
+type FinancialContract <: AbstractFinancialContract
+	id::Int
+	portfolio::Vector{ASCIIString}
+	model::PricingModel
+	attributes::Dict{ASCIIString, Union{Float64, Int, ASCIIString, Date}}
+	log::Vector{ASCIIString}
+
+	FinancialContract(id::Int, portfolio::Vector{ASCIIString}, model::PricingModel) = new(id, portfolio, model, Dict{ASCIIString, Union{Float64, Int, ASCIIString, Date}}(), Vector{ASCIIString}())
+end

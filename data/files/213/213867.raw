@@ -1,0 +1,56 @@
+## =============================================================================
+## treepredict.jl - a re-written version of a decsition tree python
+##                  by Toby Segaran's Collective inttelligence
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+import Base.import
+
+f = open("./data/decision_tree_example.txt")
+
+my_data = Array{Any}[]
+
+for line in eachline(f)
+    val = split(strip(line), "\t")
+    push!(my_data, val)
+end
+
+## code from Jacob here !
+for elm in my_data
+    for (i, v) in enumerate(elm)
+        parsed = tryparse(Int, v)
+        elm[i] = isnull(parsed) ? v : get(parsed)
+    end
+end
+
+close(f)
+
+## class definition
+type DecisionNode
+    col::Int
+    value::ASCIIString
+    tb::DecisionNode
+    fb::DecisionNode
+    results::ASCIIString
+    
+    function DecisionNode(col, value, tb, fb, results)
+        new(col, value, tb, fb, results)
+    end
+end
+
+## Divides a set on a specific column.
+## Can handle numeric or nomnal values.
+function divide_set(rows, column, value)
+
+    set1 = []
+    set2 = []
+
+    if isa(value, Int) || isa(value, Float32)
+        set1 = filter(rows -> rows[column] >= value, rows)
+        set2 = filter(rows -> rows[column] < value, rows)
+    else
+        set1 = filter(rows -> rows[column] == value, rows)
+        set2 = filter(rows -> rows[column] != value, rows)
+    end
+
+    return (set1, set2)
+end

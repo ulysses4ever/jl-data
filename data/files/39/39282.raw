@@ -1,0 +1,190 @@
+import Graphs
+
+# TODO: be sure this works when repo becomes a package.
+# Hat tip: https://groups.google.com/forum/#!topic/julia-users/BSQfu9mmoL0 
+bctdir = dirname(Base.source_path());
+
+""" empty_graph(V::Type, E::Type, is_directed::Bool=true);
+Returns an empty graph of the given vertex type, V, and edge type, E, to which vertices and edges may be added using functions `Graph.add_vertex!` and `Graph.add_Edge!` respectively.
+V must be either Graph.KeyVertex or Graph.ExVertex.
+E must be either Graph.Edge{V} or Graph.ExEdge{V}.
+"""
+function empty_graph(V::Type, E::Type, is_directed::Bool=true)
+    if !(V <: Graphs.KeyVertex || V <: Graphs.ExVertex)
+        error("Vertex type, V, must be either Graphs.KeyVertex or Graphs.ExVertex. ", V," is unrecognized.");
+    end
+    if E != Graphs.Edge{V} || E != Graphs.ExEdge{V}
+        error("For edge/vertex compatibility, edge type, E, must be either Graphs.Edge{",V,"} or Graphs.ExEdge{",V,"}. ",E," is incorrect.")
+    end
+    gindexof = Dict{V,Int}();
+    gfinclist = Array{Array{E,1},1}();
+    gbinclist = Array{Array{E,1},1}();
+    gedges = Array{E,1}();
+    gvertices = Array{V,1}();
+    return Graphs.Graph{V,E}(is_directed, gvertices, gedges, gfinclist, gbinclist, gindexof);
+end
+
+function fve30(bctdir::AbstractString = bctdir)
+    Names = readdlm(joinpath(bctdir,"fve30Names.txt"), ' ', ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(bctdir,"fve30CIJ.txt"), ' ', Int);
+    return bct_graph(Names, CIJ, true);
+end
+
+function fve32(bctdir::AbstractString = bctdir)
+    Names = readdlm(joinpath(bctdir,"fve32Names.txt"), ' ', ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(bctdir,"fve32CIJ.txt"), ' ', Int);
+    return bct_graph(Names, CIJ, true);
+end
+
+function macaque47(bctdir::AbstractString = bctdir)
+    Names = readdlm(joinpath(bctdir,"macaque47Names.txt"), ' ',
+                    ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(bctdir,"macaque47CIJ.txt"), ' ', Int);
+    # Not all vertices are named in this dataset: pad with numbers
+    pad = map(string, (1+size(Names,1)):(size(CIJ,1)));
+    Names = vcat(Names, pad);
+    return bct_graph(Names, CIJ, true);
+end
+
+function macaque71(bctdir::AbstractString = bctdir)
+    Names = readdlm(joinpath(bctdir,"macaque71Names.txt"), ' ',
+                    ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(bctdir,"macaque71CIJ.txt"), ' ', Int);
+    return bct_graph(Names, CIJ, true);
+end
+
+
+""" cat(threshold::Int=0, ctx::Bool=true, bctdir::AbstractString = bctdir)
+
+The cat dataset consists of two weighted, directed graphs. Weights are integers between 0 and 3, where 0 means no connection and 3 indicates the strongest connection. A threshold between 0 and 3 determines which entries will be counted as edges. The default threshold is 0, meaning all positive entries will be edges. Weights themselves are preserved as edge attributes.
+
+The larger dataset covers the cortico-thalamic network, the smaller just the cortex. Regional names pertain to the smaller dataset (52 regions.) The larger, 95x95, weight matrix contains the smaller as its upper-left 52x52 minor. In place of names, numbers are used for regions beyond 52.
+
+The BCT dataset references Scannell et. al. [The Connectional Organization of the Cortico-thalamic System of the Cat](http://cercor.oxfordjournals.org/content/9/3/277.long)(1999). Scannell et. al. report, "Connections weighted ‘3’ are strong, connections weighted ‘2’ are intermediate, connections weighted ‘1’ are weak or sparse, and connections marked ‘.’ have been explicitly reported as absent or are unreported." In the BCT data '0' takes the place of '.'
+"""
+function cat(threshold::Int=0, ctx::Bool=true, bctdir::AbstractString = bctdir)
+    Names = readdlm(joinpath(bctdir,"catNames.txt"), ' ', ASCIIString)[:,1];
+    if !ctx
+        Names = vcat(Names, map(string, 53:95));
+    end
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = ctx ? readdlm(joinpath(bctdir,"catCIJctx.txt"), ' ', Int) :
+    readdlm(joinpath(bctdir,"catCIJall.txt"),' ',Int);
+    # TODO: edges will have weight attributes, vertices will have no attributes
+    n = size(Names,1);
+    v = map(Graphs.KeyVertex, 1:n, Names);
+    eg = Array{Graphs.ExEdge{Graphs.KeyVertex{ASCIIString}},1}(sum(CIJ .> threshold));
+    k = 0;
+    for i in 1:n, j in 1:n
+        if CIJ[i,j] > threshold
+            k += 1;
+            eg[k] = Graphs.ExEdge(k, v[i], v[j],
+                                  Dict{UTF8String,Any}("weight" => CIJ[i,j]));
+        end
+    end
+    return make_bct_graph(v, eg, true);
+end
+
+
+""" coactivation(threshold::Real=0.0, bctdir::AbstractString = bctdir)
+    
+The BCT coactivation dataset is a weighted, undirected graph derived by Crossley et. al., [Cognitive relevance of the community structure of the human brain functional coactivation network](http://www.pnas.org/content/110/28/11583.full)(2013). The data consists of a symmetric weight matrix with values in [0,1), and 3D spatial coordinates for each vertex. Thus both edges and vertices will have attributes, weights in the case of edges, coordinates in the case of vertices. Any weight exceeding the threshold argument will be counted as an edge.
+
+Crossley et. al., "used a meta-analysis of the large primary literature that used fMRI or PET to measure task-related activation (>1,600 studies; 1985–2010). We estimated the similarity (Jaccard index) of the activation patterns across experimental tasks between each pair of 638 brain regions. This continuous coactivation matrix was used to build a weighted graph to characterize network topology. The coactivation network was modular, with occipital, central, and default-mode modules predominantly coactivated by specific cognitive domains (perception, action, and emotion, respectively)." (For Jaccard index see [Wikipedia](https://en.wikipedia.org/wiki/Jaccard_index)).
+
+The related, BCT group average dataset was derived by different means in the same Crossley et. al. study. 
+"""    
+function coactivation(threshold::Real=0.0, bctdir::AbstractString = bctdir)
+    W = readdlm(joinpath(bctdir,"Coactivation_Matrix.txt"), ' ', Float64);
+    coords = readdlm(joinpath(bctdir, "Coactivation_Coord.txt"), ' ', Float64 );
+    n = size(coords,1);
+    g = empty_graph(Graphs.ExVertex, Graphs.ExEdge{Graphs.ExVertex}, false);
+    for i in 1:n
+        vtx = Graphs.ExVertex(i,string(i));
+        vtx.attributes["coordinates"]=coords[i,:]';
+        Graphs.add_vertex!(g,vtx)
+    end
+    # Note: since W is symmetric, listing only i,j edges, not j,i
+    # add_edge! will take care of symmetries
+    for i in 1:n, j in i:n
+        if W[i,j] > threshold
+            eg = Graphs.add_edge!(g, g.vertices[i], g.vertices[j]);
+            eg.attributes["weight"] = W[i,j];
+        end
+    end
+    return g;
+end
+
+""" groupaverage(threshold::Real=0.0, bctdir::AbstractString = bctdir)
+
+The BCT group average dataset is a weighted, undirected graph derived by Crossley et. al., [Cognitive relevance of the community structure of the human brain functional coactivation network](http://www.pnas.org/content/110/28/11583.full)(2013). The data consists of a symmetric weight matrix with values in [0,1), and 3D spatial coordinates for each vertex. Thus both edges and vertices will have attributes, weights in the case of edges, coordinates in the case of vertices. Any weight exceeding the threshold argument will be counted as an edge.
+
+Crossley et. al. derived the weights "from resting state fMRI data (n = 27, healthy volunteers)." The related, BCT coactivation dataset was derived by different means in the same study.  
+
+"""
+function groupaverage(threshold::Real=0.0, bctdir::AbstractString = bctdir)
+    W = readdlm(joinpath(bctdir,"GroupAverage_Weight.txt"), ' ', Float64);
+    coords = readdlm(joinpath(bctdir, "GroupAverage_Coord.txt"), ' ', Float64 );
+    n = size(coords,1);
+    g = empty_graph(Graphs.ExVertex, Graphs.ExEdge{Graphs.ExVertex}, false);
+    for i in 1:n
+        vtx = Graphs.ExVertex(i,string(i));
+        vtx.attributes["coordinates"]=coords[i,:]';
+        Graphs.add_vertex!(g,vtx)
+    end
+    # Note: since W is symmetric, listing only i,j edges, not j,i
+    # add_edge! will take care of symmetries
+    for i in 1:n, j in i:n
+        if W[i,j] > threshold
+            eg = Graphs.add_edge!(g, g.vertices[i], g.vertices[j]);
+            eg.attributes["weight"] = W[i,j];
+        end
+    end
+    return g;
+end
+
+""" bct_graph(Labels, C)
+Constructs a GenericGraph based on a vector, Names, of vertex labels, and an incidence or weight matrix, C.
+Labels, a vector of length n representing vertex labels
+C, an n by n matrix of type <: Real representing vertex connectivity.
+is_directed, true or false; if false C must be symmetric
+"""
+function bct_graph{L <: Any, T <: Real}(Labels::Array{L,1}, C::Array{T,2}, is_directed=true)
+    n = size(Labels,1);
+    if size(C) != (n,n)
+        error("C matrix size, ",size(C),
+              ", incompatible with Labels size, ",n,".");
+    end
+    if !is_directed && C != C'
+        error("C is not symmetric, hence not the connection matrix of an undirected graph");
+    end
+    v = map(Graphs.KeyVertex, 1:size(Labels,1), Labels);
+    eg = Array{Graphs.Edge{typeof(v[1])},1}(sum(C .> 0));
+    k = 0;
+    for i in 1:n, j in 1:n
+        if C[i,j] > 0
+            k += 1;
+            eg[k] = Graphs.Edge(k, v[i], v[j]);
+        end
+    end
+    return make_bct_graph(v, eg, is_directed);
+end
+
+
+function make_bct_graph{V,E}(v::Array{V,1}, eg::Array{E,1}, is_directed::Bool=true)
+    gindexof = Dict{V,Int}();
+    gfinclist = Array{Array{E,1},1}();
+    gbinclist = Array{Array{E,1},1}();
+    gedges = Array{E,1}();
+    gvertices = Array{V,1}();
+    g = Graphs.Graph{V,E}(is_directed, gvertices, gedges, gfinclist, gbinclist, gindexof);
+    for vertex in v Graphs.add_vertex!(g,vertex) end;
+    for edge in eg Graphs.add_edge!(g, edge) end;
+    return g;
+end
+
+

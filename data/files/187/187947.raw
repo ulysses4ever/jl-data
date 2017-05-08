@@ -1,0 +1,25 @@
+;; marks.jl - Provide a way to operate on multiple windows
+;;
+;; Author : Yann Hodique <Yann.Hodique@lifl.fr>
+
+(defvar marked-windows-list nil)
+
+(defun mark-window (win)
+  (interactive "%W")
+  (setq marked-windows-list (append marked-windows-list (list win))))
+
+(defun unmark-window (win)
+  (interactive "%W")
+  (setq marked-windows-list (remove win marked-windows-list)))
+
+(defun unmark-all-windows ()
+  (interactive)
+  (setq marked-windows-list nil))
+
+(defun apply-on-marked-windows (func)
+  (mapcar func marked-windows-list))
+
+(defun marked-windows ()
+  (not (eq marked-windows-list nil)))
+
+(provide 'marks)

@@ -1,0 +1,11 @@
+
+cd("/Users/martinsouchier/Desktop/Julia/Term paper/Portfolio_choices")
+include("src/Opt_portfolio_choices.jl")
+
+# Create a dictionary with the parameters
+parameters = Dict("teta"=> 0.7,"rho"=>0.99, "sigma"=>0.05, "alpha" => 0.8, "lambda" => 2,"gamma"=>10, "beta"=>1, "psi" => 0.05, "tau" => 0.00419)
+k0 = 0.5 # value to start with
+N = 1000000 # Number of periods for the simulation - tradeoff speed versus accuracy
+tol = 0.00001 # Define tolerance for the loop
+
+results = Opt_portfolio_choices.solver(parameters,k0,N,tol)

@@ -1,0 +1,313 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+include("modelling_functions.jl")
+include("nw_algorithm.jl")
+
+##################################################################################
+
+
+##################################################################################
+
+type ModifiedNWSystem
+  _matrix::NWMatrix
+
+  _seq1::Array{Char}
+  _seq2::Array{Char}
+
+  _pdaSeq1::RecognitionPDA
+  _pdaSeq2::RecognitionPDA
+end
+
+type NaiveNWSystem
+  _matrix::NWMatrix
+
+  _seq1::Array{Char}
+  _seq2::Array{Char}
+
+  _substitutionMatrix::SubstMatrix
+end
+
+function getLengthOfSeq1(system::ModifiedNWSystem)
+  return length(system._seq1)
+end
+
+function getLengthOfSeq1(system::NaiveNWSystem)
+  return length(system._seq1)
+end
+
+
+function getLengthOfSeq2(system::ModifiedNWSystem)
+  return length(system._seq2)
+end
+
+function getLengthOfSeq2(system::NaiveNWSystem)
+  return length(system._seq2)
+end
+
+
+function getNuclInSeq1(system::ModifiedNWSystem, i::Int64)
+    return system._seq1[i]
+end
+
+function getNuclInSeq1(system::NaiveNWSystem, i::Int64)
+    return system._seq1[i]
+end
+
+function getNuclInSeq2(system::ModifiedNWSystem, j::Int64)
+    return system._seq2[j]
+end
+
+function getNuclInSeq2(system::NaiveNWSystem, j::Int64)
+    return system._seq2[j]
+end
+
+
+function getIdentityOrSubstitutionScore(system::NaiveNWSystem, 
+                                        nucl_a::Char,
+                                        nucl_b::Char)
+  return getScore(system._substitutionMatrix, nucl_a, nucl_b)
+end
+
+function createModifiedNWSystem(seq1::Array{Char}, seq2::Array{Char})
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if lenOfSeq1 > lenOfSeq2
+        return ModifiedNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1,
+          createRecognitionPDA(lenOfSeq1), createRecognitionPDA(lenOfSeq1))  
+    else
+        return ModifiedNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2,
+          createRecognitionPDA(lenOfSeq2), createRecognitionPDA(lenOfSeq2))
+    end
+end
+
+function createNaiveNWSystem(seq1::Array{Char}, seq2::Array{Char})
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if lenOfSeq1 > lenOfSeq2
+        return NaiveNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1,
+          createDefaultSubstitutionMatrix())
+    else
+        return NaiveNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2,
+          createDefaultSubstitutionMatrix())
+    end
+end
+
+abstract SubstMatrixChoice
+
+type DefaultSubstMatrix <: SubstMatrixChoice
+end
+
+type CustomSubstMatrix1 <: SubstMatrixChoice
+end
+
+function createNaiveNWSystem(seq1::Array{Char}, seq2::Array{Char}, aChoiceOfSubstMatrix::SubstMatrixChoice)
+    lenOfSeq1 = length(seq1)
+    lenOfSeq2 = length(seq2)
+
+    if isa(typeof(aChoiceOfSubstMatrix), Type{DefaultSubstMatrix})
+      chosenSubstMatrix = createDefaultSubstitutionMatrix()
+    elseif isa(typeof(aChoiceOfSubstMatrix), Type{CustomSubstMatrix1})
+      chosenSubstMatrix = createCustomSubstitutionMatrix1()
+    else
+      chosenSubstMatrix = createDefaultSubstitutionMatrix()
+    end
+
+    if lenOfSeq1 > lenOfSeq2
+        return NaiveNWSystem(createMatrix(lenOfSeq2, lenOfSeq1), seq2, seq1,
+          chosenSubstMatrix)
+    else
+        return NaiveNWSystem(createMatrix(lenOfSeq1, lenOfSeq2), seq1, seq2,
+          chosenSubstMatrix)
+    end
+end
+
+##################################################################################
+
+##################################################################################
+function runNeedlemanWunsch(system::NaiveNWSystem)
+  println("Running Naive Needleman Wunsch Algorithm")
+
+  matrix = system._matrix
+
+  numberOfRows = getNumOfRows(matrix)
+  numberOfCols = getNumOfCols(matrix)
+
+  println(numberOfRows)
+  println(numberOfCols)
+
+  ## for testing here only ## 
+  gapPenalty = 5.0
+
+  print("Gap Penalty: ")
+  println(gapPenalty)
+
+  j = 1
+  while j < numberOfCols
+    setMatrixValue(system._matrix, 1, j, j*gapPenalty)
+    j = j + 1
+  end
+
+  i = 1
+  while i < numberOfRows
+    setMatrixValue(system._matrix, i, 1, i*gapPenalty)
+    i = i + 1
+  end
+
+  i,j = 2, 2
+
+  identity_or_subst_score = 0
+  deletion_score = 0
+  insertion_score = 0
+
+  while i <= numberOfRows
+    j = 2
+    while j <= numberOfCols
+      ## calculate the scores and costs for all options
+
+      identity_or_subst_score = 
+        getIdentityOrSubstitutionScore(system,
+                                       getNuclInSeq1(system, i),
+                                       getNuclInSeq2(system, j)) 
+
+      ## initial debug...i.e. not what it should be
+      s1_curr = getNuclInSeq1(system, i)
+      s2_curr = getNuclInSeq2(system, j)
+
+      F_case_after_identity_or_subst = getMatrixValue(matrix, i-1, j-1) + identity_or_subst_score
+      F_case_after_deletion = getMatrixValue(matrix, i-1, j) - gapPenalty
+      F_case_after_insertion = getMatrixValue(matrix, i, j-1) - gapPenalty
+
+      setMatrixValue(matrix, i, j, max(F_case_after_identity_or_subst,
+                                       F_case_after_deletion,
+                                       F_case_after_insertion))
+
+      j += 1
+    end
+
+    i += 1
+  end
+
+  drawMatrix(matrix)
+  print("\n")
+  drawMatrixWithNumbers(matrix)
+end
+
+function runNeedlemanWunsch(system::ModifiedNWSystem)
+  println("Running Modified Needleman Wunsch Algorithm")
+
+  matrix = system._matrix
+
+  numberOfRows = getNumOfRows(matrix)
+  numberOfCols = getNumOfCols(matrix)
+
+  println(numberOfRows)
+  println(numberOfCols)
+
+  j = 1
+  while j < numberOfCols
+    setMatrixValue(system._matrix, 1, j, 0.0)
+    j = j + 1
+  end
+
+  i = 1
+  while i < numberOfRows
+    setMatrixValue(system._matrix, i, 1, 0.0)
+    i = i + 1
+  end
+
+  i,j = 1, 1
+
+  while i <= numberOfRows
+    while j <= numberOfCols
+      ## calculate the scores and costs for all options
+            
+      ## initial debug...i.e. not what it should be
+      s1_curr = getNuclInSeq1(system, i)
+      s2_curr = getNuclInSeq2(system, j)
+
+      if s1_curr == s2_curr
+        setMatrixValue(matrix, i, j, 6.0)
+      end
+
+      print("Current Comparision { ")
+      print(s1_curr)
+      print(" ~= ")
+      print(s2_curr)
+      println(" }")
+
+      j += 1
+    end
+
+    i += 1
+  end
+
+  drawMatrix(matrix)
+  print("\n")
+  drawMatrixWithNumbers(matrix)
+end
+
+##################################################################################
+
+println("Naive-Needleman-Wunsch")
+
+runHandWrittenQualitativeRecognitionTests()
+
+print("-----------------------------------------------------------\n")
+println("Creating Modified Needleman Wunsch System (PDA+NWMatrix+etc)\n")
+
+theModifiedNWSystem = createModifiedNWSystem(['G','T','C'],['G','A','A','A','A','T','C'])
+
+println("\n-----------------------------------------------------------")
+println("Running Modified NW...\n")
+runNeedlemanWunsch(theModifiedNWSystem)
+
+# forcing the garbage collector to run
+gc()
+
+print("-----------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (PDA+NWMatrix+etc)\n")
+
+theNaiveNWSystem = createNaiveNWSystem(['G','T','C'],['G','A','A','A','A','T','C'])
+
+println("\n-----------------------------------------------------------")
+println("Running Naive NW...\n")
+runNeedlemanWunsch(theNaiveNWSystem)
+
+# forcing the garbage collector to run
+gc()
+
+print("\n-----------------------------------------------------------\n")
+println("Creating Naive Needleman Wunsch System (Custom Subst. Matrix 1) (PDA+NWMatrix+etc)\n")
+
+theNaiveNWSystem = createNaiveNWSystem(['G','T','C'],['G','A','A','A','A','T','C'],CustomSubstMatrix1())
+
+println("\n-----------------------------------------------------------")
+println("Running Naive NW (Custom Subst. Matrix 1)...\n")
+runNeedlemanWunsch(theNaiveNWSystem)
+
+testDefaultScoring()
+
+# testRecognitionStackDataMap()

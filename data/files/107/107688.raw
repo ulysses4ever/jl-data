@@ -1,0 +1,135 @@
+#Caterpillar Tube Pricing Benchmark
+#Julia Ver. 0.0.3 # xgboost model functional + dates included
+
+#Install Needed Libraries
+#Pkg.add("BinDeps")
+#Pkg.add("JSON")
+#Pkg.add("DataFrames")
+#Pkg.add("Gadfly")
+#Pkg.add("XGBoost")
+
+#Libraries, directories, options and extra functions----------------------
+Pkg.update()
+
+using JSON
+using DataFrames
+using Dates
+using Gadfly
+using XGBoost
+
+#Read Settings file
+cd(dirname(@__FILE__()))
+directories = JSON.parsefile("SETTINGS.json")
+
+dataDirectory = directories["dataDirectory"]
+edaDirectory = directories["EDALoc"]
+
+#Load data
+train = readtable(dataDirectory * "train_set.csv")
+test = readtable(dataDirectory * "test_set.csv")
+showcols(train)
+showcols(test)
+
+#Data Transformations
+#Bracket Pricing
+function pricing2Numeric(br_pricing)
+  if br_pricing == "Yes"
+    1
+  else
+    0
+  end
+end
+
+train[:bracket_pricing] = map(pricing2Numeric, train[:, :bracket_pricing])
+test[:bracket_pricing] = map(pricing2Numeric, test[:, :bracket_pricing])
+
+#Quote Dates to numeric columns
+train[:quote_date] = Date(train[:quote_date], "y-m-d")
+test[:quote_date] = Date(test[:quote_date], "y-m-d")
+
+#New Columns
+train[:year] = year(train[:quote_date])
+train[:month] = month(train[:quote_date])
+train[:day] = day(train[:quote_date])
+train[:dayWeek] = dayofweek(train[:quote_date])
+test[:year] = year(test[:quote_date])
+test[:month] = month(test[:quote_date])
+test[:day] = day(test[:quote_date])
+test[:dayWeek] = dayofweek(test[:quote_date])
+
+#Categorical Columns as frequency
+#countmap is similar to the function "table()" in R, the only difference is that countmap() returns a dictionary
+supplierDict = countmap(vcat(train[:supplier], test[:supplier]))
+train[:supplier] = [supplierDict[supplier] for supplier in train[:supplier]]
+test[:supplier] = [supplierDict[supplier] for supplier in test[:supplier]]
+
+#Shuffle train DataFrame
+shuffledIdxs = shuffle([1:size(train, 1)])
+train = train[shuffledIdxs, :]
+
+#EDA (Example)
+#This section contains a few simple examples; if you want to learn more about Gadfly, check out
+#http://www.gadflyjl.org/
+
+#EDA 1; Cost Histograms
+#Cost histogram
+plot(train, x = "cost", Geom.histogram,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost"))
+#Log Cost histogram; useful for linear models and posible outlier detection
+plot(train, x = "cost", Geom.histogram, Scale.x_log,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost in Log Scale"))
+
+#EDA #2; tube cost vs. volume order
+#This plot was based on the script found on:
+#https://www.kaggle.com/timabram/caterpillar-tube-pricing/tube-pricing-data-exploration-v2
+plot(train, x = "quantity", y = "cost", Geom.histogram, Geom.point, Scale.x_log, Scale.y_log,
+     Geom.smooth(method = :loess, smoothing = 0.9), Guide.xlabel("Quantity Bought in Log Scale"), Guide.ylabel("Cost in Log Scale"))
+
+#Transform DataFrame into Array{float32} (which is currently supported by xgboost in julia)
+costTraining = convert(Array{Float32}, train[:, :cost])
+costTrainingLog = log1p(convert(Array{Float32}, train[:, :cost]))
+
+trainArray = convert(Array{Float32}, train[:, [:annual_usage, :bracket_pricing, :min_order_quantity, :quantity,
+                                               :year, :month, :day, :dayWeek, :supplier]])
+testArray = convert(Array{Float32}, test[:, [:annual_usage, :bracket_pricing, :min_order_quantity, :quantity,
+                                             :year, :month, :day, :dayWeek, :supplier]])
+
+#XGBOOST
+#Create Binary Matrices
+dtrain = DMatrix(trainArray, label = costTrainingLog)
+dtest = DMatrix(testArray)
+
+#Define the evaluation function (xgboost currently doesn't support RMSLE)
+function evalRMSLE(preds::Array{Float32, 1}, dtrain::DMatrix)
+  labels = get_info(dtrain, "label")
+  # return a pair metric_name, result
+  differenceLogs = log(1 + preds) - log(1 + labels)
+  RMSLEError = sqrt(1/length(differenceLogs) * sum([x ^ 2 for x in differenceLogs]))
+  return ("RMSLE", RMSLEError)
+end
+
+#5fold Cross-Validation
+nfold = 5
+num_round = 1000
+param = ["max_depth" => 10, "objective" => "reg:linear", "silent" => 1]
+
+#nfold_cv(dtrain, num_round, nfold, param = param, seed = 0)  #This takes too long, the evaluation function has to be further optimized
+
+#Model Training
+#with RMSLE Evaluation
+#XGBoostModel = xgboost(dtrain, num_round, param = param, feval = evalRMSLE)
+#without RMSLE Evaluation
+XGBoostModel = xgboost(dtrain, num_round, param = param)
+
+#Model Evaluation
+dump_model(XGBoostModel, "dump.nice.txt")
+
+#Predictions using test data
+preds = exp(predict(XGBoostModel, dtest)) - 1
+
+#Write Results
+sampleSubmission = readtable(dataDirectory * "sample_submission.csv")
+sampleSubmission[:cost] = preds
+
+writetable("juliaBenchmark.csv", sampleSubmission)
+

@@ -1,0 +1,57 @@
+ tol=1e-3
+ X=[ 0.0608217  0.462135
+ 0.576995   0.485338
+ 0.576995   0.85338
+ 0.0850871  0.510913
+ 0.167439   0.697094
+ 0.26842    0.980925
+ 0.434148   0.161947
+ 0.747831   0.971646
+ 0.167439   0.97094
+ 0.77831   0.971646
+    0.2684    0.9809
+ 0.16743   0.69709
+ 0.52144    0.184723]
+
+# p1=sortperm(X[:,1])
+# p2=sortperm(X[:,2])
+
+# d1=diff(X[p1,1])
+# b1=[ (abs(d1[i])<tol) for i=1:length(d1)]
+# d2=diff(X[p2,2])
+# b2=[ (abs(d2[i])<tol) for i=1:length(d2)]
+# [b1 b2]
+
+# p1=p1[1:length(p1)-1]
+# p2=p2[1:length(p2)-1]
+# ip1=similar(p1); ip1[p1]=1:length(p1);
+# ip2=similar(p2); ip2[p2]=1:length(p2);
+# b=b1&b2
+
+function groups(x, tol)
+    p=sortperm(x)
+    ip=similar(p); ip[p]=1:length(p); #inverse permutation
+    d=diff(x[p])
+    append!(d,[realmax(Float64)])
+    gl=cell(0)
+    j=1
+    while j<length(d)
+        s=j
+        cd=  0.0
+        while cd<=tol
+            cd=cd+d[s]
+            s=s+1
+        end
+        if (s>j+1)
+            append!(gl,[(p[j:s-1],x[p[j:s-1]])]);
+        end
+        j=s
+    end
+    return gl
+end
+
+g1=groups(X[:,1],tol)
+g2=groups(X[:,2],tol)
+show(g1)
+println(" ")
+show(g2)

@@ -1,0 +1,8 @@
+module BasePerfTests
+
+using Reexport
+@reexport using Benchmarks
+
+include("utils.jl")
+
+end # module BasePerfTests

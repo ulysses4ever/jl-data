@@ -1,0 +1,37 @@
+#include("namespace_test.jl")
+#Simple Julia module-"using" exercise
+module PhysicsConstants
+	c = 2.998e8
+end
+
+#==
+#This completely fails:
+function show_speedoflight()
+	using PhysicsConstants
+	println("\nFunction scope:")
+	@show c
+end
+==#
+
+	begin
+		c = 1
+		println("\nScope 1:")
+		@show c
+	end
+
+	#show_speedoflight() #Will not work
+
+	begin
+		#Probably should not have a using statement here in Julia...
+		using PhysicsConstants
+		println("\nScope 2:")
+		#Just shows globally defined c value... not PhysicsConstants.c:
+		@show c
+		#Of course, you can copy elements one-by-one:
+		c = PhysicsConstants.c
+		@show c
+		#But the most succinct way to access *all* module elements follows:
+		p = PhysicsConstants
+		@show p.c #(Not very elegant in mathematical expressions)
+	end
+:Done

@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:02:07 GMT
+Date: Wed, 03 May 2017 21:02:31 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5805
+Content-Length: 5864
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2690
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3865
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "ac421e1115402761c9f03f124b5dd632"
-Last-Modified: Sat, 28 Nov 2015 00:25:53 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "289356bf4f6796c38a5cd51ab5dce33c"
+Last-Modified: Sat, 09 May 2015 13:14:15 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,95 +22,95 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: b535085e7f4d6e3423e016e684de0829
-X-GitHub-Request-Id: F9AB:6637:1337BEB:18CE7FD:5902321F
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: 472D:5CA5:FD6D26:146014C:590A4567
 
 {
-  "id": 47004267,
-  "name": "SimpleFileServer.jl",
-  "full_name": "JeremyRubin/SimpleFileServer.jl",
+  "id": 35324292,
+  "name": "faster_julia_str_search",
+  "full_name": "peter1000/faster_julia_str_search",
   "owner": {
-    "login": "JeremyRubin",
-    "id": 886523,
-    "avatar_url": "https://avatars3.githubusercontent.com/u/886523?v=3",
+    "login": "peter1000",
+    "id": 6168860,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/6168860?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/JeremyRubin",
-    "html_url": "https://github.com/JeremyRubin",
-    "followers_url": "https://api.github.com/users/JeremyRubin/followers",
-    "following_url": "https://api.github.com/users/JeremyRubin/following{/other_user}",
-    "gists_url": "https://api.github.com/users/JeremyRubin/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/JeremyRubin/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/JeremyRubin/subscriptions",
-    "organizations_url": "https://api.github.com/users/JeremyRubin/orgs",
-    "repos_url": "https://api.github.com/users/JeremyRubin/repos",
-    "events_url": "https://api.github.com/users/JeremyRubin/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/JeremyRubin/received_events",
+    "url": "https://api.github.com/users/peter1000",
+    "html_url": "https://github.com/peter1000",
+    "followers_url": "https://api.github.com/users/peter1000/followers",
+    "following_url": "https://api.github.com/users/peter1000/following{/other_user}",
+    "gists_url": "https://api.github.com/users/peter1000/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/peter1000/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/peter1000/subscriptions",
+    "organizations_url": "https://api.github.com/users/peter1000/orgs",
+    "repos_url": "https://api.github.com/users/peter1000/repos",
+    "events_url": "https://api.github.com/users/peter1000/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/peter1000/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/JeremyRubin/SimpleFileServer.jl",
-  "description": "A simple julia file server and client, useful buidling distributed systems.",
+  "html_url": "https://github.com/peter1000/faster_julia_str_search",
+  "description": "Just looking for faster julia string search / searchindex options",
   "fork": false,
-  "url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl",
-  "forks_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/forks",
-  "keys_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/teams",
-  "hooks_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/events",
-  "assignees_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/tags",
-  "blobs_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/subscription",
-  "commits_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/merges",
-  "archive_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/downloads",
-  "issues_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/JeremyRubin/SimpleFileServer.jl/deployments",
-  "created_at": "2015-11-28T00:25:39Z",
-  "updated_at": "2015-11-28T00:25:53Z",
-  "pushed_at": "2015-11-30T18:44:34Z",
-  "git_url": "git://github.com/JeremyRubin/SimpleFileServer.jl.git",
-  "ssh_url": "git@github.com:JeremyRubin/SimpleFileServer.jl.git",
-  "clone_url": "https://github.com/JeremyRubin/SimpleFileServer.jl.git",
-  "svn_url": "https://github.com/JeremyRubin/SimpleFileServer.jl",
-  "homepage": null,
-  "size": 12,
+  "url": "https://api.github.com/repos/peter1000/faster_julia_str_search",
+  "forks_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/forks",
+  "keys_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/teams",
+  "hooks_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/hooks",
+  "issue_events_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/events",
+  "assignees_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/tags",
+  "blobs_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/languages",
+  "stargazers_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/stargazers",
+  "contributors_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/contributors",
+  "subscribers_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/subscribers",
+  "subscription_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/subscription",
+  "commits_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/merges",
+  "archive_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/downloads",
+  "issues_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/labels{/name}",
+  "releases_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/peter1000/faster_julia_str_search/deployments",
+  "created_at": "2015-05-09T10:18:18Z",
+  "updated_at": "2015-05-09T13:14:15Z",
+  "pushed_at": "2015-05-09T13:14:14Z",
+  "git_url": "git://github.com/peter1000/faster_julia_str_search.git",
+  "ssh_url": "git@github.com:peter1000/faster_julia_str_search.git",
+  "clone_url": "https://github.com/peter1000/faster_julia_str_search.git",
+  "svn_url": "https://github.com/peter1000/faster_julia_str_search",
+  "homepage": "",
+  "size": 2040,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
-  "has_wiki": true,
+  "has_wiki": false,
   "has_pages": false,
   "forks_count": 0,
   "mirror_url": null,
-  "open_issues_count": 0,
+  "open_issues_count": 1,
   "forks": 0,
-  "open_issues": 0,
+  "open_issues": 1,
   "watchers": 0,
   "default_branch": "master",
   "permissions": {

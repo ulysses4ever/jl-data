@@ -1,0 +1,36 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function generate()
+
+    NUM_GENOTYPES = 200
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    population = Population.make_population(config_vals)
+
+    for i = 1:NUM_GENOTYPES
+        genotype = Genotype.make_random_genotype(config_vals)
+        Genotype.write_to_graphml(genotype, config_vals, string("random_genotypes_graphml/", string(i), ".graphml"))
+        file = open(string("random_genotypes_supporting_info/", string(i)), "w")
+        Genotype.evaluate(genotype, config_vals, 1, population.preallocation)
+        write(file, string(genotype.fitness), "\n")
+        println(genotype.fitness)
+        genotype.evaluated = false
+        Genotype.evaluate(genotype, config_vals, 2, population.preallocation)
+        write(file, string(genotype.fitness), "\n")
+        println(genotype.fitness)
+        println()
+        close(file)
+    end
+end
+
+generate()

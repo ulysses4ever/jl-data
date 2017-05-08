@@ -1,0 +1,67 @@
+export random_walk, average_random_walk
+
+"""
+`random_walk(A)`
+
+returns the rating over time of each active node on an evolving graph by 
+random walks. 
+"""
+function random_walk(A::SparseMatrixCSC{Float64}; 
+                     a::Float64 = 0.65, b::Float64=0.85, iter::Int = 20)
+    n = A.n
+    d1 = A*ones(eltype(A), n)
+    d2 = A'*ones(eltype(A), n)
+    e1 = spzeros(eltype(A), n)
+    e2 = spzeros(eltype(A), n)
+    v = ones(eltype(A), n)/n
+    k = 0
+    residual = 1
+
+    @inbounds for (d, e) in ((d1,e1), (d2, e2))
+        for i = 1:n
+            if d[i] == zero(eltype(A))
+                d[i] = convert(eltype(A), 1/n)
+                e[i] = one(eltype(A))/n
+            else
+                d[i] = one(eltype(A))/d[i]
+            end
+        end
+    end
+
+    P1 = Diagonal(d1)*A + e1*sparsevec(ones(eltype(A), n))' 
+    P2 = Diagonal(d2)*A' + e2*sparsevec(ones(eltype(A), n))'
+    #display(full(P1))
+    #display(full(P2))
+    H = a*P1 + (1-a)*P2
+    K = b*H + (1- b)*ones(eltype(A), n)*ones(eltype(A), n)'/n
+    KT = K'
+    #display(K*ones(n))
+    while residual >= 1.0e-3
+        prev = v
+        v = KT*v
+        residual = norm(prev - v, 1)
+        k += 1
+        if k >= iter; break end
+    end
+    v, k
+end
+random_walk(g::IntMatrixList; a=0.65, b=0.85) = random_walk(float(spmatrix(g)), a=a, b=b)
+for elty in (:EvolvingGraph, :AttributeEvolvingGraph)
+    @eval begin
+        function random_walk(g::$elty; a=0.65, b=0.85)
+            random_walk(int_matrix_list(g), a=a, b=b)
+        end
+    end
+end
+
+
+function average_random_walk(g::AbstractEvolvingGraph; a = 0.65, b = 0.85)
+    n = num_nodes(g)
+    m = num_timestamps(g)
+    v, k = random_walk(g, a=a, b = b)
+    new_v = zeros(Float64, n)
+    for i = 1:m
+        new_v += v[1+(i-1)*n: i*n]
+    end
+    return new_v, k
+end

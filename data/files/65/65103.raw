@@ -1,0 +1,11 @@
+
+A = UpdateMatrix([2 3;4 5], [5,8])
+B = UpdateMatrix([4 2;6 1], [5,9])
+
+@test size(A) == (2,2)
+C = A+B
+@test size(C) == (3,3)
+@test C.data == [6 3 2; 4 5 0; 6 0 1]
+
+C = FrontalMatrix(A)
+@test typeof(C) <: FrontalMatrix

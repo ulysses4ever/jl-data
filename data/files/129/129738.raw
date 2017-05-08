@@ -1,0 +1,30 @@
+zero(::Type{Symbol}) = symbol("0")
+zero(::Type{Expr}) = :(:0)
+one(::Type{Symbol}) = symbol("1")
+one(::Type{Expr}) = :(:1)
+
+-(x::Symbol) = :(-($x))
+function -(x::Expr)
+  (length(x.args) == 2 && x.args[1] == :-) ? x.args[2] : :(-($x))
+end
+
++(x::Number, y::Symbol) = x == 0 ? (y == zero(Symbol) ? 0 : y) : (y == zero(Symbol) ? x : :($x+$y))
++(x::Symbol, y::Number) = x == zero(Symbol) ? (y == 0 ? 0 : y) : (y == 0 ? x : :($x+$y))
++(x::Number, y::Expr) = x == 0 ? (y == zero(Expr) ? 0 : y) : (y == zero(Expr) ? x : :($x+$y))
++(x::Expr, y::Number) = x == zero(Expr) ? (y == 0 ? 0 : y) : (y == 0 ? x : :($x+$y))
++(x::Symbol, y::Symbol) = x == zero(Symbol) ? y : (y == zero(Symbol) ? x : :($x+$y))
++(x::Symbol, y::Expr) = x == zero(Symbol) ? (y == zero(Expr) ? zero(Symbol) : y) : (y == zero(Expr) ? x : :($x+$y))
++(x::Expr, y::Symbol) = x == zero(Expr) ? (y == zero(Symbol) ? zero(Symbol) : y) : (y == zero(Symbol) ? x : :($x+$y))
+function +(x::Expr, y::Expr)
+  if x == zero(Expr)
+    return y == zero(Expr) ? zero(Expr) : y
+  else
+    if y == zero(Expr)
+      return x
+    elseif y == -x
+      return zero(Expr)
+    else
+      return :($x+$y)
+    end
+  end
+end

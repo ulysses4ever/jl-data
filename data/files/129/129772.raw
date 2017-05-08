@@ -1,0 +1,74 @@
+### Expression expansion is currently under construction.
+
+# Breadth-first traversal will be used for expanding expressions.
+# The function currently traverses each subexpression and prints its symbols.
+# The next step is to define a dictionary of local variables so as to expand expressions.
+
+function breadth_first(exprn::Expr)
+  for arg in exprn.args
+    if arg.head == :(=)
+      println("Subexpression: ", arg)
+
+      queue = Array(Union(Number, Symbol, Expr), 0)
+      unshift!(queue, arg.args[2])
+      
+      while length(queue)!=0
+        node = shift!(queue)
+        
+        if isa(node.args[2], Expr)
+          unshift!(queue, node.args[2])
+        elseif isa(node.args[2], Symbol)
+          println(node.args[2])
+          # To replace symbol, use for ex node.args[2] = :u
+        end
+        
+        if isa(node.args[3], Expr)
+          unshift!(queue, node.args[3])
+        elseif isa(node.args[3], Symbol)
+          println(node.args[3])
+          # To replace symbol, use for ex node.args[3] = :(v+3w)
+        end
+      end
+    elseif arg.head == :line
+      continue
+    else
+      error("The given exprn can not be handled")
+    end
+  end
+end
+
+# Depth-first pre-order traversal of subexpressions is an inefficient candidate for expression expansion.
+# It also overcomplicates the implementation.
+# The function will be archived and dropped from development in favor of breadth-first traversal.
+
+function depth_first_pre_order(exprn::Expr)
+  for arg in exprn.args
+    if arg.head == :(=)
+      println("Subexpression: ", arg)
+    
+      node = arg.args[2]
+      parentstack = Array(Union(Number, Symbol, Expr), 0)
+
+      while (length(parentstack)!=0 || isa(node, Expr))
+        if isa(node, Expr)   
+          push!(parentstack, node.args[3])
+          node = node.args[2]
+          
+          if isa(node, Symbol)
+            println(node)
+          end
+        else
+          if isa(parentstack[end], Symbol)
+            println(parentstack[end])
+          end
+          
+          node =pop!(parentstack)
+        end
+      end
+    elseif arg.head == :line
+      continue
+    else
+      error("The given exprn can not be handled")
+    end
+  end
+end

@@ -1,0 +1,88 @@
+
+function  mapper(input::AbstractArray{Bool},bits_per_qam)
+
+        (m,n) = size(input);
+        if(n!=1)
+                error("input dhould be a n x 1 array");
+        end
+        if(bits_per_qam == 1)
+                output=map_bpsk(input);
+        elseif(bits_per_qam == 2)
+                output=map_qpsk(input);
+        elseif(bits_per_qam == 4)
+                output=map_16qam(input);
+        elseif(bits_per_qam == 6)
+                output=map_64qam(input);
+        else
+                error("Cannot map other constellations yet");
+        end
+
+        return output;
+end
+
+function map_bpsk(input)
+        bit0    = 1-2*input;
+        output = Array(Complex{Float64},integer(length(input)),1);
+        output = bit0*(1+im)/sqrt(2);
+        return output;
+end
+
+function map_qpsk(input)
+
+        bit0    = Array(Bool,integer(length(input)/2),1);
+        bit1    = Array(Bool,integer(length(input)/2),1);
+        output = Array(Complex{Float64},integer(length(input)/2),1);
+                
+        bit0[:,1]    = input[1:2:end];
+        bit1[:,1]    = input[2:2:end];
+        output = (1-2*bit0) + im*(1-2*bit1);
+
+        output = output/sqrt(2);
+	return output;
+end
+ 
+ 
+function map_16qam(input)
+ 
+ 
+        bit0    = Array(Bool,integer(length(input)/4),1);
+        bit1    = Array(Bool,integer(length(input)/4),1);
+        bit2    = Array(Bool,integer(length(input)/4),1);
+        bit3    = Array(Bool,integer(length(input)/4),1);
+        output = Array(Complex{Float64},integer(length(input)/4),1);
+        
+        bit0[:,1]    = input[1:4:end];
+        bit1[:,1]    = input[2:4:end];
+        bit2[:,1]    = input[3:4:end];
+        bit3[:,1]    = input[4:4:end];
+ 
+        c     = [1 3 -1 -3];
+        output = float(c[1 + 2*bit0 + bit2]) + im*float(c[1 + 2*bit1 + bit3]);
+        output = output/sqrt(10);
+        return output;
+end
+
+function map_64qam(input)
+        
+        bit0    = Array(Bool,integer(length(input)/6),1);
+        bit1    = Array(Bool,integer(length(input)/6),1);
+        bit2    = Array(Bool,integer(length(input)/6),1);
+        bit3    = Array(Bool,integer(length(input)/6),1);
+        bit4    = Array(Bool,integer(length(input)/6),1);
+        bit5    = Array(Bool,integer(length(input)/6),1);
+        output = Array(Complex{Float64},integer(length(input)/6),1);
+        
+        bit0[:,1]    = input[1:6:end];
+        bit1[:,1]    = input[2:6:end];
+        bit2[:,1]    = input[3:6:end];
+        bit3[:,1]    = input[4:6:end];
+        bit4[:,1]    = input[5:6:end];
+        bit5[:,1]    = input[6:6:end];
+ 
+        c     = [3 1 5 7 -3 -1 -5 -7];
+        output = float(c[1 + 4*bit0 + 2*bit2 + bit4]) + im*float(c[1 + 4*bit1 + 2*bit3 + bit5]);
+
+        output = output/sqrt(42);
+
+        return output;
+end

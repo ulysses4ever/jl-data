@@ -1,0 +1,87 @@
+#load needed libraries
+using TextAnalysis
+
+#Helper Functions
+function categorical2frequency(dataVector)
+  #This functions counts the occurences of a category and maps it back to the data provided
+  #countmap is similar to the function "table()" in R, the only difference is that countmap() returns a dictionary
+  vectorDict = countmap(dataVector)
+  newVector = [vectorDict[dataPoint] for dataPoint in dataVector]
+  return newVector
+end
+
+function categorical2SparseMatrix(dataVector)
+  #Replace NAs with stings "NA"
+  dataVector[bool(isna(dataVector))] = "NA"
+  #Replace NAs with stings "" (empty document)
+  #dataVector[bool(isna(dataVector))] = ""
+  #Transform to StringDocument and merge them all into a Corpus
+  dataVectorCorpus = Corpus(convert(Vector, map(x -> StringDocument(x), dataVector)))
+  update_lexicon!(dataVectorCorpus)
+  #Transform corpus to document term matrix and then to a sparse matrix
+  dataVectorSparse = dtm(DocumentTermMatrix(dataVectorCorpus))
+  return dataVectorSparse
+end
+
+function categorical2response(dataVector, dataResponse, subsetIdx, LOA = true, addRandom = true)
+  #Replace NAs with stings "NA"
+  dataVector[bool(isna(dataVector))] = "NA"
+  #Test Data Indexes
+  testIdxs = find([!(i in subsetIdx) for i = 1:length(dataVector)])
+  #Subset Data
+  subsetDataVector = dataVector[subsetIdx]
+  availableResponseData = dataResponse[subsetIdx]
+  #Create a dictionary with response function (ex: average)
+  uniqueCategories = convert(Array{String}, unique(subsetDataVector))
+
+  #categoriesInTest = convert(Array{String}, unique(dataVector[testIdxs]))
+  #derp = [(akak in categoriesInTest) for akak in uniqueCategories]
+
+  #julia 0.3 syntax
+  categoryDict = [uniqueCategory => mean(availableResponseData[find(subsetDataVector .== uniqueCategory)])
+                  for uniqueCategory in uniqueCategories]
+  #julia 0.4 syntax
+  #categoryDict = Dict([uniqueCategory => mean(availableResponseData[find(subsetDataVector .== uniqueCategory)])
+  #                    for uniqueCategory in uniqueCategories])
+  #Transform dataVector to function+response
+  meanResponse = mean([valDict for valDict in values(categoryDict)])
+
+  #Average response categoricals "Leave-One-Out"
+  #Adapted from http://www.slideshare.net/OwenZhang2/tips-for-data-science-competitions
+  if LOA == true
+    print("High Cardinality Detected In Column, Processing with LOA")
+    #Select columns with high cardinality only; the test will only select them
+    highCardinality = length(unique(dataVector)) / length(dataVector) > 0.005
+    if highCardinality == true
+      newDataVectorTrain = rep(meanResponse, length(subsetDataVector))
+      for highCardCat in uniqueCategories
+        #highCardCat = uniqueCategories[1] #here for debugging
+        highCardCatIdx = find(subsetDataVector .== highCardCat)
+        for elementIdx in highCardCatIdx
+          #elementIdx = highCardCatIdx[16] #here for debbuging
+          newDataVectorTrain[elementIdx] = mean(availableResponseData[find(elementIdx .!= highCardCatIdx)])
+        end
+      end
+      newDataVectorTest = [get(categoryDict, dataPointTest, meanResponse) for dataPointTest in dataVector[testIdxs]]
+      #Append both train and test vectors
+      newDataVector = rep(meanResponse, length(dataVector))
+      newDataVector[subsetIdx] = newDataVectorTrain
+      newDataVector[testIdxs] = newDataVectorTest
+    else
+      LOA = false
+    end
+  end
+
+  #Average response categoricals
+  if LOA == false
+    newDataVector = [get(categoryDict, dataPoint, meanResponse) for dataPoint in dataVector]
+  end
+
+  if addRandom == true
+      randomNoise = randn(length(newDataVector)) / 6
+      newDataVector = newDataVector + randomNoise
+  end
+
+  return(newDataVector)
+end
+

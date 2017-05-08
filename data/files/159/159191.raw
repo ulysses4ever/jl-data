@@ -1,0 +1,54 @@
+
+function subfolders(path::AbstractString)
+  path=abspath(path)
+  files=filter(x->!startswith(x,"."),readdir(path))
+  files=map(x->joinpath(path,x), files)
+  folders=filter(isdir,files)
+  subsubfolders=map(subfolders,folders)
+  result=[path]
+  for f=subsubfolders
+    append!(result,f)
+  end
+  return result
+end
+
+append!(LOAD_PATH,subfolders("../"))
+#append!(LOAD_PATH,subfolders("."))
+
+using Classifiers
+import AdaBoosts
+import SequentialPatterns
+using Multiclass
+using ClassificationUtils
+using TestUtils
+
+
+x,y,subjects=lsa64_kadir_dataset()
+
+features=41 #features in kadir dataset
+max_frames=8
+max_iterations=40
+spc=SequentialPatterns.SequentialPatternConfig(features,max_frames,max_iterations)
+
+train_percentage=0.8
+max_classifiers=10
+subsample_cumulative_distribution=0.5
+min_samples=8
+bc=AdaBoosts.AdaBoostConfig(spc,max_classifiers,subsample_cumulative_distribution,min_samples)
+mc=AllVersusAllClassifierConfig(bc)
+repetitions=30
+errors=zeros(repetitions)
+tic()
+for i=1:repetitions
+  x_train,y_train,x_test,y_test,train_indices=split_dataset(x,y,train_percentage)
+  model=fit(mc,x_train,y_train)
+  #predicted=predict(model,x_test)
+  e=mean_loss(model,x_test,y_test)
+  e_train=mean_loss(model,x_train,y_train)
+  errors[i]=e
+  println("Finished repetition $i/$repetitions, test_error=$e, train_error=$(e_train)")
+end
+μ_error=mean(errors)
+σ_error=std(errors)
+println("Done: mean error over $repetitions repetitions is $μ_error, sigma=$σ_error")
+toc()

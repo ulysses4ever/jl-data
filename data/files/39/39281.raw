@@ -1,0 +1,111 @@
+import Graphs
+
+# TODO: be sure this works when repo becomes a package.
+# Hat tip: https://groups.google.com/forum/#!topic/julia-users/BSQfu9mmoL0 
+datadir = dirname(Base.source_path());
+
+function fve30(datadir::AbstractString = datadir)
+    Names = readdlm(joinpath(datadir,"fve30Names.txt"), ' ', ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(datadir,"fve30CIJ.txt"), ' ', Int);
+    return bct_graph(Names, CIJ, true);
+end
+
+function fve32(datadir::AbstractString = datadir)
+    Names = readdlm(joinpath(datadir,"fve32Names.txt"), ' ', ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(datadir,"fve32CIJ.txt"), ' ', Int);
+    return bct_graph(Names, CIJ, true);
+end
+
+function macaque47(datadir::AbstractString = datadir)
+    Names = readdlm(joinpath(datadir,"macaque47Names.txt"), ' ',
+                    ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(datadir,"macaque47CIJ.txt"), ' ', Int);
+    # Not all vertices are named in this dataset: pad with numbers
+    pad = map(string, (1+size(Names,1)):(size(CIJ,1)));
+    Names = vcat(Names, pad);
+    return bct_graph(Names, CIJ, true);
+end
+
+function macaque71(datadir::AbstractString = datadir)
+    Names = readdlm(joinpath(datadir,"macaque71Names.txt"), ' ',
+                    ASCIIString)[:,1];
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = readdlm(joinpath(datadir,"macaque71CIJ.txt"), ' ', Int);
+    return bct_graph(Names, CIJ, true);
+end
+
+
+"""
+The cat dataset consists of two weighted, directed graphs. Weights are integers between 0 and 3, where 0 means no connection and 3 indicates the strongest connection. A threshold between 0 and 3 determines which entries will be counted as edges. The default threshold is 0, meaning all positive entries will be edges. Weights themselves are preserved as edge attributes.
+
+The larger dataset covers the cortico-thalamic network, the smaller just the cortex. Regional names pertain to the smaller dataset (52 regions.) The larger, 95x95, weight matrix contains the smaller as its upper-left 52x52 minor. In place of names, numbers are used for regions beyond 52.
+
+The BCT dataset references Scannell et. al. [The Connectional Organization of the Cortico-thalamic System of the Cat](http://cercor.oxfordjournals.org/content/9/3/277.long)(1999). Scannell et. al. report, "Connections weighted ‘3’ are strong, connections weighted ‘2’ are intermediate, connections weighted ‘1’ are weak or sparse, and connections marked ‘.’ have been explicitly reported as absent or are unreported." In the BCT data '0' takes the place of '.'
+"""
+function cat(threshold::Int=0, ctx::Bool=true, datadir::AbstractString = datadir)
+    Names = readdlm(joinpath(datadir,"catNames.txt"), ' ', ASCIIString)[:,1];
+    if !ctx
+        Names = vcat(Names, map(string, 53:95));
+    end
+    Names = map(strip, Names); # remove useless whitespace
+    CIJ = ctx ? readdlm(joinpath(datadir,"catCIJctx.txt"), ' ', Int) :
+    readdlm(joinpath(datadir,"catCIJall.txt"),' ',Int);
+    # TODO: edges will have weight attributes, vertices will have no attributes
+    n = size(Names,1);
+    v = map(Graphs.KeyVertex, 1:n, Names);
+    eg = Array{Graphs.ExEdge{Graphs.KeyVertex{ASCIIString}},1}(sum(CIJ .> threshold));
+    k = 0;
+    for i in 1:n, j in 1:n
+        if CIJ[i,j] > threshold
+            k += 1;
+            eg[k] = Graphs.ExEdge(k, v[i], v[j],
+                                  Dict{UTF8String,Any}("weight" => CIJ[i,j]));
+        end
+    end
+    return make_graph(v, eg, true);
+end
+
+
+
+""" bct_graph(Labels, C)
+Constructs a GenericGraph based on a vector, Names, of vertex labels, and an incidence or weight matrix, C.
+Labels, a vector of length n representing vertex labels
+C, an n by n matrix of type <: Real representing vertex connectivity.
+is_directed, true or false; if false C must be symmetric
+"""
+function bct_graph{L <: Any, T <: Real}(Labels::Array{L,1}, C::Array{T,2}, is_directed=true)
+    n = size(Labels,1);
+    if size(C) != (n,n)
+        error("C matrix size, ",size(C),
+              ", incompatible with Labels size, ",n,".");
+    end
+    if !is_directed && C != C'
+        error("C is not symmetric, hence not the connection matrix of an undirected graph");
+    end
+    v = map(Graphs.KeyVertex, 1:size(Labels,1), Labels);
+    eg = Array{Graphs.Edge{typeof(v[1])},1}(sum(C .> 0));
+    k = 0;
+    for i in 1:n, j in 1:n
+        if C[i,j] > 0
+            k += 1;
+            eg[k] = Graphs.Edge(k, v[i], v[j]);
+        end
+    end
+    return make_graph(v, eg, is_directed);
+end
+
+
+function make_graph{V,E}(v::Array{V,1}, eg::Array{E,1}, is_directed::Bool=true)
+    gindexof = Dict{V,Int}();
+    gfinclist = Array{Array{E,1},1}();
+    gbinclist = Array{Array{E,1},1}();
+    gedges = Array{E,1}();
+    gvertices = Array{V,1}();
+    g = Graphs.Graph{V,E}(is_directed, gvertices, gedges, gfinclist, gbinclist, gindexof);
+    for vertex in v Graphs.add_vertex!(g,vertex) end;
+    for edge in eg Graphs.add_edge!(g, edge) end;
+    return g;
+end

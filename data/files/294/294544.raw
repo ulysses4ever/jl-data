@@ -1,0 +1,73 @@
+DataPool0 = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+DataPool1 = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+DataPool2 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+DataPool3 = ['/', '=']
+DataSet = vcat(DataPool0, DataPool1, DataPool2, DataPool3)
+highArray = Any[]
+lowArray = Any[]
+byteSet = Any[]
+
+##############################################
+function hashFile()
+	DataLength = length(DataSet)
+	while length(byteSet) != fileSize
+		for i in rand(1:DataLength)
+			for x in DataSet[i]
+				reverse(DataSet)
+				if DataSet[i] == x
+					reverse(DataSet)
+					push!(byteSet, x)
+				else
+					push!(byteSet, x)
+				end
+			end
+		end
+	end
+global passHash = join(byteSet)
+hashCont = open(file)
+end
+
+################################################
+function Hash_Gen()
+	while length(highArray) < hashID
+		for j in rand(1:hashID)
+			for v in passHash[j+3]
+				push!(highArray, v)
+			end
+		end
+	end
+topHash = join(highArray)
+ivHash = (string(ARGS[1]) * string(".hash"))
+zvHash = open(string(ivHash), "w")
+write(zvHash, topHash)
+println("Output file: ", string(ivHash), "\n")
+end
+
+####################################################
+file = ARGS[1]
+fileSize = filesize(file)
+passes = ARGS[2]
+passed = 0
+hashID = ARGS[3]
+println("\nFile: ", file)
+println("Size: ",fileSize, "\n")
+while passed != parse(Int, passes)
+	hashFile()
+	passed = passed + 1
+	println("Pass: ", passed, " out of ", passes, " complete")
+end
+println("\nFinished generating entropy...\n")
+println("Creating ", hashID, " bit Hash...\n")
+if hashID == "128"
+	hashID = 128
+	Hash_Gen()
+elseif hashID == "512"
+	hashID = 512
+	Hash_Gen()
+elseif hashID == "1024"
+	hashID = 1024
+	Hash_Gen()
+else
+	println("\nNew hash discarded...\n")
+	println("128, 512, or 1024 bits...\n")
+end

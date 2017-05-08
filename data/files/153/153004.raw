@@ -1,0 +1,48 @@
+#this is kind of pointless
+#but I'm making it just for the sake of completion
+
+#TODO: there is something really odd going on here
+#for some reason Julia says I'm ilegally redefining the constant Stack
+
+#remember: a stack is last in, first out
+type Stack{T}
+  array::AbstractArray{T}
+  function Stack(array::AbstractArray{T} = Array(T,0))
+    new(array)
+  end
+end
+
+#constructors
+Stack{T}(arr::AbstractArray{T}) = Stack{T}(arr)
+Stack(t::Type) = Stack{t}()
+
+#stack functions
+function isempty(s::Stack)
+  if top == 0
+    true
+  else
+    false
+  end
+end
+
+function push!{T}(s::Stack{T}, ele::T)
+  push(s.array, ele)
+end
+
+function pop!(s::Stack)
+  if isempty(s)
+    error("A stack has underflown.")
+  else
+    pop!(s)
+  end
+end
+
+#functional stuff
+#taking the lazy way out
+function map{T}(f::Function, s::Stack{T})
+  ret = Stack{T}()
+  for v in s.array
+    push!(ret, f(v))
+  end
+  ret
+end

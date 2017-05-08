@@ -1,0 +1,19 @@
+include("../src/tokenize/tokenize.jl")
+
+function test_tokenizer()
+    sentence = "      \t\nthe  man loves \n\n\t     the    cat\n \n"
+    gold = ["the", "man", "loves", "the", "cat"]
+    @assert(tokenize_ws(sentence) == gold)
+    tkn = "the/DT"
+    @assert(token_word(tkn) == "the")
+    @assert(token_tag(tkn) == "DT")
+    @assert(token_wordtag(tkn) == ("the", "DT"))
+    gnarly_token = "either/or/CONJ"
+    @assert(token_word(gnarly_token) == "either/or")
+    @assert(token_tag(gnarly_token) == "CONJ")
+    @assert(token_wordtag(gnarly_token) == ("either/or", "CONJ"))
+end
+
+# run the tests
+test_tokenizer()
+info("Tests pass [tokenizer]")

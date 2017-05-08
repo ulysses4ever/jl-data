@@ -1,0 +1,25 @@
+module Networks
+using LightGraphs
+
+import LightGraphs: Graph, DiGraph, SimpleGraph, Edge,
+        fadj, nv, ne,
+        add_vertex!, add_vertices!, add_edge!
+
+import Base: convert, promote_rule, ==
+
+export AbstractNetwork, Network, DiNetwork, ComplexNetworkNet
+export Net, DiNet, UNet
+
+export setprop!, getprop
+
+export graph
+
+#temporary
+export DSA
+
+include("interface.jl")
+include("network.jl")
+include("net.jl")
+
+
+end #module

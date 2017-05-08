@@ -1,0 +1,84 @@
+module fwhm
+    # Plotting library
+    using Winston;
+
+    # Takes in arrays x and y corresponding to the x-coordinates and
+    # y-coordinates of the data. Returns the FWHM if it exists, and NaN otherwise
+    function fwhm(x::Array{Any,1},y::Array{Any,1})
+        # Check to make sure that both arrays have the same length
+        # This should happen because we're really passing in a set of coordinates (x,y)
+        @assert(length(x) == length(y), "Input arrays should have the same number of elements")
+
+        # Plotting flag. Returns a PNG graph of the data and the FWHM line if set to true
+        const plot = true
+
+        # Extract the values of the extrema
+        const yMax = maximum(y)
+        const yMin = minimum(y)
+
+        # Perform unity-based normalization to squeeze everything to [0,1]
+        y = (y - yMin) / (yMax - yMin)
+
+        # Since we've normalized y, the half-maximum is simply 0.5
+        const halfMax = 0.5
+
+        # Initialize a search counter
+        i = 1;
+
+        # Do a hill-climb to find the point at which the y first crosses the halfMax
+        while sign(y[i] - halfMax) == sign(y[i-1] - halfMax)
+            i += 1;
+        end
+
+        # Linearly interpolate between the two values (one before crossing and one after)
+        # to get the exact x value corresponding to halfMax
+        tlead = x[i-1] + (halfMax - y[i-1]) / (y[i] - y[i-1]) * (x[i] - x[i-1])
+
+        # Increment i and alpha-vary to k. We'll now look for the second crossing
+        # starting from the peak in the distribution
+        k = findmax(y)[2] + 1
+
+        # Do a hill climb to find the point at which y crosses the halfMax again
+        while sign(y[k] - halfMax) == sign(y[k-1] - halfMax) && (k <= length(y) - 1)
+            k = min(k+1, length(y)-1)
+        end
+
+        # If the point is right at the edge of the data, we have a monotonically
+        # increasing distribution and there's no FWHM
+        if k != length(y)
+            # Linearly interpolate between the two values (one before crossing and one after)
+            # to get the exact x value corresponding to the halfMax
+            ttrail = x[k-1] + (halfMax - y[k-1]) / (y[k] - y[k-1]) * (x[k] - x[k-1])
+
+            if (plot)
+                p = FramedPlot(
+                    title = "Normalized Full Width Half Maximum",
+                    xlabel = "x",
+                    ylabel = "y"
+                )
+
+                # Create a line for the FWHM
+                const fwhmLineX = linspace(tlead,ttrail,k-i)
+                const fwhmLineY = halfMax * ones(Float64, length(fwhmLineX))
+
+                # Dump everything into the plot
+                add(p, Curve(x,y))
+                add(p, Curve(fwhmLineX,fwhmLineY, color="red"))
+                add(p, PlotLabel(((maximum(fwhmLineX) - minimum(fwhmLineX)) / 2 + minimum(fwhmLineX)) / (minimum(x) + maximum(x)), halfMax - 0.0375, string(ttrail - tlead), color="red"))
+
+                # Compute a hash of both data sets. We'll append this
+                # to filenames so they can be identified
+                hashName = hash(cat(2,x,y))
+
+                # Save out the result
+                savefig(p,"fwhm-$hashName.png")
+            end
+
+            # Subtract one x value from the other to find the distance
+            # Note that this is given in units of x
+            return ttrail - tlead
+        else
+            return NaN
+        end
+    end
+end # module

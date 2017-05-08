@@ -1,0 +1,18 @@
+using Romeo
+
+function handle(sock::TcpSocket)
+    print(readavailable(sock))
+
+    local hw = "Hello World!"
+
+    write(sock, "HTTP/1.1 200 Ok\r\n",
+                "Content-Length: ", string(length(hw)), "\r\n",
+                "Content-Type: text/plain\r\n",
+                "\r\n",
+                hw, "\r\n")
+    close(sock)
+end
+
+server = HttpServer(6060, handle)
+
+run(server)

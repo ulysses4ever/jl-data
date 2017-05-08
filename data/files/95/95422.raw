@@ -1,0 +1,74 @@
+### Simulate 10^7 points from the AR(2) process
+### Yt = φ_1*Y_{t-1}+φ_2*Y_{t-2}+ε_t, φ_1 = 1.0, φ_2 = -0.6,  ε_t ~ Normal(0, 1)
+
+include("common.jl")
+
+print_with_color(:white, "Simulating signals:\n")
+
+φ = Any[[1.0, -0.6], [1.5, -0.75]]
+φ_len = length(φ)
+
+n = fill(10^7, φ_len)
+a_init = fill(10.0, φ_len)
+b_init = fill(7.0, φ_len)
+
+for i = 1:φ_len
+  print_with_color(:white, "  * signal $i...")
+  OUTFILE = joinpath(DATADIR, "signal"*@sprintf("%02d", i)*".txt")
+
+  outstream = open(OUTFILE, "w+")
+
+  a = a_init[i]
+  b = b_init[i]
+
+  for j = 1:n[i]
+    c = φ[i][1]*b+φ[i][2]*a+randn()
+    @printf(outstream, "%f\n", c)
+    a = b
+    b = c
+  end
+
+  close(outstream)
+  print_with_color(:green, " done\n")
+end
+
+### Simulate 10^7 points iteratively using the following maps:
+### 1) logistic
+### 2) a member of the curved binary family, see A.J. Lawrance and N.M. Spencer, SJS, 1998
+
+logistic(x::Float64) = 4*x*(1-x)
+
+function curved_binary_family(x::Float64, p::Float64=0.999)
+  if 0 <= x < 0.5
+    return 1-(1-2*x)^p
+  elseif 0.5 <= x <= 1.0
+    return 1-(2-2*x)^p
+  else
+    error("Argument out of function's domain")
+  end
+end
+
+f = [logistic, curved_binary_family]
+f_len = length(f)
+
+n = fill(10^7, f_len)
+a_init = fill(0.5637262997475273, f_len) # a_init[1] was obtained via rand(Beta(0.5, 0.5))
+
+for i = 1:f_len
+  i_tot = i+φ_len
+  print_with_color(:white, "  * signal $(i_tot)...")
+  OUTFILE = joinpath(DATADIR, "signal"*@sprintf("%02d", i_tot)*".txt")
+
+  outstream = open(OUTFILE, "w+")
+
+  a = a_init[i]
+
+  for j = 1:n[i]
+    b = f[i](a)
+    @printf(outstream, "%f\n", b)
+    a = b
+  end
+
+  close(outstream)
+  print_with_color(:green, " done\n")
+end

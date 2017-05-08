@@ -1,0 +1,28 @@
+include("../Input.jl")
+
+using PyPlot
+
+pygui(true)
+
+dt = 1e-4
+rate = 66
+pp = PoissonProcess(1, rate, dt)
+
+dur = 100
+T = int(dur/dt)
+
+b = BitArray(T)
+for t in 1:T
+  b[t] = next(pp, t)
+end
+
+ti = b .* (1:T) * dt
+event_times = ti[ti .> 0]
+event_isi = diff(event_times)
+spike_rate = sum(b) / float(dur)
+
+plt.figure()
+plt.hist(event_isi, bins=25)
+plt.title(string("Event ISI, Spike Rate=",spike_rate))
+plt.show()
+display(gcf())

@@ -1,0 +1,18 @@
+immutable MPIState
+  comm
+  nprocs
+  procid
+  rootproc
+
+  function MPIState(MPI, rootproc)
+    comm = MPI.COMM_WORLD
+    nprocs = MPI.Comm_size(comm)
+    procid = MPI.Comm_rank(comm)+1
+    @assert 1 <= rootproc <= nprocs "Root process should be between 1 and number of procs"
+    new(comm, nprocs, procid, rootproc)
+  end
+end
+
+function println(io::IO, s::MPIState)
+  println(io, "Process $(s.procid) of $(s.nprocs), with root process $(s.rootproc).")
+end

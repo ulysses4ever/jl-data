@@ -1,0 +1,91 @@
+using DataStructures: Stack, pop!, push!
+export cholesky, pcholesky, SparseCholesky
+
+immutable SparseCholesky{S<:SparseMatrixCSC}
+    factors::S               # factor matrix 
+    perm::Vector{Int} # permutation vector
+    tree::Vector{Int}   # elimination tree
+    factors_computed::Bool    # whether factors have been computed
+end
+
+"""
+  `L = cholesky(A)`
+
+Compute the Cholesky factorization of a given sparse symmetric
+positive definite matrix `A`.
+"""
+function cholesky{T<:Real, S}(A::SparseMatrixCSC{T, S})
+    m = A.m
+    n = A.n
+    m == n || throw(DimensionMismatch(""))
+    g = sp2tree(A)                     # elimination tree
+    uDict = Dict{Int, UpdateMatrix}()  # dictionary of update matrices
+    colptr, rowval = struct_L(A)
+    L_nzval = T[]                # nzval  for L
+    L_rowval = S[]               # rowval for L
+    L_colptr = S[1]              # colptr for L
+    for j = 1:n 
+        locs = rowval[colptr[j]:colptr[j+1]-1]
+        #println("L row locs: ", locs)
+        F = FrontalMatrix(A, locs, j)
+        
+        for child in out_neighbors(j, g)
+            # form the update matrix
+            try
+                add!(F, slice(uDict[child],locs))
+            catch
+                println("Stack of update matrices is empty ...")
+            end
+        end
+        # factorize F
+        l, U = factor(F)
+        uDict[j] = U
+       
+        #println("indices: ", U.rowval)
+        append!(L_nzval, l)
+        append!(L_rowval, locs)
+        push!(L_colptr, L_colptr[end]+length(l))
+    end
+    SparseMatrixCSC(n, n, L_colptr, L_rowval, L_nzval)
+end
+
+function pcholesky{T<:Real, S}(A::SparseMatrixCSC{T, S})
+    m = A.m
+    n = A.n
+    m == n || throw(DimensionMismatch(""))
+    g = sp2tree(A)           # elimination tree
+    uDict = Dict{Int, RemoteRef}()  # a list of references of  update matrices
+    colptr, rowval = struct_L(A)
+    L_nzval = T[]                # nzval  for L
+    L_rowval = S[]               # rowval for L
+    L_colptr = S[1]              # colptr for L
+    for j = 1:n
+        children = out_neighbors(j, g)
+
+        locs = rowval[colptr[j]:colptr[j+1]-1]
+        m = length(locs)
+        #println("L row locs: ", locs)
+        F = @spawn FrontalMatrix(A, locs, j)
+
+        #println("F at processor $(F.where)")
+        for child in children
+            # form the update matrix
+           # try
+           # display(uDict[child])
+            add!(F, slice(uDict[child],locs))
+           # catch
+           #     println("Stack of update matrices is empty ...")
+           # end
+        end
+        # factorize F
+        facs = factor(F)
+        l, U = fetch(facs)
+        uDict[j] = U
+        
+        #println("indices: ", U.rowval)
+        append!(L_nzval, l)
+        append!(L_rowval, locs)
+        push!(L_colptr, L_colptr[end]+length(l))
+    end
+    SparseMatrixCSC(n, n, L_colptr, L_rowval, L_nzval)
+end

@@ -1,0 +1,10 @@
+
+(system "killall -9 conky")
+(defvar conky "conky -d -c ")
+(defvar conky_dir "~/.sawfish/Grey-Conky/conkyrc")
+(system (concat conky conky_dir "/cpu" ))
+(system (concat conky conky_dir "/time" ))
+(system (concat conky conky_dir "/battery" ))
+(system (concat conky conky_dir "/mem" ))
+(system (concat conky conky_dir "/disk" ))
+(system (concat conky conky_dir "/net" ))

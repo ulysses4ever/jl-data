@@ -1,0 +1,62 @@
+#= Julia implementions of algorithms featured in Feldman, Schmidt, and Soler, "Turning Big data into tiny data"
+=#
+
+""" j_subspace(n, d=200, j=2, epsilon=0.1, A=reshape(randn(n*d),(n,d))
+
+    A port of Feldman et. al. algorithm 1.
+
+    A nxd matrix, A, is given. An mxd coreset, C, is to be found     such that the squared Euclidean distance of any j-subspace to the rowspace of A is approximated to within a factor of 1+epsilon by its distance to the rowspace of C plus a constant.
+
+"""
+function j_subspace(n::Int=1000, d::Int=200, j::Int=2,
+                    epsilon::Float64=0.1,
+                    A::Array{Float64,2}=reshape(randn(n*d),(n,d)))
+    #= Original algorithm 1 in Matlab: 
+    %% Coreset Computation
+    %% for j-Subspace Approximation %%%
+    % 1. Creating Random Input
+    n=10000;
+    d=2000;
+    A=rand(n,d);
+    j=2;
+    epsilon=0.1;
+    =#
+    #
+    #= Matlab
+    % 2. The Actual Coreset Construction
+    m=j+ceil(j/epsilon)-1; % i.e., m=21.
+    [U, D, V]=svds(A,m);
+    C = D*V’; % C is an m-by-m matrix
+    c=norm(A,’fro’)^2-norm(D,’fro’)^2;
+    =#
+    # calculate the size of the coreset, m
+    m = j + ceil(Int, j/epsilon)-1
+    # calculate singular value decomposition of A
+    # U is the same size as A, nxd. Its columns are O.N., U'*U=I
+    # D is an n long array of eigenvalues in descending order.
+    # V is nxn. Its rows are O.N., V*V'=I
+    U,D,V = svd(A)
+    # C is the first m rows of the diagonal times V. 
+    C = diagm(D[1:m])*V[1:m,:]
+    c = vecnorm(A)^2 - vecnorm(D[1:m])^2    
+    #= Matlab
+    % 3. Compare sum of squared distances of j
+    % random orthogonal columns Q to A and C
+    % NOTE: orth is merely orthonomalizing the random dx(d-j)
+    % matrix. Q is thus dx(d-j) thus represents a subspace
+    % of dimension d-j, not dimension j.
+    Q=orth(rand(d,d-j));
+    costA= norm(A*Q,’fro’)^2;
+    costC= c+norm(C*Q,’fro’)^2;
+    errJsubspaceApprox = abs(costC/costA - 1)
+    =#
+    # function nullspace generates an O.N. basis for the null
+    # space of its argument, Y. The squared Frobenius norm of
+    # this nullspace represents the squared Euclidean distance
+    # from Y to the rowspace of A.
+    Q = nullspace(reshape(randn(d*j),(j,d)))
+    CostA = vecnorm(A*Q)^2
+    CostC = c+vecnorm(C*Q)^2
+    C, CostA, CostC, abs(CostA-CostC)/CostA
+    
+end

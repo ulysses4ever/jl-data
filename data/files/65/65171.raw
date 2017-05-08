@@ -1,0 +1,47 @@
+import Base: +, size, factor
+export FrontalMatrix, UpdateMatrix, factor
+
+
+immutable FrontalMatrix{T, S<:Integer} <: DenseArray{T,2}
+    data::Matrix{T}     # dense matrix data
+    colptr::Vector{S}   # column i is in colptr[i]:(colptr[i+1]-1)
+end
+function FrontalMatrix{T, S}(data::Matrix{T}, colptr::Vector{S})
+    m, n = size(data)
+    m == n || throw(DimensionMismatch(""))
+    FrontalMatrix(data, colptr)
+end
+size(F::FrontalMatrix) = size(F.data)
+
+# one step of Cholesky factorization
+function factor{T}(F::FrontalMatrix{T})
+    A = F.data
+    n, = size(A)
+    l = Array(T,n)
+    U = Array(T, n-1, n-1)
+    [l[i] = A[i,1]/sqrt(A[1,1]) for i = 1:n]
+    for j = 2:n
+        for i = 2:n
+            U[i-1,j-1] = A[i,j] - A[1,j]*A[1,i]/A[1,1]
+        end
+    end    
+    return l, UpdateMatrix(U, F.colptr[2:end])
+end
+
+
+immutable UpdateMatrix{T, S<:Integer} <: DenseArray{T,2}
+    data::Matrix{T}
+    colptr::Vector{S}
+end
+size(U::UpdateMatrix) = size(U.data)
+
+# extended add
+function +{T}(U1::UpdateMatrix{T}, U2::UpdateMatrix{T})
+    colptr = union(U1.colptr, U2.colptr)
+    A = zeros(T, length(colptr), length(colptr))
+    u1in = findin(colptr, U1.colptr)
+    u2in = findin(colptr, U2.colptr)
+    A[u1in,u1in] = U1.data
+    A[u2in,u2in] = A[u2in,u2in] + U2.data
+    UpdateMatrix(A, colptr)
+end

@@ -1,0 +1,10 @@
+using JuMP
+using InteriorPoint
+
+m = Model(solver=InteriorPointSolver())
+@defVar(m, x[1:6] >= 0)
+@setObjective(m, Min, dot([-10,-12,-12,0,0,0], x))
+@addConstraint(m, dot([1,2,2,1,0,0],x) == 20)
+@addConstraint(m, dot([2,1,2,0,1,0],x) == 20)
+@addConstraint(m, dot([2,2,1,0,0,1],x) == 20)
+solve(m)

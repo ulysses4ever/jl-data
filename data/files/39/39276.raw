@@ -1,0 +1,24 @@
+import Graphs
+
+""" bct_graph(Names, C)
+Constructs a **directed** GenericGraph based on a vector, Names, of vertex labels, and an incidence or weight matrix, C.
+Names, a vector of type <: AbstractString.
+C, a square matrix of type <: Real, with rows and columns equal the the length of Names.
+"""
+function bct_graph{V <: AbstractString, T <: Real}(Names::Array{V,1}, C::Array{T,2})
+    n = size(Names,1);
+    if size(C) != (n,n)
+        error("C matrix size, "*size(C)*
+              ", incompatible with Names size, "*n*".");
+    end
+    v = map(Graphs.KeyVertex, 1:size(Names,1), Names);
+    eg = Array{Graphs.Edge{typeof(v[1])},1}(sum(C .> 0));
+    k = 0;
+    for i in 1:n, j in 1:n
+        if C[i,j] > 0
+            k += 1;
+            eg[k] = Graphs.Edge(k, v[i], v[j]);
+        end
+    end
+    return Graphs.graph(v, eg);
+end

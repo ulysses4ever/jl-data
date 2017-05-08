@@ -1,0 +1,4 @@
+M = {rand(1000,1000) for i=1:10}
+before = time()
+pmap(svd, M)
+println(time() - before)

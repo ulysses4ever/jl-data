@@ -1,0 +1,47 @@
+module TestUPID
+    using Mesos
+    using FactCheck
+
+    facts("Parsing UPID") do
+        context("correct UPID is parsed without error") do
+            u, err = UPID("mesos@foo:bar")
+            @fact u => not(nothing)
+            @fact err => nothing
+        end
+
+        context("UPID with missing `ID` is parsed with error") do
+            u, err = UPID("mesoslocalhost5050")
+            @fact u => nothing
+            @fact err => not(nothing)
+        end
+
+        context("UPID with missing `Port` is parsed with error") do
+            u, err = UPID("mesos@localhost")
+            @fact u => nothing
+            @fact err => not(nothing)
+        end
+    end
+
+    facts("Converting UPID") do
+        upid = "mesos@localhost:5050"
+        u, err = UPID(upid)
+        @fact u => not(nothing)
+        @fact err => nothing
+        @fact convert(String, u) => upid
+    end
+
+    facts("Comparing UPIDs") do
+        u1, err = UPID("mesos@localhost:5050")
+        u2, err = UPID("mesos@localhost:5050")
+        u3, err = UPID("mesos1@localhost:5050")
+        u4, err = UPID("mesos@mesos.com:5050")
+        u5, err = UPID("mesos@localhost:5051")
+        @fact err => nothing
+
+        @fact u1 => u2
+        @fact u1 => not(u3)
+        @fact u1 => not(u4)
+        @fact u1 => not(u5)
+        @fact u1 => not(nothing)
+    end
+end

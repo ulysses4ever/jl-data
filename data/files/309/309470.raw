@@ -1,0 +1,86 @@
+module inputs
+
+import tools
+abstract Inputs
+
+"""
+Every neuron receives a different input, each extracted from a gaussian of given
+mean ConstTerm and standard deviation StdDev. The input is kept constant and changed
+only once a time ChangeTime has elapsed.
+"""
+type GaussianInput <: Inputs
+    ConstTerm::Float64
+    StdDev::Float64
+    ChangeTime::Float64
+    _lasttime::Float64
+    _currentstim::Array{Float64, 1}
+    GaussianInput(ConstTerm, StdDev, ChangeTime) = new(ConstTerm, StdDev, ChangeTime, -Inf, zeros(1))
+end
+
+function return_input(par::GaussianInput, t::Float64, n::Int64)
+    if t - par._lasttime < par.ChangeTime
+        inp = par._currentstim
+    else
+        inp = tools.rand_normal(par.ConstTerm, par.StdDev, n)
+        par._currentstim = inp
+        par._lasttime = t
+    end
+    return inp
+end
+
+"""
+Every neuron receives a different input, each extracted from gaussians of given
+means ConstTerm and standard deviations StdDev. The input is kept constant and changed
+only once a time ChangeTime has elapsed.
+"""
+type CustomGaussianInput <: Inputs
+    ConstTerm::Array{Float64, 1}
+    StdDev::Array{Float64, 1}
+    ChangeTime::Float64
+    _lasttime::Float64
+    _currentstim::Array{Float64, 1}
+    CustomGaussianInput(ConstTerm, StdDev, ChangeTime) = new(ConstTerm, StdDev, ChangeTime, -Inf, zeros(1))
+end
+
+function return_input(par::CustomGaussianInput, t::Float64, n::Int64)
+    if t - par._lasttime < par.ChangeTime
+        inp = par._currentstim
+    else
+        if length(par.ConstTerm) != length(par.StdDev)
+            error("The vectors of means and standard deviations must have the same lengths.")
+        end
+        if length(par.ConstTerm) != n
+            error("The vector of inputs must have the same length as the number of neurons.")
+        end
+
+        inp = zeros(n)
+        for i in 1:n
+            inp[i] = tools.rand_normal(0, par.StdDev[i])
+        end
+        inp += par.ConstTerm
+        par._currentstim = inp
+        par._lasttime = t
+    end
+    return inp
+end
+
+type UniformConstantInput <: Inputs
+    ConstTerm::Float64
+end
+
+function return_input(par::UniformConstantInput, t::Float64, n::Int64)
+    return par.ConstTerm*ones(n)
+end
+
+type CustomConstantInput <: Inputs
+    ConstTerm::Array{Float64, 1}
+end
+
+function return_input(par::CustomConstantInput, t::Float64, n::Int64)
+    if length(par.ConstTerm) != n
+        error("The vector of inputs must have the same length as the number of neurons.")
+    end
+    return par.ConstTerm
+end
+
+end

@@ -1,0 +1,82 @@
+function scenario_risk_postprocess(asset_lts::Dict{ASCIIString, Vector{Float64}})
+  asset_loss_moments = [ref => LossMoments(mean(asset_lt), std(asset_lt))
+                        for (ref, asset_lt) in asset_lts]
+  portfolio_lt = sum(values(asset_lts))
+  portfolio_loss_moments = LossMoments(mean(portfolio_lt), std(portfolio_lt))
+  return ScenarioRiskOutput(asset_loss_moments, portfolio_loss_moments)
+end
+
+
+function scenario_damage_postprocess(states::Vector{ASCIIString},
+                                     asset_damages,
+                                     taxonomy_damages,
+                                     portfolio_damage)
+  asset_dmg_moments = [ref => DamageMoments(states, vec(mean(asset_damage, 1)),
+                                            vec(std(asset_damage, 1)))
+                       for (ref, asset_damage) in asset_damages]
+
+  taxonomy_dmg_moments = [ref => DamageMoments(states,
+                                             vec(mean(taxonomy_damage, 1)),
+                                             vec(std(taxonomy_damage, 1)))
+                          for (ref, taxonomy_damage) in taxonomy_damages]
+
+  portfolio_dmg_moments = DamageMoments(states,
+                                        vec(mean(portfolio_damage, 1)),
+                                        vec(std(portfolio_damage, 1)))
+
+  return ScenarioDamageOutput(states, asset_dmg_moments,
+                              taxonomy_dmg_moments, portfolio_dmg_moments)
+end
+
+
+function classical_risk_postprocess(asset_loss_curves::Dict{ASCIIString, LossCurve})
+  avg_asset_losses = [ref => calc_avg_loss_from_loss_curve(lc)
+                      for (ref, lc) in asset_loss_curves]
+  return ClassicalRiskOutput(asset_loss_curves, avg_asset_losses)
+end
+
+
+function event_based_risk_postprocess(asset_elts::Dict{ASCIIString, Vector{Float64}},
+                                      time_h::Float64,
+                                      time_r::Float64,
+                                      num_ses::Int,
+                                      loss_curve_res::Int)
+  asset_loss_curves = [ref => build_loss_curve_from_elt(asset_elt, time_h, time_r,
+                                                        num_ses, loss_curve_res)
+                       for (ref, asset_elt) in asset_elts]
+
+  avg_asset_losses = [ref => calc_avg_loss_from_loss_curve(asset_loss_curve)
+                      for (ref, asset_loss_curve) in asset_loss_curves]
+
+  portfolio_elt = sum(values(asset_elts))
+  portfolio_loss_curve = build_loss_curve_from_elt(portfolio_elt, time_h, time_r,
+                                                   num_ses, loss_curve_res)
+  avg_portfolio_loss = calc_avg_loss_from_loss_curve(portfolio_loss_curve)
+
+  return EventBasedRiskOutput(asset_elts, portfolio_elt,
+                              asset_loss_curves, portfolio_loss_curve,
+                              avg_asset_losses, avg_portfolio_loss)
+end
+
+
+function build_loss_curve_from_elt(elt::Vector{Float64}, time_h::Float64,
+                                   time_r::Float64, num_ses::Int, loss_curve_res::Int)
+  losses = sort(elt, rev=true)
+  lrs = linspace(0.0, losses[1], loss_curve_res)
+  afoes = [sum(losses .> lr)/(time_h * num_ses) for lr in lrs]
+  poes = [1 - exp(-float(afoes * time_r))]
+  return LossCurve(time_r, lrs, poes)
+end
+
+function calc_avg_loss_from_loss_curve(loss_curve::LossCurve)
+  return dot(pairwise_mean(loss_curve.poes)[2:end-1], diff(loss_curve.lrs))
+end
+
+function calc_avg_loss_from_elt(elt::Vector{Float64}, num_ses::Int,
+                                time_h::Float64, time_r::Float64)
+  return time_r*calc_aal_from_elt(elt, num_ses, time_h)
+end
+
+function calc_aal_from_elt(elt::Vector{Float64}, num_ses::Int, time_h::Float64)
+  return sum(elt)/(time_h*num_ses)
+end

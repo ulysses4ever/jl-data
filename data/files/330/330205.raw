@@ -1,0 +1,46 @@
+# Getting own data
+raw_non_spam_path = "$(path)/raw_data/easy_ham/" # this is data from the spamAssassin public corpus
+raw_spam_path = "$(path)/raw_data/spam/"         # this is data from the spamAssassin public corpus
+
+vocab_file = "$(path)/vocab.txt"
+vocab = readtable(vocab_file, separator = '\t')
+
+X_spam, y_spam = get_data(raw_spam_path, 1, vocab)
+X_non_spam, y_non_spam = get_data(raw_non_spam_path, 0, vocab)
+
+# combine spam and non-spam data
+X_ordered = [X_spam; X_non_spam]
+y_ordered = [y_spam; y_non_spam]
+
+# mix data
+rand_idx = randperm(size(y_ordered, 1))
+
+X = X_ordered[rand_idx, :]
+y = y_ordered[rand_idx, :]
+
+# split data - 70/30
+train_end = floor(size(y, 1) * 0.7)
+X_train = X[1:train_end, :]
+y_train = y[1:train_end, :]
+
+X_test = X[train_end + 1:end, :]
+y_test = y[train_end + 1:end, :]
+
+# run modelling......
+# prepare the data for LIBSVM
+instances = X_train[:, 1:end]'
+instances_test = X_test[:, 1:end]'
+labels = y_train[1:end]
+labels_test = y_test[1:end]
+
+# train the SVM
+# kernel_type --> Linear - 0, Sigmoid - 3, RBF(default) - 2
+model = svmtrain(labels, instances, C = 0.1, kernel_type = int32(0))
+
+# check the trained model against the training data
+(pred, deci) = svmpredict(model, instances)
+println("Training - Accuracy: $(mean((pred .== labels))*100)")
+
+# check the trained model against the testing data
+(pred_test, deci_test) = svmpredict(model, instances_test)
+println("Testing - Accuracy: $(mean((pred_test .== labels_test))*100)")

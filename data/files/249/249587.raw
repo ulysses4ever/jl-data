@@ -1,0 +1,23 @@
+macro mustimplement(sig)
+    fname = sig.args[1]
+    arg1 = sig.args[2]
+    if isa(arg1,Expr)
+        arg1 = arg1.args[1]
+    end
+    :($(esc(sig)) = error(typeof($(esc(arg1))),
+                          " must implement ", $(Expr(:quote,fname))))
+end
+
+function pointer_to_iob(buffer::Ptr{Uint8}, bufSize::Cint)
+    iob = IOBuffer()
+    write(iob, buffer, bufSize)
+    seek(iob, 0)
+    return iob
+end
+
+function makeproto{T}(buffer::Ptr{Uint8}, bufSize::Cint, ::Type{T})
+    iob = pointer_to_iob(buffer, bufSize)
+    return readproto(iob, T())
+end
+
+

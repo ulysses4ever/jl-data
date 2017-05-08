@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:06 GMT
+Date: Wed, 03 May 2017 20:54:00 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5403
+Content-Length: 5100
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2916
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4648
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "f089bc7db905d16e1e5beb42f5e342a3"
-Last-Modified: Tue, 18 Apr 2017 17:50:02 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "c6265760d2cacac8fa52ac7ae1ed75b6"
+Last-Modified: Tue, 01 Nov 2016 18:24:08 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,102 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 5aeb3f30c9e3ef6ef7bcbcddfd9a68f7
-X-GitHub-Request-Id: CFA1:6634:13466B7:18EA372:590231E2
+X-Served-By: 769054b6618fd34f3638f01469b229db
+X-GitHub-Request-Id: 9C01:5C90:AB1BD5:DBD6E5:590A4368
 
 {
-  "id": 49796648,
-  "name": "Merly.jl",
-  "full_name": "codeneomatrix/Merly.jl",
+  "id": 48767587,
+  "name": "juliarc",
+  "full_name": "mortenpi/juliarc",
   "owner": {
-    "login": "codeneomatrix",
-    "id": 8965843,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/8965843?v=3",
+    "login": "mortenpi",
+    "id": 147757,
+    "avatar_url": "https://avatars2.githubusercontent.com/u/147757?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/codeneomatrix",
-    "html_url": "https://github.com/codeneomatrix",
-    "followers_url": "https://api.github.com/users/codeneomatrix/followers",
-    "following_url": "https://api.github.com/users/codeneomatrix/following{/other_user}",
-    "gists_url": "https://api.github.com/users/codeneomatrix/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/codeneomatrix/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/codeneomatrix/subscriptions",
-    "organizations_url": "https://api.github.com/users/codeneomatrix/orgs",
-    "repos_url": "https://api.github.com/users/codeneomatrix/repos",
-    "events_url": "https://api.github.com/users/codeneomatrix/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/codeneomatrix/received_events",
+    "url": "https://api.github.com/users/mortenpi",
+    "html_url": "https://github.com/mortenpi",
+    "followers_url": "https://api.github.com/users/mortenpi/followers",
+    "following_url": "https://api.github.com/users/mortenpi/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mortenpi/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mortenpi/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mortenpi/subscriptions",
+    "organizations_url": "https://api.github.com/users/mortenpi/orgs",
+    "repos_url": "https://api.github.com/users/mortenpi/repos",
+    "events_url": "https://api.github.com/users/mortenpi/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mortenpi/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/codeneomatrix/Merly.jl",
-  "description": "micro framework for web programming in Julia",
+  "html_url": "https://github.com/mortenpi/juliarc",
+  "description": "A way to sync a Julia environment. Also, useful random snippets.",
   "fork": false,
-  "url": "https://api.github.com/repos/codeneomatrix/Merly.jl",
-  "forks_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/forks",
-  "keys_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/teams",
-  "hooks_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/events",
-  "assignees_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/tags",
-  "blobs_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/subscription",
-  "commits_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/merges",
-  "archive_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/downloads",
-  "issues_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/codeneomatrix/Merly.jl/deployments",
-  "created_at": "2016-01-17T00:21:21Z",
-  "updated_at": "2017-04-18T17:50:02Z",
-  "pushed_at": "2017-04-22T03:06:30Z",
-  "git_url": "git://github.com/codeneomatrix/Merly.jl.git",
-  "ssh_url": "git@github.com:codeneomatrix/Merly.jl.git",
-  "clone_url": "https://github.com/codeneomatrix/Merly.jl.git",
-  "svn_url": "https://github.com/codeneomatrix/Merly.jl",
+  "url": "https://api.github.com/repos/mortenpi/juliarc",
+  "forks_url": "https://api.github.com/repos/mortenpi/juliarc/forks",
+  "keys_url": "https://api.github.com/repos/mortenpi/juliarc/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mortenpi/juliarc/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mortenpi/juliarc/teams",
+  "hooks_url": "https://api.github.com/repos/mortenpi/juliarc/hooks",
+  "issue_events_url": "https://api.github.com/repos/mortenpi/juliarc/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mortenpi/juliarc/events",
+  "assignees_url": "https://api.github.com/repos/mortenpi/juliarc/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mortenpi/juliarc/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mortenpi/juliarc/tags",
+  "blobs_url": "https://api.github.com/repos/mortenpi/juliarc/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mortenpi/juliarc/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mortenpi/juliarc/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mortenpi/juliarc/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mortenpi/juliarc/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mortenpi/juliarc/languages",
+  "stargazers_url": "https://api.github.com/repos/mortenpi/juliarc/stargazers",
+  "contributors_url": "https://api.github.com/repos/mortenpi/juliarc/contributors",
+  "subscribers_url": "https://api.github.com/repos/mortenpi/juliarc/subscribers",
+  "subscription_url": "https://api.github.com/repos/mortenpi/juliarc/subscription",
+  "commits_url": "https://api.github.com/repos/mortenpi/juliarc/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mortenpi/juliarc/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mortenpi/juliarc/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mortenpi/juliarc/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mortenpi/juliarc/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mortenpi/juliarc/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mortenpi/juliarc/merges",
+  "archive_url": "https://api.github.com/repos/mortenpi/juliarc/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mortenpi/juliarc/downloads",
+  "issues_url": "https://api.github.com/repos/mortenpi/juliarc/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mortenpi/juliarc/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mortenpi/juliarc/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mortenpi/juliarc/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mortenpi/juliarc/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mortenpi/juliarc/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mortenpi/juliarc/deployments",
+  "created_at": "2015-12-29T21:17:58Z",
+  "updated_at": "2016-11-01T18:24:08Z",
+  "pushed_at": "2017-04-04T21:42:22Z",
+  "git_url": "git://github.com/mortenpi/juliarc.git",
+  "ssh_url": "git@github.com:mortenpi/juliarc.git",
+  "clone_url": "https://github.com/mortenpi/juliarc.git",
+  "svn_url": "https://github.com/mortenpi/juliarc",
   "homepage": "",
-  "size": 26,
-  "stargazers_count": 13,
-  "watchers_count": 13,
+  "size": 28,
+  "stargazers_count": 1,
+  "watchers_count": 1,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
-  "has_wiki": true,
+  "has_wiki": false,
   "has_pages": false,
-  "forks_count": 2,
+  "forks_count": 1,
   "mirror_url": null,
-  "open_issues_count": 1,
-  "forks": 2,
-  "open_issues": 1,
-  "watchers": 13,
+  "open_issues_count": 0,
+  "forks": 1,
+  "open_issues": 0,
+  "watchers": 1,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
-  "network_count": 2,
-  "subscribers_count": 2
+  "network_count": 1,
+  "subscribers_count": 1
 }

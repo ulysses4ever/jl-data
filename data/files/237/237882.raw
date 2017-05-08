@@ -1,0 +1,38 @@
+import Base.isposdef
+export SDPConstraint, isposdef
+
+### Positive semidefinite cone constraint
+type SDPConstraint <: Constraint
+  head::Symbol
+  id_hash::Uint64
+  child::AbstractExpr
+  size::(Int64, Int64)
+
+  function SDPConstraint(child::AbstractExpr)
+    sz = child.size
+    if sz[1] != sz[2]
+      error("Positive semidefinite expressions must be square")
+    end
+    return new(:sdp, hash(child), child, sz)
+  end
+end
+
+function vexity(c::SDPConstraint)
+  vex = vexity(c.child)
+  if vex == AffineVexity() || vex == ConstVexity()
+    return AffineVexity()
+  else
+    return NotDcp()
+  end
+end
+
+function conic_form!(c::SDPConstraint, unique_conic_forms::UniqueConicForms)
+  if !has_conic_form(unique_conic_forms, c)
+    objective = conic_form!(c.child, unique_conic_forms)
+    cache_conic_form!(unique_conic_forms, c, ConicConstr([objective], :SDP, [c.size[1] * c.size[2]]))
+  end
+  return get_conic_form(unique_conic_forms, c)
+end
+
+isposdef(x::AbstractExpr) = SDPConstraint(x)
+

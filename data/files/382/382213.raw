@@ -1,0 +1,775 @@
+Const Max_Fund_Cnt::Integer = 20
+Const Max_End_Age::Integer = 120
+Const Mon_Retun_Cnt::Integer = 720
+
+Const Scn_Rec::Integer = 1000
+Const Market_Return_Cnt::Integer = 6
+
+type Qx_R
+	Std_Qx_M::Float64
+	Std_Qx_F::Float64
+	Prefer_Qx_M::Float64
+	Prefer_Qx_F::Float64
+end
+
+type Qx_D
+	Std_Qx_M::Float64
+	Std_Qx_F::Float64
+	Prefer_Qx_M::Float64
+	Prefer_Qx_F::Float64
+end
+
+LapseRate_Rec::LapseRate_R
+
+type LapseRate_R
+	Lapse_MP::Float64
+	Lapse_SP::Float64
+end
+
+type LapseRate_D
+	Lapse_MP::Float64
+	Lapse_SP::Float64
+end
+
+Discount_Rec::Discount_R
+
+type Discount_R
+	Dis_Rate::Float64
+end
+
+type Discount_D
+	Dis_Rate::Float64
+end
+
+AppMor_Table_Rec::AppMor_Table_R
+
+type AppMor_Table_R
+	AppMort_Code::Float64
+	AppMort(0 To 120)::Float64
+end
+
+type AppMor_Table_D
+	AppMort_Code::Float64
+	AppMort(0 To 120)::Float64
+end
+
+FundInfo_Rec::FundInfo_R
+
+type FundInfo_R
+	Fund_Code::Integer
+	KOSPI_Allo::Float64
+	Div_Stock_Allo::Float64
+	Bond_Allo::Float64
+	Short_Bond_Allo::Float64
+	Developed_Allo::Float64
+	Emerging_Allo::Float64
+end
+
+type FundInfo_D
+	Fund_Code::Integer
+	KOSPI_Allo::Float64
+	Div_Stock_Allo::Float64
+	Bond_Allo::Float64
+	Short_Bond_Allo::Float64
+	Developed_Allo::Float64
+	Emerging_Allo::Float64
+end
+
+
+FundFee_Rec:FundFee_R
+
+type FundFee_R
+	New_Fund_Code::Float64
+	GMDB_Fee::Float64
+	GMAB_Fee::Float64
+	GMAB2_Fee::Float64
+	Maintenance_Fee::Float64
+	Other_Fee::Float64
+end
+
+type FundFee_D
+	New_Fund_Code::Float64
+	GMDB_Fee::Float64
+	GMAB_Fee::Float64
+	GMAB2_Fee::Float64
+	Maintenance_Fee::Float64
+	Other_Fee::Float64
+end
+
+MotTbl_Rec(1 To 3, 1 To 2, 1 To 2) As MotTbl_R
+
+type MotTbl_R
+	MotRate(0 To 112)::Float64
+end
+
+type Inforce_R
+	EXTRACT_DATE::Integer
+	POLICY_NO::Integer
+	PRODUCT_TYPE::Integer
+	PRODUCT_CODE1::Float64
+	PRODUCT_CODE2::Integer
+	SALES_CHANNEL::Integer
+	ISSUE_DATE::Integer
+	CREDIT_RATE::Float64
+	PAYMENT_TYPE::Integer
+	PAY_PERIOD::Integer
+	MATURITY::Integer
+	PERIOD_1::Integer
+	ELAPSED_MTH::Integer
+	PAY_MTH::Integer
+	POLICYHOLDER1_AGE::Integer
+	POLICYHOLDER2_AGE::Integer
+	POLICYHOLDER1_SEX::Integer
+	POLICYHOLDER2_SEX::Integer
+	POLICYHOLDER1_NOW_AGE::Integer
+	POLICYHOLDER2_NOW_AGE::Integer
+	MAIN_UNIT_NO::Float64
+	MAIN_UNIT_FA::Float64
+	GROSS_PREM::Float64
+	MAIN_UNIT_PREM::Float64
+	RIDER_PREM::Float64
+	PAID_TOTAL_PREM::Float64
+	PAID_MAIN_UNIT_PREM::Float64
+	PAID_ADD_MAIN_PREM::Float64
+	PAID_RIDER_PREM::Float64
+	PAID_MAIN_PREM::Float64
+	TOTAL_AV::Float64
+	SEPARATE_AV::Float64
+	POLICY_LOAN::Float64
+	POLICY_LOAN_CODE::Integer
+	Scheduled_AV::Float64
+	CI_ACC_FA::Integer
+	CI_ADVANCE_RATE::Float64
+	PREM_CALC_SAMT::Float64
+	EXPECT_VRF_S_CI_BEF::Float64
+	EXPECT_VRF_S_CI_AFT::Float64
+	EXPECT_VRF_S_CI_AFT2::Float64
+	WITHDRAWAL::Float64
+	UNAMORTIZED_ALPHA::Float64
+	DEPOSIT_PREM::Float64
+	MTH_RISK_PREM::Float64
+	MTH_LOADING::Float64
+	AUTO_REDV_MM::Float64
+	AUTO_REDV_CYCL::Integer
+	GA_AUTO::Integer
+	SAVING_CAL_DVDN::Integer
+	RISK_CAL_DVDN::Integer
+	Level_Net_Prem::Float64
+	PRMC_NWCT_MAX_MTH::Integer
+	NWCT_COST_CAL::Float64
+	SPRK_PREM_SBYN::Integer
+	MNTN_COST::Float64
+	VAR_MNTN_RT1::Float64
+	PAID_UP_MNTN_COST::Float64
+	COLL_RCOST::Float64
+	IMMU_RPRM::Float64
+	FSIT_LFTB_DVCD::Integer
+	RKRT_CODE1::Float64
+	RKRT_CODE2::Float64
+	RKRT_CODE3::Float64
+	GMDB_Type::Integer
+	GMDB_Level::Integer
+	GMAB_Type::Integer
+	GMAB_Level::Integer
+	GMDB_Reset::Integer
+	GMAB_Reset::Integer
+	MCNT_AMT::Integer
+	ACC_ADD_MCNT_AMT::Integer
+	RESERVE01::Float64
+	RESERVE02::Float64
+	RESERVE03::Float64
+	RESERVE04::Float64
+	RESERVE05::Float64
+	RESERVE06::Float64
+	RESERVE07::Float64
+	RESERVE08::Float64
+	RESERVE09::Float64
+	RESERVE10::Float64
+	AV_001::Float64
+	AV_002::Float64
+	AV_003::Float64
+	AV_004::Float64
+	AV_005::Float64
+	AV_006::Float64
+	AV_007::Float64
+	AV_008::Float64
+	AV_009::Float64
+	AV_010::Float64
+	AV_011::Float64
+	AV_012::Float64
+	AV_013::Float64
+	AV_014::Float64
+	AV_015::Float64
+	AV_016::Float64
+	AV_017::Float64
+	AV_018::Float64
+	AV_019::Float64
+	AV_020::Float64
+	Allo_001::Float64
+	Allo_002::Float64
+	Allo_003::Float64
+	Allo_004::Float64
+	Allo_005::Float64
+	Allo_006::Float64
+	Allo_007::Float64
+	Allo_008::Float64
+	Allo_009::Float64
+	Allo_010::Float64
+	Allo_011::Float64
+	Allo_012::Float64
+	Allo_013::Float64
+	Allo_014::Float64
+	Allo_015::Float64
+	Allo_016::Float64
+	Allo_017::Float64
+	Allo_018::Float64
+	Allo_019::Float64
+	Allo_020::Float64
+end
+
+Inforce_Rec::Inforce_R
+
+for Scn in ScnStart:ScnEnd
+	for iii in 1:Max_Fund_Cnt
+		Tot_AV_After_Return[Scn, iii] = Start_Fund_Value[iii]
+	end
+
+	if Inforce_Rec.PRODUCT_TYPE == 1	
+		RunMNo  = Inforce_Rec.PERIOD_1 * 12 - Inforce_Rec.ELAPSED_MTH
+	else
+		RunMNo = Inforce_Rec.MATURITY * 12 - Inforce_Rec.ELAPSED_MTH
+	end
+
+	if RunMNo > Mon_Return_Cnt
+		RunMNo = Mon_Return_Cnt
+	end
+
+	for MNo in 1:RunMNo
+		NowElapsedMth = Inforce_Rec.ELAPSED_MTH + MNo
+		NowAge = Inforce_Rec.POLICYHOLDER1_AGE + int((NowElapsedMth - 1)/12)
+
+		if MNo ==1
+			Scheduled_AV = Inforce_Rec.Scheduled_AV
+			Scheduled_AV_Single = Inforce_Rec.EXPECT_VRF_S_CI_BEF
+			Return_of_Prem = Inforce_Rec.PAID_MAIN_PREM
+			Sum_Tot_AV_After_Loani = Inforce_Rec.TOTAL_AV
+		end
+
+		Exp_Risk_Mcnt_Amt1 = 0
+		Exp_Risk_Mcnt_Amt2 = 0
+		Act_Risk_Mcnt_Amt1 = 0
+		Act_Risk_Mcnt_Amt2 = 0
+
+		if Inforce_Rec.MCNT_AMT == 11
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				Act_Risk_Mcnt_Amt1 = 0.1 * (Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM)
+			else
+				Act_Risk_Mcnt_Amt1 = 5000000 * Inforce_Rec.MAIN_UNIT_NO
+			end
+		end
+
+		if Inforce_Rec.MCNT_AMT == 12
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				Act_Risk_Mcnt_Amt1 = 0.1 * (Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM)
+			else
+				Act_Risk_Mcnt_Amt1 = 6000000 * Inforce_Rec.MAIN_UNIT_NO
+			end
+		end
+
+		if Inforce_Rec.MCNT_AMT == 13
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				Act_Risk_Mcnt_Amt1 = 0
+			else
+				Act_Risk_Mcnt_Amt1 = Inforce_Rec.MAIN_UNIT_PREM * 12 / Inforce_Rec.PAYMENT_TYPE * 0.5
+			end
+		end
+
+		if Inforce_Rec.MCNT_AMT == 14
+			Act_Risk_Mcnt_Amt1 = Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM
+		end
+
+		if Inforce_Rec.MCNT_AMT == 15
+			Exp_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Scheduled_AV)
+			Exp_Risk_Mcnt_Amt2 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Scheduled_AV_Single)
+			Act_Risk_Mcnt_Amt1 = Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM
+		end
+
+		if Inforce_Rec.MCNT_AMT == 16
+			Exp_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Scheduled_AV * 1.05)
+			Act_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Sum_Tot_AV_After_Loani * 1.05)
+		end
+
+		if Inforce_Rec.MCNT_AMT == 17
+			Exp_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Scheduled_AV * 1.05)
+			Exp_Risk_Mcnt_Amt2 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Scheduled_AV_Single * 1.05)
+			Act_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Sum_Tot_AV_After_Loani * 1.05)
+		end
+
+		if Inforce_Rec.MCNT_AMT == 18
+			Exp_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Scheduled_AV * 1.1)
+			Exp_Risk_Mcnt_Amt2 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Scheduled_AV_Single * 1.1)
+			Act_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Sum_Tot_AV_After_Loani * 1.1)
+		end
+
+		if Inforce_Rec.MCNT_AMT == 19
+			Exp_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Scheduled_AV * 1.05)
+			Act_Risk_Mcnt_Amt1 = Max(Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM, Return_of_Prem, Sum_Tot_AV_After_Loani * 1.05)
+		end
+
+		# ============= Get Risk_Mcnt_Amt(재해사망보험금) ==================
+		if Inforce_Rec.ACC_ADD_MCNT_AMT == 21
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				Act_Risk_Mcnt_Amt1 = Act_Risk_Mcnt_Amt1 + 0.1 * (Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM)
+			else
+				Act_Risk_Mcnt_Amt1 = Act_Risk_Mcnt_Amt1 + 5000000 * Inforce_Rec.MAIN_UNIT_NO
+			end
+		end
+
+		if Inforce_Rec.ACC_ADD_MCNT_AMT == 22
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				Act_Risk_Mcnt_Amt1 = Act_Risk_Mcnt_Amt1 + 0.1 * (Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM)
+			else
+				Act_Risk_Mcnt_Amt1 = Act_Risk_Mcnt_Amt1 + 6000000 * Inforce_Rec.MAIN_UNIT_NO
+			end
+		end
+
+		if Inforce_Rec.ACC_ADD_MCNT_AMT == 23
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				Act_Risk_Mcnt_Amt1 = Act_Risk_Mcnt_Amt1
+			else
+				Act_Risk_Mcnt_Amt1 = Act_Risk_Mcnt_Amt1 + Inforce_Rec.MAIN_UNIT_PREM * 12 / Inforce_Rec.PAYMENT_TYPE * 0.5
+			end
+		end
+
+		if Inforce_Rec.CI_ACC_FA == 1 && Inforce_Rec.PRODUCT_TYPE == 3
+			Exp_Risk_Mcnt_Amt1 = Inforce_Rec.MAIN_UNIT_FA * (1 - Inforce_Rec.CI_ADVANCE_RATE)
+			Exp_Risk_Mcnt_Amt2 = Inforce_Rec.MAIN_UNIT_FA * (1 - Inforce_Rec.CI_ADVANCE_RATE)
+			Act_Risk_Mcnt_Amt1 = Inforce_Rec.MAIN_UNIT_FA * (1 - Inforce_Rec.CI_ADVANCE_RATE)
+		end
+
+		# ============= Get Act_Risk_Mcnt_Amt2(변동보험금) ==================
+		if Inforce_Rec.RISK_CAL_DVDN == 2 && (Inforce_Rec.MCNT_AMT == 15 || Inforce_Rec.MCNT_AMT == 17 || Inforce_Rec.MCNT_AMT == 18)
+			if Sum_Tot_AV_After_Loani > Scheduled_AV 
+				Act_Risk_Mcnt_Amt2 = (Sum_Tot_AV_After_Loani - Scheduled_AV) * Act_Risk_Mcnt_Amt1 / Scheduled_AV_Single
+			end
+		end
+
+		# ============= Get IMMU_RPRM(납면보험료) 임시처리==================
+		IMMU_RPRM = 0
+		if Inforce_Rec.RISK_CAL_DVDN == 2
+			if Inforce_Rec.PAYMENT_TYPE == 0
+				IMMU_RPRM = 0
+			elseif Inforce_Rec.PAY_PERIOD <= 5
+				IMMU_RPRM = Inforce_Rec.MAIN_UNIT_PREM * 0.0005
+			elseif Inforce_Rec.PAY_PERIOD <= 10
+				IMMU_RPRM = Inforce_Rec.MAIN_UNIT_PREM * 0.001
+			elseif Inforce_Rec.PAY_PERIOD >= 11
+				IMMU_RPRM = Inforce_Rec.MAIN_UNIT_PREM * 0.002
+			end
+		end
+
+		# ============= Get GP ==================
+		if Inforce_Rec.PAYMENT_TYPE == 0 || (Inforce_Rec.CI_ACC_FA == 1 && Inforce_Rec.PRODUCT_TYPE == 3)
+			GrossPremium = 0
+			Nelp_Net_Prem = 0
+		else
+			if NowElapsedMth > Inforce_Rec.PAY_PERIOD* 12
+				GrossPremium = 0
+				Nelp_Net_Prem = 0
+			else
+				if (NowElapsedMth - 1) / Inforce_Rec.PAYMENT_TYPE == Int((NowElapsedMth - 1) / Inforce_Rec.PAYMENT_TYPE)
+					GrossPremium = Inforce_Rec.MAIN_UNIT_PREM
+					Nelp_Net_Prem = Inforce_Rec.Level_Net_Prem - I&&_RPRM
+				else
+					GrossPremium = 0
+					Nelp_Nse
+				end
+			end
+		end
+
+		# ======== Get Loading ( Gamma)  =========
+		if Inforce_Rec.PAYMENT_TYPE == 0 || (NowElapsedMth > Inforce_Rec.PAY_PERIOD * 12)
+			Loading_Mth = Inforce_Rec.PAID_UP_MNTN_COST
+		end
+
+		if Inforce_Rec.PAY&&T_TYPE > 0 && NowElapsedMth <= Inforce_Rec.PAY_PERIOD * 12
+			if GrossPremium == 0
+				Loading_Mth = 0
+			elseiseec.SAVING_CAL_DVDN == 2
+				if Inforce_Rec.PRMC_NWCT_MAX_MTH < NowEla	Loading_Mth = Inforce_Rec.MNTN_COST + Inforce_Rec.COLL_RCOST
+				else
+					Loading_Mth = Inforce_Rec.NWCT_COST_CAL + Inforce_Rec.MNTN_COST + Inforce_Rec.COLL_RCOST
+				end
+			elseif Inforce_Rec.SAVING_CAL_DVDN == 1
+				Loading_Mth = 0
+			end
+		end
+
+		if Inforce_Rec.CI_ACC_FA == 1 && Inforce_Rec.PRODUCT_TYPE == 3
+			Nelp_Net_Prem = 0
+			Loading_Mth = Inforce_Rec.PAID_UP_MNTN_COST
+		end
+
+		# ======== Get VAR_MNTN Loading =========
+		if Inforce_Rec.RISK_CAL_DVDN == 2 && (Inforce_Rec.MCNT_AMT == 15 || Inforce_Rec.MCNT_AMT == 17 || Inforce_Rec.MCNT_AMT == 18)
+			if Sum_Tot_AV_After_Loani > Scheduled_AV
+				Var_Mntn_Cost = Act_Risk_Mcnt_Amt2 * Inforce_Rec.VAR_MNTN_RT1 / 12
+			end
+		end
+
+		# ============= Get Charged Exp_RiskPrem ==================
+		if Inforce_Rec.CI_ACC_FA == 1 && Inforce_Rec.PRODUCT_TYPE == 3
+			Exp_Level_NP = (Exp_Risk_Mcnt_Amt1 * (1 + Inforce_Rec.CREDIT_RATE) ^ (-1 / 24) - Scheduled_AV) * AppMort2(Scn, NowAge) / 12
+			Exp_Level_NP_Single = EInforce_Recxp_Level_NP
+		else
+			Exp_Level_NP = (Exp_Risk_Mcnt_Amt1 * (1 + Inforce_Rec.CREDIT_RATE) ^ (-1 / 24) - Scheduled_AV) * AppMort1(Scn, NowAge) / 12
+			Exp_Level_NP_Single = (Exp_Risk_Mcnt_Amt2 * (1 + Inforce_Rec.CREDIT_RATE) ^ (-1 / 24) - Scheduled_AV_Single) * AppMort1(Scn, NowAge) / 12
+		end
+
+		Exp_Level_NP = Max(Exp_Level_NP, 0)
+		Exp_Level_NP_Single = Max(Exp_Level_NP_Single, 0)
+
+		if Inforce_Rec.SPRK_PREM_SBYN == 1
+			if Inforce_Rec.PAYMENT_TYPE == 0 |Inforce_Rec| (NowElapsedMth > Inforce_Rec.PAY_PERIOD * 12)
+				if Inforce_Rec.PAID_UP_MNTN_COST >= Exp_Level_NP
+					Loading_Mth = Loading_Mth - Exp_Level_NP
+				else
+					Loading_Mth = 0
+				end
+			end
+		end
+
+		if Inforce_Rec.SPRK_PREM_SBYN == 1
+			if GrossPremium != 0
+				if Inforce_Rec.PAYMENT_TYPE != 0 && NowElapsedMth <= Inforce_Rec.PAY_PERIOD * 12
+					if Inforce_Rec.MNTN_COST >= Exp_Level_NP
+						Loading_Mth = Loading_Mth - Exp_Level_NP
+					else
+						Loading_Mth = Loading_Mth - Inforce_Rec.MNTN_COST
+					end
+				end
+			end
+		end
+
+		if Inforce_Rec.SAVING_CAL_DVDN == 2
+			Scheduled_AV = (Scheduled_AV + GrossPremium - Loading_Mth - Exp_Level_NP) * (1 + Inforce_Rec.CREDIT_RATE) ^ (1 / 12)
+			Scheduled_AV_Single = (Scheduled_AV_Single - Inforce_Rec.PAID_UP_MNTN_COST - Exp_Level_NP_Single) * (1 + Inforce_Rec.CREDIT_RATE) ^ (1 / 12)
+		end
+
+		if Inforce_Rec.SAVING_CAL_DVDN == 1
+			Scheduled_AV = (Scheduled_AV + Nelp_Net_Prem - Loading_Mth - Exp_Level_NP) * (1 + Inforce_Rec.CREDIT_RATE) ^ (1 / 12)
+			Scheduled_AV_Single = (Scheduled_AV_Single - Inforce_Rec.PAID_UP_MNTN_COST - Exp_Level_NP_Single) * (1 + Inforce_Rec.CREDIT_RATE) ^ (1 / 12)
+		end
+
+		if Inforce_Rec.CI_ACC_FA == 1 && Inforce_Rec.PRODUCT_TYPE == 3
+			Scheduled_AV_Single = Scheduled_AV
+		end
+
+		if Inforce_Rec.POLICYHOLDER1_SEX == 1
+			Scheduled_AV = min((Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM) * 1.2, Scheduled_AV)
+			Scheduled_AV_Single = min((Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM) * 1.2, Scheduled_AV_Single)
+		else
+			Scheduled_AV = min((Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM) * 1.1, Scheduled_AV)
+			Scheduled_AV_Single = min((Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM) * 1.1, Scheduled_AV_Single)
+		end
+
+		if Inforce_Rec.RISK_CAL_DVDN == 1
+			Act_Level_NP = Exp_Level_NP
+		elseif Inforce_Rec.RISK_CAL_DVDN == 2
+			Act_Level_NP = ((Act_Risk_Mcnt_Amt1 + Act_Risk_Mcnt_Amt2) * (1 + Inforce_Rec.CREDIT_RATE) ^ (-1 / 24) - Sum_Tot_AV_After_Loani) * AppMort1(Scn, NowAge) / 12
+		end
+
+		Act_Level_NP = max(Act_Level_NP, 0)
+
+		for iii in 1:Max_Fund_Cnt
+			if Inforce_Rec.SAVING_CAL_DVDN == 2
+				Tot_AV_After_DP(Scn, iii) = Tot_AV_After_Return(Scn, iii) + (GrossPremium - Loading_Mth - Var_Mntn_Cost - Act_Level_NP) * Fund_Allo(iii)
+			elseif Inforce_Rec.SAVING_CAL_DVDN == 1
+				Tot_AV_After_DP(Scn, iii) = Tot_AV_After_Return(Scn, iii) + (Nelp_Net_Prem - Loading_Mth - Var_Mntn_Cost - Act_Level_NP) * Fund_Allo(iii)
+			end
+		end
+
+		Sum_Tot_AV_After_DP = 0
+
+		for iii in 1:Max_Fund_Cnt
+			Sum_Tot_AV_After_DP = Sum_Tot_AV_After_DP + Tot_AV_After_DP(Scn, iii)
+		end
+
+		if Sum_Tot_AV_After_DP < 0
+			Sum_Tot_AV_After_DP = 0
+			for iii in 1:Max_Fund_Cnt
+				Tot_AV_After_DP(Scn, iii) = 0
+			end
+		end
+
+		for iii in 1:Max_Fund_Cnt
+			GMDB_Fee(Scn, iii) = Tot_AV_After_DP(Scn, iii) * Fund_GMDB_Fee(iii) / 12
+			if Inforce_Rec.GMAB_Type == 4 && NowElapsedMth >= 60
+				GMAB_Fee(Scn, iii) = Tot_AV_After_DP(Scn, iii) * 0.006 / 12
+			else
+				GMAB_Fee(Scn, iii) = Tot_AV_After_DP(Scn, iii) * Fund_GMAB_Fee(iii) / 12
+			end
+			Other_Fee(Scn, iii) = Tot_AV_After_DP(Scn, iii) * Fund_Other_Fee(iii) / 12
+			Tot_AV_After_GMXB(Scn, iii) = Tot_AV_After_DP(Scn, iii) - (GMDB_Fee(Scn, iii) + GMAB_Fee(Scn, iii) + Other_Fee(Scn, iii))
+		end
+
+		Sum_GMDB_Fee = 0
+		Sum_GMAB_Fee = 0
+		Sum_Other_Fee = 0
+
+		for iii in 1:Max_Fund_Cnt
+			Sum_GMDB_Fee = Sum_GMDB_Fee + GMDB_Fee(Scn, iii)
+			Sum_GMAB_Fee = Sum_GMAB_Fee + GMAB_Fee(Scn, iii)
+			Sum_Other_Fee = Sum_Other_Fee + Other_Fee(Scn, iii)
+		end
+
+		Sum_Tot_AV_After_GMXB = 0
+
+		for iii in 1:Max_Fund_Cnt
+			Sum_Tot_AV_After_GMXB = Sum_Tot_AV_After_GMXB + Tot_AV_After_GMXB(Scn, iii)
+		end
+
+		for iii in 1:Max_Fund_Cnt
+			Tot_AV_After_Return(Scn, iii) = Tot_AV_After_GMXB(Scn, iii) * (1 + Fund_Return_Table(Scn, iii, MNo))
+		end
+
+		Sum_Tot_AV_After_Return = 0
+		
+		for iii in 1:Max_Fund_Cnt
+			Sum_Tot_AV_After_Return = Sum_Tot_AV_After_Return + Tot_AV_After_Return(Scn, iii)
+		end
+
+		Sum_Tot_AV_After_Loani = 0
+		Sum_Tot_AV_After_Loani = Sum_Tot_AV_After_Return + Inforce_Rec.POLICY_LOAN * (1 + (Inforce_Rec.CREDIT_RATE + 0.029 - 0.015)) ^ (MNo / 12)
+
+		Return_of_Prem = Return_of_Prem + GrossPremium
+
+		if Inforce_Rec.GMDB_Type == 1
+			if Inforce_Rec.GMDB_Level == 1
+				GMDB_Guar = Return_of_Prem
+			end
+		end
+
+		if Inforce_Rec.GMDB_Type == 2
+			if Inforce_Rec.GMDB_Level == 1
+				if Inforce_Rec.CI_ACC_FA == 1 && Inforce_Rec.PRODUCT_TYPE == 3
+					GMDB_Guar = Inforce_Rec.MAIN_UNIT_FA * (1 - Inforce_Rec.CI_ADVANCE_RATE)
+				else
+					GMDB_Guar = Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM
+				end
+			end
+		end
+
+		if Inforce_Rec.GMDB_Type == 3 && NowElapsedMth == 60
+			DoubleUp_5_AV = Sum_Tot_AV_After_Return
+		end
+
+		if Inforce_Rec.GMDB_Type == 3
+			if NowElapsedMth >= 60
+				GMDB_Guar = max(DoubleUp_5_AV, Return_of_Prem * 1.1)
+			else
+				GMDB_Guar = Return_of_Prem
+			end
+		end
+
+		if Inforce_Rec.GMAB_Type == 1 && NowElapsedMth == Inforce_Rec.PERIOD_1 * 12
+			if Inforce_Rec.GMAB_Level == 1
+				GMAB_Guar = Return_of_Prem
+			end
+		end
+
+		if Inforce_Rec.GMAB_Type == 2 && NowElapsedMth == Inforce_Rec.PERIOD_1 * 12
+			if Inforce_Rec.GMAB_Level == 1
+				GMAB_Guar = Inforce_Rec.MAIN_UNIT_FA - Inforce_Rec.WITHDRAWAL + Inforce_Rec.PAID_ADD_MAIN_PREM
+			end
+		end
+
+		if Inforce_Rec.GMAB_Type == 3 && Inforce_Rec.PAY_PERIOD >= 10
+			if NowElapsedMth < Inforce_Rec.PAY_PERIOD * 12
+				GMAB_Guar = 0
+			elseif NowElapsedMth == Inforce_Rec.PERIOD_1 * 12
+				GMAB_Guar = Return_of_Prem * (1 + 0.06 * (Int((NowElapsedMth - Inforce_Rec.PAY_PERIOD * 12) / 36)))
+			elseif NowElapsedMth == Inforce_Rec.PAY_PERIOD * 12
+				GMAB_Guar = Return_of_Prem
+			elseif (NowElapsedMth - Inforce_Rec.PAY_PERIOD * 12) / 36 == Int((NowElapsedMth - Inforce_Rec.PAY_PERIOD * 12) / 36)
+				GMAB_Guar = Return_of_Prem * (1 + 0.06 * (Int((NowElapsedMth - Inforce_Rec.PAY_PERIOD * 12) / 36)))
+			else
+				GMAB_Guar = 0
+			end
+		end
+
+		if Inforce_Rec.GMAB_Type == 3 && (Inforce_Rec.PAY_PERIOD == 5 || Inforce_Rec.PAY_PERIOD == 7)
+			if NowElapsedMth < Inforce_Rec.PAY_PERIOD * 12
+				GMAB_Guar = 0
+			elseif NowElapsedMth == Inforce_Rec.PERIOD_1 * 12
+				GMAB_Guar = Return_of_Prem * (1 + 0.06 * (Int((NowElapsedMth - Inforce_Rec.PAY_PERIOD * 12) / 36)))
+			elseif NowElapsedMth == Inforce_Rec.PAY_PERIOD * 12
+				GMAB_Guar = Return_of_Prem * 0.85
+			elseif NowElapsedMth < 120
+				GMAB_Guar = 0
+			elseif NowElapsedMth == 120
+				GMAB_Guar = Return_of_Prem
+			elseif (NowElapsedMth - 120) / 36 == Int((NowElapsedMth - 120) / 36)
+				GMAB_Guar = Return_of_Prem * (1 + 0.06 * (Int((NowElapsedMth - 120) / 36)))
+			else
+				GMAB_Guar = 0
+			end
+		end
+
+		if Inforce_Rec.GMAB_Type == 4
+			if NowElapsedMth == 60
+				DoubleUp_5_AV = Sum_Tot_AV_After_Return
+			end
+			if NowElapsedMth == Inforce_Rec.PERIOD_1 * 12
+				GMAB_Guar = max(DoubleUp_5_AV, Return_of_Prem * 1.1)
+			end
+		end
+
+		if Inforce_Rec.PRODUCT_TYPE != 1
+			GMAB_Guar = 0
+		elseif NowElapsedMth > Inforce_Rec.PERIOD_1 * 12
+			GMAB_Guar = 0
+		end
+
+		if Inforce_Rec.POLICYHOLDER1_SEX == 1
+			Mot_Qx = Qx_Data(Inforce_Rec.POLICYHOLDER1_AGE + Int((NowElapsedMth - 1) / 12)).Std_Qx_M
+		end
+		if Inforce_Rec.POLICYHOLDER1_SEX == 2
+			Mot_Qx = Qx_Data(Inforce_Rec.POLICYHOLDER1_AGE + Int((NowElapsedMth - 1) / 12)).Std_Qx_F
+		end
+
+		Mot_Trend = 0.763
+		Mot_Qx_Mth = 1 - (1 - min(Mot_Qx, 1)) ^ (1 / 12)
+		Death_Rate = 1 - (1 - min(Mot_Qx * Mot_Trend, 1)) ^ (1 / 12)
+
+		if Inforce_Rec.PRODUCT_TYPE == 1 && NowElapsedMth > Inforce_Rec.PERIOD_1 * 12
+			GMDB_Claim = 0
+		else
+			if NowElapsedMth > Inforce_Rec.MATURITY * 12
+				GMDB_Claim = 0
+			elseif Inforce_Rec.GMDB_Type == 1 || Inforce_Rec.GMDB_Type == 3
+				GMDB_Claim = max(0, GMDB_Guar - Act_Risk_Mcnt_Amt1 - Sum_Tot_AV_After_Loani) * Death_Rate
+			elseif Inforce_Rec.GMDB_Type == 2 && Sum_Tot_AV_After_Return <= 0
+				GMDB_Claim = max(0, GMDB_Guar - Sum_Tot_AV_After_Loani) * Death_Rate
+			else
+				GMDB_Claim = 0
+			end
+		end
+
+		if Inforce_Rec.PRODUCT_TYPE == 1 && NowElapsedMth > Inforce_Rec.PERIOD_1 * 12
+			GMAB_Claim = 0
+		else
+			if NowElapsedMth > Inforce_Rec.MATURITY * 12
+				GMAB_Claim = 0
+			else
+				GMAB_Claim = max(0, GMAB_Guar - Sum_Tot_AV_After_Loani)
+			end
+		end
+
+		iii = Int((NowElapsedMth - 1) / 12) + 1
+
+		if iii > 30
+			iii = 30
+		end
+
+		if Inforce_Rec.PAYMENT_TYPE == 0
+			Lapse_Mth = 1 - (1 - LapseRate_Data(iii).Lapse_SP) ^ (1 / 12)
+		else
+			Lapse_Mth = 1 - (1 - LapseRate_Data(iii).Lapse_MP) ^ (1 / 12)
+		end
+
+		Death_Rate = Tot_Live * Death_Rate * (1 - 0.5 * Lapse_Mth)
+		Lapse_Rate = Tot_Live * Lapse_Mth * (1 - 0.5 * Death_Rate)
+
+		if Inforce_Rec.PRODUCT_TYPE == 1 && NowElapsedMth <= Inforce_Rec.PERIOD_1 * 12
+			GMDB_Fee_Dec = Sum_GMDB_Fee * Tot_Live
+			GMAB_Fee_Dec = Sum_GMAB_Fee * Tot_Live
+		elseif NowElapsedMth <= Inforce_Rec.MATURITY * 12
+			GMDB_Fee_Dec = Sum_GMDB_Fee * Tot_Live
+			GMAB_Fee_Dec = Sum_GMAB_Fee * Tot_Live
+		else
+			GMDB_Fee_Dec = 0
+			GMAB_Fee_Dec = 0
+		end
+
+		GMDB_Claim_Dec = GMDB_Claim * Tot_Live
+
+		if Inforce_Rec.PRODUCT_TYPE == 1 && NowElapsedMth == Inforce_Rec.PERIOD_1 * 12
+			GMAB_Claim_Dec = GMAB_Claim * Tot_Live
+		elseif NowElapsedMth == Inforce_Rec.MATURITY * 12
+			GMAB_Claim_Dec = GMAB_Claim * Tot_Live
+		else
+			GMAB_Claim_Dec = 0
+		end
+
+		Tot_Live = Tot_Live - Death_Rate - Lapse_Rate
+
+		AV_Dec = Sum_Tot_AV_After_Loani * Tot_Live
+		PV_GMDB_Fee_Dec = PV_GMDB_Fee_Dec + GMDB_Fee_Dec * (1 / (1 + Discount_Rate)) ^ ((MNo - 1) / 12)
+		PV_GMAB_Fee_Dec = PV_GMAB_Fee_Dec + GMAB_Fee_Dec * (1 / (1 + Discount_Rate)) ^ ((MNo - 1) / 12)
+		PV_GMDB_Claim_Dec = PV_GMDB_Claim_Dec + GMDB_Claim_Dec * (1 / (1 + Discount_Rate)) ^ ((MNo) / 12)
+		PV_GMAB_Claim_Dec = PV_GMAB_Claim_Dec + GMAB_Claim_Dec * (1 / (1 + Discount_Rate)) ^ ((MNo) / 12)
+
+		PV_AV_Dec = PV_AV_Dec + AV_Dec * (1 / (1 + Discount_Rate)) ^ ((MNo - 1) / 12)
+
+		if Inforce_Rec.AUTO_REDV_CYCL > 0
+			if (NowElapsedMth - Inforce_Rec.AUTO_REDV_MM) / Inforce_Rec.AUTO_REDV_CYCL == Int((NowElapsedMth - Inforce_Rec.AUTO_REDV_MM) / Inforce_Rec.AUTO_REDV_CYCL)
+				for iii in 1:Max_Fund_Cnt
+					Tot_AV_After_Return(Scn, iii) = Sum_Tot_AV_After_Return * Fund_Allo(iii)
+				end
+			end
+		end
+
+		if Inforce_Rec.GA_AUTO > 0
+			if NowElapsedMth > 60 && (NowElapsedMth > Inforce_Rec.PAY_PERIOD * 12)
+				if Sum_Tot_AV_After_Loani / Return_of_Prem * 100 >= Inforce_Rec.GA_AUTO
+					Gross_PV_AV(Scn) = Gross_PV_AV(Scn) + Inforce_Rec.TOTAL_AV
+					Gross_GMDB_Fee(Scn) = Gross_GMDB_Fee(Scn) + PV_GMDB_Fee_Dec
+					Gross_GMAB_Fee(Scn) = Gross_GMAB_Fee(Scn) + PV_GMAB_Fee_Dec
+					Gross_GMDB_Claim(Scn) = Gross_GMDB_Claim(Scn) + PV_GMDB_Claim_Dec
+					Gross_GMAB_Claim(Scn) = Gross_GMAB_Claim(Scn) + PV_GMAB_Claim_Dec
+					break
+				end
+			end
+		end
+
+		if Inforce_Rec.PRODUCT_TYPE == 4
+			if Scheduled_AV < Exp_Level_NP
+				Gross_PV_AV(Scn) = Gross_PV_AV(Scn) + Inforce_Rec.TOTAL_AV
+				Gross_GMDB_Fee(Scn) = Gross_GMDB_Fee(Scn) + PV_GMDB_Fee_Dec
+				Gross_GMAB_Fee(Scn) = Gross_GMAB_Fee(Scn) + PV_GMAB_Fee_Dec
+				Gross_GMDB_Claim(Scn) = Gross_GMDB_Claim(Scn) + PV_GMDB_Claim_Dec
+				Gross_GMAB_Claim(Scn) = Gross_GMAB_Claim(Scn) + PV_GMAB_Claim_Dec
+				break
+			end
+		end
+
+		if MNo == RunMNo
+			Gross_PV_AV(Scn) = Gross_PV_AV(Scn) + Inforce_Rec.TOTAL_AV
+			Gross_GMDB_Fee(Scn) = Gross_GMDB_Fee(Scn) + PV_GMDB_Fee_Dec
+			Gross_GMAB_Fee(Scn) = Gross_GMAB_Fee(Scn) + PV_GMAB_Fee_Dec
+			Gross_GMDB_Claim(Scn) = Gross_GMDB_Claim(Scn) + PV_GMDB_Claim_Dec
+			Gross_GMAB_Claim(Scn) = Gross_GMAB_Claim(Scn) + PV_GMAB_Claim_Dec
+		end
+
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

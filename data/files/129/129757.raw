@@ -1,0 +1,16 @@
+using Symbolic
+
+testexprn01 = :(1+x-2*y)
+
+println("Check whether ", testexprn01, " contains x: ", contains(testexprn01, :x), "\n")
+println("Check whether ", testexprn01, " contains z: ", contains(testexprn01, :z), "\n")
+
+println("Check whether ", testexprn01, " contains 2*y: ", contains(testexprn01, :(2*y)), "\n")
+
+testexprn02 = copy(testexprn01)
+replace(testexprn02, :x, :(z^2))
+println("Replace x in ", testexprn01, " by z^2: ", testexprn02, "\n")
+
+testexprn03 = copy(testexprn01)
+replace(testexprn03, :(2*y), :(z^2))
+println("Replace 2*y in ", testexprn01, " by z^2: ", testexprn03)

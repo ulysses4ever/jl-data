@@ -1,0 +1,87 @@
+###################################################
+## Defines the 'InstanceGraph' type
+###################################################
+
+type InstanceNode
+  node_type::TypeNode
+  arr_time::Int64
+  departed::Bool
+  matched::Bool
+  dep_time::Int64
+
+  "Constructor: reference to the node type"
+  function InstanceNode(type_node::TypeNode, arr::Int64)
+    obj = new()
+    obj.node_type = type_node
+    obj.departed = false
+    obj.matched = false
+    obj.arr_time = arr
+    obj.dep_time = -1
+    return obj
+  end
+end
+
+type InstanceGraph
+  type_graph::TypeGraph
+  all_nodes::Array{InstanceNode,1}
+  present_nodes::Array{InstanceNode,1}
+  all::Int64
+
+  "Constructor: reference to the underlying type graph.
+  returns an empty InstanceGraph"
+  function InstanceGraph(tg::TypeGraph)
+    obj = new()
+    obj.type_graph = tg
+    obj.all_nodes = Array(InstanceNode,0)
+    obj.present_nodes = Array(InstanceNode,0)
+    obj.all = 0
+    return obj
+  end
+end
+
+function arrival!(pool::InstanceGraph, node::TypeNode, arr_time::Int64)
+  new_node = InstanceNode(node, arr_time)
+  push!(pool.all_nodes, new_node)
+  push!(pool.present_nodes, new_node)
+  pool.all = length(pool.all_nodes)
+end
+
+function departures!(pool::InstanceGraph, time::Int64)
+  copy = pool.present_nodes[:]
+  for n in copy
+    if rand() < n.node_type.dep_rate
+      n.departed = true
+      n.dep_time = time
+      deleteat!(pool.present_nodes, findin(pool.present_nodes, [n]))
+    end
+  end
+end
+
+"Removes from the pool the nodes corresponding to the node_ids.
+Relates to how the adjacency matrix is generated"
+function remove_matched!(pool::InstanceGraph, node_ids::Array{Int64,1}, time::Int64)
+  for n in node_ids
+    pool.present_nodes[n].matched = true
+    pool.present_nodes[n].dep_time = time
+  end
+  deleteat!(pool.present_nodes, node_ids)
+end
+
+
+"# returns a list of all the edges,
+# and two lists of the ingoing and outgoing edges to each of the vertices"
+function am_generator(pool::InstanceGraph)
+  n = length(pool.present_nodes)
+  adjacency_matrix = zeros(Int64, (n,n))
+  g = pool.type_graph.graph
+  for i =1:n
+    id_i = pool.present_nodes[i].node_type.id
+    for j =1:n
+      id_j = pool.present_nodes[j].node_type.id
+      if has_edge(g, id_i, id_j) == 1 && i != j
+        adjacency_matrix[i,j] = 1
+      end
+    end
+  end
+  return adjacency_matrix
+end

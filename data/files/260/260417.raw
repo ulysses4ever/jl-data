@@ -1,0 +1,15 @@
+fragility_format = "continuous"
+
+fragility_means = [0.160 0.225 0.400 0.600]
+fragility_stds = [0.104 0.158 0.300 0.480]
+
+hazard_imls = []
+hazard_poes = []
+computed_hazard_poes = [8.642581098E-01 8.140198775E-01 7.278886755E-01 6.266286191E-01 5.246282956E-01 4.305617959E-01 3.485034633E-01 2.794787219E-01 2.228030415E-01 1.770040630E-01 1.403738365E-01 1.112629770E-01 8.821364230E-02 6.999714814E-02 5.561364911E-02 4.425156564E-02 3.526675012E-02 2.815214237E-02 2.250634386E-02 1.801689639E-02]
+
+minIML = 0.05
+maxIML = 1.40
+continuous_fragility_discretization = 20
+
+hazard_investigation_time = 50.0
+risk_investigation_time = 1.0

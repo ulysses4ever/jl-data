@@ -1,0 +1,112 @@
+commit 9a2f86f7789cc6f308e178614cffcd2358eedf15
+Author: milktrader <milktrader@gmail.com>
+Date:   Wed Apr 10 09:29:34 2013 -0400
+
+    deprecated read_csv_for_testing with passing tests closes #20
+
+diff --git a/src/TimeSeries.jl b/src/TimeSeries.jl
+index 7a2efee..bd4591b 100644
+--- a/src/TimeSeries.jl
++++ b/src/TimeSeries.jl
+@@ -35,8 +35,7 @@ export read_time,
+        sip, 
+        sips, 
+ ## testing
+-       @timeseries,
+-       read_csv_for_testing
++       @timeseries
+ 
+ ################## include files #####################
+ 
+diff --git a/src/io.jl b/src/io.jl
+index 32a26bd..2364d86 100644
+--- a/src/io.jl
++++ b/src/io.jl
+@@ -1,11 +1,25 @@
+-function read_time(filename::String, fmt::String, indexby::Int)
+-  df = read_table(filename)
+-  within!(df, :(Date = $parse_date($fmt, $df[:,$indexby])))
++function read_time(filename::String, fmt::String)
++  cdf        = read_table(filename)
++  cnames     = colnames(cdf)
++  time_array = CalendarTime[]
++
++  for i in 1:nrow(cdf)
++    push!(time_array, Calendar.parse("yyyy-MM-dd", cdf[i,1]))
++  end
++
++  df = @DataFrame("Date" => time_array)
++
++  for i in 2:length(cnames)
++    colname  = cnames[i]
++    within!(df, :($colname = $cdf[:,$i]))
++  end
++
+   df["Date"] = IndexedVector(df["Date"])
+-  if df[1,1] > df[2,1]
++
++  if df[1,"Date"] > df[2, "Date"]
+     flipud!(df)
+   end
+   df
+ end
+ 
+-read_time(filename) = read_time(filename, "yyyy-MM-dd", 1)
++read_time(filename) = read_time(filename, "yyyy-MM-dd")
+diff --git a/test/indexdate.jl b/test/indexdate.jl
+index 5144ce3..82ec555 100644
+--- a/test/indexdate.jl
++++ b/test/indexdate.jl
+@@ -1,4 +1,4 @@
+-df = read_csv_for_testing(Pkg.dir("TimeSeries/test/data/spx.csv"))
++df = read_time(Pkg.dir("TimeSeries/test/data/spx.csv"))
+ 
+ df_year  = indexyear(df,1970)
+ df_month = indexmonth(df,4)
+diff --git a/test/lag.jl b/test/lag.jl
+index 7037024..5cf1404 100644
+--- a/test/lag.jl
++++ b/test/lag.jl
+@@ -71,8 +71,7 @@ dvb_lag = lag(dvb,3)
+ # 
+ # ######## DataFrame ######################
+ 
+-
+-df = read_csv_for_testing(Pkg.dir("TimeSeries/test/data/spx.csv"))
++df = read_time(Pkg.dir("TimeSeries/test/data/spx.csv"))
+ 
+ lead!(df, "Close", 1)
+ lead!(df, "Close", 3)
+diff --git a/test/moving.jl b/test/moving.jl
+index a1133d0..07e0985 100644
+--- a/test/moving.jl
++++ b/test/moving.jl
+@@ -47,7 +47,7 @@ vf      = [1.,2,3,4,5]
+ # @assert 5 == length(dvs_lag)
+ 
+ ######## DataFrame ######################
+-df = read_csv_for_testing(Pkg.dir("TimeSeries/test/data/spx.csv"))
++df = read_time(Pkg.dir("TimeSeries/test/data/spx.csv"))
+ 
+ moving!(df, "Close", mean, 50)
+ moving!(df, "Close", mean, 200)
+diff --git a/test/returns.jl b/test/returns.jl
+index a83308e..1041872 100644
+--- a/test/returns.jl
++++ b/test/returns.jl
+@@ -1,4 +1,4 @@
+-df = read_csv_for_testing(Pkg.dir("TimeSeries/test/data/spx.csv"))
++df = read_time(Pkg.dir("TimeSeries/test/data/spx.csv"))
+ 
+ sr = simple_return(df["Close"])
+ lr = log_return(df["Close"])
+diff --git a/test/upto.jl b/test/upto.jl
+index 5121fd5..9f765ee 100644
+--- a/test/upto.jl
++++ b/test/upto.jl
+@@ -1,4 +1,4 @@
+-df = read_csv_for_testing(Pkg.dir("TimeSeries/test/data/spx.csv"))
++df = read_time(Pkg.dir("TimeSeries/test/data/spx.csv"))
+ 
+ upto!(df, "Close", mean);
+ upto!(df, "Close", var);

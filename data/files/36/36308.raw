@@ -1,0 +1,25 @@
+
+function v(; args...)
+    for a in args
+        sy, val = a
+        if sy==:d
+            println("got d")
+        elseif sy==:b
+            println("got b")
+        end
+    end
+end
+
+function s(; b=2, c=3)
+    v(;b=b,c=c)
+end
+
+s(b=2, c=3)
+
+function n(; args...)
+    v(; args...)
+end
+
+n(a=1, b=3, c=4)
+
+v(c=8, d=6)

@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:02:33 GMT
+Date: Wed, 03 May 2017 21:02:48 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5612
+Content-Length: 6531
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2654
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3836
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "583a3a1f7ee6bb18f67bb42dba49c0b7"
-Last-Modified: Tue, 24 Nov 2015 17:48:48 GMT
+ETag: "04f3ba5e644d88dea5c7cfce1967b32b"
+Last-Modified: Wed, 21 Dec 2016 08:53:37 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,84 +22,84 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: bae57931a6fe678a3dffe9be8e7819c8
-X-GitHub-Request-Id: 28DE:6634:134A0E6:18EEF7F:59023239
+X-Served-By: 10ea50bffaded85949561216def301f3
+X-GitHub-Request-Id: 729C:5C87:6643C1:834AB5:590A4578
 
 {
-  "id": 46808535,
-  "name": "CoordinateSystems.jl",
-  "full_name": "drewkett/CoordinateSystems.jl",
+  "id": 47901546,
+  "name": "POMDPSolve.jl",
+  "full_name": "JuliaPOMDP/POMDPSolve.jl",
   "owner": {
-    "login": "drewkett",
-    "id": 2132248,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/2132248?v=3",
+    "login": "JuliaPOMDP",
+    "id": 16347008,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16347008?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/drewkett",
-    "html_url": "https://github.com/drewkett",
-    "followers_url": "https://api.github.com/users/drewkett/followers",
-    "following_url": "https://api.github.com/users/drewkett/following{/other_user}",
-    "gists_url": "https://api.github.com/users/drewkett/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/drewkett/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/drewkett/subscriptions",
-    "organizations_url": "https://api.github.com/users/drewkett/orgs",
-    "repos_url": "https://api.github.com/users/drewkett/repos",
-    "events_url": "https://api.github.com/users/drewkett/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/drewkett/received_events",
-    "type": "User",
+    "url": "https://api.github.com/users/JuliaPOMDP",
+    "html_url": "https://github.com/JuliaPOMDP",
+    "followers_url": "https://api.github.com/users/JuliaPOMDP/followers",
+    "following_url": "https://api.github.com/users/JuliaPOMDP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPOMDP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPOMDP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPOMDP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPOMDP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPOMDP/repos",
+    "events_url": "https://api.github.com/users/JuliaPOMDP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPOMDP/received_events",
+    "type": "Organization",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/drewkett/CoordinateSystems.jl",
-  "description": null,
+  "html_url": "https://github.com/JuliaPOMDP/POMDPSolve.jl",
+  "description": "A Julia wrapper for pomdp-solve that interfaces with the POMDPs.jl framework",
   "fork": false,
-  "url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl",
-  "forks_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/forks",
-  "keys_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/teams",
-  "hooks_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/events",
-  "assignees_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/tags",
-  "blobs_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/subscription",
-  "commits_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/merges",
-  "archive_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/downloads",
-  "issues_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/drewkett/CoordinateSystems.jl/deployments",
-  "created_at": "2015-11-24T17:48:30Z",
-  "updated_at": "2015-11-24T17:48:48Z",
-  "pushed_at": "2015-11-24T18:16:21Z",
-  "git_url": "git://github.com/drewkett/CoordinateSystems.jl.git",
-  "ssh_url": "git@github.com:drewkett/CoordinateSystems.jl.git",
-  "clone_url": "https://github.com/drewkett/CoordinateSystems.jl.git",
-  "svn_url": "https://github.com/drewkett/CoordinateSystems.jl",
+  "url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl",
+  "forks_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/forks",
+  "keys_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/teams",
+  "hooks_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/events",
+  "assignees_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/tags",
+  "blobs_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/subscription",
+  "commits_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/merges",
+  "archive_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/downloads",
+  "issues_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/JuliaPOMDP/POMDPSolve.jl/deployments",
+  "created_at": "2015-12-13T01:28:17Z",
+  "updated_at": "2016-12-21T08:53:37Z",
+  "pushed_at": "2017-01-05T00:48:02Z",
+  "git_url": "git://github.com/JuliaPOMDP/POMDPSolve.jl.git",
+  "ssh_url": "git@github.com:JuliaPOMDP/POMDPSolve.jl.git",
+  "clone_url": "https://github.com/JuliaPOMDP/POMDPSolve.jl.git",
+  "svn_url": "https://github.com/JuliaPOMDP/POMDPSolve.jl",
   "homepage": null,
-  "size": 4,
-  "stargazers_count": 0,
-  "watchers_count": 0,
+  "size": 33,
+  "stargazers_count": 4,
+  "watchers_count": 4,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
@@ -108,16 +108,35 @@ X-GitHub-Request-Id: 28DE:6634:134A0E6:18EEF7F:59023239
   "has_pages": false,
   "forks_count": 0,
   "mirror_url": null,
-  "open_issues_count": 0,
+  "open_issues_count": 1,
   "forks": 0,
-  "open_issues": 0,
-  "watchers": 0,
+  "open_issues": 1,
+  "watchers": 4,
   "default_branch": "master",
   "permissions": {
     "admin": false,
     "push": false,
     "pull": true
   },
+  "organization": {
+    "login": "JuliaPOMDP",
+    "id": 16347008,
+    "avatar_url": "https://avatars0.githubusercontent.com/u/16347008?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JuliaPOMDP",
+    "html_url": "https://github.com/JuliaPOMDP",
+    "followers_url": "https://api.github.com/users/JuliaPOMDP/followers",
+    "following_url": "https://api.github.com/users/JuliaPOMDP/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JuliaPOMDP/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JuliaPOMDP/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JuliaPOMDP/subscriptions",
+    "organizations_url": "https://api.github.com/users/JuliaPOMDP/orgs",
+    "repos_url": "https://api.github.com/users/JuliaPOMDP/repos",
+    "events_url": "https://api.github.com/users/JuliaPOMDP/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JuliaPOMDP/received_events",
+    "type": "Organization",
+    "site_admin": false
+  },
   "network_count": 0,
-  "subscribers_count": 0
+  "subscribers_count": 2
 }

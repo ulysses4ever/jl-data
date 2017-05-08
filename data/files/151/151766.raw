@@ -1,0 +1,17 @@
+immutable MPIState
+  comm
+  nprocs
+  procid
+  rootproc
+
+  function MPIState(MPI, rootproc)
+    comm = MPI.COMM_WORLD
+    nprocs = MPI.Comm_size(comm)
+    procid = MPI.Comm_rank(comm)
+    new(comm, nprocs, procid, rootproc)
+  end
+end
+
+function println(io::IO, s::MPIState)
+  println(io, "Process $(s.procid) of $(s.nprocs), with root process $(s.rootproc).")
+end

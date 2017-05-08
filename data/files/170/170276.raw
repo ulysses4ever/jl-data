@@ -1,0 +1,99 @@
+# JagsModule.jl 
+# Autor: ryganon
+
+module JagsModule
+
+#imports / exports
+import Base.*
+export JagsModel, JagsSamples, executeModel, readSamples
+
+# A simple type representing a Jags model
+#   dir = path to the directory
+#   scriptFile = the file with the commands for Jags console
+#   indexFile = the file with indexes for each variable in the sample file
+type JagsModel
+    dir
+    scriptFile
+    indexFile
+end
+
+# A type representing all the variables monitored by the model
+#   samples: array with the values
+#   statistics: array of JagsStatistics variables
+type JagsSamples
+    name::String
+    samples
+    statistics
+end
+
+# Type with the statistics for each variable
+type JagsStatistics
+    mean
+    std
+    var
+    median
+end
+
+#Functions
+
+# The simplest way to run a model in Jags
+function executeModel(model::JagsModel)
+    try
+        output= run(`jags $(teste.dir)$(teste.script)`)
+    catch
+        error("Error: at runJagsModel")
+    end
+end
+
+# Read the index file
+function readSamples(model::JagsModel)
+    
+    local asamples
+    try
+        # First, read the indexes file to get variables names and positions
+        findexes = dlmread(strcat(model.dir,model.indexFile)," ")
+        
+        # Now, load the file with the samples
+        fsamples = dlmread(strcat(model.dir,"CODAchain1.txt")," ", Float64)
+
+        # The number os variables = number of rows in findexes
+        nvariables = size(findexes,1)
+
+        # The returned array
+        asamples = Array(JagsSamples, (1,nvariables))
+
+        # For each variable in findexes, get the NAME and the RANGE of the values
+        for i in 1:nvariables
+            pstart = convert(Int,findexes[i,2])
+            pend = convert(Int,findexes[i,3])
+
+            tmpValues = fsamples[pstart:pend, 3]
+
+            # run statistics
+            tmpStats = runStatistics(tmpValues) 
+            
+            # creating the JagsSamples
+            asamples[1,i] = JagsSamples(findexes[i,1], tmpValues, tmpStats)
+        end
+    catch
+        error("Error: at readSamples")
+    end
+    # Return an array with JagsSamples
+    asamples
+end
+
+# Stats:
+# mean(v[, dim])
+# std(v[, corrected])
+# var(v[, corrected])
+# median(v)
+function runStatistics(values::Array)
+    try
+        result = JagsStatistics(mean(values),std(values),var(values),median(values))
+    catch
+        error("Error: at runStatistics")
+    end
+end
+
+
+end #end of JagsModule

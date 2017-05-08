@@ -1,0 +1,21 @@
+function findbestquadrprimeformula(A, B)
+    mostprimes = 0
+    local bestpair
+    for a in A, b in B
+        n = 0
+        while isprime(n^2 + a*n + b)
+            n += 1
+        end
+        if n > mostprimes
+            mostprimes = n
+            bestpair = (a, b)
+        end
+    end
+    return bestpair
+end
+
+@time res = prod(findbestquadrprimeformula(-1000:1000, -1000:1000))
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

@@ -1,0 +1,48 @@
+module Jules
+
+export
+btw,
+decr,
+eq,
+gt,
+gte,
+incr,
+isneg,
+isnothing,
+ispos,
+iszero,
+lt,
+lte,
+mul,
+negate,
+neq,
+pow,
+truthy
+
+ispos(n) = n >= 0
+isneg(n)  = n < 0
+iszero(n) = n == 0
+isnothing(x) = x == nothing
+
+truthy(val) = !is(val, nothing) && !is(val, false)
+negate(pred) = x -> !pred(x)
+
+incr(i) = x -> x + i
+decr(i) = x -> x - i
+mul(i) = x -> x * i
+pow(i) = x -> x ^ i
+lt(i) = x -> x < i
+lte(i) = x -> x <= i
+gt(i) = x -> x > i
+gte(i) = x -> x >= i
+eq(i) = x -> x == i
+neq(i) = negate(eq(i))
+eq(i :: FloatingPoint, tol) = x -> abs(x - i) < tol
+neq(i :: FloatingPoint, tol) = x -> !(eq, tol)
+btw(a,b) = x -> (x >= a) && (x < b)
+
+end ## end module
+
+
+
+include("FPUtil.jl")

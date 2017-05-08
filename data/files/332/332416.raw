@@ -1,0 +1,62 @@
+num_inputs = convert(Int32, 4)
+num_hidden = convert(Int32, 4)
+num_outputs = convert(Int32, 2)
+
+layer_1_weights = rand(convert(Float32, -1):convert(Float32, 0.1):convert(Float32, 1), num_inputs * num_hidden)
+layer_2_weights = rand(convert(Float32, -1):convert(Float32, 0.1):convert(Float32, 1), num_outputs * num_hidden)
+inputs = rand(convert(Float32, 0):convert(Float32, 0.1):convert(Float32, 1), num_inputs)
+hidden_activations = zeros(Float32, num_hidden)
+outputs = zeros(Float32, num_outputs)
+walls = [convert(Float32, 0), convert(Float32, 1), convert(Float32, 0), 
+         convert(Float32, 1), convert(Float32, 0), convert(Float32, 0),
+         convert(Float32, 0), convert(Float32, 1), convert(Float32, 200),
+         convert(Float32, 1), convert(Float32, 0), convert(Float32, 400),]
+
+num_goals = convert(Int32, 10)
+goals = convert(Array{Float32, 1},  [20, 100, 
+               110, 100, 
+               200, 100, 
+               290, 100, 
+               380, 100, 
+               290, 100, 
+               200, 100, 
+               110, 100, 
+               20, 100, 
+               110, 100, 
+               200, 100, 
+               290, 100, 
+               380, 100, 
+               290, 100, 
+               200, 100, 
+               110, 100, 
+               20, 100,
+               20, 100, 
+               110, 100, 
+               200, 100, 
+               290, 100, 
+               380, 100, 
+               290, 100, 
+               200, 100, 
+               110, 100, 
+               20, 100, 
+               110, 100, 
+               200, 100, 
+               290, 100, 
+               380, 100, 
+               290, 100, 
+               200, 100, 
+               110, 100, 
+               20, 100],)
+
+bit_string = convert(Array{Int32, 1},[0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0,0,1,1,0,0,1,0,0,1,0,1,1,0,0,1,0,0,0,1,0,1,1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,1,0,1,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,1,0,0,1,1,0,0,0,0,1,1,0,1,1,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,1,0,1,1,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,0,0,0,1,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,1,1,0,0,0,0,1,0,1,1,0,1,0,0,0,0])
+fitness = [convert(Float32, 0)]
+
+for i = 1:1
+Libdl.dlopen("/home/david/TehzCodes/GRNEvolution/librobosim")
+ccall((:simulate, "/home/david/TehzCodes/GRNEvolution/librobosim"), Void,
+      (Int32, Ptr{Float32}, Ptr{Float32}, Int32, Ptr{Int32}, Int32, Int32, Int32, 
+       Int32, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Ptr{Float32}, Int32),
+      convert(Int32, 1000), walls, goals, num_goals, bit_string, convert(Int32, 10), num_inputs, num_hidden, 
+      num_outputs, layer_1_weights, layer_2_weights, inputs, hidden_activations, 
+      outputs, fitness, convert(Int32, 1))
+end

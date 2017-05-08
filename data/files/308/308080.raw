@@ -1,0 +1,63 @@
+const Nx = 1280
+const Ny = 720
+const hx = 1/(Ny - 2)
+const hy = 1/(Ny - 2)
+const K = 1.95 #1.76 at 800
+const DeltaT = 0.0005*K
+const gamma = 0.00003
+function enforceDirichlet(A::Array{Float64, 2})
+	for y in 2:Ny-1
+		A[Nx, y] = 0.0
+	end
+end
+function enforcePeriodic(A::Array{Float64, 2})
+	for x in 1:Nx
+		A[x, 1] = A[x, Ny - 1]
+		A[x, Ny] = A[x, 2]
+	end
+end
+function enforceFree(A::Array{Float64, 2})
+	for y in 2:Ny-1
+		A[1, y] = A[3, y]
+	end
+end
+function updateBulk(arr1::Array{Float64, 2}, arr2::Array{Float64, 2}, arr3::Array{Float64, 2})
+	for j in 2:Ny-1
+		arr1[2, j] = 2*arr2[2, j] - arr3[2, j] + DeltaT^2*((arr2[3,j] - 2*arr2[2,j] + arr2[1,j])/(hx^2) + (arr2[2,j+1] - 2*arr2[2,j] + arr2[2,j-1])/(hy^2))
+	end
+	for j in 2:Ny-1
+		for i in 3:Nx-1
+			arr1[i, j] = 2*arr2[i, j] - arr3[i, j] + DeltaT^2*((arr2[i+1,j] - 2*arr2[i,j] + arr2[i-1,j])/(hx^2) + (arr2[i,j+1] - 2*arr2[i,j] + arr2[i,j-1])/(hy^2))
+		end
+	end
+end
+function test()
+	arr1 = zeros(Nx, Ny);
+#	arr2 = [gamma/(x^2*hx^2 + 0.0303*y^2*hx^2 + gamma) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)];
+#	arr3 = [gamma/((x-0.00046/hx*K)^2*hx^2 + 0.03*y^2*hx^2 + gamma) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)];
+	arr2 = [-exp(-0.04(sqrt((x^2+y^2)) - 200.0 + 0.000501*K/hx)^2) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)]
+	arr3 = [-exp(-0.04(sqrt((x^2+y^2)) - 200.0)^2) for x in -div(Nx,2)+1:div(Nx,2), y in -div(Ny,2)+1:div(Ny,2)]
+	enforceDirichlet(arr3)
+	enforcePeriodic(arr3)
+	enforceFree(arr3)
+	enforceDirichlet(arr2)
+	m = 100
+	@time for j in 0:m-1
+		IPM.ExportImage(IPM.EndolithModified(1.0*permutedims(arr2,[2,1])),string("LinearLstarFinestNeg",j,".png"))
+		#if j == 44
+		#	writecsv("arr2at44.CSV", arr2)
+		#end
+		for i in 1:iround(20/K/3)
+			enforcePeriodic(arr2)
+			enforceFree(arr2)
+			updateBulk(arr1, arr2, arr3)
+			enforcePeriodic(arr1)
+			enforceFree(arr1)
+			updateBulk(arr3, arr1, arr2)
+			enforcePeriodic(arr3)
+			enforceFree(arr3)
+			updateBulk(arr2, arr3, arr1)
+		end
+	end
+	IPM.ExportImage(IPM.EndolithModified(1.0*permutedims(arr2,[2,1])),string("LinearLstarFinestNeg", m, ".png"))
+end

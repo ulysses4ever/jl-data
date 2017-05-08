@@ -1,0 +1,6 @@
+# Read data from file
+function read_from_file! (filename::String, delimiter::Char, headers)
+  lines = readdlm(filename, delimiter)
+  headers = lines[1,:]
+  #lines[2:end,:]:
+end

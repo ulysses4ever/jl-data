@@ -1,0 +1,15 @@
+include("../src/IAST.jl")
+
+# fit langmuir isotherm to Xe isotherm, then output to file
+df_Xe = readtable("DOHYIJ_Xe.csv", skipstart=0)
+xe_isotherm = LangmuirIsotherm(df_Xe, :Xe, :P)
+
+P = linspace(0,100) # want predictions at this array of pressures (see logspace too)
+prediction = xe_isotherm.loading(P)
+# construct dataframe with this predicted loading
+df = DataFrame()
+df[:P] = P
+df[:loading] = prediction
+# or, another method:
+ # df = DataFrame(P=P, prediction=prediction)
+writetable("Langmuirfit.csv", df)

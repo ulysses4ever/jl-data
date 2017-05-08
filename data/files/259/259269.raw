@@ -1,0 +1,38 @@
+using Risk
+test_case = "case_1b"
+calculation_mode = "classical_damage"
+case_file = "test/$(calculation_mode)/data/$(test_case).jld"
+
+time_h = 1.0
+time_r = 1.0
+discretization = 29
+min_iml, max_iml = 0.0, 5.0
+hc1_imls = linspace(min_iml, max_iml, discretization)
+hc1_poes = [0.03986126698, 0.02456866772, 0.01014473911, 0.00417713181, 0.001806539893, 0.00082000522, 0.00038506998, 0.0001833003622, 0.00008827768691, 0.00004226578114, 0.00001948557373, 0.000008272957206, 0.000003069749791, 0.0000008607793545, 0.00000009611512153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+hc_imls = {"b1"=>[hc1_imls]}
+hc_poes = {"b1"=>[hc1_poes]}
+branches = keys(hc_imls)
+
+a_ref = ["a1"]
+a_loc = [1]
+a_tax = ["tax1"]
+a_num = [1]
+a_occ = [1]
+a_val = [10000]
+a_ded = [NaN]
+a_lim = [NaN]
+num_assets = length(a_ref)
+
+ff_states = ["ds1", "ds2", "ds3", "ds4"]
+ff_type = {"ff1"=>"discrete"}
+ff_ids = keys(ff_type)
+ff1_mean_imls = [0.500, 1.000, 1.500, 2.000]
+ff1_std_imls = [0.400, 0.800, 1.200, 1.600]
+ff1_poes = transpose(ff1_poes)
+ff_mean_imls = {"ff1"=>ff1_mean_imls}
+ff_std_imls = {"ff1"=>ff1_std_imls}
+
+tax_ff_map = {"tax1"=>["ff1"]}
+taxonomies = keys(tax_ff_map)
+
+include("write_jld.jl")

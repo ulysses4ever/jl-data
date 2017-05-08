@@ -1,0 +1,67 @@
+module RandomHyperplaneClassifiers
+using Classifiers
+using Distributions
+
+importall Classifiers
+
+export RandomHyperplaneClassifier,RandomHyperplaneConfig,fit,predict,loss
+
+type RandomHyperplaneClassifier <: Classifier
+  b::Float64 #bias
+  w::Array{Float64} #normal
+  polarity::Float64
+end
+
+type RandomHyperplaneConfig  <: ClassifierConfig
+
+end
+
+typealias Input Vector{Float64}
+typealias Inputs Vector{Input}
+typealias Output Int
+typealias Outputs Vector{Output}
+
+function sample_norm_normal(x::Inputs)
+  norms=map(norm, x)
+  μ_norm=mean(norms)
+  σ_norm=std(norms)
+  if (σ_norm>zero(σ_norm))
+    norm_generator=Normal(μ_norm, σ_norm)
+    new_norm=rand(norm_generator,1)[1]
+  else
+    new_norm=μ_norm
+  end
+end
+
+function fix_polarity!(m::RandomHyperplaneClassifier,x,y)
+  e=Classifiers.mean_loss(m,x,y)
+  if (e>0.5)
+    m.polarity=-m.polarity
+  end
+end
+
+function fit(c::RandomHyperplaneConfig,x,y)
+  centroid=sum(x)./length(x)
+  d=length(x[1])
+  new_norm=sample_norm_normal(x)
+  w=rand(d)
+  w=w./norm(w)*new_norm
+  b=-dot(w,centroid)
+  m=RandomHyperplaneClassifier(b,w,1)
+  fix_polarity!(m,x,y)
+  return m
+end
+
+function loss(c::RandomHyperplaneClassifier,predicted::Vector{Int},y::Vector{Int})
+    predicted.!=y
+end
+
+function predict(c::RandomHyperplaneClassifier,x::Vector{Float64})
+  sign(sum(x.*c.w)+c.b)*c.polarity
+end
+
+function predict(c::RandomHyperplaneClassifier,x)
+  map(d -> predict(c,d),x)
+end
+
+end

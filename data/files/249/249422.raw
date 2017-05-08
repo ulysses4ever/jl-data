@@ -1,0 +1,53 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+
+TOTAL_TASKS = 5
+TASK_CPUS = 1
+TASK_MEM = 128
+
+
+function scheduler_registered(driver::SchedulerDriver, frameworkInfo::Proto.FrameworkInfo, masterInfo::Proto.MasterInfo)
+    println("Julia: Registered with framework ID $(frameworkId.value)")
+end
+
+function scheduler_registered(driver::SchedulerDriver, masterInfo::Proto.MasterInfo)
+    println("Julia: Re-registered with master: $(masterInfo.hostname)")
+end
+
+function scheduler_resourceOffers(driver::SchedulerDriver, offers::Vector{Proto.Offer})
+end
+
+function scheduler_statusUpdate(driver::SchedulerDriver, status::Proto.TaskStatus)
+end
+
+function scheduler_frameworkMessage(driver::SchedulerDriver, executorId::Proto.ExecutorID, slaveId::Proto.SlaveID, message::String)
+end
+
+if length(ARGS) == 0
+    println("Usage: $(ENV["_"]) master")
+    exit(1)
+end
+
+executor = @proto Proto.ExecutorInfo (
+    :name => "Test Executor (Julia)",
+    :source => "julia_test",
+    :executor_id => (
+        @proto Proto.ExecutorID (:value => "default")
+    ),
+    :command => (
+        @proto Proto.CommandInfo (:value => joinpath(pwd(), "executor.jl"))
+    )
+)
+
+framework = @proto Proto.FrameworkInfo (
+    :name =>  "Test Framework (Julia)",
+    :user => "" # Have Mesos fill in the current user.
+    :principal = "test-framework-julia"
+)
+
+scheduler = Scheduler(registered = scheduler_registered,
+                    resourceOffers = scheduler_resourceOffers,
+                    statusUpdate = scheduler_statusUpdate,
+                    frameworkMessage = scheduler_frameworkMessage)
+run(scheduler, framework, ARGS[1])

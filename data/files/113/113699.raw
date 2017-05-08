@@ -1,0 +1,48 @@
+include("Metropolis.jl")
+include("Coin.jl")
+using Distributions
+using Gadfly
+C = CoinFlips
+M = Metropolis
+
+# ------------------- #
+# Single coin flipped #
+# ------------------- #
+flips = C.flip(C.Coin(.7), 100)
+obs = M.ObservedData(flips, C.loglik)
+
+pm = M.model(:p, Beta(1,1))
+
+ss = M.sampleMCMC(pm, obs, 100_000, 95_000)
+
+M.plotMCMC(ss)
+
+
+# ----------------- #
+# Two coins flipped #
+# ----------------- #
+
+flips2 = [C.flip(C.Coin(.7), 100), C.flip(C.Coin(.2), 50)]
+obs2 = M.ObservedData(flips2, C.mixedloglik)
+
+# Draw the plot of flips
+fp = plot(layer(x=1:150, y=obs2.data, Geom.point),
+          layer(xintercept=[100], Geom.vline))
+draw(SVG("../../graphs/flips.svg", 1200px, 800px), fp)
+
+p1node = (:p1, Beta(1, 1))
+p2node = (:p2, Beta(1, 1))
+knode  = (:k, DiscreteUniform(0, 150))
+
+pm2 = M.model([p1node, p2node, knode])
+
+ss2 = M.sampleMCMC(pm2, obs2, 100_000, 95_000)
+
+M.plotMCMC(ss2)
+
+
+curr = [0.6888765100447505,-0.23639817496251275,73.57029742187567]
+prop = [-0.03174879178208723,-0.23143474103424738,88.2781654419288]
+
+
+

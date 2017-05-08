@@ -1,0 +1,33 @@
+using TensorWorkbench
+import TensorWorkbench: krprod2
+using BenchmarkTools
+
+### Khatri-Rao Product Benchmarks ###
+krbench = BenchmarkGroup()
+
+function kr_naive1(n)
+    srand(1234)
+    A = [ randn(50,50) for _ in 1:n ]
+    return reduce(krprod, A)
+end
+function kr_naive2(n)
+    srand(1234)
+    A = [ randn(50,50) for _ in 1:n ]
+    return reduce(krprod2, A)
+end
+function kr_test(n)
+    srand(1234)
+    A = [ randn(50,50) for _ in 1:n ]
+    return krprod(A)
+end
+
+krbench["naive1"] = BenchmarkGroup()
+krbench["naive2"] = BenchmarkGroup()
+krbench["krprod"] = BenchmarkGroup()
+for n = 2:3
+    @eval krbench["naive1"][string($n)] = @benchmarkable kr_naive1($n)
+    @eval krbench["naive2"][string($n)] = @benchmarkable kr_naive2($n)
+    @eval krbench["krprod"][string($n)] = @benchmarkable kr_test($n)
+end
+
+krresult = run(krbench)

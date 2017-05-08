@@ -1,0 +1,24 @@
+
+# Tests for MarketRisk module
+
+using Base.Test
+using BusinessDays
+using MarketRisk
+using InterestRates
+
+include("ScenarioFactory.jl")
+include("PricingModelFactory.jl")
+
+# Basic functions that should be overloaded
+import MarketRisk.getfunctionalcurrency
+import MarketRisk.FinancialContract
+getfunctionalcurrency() = SpotCurrency("BRL")
+FinancialContract(id::Int, portfolio::Vector{ASCIIString}, model_name::ASCIIString) = FinancialContract(id, portfolio, PricingModelFactory.getpricingmodel(model_name))
+
+contract01 = FinancialContract(1, ["MyCompany", "Trading"], "Fixed_USD")
+contract01.attributes["NOTIONAL"] = 1000.0
+contract01.attributes["MATURITY"] = Date(2015,10,02)
+contract01.attributes["ASSET_LIABILITY"] = "a"
+scen = ScenarioFactory.getscenario(Date(2015,08,05))
+p = price(contract01, scen)
+println("And the price is: $(p)")

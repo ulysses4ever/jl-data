@@ -1,0 +1,39 @@
+import Base: start
+
+immutable SignalIterator{T}
+  f::Function # f : A ⊆ R^m -> R^n, m ≥ n
+  seed::Vector{T}
+  m::Int
+  n::Int
+  d::Int # d for difference, as d := m-n
+  nstart::Int # nstart := d+1
+end
+
+function SignalIterator{T}(f::Function, seed::Vector{T}, n::Int)
+  m = length(seed)
+  d = m-n
+  SignalIterator{T}(f, seed, m, n, d, d+1)
+end
+
+SignalIterator{T}(f::Function, seed::T) = SignalIterator(f, typeof(seed)[seed], 1)
+
+start(it::SignalIterator) = it.seed
+
+function next!(it::SignalIterator, state)
+  for i in 1:it.d
+    state[i] = state[i+1]
+  end
+  for i in (it.nstart):it.m
+    state[i] = it.f(state...)
+  end
+end
+
+logistic(x::Float64) = 4*x*(1-x)
+
+myit = SignalIterator(logistic, 0.21)
+
+state = start(myit)
+for i in 1:10
+  next!(myit, state)
+  println(state[myit.nstart:end])
+end

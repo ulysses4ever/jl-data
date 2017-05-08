@@ -1,0 +1,13 @@
+baseCommandsList = ["/add","/check","/close","/compare","/delete","/edit","export","/new","/open","/redraw","/save","/saveas","/show","/solve"]
+tackCommandsList = ["-color","-length","-name","-xy"]
+objectsList = ["move","node","payoffset","player"]
+
+function ParseInput(input::String)
+  inputArray = split(rstrip(lstrip(chomp(lowercase(input)))))
+
+  if inputArray[1] == "/add"
+    number::Int = convert(Int,inputArray[2])
+    object::String = inputArray[3]
+
+  end
+end

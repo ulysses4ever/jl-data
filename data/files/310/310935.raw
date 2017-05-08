@@ -1,0 +1,31 @@
+__precompile__()
+
+using Distances
+using Distributions
+#using MLBase
+using Stats
+using Iterators
+
+module DataDepth
+
+import Stats: var, cov, mean, median, mad
+import Distances: colwise,Euclidean
+	
+	###source files
+	
+	include("common.jl")
+	include("mcd.jl")
+	include("depth.jl")
+	include("feature_selection.jl")
+	
+	include("dd-plot.jl")
+	
+	include("kNN.jl")
+	include("ddalpha.jl")
+	include("dd-s.jl")
+	include("dd-ncc.jl")
+	
+	#include("crossval.jl")
+	#include("eval_crossval.jl")
+	
+end #module end

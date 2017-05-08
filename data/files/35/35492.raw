@@ -1,0 +1,19 @@
+include("convEnc.jl");
+using Debug
+@debug function turboEnc(state::Array{Int64,2},output::Array{Bool,3},
+                ibits::AbstractArray{Bool},intlv::Array{Int64,2},
+                punct::Array{Int64,2})
+#output : output bits (i,j,k) - i-th state, j - input bit, k - th output bit
+obits1 =  convEnc(state,output,ibits);
+ibits1 =  ibits[intlv];
+obits2 =  convEnc(state,output,ibits1);
+len    = length(obits1);
+allTog = vec(reshape([obits1';obits2'],2*len,1));
+
+deleteat!(allTog,punct);
+len = length(allTog);
+
+op = reshape(allTog,len,1);
+
+return(op);
+end

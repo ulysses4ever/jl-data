@@ -1,0 +1,142 @@
+import Distributions
+
+typealias EcocDesign Matrix{Int}
+abstract EcocDesignGenerator
+
+type EcocDenseRandom <: EcocDesignGenerator
+  classes::Int
+  positive_probability::Float64
+  samples::Int
+  codes::Int
+end
+
+function EcocDenseRandom(classes::Int)
+  codes=round(Int, 10*log(classes))
+  EcocDenseRandom(classes,0.5,10000,codes)
+end
+
+type EcocSparseRandom <: EcocDesignGenerator
+  classes::Int
+  positive_probability::Float64
+  negative_probability::Float64
+  samples::Int
+  codes::Int
+end
+function EcocSparseRandom(classes::Int)
+  codes=round(Int, 100*log(classes))
+  EcocSparseRandom(classes,0.25,0.25,100,codes)
+end
+
+type EcocOVA <: EcocDesignGenerator
+  classes::Int
+end
+type EcocOVO <: EcocDesignGenerator
+  classes::Int
+end
+
+
+function generate_design(g::EcocSparseRandom)
+  probabilities=[g.negative_probability, 1-g.negative_probability-g.positive_probability,g.positive_probability]
+  c=Distributions.Categorical(probabilities)
+  best_design=[]
+  best_design_score=-1 #design_score(best_design)
+  for i=1:g.samples
+    design=rand(c,g.classes,g.codes)-2
+    design=normalize_design(design)
+    score=design_score(design)
+    #println(score)
+    if (score > best_design_score)
+      best_design=design
+      best_design_score=score
+    end
+  end
+  best_design
+end
+
+
+function generate_design(g::EcocDenseRandom)
+  if (g.positive_probability>=0.5)
+    positive_limit=typemax(Int)
+    negative_limit=- round(Int,positive_limit*g.positive_probability)
+  else
+    negative_limit=-typemax(Int)
+    positive_limit=-round(Int,positive_limit*g.positive_probability)
+  end
+  #best_design=sign(rand(negative_limit:positive_limit,g.classes,g.codes))
+  best_design=[]
+  best_design_score=-1 #design_score(best_design)
+  for i=1:g.samples
+    design=rand(negative_limit:positive_limit,g.classes,g.codes)
+    design=sign(design)
+    design=normalize_design(design)
+    score=design_score(design)
+    #println(score)
+    if (score > best_design_score)
+      best_design=design
+      best_design_score=score
+    end
+  end
+  best_design
+end
+
+function remove_uniform_columns(design::EcocDesign)
+  classes,codes=size(design)
+  positives_per_column=vec(sum(design.==1,1))
+  negatives_per_column=vec(sum(design.==-1,1))
+  non_uniform= (positives_per_column.>0) & (negatives_per_column.>0)
+  # println(".-----.")
+  # println(classes)
+  # println(design)
+  # println(positives_per_column)
+  # println(non_uniform)
+  design[:,non_uniform]
+end
+function remove_repeated_columns(design::EcocDesign)
+  codes=size(design,2)
+  not_repeated=trues(codes)
+  for i=2:codes
+     for j=1:i-1
+       if (design[:,i]==design[:,j] || design[:,i]==-design[:,j])
+         not_repeated[i]=false
+         break
+       end
+     end
+  end
+  design[:,not_repeated]
+end
+function normalize_design(design::EcocDesign)
+  design=remove_uniform_columns(design)
+  design=remove_repeated_columns(design)
+
+end
+function design_score(design::EcocDesign)
+  classes,codes=size(design)
+  score=typemax(Float64)
+  for i=1:classes
+    for j=i+1:classes
+      score=min(score,modified_hamming_distance(design[i,:],design[j,:]))
+    end
+  end
+  score
+end
+
+function generate_design(g::EcocOVA)
+  design=-ones(Int,g.classes,g.classes)
+  design[diagind(design)]=1
+  design
+end
+
+function generate_design(g::EcocOVO)
+  total_models=round(Int,g.classes*(g.classes-1)/2)
+  design=zeros(Int,g.classes,total_models)
+
+  model=1
+  for i=1:g.classes
+    for j=i+1:g.classes
+      design[i,model]=1
+      design[j,model]=-1
+      model+=1
+    end
+  end
+  design
+end

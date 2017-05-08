@@ -1,0 +1,11 @@
+module stockMonitor
+
+export	CollectData,
+		getReport
+
+include ("dataAnalysis.jl")
+include ("dataCollector.jl")
+include ("utility.jl")
+include ("controller.jl")
+
+end

@@ -1,0 +1,30 @@
+function interp1d(x, y, x_new)
+
+  if ndims(x) != 1:
+    error("the x array must have exactly one dimension.")
+  if ndims(y) == 0:
+    error("the y array must have at least one dimension.")
+
+  # 2. Find where in the orignal data, the values to interpolate
+  #    would be inserted.
+  #    Note: If x_new[n] == x[m], then m is returned by searchsorted.
+  x_new_indices = searchsorted(x, x_new)
+
+  # 3. Clip x_new_indices so that they are within the range of
+  #    x indices and at least 1.  Removes mis-interpolation
+  #    of x_new[n] = x[0]
+  x_new_indices = clip(x_new_indices, 1, len(x)-1)
+
+  # 4. Calculate the slope of regions that each x_new value falls in.
+  lo = x_new_indices - 1
+  hi = x_new_indices
+
+  # Note that the following two expressions rely on the specifics of the
+  # broadcasting semantics.
+  slope = (y[hi] - y[lo]) / (x[hi] - x[lo])[:, None]
+
+  # 5. Calculate the actual value for each entry in x_new.
+  y_new = slope*(x_new - x[lo])[:, None] + y[lo]
+
+  return y_new
+end

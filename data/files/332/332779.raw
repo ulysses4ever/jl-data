@@ -1,0 +1,10 @@
+include("genotype.jl")
+import Genotype
+function evolve()
+  foo = Genotype.make_random_genotype()
+  Genotype.simulate(foo)
+  println(foo.activations[Config.num_simulation_iterations * foo.num_nodes])
+end
+
+@time evolve()
+

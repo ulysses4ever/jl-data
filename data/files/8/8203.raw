@@ -1,0 +1,219 @@
+function sqlvalue(values, i)
+    temp_val_ptr = unsafe_load(values, i)
+    valuetype = sqlite3_value_type(temp_val_ptr)
+
+    if valuetype == SQLITE_INTEGER
+        if WORD_SIZE == 64
+            return sqlite3_value_int64(temp_val_ptr)
+        else
+            return sqlite3_value_int(temp_val_ptr)
+        end
+    elseif valuetype == SQLITE_FLOAT
+        return sqlite3_value_double(temp_val_ptr)
+    elseif valuetype == SQLITE_TEXT
+        # TODO: have a way to return UTF16
+        return bytestring(sqlite3_value_text(temp_val_ptr))
+    elseif valuetype == SQLITE_BLOB
+        nbytes = sqlite3_value_bytes(temp_val_ptr)
+        blob = sqlite3_value_blob(temp_val_ptr)
+        buf = zeros(Uint8, nbytes)
+        unsafe_copy!(pointer(buf), convert(Ptr{Uint8}, blob), nbytes)
+        return sqldeserialize(buf)
+    else
+        return NULL
+    end
+end
+
+sqlreturn(context, ::NullType)          = sqlite3_result_null(context)
+sqlreturn(context, val::Int32)          = sqlite3_result_int(context, val)
+sqlreturn(context, val::Int64)          = sqlite3_result_int64(context, val)
+sqlreturn(context, val::Float64)        = sqlite3_result_double(context, val)
+sqlreturn(context, val::UTF16String)    = sqlite3_result_text16(context, val)
+sqlreturn(context, val::AbstractString) = sqlite3_result_text(context, val)
+sqlreturn(context, val::Vector{UInt8})  = sqlite3_result_blob(context, val)
+
+sqlreturn(context, val::Bool) = sqlreturn(context, int(val))
+sqlreturn(context, val) = sqlreturn(context, sqlserialize(val))
+
+# Internal method for generating an SQLite scalar function from
+# a Julia function name
+function scalarfunc(func,fsym=symbol(string(func)))
+    # check if name defined in Base so we don't clobber Base methods
+    nm = isdefined(Base,fsym) ? :(Base.$fsym) : fsym
+    return quote
+        #nm needs to be a symbol or expr, i.e. :sin or :(Base.sin)
+        function $(nm)(context::Ptr{Void}, nargs::Cint, values::Ptr{Ptr{Void}})
+            args = [SQLite.sqlvalue(values, i) for i in 1:nargs]
+            ret = $(func)(args...)
+            SQLite.sqlreturn(context, ret)
+            nothing
+        end
+    end
+end
+function scalarfunc(expr::Expr)
+    f = eval(expr)
+    return scalarfunc(f)
+end
+
+# convert a byteptr to an int, ptr[start] -> 256^0, ptr[start+1] -> 256^1...
+# TODO: this assumes little-endian
+function bytestoint(ptr::Ptr{UInt8}, start::Int, len::Int)
+    s = 0
+    for i in start:start+len-1
+        v = unsafe_load(ptr, i)
+        s += v * 256^(i - start)
+    end
+
+    return s
+end
+
+function stepfunc(init, func, fsym=symbol(string(func)*"_step"))
+    nm = isdefined(Base,fsym) ? :(Base.$fsym) : fsym
+    return quote
+        function $(nm)(context::Ptr{Void}, nargs::Cint, values::Ptr{Ptr{Void}})
+            args = [sqlvalue(values, i) for i in 1:nargs]
+            intsize = sizeof(Int)
+            ptrsize = sizeof(Ptr)
+            acsize = intsize + ptrsize
+            acptr = convert(Ptr{UInt8}, sqlite3_aggregate_context(context, acsize))
+            # acptr will be zeroed-out if this is the first iteration
+            ret = ccall(
+                :memcmp, Cint, (Ptr{UInt8}, Ptr{UInt8}, Cuint),
+                zeros(UInt8, acsize), acptr, acsize,
+            )
+            try
+                if ret == 0
+                    acval = $(init)
+                    # TODO: allocate 256 byte
+                    valsize = sizeof(sqlserialize(acval))
+                    valptr = convert(Ptr{UInt8}, c_malloc(valsize))
+                else
+                    # size of serialized value is first sizeof(Int) bytes
+                    valsize = bytestoint(acptr, 1, intsize)
+                    # ptr to serialized value is last sizeof(Ptr) bytes
+                    valptr = reinterpret(
+                        Ptr{UInt8}, bytestoint(acptr, intsize+1, ptrsize)
+                    )
+                    # deserialize the value pointed to by valptr
+                    acvalbuf = zeros(UInt8, valsize)
+                    unsafe_copy!(pointer(acvalbuf), valptr, valsize)
+                    acval = sqldeserialize(acvalbuf)
+                end
+                funcret = sqlserialize($(func)(acval, args...))
+                newsize = length(funcret)
+                # TODO: increase this in a cleverer way?
+                newsize > valsize && (valptr = convert(Ptr{UInt8}, c_realloc(valptr, newsize)))
+                # copy serialized return value
+                unsafe_copy!(valptr, pointer(funcret), newsize)
+                # following copies are easier with arrays
+                acptr = pointer_to_array(acptr, acsize, false)
+                # copy the size of the serialized value
+                unsafe_copy!(
+                    acptr, 1,
+                    reinterpret(UInt8, [newsize]), 1,
+                    intsize,
+                )
+                # copy the address of the pointer to the serialized value
+                unsafe_copy!(
+                    acptr, intsize+1,
+                    reinterpret(UInt8, [valptr]), 1,
+                    ptrsize,
+                )
+            catch
+                # TODO:
+                 # this won't catch all memory leaks so add an else clause
+                 # alternatively use c-style checking in this function
+                if isdefined(:valptr)
+                    c_free(valptr)
+                end
+                rethrow()
+            end
+            nothing
+        end
+    end
+end
+
+# TODO: free valptr on error
+function finalfunc(init, func, fsym=symbol(string(func)*"_final"))
+    nm = isdefined(Base,fsym) ? :(Base.$fsym) : fsym
+    return quote
+        function $(nm)(context::Ptr{Void}, nargs::Cint, values::Ptr{Ptr{Void}})
+            acptr = convert(Ptr{UInt8}, sqlite3_aggregate_context(context, 0))
+            # step function wasn't run
+            if acptr == C_NULL
+                sqlreturn(context, $(init))
+            else
+                intsize = sizeof(Int)
+                ptrsize = sizeof(Ptr)
+                acsize = intsize + ptrsize
+                # load size
+                valsize = bytestoint(acptr, 1, intsize)
+                # load ptr
+                valptr = reinterpret(
+                    Ptr{UInt8}, bytestoint(acptr, intsize+1, ptrsize)
+                )
+                # load value
+                acvalbuf = zeros(UInt8, valsize)
+                unsafe_copy!(pointer(acvalbuf), valptr, valsize)
+                acval = sqldeserialize(acvalbuf)
+
+                ret = $(func)(acval)
+                c_free(valptr)
+                sqlreturn(context, ret)
+            end
+            nothing
+        end
+    end
+end
+
+# User-facing macro for convenience in registering a simple function
+# with no configurations needed
+macro register(db, func)
+    :(register($(esc(db)), $(esc(func))))
+end
+
+# User-facing method for registering a Julia function to be used within SQLite
+function register(db::SQLiteDB, func::Function; nargs::Int=-1, name::AbstractString=string(func), isdeterm::Bool=true)
+    @assert nargs <= 127 "use -1 if > 127 arguments are needed"
+    # assume any negative number means a varargs function
+    nargs < -1 && (nargs = -1)
+    @assert sizeof(name) <= 255 "size of function name must be <= 255"
+
+    f = eval(scalarfunc(func,symbol(name)))
+
+    cfunc = cfunction(f, Nothing, (Ptr{Void}, Cint, Ptr{Ptr{Void}}))
+    # TODO: allow the other encodings
+    enc = SQLITE_UTF8
+    enc = isdeterm ? enc | SQLITE_DETERMINISTIC : enc
+
+    @CHECK db sqlite3_create_function_v2(
+        db.handle, name, nargs, enc, C_NULL, cfunc, C_NULL, C_NULL, C_NULL
+    )    
+end
+
+# as above but for aggregate functions
+function register(
+    db::SQLiteDB, init, step::Function, final::Function;
+    nargs::Int=-1, name::AbstractString=string(final), isdeterm::Bool=true
+)
+    @assert nargs <= 127 "use -1 if > 127 arguments are needed"
+    nargs < -1 && (nargs = -1)
+    @assert sizeof(name) <= 255 "size of function name must be <= 255 chars"
+
+    s = eval(stepfunc(init, step, Base.function_name(step)))
+    cs = cfunction(s, Nothing, (Ptr{Void}, Cint, Ptr{Ptr{Void}}))
+    f = eval(finalfunc(init, final, Base.function_name(final)))
+    cf = cfunction(f, Nothing, (Ptr{Void}, Cint, Ptr{Ptr{Void}}))
+
+    enc = SQLITE_UTF8
+    enc = isdeterm ? enc | SQLITE_DETERMINISTIC : enc
+
+    @CHECK db sqlite3_create_function_v2(
+        db.handle, name, nargs, enc, C_NULL, C_NULL, cs, cf, C_NULL
+    )
+end
+
+# annotate types because the MethodError makes more sense that way
+regexp(r::AbstractString, s::AbstractString) = ismatch(Regex(r), s)
+# macro for preserving the special characters in a string
+macro sr_str(s) s end

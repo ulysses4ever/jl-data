@@ -1,0 +1,53 @@
+using Distances
+
+function find_nearest(N::Integer, dist::Vector, dist_sort::Vector)
+    indices = zeros(Int64, N)
+    dists = zeros(Float64, N)
+    
+    for j in 1:N
+        for i=1:length(dist)
+            if dist[i] == dist_sort[j]
+                indices[j] = i
+                dists[j] = dist_sort[j]
+                break
+            end
+        end
+    end
+    
+    return indices, dists
+end
+
+function nearest_neighbors(y::Vector, X::Matrix, N::Integer, m::metric)
+    dist = colwise(m, y, X)
+    dist_sort = sort(dist)
+    indices, dists = find_nearest(N, dist, dist_sort)
+    return indices, dists
+end
+
+function majority_vote(labels, dist)
+    uniqueLabels = unique(labels)
+    highScore = 0
+    score = 0
+    majorLabel = uniqueLabels[1]
+    for l in uniqueLabels
+        score = 0
+        for i=1:length(labels)
+            if labels[i] == l
+                score += 1
+            end
+        end
+        if score > highScore
+            highScore = score * 1
+            majorLabel = l
+        end
+    end
+    return majorLabel     
+    
+end
+
+function predict(X::Matrix,labels::Vector,y::Vector,N::Integer=3,m::Metric=Euclidean())
+  inds, dists = nearest_neighbors(y,X,N)
+  ll = labels[inds]
+  predictedLabel = majority_vote(ll, dists)
+  return predictedLabel
+end

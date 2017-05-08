@@ -1,0 +1,35 @@
+test_case = "case_6a"
+calculation_mode = "scenario_risk"
+case_file = "test/$(calculation_mode)/data/$(test_case).jld"
+
+number_of_ground_motion_fields = 1000000
+
+gm_means = {"b1"=>[-0.64757464], "b2"=>[-0.49701075]}
+gm_stds  = {"b1"=>[0.564], "b2"=>[0.54285186]}
+branches = keys(gm_means)
+
+a_ref = ["a1"]
+a_loc = [1]
+a_tax = ["tax1"]
+a_num = [1]
+a_occ = [1]
+a_val = [10000]
+a_ded = [NaN]
+a_lim = [NaN]
+num_assets = length(a_ref)
+
+vf_type = {"vf1"=>"LN"}
+vf_ids = keys(vf_type)
+
+vf1_imls = [0.05, 0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40, 1.60, 1.80, 2.00]
+vf1_mean_lrs = [0.01, 0.04, 0.10, 0.20, 0.33, 0.50, 0.67, 0.80, 0.90, 0.96, 0.99]
+vf1_cov_lrs = [0.03, 0.12, 0.24, 0.32, 0.38, 0.40, 0.38, 0.32, 0.24, 0.12, 0.03]
+
+vf_imls = {"vf1"=>vf1_imls}
+vf_mean_lrs = {"vf1"=>vf1_mean_lrs}
+vf_cov_lrs = {"vf1"=>vf1_cov_lrs}
+
+tax_vf_map = {"tax1"=>["vf1"]}
+taxonomies = keys(tax_vf_map)
+
+include("write_jld.jl")

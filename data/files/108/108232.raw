@@ -1,0 +1,31 @@
+using Romeo
+
+export App
+
+# exported
+
+type App
+    server::HttpServer
+    routes::Dict{String, Route}
+end
+
+App(port::Integer) = create_app(port)
+
+# NOT exported
+
+function create_app(port::Integer)
+    app = App(HttpServer(function f(x...) end, port), (String=>Route)[])
+
+    Event(app.server, "request") do server::HttpServer, req::Request, res::Response
+        local route_key = req.method * "_" * req.path
+
+        if !haskey(app.routes, route_key)
+            log(DEBUG, "unhandled: " * req.path)
+            return
+        end
+
+        app.routes[route_key].handle(req, res)
+    end
+
+    return app
+end

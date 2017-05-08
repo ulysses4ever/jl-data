@@ -1,0 +1,50 @@
+type SoftLoss <: LossLayer; y; SoftLoss()=new(); end
+
+# Cross entropy loss to use after the Soft layer.
+# l.y should have normalized probabilities output by the model.
+# p has normalized probabilities from the answer key.
+# Normalization is across the last dimension, i.e. sum(p[:,...,:,i])==1
+# Overwrites p with the gradient of the loss wrt y, i.e. 1-p/y
+# Loss = -sum[p log(y)]
+
+forw(l::SoftLoss, x; o...)=(l.y=x)
+
+function back(l::SoftLoss, p; dx=true, o...)
+    @assert issimilar(p,l.y)
+    dx || return
+    (nd,nx) = size2(p)
+    for i=1:length(p)
+        p[i] = ((l.y[i]-p[i])/l.y[i])/nx
+    end
+    return p
+end
+
+function loss(l::SoftLoss, p)
+    @assert issimilar(p,l.y)
+    p = to_host(p)
+    y = to_host(l.y)
+    (nd,nx) = size2(p)
+    cost = zero(Float64)
+    for i=1:length(p)
+        cost -= (p[i]*log(y[i]))
+    end
+    return cost/nx
+end
+
+if GPU
+function back(l::SoftLoss, p::CudaArray{Float32}; dx=true, o...)
+    @assert issimilar(p, l.y)
+    dx || return
+    (st,nx) = size2(p)
+    ccall((:ssoftloss,libkunet),Void,(Cint,Cfloat,Ptr{Float32},Ptr{Float32}),length(p),1/nx,l.y,p)
+    return p
+end
+
+function back(l::SoftLoss, p::CudaArray{Float64}; dx=true, o...)
+    @assert issimilar(p, l.y)
+    dx || return
+    (st,nx) = size2(p)
+    ccall((:dsoftloss,libkunet),Void,(Cint,Cdouble,Ptr{Float64},Ptr{Float64}),length(p),1/nx,l.y,p)
+    return p
+end
+end # if GPU

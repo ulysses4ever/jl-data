@@ -1,0 +1,18 @@
+using CommLib
+using Debug
+include("../types/TurboParams_t.jl")
+@debug function turboDecode(rxSamples::Array{Float64,2},
+                    EsNo::Float64,tParams::TurboParams_t)
+
+nIpLLRs = length(rxSamples);
+scRx    = EsNo * rxSamples;
+
+nextStates = tParams.nextStates;
+opBits     = tParams.opBits;
+intlv      = tParams.intlv;
+
+(nStates,nInpStates,nOutputs) = size(opBits);
+
+
+
+end

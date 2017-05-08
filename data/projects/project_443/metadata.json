@@ -1,17 +1,17 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:00:14 GMT
+Date: Wed, 03 May 2017 21:00:24 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 4837
+Content-Length: 5406
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3126
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4102
+X-RateLimit-Reset: 1493848245
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "4dd330d56474805916e717eeaeda2c2a"
-Last-Modified: Thu, 14 Apr 2016 18:13:36 GMT
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
+ETag: "a4bf083fab0497d328d89d6d60b7f685"
+Last-Modified: Mon, 25 Apr 2016 14:19:05 GMT
+X-OAuth-Scopes: repo
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
@@ -22,82 +22,82 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 10ea50bffaded85949561216def301f3
-X-GitHub-Request-Id: BD76:6631:863C2F:AD61AF:590231AE
+X-Served-By: eef8b8685a106934dcbb4b7c59fba0bf
+X-GitHub-Request-Id: E1AB:5CA5:FD0790:1457EFD:590A44E8
 
 {
-  "id": 55581301,
-  "name": "rlntm",
-  "full_name": "ulucs/rlntm",
+  "id": 55778024,
+  "name": "NeuralNet.jl",
+  "full_name": "tomaklutfu/NeuralNet.jl",
   "owner": {
-    "login": "ulucs",
-    "id": 11823240,
-    "avatar_url": "https://avatars2.githubusercontent.com/u/11823240?v=3",
+    "login": "tomaklutfu",
+    "id": 16100030,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/16100030?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/ulucs",
-    "html_url": "https://github.com/ulucs",
-    "followers_url": "https://api.github.com/users/ulucs/followers",
-    "following_url": "https://api.github.com/users/ulucs/following{/other_user}",
-    "gists_url": "https://api.github.com/users/ulucs/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/ulucs/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/ulucs/subscriptions",
-    "organizations_url": "https://api.github.com/users/ulucs/orgs",
-    "repos_url": "https://api.github.com/users/ulucs/repos",
-    "events_url": "https://api.github.com/users/ulucs/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/ulucs/received_events",
+    "url": "https://api.github.com/users/tomaklutfu",
+    "html_url": "https://github.com/tomaklutfu",
+    "followers_url": "https://api.github.com/users/tomaklutfu/followers",
+    "following_url": "https://api.github.com/users/tomaklutfu/following{/other_user}",
+    "gists_url": "https://api.github.com/users/tomaklutfu/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/tomaklutfu/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/tomaklutfu/subscriptions",
+    "organizations_url": "https://api.github.com/users/tomaklutfu/orgs",
+    "repos_url": "https://api.github.com/users/tomaklutfu/repos",
+    "events_url": "https://api.github.com/users/tomaklutfu/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/tomaklutfu/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/ulucs/rlntm",
-  "description": "Implementation of http://arxiv.org/abs/1505.00521",
+  "html_url": "https://github.com/tomaklutfu/NeuralNet.jl",
+  "description": "Small Artificial Neural Net Package",
   "fork": false,
-  "url": "https://api.github.com/repos/ulucs/rlntm",
-  "forks_url": "https://api.github.com/repos/ulucs/rlntm/forks",
-  "keys_url": "https://api.github.com/repos/ulucs/rlntm/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/ulucs/rlntm/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/ulucs/rlntm/teams",
-  "hooks_url": "https://api.github.com/repos/ulucs/rlntm/hooks",
-  "issue_events_url": "https://api.github.com/repos/ulucs/rlntm/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/ulucs/rlntm/events",
-  "assignees_url": "https://api.github.com/repos/ulucs/rlntm/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/ulucs/rlntm/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/ulucs/rlntm/tags",
-  "blobs_url": "https://api.github.com/repos/ulucs/rlntm/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/ulucs/rlntm/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/ulucs/rlntm/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/ulucs/rlntm/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/ulucs/rlntm/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/ulucs/rlntm/languages",
-  "stargazers_url": "https://api.github.com/repos/ulucs/rlntm/stargazers",
-  "contributors_url": "https://api.github.com/repos/ulucs/rlntm/contributors",
-  "subscribers_url": "https://api.github.com/repos/ulucs/rlntm/subscribers",
-  "subscription_url": "https://api.github.com/repos/ulucs/rlntm/subscription",
-  "commits_url": "https://api.github.com/repos/ulucs/rlntm/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/ulucs/rlntm/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/ulucs/rlntm/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/ulucs/rlntm/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/ulucs/rlntm/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/ulucs/rlntm/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/ulucs/rlntm/merges",
-  "archive_url": "https://api.github.com/repos/ulucs/rlntm/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/ulucs/rlntm/downloads",
-  "issues_url": "https://api.github.com/repos/ulucs/rlntm/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/ulucs/rlntm/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/ulucs/rlntm/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/ulucs/rlntm/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/ulucs/rlntm/labels{/name}",
-  "releases_url": "https://api.github.com/repos/ulucs/rlntm/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/ulucs/rlntm/deployments",
-  "created_at": "2016-04-06T06:28:53Z",
-  "updated_at": "2016-04-14T18:13:36Z",
-  "pushed_at": "2016-04-30T11:40:34Z",
-  "git_url": "git://github.com/ulucs/rlntm.git",
-  "ssh_url": "git@github.com:ulucs/rlntm.git",
-  "clone_url": "https://github.com/ulucs/rlntm.git",
-  "svn_url": "https://github.com/ulucs/rlntm",
-  "homepage": "",
-  "size": 1050,
+  "url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl",
+  "forks_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/forks",
+  "keys_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/teams",
+  "hooks_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/events",
+  "assignees_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/tags",
+  "blobs_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/subscription",
+  "commits_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/merges",
+  "archive_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/downloads",
+  "issues_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/tomaklutfu/NeuralNet.jl/deployments",
+  "created_at": "2016-04-08T12:40:19Z",
+  "updated_at": "2016-04-25T14:19:05Z",
+  "pushed_at": "2016-04-25T15:33:38Z",
+  "git_url": "git://github.com/tomaklutfu/NeuralNet.jl.git",
+  "ssh_url": "git@github.com:tomaklutfu/NeuralNet.jl.git",
+  "clone_url": "https://github.com/tomaklutfu/NeuralNet.jl.git",
+  "svn_url": "https://github.com/tomaklutfu/NeuralNet.jl",
+  "homepage": null,
+  "size": 56,
   "stargazers_count": 0,
   "watchers_count": 0,
   "language": "Julia",

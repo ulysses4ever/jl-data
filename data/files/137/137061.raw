@@ -1,0 +1,332 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+#finds 6-mer of most likely upregulating promotor from data.
+# data consists of two sets of sequences identifying regions around binding sites,
+# the first known to be a list of positive promotors, while second being list of neg.
+#  -- method: find starting points for 6-tuples amoung each sequence
+#             to construct alignment matrix. From alignment matrix construct profile
+#             matrix. From profile matrix (representing variability of nucleotide
+#             composition at each point of a particular choice of l-mers (6-mers here))
+#             we choose consensus l-mer (the consensus string) representing
+#             most represented nucleotide.
+#             The score of each consens l-mer is the summation of the magnitudes 
+#             representing the most frequence nucleotide in each column.
+#             In other words, for each nucleotide in string, take sum of the numbers
+#             that led us to choose that particular nucleotide.
+
+#       eg: for t sequences S_1 .. S_t
+#               l-mer(S_1) ATCCAGCT
+#               l-mer(S_2) GGGCAACT
+#               l-mer(S_3) ATGGATCT
+#                   ..       ...
+#               l-mer(S_t) ATGGCACT
+#                       ||
+#                       \/
+#                partial alignment matrix
+#                       ||
+#                       \/
+#                partial profile matrix             
+#            j= 1 2 3 4 5 6 7 l=8
+#               - - - - - - - -
+#         i= A |5 1 0 0 5 5 0 0
+#            G |1 7 0 0 0 1 1 6
+#            C |1 1 6 3 0 1 0 0
+#            T |0 0 1 4 2 0 6 -
+#          
+#               A T G C A A C T
+
+type LMer
+    _data::Array{Char}
+end
+
+function createLMer(data::Array{Char})
+    return LMer(data)
+end
+
+type BestLMer
+    _lmer::LMer
+end
+
+function createEmptyLMer()
+    return LMer([' '])
+end
+
+function createBestLMer(lmer::LMer)
+    return BestLMer(lmer)
+end
+
+function createBestLMer(lmerArray::Array{Char})
+    return BestLMer(LMer(lmerArray))
+end
+
+function createEmptyBestLMer()
+    return createBestLMer(createEmptyLMer())
+end
+
+type SequenceAndPartialProfileMatrix
+     _seq::Array{Char}
+
+    # best profile contribution is mapping of both sequence number {i|1<=i<=t}, and nucleotide base {'A'|'C'|'G'|'T'}
+    _bestProfileContributions::Dict{Any,Any} #this is set in algorithm
+
+    # best l-mer(6-mer) for sequence i that contributes to the profile matrix, actually the value is an array since there are
+    #  multiple permations hat may maximize the value in A, but may or may not maximize the value in others.
+    #    ** but we worry about that after all the 'candidate' lmers for a given sequence have been compiled (again here only
+    #        the lmers that contributes to best score for nucleotide (eg. for just A or just for B)
+    _bestlmers::Dict{Any,Any} #This will be set in algorithm. All high scoring values will the same profile contribution
+end
+
+function getBestPartialProfileScore(sppm::SequenceAndPartialProfileMatrix, seq_number::Int64, nucleotide::Char)
+    return get(sppm._bestProfileContributions, (seq_number, nucleotide), -1)
+end
+
+function getBestScoringProfileLMers(sppm::SequenceAndPartialProfileMatrix, seq_number::Int64, nucleotide::Char)
+    println("called getBestScoringProfileLMers")
+    ret = get(sppm._bestlmers, (seq_number,nucleotide),[createEmptyBestLMer()])
+    return ret 
+end
+#a homologous function to the above
+function getBestLMers(sppm::SequenceAndPartialProfileMatrix, seq_number::Int64, nucleotide::Char)
+    return getBestScoringProfileLMers(sppm,seq_number,nucleotide)
+end
+
+#resets the score, and resets aswell the associated list of l-mers to empty list
+function resetBestProfileContribution(sppm::SequenceAndPartialProfileMatrix, seq_number::Int64, nucleotide::Char, newScore::Int64, newBestLMer::BestLMer)
+    if has(sppm._bestProfileContributions, (seq_number,nucleotide))
+        del(sppm._bestProfileContributions,(seq_number, nucleotide))
+    end
+    merge!(sppm._bestProfileContributions, {(seq_number,nucleotide)=>newScore})
+
+    if has(sppm._bestlmers,(seq_number,nucleotide))
+        del(sppm._bestlmers,(seq_number,nucleotide))
+    end
+    merge!(sppm._bestlmers,{(seq_number,nucleotide)=>[newBestLMer]})
+end
+
+function addToBestLMers(sppm::SequenceAndPartialProfileMatrix,seq_number::Int64,nucleotide::Char,lmer::BestLMer)
+    if !has(sppm._bestlmers,(seq_number,nucleotide))
+        existingBestLMers = getBestLMers(sppm,seq_number,nucleotide)
+        push(existingBestLMers,lmer)
+    else
+        merge!(sppm._bestlmers, {(seq_number,nucleotide)=>[lmer]})
+    end
+end
+
+
+function createSPPM(seq::Array{Char})
+    initBestPartialProfileScores = {(-1,'A')=>0,(-1,'C')=>0,(-1,'G')=>0,(-1,'T')=>0}
+    initBestScoringLMers = {(-1,'A')=>[createEmptyBestLMer()],(-1,'C')=>[createEmptyBestLMer()],(-1,'G')=>[createEmptyBestLMer()],(-1,'T')=>[createEmptyBestLMer()]} 
+
+    ret = SequenceAndPartialProfileMatrix(seq, initBestPartialProfileScores, initBestScoringLMers)
+    del_all(ret._bestlmers)
+
+    return ret
+end
+
+function doWork()
+    positivePromotorFile = open("promotorPositive.fa","r")
+
+    positivePromotorLines = readlines(positivePromotorFile)
+
+    maxLengthOfPositivePromotorSeq = 0
+    #convert input promotor sequences to array of characters, and place into array of seq.
+    positivePromotorSequences = [createSPPM([' '])]
+    del_all(positivePromotorSequences)
+
+    for line in positivePromotorLines
+        if !begins_with(line,'>')
+            lengthOfPositivePromotorSeq = length(line)
+
+            if (lengthOfPositivePromotorSeq > maxLengthOfPositivePromotorSeq)
+                maxLengthOfPositivePromotorSeq = lengthOfPositivePromotorSeq
+            end
+            push(positivePromotorSequences, createSPPM(chars(line)))
+        end
+    end
+
+    print("Max length of positive promotor sequence: ")
+    println(maxLengthOfPositivePromotorSeq)
+
+    #now sequentially pick frames of 6 beginning from 1 to size of promotor sequences
+    #and run algorithm
+    t = length(positivePromotorSequences)
+    print("t=")
+    println(t)
+    l = 6
+
+    for i=1:t
+        sequenceAndPartialProfileMatrix = positivePromotorSequences[i]
+
+        characterArray = sequenceAndPartialProfileMatrix._seq
+        print("Character array: ")
+        println(characterArray)
+
+        print("i=")
+        println(i)
+
+        lengthOfCharacterArray = length(characterArray)
+        #try out every start position for l-mer
+        for k=1:(lengthOfCharacterArray - l - 1)
+            startOflmer = k
+            lastIndexOflmer = startOflmer + l - 1
+
+            print("i=")
+            print(i)
+            print(", k=")
+            println(k)
+
+            alignmentMatrix = [' ']
+            del_all(alignmentMatrix)
+            for j=startOflmer:lastIndexOflmer
+                push(alignmentMatrix,characterArray[j])
+            end
+
+            print("Alignment matrix")
+            println(alignmentMatrix)
+
+            currentLMerScoreForNucl = { 'A'=>0,'C'=>0,'G'=>0,'T'=>0}
+
+            # So we here calculate the single portions of the "best profile matrix" we can find
+            #  that is, the portions of the entry that this tuple would(ideally) contribute to
+            #  for each individual nucleotide.
+            #      We essentially calculate the frequencies of each 4 nucleotides for each value in 
+            #       l-mer(6-mer). Naturally for a single neucleotide say 'A', the highest frequency is
+            #       l(in our case a 6-mer), and if that were the case, the rest would automatically be 0.
+            #       More specifically the sum of all the frequencies must add up to l(6).
+            for j=1:l
+                if alignmentMatrix[j] == 'A'
+                    oldVal = get(currentLMerScoreForNucl, 'A', 'X')
+                    
+                    if (oldVal == 'X')
+                        error("currentLMerScoreForNucl dictionary SHOULD have a value")
+                    else
+                        del(currentLMerScoreForNucl,'A')
+                        merge!(currentLMerScoreForNucl, {'A'=>(oldVal+1)})
+                    end
+                end
+                if alignmentMatrix[j] == 'C'
+                    oldVal = get(currentLMerScoreForNucl, 'C', 'X')
+
+                    if (oldVal == 'X')
+                        error("currentLMerScoreForNucl dictionary SHOULD have a value")
+                    else
+                        del(currentLMerScoreForNucl,'C')
+                        merge!(currentLMerScoreForNucl,{'C'=>(oldVal+1)})
+                    end
+                end
+                if alignmentMatrix[j] == 'G'
+                    oldVal = get(currentLMerScoreForNucl, 'G', 'X')
+
+                    if (oldVal == 'X')
+                        error("currentLMerScoreForNucl dictionary SHOULD have a value")
+                    else
+                        del(currentLMerScoreForNucl,'G')
+                        merge!(currentLMerScoreForNucl,{'G'=>(oldVal+1)})
+                    end
+                end
+                if alignmentMatrix[j] == 'T'
+                    oldVal = get(currentLMerScoreForNucl, 'T', 'X')
+
+                    if (oldVal == 'X')
+                        error("currentLMerScoreForNucl dictionary SHOULD have a value")
+                    else
+                        del(currentLMerScoreForNucl,'T')
+                        merge!(currentLMerScoreForNucl,{'T'=>(oldVal+1)})
+                    end
+                end
+            end
+
+            # NEW calculate the totals amoung the colums for each: A, C, G, T individually
+            #  if that tuple happens to be a high fo that nucleotide, record it in the approriate index list (we may record same
+            #  multiple times (ACCROSS) indices) but not in the same indice.
+
+            for nucleotide in ['A','C','G','T']
+                bestPartialScore = getBestPartialProfileScore(sequenceAndPartialProfileMatrix,i,nucleotide)
+                currentPartialScoreForNucl = get(currentLMerScoreForNucl,nucleotide,-1)
+
+                if bestPartialScore < currentPartialScoreForNucl
+                    # Old best score and corresponding l-mers are invalidated, and new best score is set along with
+                    #  the l-mer that produced it
+
+                    newBestLMerForNucl = createBestLMer(alignmentMatrix)
+                    resetBestProfileContribution(sequenceAndPartialProfileMatrix,i,nucleotide,currentPartialScoreForNucl,newBestLMerForNucl)
+                    print("-- ReplacedBestMatrixRow with l-mer:")
+                    print((nucleotide,newBestLMerForNucl))
+                    print(" with a score = ")
+                    println(get(currentLMerScoreForNucl,nucleotide,-1))
+                elseif bestPartialScore == currentPartialScoreForNucl
+                    print("-- Tied Best Profile Contribution for S_")
+                    print(i)
+                    print(" --")
+
+                    # Check best results to see if this l-mer doesn't match character for character (in direct sequence)
+                    #  with another l-mer (from the same sequence S_i) already in bestResults
+    
+                    isUniqueForAll = true
+                   
+                    for aBestLmer in getBestLMers(sequenceAndPartialProfileMatrix,i,nucleotide)
+                        theLMerOfABestLMer = aBestLmer._lmer
+                        isUniqueToThisOne = false
+                        for aCharacter::Char in theLMerOfABestLMer._data, currLmerCharacter::Char in alignmentMatrix
+                            if aCharacter != currLmerCharacter
+                                isUniqueToThisOne = true
+                                break
+                            end
+                        end
+                  
+                        # Being unique to just ONE of the lmers in the collection alredy in 
+                        #  bestLMers is not enough, it must be unique to them ALL
+
+                        if isUniqueForAll && !isUniqueToThisOne
+                            isUniqueForAll = false
+                            break
+                        end
+                    end
+
+                    # if this new sequence is NOT in best results, put it in best results
+                    if isUniqueForAll
+                        addToBestLMers(sequenceAndPartialProfileMatrix,i,nucleotide,createBestLMer(alignmentMatrix))
+
+                        print("-- l-tuple is a unique lmer that produces the best partial score for nucleotide'")
+                        print(nucleotide)
+                        print("' with lmer: ")
+                        print(alignmentMatrix)
+                        print("is a unique lmer that produces best score = ")
+                        println(get(currentLMerScoreForNucl,nucleotide,-1))
+                    end
+                end
+            end
+        end
+
+        for nucleotide in ['A','C','G','T']
+            print("Best score for ")
+            print(nucleotide)
+            print(" is ")
+            println(getBestPartialProfileScore(sequenceAndPartialProfileMatrix,i,nucleotide))
+        end
+    end
+end
+
+
+doWork()

@@ -1,0 +1,15 @@
+gm_means = [-0.48942419, -1.36052195, -2.99893694, -0.43191481, -1.36182799, -0.54792922, -1.36052195]
+gm_stds = [0.54284872, 0.54331672, 0.54448386, 0.54282542, 0.54331757, 0.54287336, 0.54331672]
+num_assets = 1
+num_sims = 1000000
+gmfs = [GroundMotionField([loc => rand_lognormal(gm_means[loc], gm_stds[loc])
+                           for loc=1:num_assets]) for i=1:num_sims]
+
+ff_states = ["slight", "moderate", "extreme", "complete"]
+ff_mean_imls = [0.500, 1.000, 1.500, 2.000]
+ff_std_imls = [0.400, 0.800, 1.200, 1.600]
+ff = ContinuousFragilityFunction(ff_states, ff_mean_imls, ff_std_imls)
+
+assets = [Asset("a1", 1, "wood", 1, 10000, 1)]
+
+tax_ff_map = ["wood" => ff]

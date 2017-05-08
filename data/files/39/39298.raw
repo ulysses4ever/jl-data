@@ -1,0 +1,34 @@
+function largestPrimeFactorOf(number)
+    maxdim = 0
+    maxdim = int(number / 2)
+    primeFactors = Int64[maxdim]
+    primeFactorsGenerated = 0
+    maxPrimeFactor = 2
+    gen = 3
+    while gen < number
+        isPrime = true
+        idx = 1
+        top = length(primeFactors)
+        while idx <= top
+            prime = primeFactors[idx]
+            if prime < gen / 2
+                if gen % prime == 0
+                    isPrime = false
+                    break
+                end
+            else
+                break
+            end
+            idx+=1
+        end
+        if isPrime
+            primeFactorsGenerated += 1
+            primeFactors[primeFactorsGenerated] = gen
+            if number % gen == 0
+               maxPrimeFactor = gen
+               println(gen)
+            end
+        end
+        gen+=2
+    end
+end

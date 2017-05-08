@@ -1,0 +1,174 @@
+include("config.jl")
+include("fixed_genotype.jl")
+
+module Fixed_Population
+using Config
+using Fixed_Genotype
+
+type Type_Population
+    genotypes::Array{Fixed_Genotype.Type_Genotype, 1}
+    most_fit::Fixed_Genotype.Type_Genotype
+    average_fitness::Int32
+    target_expression::Array{Int32, 1}
+    first_20::Bool
+    to_copy_over::Array{Int32, 1}
+    #fitness_vals::Array{Int32, 1}
+end
+
+function make_population(config_vals::Config.Type_Config_Values)
+    genotypes::Array{Fixed_Genotype.Type_Genotype, 1} = Fixed_Genotype.Type_Genotype[]
+    to_copy_over::Array{Int32, 1} = zeros(Int32, config_vals.births_and_deaths_per_generation)
+    for i = 1:config_vals.population_size
+        push!(genotypes, Fixed_Genotype.make_random_genotype(config_vals))
+    end
+
+    fitness_file_array = readdlm(open("out"), Int32)
+    
+    if config_vals.use_fitness_table:
+        pareto_max = [0, 0]
+        pareto_min = [1000, 1000]
+        for i in 1:256
+            if (fitness_file_array[i, 2] > pareto_max[1]) && (fitness_file_array[i, 3] > pareto_max[2])
+                pareto_max = [fitness_file_array[i, 2], fitness_file_array[i, 3]]
+            end
+            if (fitness_file_array[i, 2] < pareto_min[1]) && (fitness_file_array[i, 3] < pareto_min[2])
+                pareto_min = [fitness_file_array[i, 2], fitness_file_array[i, 3]]
+            end
+        end
+    end
+
+    println(pareto_max, " ", pareto_min)
+
+    return Type_Population(genotypes, genotypes[1], 5, config_vals.expression_1, false, to_copy_over)
+end
+
+function switch_target(population::Type_Population, config_vals::Config.Type_Config_Values)
+    population.first_20 = false
+    for genotype in population.genotypes
+        genotype.fitness = 0.0
+    end
+    if config_vals.use_randomised_targets
+        population.target_expression = rand(0:1, config_vals.target_length)
+    else
+        if population.target_expression == config_vals.expression_1
+            population.target_expression = config_vals.expression_2
+        else
+            population.target_expression = config_vals.expression_1
+        end
+    end
+end
+
+function evaluate(population::Type_Population, i, config_vals::Config.Type_Config_Values)
+    for genotype in population.genotypes
+        Fixed_Genotype.evaluate(genotype, population.target_expression, config_vals)
+    end
+    if !population.first_20
+        for genotype in population.genotypes
+            if genotype.fitness == 100
+                population.first_20 = true
+                println("first 100 ", i % config_vals.generations_per_target_switch)
+                break
+            end
+        end
+    end
+end
+
+function switch_target(population::Type_Population, config_vals::Config.Type_Config_Values)
+    population.first_20 = false
+    for genotype in population.genotypes
+        genotype.fitness = -1.0
+    end
+    if population.target_expression == config_vals.expression_1
+        population.target_expression = config_vals.expression_2
+    else
+        population.target_expression = config_vals.expression_1
+    end
+end
+
+function print_stats(population::Type_Population, config_vals::Config.Type_Config_Values, verbose::Bool) 
+    average_num_nodes::Float32 = 0.0
+    average_num_connections::Float32 = 0.0
+    average_fitness::Float32 = 0.0
+    max_fitness::Float32 = 0.0
+    min_fitness::Float32 = 100.0
+    best = population.genotypes[1]
+    for genotype in population.genotypes
+        average_fitness += genotype.fitness
+        average_num_nodes += genotype.num_nodes
+        this_average_num_connections = 0.0
+        for i = 1:genotype.num_nodes
+            this_average_num_connections += genotype.used_connections[i]
+        end
+        this_average_num_connections /= genotype.num_nodes
+        average_num_connections += this_average_num_connections
+        if genotype.fitness > max_fitness
+            max_fitness = genotype.fitness
+            best = genotype
+        end
+        if genotype.fitness < min_fitness
+            min_fitness = genotype.fitness
+        end
+    end
+    average_fitness /= length(population.genotypes)
+    average_num_nodes /= length(population.genotypes)
+    average_num_connections /= length(population.genotypes)
+    println("average fitness ", average_fitness, " max/min fitness ", max_fitness, " ", min_fitness, 
+             " av num nodes ", average_num_nodes, " av num connns ", average_num_connections)
+    if(verbose)
+        println("parents connections ", best.parents_connections)
+        println("child s connections ", best.connections)
+        println("parents     weights ", best.parents_weights)
+        println("child s     weights ", best.weights)
+        println("parents node weights ", best.parents_node_weights)
+        println("child s node weights ", best.node_weights)
+        println("parents thresholds ", best.parents_thresholds)
+        println("child s thresholds ", best.thresholds)
+        println("parents activations")
+        for i = 1:(config_vals.num_simulation_iterations + 1)
+            println(best.parents_activations[((i - 1) * best.num_nodes + 1):(i * best.num_nodes)])
+        end
+        println("childs activations")
+        for i = 1:(config_vals.num_simulation_iterations + 1)
+            println(best.activations[((i - 1) * best.num_nodes + 1):(i * best.num_nodes)])
+        end
+    end
+    return 0
+end
+
+function breed_and_exterminate(population::Type_Population, config_vals::Config.Type_Config_Values)
+
+    if(length(population.genotypes) > config_vals.births_and_deaths_per_generation)
+        for i = 1:config_vals.births_and_deaths_per_generation
+            index_to_delete = 1
+            lowest_fitness::Float32 = 2000
+            for j = 1:config_vals.extermination_tournament_size
+                new_index = rand(1:length(population.genotypes))
+                if population.genotypes[new_index].fitness < lowest_fitness
+                    index_to_delete = new_index
+                    lowest_fitness = population.genotypes[new_index].fitness
+                end
+            end
+            population.to_copy_over[i] = index_to_delete
+        end
+    else
+        println("skipsdfsdfsdfsd")
+    end
+    for i = 1:config_vals.births_and_deaths_per_generation
+        index_to_breed = 1
+        highest_fitness::Float32 = -1
+        for j = 1:config_vals.breeding_tournament_size
+            new_index = rand(1:length(population.genotypes))
+            if population.genotypes[new_index].fitness > highest_fitness
+                index_to_breed = new_index
+                highest_fitness = population.genotypes[new_index].fitness
+            end
+        end
+        Fixed_Genotype.copy_into(population.genotypes[population.to_copy_over[i]], population.genotypes[index_to_breed])
+        population.genotypes[population.to_copy_over[i]].fitness = -1.0
+        Fixed_Genotype.mutate(population.genotypes[population.to_copy_over[i]], config_vals)
+    end
+
+        return 0
+end
+
+end

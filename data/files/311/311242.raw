@@ -1,0 +1,56 @@
+push!(LOAD_PATH, ".")
+using JuliAMP
+
+@everywhere function experiment(run)
+    println("Run #$run:")
+
+    # Parameters
+    n = 1024
+    rho = 0.44
+    alpha = 0.72
+    delta = 1e-8
+
+    t_max = 100
+
+    # Generate instance
+    k, m = round(Int, ceil(rho * n)), round(Int, ceil(alpha * n))
+
+    x = zeros(n)
+    supp = randperm(n)[1:k]
+    x[supp] = randn(k)
+    F = randn(m, n) / sqrt(n)
+    w = sqrt(delta) * randn(m)
+    y = F * x + w
+    
+    opts = Dict()
+    opts["x"] = x
+    opts["prior_prmts"] = [rho, 0.0, 1.0]
+    opts["t_max"] = 100
+    opts["disp"] = 0
+
+    # Run algorithm
+    tic()
+    x_hat, mses, _ = JuliAMP.iterate_amp(y, F, opts)
+    rt_amp = toq()
+    println("  AMP: $rt_amp seconds")
+
+    tic()
+    x_hat, mses, _ = JuliAMP.iterate_swamp(y, F, opts)
+    rt_swamp = toq()
+    println("  SwAMP: $rt_swamp seconds")
+
+    opts["parallel"] = false
+    tic()
+    x_hat, mses, _ = JuliAMP.iterate_rbp(y, F, opts)
+    rt_rbp = toq()
+    println("  rBP: $rt_rbp seconds")
+
+    return rt_amp, rt_swamp, rt_rbp
+end
+
+#x = pmap(experiment, Any[i for i in 1:10])
+output = open("julia_runtimes.dat", "w")
+for run = 1:1001
+    rt_amp, rt_swamp, rt_rbp = experiment(run)
+    println(output, "$rt_amp\t$rt_swamp\t$rt_rbp")
+end

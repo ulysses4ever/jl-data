@@ -1,0 +1,17 @@
+import Graphs
+import Base.Test
+
+function test_joint_degree()
+   # 0x4dce541f3ff799d5 is the Julia hash of Matlab jdegree output for fve30.
+    g = fve30();
+    h = hash(joint_degree(g));
+    Base.Test.@test h == 0x4dce541f3ff799d5;
+    # NOTE: There is no Matlab equivalent for undirected graphs.
+    # 0xc531d72bee210917 is the hash of joint_degree(groupaverage())
+    # which was partially checked by hand
+    g = groupaverage();
+    h = hash(joint_degree(g));
+    Base.Test.@test h == 0xc531d72bee210917;
+end
+
+test_joint_degree()

@@ -1,15 +1,18 @@
-HTTP/1.1 301 Moved Permanently
+HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:49 GMT
+Date: Wed, 03 May 2017 21:02:08 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 168
-Status: 301 Moved Permanently
+Content-Length: 5345
+Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2737
-X-RateLimit-Reset: 1493318926
-X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
-X-Accepted-OAuth-Scopes: admin:repo_hook, delete_repo, read:repo_hook, repo, repo:status, repo_deployment, write:repo_hook
-Location: https://api.github.com/repositories/47795918
+X-RateLimit-Remaining: 3892
+X-RateLimit-Reset: 1493848245
+Cache-Control: private, max-age=60, s-maxage=60
+Vary: Accept, Authorization, Cookie, X-GitHub-OTP
+ETag: "a892c7ac2c2fe2471affb7cf249d6be5"
+Last-Modified: Thu, 18 Aug 2016 17:28:01 GMT
+X-OAuth-Scopes: repo
+X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
 Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
 Access-Control-Allow-Origin: *
@@ -19,11 +22,102 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 02ea60dfed58b2a09106fafd6ca0c108
-X-GitHub-Request-Id: E7E3:6637:1336DCE:18CD5C2:5902320D
+X-Served-By: 6694d697f15dfc31f0ffaf8cdb1d5a86
+X-GitHub-Request-Id: B58B:5CA3:FFC2C5:148DCC5:590A4550
 
 {
-  "message": "Moved Permanently",
-  "url": "https://api.github.com/repositories/47795918",
-  "documentation_url": "https://developer.github.com/v3/#http-redirects"
+  "id": 21444901,
+  "name": "GradientBoost.jl",
+  "full_name": "svs14/GradientBoost.jl",
+  "owner": {
+    "login": "svs14",
+    "id": 4926070,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/4926070?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/svs14",
+    "html_url": "https://github.com/svs14",
+    "followers_url": "https://api.github.com/users/svs14/followers",
+    "following_url": "https://api.github.com/users/svs14/following{/other_user}",
+    "gists_url": "https://api.github.com/users/svs14/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/svs14/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/svs14/subscriptions",
+    "organizations_url": "https://api.github.com/users/svs14/orgs",
+    "repos_url": "https://api.github.com/users/svs14/repos",
+    "events_url": "https://api.github.com/users/svs14/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/svs14/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "html_url": "https://github.com/svs14/GradientBoost.jl",
+  "description": "Gradient boosting framework for Julia.",
+  "fork": false,
+  "url": "https://api.github.com/repos/svs14/GradientBoost.jl",
+  "forks_url": "https://api.github.com/repos/svs14/GradientBoost.jl/forks",
+  "keys_url": "https://api.github.com/repos/svs14/GradientBoost.jl/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/svs14/GradientBoost.jl/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/svs14/GradientBoost.jl/teams",
+  "hooks_url": "https://api.github.com/repos/svs14/GradientBoost.jl/hooks",
+  "issue_events_url": "https://api.github.com/repos/svs14/GradientBoost.jl/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/svs14/GradientBoost.jl/events",
+  "assignees_url": "https://api.github.com/repos/svs14/GradientBoost.jl/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/svs14/GradientBoost.jl/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/svs14/GradientBoost.jl/tags",
+  "blobs_url": "https://api.github.com/repos/svs14/GradientBoost.jl/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/svs14/GradientBoost.jl/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/svs14/GradientBoost.jl/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/svs14/GradientBoost.jl/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/svs14/GradientBoost.jl/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/svs14/GradientBoost.jl/languages",
+  "stargazers_url": "https://api.github.com/repos/svs14/GradientBoost.jl/stargazers",
+  "contributors_url": "https://api.github.com/repos/svs14/GradientBoost.jl/contributors",
+  "subscribers_url": "https://api.github.com/repos/svs14/GradientBoost.jl/subscribers",
+  "subscription_url": "https://api.github.com/repos/svs14/GradientBoost.jl/subscription",
+  "commits_url": "https://api.github.com/repos/svs14/GradientBoost.jl/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/svs14/GradientBoost.jl/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/svs14/GradientBoost.jl/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/svs14/GradientBoost.jl/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/svs14/GradientBoost.jl/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/svs14/GradientBoost.jl/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/svs14/GradientBoost.jl/merges",
+  "archive_url": "https://api.github.com/repos/svs14/GradientBoost.jl/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/svs14/GradientBoost.jl/downloads",
+  "issues_url": "https://api.github.com/repos/svs14/GradientBoost.jl/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/svs14/GradientBoost.jl/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/svs14/GradientBoost.jl/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/svs14/GradientBoost.jl/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/svs14/GradientBoost.jl/labels{/name}",
+  "releases_url": "https://api.github.com/repos/svs14/GradientBoost.jl/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/svs14/GradientBoost.jl/deployments",
+  "created_at": "2014-07-03T00:36:13Z",
+  "updated_at": "2016-08-18T17:28:01Z",
+  "pushed_at": "2014-07-21T11:16:52Z",
+  "git_url": "git://github.com/svs14/GradientBoost.jl.git",
+  "ssh_url": "git@github.com:svs14/GradientBoost.jl.git",
+  "clone_url": "https://github.com/svs14/GradientBoost.jl.git",
+  "svn_url": "https://github.com/svs14/GradientBoost.jl",
+  "homepage": "http://svs14.github.io/GradientBoost.jl",
+  "size": 252,
+  "stargazers_count": 8,
+  "watchers_count": 8,
+  "language": "Julia",
+  "has_issues": true,
+  "has_projects": true,
+  "has_downloads": true,
+  "has_wiki": true,
+  "has_pages": true,
+  "forks_count": 3,
+  "mirror_url": null,
+  "open_issues_count": 0,
+  "forks": 3,
+  "open_issues": 0,
+  "watchers": 8,
+  "default_branch": "master",
+  "permissions": {
+    "admin": false,
+    "push": false,
+    "pull": true
+  },
+  "network_count": 3,
+  "subscribers_count": 1
 }

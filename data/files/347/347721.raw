@@ -1,0 +1,247 @@
+# *****************************************************************************
+# Written by Ritchie Lee, ritchie.lee@sv.cmu.edu
+# *****************************************************************************
+# Copyright ã ``2015, United States Government, as represented by the
+# Administrator of the National Aeronautics and Space Administration. All
+# rights reserved.  The Reinforcement Learning Encounter Simulator (RLES)
+# platform is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License. You
+# may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0. Unless required by applicable
+# law or agreed to in writing, software distributed under the License is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+# _____________________________________________________________________________
+# Reinforcement Learning Encounter Simulator (RLES) includes the following
+# third party software. The SISLES.jl package is licensed under the MIT Expat
+# License: Copyright (c) 2014: Youngjun Kim.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED
+# "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+# NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+# PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# *****************************************************************************
+
+module GrammarCounts
+
+export RuleCounts, DecisionCounts
+
+using RLESUtils, MathUtils
+using DerivationTrees
+import Base: getindex, setindex!, count, length, haskey
+
+typealias CountDict Dict{Symbol,Float64}
+typealias VCountDict Dict{Symbol,Vector{Float64}}
+typealias RCountTable Vector{CountDict} #key=depth,name, value=pathcount (from rule)
+typealias DCountTable Vector{VCountDict} #key=depth,name, value=pathcounts for each action
+
+function RCountTable(maxdepth::Int64)
+  table = Array(Dict{Symbol,Float64}, maxdepth)
+end
+
+function DCountTable(maxdepth::Int64)
+  table = Array(Dict{Symbol,Vector{Float64}}, maxdepth)
+end
+
+type RuleCounts
+  table::RCountTable #stores log of the counts per rule
+end
+
+type DecisionCounts
+  table::DCountTable #stores log of the counts per decision per rule
+end
+
+######################################################################################
+#getters/setters and helpers
+#=
+function getindex(dcounts::DecisionCounts, depth::Int64, name::Symbol, action::Int64)
+  dcounts.table[depth][name][action]::Float64
+end
+
+function getindex(dcounts::DecisionCounts, depth::Int64, name::Symbol)
+  dcounts.table[depth][name]::Vector{Float64}
+end
+
+function getindex(rcounts::RuleCounts, depth::Int64, name::Symbol)
+  rcounts.table[depth][name]::Float64
+end
+=#
+
+function getindex(rcounts::RuleCounts, depth::Int64)
+  rcounts.table[depth]
+end
+
+function getindex(dcounts::DecisionCounts, depth::Int64)
+  dcounts.table[depth]
+end
+
+function getindex(dcounts::DecisionCounts, depth::Int64, name::Symbol)
+  dcounts.table[depth][name]
+end
+
+function haskey(dcounts::DecisionCounts, depth::Int64)
+  depth <= length(dcounts.table)
+end
+
+function haskey(dcounts::DecisionCounts, depth::Int64, name::Symbol)
+  haskey(dcounts, depth) && haskey(dcounts[depth], name)
+end
+
+#=
+function setindex!(dcounts::DecisionCounts, val::Float64, depth::Int64, name::Symbol, action::Int64)
+  @assert haskey(dcounts.table, depth) && haskey(dcounts.table[depth][name])
+  @assert length(dcounts.table[depth][name]) >= action
+  dcounts.table[depth][name][action] = val
+end
+
+function setindex!(dcounts::DecisionCounts, vals::Vector{Float64}, depth::Int64, name::Symbol)
+  if !haskey(dcounts.table, depth)
+    dcounts.table[depth] = Dict{Symbol,Vector{Float64}}()
+  end
+  dcounts.table[depth][name] = copy(vals)
+end
+
+function setindex!(rcounts::RuleCounts, val::Float64, depth::Int64, name::Symbol)
+  if !haskey(rcounts.table, depth)
+    rcounts.table[depth] = CountDict()
+  end
+  rcounts.table[depth][name] = val
+end
+=#
+
+function setindex!(rcounts::RuleCounts, d::CountDict, depth::Int64)
+    rcounts.table[depth] = d
+end
+
+function setindex!(dcounts::DecisionCounts, d::VCountDict, depth::Int64)
+    dcounts.table[depth] = d
+end
+
+######################################################################################
+#RuleCount methods
+
+RuleCounts(maxdepth::Int64) = RuleCounts(RCountTable(maxdepth))
+
+#"""
+#Returns a Dict where key is symbol of grammar rule and value is counts
+#"""
+function RuleCounts(grammar::Grammar, maxdepth::Int64)
+  rcounts = RuleCounts(maxdepth)
+
+  #initial counts
+  rcounts[maxdepth] = initcounts(grammar)
+  for i = (maxdepth - 1):-1:1
+    rcounts[i] = recurse(grammar, rcounts[i+1])
+  end
+  rcounts
+end
+
+function initcounts(grammar::Grammar)
+  logcnts0 = CountDict()
+  for (name, rule) in grammar.rules
+    logcnts0[name] = init(rule)
+  end
+  logcnts0
+end
+
+function recurse(grammar::Grammar, logcnts0::CountDict)
+  logcnts1 = CountDict()
+  for (name, rule) in grammar.rules
+    logcnts1[name] = count(grammar, rule, logcnts0)
+  end
+  logcnts1
+end
+
+init(rule::OrRule) = -Inf
+init(rule::ExprRule) = -Inf
+init(rule::ReferencedRule) = -Inf
+
+#terminals
+init(rule::RangeRule) = log(length(rule.range))
+init(rule::Terminal) = 0.0 #log(1.0)
+
+function count(grammar::Grammar, rule::OrRule, logcnts0::CountDict)
+  logxpy(vec_count(grammar, rule, logcnts0))::Float64 #sum the counts, keeping values in log form
+end
+
+function count(grammar::Grammar, rule::ExprRule, logcnts0::CountDict)
+  logcnts1 = 0.0
+  for arg in rule.args
+    if isa(arg, Rule)
+      logcnts1 += count(grammar, arg, logcnts0)
+    end
+  end
+  logcnts1
+end
+
+function count(grammar::Grammar, rule::ReferencedRule, logcnts0::CountDict)
+  logcnts0[rule.symbol] #passthrough
+end
+
+#terminals are not recursive
+count(grammar::Grammar, rule::RangeRule, logcnts0::CountDict) = init(rule)
+count(grammar::Grammar, rule::Terminal, logcnts0::CountDict) = init(rule)
+
+#vector of counts, by decision
+function vec_count(grammar::Grammar, rule::OrRule, logcnts0::CountDict)
+  Float64[count(grammar, r, logcnts0) for r in rule.values]
+end
+
+function vec_count(grammar::Grammar, rule::RangeRule, logcnts0::CountDict)
+  zeros(length(rule.range))::Vector{Float64}
+end
+
+#non-decisions
+vec_count(grammar::Grammar, rule, logcnts0::CountDict) = count(grammar, rule, logcnts0)
+
+
+######################################################################################
+#DecisionCount methods
+
+DecisionCounts(maxdepth::Int64) = DecisionCounts(DCountTable(maxdepth))
+
+function DecisionCounts(grammar::Grammar, maxdepth::Int64)
+  rcounts = RuleCounts(grammar, maxdepth)
+  dcounts = DecisionCounts(grammar, rcounts)
+  dcounts
+end
+
+#"""
+#Returns a Dict where key is symbol of decision rule, value is a vector of counts for each action
+#Example:
+#see runtests.jl
+#"""
+function DecisionCounts(grammar::Grammar, rcounts::RuleCounts)
+  maxdepth = length(rcounts)
+  dcounts = DecisionCounts(maxdepth)
+
+  for i = 1:maxdepth
+    dcounts[i] = r2dcounts(grammar, rcounts[i])
+  end
+  dcounts
+end
+
+function r2dcounts(grammar::Grammar, rdict::CountDict)
+  ddict = VCountDict()
+  for (name, rule) in grammar.rules
+    if isa(rule, DecisionRule)
+      ddict[name] = vec_count(grammar, rule, rdict)
+    end
+  end
+  ddict
+end
+
+length(rcounts::RuleCounts) = length(rcounts.table)
+length(dcounts::DecisionCounts) = length(dcounts.table)
+
+end #module

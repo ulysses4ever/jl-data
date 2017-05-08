@@ -1,0 +1,72 @@
+module Streaming
+
+using Jules
+using FPUtil
+
+export
+merge,
+emptymoments,
+moments,
+update,
+nobs,
+mean,
+Moments,
+var,
+std,
+kurtosis,
+skewness
+
+############################
+## Moments
+############################
+
+type Moments
+  n::Integer
+  mean::FloatingPoint
+  m2::FloatingPoint
+  m3::FloatingPoint
+  m4::FloatingPoint
+end
+
+stabilityratio = 0.1
+
+function merge(xa::Moments, xb::Moments)
+  delta = xb.mean - xa.mean
+  n = xa.n + xb.n
+
+  xsmall, xlarge = (xa.n < xb.n) ? (xa, xb) : (xb, xa)
+
+  ratio = xsmall.n / n
+  mean = if ratio < stabilityratio
+    xlarge.mean + (xsmall.mean - xlarge.mean) * ratio
+  else
+    (xa.n * xa.mean + xb.n * xb.mean) / n
+  end
+
+  m2 = xa.m2 + xb.m2 + ((delta * delta) * xa.n * xb.n / n)
+
+  m3 = xa.m3 + xb.m3 +
+  ((delta * delta * delta) * xa.n * xb.n * (xa.n - xb.n) / (n * n)) +
+  (3 * delta * (xa.n * xb.m2 - xb.n * xa.m2) / n)
+
+  m4 = xa.m4 + xb.m4 +
+  ((delta * delta * delta * delta) * (xa.n * xb.n * ((xa.n * xa.n - xa.n * xb.n + xb.n * xb.n))) / (n * n * n)) +
+  (6 * (delta * delta) * (xa.n * xa.n * xb.m2 + xb.n * xb.n * xa.m2) / (n * n)) +
+  (4 * delta * (xa.n * xb.m3 - xb.n * xa.m3) / n)
+
+  Moments(n, mean, m2, m3, m4)
+end
+
+emptymoments() = Moments(0, 0, 0, 0, 0)
+moments(x) = Moments(1, x, 0, 0, 0)
+moments(xs::Vector) = foldl((a,b) -> update(a,b), emptymoments(), xs)
+update(m::Moments, x) = merge(m, moments(x))
+update(m::Moments, x, n) = merge(m, Moments(n, x * n))
+nobs(m::Moments) = m.n
+mean(m::Moments) = m.mean
+var(m::Moments) = m.m2 / m.n
+std(m::Moments) = sqrt(var(m))
+skewness(m::Moments) = sqrt(m.n) * m.m3 / (m.m2 ^ 1.5)
+kurtosis(m::Moments) = (m.n * m.m4) / (m.m2 * m.m2) - 3
+
+end ## end module

@@ -1,0 +1,149 @@
+using Requests
+
+function getdefined(array)
+    definedpositions = [isdefined(array, i) for i in 1:length(array)]
+    definedarray = array[definedpositions]
+    return definedarray
+end
+
+response = post(url, data=data, headers=headers)
+responsedict = JSON.parse(readall(response))
+responsekeys = getdefined(responsedict.keys)
+
+searchresult = Array{Any, 1}()
+if ("data" in responsekeys)
+    push!(searchresult, responsedict["data"])
+end
+
+moreavailable = "nextUri" in responsekeys
+calls = 0
+while moreavailable
+    calls += 1
+    println(calls)
+    nexturi = responsedict["nextUri"]
+    response = get(nexturi)
+    responsedict = JSON.parse(readall(response))
+    responsekeys = getdefined(responsedict.keys)
+    if ("data" in responsekeys)
+        for d in responsedict["data"]
+            push!(searchresult, d)
+        end
+    end
+    moreavailable = "nextUri" in responsekeys
+end
+
+using DataFrames
+df = DataFrame(Any, 0, length(searchresult[1]))
+for i in 1:length(searchresult)
+    push!(df, searchresult[i])
+end
+
+using DBI
+
+function Base.connect(::Type{Presto},
+                      host::AbstractString="",
+                      port::AbstractString="",
+                      user::AbstractString="",
+                      schema::AbstractString="",
+                      catalog::AbstractString="")
+
+    headers = Dict("X-Presto-Catalog" => catalog,
+                   "X-Presto-Schema"  => schema,
+                   "X-Presto-Source"  => "PrestoJulia",
+                   "X-Presto-User"    => user)
+
+    url = "http://$host:$port/v1/statement"
+
+    connection = Dict{AbstractString, Any}("headers" => headers,
+                                           "url"     => url)
+
+    return connection
+end
+
+
+
+
+
+
+using DBI
+
+typealias PrestoConnectionStatus UInt32
+const CONNECTION_OK = 0
+const CONNECTION_BAD = 1
+
+typealias PrestoResultStatus UInt32
+const RESULT_OK = 0
+const RESULT_BAD = 1
+
+abstract Presto <: DBI.DatabaseSystem
+
+type PrestoConnection
+    headers::Dict{AbstractString, Any}
+    url::AbstractString
+
+    function PrestoConnection(host::AbstractString="",
+                              port::AbstractString="",
+                              user::AbstractString="",
+                              schema::AbstractString="",
+                              catalog::AbstractString="")
+
+        headersDict = Dict("X-Presto-Catalog" => catalog,
+                           "X-Presto-Schema"  => schema,
+                           "X-Presto-Source"  => "PrestoJulia",
+                           "X-Presto-User"    => user)
+        new(headersDict,"http://$host:$port/v1/statement")
+    end
+end
+
+type PrestoResult
+    resultData::DataFrame
+    status::PrestoResultStatus
+end
+
+type PrestoDatabaseHandle <: DBI.DatabaseHandle
+    connection::PrestoConnection
+    status::PrestoConnectionStatus
+    closed::Bool
+
+    function PrestoDatabaseHandle(connection::PrestoConnection,
+                                  status::ConnectionStatus)
+        new(connection, status, false)
+    end
+end
+
+type PrestoResultHandle
+    result::PrestoResult
+    types::Vector{DataType}
+    nrows::Integer
+    ncols::Integer
+end
+
+function PrestoResultHandle(result::PrestoResult)
+    status = result.status
+    if status == RESULT_OK
+        types = DataType[t for t in eltypes(result.resultData)]
+        nrows = nrow(result.resultData)
+        ncols = ncol(result.resultData)
+    else
+        types = DataType[]
+        nrows = 0
+        ncols = 0
+    end
+    return PrestoResultHandle(result, types, nrows, ncols)
+end
+
+type PrestoStatementHandle <: DBI.StatementHandle
+    db::PrestoDatabaseHandle
+    stmt::AbstractString
+    executed::Int
+    paramtypes::Array{DataType}
+    finished::Bool
+    result::PrestoResultHandle
+
+    function PrestoStatementHandle(db::PrestoDatabaseHandle,
+                                   stmt::AbstractString,
+                                   executed=0,
+                                   paramtypes::Array{DataType}=DataType[])
+        new(db, stmt, executed, paramtypes, false)
+    end
+end

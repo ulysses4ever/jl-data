@@ -1,0 +1,468 @@
+
+
+### Leave-one-out-Cross validation
+function LOOCrossValidation(data,classlabels)
+    q = length(unique(classlabels))
+    unique_classes = sort(unique(classlabels))
+    
+    #Generate folds for Cross validation => 10x10 (returns the training indices, not the test indices)
+    folds = collect(LOOCV(length(data[:,1])))
+
+    res = cell(length(folds))
+
+    #mismatch = 0
+
+    for i in 1:length(folds)
+        data_tmp = data[setdiff(collect(1:length(data[:,1])),i),:]
+        classlabels_tmp = classlabels[setdiff(collect(1:length(data[:,1])),i),:]
+        res[i] = ddalpha(data[i,:],data_tmp,classlabels_tmp,depth_mahalanobis)
+    end
+    return res
+end
+
+### 2. k-fold Cross Validation
+
+@everywhere function kFoldCrossValidation(name,data,classlabels,stratified=true,n=10,k=10)
+    if(stratified == false)
+        CVresult = cell(k,n)
+        unique_classes = sort(unique(classlabels))
+        q = length(unique_classes)
+        
+        testFoldsToFile = cell(k,n)
+        
+        for m in 1:n
+            #Generate folds for Cross validation => 10x10 (returns the training indices, not the test indices)
+            trainingFolds = collect(Kfold(length(data[:,1]), k))
+            testFolds = cell(k)
+
+            for i in 1:k
+                testFolds[i] = setdiff(collect(1:length(data[:,1])),trainingFolds[i])
+                testFoldsToFile[i,m] = testFolds[i]
+            end
+
+            #for i in 1:k
+            #    CVresult[i,m] = (testFolds[i],ddalpha(data[testFolds[i],:],data[trainingFolds[i],:],classlabels[trainingFolds[i]],depth_projection,2,true),classlabels[testFolds[i]])
+            #end
+        end
+        writedlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\folds\\folds_$(name)_$(n)_$(k).txt", testFoldsToFile)
+        return CVresult
+    else
+        CVresult = cell(k,n)
+        unique_classes = sort(unique(classlabels))
+        q = length(unique_classes)
+        
+        #This variable is used to save the folds from n runs and k folds for reusing with other classificators
+        testFoldsToFile = cell(k,n)
+        
+        for m in 1:n
+            #Generate folds for Cross validation => 10x10 (returns the training indices, not the test indices)
+            trainingFolds = collect(StratifiedKfold(classlabels, k))
+            testFolds = cell(k)
+
+            for i in 1:k
+                testFolds[i] = setdiff(collect(1:length(data[:,1])),trainingFolds[i])
+                testFoldsToFile[i,m] = testFolds[i]
+            end
+
+            #for i in 1:k
+            #    CVresult[i,m] = (testFolds[i],ddalpha(data[testFolds[i],:],data[trainingFolds[i],:],classlabels[trainingFolds[i]],depth_projection,2,true),classlabels[testFolds[i]])
+            #end
+        end
+        writedlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\folds\\folds_$(name)_$(n)_$(k).txt", testFoldsToFile)
+        return CVresult
+    end 
+end
+
+@everywhere function kFoldCrossValidationFixedFolds(name,data_set,classlabels,n=10,k=10)
+        CVresult = cell(k,n)
+        unique_classes = sort(unique(classlabels))
+        q = length(unique_classes)
+        
+        #rows = folds, columns = runs
+        testFolds = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\folds\\folds_$(name)_$(n)_$(k).txt")
+        
+        #Parse test indices from String to Array{Int64,1}
+        for i in 1:length(testFolds[:,1]) #folds
+            for j in 1:length(testFolds[1,:]) #runs
+                testFolds[i,j] = include_string(testFolds[i,j])
+            end
+        end
+
+        #Transpose data set (only for SVM!)
+        #data_set = data_set'
+        
+    for m in 1:n
+     for i in 1:k
+                #### WARNING: length(data_set[:,1]) when using nxd instead of dxn again
+                #### SVM: length(data_set[1,:])
+                trainingFold = setdiff(collect(1:length(data_set[:,1])),testFolds[i,m])
+                
+            #LDA training phase
+            #dv = DataFrame()
+            #dv[:A] = classlabels[trainingFold]
+            #pool!(dv, [:A])
+            #tmp_classlabels = dv[:A].refs
+            #model = DiscriminantAnalysis.lda(data_set[trainingFold,:], tmp_classlabels)
+            
+            CVresult[i,m] = (testFolds[i,m], ddsvm_classify(data_set[testFolds[i,m],:],data_set[trainingFold,:],classlabels[trainingFold],depth_halfspace,1) , classlabels[testFolds[i,m]])
+            
+            #CVresult[i,m] = (testFolds[i,m], ddalpha_classify(data_set[testFolds[i,m],:],data_set[trainingFold,:],classlabels[trainingFold],depth_mahalanobis), classlabels[testFolds[i,m]])
+            #ddalpha(data_set[testFolds[i,m],:],data_set[trainingFold,:],classlabels[trainingFold],depth_spatial_notaffineinvariant)
+            end
+        end
+        writedlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\results\\DD-SVM\\CVresult_$(name)_$(n)_$(k)_DD-LIBSVM_Dloc.txt", CVresult)
+    println("crossval finished for $(name)")
+    return CVresult
+end
+
+@everywhere function getSavedkNNCounts(name,classificator_name,n=10,k=10,feature_selection=false)
+
+	if(feature_selection==true)
+		if(name == "SHIPP2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SHIPP2002_rma\\featureSelection\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "ARMSTRONG2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\ARMSTRONG2002_rma\\featureSelection\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "DYRSKJOET2003_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\DYRSKJOET2003_rma\\featureSelection\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "POMEROY2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\POMEROY2002_rma\\featureSelection\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "SINGH2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SINGH2002_rma\\featureSelection\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		else
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\results\\featureSelection\\CVresult_$(name)_$(n)_$(k)_$(classificator_name).txt")
+		end
+	else
+		if(name == "SHIPP2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SHIPP2002_rma\\count_kNN.txt")
+		elseif(name == "ARMSTRONG2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\ARMSTRONG2002_rma\\count_kNN.txt")
+		elseif(name == "DYRSKJOET2003_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\DYRSKJOET2003_rma\\count_kNN.txt")
+		elseif(name == "POMEROY2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\POMEROY2002_rma\\count_kNN.txt")
+		elseif(name == "SINGH2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SINGH2002_rma\\count_kNN.txt")
+		else
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\results\\count_kNN.txt")
+		end
+	end
+
+    #Parse test indices from String to Array{Int64,1}
+    
+    for j in 1:length(CVresults[1,:])
+        for i in 1:length(CVresults[:,1])
+            CVresults[i,j] = include_string(CVresults[i,j])
+        end
+    end
+    
+    return CVresults
+end
+
+@everywhere function getSavedCVResults(name,classificator_name,n=10,k=10,feature_selection=false,features=-1)
+
+	if(feature_selection==true)
+		if(name == "SHIPP2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SHIPP2002_rma\\featureSelection\\CVresult_$(n)_$(k)_k$(features)_$(classificator_name).txt")
+		elseif(name == "ARMSTRONG2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\ARMSTRONG2002_rma\\featureSelection\\CVresult_$(n)_$(k)_k$(features)_$(classificator_name).txt")
+		elseif(name == "DYRSKJOET2003_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\DYRSKJOET2003_rma\\featureSelection\\CVresult_$(n)_$(k)_k$(features)_$(classificator_name).txt")
+		elseif(name == "POMEROY2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\POMEROY2002_rma\\featureSelection\\CVresult_$(n)_$(k)_k$(features)_$(classificator_name).txt")
+		elseif(name == "SINGH2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SINGH2002_rma\\featureSelection\\CVresult_$(n)_$(k)_k$(features)_$(classificator_name).txt")
+		else
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\results\\featureSelection\\CVresult_$(name)_$(n)_$(k)_k$(features)_$(classificator_name).txt")
+		end
+	else
+		if(name == "SHIPP2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SHIPP2002_rma\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "ARMSTRONG2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\ARMSTRONG2002_rma\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "DYRSKJOET2003_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\DYRSKJOET2003_rma\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "POMEROY2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\POMEROY2002_rma\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		elseif(name == "SINGH2002_rma")
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\SINGH2002_rma\\CVresult_$(n)_$(k)_$(classificator_name).txt")
+		else
+			CVresults = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\results\\CVresult_$(name)_$(n)_$(k)_$(classificator_name).txt")
+		end
+	end
+
+    #Parse test indices from String to Array{Int64,1}
+    
+    for j in 1:length(CVresults[1,:])
+        for i in 1:length(CVresults[:,1])
+            CVresults[i,j] = include_string(CVresults[i,j])
+        end
+    end
+    
+    return CVresults
+end
+
+@everywhere function errorRate(CVresults,data_set)
+    errorRates = cell(length(CVresults[1,:]))
+    for i in 1:length(CVresults[1,:]) #runs
+        tmp1 = 0
+        for j in 1:length(CVresults[:,1]) #folds
+            tmp1 = tmp1 + sum(CVresults[j,i][2] .!= CVresults[j,i][3])
+            #tmp1 = tmp1 + abs(sum(CVresults[j,i][2]-CVresults[j,i][3]))
+        end
+        errorRates[i] = tmp1/length(data_set[:,1])
+        #println("Run $(i): ErrorRate $(errorRates[i])")
+    end
+    return errorRates
+end
+
+#True positive rate
+#if it's a binary classification problem, index_trueclass is the index of the positive class in the classlabels-array
+@everywhere function sensitivity(CVresults,classlabels,index_trueclass=2)
+    #1. Calculate TP/(TP+FN) in every run for every class 
+    # => This results in an array of the length of unique classes
+    #2. Calculate mean of the class-dependent sensitivities
+    
+    unique_classlabels = sort(unique(classlabels))
+    
+    if(length(unique_classlabels) == 2)
+		sens = cell(length(CVresults[1,:]))
+        tp = 0
+        fn = 0
+        for j in 1:length(CVresults[1,:]) #runs
+		tp = 0
+		fn = 0
+            for k in 1:length(CVresults[:,1]) #folds
+                tp = tp + countSameElements(unique_classlabels[index_trueclass],CVresults[k,j][2],CVresults[k,j][3])
+                fn = fn + countFalseNegatives(unique_classlabels[index_trueclass],CVresults[k,j][2],CVresults[k,j][3])
+            end
+			sens[j] = tp/(tp+fn)
+        end
+        return sens
+        #multiclass classification => one-against-all, c sensitivity-values for c classes 
+    else
+        sens2 = cell(length(unique_classlabels))
+        for i in 1:length(unique_classlabels)
+		sens1 = zeros(length(CVresults[1,:]))
+        tp = 0
+        fn = 0
+            for j in 1:length(CVresults[1,:]) #runs
+			tp = 0
+			fn = 0
+                for k in 1:length(CVresults[:,1]) #folds
+                    tp = tp + countSameElements(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                    fn = fn + countFalseNegatives(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                end
+				sens1[j] = tp/(tp+fn)
+            end
+			sens2[i] = sens1
+        end
+        return sens2
+    end  
+end
+
+#True negative rate
+@everywhere function specificity(CVresults,classlabels,index_falseclass=1)
+    #1. Calculate TN/(TN+FP) in every run for every class 
+    # => This results in an array of the length of unique classes
+    #2. Calculate mean of the class-dependent specificities
+    
+    unique_classlabels = sort(unique(classlabels))
+    
+    if(length(unique_classlabels) == 2)
+		spec = cell(length(CVresults[1,:]))
+        tn = 0
+        fp = 0
+        for j in 1:length(CVresults[1,:]) #runs
+		tn = 0
+		fp = 0
+            for k in 1:length(CVresults[:,1]) #folds
+                tn = tn + countSameElements(unique_classlabels[index_falseclass],CVresults[k,j][2],CVresults[k,j][3])
+                fp = fp + countFalseNegatives(unique_classlabels[index_falseclass],CVresults[k,j][2],CVresults[k,j][3])
+            end
+			spec[j] = tn/(tn+fp)
+        end
+        return spec
+        #multiclass classification => one-against-all, c specificity-values for c classes 
+    else
+        spec2 = cell(length(unique_classlabels))
+        for i in 1:length(unique_classlabels)
+        spec1 = zeros(length(CVresults[1,:]))
+			tn = 0
+            fp = 0
+            for j in 1:length(CVresults[1,:]) #runs
+			tn = 0
+			fp = 0
+                for k in 1:length(CVresults[:,1]) #folds
+                    tn = tn + countTrueNegatives(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                    fp = fp + countFalsePositives(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                end
+				spec1[j] = tn/(tn+fp) 
+            end
+			spec2[i] = spec1
+        end
+        return spec2
+    end
+end
+
+@everywhere function accuracy(CVresults,classlabels)
+    #1. Calculate TP/(TP+FN) in every run for every class 
+    # => This results in an array of the length of unique classes
+    #2. Calculate mean of the class-dependent sensitivities
+    
+    unique_classlabels = sort(unique(classlabels))
+    acc = zeros(length(unique_classlabels))
+    
+    for i in 1:length(unique_classlabels)
+        tp = 0
+        fn = 0
+        tn = 0
+        fp = 0
+        
+        for j in 1:length(CVresults[1,:]) #runs
+            for k in 1:length(CVresults[:,1]) #folds
+                tp = tp + countSameElements(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                tn = tn + countTrueNegatives(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                fn = fn + countFalseNegatives(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+                fp = fp + countFalsePositives(unique_classlabels[i],CVresults[k,j][2],CVresults[k,j][3])
+            end
+        end
+        
+        acc[i] = (tp+tn)/(tp+fn+fp+tn)
+    end
+    return acc
+end
+
+#helper function for true positives
+@everywhere function countSameElements(class,arr1,arr2)
+    res = 0
+    for i in 1:length(arr1)
+        if (arr1[i] == class && arr2[i] == class)
+            res = res +1
+        end
+    end
+    return res
+end
+
+#helper function for false positives
+@everywhere function countFalsePositives(class,arr1,arr2)
+    res = 0
+    for i in 1:length(arr1)
+        if (arr1[i] == class && arr2[i] != class)
+            res = res +1
+        end
+    end
+    return res
+end
+
+#helper function for true negatives
+@everywhere function countTrueNegatives(class,arr1,arr2)
+    res = 0
+    for i in 1:length(arr1)
+        if (arr1[i] != class && arr2[i] != class)
+            res = res +1
+        end
+    end
+    return res
+end
+
+#helper function for false negatives
+@everywhere function countFalseNegatives(class,arr1,arr2)
+    res = 0
+    for i in 1:length(arr1)
+        if (arr1[i] != class && arr2[i] == class)
+            res = res +1
+        end
+    end
+    return res
+end
+
+function generateUCIFolds()
+   directory = readdir("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\data\\UCI")
+    # 1. Remove all .dat or .data suffixes and make directory unique, also remove semeion from the list
+    for i in 1:length(directory)
+        directory[i] = split(directory[i],".")[1]
+    end
+    directory = unique(directory)
+    splice!(directory,findin(directory,["semeion"])[1])
+
+    for i in directory
+        data_set = UCIDataToMatrix(i)[1]
+        classlabels = UCIDataToMatrix(i)[2]
+        kFoldCrossValidation(i,data_set,classlabels,false)
+    end 
+end
+
+#Writes Z matrices of data depth algorithms to a text file
+#Output: A n x k matrix with rows being the folds, columns being the runs
+#An element of the n x k matirx is the trained matrix Z
+function generateDDalphaZ(name,data_set,classlabels,depth_function,p=2,n=10,k=10)
+    sortedData = sortData(data_set,classlabels)
+    exponents = featureSpaceHelperVector(p,length(sortedData))
+    writedlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\Z\\exponents_$(name)_$(p).txt", exponents)
+    
+    Zresult = cell(k,n)
+        
+    #rows = folds, columns = runs
+    testFolds = readdlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\folds\\folds_$(name)_$(n)_$(k).txt")
+        
+        #Parse test indices from String to Array{Int64,1}
+        for i in 1:length(testFolds[1,:])
+            for j in 1:length(testFolds[:,1])
+                testFolds[i,j] = include_string(testFolds[i,j])
+            end
+        end
+        
+        for m in 1:n
+            for i in 1:k
+                trainingFold = setdiff(collect(1:length(data_set[:,1])),testFolds[i,m])
+            sortedTrainingData = sortData(data_set[trainingFold,:],classlabels[trainingFold])
+            Zresult[i,m] = featureSpace(sortedTrainingData,depth_function)
+            end
+        end
+    writedlm("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\cv\\UCI\\Z\\Z_$(name)_$(p)_$(n)_$(k)_$(depth_function).txt", Zresult)
+end
+
+#directory = readdir("C:\\Users\\robin\\Documents\\Julia Scripts\\datadepth lokal\\data\\UCI")
+    # 1. Remove all .dat or .data suffixes and make directory unique, also remove semeion from the list
+#    for i in 1:length(directory)
+#        directory[i] = split(directory[i],".")[1]
+#    end
+#    directory = unique(directory)
+#    splice!(directory,findin(directory,["semeion"])[1])
+#    splice!(directory,findin(directory,["ecoli"])[1])
+
+#    for i in directory
+#        data_set = UCIDataToMatrix(i)[1]
+#        classlabels = UCIDataToMatrix(i)[2]
+#        kFoldCrossValidationFixedFolds(i,data_set,classlabels)
+#       println("Cross validation done for $(i)")
+#    end 
+
+#i = "ionosphere"
+#for i in ["glass", "ionosphere","iris","parkinsons","wdbc","wine"]
+#    data_set = UCIDataToMatrix(i)[1]
+#    classlabels = UCIDataToMatrix(i)[2]
+#    kFoldCrossValidationFixedFolds(i,data_set,classlabels,10,10)
+#end
+
+#kFoldCrossValidationFixedFolds(i,data_set,classlabels)
+
+#data_set = DSToMatrix("SHIPP2002_rma")
+#classlabels = DSClasslabels("SHIPP2002_rma")
+
+#sortedData = sortData(data_set,classlabels)
+#falses = length(sortedData[1][:,1])
+#trues = length(sortedData[2][:,1])
+
+#REMEMBER FEATURE VS OBSERVATIONS IN SVM!!!!
+
+#kFoldCrossValidation(data,classlabels,true,10,10)
+
+#i = "parkinsons"
+
+#CVresults = getSavedCVResults(i,"DDalpha_Dmah")
+#println("Cross-Validation Results")
+#println("Error Rate: $(errorRate(CVresults,UCIDataToMatrix(i)[1])*100) %")
+#println("Accuracy: $(accuracy(CVresults,UCIDataToMatrix(i)[2])*100) %")
+#println("Sensitivity (TP/(TP+FN)): $(sensitivity(CVresults,UCIDataToMatrix(i)[2])*100) %")
+#println("Specifitiy (TN/(TN+FP)): $(specificity(CVresults,UCIDataToMatrix(i)[2])*100) %") 

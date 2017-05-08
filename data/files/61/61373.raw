@@ -1,0 +1,130 @@
+module VoxelBox
+
+type VoxelBoxVolume{CoordT<:FloatingPoint,DataT<:Number}
+    origin::Array{CoordT,1}
+    dimensions::Array{CoordT,1}
+    data::Array{DataT,3}
+end
+export VoxelBoxVolume
+
+# Construct voxel value filler 
+function VoxelBoxVolume{CoordT<:FloatingPoint,DataT<:Number}(::Type{DataT},
+                                                       nvox::Array{Int,1},
+                                                       dimensions::Array{CoordT,1})
+    origin=zeros(CoordT,3)
+    data=zeros(DataT,nvox...)
+    V= VoxelBoxVolume(origin,dimensions,data);
+    return V
+end
+export VoxelBoxVolume
+
+
+# Construct voxel value filler 
+function VoxelBoxVolume{CoordT<:FloatingPoint,DataT<:Number}(V::VoxelBoxVolume{CoordT,DataT})
+    Vc= deepcopy(V)
+    Vc.data*=0;
+    return Vc
+end
+export VoxelBoxVolume
+
+
+function fillvolume!{CoordT<:FloatingPoint,DataT<:Number}(V::VoxelBoxVolume{CoordT,DataT},
+                                                    f::Function,
+                                                    fillvalue::DataT,
+                                                    emptyvalue::DataT)
+    nx, ny, nz = size(V.data)
+    voxszx=V.dimensions[1]/nx
+    voxszy=V.dimensions[2]/ny
+    voxszz=V.dimensions[3]/nz
+    for i = 1:nx
+        x = V.origin[1] + voxszx*(i+0.5)
+        for j = 1:ny
+            y = V.origin[2] + voxszy*(j+0.5)
+            for k = 1:nz
+                z = V.origin[3] + voxszz*(k+0.5)
+                V.data[i,j,k] = (f(x,y,z)<zero(CoordT)? fillvalue: emptyvalue)
+            end
+        end
+    end
+    return V
+end
+export fillvolume!
+
+function sphereobj{CoordT<:FloatingPoint}(x::CoordT,y::CoordT,z::CoordT,
+                                             cx::CoordT, cy::CoordT, cz::CoordT, r::CoordT)
+    return ((x-cx)^2+(y-cy)^2+(z-cz)^2) - r*r # inside negative, outside positive
+end
+export sphereobj
+
+function boxobj{CoordT<:FloatingPoint}(x::CoordT,y::CoordT,z::CoordT,
+                                          cx::CoordT, cy::CoordT, cz::CoordT,  dx::CoordT, dy::CoordT, dz::CoordT)
+    return max(max((x-cx)-dx,cx-x),
+               max((y-cy)-dy,cy-y),
+               max((z-cz)-dz,cz-z)) # inside negative, outside positive
+end
+export boxobj
+
+# Merge the "under" volume into the "over" volume.  The "over" volume voxels have precedence.
+function mergevolume!{CoordT<:FloatingPoint,DataT<:Number}(Vover::VoxelBoxVolume{CoordT,DataT},
+                                                           Vunder::VoxelBoxVolume{CoordT,DataT},
+                                                           emptyvalue::DataT)
+    if (size(Vover.data)!=size(Vunder.data))
+        error("Volumes are incompatible")
+    end
+    
+    nx, ny, nz = size(Vover.data)
+    voxszx=Vover.dimensions[1]/nx
+    voxszy=Vover.dimensions[2]/ny
+    voxszz=Vover.dimensions[3]/nz
+    for i = 1:nx
+        x = Vover.origin[1] + voxszx*(i+0.5)
+        for j = 1:ny
+            y = Vover.origin[2] + voxszy*(j+0.5)
+            for k = 1:nz
+                z = Vover.origin[3] + voxszz*(k+0.5)
+                if (Vunder.data[i,j,k]!=emptyvalue) && (Vover.data[i,j,k]==emptyvalue)
+                    Vover.data[i,j,k] = Vunder.data[i,j,k]
+                end
+            end
+        end
+    end
+    return Vover
+end
+export mergevolume!
+
+
+function vtkexport{CoordT<:FloatingPoint,DataT<:Number}(V::VoxelBoxVolume{CoordT,DataT},theFile::String)
+    fid=open(theFile,"w");
+    if (fid==-1)
+        error (["Could not open " * theFile])
+        return nothing
+    end
+    print(fid,"# vtk DataFile Version 2.0\n");
+    print(fid,"Example\n");
+    print(fid,"ASCII\n");
+    print(fid,"DATASET STRUCTURED_POINTS\n");
+    nx, ny, nz = size(V.data)
+    print(fid,"DIMENSIONS $(nx) $(ny) $(nz)\n");
+    voxszx=V.dimensions[1]/nx
+    voxszy=V.dimensions[2]/ny
+    voxszz=V.dimensions[3]/nz
+    print(fid,"SPACING $(voxszx) $(voxszy) $(voxszz)\n");
+    print(fid,"ORIGIN 0 0 0\n");
+    print(fid,"POINT_DATA $(nx*ny*nz)\n");
+    typed="int"
+    if (DataT==Int)
+        typed="int"
+    else
+        typed="undefined"
+    end
+    print(fid,"SCALARS volume_scalars $typed 1\n");
+    print(fid,"LOOKUP_TABLE default\n");
+    for j=1:(nx*ny*nz)
+        print(fid,"$(V.data[j])\n");
+    end   
+     fid=close(fid);
+end
+export vtkexport
+
+
+end

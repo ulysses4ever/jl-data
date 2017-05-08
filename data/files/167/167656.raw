@@ -1,0 +1,169 @@
+module Sudoku
+
+import Base: show, getindex, setindex!, ndims, size
+export SudokuBoard
+
+abstract SudokuStrategy
+immutable FindSingleStrategy <: SudokuStrategy end
+
+const FindSingle = FindSingleStrategy()
+
+type SudokuBoard
+    puzzle::Matrix{Int}
+    solution::Matrix{Int}
+    possibilities::Array{Int, 3}
+
+    function SudokuBoard(puzzle::Matrix{Int})
+        size(puzzle) == (9, 9) || error("Only 9×9 boards are supported")
+        sb = new(copy(puzzle), zeros(puzzle), zeros(Int, 9, 9, 9))
+        markgiven!(sb)
+        sb
+    end
+end
+
+function convertpuzzle(puzzle::String)
+    puzzle = replace(replace(puzzle, r"[^0-9.]", ""), ".", "0")
+    reshape([parseint(c) for c in puzzle], 9, 9)'
+end
+
+function SudokuBoard(puzzle::String)
+    SudokuBoard(convertpuzzle(puzzle))
+end
+
+function _show(io::IO, board::Matrix{Int})
+    for i = 1:size(board, 1)
+        i in (4, 7) && println(io, join(["-"^7 for k=1:3], "+"))
+
+        row = board[i,:]
+        println(" "*replace(join([join(row[k:k+2], " ") for k=1:3:9], " | "), "0", ".")*" ")
+    end
+end
+
+function show(io::IO, sb::SudokuBoard)
+    _show(io, sb.solution)
+end
+
+function section(i::Int, j::Int)
+    return range(div(i-1, 3)*3 + 1, 3), range(div(j-1, 3)*3 + 1, 3)
+end
+
+ndims(sb::SudokuBoard) = ndims(sb.solution)
+size(sb::SudokuBoard) = size(sb.solution)
+size(sb::SudokuBoard, d) = size(sb.solution, d)
+getindex(sb::SudokuBoard, inds...) = sb.solution[inds...]
+
+function setindex!(sb::SudokuBoard, v::Int, i::Int, j::Int)
+    s = sb.solution
+    p = sb.possibilities
+
+    s[i,j] == v && return v
+    s[i,j] != 0 && error("Marking position ($i, $j) that already has been set to $(s[i, j])")
+    s[i,j] = v
+
+    # Perform elimination.
+    p[i,j,v] != 0 && error("Marking impossible position ($i, $j) to $v")
+    # Eliminate row.
+    p[:,j,v] = 1
+
+    # Eliminate column.
+    p[i,:,v] = 1
+
+    # Eliminate section.
+    p[section(i, j)...,v] = 1
+
+    # Eliminate itself.
+    p[i,j,:] = 1
+    p[i,j,v] = 0
+end
+
+setindex!(sb::SudokuBoard, v::Int, ind::Int) = setindex!(sb, v, ind2sub(size(sb), ind)...)
+
+function markgiven!(sb::SudokuBoard)
+    for i=1:9, j=1:9
+        v = sb.puzzle[i,j]
+        if v != 0
+            sb[i,j] = v
+        end
+    end
+end
+
+issolved(sb::SudokuBoard) = findfirst(sb.solution, 0) == 0
+
+function isimpossible(sb::SudokuBoard)
+    p = sb.possibilities
+    for i=1:9, j=1:9
+        findfirst(p[i,j,:], 0) == 0 && return true
+    end
+    return false
+end
+
+function solvewithstrategy!(sb::SudokuBoard, ::FindSingleStrategy)
+    s = sb.solution
+    p = sb.possibilities
+    for i=1:9, j=1:9
+        if s[i,j] == 0
+            v = findfirst(p[i,j,:], 0)
+            if findnext(p[i,j,:], 0, v+1) == 0
+                sb[i,j] = v
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function solvewithstrategies!(sb::SudokuBoard)
+    solvewithstrategy!(sb, FindSingle) && return true
+    return false
+end
+
+function findcellwithminimumpossibilities(sb::SudokuBoard)
+    s = sb.solution
+    p = sb.possibilities
+    bestcount = -1
+    besti, bestj = 0, 0
+    for i=1:9, j=1:9
+        if s[i,j] == 0
+            c = countnz(p[i,j,:])
+            if c > bestcount
+                bestcount = c
+                besti, bestj = i, j
+            end
+        end
+    end
+    return besti, bestj
+end
+
+function solve!(sb::SudokuBoard)
+    while solvewithstrategies!(sb)
+        issolved(sb) && return true
+        isimpossible(sb) && return false
+    end
+
+    s = sb.solution
+    p = sb.possibilities
+    while true
+        i, j = findcellwithminimumpossibilities(sb)
+        i == 0 && j == 0 && return true
+        for k=1:9
+            if p[i,j,k] == 0
+                # Set (i,j) to k is possible.
+                sb2 = deepcopy(sb)
+                sb2[i,j] = k
+                if !isimpossible(sb2) && solve!(sb2)
+                    sb.solution = sb2.solution
+                    sb.possibilities = sb2.possibilities
+                    return true
+                end
+            end
+        end
+        return false
+    end
+end
+
+function solve(puzzle)
+    sb = SudokuBoard(puzzle)
+    solve!(sb) ? sb : nothing
+end
+
+end

@@ -1,0 +1,69 @@
+
+#= According to Brad DeLong in lectures 1 & 2, Econ 207 UCB, the six most important macroeconomic variables are
+
+1. Real GDP, GDPC1 (Q), the broadest measure of economic activity
+2. The unemployment rate, UNRATE (M),a measure of slack and waste.
+3. Inflation rate and price level, CPIAUCSL (M), a measure of how well the economy enables rational economic decisions
+4. Stock market indices, business and investor confidence. Shiller will be the best source for this.
+5. Interest rates on short term gov't bonds, TB3MS (M), a measure of liquidity in the economy
+6. Interest rates on long term corporate bonds, a measure of business access to capital. Shiller is also the best source for this.
+=#
+
+#= A far more convenient macro dataset is available from Michael McCracken at the St. Louis Fed's research department https://research.stlouisfed.org/econ/mccracken/fred-databases/.
+
+It does appear that manual download is easiest.
+
+Δ = x[t] - x[t-1]
+Transformation codes are as follows
+
+1. No transform
+2. Δx
+3. Δ^2 x
+4. log(x)
+5. Δlog(x)
+6. Δ^2 log(x)
+
+=#
+
+""" mccracken(datadir)
+
+Read file mccracken.csv from the given data directory, returning a 2D array of type Any.
+"""
+function mccracken{T<:AbstractString}(datadir::T)
+    fname = joinpath(datadir,"mccracken.csv")
+    mc2 = readdlm(fname,',',header=true)
+    for i in 1:size(mc2[1],1)
+        mc2[1][i,1]=Date(mc2[1][i,1],"m/d/y")
+    end
+    mc2
+end
+
+""" group_index(group::Symbol)
+
+Return an iterator for the given group of economic indicators. The group argument must be one of the following Symbols
+
+1. :income or :output
+2. :labor or :labour
+3. :housing
+4. :consumption, :orders or :inventories
+5. :money or :credit
+6. :interest or :exchange_rate
+"""
+function group_index(group::Symbol)
+    if group==:income || group==:output
+        return 1:17
+    elseif group==:labor || group==:labour
+        return 17+(1:32)
+    elseif group==:housing
+        return 17+32+(1:10)
+    elseif group==:consumpution || group==:orders ||
+        group==:inventories
+        return 17+32+10+(1:14)
+    elseif group==:money || group==:credit
+        return 17+32+10+14+(1:14)
+    elseif group==:interest || group==:exchange_rate
+        return 17+32+10+14+14+(1:22)
+    else
+        error("unrecognized group ",group)
+    end
+end

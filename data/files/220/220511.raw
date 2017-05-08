@@ -1,0 +1,99 @@
+#Library related to Generation of Initial Solution
+#Copyright(c) 2015: Kally Chung
+
+#01...orderD
+
+include( "IO_MCITW-1P.jl" )
+
+function orderD( cardD )
+#sort deliveries
+#===============#
+#    input: int cardD
+#   output: array sortedD
+
+  sortedD = zeros( Int, cardD)  #output
+
+  aux = zeros( Int, cardD)  #keep which number is available or not
+                            #{0-available, 1-already selected}
+  count = 0   #count how many numbers have been sorted
+  num = 0     #number selected
+
+  #checking process
+  if ( cardD <= 0 )
+    println( "cardD -> invalid number " )
+  end
+  
+  #selection process
+  while( count != (cardD-1) )
+    num = rand( 1:cardD )
+    if ( aux[ num ] == 0 )
+      count = count + 1
+      sortedD[ count ] = num
+      aux[ num ] = 1
+    end
+  end
+  
+  #selection process for the last number
+  for i in 1:cardD
+    if ( aux[i] == 0 )
+      sortedD[ cardD ] = i
+      break
+    else
+      continue
+    end
+  end
+
+  return sortedD
+end
+
+function findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd, valueBin )
+#findDemRec
+#==========#
+#    input: int offer -------------> DA
+#           array(int) valPA ------> array containing PA's from available pickups
+#           int cardValP ----------> number of available pickups
+#           array(bool) currValP --> array containing which pickups are being
+#                                    considered
+#           array(bool) optDem-----> array containing the pickups that will be 
+#                                    the demand
+#           int diff --------------> difference between offer and sum of PA's
+#           int currInd -----------> current index in the recursion
+#           bool valueBin ---------> which value is been considered {0,1}
+#   output: array optDem
+  
+  println( "currValP = $currValP, currInd = $currInd, valueBin = $valueBin")
+  currValP[ currInd ] = valueBin
+  println( "currValP_M = $currValP")
+  if ( currInd == cardValP )
+    aux = 0
+    for j in 1:cardValP
+      aux = aux + currValP[j] * valPA[j]
+    end
+    aux = offer - aux
+    
+    if ( ( aux < diff ) && ( aux >= 0 ) )
+      println("kk")
+      for i in 1:cardValP
+        optDem[i] = currValP[i]
+      end
+      diff = aux
+    end
+    println( "optDem = $optDem")
+    println( "diff = $diff")
+    return optDem, diff
+  else
+    println( "ufa" )
+    (optDem, diff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd + 1, 0)
+    (optDem, diff) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, currInd + 1, 1)
+  end
+end
+
+function findDemand(offer, valPA, cardValP, optDem, diff)
+  currValP = zeros( Int, cardValP)
+  (A, B) = findDemRec( offer, valPA, cardValP, currValP, optDem, diff, 1, 0)
+  println( "*A = $A" )
+  println( "*optDem = $optDem" )
+  println( "diff = $diff" )
+  (C, D) = findDemRec( offer, valPA, cardValP, currValP, A, B, 1, 1)
+  return A,B,C,D
+end

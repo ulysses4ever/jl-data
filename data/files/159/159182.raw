@@ -1,0 +1,40 @@
+
+function subfolders(path::AbstractString)
+  path=abspath(path)
+  files=filter(x->!startswith(x,"."),readdir(path))
+  files=map(x->joinpath(path,x), files)
+  folders=filter(isdir,files)
+  subsubfolders=map(subfolders,folders)
+  result=[path]
+  for f=subsubfolders
+    append!(result,f)
+  end
+  return result
+end
+
+append!(LOAD_PATH,subfolders("../"))
+
+using Classifiers
+using AdaBoosts
+using TestUtils
+import RandomHyperplaneClassifiers
+using Multiclass
+
+x,y,labels=iris_dataset()
+#x=mapslices(vec,x,2)
+
+c=RandomHyperplaneClassifiers.RandomHyperplaneConfig()
+
+max_classifiers=20
+subsample_cumulative_distribution=0.5
+min_samples=5
+bc=AdaBoostConfig(c,max_classifiers,subsample_cumulative_distribution,min_samples)
+mc=AllVersusAllClassifierConfig(bc)
+model=fit(mc,x,y)
+predicted=predict(model,x)
+println(predicted)
+println(y)
+println(loss(model,x,y))
+
+
+#using PyPlot

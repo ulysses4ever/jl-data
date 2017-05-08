@@ -1,0 +1,21 @@
+###
+### tokenize.jl
+###
+
+function tokenize_ws(s::String)
+    return split(strip(s), r"\s+")
+end
+
+function word_tag(token::String, sep="/")
+    elems = split(token, sep)
+    return (join(elems[1:end-1], sep), elems[end])
+end
+
+function word(token::String, sep="/")
+    elems = split(token, sep)
+    return join(elems[1:end-1], sep)
+end
+
+function tag(token::String, sep="/")
+    return split(token, sep)[end]
+end

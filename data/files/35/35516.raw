@@ -1,0 +1,19 @@
+using Debug
+include("dec2bin.jl");
+@debug function oct2bin(n::Int64)
+# converts octal to binary. Output for each octal digit is a set of three binary
+# digits. oct2bin(54) gives true;false;true; true;false;false
+    nb = n;
+    op = [];
+    if(nb == 0)
+        return([0;0;0]'');
+    end
+    while(nb != 0)
+        digit  = nb%10;
+        nb     = convert(Int64,floor(nb/10));
+        currOP = dec2bin(digit,3);
+        op     = vcat(currOP,op);
+    end
+
+    return(op);
+end

@@ -1,0 +1,223 @@
+#|
+
+Remote Application Sawfish Module.  Version 1.2.
+
+Copyright (c) 2003-2004 Ewan Mellor <sawfish@ewanmellor.org.uk>.
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+
+
+This module encapsulates a connection to a running application with which you
+wish to interact.  For example, this module may be used to ask a web-browser
+or an editor to load a file.  The only requirements we have are that it must
+be possible to communicate with the application in question from the command
+line whilst it is running and that the application opens a window on the
+desktop.
+
+A remote-application instance may be given a choice of applications to use for
+an intended purpose, and that instance will then isolate you, the programmer,
+from the choice made.  For example, you may pass in a list of known
+web-browsers, and this module will select whichever one is running or
+installed, remember that fact, and use the same browser instance each time.
+There is no need for the client programmer to worry about which browser the
+user has installed once the initial configuration has been made.
+
+This file may be obtained from http://www.ewanmellor.org.uk/sawfish.html.
+
+Install this file by placing it inside your ~/.sawfish/lisp/ directory.
+
+|#
+
+
+(define-structure remote-application
+  (export remote-application-create
+          remote-application-invoke
+          remote-application-window
+          )
+
+  (open user
+        rep
+        rep.data.queues
+        rep.data.tables
+        rep.regexp
+        rep.io.processes
+        rep.io.timers
+        rep.system
+        sawfish.wm
+        sawfish.wm.util.display-window
+        )
+
+
+(define (remote-application-create app-names start-app-commands)
+  "Create a handle that represents a connection to a remote application.  The
+app-names parameter should be a list of possible names for that application,
+as seen in the window's class, and the start-app-commands should be a list of
+commands to run, in the given order, to start an application instance if one
+is not already running."
+  (let ((window-re (mapconcat
+                    (lambda (name)
+                      (concat "\(" name ".*\)"))
+                    app-names
+                    "\|"))
+        (table (make-table symbol-hash equal)))
+    
+    (table-set table 'APP-NAMES app-names)
+    (table-set table 'START-APP-COMMANDS start-app-commands)
+    (table-set table 'WINDOW-RE window-re)
+    (table-set table 'QUEUE (make-queue))
+
+    (add-hook 'add-window-hook (lambda (w) (start-app-hook table w)) t)
+    
+    table
+    )
+  )
+
+
+(define (remote-application-invoke instance commands focus #!rest params)
+  (let* ((window (remote-application-window instance)))
+    (if window
+        (invoke instance commands focus window params)
+      (start-app instance commands focus params))
+    )
+  )
+
+
+(define (remote-application-window instance)
+  "Find and return a window for the application."
+
+  (let ((window-re (table-ref instance 'WINDOW-RE)))
+    (car (filter (lambda (w)
+                   (string-match window-re (window-class w) 0 t))
+                 (managed-windows))))
+  )
+
+
+;;;; Invocation
+
+
+(define (invoke instance commands focus window params)
+  (let ((cmd (invocation-command instance commands window)))
+    (when cmd
+      (system (concat (eval (list* format nil cmd params)) " &"))
+      
+      (when focus
+        (display-window window)
+        (unshade-window window))
+      )))
+
+
+(define (invocation-command instance commands window)
+  "Determine the command to use to invoke the application."
+  
+  (let* ((app-names (table-ref instance 'APP-NAMES))
+         (win-class (window-class window))
+         (app-name (car (filter
+                         (lambda (name)
+                           (string-match name win-class 0 t))
+                         app-names))))
+    (filter-key-value app-name commands)
+    )
+  )
+
+
+(define (filter-key-value key list)
+  (cdar (filter
+         (lambda (pair) (= (car pair) key))
+         list)
+        )
+  )
+
+
+;;;; Starting the Application
+
+
+(define (start-app instance invocation-commands focus params)
+  (let ((queue              (table-ref instance 'QUEUE))
+        (start-app-commands (table-ref instance 'START-APP-COMMANDS)))
+    (enqueue queue (vector invocation-commands focus params))
+    (unless (> (queue-length queue) 1)
+      (start-app-2 instance start-app-commands)
+      )
+    t
+    )
+  )
+
+
+(define (start-app-2 instance start-app-commands)
+  (if start-app-commands
+      (let ((command (car start-app-commands))
+            (rest    (cdr start-app-commands))
+            (process (make-process standard-output)))
+
+        (start-process process command)
+
+        (start-app-3 instance process rest)
+        )
+
+    (display-message "Remote-application failed to start an instance!")
+    ; Empty the queue firstly because the user expects that these invocations
+    ; have irrevocably failed, and secondly to allow further invocations to
+    ; trigger an attempt at starting the application again (in the event that
+    ; the user fixes whatever's wrong).
+    (empty-queue (table-ref instance 'QUEUE))
+    )
+  )
+
+
+(define (start-app-3 instance process start-app-commands)
+  (cond ((remote-application-window instance)
+         t)
+        ((not (process-running-p process))
+         (start-app-2 instance start-app-commands))
+        (t
+         (make-timer
+          (lambda () (start-app-3 instance process start-app-commands))
+          0 200))
+        )
+  )
+
+
+(define (start-app-hook instance w)
+  (let ((window-re (table-ref instance 'WINDOW-RE))
+        (queue     (table-ref instance 'QUEUE)))
+
+    (when (string-match window-re (window-name w))
+      (mapc (lambda (p) (invoke instance
+                                (aref p 0)
+                                (aref p 1)
+                                w
+                                (aref p 2)
+                                ))
+            (queue->list queue))
+      (empty-queue queue)
+      )
+    )
+  )
+
+
+(define (empty-queue q)
+  (unless (queue-empty-p q)
+    (dequeue q)
+    (empty-queue q)
+    )
+  )
+
+
+)

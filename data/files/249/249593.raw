@@ -1,0 +1,65 @@
+macro mustimplement(sig)
+    fname = sig.args[1]
+    arg1 = sig.args[2]
+    if isa(arg1,Expr)
+        arg1 = arg1.args[1]
+    end
+    :($(esc(sig)) = error(typeof($(esc(arg1))),
+                          " must implement ", $(Expr(:quote,fname))))
+end
+
+function pointer_to_iob(buffer::Ptr{Uint8}, bufSize::Cint)
+    iob = IOBuffer()
+    write(iob, buffer, bufSize)
+    seek(iob, 0)
+    return iob
+end
+
+function makeproto{T}(buffer::Ptr{Uint8}, bufSize::Cint, ::Type{T})
+    iob = pointer_to_iob(buffer, bufSize)
+    return readproto(iob, T())
+end
+
+macro proto (protoType, protoBody)
+    return quote
+        pbObj = $protoType()
+        if isa($protoBody, Pair)
+            s,v = $protoBody
+            set_field!(pbObj, s, v)
+        else
+            for (s,v) in $protoBody
+                set_field!(pbObj, s, v)
+            end
+        end
+        pbObj
+    end
+end
+
+function createFramework(name::String; user::String = "")
+    framework = @proto Proto.FrameworkInfo (
+        :name => name,
+        :user => user
+    )
+
+    if haskey(ENV, "MESOS_CHECKPOINT")
+        info("Enabling checkpoint for the framework")
+        set_field!(framework, :checkpoint, true)
+    end
+
+    if haskey(ENV, "MESOS_AUTHENTICATE")
+        info("Enabling authentication for the framework")
+        set_field!(framework, :principal, ENV["DEFAULT_PRINCIPAL"])
+    else
+        set_field!(framework, :principal, "test-framework-julia")
+    end
+
+    return framework
+end
+
+function createResourse(rname::String, rvalue::Float64)
+    return @proto Proto.Resource (
+        :name => rname,
+        :_type => Proto.Value_Type.SCALAR,
+        :scalar => @proto Proto.Value_Scalar (:value => rvalue)
+    )
+end

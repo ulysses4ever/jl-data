@@ -1,0 +1,231 @@
+module dag2048
+
+using jb2048
+import Base.show
+
+abstract DagNode
+
+nutrange(p::Vector{Float64}) = findfirst(p):findlast(p)
+const pal = 10  # probability array length
+ifrozen = [1]       # frozen indices
+ifree = setdiff(1:9, ifrozen)
+
+meandag = Dict{UInt64,DagNode}()
+type MeanNode <: DagNode
+    board::Board
+    # child::Vector{DagNode}
+    proba::Vector{Float64}
+    height::Int
+
+    function MeanNode(b::Board)
+        global meandag::Dict{UInt64,DagNode}
+        bfree = b[ifree]
+        key = hash((ifrozen,bfree))
+        node = get(meandag, key, nothing)
+        node == nothing || return node
+        proba = zeros(pal)
+        height = 0
+        izero = find(b .== 0)  # empty cells (indices)
+        nz = length(izero)
+        p1 = 0.9/nz
+        p2 = 0.1/nz
+        for i in izero
+            b[i] = 1
+            c = MaxNode(copy(b))
+            proba += c.proba * p1
+            h = c.height + 1
+            h > height && (height = h)
+            b[i] = 2
+            c = MaxNode(copy(b))
+            proba += c.proba * p2
+            h = c.height + 1
+            h > height && (height = h)
+            b[i] = 0
+        end
+        # pprec > 0 && (proba = round(proba, pprec))
+        proba = round(proba, 6)
+        meandag[key] = new(b, proba, height)
+    end
+end
+
+itarget = [2, 4]    # target indices
+ixtarget = copy(itarget)  # extended (adjacent) target indices
+append!(ixtarget, [3, 5, 7])
+targetmin, targetmax = 4, 7
+
+maxdag = Dict{UInt64,DagNode}()
+type MaxNode <: DagNode
+    board::Board
+    child::Vector{DagNode}
+    proba::Vector{Float64}
+    best::Tuple{Int,Int}
+    height::Int
+
+    function MaxNode(b::Board)
+        global maxdag::Dict{UInt64,DagNode}
+        bfree = b[ifree]
+        key = hash((ifrozen,bfree))
+        node = get(maxdag, key, nothing)
+        node == nothing || return node
+        child = DagNode[]
+        proba = zeros(pal)
+        # ip = collect(Float64, [1<<i for i=1:10])
+        ip = collect(Float64, 1:pal)
+        best = (0,0)
+        height = 0
+        n = 0
+        sup = maximum(bfree)
+        local p::Float64
+        if sup < targetmax
+            for d = 1:4
+                bs, score, moved = slide(b, d)
+                if moved
+                    bs[ifrozen] == b[ifrozen] || continue
+                    # all(b[ifrozen] .≤ bs[ifrozen]) || continue
+                    sups = maximum(bs[ifree])
+                    isup = find(bs .== sups) ∩ ifree
+                    sups < targetmin || (sups in bs[itarget] && isup ⊆ ixtarget) || continue
+                    n += 1
+                    c = MeanNode(bs)
+                    push!(child, c)
+                    if n < 2
+                        best = (n,d)
+                        proba = c.proba
+                        p = sum(ip .* proba)
+                    else
+                        cp = sum(ip .* c.proba)
+                        cp > p && (p = cp; proba = c.proba; best = (n,d))
+                    end
+                    h = c.height
+                    h > height && (height=h)
+                end
+            end # for d = 1:4
+        end # if sup < targetmax
+        sup > 0 && n == 0 && (proba[sup] = 1.0)
+        if height > 0
+            k = nutrange(proba)
+            if length(k) == 1
+                leaf = true
+                for c in child
+                    proba == c.proba || (leaf = false; break)
+                end
+                leaf && (height = 0)
+            end
+        end
+        maxdag[key] = new(b, child, proba, best, height)
+    end
+end
+
+function newdag(b::Board)
+    empty!(meandag)
+    empty!(maxdag)
+    MaxNode(b)
+end
+
+# isleaf(d::DagNode) = length(d.child) == 0
+isleaf(d::DagNode) = (d.height == 0)
+
+function show(io::IO, d::DagNode)
+    b = d.board
+    m, n = size(b)
+    print(io, "[")
+    for i in 1:m
+        for j in 1:n
+            print(io, " ", b[i,j])
+        end
+        if i < m
+            print(io, ";")
+        else
+            print(io, "]")
+        end
+    end
+    k = nutrange(d.proba)
+    p = d.proba[k]
+    p = round(100*p,2)
+    # isleaf(d) && print(io, " leaf")
+    if isa(d, MeanNode)
+        print(io, " -> proba $k$p height $(d.height)")
+    else
+        print(io, " -> proba $k$p best $(d.best) height $(d.height)")
+    end
+end
+
+function play!(g::Game; moves=32768, display=false)
+    n = g.length
+    if n < 2
+        g.hist = History(128)
+        record(g.hist, g.board, 0, 0)
+    end
+    gf = g[ifrozen]
+    while g.length < n + moves
+        node = MaxNode(g.board)
+        isleaf(node) && break
+        c = node.child[node.best[1]]
+        g.board = copy(c.board)
+        g.board[ifrozen] = gf
+        g.newtile = tileinsert!(g.board)
+        g.length += 1
+        g.depth = node.height   # hack before plotting
+        display && plot(g)
+        record(g)
+    end
+    g.length
+end
+
+function xplay!(g::Game; moves=32768, display=false)
+    global targetmin = 4
+    global target
+    n = g.length
+    if n < 2
+        g.hist = History(128)
+        record(g.hist, g.board, 0, 0)
+    end
+    while g.length < n + moves
+        b = g.board[1:2,:]
+        key = hash(b)
+        node = get(maxdag, key, nothing)
+        if node == nothing
+            target = [1,2,3]
+            node = MaxNode(b)
+        end
+        dir = node.best[2]
+        d = dir
+        if dir in [0, 4]
+            b = g.board[:,1:2]
+            key = hash(b)
+            node = get(maxdag, key, nothing)
+            if node == nothing
+                target = [1,2,4]
+                node = MaxNode(b)
+            end
+            dir = node.best[2]
+            d = 10*d + dir
+            # dir == 2 && (dir = 0)
+        end
+        dir > 0 || break
+        b,score,moved = slide(g.board,dir)
+        moved || break
+        g.board = b
+        g.newtile = tileinsert!(g.board)
+        g.length += 1
+        g.depth = d
+        display && plot(g)
+        record(g)
+    end
+    g.length
+end
+
+function repartition(b::Board, n::Int)
+    hsup = zeros(Int, pal)
+    moves = zeros(Int, n)
+    for i=1:n
+        g = Game(b)
+        play!(g)
+        moves[i] = g.length
+        sup = maximum(g.board[ifree])
+        sup ≤ pal && (hsup[sup] += 1)
+    end
+    hsup, moves
+end
+
+end

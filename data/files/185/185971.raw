@@ -1,0 +1,32 @@
+using JuMP, Ipopt, Junquo
+using BaseTestNext
+
+function test()
+    n = 5
+    srand(12345)
+    q = rand(n) - 0.5
+    Q = rand(n,n)
+    Q = Q'Q  # PSD!
+
+    ipopt_m = Model(solver=IpoptSolver())
+    @defVar(ipopt_m, -i <= x[i=1:n] <= +i)
+    @setObjective(ipopt_m, Min, dot(x,Q*x) + dot(x,q))
+    solve(ipopt_m)
+    ipopt_val = getValue(x)
+
+    junquo_m = Model(solver=JunquoSolver())
+    @defVar(junquo_m, -i <= x[i=1:n] <= +i)
+    @setObjective(junquo_m, Min, dot(x,Q*x) + dot(x,q))
+    solve(junquo_m)
+    junquo_val = getValue(x)
+
+    @show junquo_val
+    @show getObjectiveValue(junquo_m)
+    @show dot(junquo_val,Q*junquo_val) + dot(junquo_val,q)
+
+    @show ipopt_val
+    @show getObjectiveValue(ipopt_m)
+    @show dot(ipopt_val,Q*ipopt_val) + dot(ipopt_val,q)
+end
+
+test()

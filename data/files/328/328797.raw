@@ -1,0 +1,10 @@
+export Response
+
+# exported
+
+type Response
+    headers::Dict{String, String}
+    socket::TcpSocket
+
+    Response(socket::TcpSocket) = new((String => String)[], socket)
+end

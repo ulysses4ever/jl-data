@@ -1,0 +1,49 @@
+function arnold(a::Float64, k::Float64)
+	temp::Float64 = 0.0
+	sum::Float64 = 0.0
+	for j in 1:200
+		temp = rand()
+		for i in 1:50
+			temp = temp + a - k*sin(2*pi*temp)
+		end
+		sum += temp
+	end
+	return sum/(50*200)
+end
+
+a1 = [arnold(a,k) for a in 0.0:0.01:1.0, k in 0.0:0.01:1.0];
+
+
+
+
+C = A[1:101,1:101];
+D = zeros(Float64, 201, 201);
+for i in 1:101, j in 1:101
+D[100+i,100+j] = C[i,j]
+end
+for i in 1:101, j in 1:100
+D[100+i,j] = C[i,101-j]
+end
+for i in 1:100, j in 1:101
+D[i,100+j] = -C[101-i,j]
+end
+for i in 1:100, j in 1:100
+D[i,j] = -C[101-i,101-j]
+end
+IPM.ExportImage(IPM.Endolith(D), "testArnoldMini.png")
+
+
+D = zeros(Float64, 6001, 6001);
+for i in 1:3001, j in 1:3001
+D[3000+i,3000+j] = A[i,j]
+end
+for i in 1:3001, j in 1:3000
+D[3000+i,j] = A[i,3001-j]
+end
+for i in 1:3000, j in 1:3001
+D[i,3000+j] = -A[3001-i,j]
+end
+for i in 1:3000, j in 1:3000
+D[i,j] = -A[3001-i,3001-j]
+end
+IPM.ExportImage(IPM.EndolithModified(D/3.0), "testArnoldModified3.png")

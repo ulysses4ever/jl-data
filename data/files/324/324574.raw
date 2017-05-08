@@ -1,0 +1,17 @@
+###
+### CompLing utils
+###
+
+### collections of some utilities for computational linguistics
+### and natural language processing.
+
+
+module CompLingUtils
+
+import Base: haskey, start, next, done
+
+export Counter, counter
+
+include("counter.jl")
+
+end # module

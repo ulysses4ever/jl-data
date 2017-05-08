@@ -1,0 +1,257 @@
+module CART
+using Jules
+using FPUtil
+using Streaming
+using Logging
+setloglevel()
+
+export
+CARTConf,
+CARTTree,
+CARTNode,
+CategoricalCARTNode,
+ContinuousCARTNode,
+CARTLeaf,
+findsplit,
+buildtree,
+computeprediction,
+sortcategorical,
+GaussianCARTConf
+
+##################################
+## configuration
+##################################
+abstract CARTConf
+maxdepth(conf::CARTConf) = conf.maxdepth
+minnobs(conf::CARTConf) = conf.minnobs
+usepar(conf::CARTConf) = try truthy(conf.usepar) end
+categorical(conf::CARTConf) = try
+  conf.categorical
+  catch
+    [1:0]
+  end
+computeprediction(conf::CARTConf) =
+  error("predictor is not defined for CARTConf of type $(typeof(conf))")
+function process(conf::CARTConf)
+  @assert maxdepth(conf) > 0
+  @assert minnobs(conf) > 0
+end
+
+##################################
+## tree representation
+##################################
+abstract CARTTree
+abstract CARTNode <: CARTTree
+immutable CategoricalCARTNode <: CARTNode
+  feature::Int
+  condition::String
+  loss::Number
+  splitval::Set{Int8}
+  left::CARTTree
+  right::CARTTree
+  size::Int
+
+  CategoricalCARTNode(feature::Int,
+                      loss::Number,
+                      splitval::Set{Int8},
+                      left::CARTTree,
+                      right::CARTTree,
+                      size::Int) =
+                        new(feature,
+                            "in",
+                            loss,
+                            splitval,
+                            left,
+                            right,
+                            size)
+end
+immutable ContinuousCARTNode <: CARTNode
+  feature::Int
+  loss::Number
+  splitval::Number ## left when feature value < splitval
+  left::CARTTree
+  right::CARTTree
+  size::Int
+
+  ContinuousCARTNode(feature::Int,
+                     loss::Number,
+                     splitval::Number,
+                     left::CARTTree,
+                     right::CARTTree,
+                     size::Int) =
+                       new(feature,
+                           "<",
+                           loss,
+                           splitval,
+                           left,
+                           right,
+                           size)
+end
+immutable CARTLeaf <: CARTTree
+  loss::Number
+  pred
+  size::Int
+end
+
+cartnode(feature::Int,
+         loss::Number,
+         splitval::Set{Int8},
+         left::CARTTree,
+         right::CARTTree,
+         size::Int) =
+           CategoricalCARTNode(feature,
+                               loss,
+                               splitval,
+                               left,
+                               right,
+                               size)
+cartnode(feature::Int,
+         loss::Number,
+         splitval::Number,
+         left::CARTTree,
+         right::CARTTree,
+         size::Int) =
+           ContinuousCARTNode(feature,
+                              loss,
+                              splitval,
+                              left,
+                              right,
+                              size)
+
+
+##################################
+## tree construction
+##################################
+
+function sortcategorical(target::Vector, feature::Vector{Int8}, conf::CARTConf)
+  nsamples = length(target)
+
+  grouped = Dict{Int8,Vector{Float64}}()
+  for i in nsamples
+    vs = get!(grouped, feature[i], [])
+    push!(u, convert(Float64, target[i]))
+  end
+
+  pr = computeprediction(conf)
+  catdict = Dict{Int8,Float64}{}
+  for (k, v) in grouped
+    push!(catdict, k, pr(v))
+  end
+
+  @debug "$(length(cats)) levels: $(catdict)"
+
+  sortperm(feature, by = k -> catdict[k]), catdict
+end
+
+findsplit(target::Vector,
+          feature::Vector,
+          perm::Vector,
+          catdict::Union(Nothing,Dict{Int8,FloatingPoint}),
+          conf::CARTConf) =
+  error("findsplit not defined for CARTConf of type $(typeof(conf))")
+
+function _findsplit(target::Vector, feature::Vector, conf::CARTConf, iscategorical::Bool)
+  ## if categorical, sort by their overall prediction
+  perm, catdict = if iscategorical
+     sortcategorical(target, feature, conf)
+  else
+    sortperm(feature), nothing
+  end
+
+  left, right, loss, splitval =
+    findsplit(target, feature, perm, catdict, conf)
+
+  ## if categorical, convert split into a set
+  if iscategorical
+    threshold = catdict[splitval]
+    splitval = Set(keys(filter((k, v) -> v < threshold, catdict)))
+  end
+
+  left, right, loss, splitval
+end
+
+buildtree(target::Vector, features::AbstractArray, conf::CARTConf) =
+  _buildtree(target, features, process(conf), 0)
+
+function _buildtree(target::Vector,
+                    features::AbstractArray,
+                    conf::CARTConf,
+                    depth::Int)
+  nsamples = length(target)
+  nfeatures = size(features, 2)
+
+  @assert (nsamples > 0) && (nsamples == size(features, 1))
+
+  if (depth < maxdepth(conf)) && (nsamples > (2 * minnobs(conf)))
+    candidatesplits = map(i -> _findsplit(target,
+                                         features[:,i],
+                                         conf,
+                                         i in categorical(conf)),
+                          1:nfeatures,
+                          usepar = usepar(conf))
+
+    ((leftidx, rightidx, loss, splitval), featureid) =
+      minby(x -> x[1][2],
+            zipwithindex(candidatesplits))
+
+    cartnode(featureid, loss, splitval,
+             _buildtree(target[leftidx], features[leftidx,:], conf, depth + 1),
+             _buildtree(target[rightidx], features[rightidx,:], conf, depth + 1),
+             nsamples)
+  else
+    CARTLeaf(loss, computeprediction(conf)(target), nsamples)
+  end
+end
+
+##################################
+## gaussian loss
+##################################
+
+immutable GaussianCARTConf <: CARTConf
+  maxdepth::Int
+  minnobs::Int
+  usepar::Bool
+end
+
+computeprediction(conf::GaussianCARTConf) = mean
+
+function findsplit(target::Vector,
+                   feature::Vector,
+                   perm::Vector,
+                   catdict::Union(Nothing,Dict{Int8,FloatingPoint}),
+                   conf::GaussianCARTConf)
+  nsamples = length(target)
+
+  ## initialize by sending all samples into the right branch
+  right = streammse()
+  bestidx, bestmse, bestsplitval = 1, 0.0, feature[perm[1]]
+  for i in perm
+    (a, mse) = streammse(right, target[i], true)
+    bestmse = mse
+    right = a
+  end
+
+  ## iterate through split points
+  left = streammse()
+  for p in 2:nsamples
+    isplit = perm[p]
+    i = perm[p-1]
+    (al, msel) = streammse(left, target[i], true)
+    (ar, mser) = streammse(right, target[i], false)
+
+    ## update best split point
+    ## if the splitval is equal to the previous splitval, skip it
+    if (feature[i] != feature[isplit]) && ((msel + mser) < best)
+      bestidx = isplit
+      bestmse = msel + mser
+      bestsplitval = feature[isplit]
+    end
+    left = al
+    right = ar
+  end
+
+  perm[1:bestidx-1], perm[bestidx:end], bestmse, bestsplitval
+end
+
+
+end ## end module

@@ -1,0 +1,10 @@
+using Laurence,
+      Romeo
+
+app = App(6060)
+
+GET(app, "/favicon.ico") do req::Request, res::Response
+    log(INFO, "favicon ignored!")
+end
+
+Laurence.run(app)

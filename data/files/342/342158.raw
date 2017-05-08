@@ -1,0 +1,61 @@
+############## type defns and constructors #############
+abstract Active
+immutable ASymbol <: Active
+    sym::Symbol
+    dsym::Symbol
+end
+ASymbol(s::Symbol) = ASymbol(s,gensym("d$s"))
+immutable ARef <: Active
+    s::ASymbol
+    ref
+end
+immutable ATrans{A<:Active} <:Active
+    s::A
+end
+immutable ATypeassert{A<:Active} <: Active
+    s::A
+    typ::DataType
+end
+
+immutable Overwriting{A<:Active} <: Active
+    s::A
+    storage::Symbol
+end
+
+dsym(x::ATrans) = Expr(symbol('\''),dsym(x.s))
+dsym(x::ARef) = Expr(:ref,dsym(x.s),x.ref)
+dsym(x::ASymbol) = x.dsym
+dsym(x::ATypeassert) = Expr(:(::),dsym(x.s),x.typ)
+dsym(x::Overwriting) = dsym(x.s)
+sym(x::ATrans) = Expr(symbol('\''),sym(x.s))
+sym(x::ARef) = Expr(:ref,sym(x.s),x.ref)
+sym(x::ASymbol) = x.sym
+sym(x::ATypeassert) = Expr(:(::),sym(x.s),x.typ)
+sym(x::Overwriting) = sym(x.s)
+
+
+sym(x::Symbol) = x
+sym(x::Expr) = x.head == :(::) ? x.args[1] : error("can't take sym($x) with head $(x.head).")
+
+typealias SymDict Dict{Symbol,Any} #for encoding sweep we want to maintain a set of active symbols
+    #so that if active syms appear on the RHS of an assignment we can tag the LHS as active
+
+type AFor #for for-loops, we want to keep track of all active vars inside the block;
+          #including local vars that aren't active outside the loop.
+    loop::Expr
+    block::Expr
+    s::Dict
+end
+
+type AIf
+    ifcond
+    ifTrue
+    ifFalse
+    sTrue::Dict
+    sFalse::Dict
+end
+#AIf(ifcond,ifTrue,ifFalse,sTrue,sFalse) = AIf(ifcond,ifTrue,ifFalse,sTrue,sFalse,:boohoo)
+
+immutable CallExpr{T}
+end
+CallExpr(ex::Expr) = ex.head==:call ? CallExpr{ex.args[1]}() : error("CallExpr(ex::Expr) expects ex.head==:call")

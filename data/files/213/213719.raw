@@ -1,0 +1,24 @@
+# ====================================================================
+# 03_sample.jl - dataframes sample 03
+# sample DataFrames
+# Copyright(C). masaruna@ 2017. All rights reserved.
+# ====================================================================
+using DataFrames
+using DataArrays
+using StatsBase
+using RDatasets
+using DecisionTree
+using ScikitLearn
+using Regression
+using GLM
+using Clustering
+using Distributions
+# using PyPlot
+using Gadfly
+
+df = DataFrame(Number = @data([1, 2, 6, 8, 26]),
+               Name  = @data(["Hydrogen", "Helium", "Carbon", "Oxygen", "Iron"]),
+               AtomicWeight = @data([1.0079, 4.0026, 12.0107, 15.9994, 55.845]),
+               Symbol = @data(["H", "He", "C", "O", "Fe"]),
+               Discovered = @data([1776, 1895, 0, 1774, NA])
+               )

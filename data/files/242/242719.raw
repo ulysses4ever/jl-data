@@ -1,0 +1,27 @@
+type MSet{T}
+	items::Array{T,1}
+end
+
+function MSet{T}(args::T...)
+	coll = T[]
+	for arg in args
+		Base.push!(coll, arg)
+	end
+	coll = unique(coll)
+	MSet(sort!(coll))
+end
+
+MSet() 						=MSet([])
+eltype{T}(::Type{MSet{T}}) 	= T
+similar{T}(s::MSet{T}) 		= MSet()
+push!(X::MSet, Y::MSet) 	= Base.push!(X.items, Y)
+push!(X::MSet, Y::Any) 		= Base.push!(X.items, Y)
+==(X::MSet, Y::MSet) 		= X.items == Y.items
+isempty(X::MSet) 			= isempty(X.items)
+getindex(X::MSet, i::Int) 	= X.items[i]
+
+
+
+
+		
+

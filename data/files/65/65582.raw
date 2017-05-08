@@ -1,0 +1,19 @@
+include("../stack.jl")
+s =  Stack{Int64}(5);
+push!(s,200);
+push!(s,400);
+push!(s,800);
+println(cap(s))
+println(size(s))
+println(top(s))
+println(isempty(s))
+# t.strictEqual(s.cap(), 5);
+# t.strictEqual(s.size(), 3);
+# t.strictEqual(s.top(), 800);
+# t.strictEqual(s.push(500), s.size());
+# t.strictEqual(s.pop(), 500);
+# t.strictEqual(s.pop(), 800);
+# t.strictEqual(s.isempty(), false);
+# t.strictEqual(s.empty(), s);
+# t.strictEqual(s.size(), 0);
+# t.strictEqual(s.isempty(), true);

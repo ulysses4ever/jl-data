@@ -1,0 +1,42 @@
+type ECOC <:MulticlassWithBinaryClassifier
+  binary_models::Vector{Classifier}
+end
+
+
+type ECOCConfig <:MulticlassWithBinaryClassifierConfig
+    binary_classifier_config::ClassifierConfig
+end
+
+
+function fit(c::ECOCConfig,x,y)
+    classes=maximum(y)
+    binary_models=Classifier[]
+
+    for class=1:classes
+      println("Training model for class $class")
+      binary_y=copy(y)
+      binary_y[y.==class]=1
+      binary_y[y.!=class]=-1
+      binary_model=fit(c.binary_classifier_config,x,binary_y)
+      push!(binary_models,binary_model)
+    end
+    ECOC(binary_models)
+end
+function predict(m::ECOC,x)
+    classes=length(m.binary_models)
+    n=length(x)
+    binary_models=Classifier[]
+    results=zeros(n,classes)
+    for class=1:classes
+      binary_model=m.binary_models[class]
+      results[:,class]=predict(binary_model,x)
+    end
+    predicted=zeros(n)
+    for i=1:n
+      detected=find(results[i,:].==1)
+      if length(detected)==1
+        predicted[i]=detected[1]
+      end
+    end
+    predicted
+end

@@ -1,0 +1,161 @@
+module risk
+
+using OVRFF.model
+
+abstract SmoothFunction
+abstract Loss <: SmoothFunction
+abstract Regularizer <: SmoothFunction
+
+function gradient_ffd(func::SmoothFunction, h::model.Linear,
+    X::StridedMatrix{Float64}, y::StridedMatrix{Float64},
+    epsilon::Float64 = 1e-8)
+
+    grad = Matrix{Float64}(2 * h.phi.D, h.phi.kernel.r)
+    buffer = Matrix{Float64}(h.phi.kernel.r, size(X, 2))
+    phi_x = Matrix{Float64}(2 * h.phi.D, size(X, 2))
+    pred = Matrix{Float64}(h.phi.kernel.p, size(X, 2))
+
+    f = (h)->(
+        model.map!(h.phi, X, phi_x);
+        model.predict!(h, phi_x, pred, buffer);
+        risk.eval(func, h, phi_x, y, pred))
+    @inbounds @simd for j in 1:size(h.ff_coefs, 2)
+        @inbounds @simd for i in 1:size(h.ff_coefs, 1)
+            h.ff_coefs[i, j] += epsilon
+            f1 = f(h)
+            h.ff_coefs[i, j] -= 2 * epsilon
+            f2 = f(h)
+            h.ff_coefs[i, j] += epsilon
+            grad[i, j] = (f1 - f2) / (2 * epsilon)
+        end
+    end
+    grad
+end
+
+function gradient_ffd(func::SmoothFunction, h::model.Linear,
+    X::StridedVector{Float64}, y::StridedVector{Float64},
+    epsilon::Float64 = 1e-8)
+
+    grad = Matrix{Float64}(2 * h.phi.D, h.phi.kernel.r)
+    buffer = Vector{Float64}(h.phi.kernel.r)
+    phi_x = Vector{Float64}(2 * h.phi.D)
+    pred = Vector{Float64}(h.phi.kernel.p)
+
+    f = (h)->(
+        model.map!(h.phi, X, phi_x);
+        model.predict!(h, phi_x, pred, buffer);
+        risk.eval(func, h, phi_x, y, pred))
+    @inbounds @simd for j in 1:size(h.ff_coefs, 2)
+        @inbounds @simd for i in 1:size(h.ff_coefs, 1)
+            h.ff_coefs[i, j] += epsilon
+            f1 = f(h)
+            h.ff_coefs[i, j] -= 2 * epsilon
+            f2 = f(h)
+            h.ff_coefs[i, j] += epsilon
+            grad[i, j] = (f1 - f2) / (2 * epsilon)
+        end
+    end
+    grad
+end
+
+function gradient!(loss::Loss, h::model.Linear,
+    phi_x::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64},
+    grad::Matrix{Float64}, buffer::StridedVecOrMat{Float64})
+
+    gradient!(loss, h.phi.kernel, phi_x, pred, y, grad, buffer);
+end
+
+function gradient(loss::Loss, h::model.Linear,
+    X::StridedMatrix{Float64}, y::StridedMatrix{Float64})
+
+
+    grad = Matrix{Float64}(2 * h.phi.D, h.phi.kernel.r)
+    buffer = Matrix{Float64}(h.phi.kernel.r, size(X, 2))
+    phi_x = Matrix{Float64}(2 * h.phi.D, size(X, 2))
+    pred = Matrix{Float64}(h.phi.kernel.p, size(X, 2))
+
+    model.map!(h.phi, X, phi_x)
+    model.predict!(h, phi_x, pred, buffer)
+    fill!(grad, 0)
+    gradient!(loss, h, phi_x, y, pred, grad, buffer)
+
+    grad
+end
+
+function gradient(loss::Loss, h::model.Linear,
+    X::StridedVector{Float64}, y::StridedVector{Float64})
+
+
+    grad = Matrix{Float64}(2 * h.phi.D, h.phi.kernel.r)
+    buffer = Vector{Float64}(h.phi.kernel.r)
+    phi_x = Vector{Float64}(2 * h.phi.D)
+    pred = Vector{Float64}(h.phi.kernel.p)
+
+    model.map!(h.phi, X, phi_x)
+    model.predict!(h, phi_x, pred, buffer)
+    fill!(grad, 0)
+    gradient!(loss, h, phi_x, y, pred, grad, buffer)
+
+    grad
+end
+
+immutable loss_L22 <: Loss
+end
+
+function eval(loss::loss_L22, h::model.Linear,
+    phi_x::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64})
+
+    vecnorm(pred-y)^2 / (2. * size(y, 2))
+end
+
+function gradient!(loss::loss_L22, kernel::model.DecomposableKernel,
+    phi_x::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64},
+    grad::Matrix{Float64}, buffer::StridedVecOrMat{Float64})
+
+    pred -= y;
+    BLAS.gemm!('N', 'N', 1., kernel.B, pred, 0., buffer);
+
+    m = size(phi_x, 2);
+    scale = 1. / m;
+    @inbounds @simd for i = 1:m
+        BLAS.gemm!('N', 'T', scale, slice(phi_x, :, i), slice(buffer, :, i), 1., grad);
+    end
+end
+
+immutable reg_None <: Regularizer
+end
+
+function eval(reg::reg_None, h::model.Linear,
+    phi_x::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64})
+
+    0
+end
+
+function gradient!(reg::reg_None, h::model.Linear,
+    phi_x::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64},
+    grad::Matrix{Float64}, buffer::StridedVecOrMat{Float64})
+
+end
+
+immutable reg_L22 <: Regularizer
+    lambda::Float64
+end
+
+function reg_L22()
+    reg_L22(0)
+end
+
+function eval(reg::reg_L22, h::model.Linear,
+    phi_x::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64})
+
+    reg.lambda * vecnorm(h.ff_coefs)^2 / 2.
+end
+
+function gradient!(reg::reg_L22, h::model.Linear,
+    phi_x::StridedVecOrMat{Float64}, pred::StridedVecOrMat{Float64}, y::StridedVecOrMat{Float64},
+    grad::Matrix{Float64}, buffer::StridedVecOrMat{Float64})
+
+    BLAS.axpy!(length(grad), reg.lambda, h.ff_coefs, stride(h.ff_coefs, 1), grad, stride(grad, 1));
+end
+
+end # module Risk

@@ -1,0 +1,40 @@
+include("jb2048.jl")
+include("dag2048.jl")
+# julia set working module
+
+jb2048.setgamma(jb2048.gamma[2:4,2:4])
+jb2048.setcareful([4,6,9,9])
+
+g=jb2048.initgame()
+    xplay!(g,display=true)
+
+λ,μ=length(maxdag),length(meandag)
+exp(log(λ)/8)
+
+i=-16
+i-=1;plot(g.hist[i]...)
+    h=MaxNode(g.hist[i][1])
+i+=1;plot(g.hist[i]...)
+    h=MaxNode(g.hist[i][1])
+h.child
+jb2048.back!(g,i)
+jb2048.force!(g,2)
+
+@time r=repartition(100,verbose=6:9)
+@time r=repartition(1000)
+
+state=start(maxdag)
+(key,node),state=next(maxdag,state);state,node
+begin
+    while !done(maxdag,state)
+        (key,node),state=next(maxdag,state)
+        b=node.board
+        maximum(b[ifree])==3 && break
+    end
+    plot(node.board,0,node.height)
+    state,node
+end
+node.child
+
+gc()
+empty!(maxdag);empty!(meandag)

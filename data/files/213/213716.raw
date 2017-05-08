@@ -1,0 +1,45 @@
+# ====================================================================
+# ipy_samp01.jl - IPython sample01
+# IPython DataScience Cookbook sample
+# Copyright(C). masaruna@ 2017. All rights reserved.
+# ====================================================================
+using DataFrames
+using RDatasets
+using DecisionTree
+using GLM
+using Regression
+using Clustering
+using ScikitLearn
+using Distributions
+#using PyPlot
+using Gadfly
+
+cd(expanduser("/home/masaruna/Dropbox/python/401_IPython_DataScience_Cookbook/cookbook-data/"))
+
+# get Roger Federar's data
+player = "Roger Federer"
+df = readtable(@sprintf("data/%s.csv", replace(player, " ", "-")))
+
+# Roger Federer's win rate
+df[:win] = df[:winner] .== player
+
+print(
+    "$player has won $(@sprintf("%2.3f", 100 * mean(df[:win]))) of his ATP matches."
+)
+
+d_fmt = Dates.DateFormat("dd.mm.yyyy")
+date = Date(df[:start_date], d_fmt)
+df[:start_date2] = date
+df[:dblfaults] = (df[:player1_double_faults] ./ df[:player1_total_points_total])
+
+by(df, :surface, df -> mean(df[:win]))
+df2 = by(df, :year, df -> DataFrame(mx = maximum(df[:start_date2]), me = mean(dropna(df[:dblfaults]))) )
+
+
+plot(df2, x=:mx, y=:me)
+plot(df, x=:start_date2, y=:dblfaults, Geom.point)
+
+plot(df, x=:dblfaults, Geom.histogram)
+plot(df, x=:start_date2, Geom.histogram)
+
+df[:start_date2] .== Date("2012-01-16")

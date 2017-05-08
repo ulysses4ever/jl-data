@@ -1,0 +1,79 @@
+module SharedWords
+"A measurement of string distance that checks to see how many words are shared between two different strings"
+
+function get_words(string)
+	words_matches = collect(eachmatch(r"\w+",string))
+	word_array = map(x->x.match,words_matches)
+	return word_array
+end
+
+function is_words_in_string(word_array,string)
+	bool_array = map(x->contains(string,x),word_array)
+	summn = sum(map(int,bool_array))
+	return summn
+end
+
+function orderedsharedwords(larger,smaller)
+	"Returns the number of shared words between two strings, where the first argument is shorter than the second"
+	smallwords = get_words(smaller)
+	words_shared = is_words_in_string(smallwords,larger)
+	return words_shared
+end
+
+function sharedwords(string1,string2)
+	"Returns the number of shared words between two strings"
+	"""This version askes for an index: that index is if you 
+	already know that one string is shorter or longer than the other.
+	If that's the case, pass it either one or two and it will know that string1 is larger than string 2 (this is to optimize against sharedwordsmetric which wants this information as well)"""
+	(longer,shorter) = return_strings_in_length_order_descending(string1,string2)
+	#Small words is an array of all the words in shorter
+	smallwords = get_words(smaller)
+	#words_shared is the number of words shared between the two strings
+	words_shared = is_words_in_string(smallwords,larger)
+	return words_shared
+end
+export sharedwords
+function return_strings_in_length_order_descending(string1,string2)
+	"Returns a tuple where the first element is the longer and the second element is the shorter of the two strings"
+	l1 = length(string1)
+	l2 = length(string2)
+	if l1 > l2
+		larger = string1
+		smaller = string2
+	else
+		larger = string2
+		smaller = string1
+	end
+	return (larger,smaller)
+end
+function return_string_in_length_order_descending_with_length_of_smallest(string1,string2)
+"This is completely for sharemetric"
+	function return_strings_in_length_order_descending(string1,string2)
+	"Returns a tuple where the first element is the longer and the second element is the shorter of the two strings"
+	l1 = length(string1)
+	l2 = length(string2)
+	if l1 > l2
+		larger = string1
+		smaller = string2
+		return (larger,smaller,l2)
+
+	else
+		larger = string2
+		smaller = string1
+		return (larger,smaller,l1)
+	end
+end
+
+
+
+function sharemetric(string1,string2)
+	"Returns the number of shared words divided by the length of the smallest string. If the smallest string is a substring of the largest string, this will return 0. Otherwise, it returns 1 - percentage_difference"
+	(longer,shorter,length_of_shortest) = return_strings_in_length_order_descending_with_length_of_shortest(string1,string2)
+	shared = orderedsharedwords(longer,shorter)
+	sharemetric = shared/length_of_shortest
+	return 1-sharemetric
+end
+
+
+
+end # module

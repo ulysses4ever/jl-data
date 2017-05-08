@@ -1,0 +1,12 @@
+export beep
+
+function beep()
+	frequency = 400
+	durationSec = 0.2
+	fVolume = 0.4
+	wave = SinOsc(400) * fVolume
+	play(wave)
+	sleep(durationSec)
+	stop(wave)
+	sleep(durationSec)
+end

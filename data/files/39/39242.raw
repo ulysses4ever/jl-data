@@ -1,0 +1,65 @@
+import Graphs
+import Base.Test
+
+#= Some of the following tests compare hashes of Matlab results with hashes of Julia results. The general procedure was to apply a Matlab function to data, port the result to Julia in binary *.mat format (using Julia's MAT package,) and to compute the hash in Julia. The hash was then hard-coded into the test for comparison with the result of a similar procedure using the equivalent Julia function and data.
+
+For exact, integer results comparing hashes should work across platforms and architectures. My hope is that floating point standards ensure this convenient strategy will work for floating point results as well.
+=#
+
+function test_joint_degree()
+    mhash = 0x4dce541f3ff799d5;
+    g = fve30();
+    jhash = hash(joint_degree(g));
+    Base.Test.@test jhash == mhash;
+    # NOTE: There is no Matlab equivalent for undirected graphs.
+    # 0xc531d72bee210917 is the hash of joint_degree(groupaverage())
+    # which was partially checked by hand.
+    g = groupaverage();
+    jhash = hash(joint_degree(g));
+    Base.Test.@test jhash == 0xc531d72bee210917;
+end
+
+# function `strengths` is extremely straightforward; test omitted.
+
+function test_general_topological_overlap()
+    # Hash of Matlab result from `gtom(GroupAverage_rsfMRI > 0);`
+    mhash = 0x9e7f71212ec5f8ba;
+    g = groupaverage();
+    jhash = hash(general_topological_overlap(g, 2));
+    Base.Test.@test jhash == mhash;
+    # NOTE: There is no Matlab equivalent for directed graphs.
+    # Result on fv30 was partially checked by hand.
+    # hash(general_topological_overlap(fve30(), 2))
+    # 0x047ab4e66cda13ab
+    jhash = hash(general_topological_overlap(fve30(), 2));
+    Base.Test.@test jhash == 0x047ab4e66cda13ab;
+end
+
+function test_edge_neighborhood_overlap()
+    # directed graph
+    mhash = 0x6439ea51befd9c53;
+    jhash = hash(sort(edge_neighborhood_overlap(fve30())));
+    Base.Test.@test jhash==mhash;
+    # undirected graph
+    mhash = 0xa608ef8fda147c45;
+    jhash = hash(sort(edge_neighborhood_overlap(groupaverage())));
+    Base.Test.@test jhash==mhash;
+end
+
+function test_matching_index()
+    # Directed graph
+    mhash1 = 0xbd330304dda88e3f; # Mall, suitably reformatted.
+    mhash2 = 0x3fcf67fa2ff88e55; # Min and Mout, suitably reformatted.
+    Jall, J = matching_index(macaque47());
+    Base.Test.@test hash(Jall) == mhash1;
+    Base.Test.@test hash(J) == mhash2;
+    # Undirected graph
+    mhash = 0x5d312a8c6efebe5f;
+    J = matching_index(groupaverage());
+    Base.Test.@test hash(J) == mhash;
+end
+
+test_joint_degree()
+test_general_topological_overlap()
+test_edge_neighborhood_overlap()
+test_matching_index()

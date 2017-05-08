@@ -1,0 +1,59 @@
+number_names = {"0"=> "",
+                "1"=> "one",
+                "2"=> "two",
+                "3"=> "three",
+                "4"=> "four",
+                "5"=> "five",
+                "6"=> "six",
+                "7"=> "seven",
+                "8"=> "eight",
+                "9"=> "nine",
+                "10"=> "ten",
+                "11"=> "eleven",
+                "12"=> "twelve",
+                "13"=> "thirteen",
+                "14"=> "fourteen",
+                "15"=> "fifteen",
+                "16"=> "sixteen",
+                "17"=> "seventeen",
+                "18"=> "eighteen",
+                "19"=> "nineteen",
+                "20"=> "twenty",
+                "30"=> "thirty",
+                "40"=> "forty",
+                "50"=> "fifty",
+                "60"=> "sixty",
+                "70"=> "seventy",
+                "80"=> "eighty",
+                "90"=> "ninety",
+                "1000"=> "onethousand"}
+
+function number_word(n)
+
+    n_string = string(n)
+    s = length(n_string)
+    words = ""
+    if s == 3
+        fdigit = string(n_string[1])
+        words = join([words, number_names[fdigit], "hundred"])
+        leftover = parseint(n_string[2:end])
+        if leftover != 0
+            words = join([words, "and"])
+        end
+        n_string = string(leftover)
+    end
+    if haskey(number_names, n_string) 
+        words = join([words, number_names[n_string]])
+    else
+        add_z = join([n_string[1] , "0"])
+        words = join([words, number_names[add_z], 
+                      number_names[string(n_string[2])]])
+    end
+    return length(strip(words))
+end
+
+
+sm = @parallel (+) for i in 1:1000
+    number_word(i)
+end
+println(sm)

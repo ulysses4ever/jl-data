@@ -1,0 +1,17 @@
+module CommLib
+	include("signal/mapper.jl");
+	include("signal/convEnc.jl");
+	include("signal/turboEnc.jl");
+	include("channel/addNoise.jl");
+	include("demod/sliceLLR.jl");
+	include("types/TurboParams_t.jl");
+	include("demod/turboDecode.jl");
+	include("stats/measBER.jl");
+	include("utils/dec2bin.jl");
+	include("utils/bin2dec.jl");
+	include("utils/convPolyToTrellis.jl");
+
+	export mapper,addNoise,sliceLLR,measBER;	
+	export dec2bin,bin2dec,convPolyToTrellis,convEnc,turboEnc,turboDecode;
+
+end

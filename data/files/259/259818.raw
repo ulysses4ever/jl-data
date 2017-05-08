@@ -1,0 +1,19 @@
+num_assets = 1
+num_sims = 100000
+gmvs = readcsv("/Users/anirudh/GEM/OpenQuake/Tests/test/event_based_risk/data/case2a_gmfs.csv")
+num_gmfs = size(gmvs, 1)
+gmfs = [GroundMotionField([loc => gmvs[i,loc]
+                           for loc=1:num_assets]) for i=1:num_gmfs]
+
+vf_imls = [0.05, 0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40, 1.60, 1.80, 2.00]
+vf1_mean_lrs = [0.01, 0.04, 0.10, 0.20, 0.33, 0.50, 0.67, 0.80, 0.90, 0.96, 0.99]
+vf1_cov_lrs = [0.03, 0.12, 0.24, 0.32, 0.38, 0.40, 0.38, 0.32, 0.24, 0.12, 0.03]
+
+vf = ContinuousVulnerabilityFunction("LN", vf_imls, vf1_mean_lrs, vf1_cov_lrs)
+
+assets = [Asset("a1", 1, "wood", 1, 10000, 1)]
+
+tax_vf_map = ["wood" => vf]
+
+risk_investigation_time = 1.0
+loss_curve_res = 50

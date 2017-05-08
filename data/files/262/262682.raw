@@ -1,0 +1,9 @@
+f = open("./p099_base_exp.txt")
+pairs = readcsv(f, Float64)
+close(f)
+
+@time res = indmax(mapslices(x -> x[2] * log(x[1]), pairs, [2]))
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(pipe(`echo -n $res`, `md5sum`))

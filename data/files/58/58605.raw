@@ -1,0 +1,108 @@
+include("modules/Utils.jl")
+import Utils: rows, columns
+import JSON
+import Distances
+
+immutable type Item
+  id::Int
+  value::Vector{Float64}
+end
+
+type Cluster
+  id::Int
+  core::Vector{Float64}
+  error::Float64
+end
+
+# Read data from file
+function read_from_file (filename::String, delimiter::Char, items::Vector{Item}, associations)
+  lines = readdlm(filename, delimiter)
+  try # column vector
+    convert(Vector{String}, lines[:,1]) # detect headers
+    map((x) -> push!(items, Item(x - 1, lines[:,x])), 2:columns(lines))
+  catch # row vector
+    map((x) -> push!(items, Item(x - 1, vec(lines[x,:]))), 2:rows(lines))
+  end
+  map((x) -> associations[x] = 0, 1:length(items))
+end
+
+# Add to cluster function
+function set_related_cluster(new_cluster_id::Int, item_id::Int, associations) 
+  associations[item_id] = new_cluster_id
+end
+
+# Select the random starting items for clusters
+function randomize_starting_cluster_cores (items, clusters, number_of_cores, associations)
+  selected_cores = Int[]
+  while length(selected_cores) < number_of_cores
+    new_core = rand(1:length(items))
+    if(all((x) -> (x != new_core), selected_cores))
+      push!(selected_cores, new_core)
+      push!(clusters, Cluster(length(clusters) + 1, items[new_core].value, 0)) 
+      set_related_cluster(length(clusters), new_core, associations)
+    end
+  end
+end
+
+# Compute cluster core // Works only for continuous numeric values
+function compute_cluster_core(items, clusters, cluster_id, associations, error_function)
+  new_vector = zeros(items[1].value)
+  nb_items = 0
+  error = 0.0
+  for item in items
+    if associations[item.id] == cluster_id
+      new_vector += item.value
+      error += Distances.evaluate(error_function, clusters[cluster_id].core, item.value)
+      nb_items += 1
+    end
+  end
+  clusters[cluster_id].core = map((x) -> x / nb_items, new_vector)
+  clusters[cluster_id].error = error
+end
+
+# Kmeans effective function
+function kmeans_iteration (items::Vector{Item}, clusters::Vector{Cluster}, associations, distance_function, error_function, print_intermediate)
+  for item in items
+    distances = Float64[]
+    for cluster in clusters
+      push!(distances, Distances.evaluate(distance_function, cluster.core, item.value))
+    end
+    set_related_cluster(findmin(distances)[2], item.id, associations) # findmin(distances)[2] => index of the smallest distance
+  end
+  return (sum(map((cluster) -> compute_cluster_core(items, clusters, cluster.id, associations, error_function), clusters)) / length(items))
+  # if print_intermediate
+  #   println(items, associations)
+  # end
+end
+
+# Kmeans Wrapper
+function kmeans (data_file_name, data_file_delimiter, number_of_cores, stop_after_iterations, error_epsilon = 0, distance_function = Distances.Euclidean(), error_function = Distances.Euclidean(), print_intermediate = false)
+  items = Item[]::Vector{Item}
+  clusters = Cluster[]::Vector{Cluster}
+  associations = (Int => Int)[]
+  results = (Cluster => Vector{Item})[]
+  error = 0.0::Float64
+  read_from_file(data_file_name, data_file_delimiter, items, associations)
+  randomize_starting_cluster_cores(items, clusters, number_of_cores, associations)
+  for i in 1:stop_after_iterations
+    error = kmeans_iteration(items, clusters, associations, distance_function, error_function, print_intermediate)
+    if print_intermediate 
+      println(error)
+    end
+    if error < error_epsilon 
+      break
+    end
+  end
+
+  # Print results
+  print("{\"clusters\":[")
+  results = String[]
+  for cluster in clusters
+     push!(results, (string("{\"id\":", cluster.id, ",\"items\":", JSON.json(map((association) -> (items[association[1]]), (filter(((a,b) -> b == cluster.id), associations)))), "}")))
+  end
+  print(join(results, ','))
+  println("]}")
+end
+
+# Results
+@time kmeans(ARGS[1], ',', 2, 30)

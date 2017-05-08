@@ -1,0 +1,22 @@
+module DataStructures
+
+import Base: push!, pop!, length, isempty, map
+import Utility: lesser, greater
+
+export BinaryHeap, MinHeap, MaxHeap
+export changekey!, length, peek, value,
+        buildheap!, heapify!,
+        parent, left, right
+        push!, pop!
+
+export List, Cons, Nil
+export cons, nil, head, tail, push, map
+
+export Stack
+export map, isempty, push!, pop!
+
+include("binheap.jl")
+include("list.jl")
+include("stack.jl")
+
+end

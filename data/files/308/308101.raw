@@ -1,0 +1,400 @@
+str = "S3";
+f = 2;
+A = readcsv(string("C:\\Users\\Peter\\Documents\\", str, ".csv"), Int);
+I = div(A[:,1],f);
+J = div(A[:,2],f);
+V = convert(Float32,1)*A[:,3];
+minIndex = min(minimum(I),minimum(J));
+maxIndex = max(maximum(I),maximum(J));
+crop = div(3*minIndex,4);
+N = minIndex + maxIndex - 2*crop;
+B = full(sparse(I-crop,J-crop,V,N,N));
+C = zeros(Float32,N,N);
+
+function shift(i::Int,n::Int)
+	return mod(i-n/2-1,n)-n/2;
+end
+
+function Lorentz(i::Int,j::Int,n::Int)
+	alpha = 0.020;
+	return convert(Float32,alpha/(shift(i,n)^2+shift(j,n)^2+alpha));
+end
+
+function fillLorentz(C,N)
+	for i in [1:N]
+		for j in [1:N]
+			C[i,j] = 100*Lorentz(i,j,N)
+		end
+	end
+end
+
+function ImageWrite(A,name)
+	imwrite(convert(Image,A),string(name,".png"));
+end
+
+function cconv(a,b)
+	return abs(ifft(fft(a).*fft(b)));
+end
+
+function cconvReal(a,b)
+	n = size(a)[1];
+	return abs(irfft(rfft(a).*rfft(b),n));
+end
+
+function Colorize(A)
+	(n1,n2)=size(A);
+	temp = 0.0;
+	B = zeros(Float32,n1,n2,3);
+	for i in [1:n1]
+		for j in [1:n2]
+			temp = A[i,j];
+			B[i,j,1] = 1.0*temp;
+			B[i,j,2] = 0.3*temp;
+			B[i,j,3] = 0.1*temp;
+		end
+	end
+	return B;
+end
+
+function exportImage(B,C,str)
+	ImageWrite(Colorize(cconvReal(B,C)),str);
+end
+#To more efficiently convolve, do a rfft! in-place on blur target, 
+#do a rfft! in-place of the blur kernel, multiply in-place, and 
+#then irfft! in-place. Uses no more storage than original target and
+#blur kernel.
+
+#Further gains can be gotten by computing the symmetry-folded blur kernel first,
+#computing its type-1 DCT, replacing the blur kernel with the target,
+#in-place rfft!ing the target, multiplying by the unfolded DCT, and in-place 
+#irfft!ing it to only use 5/8th of the storage. However, if the FFT uses
+#the bulk of the maximum RAM used, this may not be helpful. Also, it's
+#restricted to only even-length targets (odd-length requires type-V through
+#type-VIII transforms or something).
+
+#Mathematica DCT I and FFTW DCT I differ by a constant, but if we're just blurring
+#then it shouldn't be a problem.
+
+#Okay, so there's no such thing as rfft!, since the array sizes don't match.
+#You can do A = rfft(A), but automatic garbage-collection does not appear to
+#be used for variables overwritten by other values, so the max memory usage is
+#the same as if there was B = rfft(A) and then A is cleared.
+
+
+
+#FFT TESTS (5000x5000 random array):
+#Object size 100MB
+#Rand takes ~100MB and 0.13 sec.
+#fft takes ~300MB and 1.5 sec.
+#rfft takes ~200MB and 1.0 sec.
+
+#FFT (10000x10000 random)
+#Allocate takes 0.38 sec, 400MB;
+#fft(A) takes 3.2 sec and 800MB.
+#rfft(A) takes 2 sec and 400MB.
+#dct(A) takes 4.3 sec and 400MB.
+#dct!(A) takes 4.1 sec and 0MB.
+#idct!(A) takes 4.0 sec and 0MB.
+#dctI(A) takes 9.8 sec and 400MB.
+#Interestingly, dctI is twice as slow as dctII, dctIII and dctIV, which all take roughly the same time.
+#dctI!(A) takes 9.8 sec and 0MB.
+
+#Monocolor version
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+(str, alpha, beta, gamma, f, p, outStr) = ("S20", 13.0f0, 0.4f0, 1.25f0, 2.0f0, 500, "S20out");
+@time (I, J, V) = ImportSparse(str);
+@time (I, J, N1, N2) = RescaleSparse(I, J, f, p);
+M1 = div(N1, 2) + 1;
+M2 = div(N2, 2) + 1;
+@time A = RCpair(full(sparse(I, J, V, N1, N2)));
+gc();
+@time rfft!(A);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+@time SpectralMultiply_Real_RealEven(A, B);
+@time irfft!(A);
+B = 0; 
+gc();
+@time B = zeros(Uint8, 3, N1, N2);
+@time ColorizeUint8(A, B);
+A = 0;
+gc();
+@time ImageWrite(B, outStr);
+B = 0;
+gc();
+
+#Color version (need to fix scale! or use something else to clear A)
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+(str, alpha, beta, gamma, f, p, outStr) = ("S20colored3", 13.0f0, 0.1f0, 1.25f0, 2.0f0, 20, "S20colored3big");
+@time (I, J, V1, V2, V3) = ImportSparse(str);
+@time (I, J, N1, N2) = RescaleSparse(I, J, f, p);
+M1 = div(N1, 2) + 1;
+M2 = div(N2, 2) + 1;
+
+@time A = RCpair(full(sparse(I, J, V1, N1, N2)));
+gc();
+@time rfft!(A);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+@time SpectralMultiply_Real_RealEven(A, B);
+@time irfft!(A);
+B = 0; 
+gc();
+@time Ba = zeros(Uint8, 3, N1, N2);
+@time ColorizeUint8(A, Ba, 1);
+
+@time scale!(A.R, 0.0f0);
+@time A = FillRCpair(A, I, J, V2);
+@time rfft!(A);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+@time SpectralMultiply_Real_RealEven(A, B);
+@time irfft!(A);
+B = 0; 
+gc();
+@time ColorizeUint8(A, Ba, 2);
+
+@time scale!(A.R, 0.0f0);
+@time A = FillRCpair(A, I, J, V3);
+@time rfft!(A);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+@time SpectralMultiply_Real_RealEven(A, B);
+@time irfft!(A);
+B = 0; 
+gc();
+@time ColorizeUint8(A, Ba, 3);
+A = 0;
+gc();
+
+@time ImageWrite(Ba, outStr);
+Ba = 0;
+gc();
+
+#Check the speed of scale! on subarrays.
+
+#Symmetry-reduced monocolor version
+
+#Note that for DCT-I, the fastest size is of the form M = 2^k + 1, not M = 2^k.
+
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+(str, alpha, beta, gamma, f, p, outStr) = ("S19symmetryreduced", 13.0f0, 0.2f0, 1.25f0, 1.636f0, 1, "S19biggereven");
+@time (I, J, V) = ImportSparse(str);
+@time (I, J, M1, M2) = RescaleSparse(I, J, f, p);
+@time A = full(sparse(I, J, V, M1, M2));
+@time FFTW.r2r!(A, FFTW.REDFT00);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+B = 0;
+gc();
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time B = zeros(Uint8, 3, 2*M1, 2*M2);
+@time ColorizeUint8Symmetric(A, B);
+A = 0;
+gc();
+@time ImageWrite(B, outStr);
+B = 0;
+gc();
+
+
+#Root visualizer
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+(str, alpha, beta, gamma, f, p, outStr) = ("quadratics", 13.0f0, 0.2f0, 1.25f0, 2.0f0, 1, "quadratics");
+@time (I, J, V) = ImportSparse(str);
+@time (I, J, M1, M2) = RescaleSparse(I, J, f, p);
+M1 = 2^13 + 1;
+M2 = 2^12 + 1;
+@time A = zeros(Float32, M1, M2);
+@time FillMatrix(A, I, J, V);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+B = 0;
+gc();
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time B = zeros(Uint8, 3, 2*M1, 2*M2);
+@time ColorizeUint8Symmetric(A, B);
+A = 0;
+gc();
+@time ImageWrite(B, outStr);
+B = 0;
+gc();
+
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+(str, alpha, beta, gamma, f, p, outStr) = ("cubics", 13.0f0, 0.1f0, 1.25f0, 4.0f0, 1, "cubicsmall");
+@time (I, J, V) = ImportSparse(str);
+@time (I, J, M1, M2) = RescaleSparse(I, J, f, p);
+M1 = 2^12 + 1;
+M2 = 3*(2^10) + 1;
+@time A = zeros(Float32, M1, M2);
+@time FillMatrix(A, I, J, V);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+B = 0;
+gc();
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time B = zeros(Uint8, 3, 2*M1, 2*M2);
+@time ColorizeUint8Symmetric(A, B);
+A = 0;
+gc();
+@time ImageWrite(B, outStr);
+B = 0;
+gc();
+
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); using FFTW; include("HiRes.jl");
+(alpha, beta, gamma, f, p, outStr) = (10.0f0, 0.2f0, 1.25f0, 1.0f0, 1, "quadcubbig");
+@time (Iquad, Jquad, Vquad) = ImportSparse("quadratics");
+@time (Iquad, Jquad, M1, M2) = RescaleSparse(Iquad, Jquad, f, p);
+Vquad *= 10;
+@time (Icube, Jcube, Vcube) = ImportSparse("cubics");
+@time (Icube, Jcube, M1, M2) = RescaleSparse(Icube, Jcube, f, p);
+M1 = 2^14 + 1;
+M2 = 3*(2^12) + 1;
+@time A = zeros(Float32, M1, M2);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+gc();
+@time Ba = zeros(Uint8, 2*M1, 2*M2, 3);
+gc();
+
+@time FillMatrix(A, Iquad, Jquad, 1.0f0*Vquad);
+@time FillMatrix(A, Icube, Jcube, 0.3f0*Vcube);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time ColorizeUint8Symmetric(A, Ba, 1);
+A *= 0;
+
+@time FillMatrix(A, Iquad, Jquad, 0.3f0*Vquad);
+@time FillMatrix(A, Icube, Jcube, 1.0f0*Vcube);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time ColorizeUint8Symmetric(A, Ba, 2);
+A *= 0;
+
+@time FillMatrix(A, Iquad, Jquad, 0.1f0*Vquad);
+@time FillMatrix(A, Icube, Jcube, 0.1f0*Vcube);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time ColorizeUint8Symmetric(A, Ba, 3);
+A *= 0;
+
+A = 0;
+B = 0;
+(Iquad, Jquad, Vquad, Icube, Jcube, Vcube) = (0,0,0,0,0,0);
+gc();
+
+@time ImageWrite(Ba, outStr);
+Ba = 0;
+gc();
+
+#I think that Images needs more RAM to export an image whose colordim is 3, since the native disk format has it with colordim 1, so it makes an extra transposed copy of the image or something?
+
+#Root visualizer using sparse matrices
+
+using Images; cd("J:\\Julia"); include("fftw.jl"); include("MatrixMarket.jl"); using FFTW; using MatrixMarket; include("HiRes.jl");
+(str, alpha, beta, gamma, f, p, outStr) = ("CubicsBig.mtx", 13.0f0, 0.1f0, 1.25f0, 6.0f0, 1, "cubics");
+@time (I, J, V) = findnz(MatrixMarket.mmread(str)[1:60000,1:40000]);
+@time (I, J, M1, M2) = RescaleSparse(I, J, f, p);
+@time A = zeros(Float32, M1, M2);
+@time FillMatrix(A, I, J, V);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma);
+@time FFTW.r2r!(B, FFTW.REDFT00);
+A .*= B;
+A /= 4*(M1-1)*(M2-1);
+B = 0;
+gc();
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time B = zeros(Uint8, 3, 2*M1, 2*M2);
+@time ColorizeUint8Symmetric(A, B);
+A = 0;
+gc();
+@time ImageWrite(B, outStr);
+B = 0;
+gc();
+
+#Quadratics and cubics, only 1/4 of image
+cd("J:\\Julia"); include("fftw.jl"); include("MatrixMarket.jl"); 
+using FFTW; using MatrixMarket; include("HiRes.jl");
+(alpha, beta, gamma, f, p, outStr) = (4.0f0, 0.3f0, 1.3f0, 1.0f0, 1, "Quarter Cubics and Quadratics4");
+@time (Icube, Jcube, Vcube) = findnz(MatrixMarket.mmread("CubicsBig.mtx")[1:(2^15),1:(2^13*3)]);
+@time (Iquad, Jquad, Vquad) = findnz(MatrixMarket.mmread("QuadraticsBig.mtx")[1:(2^15),1:(2^13*3)]);
+@time (Icube, Jcube, temp1, temp2) = RescaleSparse(Icube, Jcube, f, p);
+@time (Iquad, Jquad, temp1, temp2) = RescaleSparse(Iquad, Jquad, f, p);
+gc();
+M1 = 2^15 + 1;
+M2 = 2^13*3 + 1;
+@time A = zeros(Float32, M1, M2);
+gc();
+@time B = LorentzKernel(M1, M2, alpha, beta, gamma); 
+gc();
+@time Ba = zeros(Uint8, 3, M1, M2);
+gc();
+@time FFTW.r2r!(B, FFTW.REDFT00);
+
+@time FillMatrix(A, Iquad, Jquad, 1.0f0*Vquad);
+@time FillMatrix(A, Icube, Jcube, 0.3f0*Vcube);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+ElementwiseProduct(A, B);
+scale!(A, float32(1/(4*(M1-1)*(M2-1))));
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time ColorizeUint8(A, Ba, 1);
+scale!(A, 0.0f0);
+
+@time FillMatrix(A, Iquad, Jquad, 0.3f0*Vquad);
+@time FillMatrix(A, Icube, Jcube, 1.0f0*Vcube);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+ElementwiseProduct(A, B);
+scale!(A, float32(1/(4*(M1-1)*(M2-1))));
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time ColorizeUint8(A, Ba, 2);
+scale!(A, 0.0f0);
+
+@time FillMatrix(A, Iquad, Jquad, 0.1f0*Vquad);
+@time FillMatrix(A, Icube, Jcube, 0.1f0*Vcube);
+@time FFTW.r2r!(A, FFTW.REDFT00);
+ElementwiseProduct(A, B);
+scale!(A, float32(1/(4*(M1-1)*(M2-1))));
+@time FFTW.r2r!(A, FFTW.REDFT00);
+gc();
+@time ColorizeUint8(A, Ba, 3);
+scale!(A, 0.0f0);
+
+A = 0;
+B = 0;
+(Iquad, Jquad, Vquad, Icube, Jcube, Vcube) = (0,0,0,0,0,0);
+gc();
+
+using Images
+@time ImageWrite(Ba, outStr);
+Ba = 0;
+gc();
+

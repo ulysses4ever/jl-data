@@ -1,0 +1,9 @@
+import pe
+
+for i in 1:10^12
+    n = pe.triangle(i)
+    if length(pe.divisors(n)) > 500
+        println(n)
+        quit()
+    end
+end

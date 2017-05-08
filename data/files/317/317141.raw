@@ -1,0 +1,32 @@
+
+# an iterator for an NxT matrix, N is number of features, T is number of time points
+type VectorTimeSeries
+  X::Array
+end
+
+Base.start(v::VectorTimeSeries) = 1
+Base.done(v::VectorTimeSeries, state) = size(v.X)[2] == state-1
+Base.next(v::VectorTimeSeries, state) = v.X[:, state], state+1
+
+
+type GaussianTimeSeries
+  N::Integer
+  mean::Float64
+  sd::Float64
+end
+
+Base.start(g::GaussianTimeSeries) = 1
+Base.done(g::GaussianTimeSeries, state) = false
+Base.next(g::GaussianTimeSeries, state) = randn(g.N)*g.sd + g.mean, state+1
+
+
+function construct_input_stream(cfg, num_inputs)
+
+  istream = None
+  if cfg["name"] == "gaussian"
+    istream = GaussianTimeSeries(num_inputs, cfg["mean"], cfg["sd"])
+  end
+
+  return istream
+end
+

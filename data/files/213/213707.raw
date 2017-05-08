@@ -1,0 +1,4 @@
+using Gadfly
+M = sprand(300, 300, 0.1)  # generate a sparse matrix with density 0.1 of non-zeros
+M = full(M)
+display(spy(M))

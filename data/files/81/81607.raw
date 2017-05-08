@@ -1,0 +1,76 @@
+# IJulia hooks for displaying plots with RCall
+
+# TODO: create a special graphics device. This would allow us to not accidently close devices opened by users, and display plots immediately as they appear.
+
+ijulia_mime = nothing
+
+@doc """
+Set options for R plotting with IJulia.
+
+The first argument should be a MIME object: currently supported are
+* `MIME("image/png")` [default]
+* `MIME("image/svg+xml")`
+
+The remaining arguments (keyword only) are passed to the appropriate R graphics
+device: see the relevant R help for details.
+"""->
+function ijulia_setdevice(m::MIME;kwargs...)
+    global ijulia_mime
+    reval("options(device = function(filename='$(ijulia_file_fmt)',...) $(rdevicename(m))(filename,...))")
+    ijulia_mime = m
+    nothing
+end
+ijulia_setdevice(m::MIME"image/png") = ijulia_setdevice(m,width=6*72,height=5*72)
+ijulia_setdevice(m::MIME"image/svg+xml") = ijulia_setdevice(m,width=6,height=5)
+
+rdevicename(m::MIME"image/png") = :png
+rdevicename(m::MIME"image/svg+xml") = :svg
+
+
+function ijulia_displayfile(m::MIME"image/png", f)
+    open(f) do f
+        d = readbytes(f)
+        display(Main.IPythonDisplay.InlineDisplay(),m,d)
+    end
+end
+function ijulia_displayfile(m::MIME"image/svg+xml", f)
+    open(f) do f
+        d = readall(f)
+        display(Main.IPythonDisplay.InlineDisplay(),m,d)
+    end
+end
+
+@doc """
+Called after cell evaluation.
+Closes graphics device and displays files in notebook.
+"""->
+function ijulia_displayplots()
+    if rcopy(Int,"dev.cur()") != 1
+        rcopy(Int,"dev.off()")
+        for fn in sort(readdir(ijulia_file_dir))
+            ffn = joinpath(ijulia_file_dir,fn)
+            ijulia_displayfile(ijulia_mime,ffn)
+            rm(ffn)
+        end
+    end
+end
+
+# cleanup after error
+function ijulia_cleanup()
+    if rcopy(Int,"dev.cur()") != 1
+        rcopy(Int,"dev.off()")
+    end
+    for fn in readdir(ijulia_file_dir)
+        ffn = joinpath(ijulia_file_dir,fn)
+        rm(ffn)
+    end
+end
+
+function ijulia_init()
+    global const ijulia_file_dir = tempname()
+    mkpath(ijulia_file_dir)
+    global const ijulia_file_fmt = joinpath(ijulia_file_dir,"rij_%03d")
+    Main.IJulia.push_postexecute_hook(ijulia_displayplots)
+    Main.IJulia.push_posterror_hook(ijulia_cleanup)
+    ijulia_setdevice(MIME"image/png"())
+end

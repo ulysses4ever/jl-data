@@ -1,0 +1,53 @@
+abstract AbstractFinancialContract
+
+type FinancialContract <: AbstractFinancialContract
+	id::Int
+	portfolio::Vector{ASCIIString}
+	model::PricingModel
+	attributes::Dict{ASCIIString, Union{Float64, Int, ASCIIString, Date}}
+	log::Vector{ASCIIString}
+
+	FinancialContract(id::Int, portfolio::Vector{ASCIIString}, model::PricingModel) = new(id, portfolio, model, Dict{ASCIIString, Union{Float64, Int, ASCIIString, Date}}(), Vector{ASCIIString}())
+end
+
+# Namespace for string constants
+module FC_KEYS
+	const MATURITY = "MATURITY"
+	const NOTIONAL = "NOTIONAL"
+	const ASSET_LIABILITY = "ASSET_LIABILITY"
+	const FORWARD_PRICE = "FORWARD_PRICE"
+	const QUANTITY = "QUANTITY"
+end
+
+fc_set_maturity!(fc::FinancialContract, maturity::Date) = fc.attributes[FC_KEYS.MATURITY] = maturity
+fc_get_maturity(fc::FinancialContract) = fc.attributes[FC_KEYS.MATURITY]::Date
+
+fc_set_notional!(fc::FinancialContract, notional::Float64) = fc.attributes[FC_KEYS.NOTIONAL] = notional
+fc_get_notional(fc::FinancialContract) = fc.attributes[FC_KEYS.NOTIONAL]::Float64
+
+function fc_set_asset_liability!(fc::FinancialContract, a_l::String)
+	if !(a_l in ["a", "l"])
+		error("ASSET_LIABILITY should be either a or l. Found $(a_l)")
+	end
+	fc.attributes[FC_KEYS.ASSET_LIABILITY] = a_l
+end
+
+fc_get_asset_liability(fc::FinancialContract) = fc.attributes[FC_KEYS.ASSET_LIABILITY]::ASCIIString
+
+# Obtains ASSET/LIABILITY multiplier.
+# Returns 1.0 if "a", -1.0 if "l". Throws error otherwise.
+function fc_get_asset_liability_multiplier(fc::FinancialContract)
+	a_l = fc_get_asset_liability(fc)
+	if a_l == "a"
+		return 1.0
+	elseif a_l == "l"
+		return -1.0
+	end
+	error("ASSET_LIABILITY should be equal to 'a' or 'l'. Found $(a_l).")
+end
+
+fc_set_forward_price!(fc::FinancialContract, fp::Float64) = fc.attributes[FC_KEYS.FORWARD_PRICE] = fp
+fc_get_forward_price(fc::FinancialContract) = fc.attributes[FC_KEYS.FORWARD_PRICE]::Float64
+
+fc_set_quantity!(fc::FinancialContract, qty::Float64) = fc.attributes[FC_KEYS.QUANTITY] = qty
+fc_get_quantity(fc::FinancialContract) = fc.attributes[FC_KEYS.QUANTITY]::Float64

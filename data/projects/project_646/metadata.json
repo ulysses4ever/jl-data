@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 18:01:01 GMT
+Date: Wed, 03 May 2017 21:01:07 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 5121
+Content-Length: 5988
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 2950
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 3995
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "439ed28b56484d3ef8c999480e6d2771"
-Last-Modified: Sat, 22 Oct 2016 15:05:04 GMT
+ETag: "2f34672c60a58ba09225f8cf1c25d1e0"
+Last-Modified: Sun, 31 Jan 2016 20:01:44 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,84 +22,84 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: 7b641bda7ec2ca7cd9df72d2578baf75
-X-GitHub-Request-Id: EA31:6633:DD68DD:11EAEEF:590231DD
+X-Served-By: 3e3b9690823fb031da84658eb58aa83b
+X-GitHub-Request-Id: 3C3A:5C90:ABEE13:DCE865:590A4513
 
 {
-  "id": 50530142,
-  "name": "PortAudio.jl",
-  "full_name": "seebk/PortAudio.jl",
+  "id": 41455058,
+  "name": "rgb_animation_julia",
+  "full_name": "mikesj-public/rgb_animation_julia",
   "owner": {
-    "login": "seebk",
-    "id": 1400917,
-    "avatar_url": "https://avatars0.githubusercontent.com/u/1400917?v=3",
+    "login": "mikesj-public",
+    "id": 11404182,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/11404182?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/seebk",
-    "html_url": "https://github.com/seebk",
-    "followers_url": "https://api.github.com/users/seebk/followers",
-    "following_url": "https://api.github.com/users/seebk/following{/other_user}",
-    "gists_url": "https://api.github.com/users/seebk/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/seebk/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/seebk/subscriptions",
-    "organizations_url": "https://api.github.com/users/seebk/orgs",
-    "repos_url": "https://api.github.com/users/seebk/repos",
-    "events_url": "https://api.github.com/users/seebk/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/seebk/received_events",
+    "url": "https://api.github.com/users/mikesj-public",
+    "html_url": "https://github.com/mikesj-public",
+    "followers_url": "https://api.github.com/users/mikesj-public/followers",
+    "following_url": "https://api.github.com/users/mikesj-public/following{/other_user}",
+    "gists_url": "https://api.github.com/users/mikesj-public/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/mikesj-public/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/mikesj-public/subscriptions",
+    "organizations_url": "https://api.github.com/users/mikesj-public/orgs",
+    "repos_url": "https://api.github.com/users/mikesj-public/repos",
+    "events_url": "https://api.github.com/users/mikesj-public/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/mikesj-public/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/seebk/PortAudio.jl",
-  "description": "PortAudio wrapper for Julia",
+  "html_url": "https://github.com/mikesj-public/rgb_animation_julia",
+  "description": "The goal is to make an animation that has every 8-bit RGB color in an animation exactly once (one pixel in one frame), and to make it look decent",
   "fork": false,
-  "url": "https://api.github.com/repos/seebk/PortAudio.jl",
-  "forks_url": "https://api.github.com/repos/seebk/PortAudio.jl/forks",
-  "keys_url": "https://api.github.com/repos/seebk/PortAudio.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/seebk/PortAudio.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/seebk/PortAudio.jl/teams",
-  "hooks_url": "https://api.github.com/repos/seebk/PortAudio.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/seebk/PortAudio.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/seebk/PortAudio.jl/events",
-  "assignees_url": "https://api.github.com/repos/seebk/PortAudio.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/seebk/PortAudio.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/seebk/PortAudio.jl/tags",
-  "blobs_url": "https://api.github.com/repos/seebk/PortAudio.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/seebk/PortAudio.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/seebk/PortAudio.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/seebk/PortAudio.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/seebk/PortAudio.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/seebk/PortAudio.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/seebk/PortAudio.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/seebk/PortAudio.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/seebk/PortAudio.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/seebk/PortAudio.jl/subscription",
-  "commits_url": "https://api.github.com/repos/seebk/PortAudio.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/seebk/PortAudio.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/seebk/PortAudio.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/seebk/PortAudio.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/seebk/PortAudio.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/seebk/PortAudio.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/seebk/PortAudio.jl/merges",
-  "archive_url": "https://api.github.com/repos/seebk/PortAudio.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/seebk/PortAudio.jl/downloads",
-  "issues_url": "https://api.github.com/repos/seebk/PortAudio.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/seebk/PortAudio.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/seebk/PortAudio.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/seebk/PortAudio.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/seebk/PortAudio.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/seebk/PortAudio.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/seebk/PortAudio.jl/deployments",
-  "created_at": "2016-01-27T18:56:01Z",
-  "updated_at": "2016-10-22T15:05:04Z",
-  "pushed_at": "2016-04-04T15:09:07Z",
-  "git_url": "git://github.com/seebk/PortAudio.jl.git",
-  "ssh_url": "git@github.com:seebk/PortAudio.jl.git",
-  "clone_url": "https://github.com/seebk/PortAudio.jl.git",
-  "svn_url": "https://github.com/seebk/PortAudio.jl",
-  "homepage": null,
-  "size": 22,
-  "stargazers_count": 4,
-  "watchers_count": 4,
+  "url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia",
+  "forks_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/forks",
+  "keys_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/teams",
+  "hooks_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/hooks",
+  "issue_events_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/events",
+  "assignees_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/tags",
+  "blobs_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/languages",
+  "stargazers_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/stargazers",
+  "contributors_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/contributors",
+  "subscribers_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/subscribers",
+  "subscription_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/subscription",
+  "commits_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/merges",
+  "archive_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/downloads",
+  "issues_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/labels{/name}",
+  "releases_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/mikesj-public/rgb_animation_julia/deployments",
+  "created_at": "2015-08-26T23:34:41Z",
+  "updated_at": "2016-01-31T20:01:44Z",
+  "pushed_at": "2015-09-11T13:03:41Z",
+  "git_url": "git://github.com/mikesj-public/rgb_animation_julia.git",
+  "ssh_url": "git@github.com:mikesj-public/rgb_animation_julia.git",
+  "clone_url": "https://github.com/mikesj-public/rgb_animation_julia.git",
+  "svn_url": "https://github.com/mikesj-public/rgb_animation_julia",
+  "homepage": "",
+  "size": 167,
+  "stargazers_count": 9,
+  "watchers_count": 9,
   "language": "Julia",
   "has_issues": true,
   "has_projects": true,
@@ -108,10 +108,10 @@ X-GitHub-Request-Id: EA31:6633:DD68DD:11EAEEF:590231DD
   "has_pages": false,
   "forks_count": 1,
   "mirror_url": null,
-  "open_issues_count": 2,
+  "open_issues_count": 0,
   "forks": 1,
-  "open_issues": 2,
-  "watchers": 4,
+  "open_issues": 0,
+  "watchers": 9,
   "default_branch": "master",
   "permissions": {
     "admin": false,
@@ -119,5 +119,5 @@ X-GitHub-Request-Id: EA31:6633:DD68DD:11EAEEF:590231DD
     "pull": true
   },
   "network_count": 1,
-  "subscribers_count": 1
+  "subscribers_count": 3
 }

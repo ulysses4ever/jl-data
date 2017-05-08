@@ -1,0 +1,30 @@
+# Walter O'Keefe
+# Created 2015-01-10
+# Project Euler, problem 04
+#   A palindromic number reads the same both ways. The largest palindrome made
+#   from the product of two 2-digit numbers is 9009 = 91 × 99.
+#   Find the largest palindrome made from the product of two 3-digit numbers.
+
+# some useful functions
+
+# determine if a number is a palindrome
+ispal(n::Int) = digits(a) == reverse(digits(a))
+
+# create minimum base-10 number with d digits
+getmin(d::Int) = 10^(d-1)
+
+# create maximum base-10 number with d digits
+getmax(d::Int) = (10^d)-1
+
+function eul004(d::Int)
+    dmax = getmax(d)
+    threshold = dmax/10 # arbitrary threshold
+    nums = fill(dmax,2)
+    for l = 0:threshold
+        for i = 0:threshold
+            x = int((nums[1]-i) * nums[2])
+            ispal(x) && return [x nums[1]-i nums[2]]
+        end
+        nums[2] -= 1;
+    end
+end

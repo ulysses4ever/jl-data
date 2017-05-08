@@ -1,0 +1,38 @@
+using Jules, Streaming
+using Base.Test
+
+function MomentsTests()
+  xs = [0.101,-0.172,0.183,0.045,0.408,-1.156,-0.064,0.282,1.145,-1.042,1.595,-0.212,-0.606,-0.464,0.64,-0.957,0.773,0.274,0.631,-0.526]
+  mmts = foldl(update, emptymoments(), xs)
+
+  @test_approx_eq_eps(mean(xs), mean(mmts), 0.001)
+  @test_approx_eq_eps(var(xs), var(mmts), 0.03)
+  @test_approx_eq_eps(skewness(xs), skewness(mmts), 0.001)
+  @test_approx_eq_eps(kurtosis(xs), kurtosis(mmts), 0.001)
+
+  n = 100
+  for i in 1:n
+    k = rand(100:1000)
+    xs = sqrt(rand(1:10000,k))
+
+    mmts = foldl(update, emptymoments(), xs)
+
+    m1 = mean(xs)
+    m2 = mean(mmts)
+    @test_approx_eq_eps(m1, m2, 0.03 * abs(m1))
+
+    v1 = std(xs)
+    v2 = std(mmts)
+    @test_approx_eq_eps(v1, v2, 0.03 * abs(v1))
+
+    s1 = skewness(xs)
+    s2 = skewness(mmts)
+    @test_approx_eq_eps(s1, s2, 0.03 * abs(s1))
+
+    k1 = kurtosis(xs)
+    k2 = kurtosis(mmts)
+    @test_approx_eq_eps(k1, k2, 0.03 * abs(k1))
+  end
+end
+
+MomentsTests()

@@ -1,0 +1,29 @@
+# load training data.
+raw_training_data = matread("$(path)/other_testing_data/spamTrain.mat")
+raw_testing_data = matread("$(path)/other_testing_data/spamTest.mat")
+
+# get the raw data into variables to make working with it easier
+X = raw_training_data["X"]
+y = raw_training_data["y"]
+X_test = raw_testing_data["Xtest"]
+y_test = raw_testing_data["ytest"]
+
+
+# prepare the data for LIBSVM
+instances = X[:, 1:end]'
+instances_test = X_test[:, 1:end]'
+labels = y[1:end]
+labels_test = y_test[1:end]
+
+# train the SVM
+# kernel_type --> Linear - 0, Sigmoid - 3, RBF(default) - 2
+model = svmtrain(labels, instances, C = 0.1, kernel_type = int32(0))
+
+# check the trained model against the training data
+(pred, deci) = svmpredict(model, instances)
+println("Training - Accuracy: $(mean((pred .== labels))*100)")
+
+# check the trained model against the testing data
+(pred_test, deci_test) = svmpredict(model, instances_test)
+println("Testing - Accuracy: $(mean((pred_test .== labels_test))*100)")
+

@@ -1,0 +1,78 @@
+module CoinFlips
+
+export Coin, flip, heads, tails, loglik, mixedloglik
+using Distributions
+
+# A coin is flipped, and returns heads (1) with probability p.
+immutable Coin
+    p::Float64
+
+    function Coin(p::Float64)
+        if p > 1.0 || p < 0.0
+            error("p must be between 0 and 1, inclusive.")
+        else
+            new(p)
+        end
+    end
+end
+
+
+typealias Flip Bool
+typealias Flips Vector{Flip}
+
+
+# Constructors for a flip and series of flips.
+flip(c::Coin) = bool(rand(Bernoulli(c.p)))::Flip
+flip(c::Coin, n::Int) = bool([flip(c) for i = 1:n])::Flips
+
+# Count heads (1s) and tails (0s)
+heads(fs::Flips) = sum(fs)
+tails(fs::Flips) = length(fs) - heads(fs)
+
+
+# Likelihood functions calculate the probability
+# of observing a sequence of flips given underlying parameters.
+# We take the log for convenience and numerical stability.
+# (Log likelihoods are additive, raw likelihoods are multiplicative;
+# this can cause underflow problems.)
+
+# For a single coin, the only parameter is p (the probability of heads).
+# The observerd flips are binomial RVs with probability p.
+#
+# Likelihood of some draws from a binomial variable is:
+#     p^(# of 1s) * (1-p)^(# of 0s)
+# So the log likelihood is:
+#     (# of 1s) * log(p) + (# of 0s) * log(1-p)
+function loglik(fs::Flips, p::Float64)
+    if p < 0.0 || p > 1.0
+        typemin(Float64)
+    else
+        heads(fs) * log(p) + tails(fs) * log(1-p)
+    end
+end
+
+loglik(fs::Flips, p::Vector) = loglik(fs, p...)
+
+# For mixed flips, there are two binomial probability
+#
+# Likelihood of observing a sequence of flips given there are
+# two different coins being flipped, one after another, with the
+# second coin starting after some unknown time n1.
+function mixedloglik(fs::Flips, p1::Float64, p2::Float64, n1::Int)
+    fs1 = fs[1:n1]
+    fs2 = fs[(n1+1):end]
+    h1 = heads(fs1)
+    h2 = heads(fs2)
+    loglik(fs1, p1) + loglik(fs2, p2)
+end
+
+mixedloglik(fs::Flips, p1::Float64, p2::Float64, n1) =
+    mixedloglik(fs, p1, p2, int(n1))
+
+mixedloglik(fs::Flips, params::Vector) = mixedloglik(fs, params...)
+
+
+end # module
+
+
+

@@ -1,0 +1,13 @@
+immutable MPIState
+  comm
+  nprocs
+  procid
+  rootproc
+
+  function MPIState(rootproc)
+    comm = MPI.COMM_WORLD
+    nprocs = MPI.size(comm)
+    procid = MPI.rank(comm)
+    new(comm, nprocs, procid, rootproc)
+  end
+end

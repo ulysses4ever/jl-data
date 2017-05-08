@@ -1,0 +1,204 @@
+module Metropolis
+export model, sampleMCMC, plotMCMC
+
+using Distributions
+using Gadfly
+
+# ------------------------------
+# Specifying a Probability Model
+# ------------------------------
+
+immutable ObservedData{T}
+    data::Vector{T}
+    loglik::Function
+end
+
+# A probability model is made up of one or more ModelNodes,
+# one for each parameter we want to estimate the posterior
+# distribution of.
+immutable ModelNode
+    name::Symbol
+    prior::Distribution
+    support::Vector
+end
+
+# A tuple version of the Node, just so models can be
+# constructed with tuples.
+typealias ModelNodeTuple (Symbol, Distribution)
+
+
+immutable Model
+    nodes::Vector{ModelNode}
+end
+
+# Constructors
+function ModelNode(name::Symbol, prior::Distribution)
+    ModelNode(name, prior, [minimum(prior), maximum(prior)])
+end
+
+model(nodes::Vector{ModelNode}) = Model(nodes)
+
+
+model(nodes::Vector{ModelNodeTuple}) =
+    Model([ModelNode(node...) for node in nodes])
+
+# Constructor for a 1-parameter model using scalar arguments
+model(name::Symbol, prior::Distribution) = model([ModelNode(name, prior)])
+
+
+model(node::ModelNodeTuple) = Model([ModelNode(node...)])
+
+# Computing the log prior of a ModelNode's parameter
+function logprior(n::ModelNode, x)
+    f = n.prior
+    isa(f, DiscreteDistribution) ? logpmf(f, x) : logpdf(f, x)
+end
+
+# Log prior of a model is sum of log prior of the nodes
+logprior(m::Model, xs) =
+    sum([logprior(n, x) for (n,x) in zip(m.nodes, xs)])
+
+
+# ------------- #
+# MCMC Sampling #
+# ------------- #
+# A trace object contains the results of an MCMC sampling.
+immutable MCMCTrace
+    names::Vector{Symbol}
+    trace::Array
+end
+
+type MCMCState
+    current::Vector
+    mean::Vector{Float64}
+    sumsquares::Vector{Float64}
+    vars::Vector{Float64}
+    iter::Int
+    rejections::Int
+end
+
+# Initialize the MCMC state before running simulations,
+# based on the priors.
+function MCMCState(m::Model)
+    current = [float(mean(n.prior))::Float64 for n in m.nodes]
+    sumsquares = current .^ 2
+    vars = [float(var(n.prior))::Float64 for n in m.nodes]
+    iter = 0
+    rejections = 0
+    MCMCState(current, current, sumsquares, vars, iter, rejections)
+end
+
+function sampleMCMC(m::Model, obs::ObservedData, n::Int,
+                    burnin::Int, thin::Int=1)
+
+    d = length(m.nodes)
+    # Initialize the state object that keeps track of the sampling
+    mc = MCMCState(m)
+
+    # Initialize the proposal distribution
+    propdist = MvNormal(mc.current, mc.vars * eye(d))
+    println(var(propdist))
+
+    # Generate the first proposal
+    current = propose(m, propdist, mc)
+
+    # Initialize the matrix holding posterior samples
+    samples = fill(NaN, n, d)
+
+    for i = 1:n
+        # Tune proposal after halfway done, and every 100th iter.
+        adapt = (i > Inf) ? true: false
+
+        # Generate a proposal
+        proposal = propose(m, propdist, mc, adapt)
+
+        # Find out if we accept or reject proposals
+        acceptance = accept(m, obs, current, proposal)
+
+        # Update the current state
+        current = acceptance ? proposal : current
+
+        # Update the state object
+        mc.current = current
+        mc.iter = i
+        mc.mean = ((i-1) .* mc.mean + current) ./ i
+        mc.sumsquares  = mc.sumsquares .+ current.^2
+        mc.vars = (mc.sumsquares - mc.mean.^2) ./ i
+        println("variances: ", mc.vars)
+        if i > burnin
+            mc.rejections = mc.rejections + (1 - int(acceptance))
+        end
+
+        # Fill in the traces of samples.
+        samples[i, :] = current
+
+    end
+    println("Rejection Rates:",  mc.rejections ./ (n - burnin))
+    MCMCTrace([n.name for n in m.nodes], samples[(burnin+1):thin:end, :])
+end
+
+
+# ------------------------ #
+# The Metropolis Algorithm #
+# ------------------------ #
+# 1. Generate proposal values for the paramter(s).
+# 2. Accept or reject the proposal.
+# 3. Repeat.
+
+function adapt_proposal(mc::MCMCState)
+    d = length(mc.current)
+    mus = [float(c)::Float64 for c in mc.current]::Vector{Float64}
+    adapted_var = ((0.95 * 2.38^2) .* mc.vars .+ 0.0005) ./ d
+    MvNormal(mus, eye(d) .* adapted_var)
+end
+
+function propose(m::Model, prop::MultivariateDistribution,
+                 mc::MCMCState, adapt=false)
+    newprop = adapt ? adapt_proposal(mc) : prop
+    println(var(newprop))
+    props = rand(newprop)
+    props
+end
+
+# The acceptance rule for the Metropolis algorithm.
+# Given a proposed value for parameter(s) `p`, compare
+# the log value of the posterior at the proposal value
+# to that of the current value(s), `c`. If the proposal has
+# a higher probability, we accept it for sure. if not,
+# we accept it with probability f(p|D) / f(c|D) < 1.
+function accept(m::Model, obs::ObservedData, current, proposal)
+    # Reject if any proposals are outside the support of the
+    # priors.
+    lbounds = [n.support[1] for n in m.nodes]
+    ubounds = [n.support[2] for n in m.nodes]
+    if any((proposal .<= lbounds) | (proposal .>= ubounds))
+        return false
+    end
+
+    logp_current = obs.loglik(obs.data, current) +  logprior(m, current)
+    logp_proposed = obs.loglik(obs.data, proposal) + logprior(m, proposal)
+    dlogp = min(0, logp_proposed - logp_current)
+
+    rand(Bernoulli(exp(dlogp))) == 1 ? true: false
+end
+
+
+# Plot time-series/traces and histograms to SVG plots.
+function plotMCMC(trace::MCMCTrace, path::ASCIIString = "../../graphs/")
+    # Helper function for writing plots to file
+    function drawplot(param, graphlab, plt)
+        fpath = path * string(param) * "_" * graphlab * ".svg"
+        draw(SVG(fpath, 1200px, 800px), plt)
+    end
+
+    (nsamples, nparams) = size(trace.trace)
+
+    for i = 1:nparams
+        ts = plot(x=1:nsamples, y=trace.trace[:, i], Geom.line)
+        drawplot(trace.names[i], "ts", ts)
+        hist = plot(x=trace.trace[:, i], Geom.histogram)
+        drawplot(trace.names[i], "hist", hist)
+    end
+end
+
+end # module

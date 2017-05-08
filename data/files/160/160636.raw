@@ -1,0 +1,10 @@
+using MethylHMM
+
+# Create a betabinomial HMM
+filename = "/Users/alex/Dropbox/code/MethylHMM/data/allc_AM_E1_2_chr2subset.tsv"
+n_states = 2
+hmm = betabinom_HMM(n_states,filename)
+
+# Fit the parameters to the data
+fit!(hmm; max_iter=200, tol=1e-2)
+

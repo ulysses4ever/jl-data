@@ -1,0 +1,63 @@
+# Players properties structure
+type Player{P,N,UF}
+  index::Int
+  name::String
+  nodes::Array{N,1}
+  examined::Dict{P,Bool}
+  utilityfunctions::Array{UF,1}
+end
+
+# Nodes properties structure
+type Node{P,M}
+  index::Int
+  name::String
+  parentplayerindex::Int
+  parentmoveindex::Nullable{Int}
+  timeposistion::Int
+  examined::Dict{P,Bool}
+  moves::Array{M,1}
+end
+
+# Moves properties structure
+type Move{P,N,R,V}
+  index::Int
+  name::String
+  length::Int
+  parentnodeindex::Int
+  parentplayerindex::Int
+  examined::Dict{P,Bool}
+  payoffset::Dict{R,V}
+end
+# Infoset properties structure
+type InfoSet{N}
+  id::Int
+  name::String
+  span::Nullable{Int}
+  nodes::Array{N,1}
+end
+
+# Variable properties structure
+type Variable{P,R}
+  id::Int
+  name::String
+  linkedresource::R
+  examined::Dict{P,Bool}
+end
+
+type Resource{R}
+  id::Int
+  name::String
+  shared::Bool
+  examined::Bool
+  independentpercentage::Float
+  dependentpercentage::Nullable{Dict{R,Float}}
+  initalamount::Float
+  finalamount::Nullable{Float} 
+  minimumamount::Float
+  maximumamount::Float
+end
+
+type UtilityFunction 
+  resourcepercentage::Dict{R,Float}
+  resourcecondition::Dict{R,C}
+end

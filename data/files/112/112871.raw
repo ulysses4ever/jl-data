@@ -1,0 +1,23 @@
+# euler.jl: header for my Julia Project Euler solutions
+
+module Euler
+
+# number of digits in an integer
+intlen(i::Int) = length(digits(i))
+
+# determine if a number is a palindrome
+ispal(n::Int) = digits(n) == reverse(digits(n))
+
+# create minimum base-10 integer with d digits
+getmin(d::Int) = 10^(d-1)
+
+# create maximum base-10 integer with d digits
+getmax(d::Int) = (10^d)-1
+
+# find the sum of the squares of all integers below maxn
+sumofsquares(maxn::Int) = sum([1:maxn].^2)
+
+# find the square of the sum of all integers below maxn
+squareofsum(maxn::Int) = sum([1:maxn])^2
+
+end

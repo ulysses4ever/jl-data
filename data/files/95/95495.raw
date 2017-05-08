@@ -1,0 +1,51 @@
+DATADIR = "../../../data/experiment01"
+OUTDIR = "../../output/experiment01"
+
+DATAFILE01 = joinpath(DATADIR, "adjusted_synchronous_driver.txt")
+DATAFILE02 = joinpath(DATADIR, "adjusted_driver_with_optical_noise.txt")
+
+OUTFILE = joinpath(OUTDIR, "suncohcsk_ber.txt")
+
+npoints = countlines(DATAFILE01)-1
+
+if (countlines(DATAFILE02)-1) != npoints; error("Driver and received signal have unequal lengths.") ; end
+
+sprlens = 2:25
+nsprlens = length(sprlens)
+bers = Array(Float64, nsprlens)
+
+for i = 1:nsprlens
+  sprrange = 0:sprlens[i]:npoints
+  nsprseqs = length(sprrange)-1
+
+  x = Array(Float64, sprlens[i])
+  r = Array(Float64, sprlens[i])
+
+  nbiterrors = 0
+
+  datastream01 = open(DATAFILE01, "r")
+  datastream02 = open(DATAFILE02, "r")
+
+  datatitle01 = readline(datastream01)
+  datatitle02 = readline(datastream02)
+
+  for j = 1:nsprseqs
+    for k = 1:sprlens[i]
+      x[k] = float64(readline(datastream01))
+      r[k] = float64(readline(datastream02))
+    end
+
+    if cov(x, r) < 0
+      nbiterrors += 1
+    end
+  end
+
+  close(datastream01)
+  close(datastream02)
+
+  bers[i] = nbiterrors/nsprseqs
+
+  println("Completed simulation $i of $nsprlens")
+end
+
+writedlm(OUTFILE, hcat(sprlens, bers), ' ')

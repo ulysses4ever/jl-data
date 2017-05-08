@@ -1,0 +1,26 @@
+type Poly <: FormulaHelper
+    lhs::Symbol
+    rhs::Symbol
+    degree::Integer
+end
+
+function DataFrames.Formula(poly::Poly)
+    lhs = poly.lhs
+    rhsvar = string(poly.rhs)
+    rhs = parse(join(rhsnames(poly),"+"))
+    Formula(lhs, rhs)
+end
+
+
+function augment(poly::Poly, df::AbstractDataFrame)
+    colnames = map(parse, rhsnames(poly))
+    for (i,col) in enumerate(colnames)
+        df[col] = df[poly.rhs].^i
+    end
+    df
+end
+
+function rhsnames(poly::Poly)
+    rhsvar = string(poly.rhs)
+    [join([rhsvar; n]) for n in 1:poly.degree]
+end

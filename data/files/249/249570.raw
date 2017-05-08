@@ -1,0 +1,152 @@
+# Executor callback wrappers
+function registered_exec(eiBuf::Ptr{Uint8}, eiBufSize::Cint,
+                        fiBuf::Ptr{Uint8}, fiBufSize::Cint,
+                        siBuf::Ptr{Uint8}, siBufSize::Cint,
+                        callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    executorInfo = makeproto(eiBuf, eiBufSize, Proto.ExecutorInfo)
+    frameworkInfo = makeproto(fiBuf, fiBufSize, Proto.FrameworkInfo)
+    slaveInfo = makeproto(siBuf, siBufSize, Proto.SlaveInfo)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor), executorInfo, frameworkInfo, slaveInfo)
+    return
+end
+
+function reregistered_exec(slaveBuf::Ptr{Uint8}, slaveBufSize::Cint,
+                           callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    slaveInfo = makeproto(slaveBuf, slaveBufSize, Proto.SlaveInfo)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor), slaveInfo)
+    return
+end
+
+function disconnected_exec(callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor))
+    return
+end
+
+function launchTask_exec(taskBuf::Ptr{Uint8}, taskBufSize::Cint,
+                         callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    taskInfo = makeproto(taskBuf, taskBufSize, Proto.TaskInfo)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor), taskInfo)
+    return
+end
+
+function killTask_exec(taskBuf::Ptr{Uint8}, taskBufSize::Cint,
+                       callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    taskId = makeproto(taskBuf, taskBufSize, Proto.TaskID)
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor), taskId)
+    return
+end
+
+function frameworkMessage_exec(data::Ptr{Uint8}, dataLength::Cint,
+                               callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor), bytestring(data, dataLength))
+    return
+end
+
+function shutdown_exec(callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor))
+    return
+end
+
+function error_exec(msg::Ptr{Uint8}, msgSize::Cint,
+                    callbackPtr::Ptr{Void}, executorPtr::Ptr{Void}, driverPtr::Ptr{Void})
+    callback = unsafe_pointer_to_objref(callbackPtr)::Function
+    executor = unsafe_pointer_to_objref(executorPtr)::Executor
+    callback(ExecutorDriver(driverPtr, executor), bytestring(msg, msgSize))
+    return
+end
+
+# Callback C handles
+const registered_exec_c = cfunction(registered_exec, Void,
+    (Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const reregistered_exec_c = cfunction(reregistered_exec, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const disconnected_exec_c = cfunction(disconnected_exec, Void,
+    (Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const launchTask_exec_c = cfunction(launchTask_exec, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const killTask_exec_c = cfunction(killTask_exec, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const frameworkMessage_exec_c = cfunction(frameworkMessage_exec, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const shutdown_exec_c = cfunction(shutdown_exec, Void,
+    (Ptr{Void}, Ptr{Void}, Ptr{Void}))
+const error_exec_c = cfunction(error_exec, Void,
+    (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}))
+
+# Executor callback container
+type ExecutorCallback
+    registered_cf::Ptr{Void}
+    registered_callback::Any
+    reregistered_cf::Ptr{Void}
+    reregistered_callback::Any
+    disconnected_cf::Ptr{Void}
+    disconnected_callback::Any
+    launchTask_cf::Ptr{Void}
+    launchTask_callback::Any
+    killTask_cf::Ptr{Void}
+    killTask_callback::Any
+    frameworkMessage_cf::Ptr{Void}
+    frameworkMessage_callback::Any
+    shutdown_cf::Ptr{Void}
+    shutdown_callback::Any
+    error_cf::Ptr{Void}
+    error_callback::Any
+
+    executor::Executor
+
+    function ExecutorCallback(executor = EmptyExecutor(); callbacks...)
+        callbacks = Dict{Symbol,Any}(callbacks)
+        registered = get(callbacks, :registered, nothing)
+        reregistered = get(callbacks, :reregistered, nothing)
+        disconnected = get(callbacks, :disconnected, nothing)
+        launchTask = get(callbacks, :launchTask, nothing)
+        killTask = get(callbacks, :killTask, nothing)
+        frameworkMessage = get(callbacks, :frameworkMessage, nothing)
+        shutdown = get(callbacks, :shutdown, nothing)
+        error = get(callbacks, :error, nothing)
+
+        return new(
+            (registered == nothing ? C_NULL : registered_exec_c), registered,
+            (reregistered == nothing ? C_NULL : reregistered_exec_c), reregistered,
+            (disconnected == nothing ? C_NULL : disconnected_exec_c), disconnected,
+            (launchTask == nothing ? C_NULL : launchTask_exec_c), launchTask,
+            (killTask == nothing ? C_NULL : killTask_exec_c), killTask,
+            (frameworkMessage == nothing ? C_NULL : frameworkMessage_exec_c), frameworkMessage,
+            (shutdown == nothing ? C_NULL : shutdown_exec_c), shutdown,
+            (error == nothing ? C_NULL : error_exec_c), error,
+            executor
+        )
+    end
+end
+
+# function Base.run(executor_cb::ExecutorCallback)
+#     executorDriver = ccall((:initialize, Mesos.libmesosjl), Ptr{Void}, (Ptr{ExecutorCallback},), &executor_cb)
+#     if executorDriver == C_NULL
+#         error("Cannot start executor driver")
+#     end
+#     info("Julia executor driver started")
+#     run(ExecutorDriver(executorDriver, executor_cb.executor))
+#     ccall((:finalize, Mesos.libmesosjl), Void, (Ptr{Void},), executorDriver)
+#     exit(status == Status.DRIVER_STOPPED ? 0 : 1)
+# end
+
+function Base.run(executor_cb::ExecutorCallback)
+    status = ccall((:run_executor, Mesos.libmesosjl), Cint, (Ptr{ExecutorCallback},), &executor_cb)
+    println("Executor driver ststus: $status")
+    exit(status == Status.DRIVER_STOPPED ? 0 : 1)
+end
+

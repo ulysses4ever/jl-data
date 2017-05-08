@@ -1,0 +1,168 @@
+module Opt_portfolio_choices
+# This jl file creates the dictionary with key parameters and create the function used in the fixedpoint
+
+  using Distributions, StatsBase, PyPlot
+  export fixedpoint, solver
+
+  # Define the function that will return the value of the variable of interest
+  function fixedpoint(k0, N, epsh, epsf,param)
+
+    #=
+    Method
+    Create matrices for each control and state variable over N periods.
+    Create a vector of innovation for epsilons. From this vector, the shock goes to the state variables and then to the control variables. Then, obtain the price and returns variables.
+    We will obtain a set of vectors describing the economy. We can then compute the variance / covariance of such vectors.
+    =#
+
+    # Get the parameters
+    teta = param["teta"]
+    rho = param["rho"]
+    sigma = param["sigma"]
+    alpha = param["alpha"]
+    lambda = param["lambda"]
+    gamma = param["gamma"]
+    beta = param["beta"]
+    psi = param["psi"]
+    tau = param["tau"]
+
+    # Initialization of the vectors for control and state variables
+    aa = zeros(N)
+    ad = zeros(N)
+    wd = zeros(N)
+
+    pf = zeros(N)
+    qd = zeros(N)
+    qa = zeros(N)
+    wa = zeros(N)
+    ka = zeros(N)
+
+    priceF = zeros(N)
+    p = zeros(N)
+    pstar = zeros(N)
+    rd = zeros(N)
+    port = zeros(N)
+
+    # Combined parameters
+    para_pa = 1/(4*lambda*alpha*(1-alpha))
+    para_pw = - (2*alpha-1)/(4*lambda*alpha*(1-alpha))
+    para_qa = (1-teta)*rho*psi*((1-para_pa)-(2*alpha-1)*para_pw)/((1 - (2*alpha-1) * para_pw + teta*para_pw)*((1-psi*teta)-rho*(1-psi))) + (1-teta)*para_pa*(2*alpha-1)*para_pw/(1 - (2*alpha-1) * para_pw + teta*para_pw)
+    para_qw = - (1 - (2*alpha-1) * para_pw) * (1-teta)*para_pw /(1 - (2*alpha-1) * para_pw + teta*para_pw)
+    para_ka = 1/4 * (para_qa + (2*k0-1)*(2*alpha-1)*para_pa)
+    para_kw = 1/4 * (para_qw - (2*k0-1)*(1-(2*alpha-1)*para_pw))
+    para_n1 = ((2*k0-1)*((1-psi)*para_qa+psi*(1-teta)*(1-para_pa)) + (2*alpha-1)*para_pa + psi*teta*(1-para_pa))/(1-(2*k0-1)*((1-psi)*para_qw-psi*(1-teta)*para_pw)-(2*alpha-1)*para_pw+psi*teta*para_pw)
+    para_n2 = - ((1-psi*teta)*((2*k0-1)*para_qa + (2*alpha-1)*para_pa))/(1-(2*k0-1)*((1-psi)*para_qw-psi*(1-teta)*para_pw)-(2*alpha-1)*para_pw+psi*teta*para_pw)
+    para_n3 = ((1-psi*teta)*(1-(2*k0-1)*para_qw - (2*alpha-1)*para_pw))/(1-(2*k0-1)*((1-psi)*para_qw-psi*(1-teta)*para_pw)-(2*alpha-1)*para_pw+psi*teta*para_pw)
+    para_m1 = (1-psi)*para_qa/(1-psi*teta) + psi*(1-teta)*(1-para_pa)/(1-psi*teta)
+    para_m2 = - para_qa
+    para_m3 = (1-psi)*para_qw/(1-psi*teta) - psi*(1-teta)*para_pw/(1-psi*teta)
+    para_m4 = - para_qw
+
+    # Combined parameters for the Belman
+    I = [1 0 0 ; 0 1 0; 0 0 1]
+    para_r0 = (1-psi*teta)/(1-psi)
+    para_psi_prime = 1 - beta*(1-psi)*para_r0^(1-gamma)
+    para_qsh = [(para_pa + para_qa)/2 (para_pw + para_qw)/2 1]
+    para_qsf = [(para_pa - para_qa)/2 (para_pw - para_qw)/2 1]
+    para_N1 = [rho 0 0; (rho*para_n1+para_n2) para_n3 0; 0 0 rho]
+    para_ash = [0.5*rho 0 rho]
+    para_asf = [-0.5*rho 0 rho]
+    para_rq = (1-psi)/(1-psi*teta)
+    para_ra = 1 - para_rq
+    para_psh = (1-alpha)*[para_pa para_pw 0]
+    para_psf = alpha*[para_pa para_pw 0]
+    para_rsh = - para_qsh + para_rq * para_qsh * para_N1 + para_ra * para_ash + para_psh + para_psh*para_N1
+    para_rsf = - para_qsf + para_rq * para_qsf * para_N1 + para_ra * para_asf + para_psf + para_psf*para_N1
+    para_H1h = (1-gamma)*para_rsh*inv((I-(1-para_psi_prime)*para_N1))
+    para_H1f = (1-gamma)*para_rsf*inv((I-(1-para_psi_prime)*para_N1))
+
+    # Vectors of innovations
+    epsa = (epsh+epsf)/2
+    epsd = epsh-epsf
+
+    ## Generate the whole evolution of the econommy
+
+    # Generate the state variables
+    for i in 1:N-1
+      aa[i+1] = rho*aa[i]+epsa[i+1]
+      ad[i+1] = rho*ad[i]+epsd[i+1]
+      wd[i+1] = para_n1*epsd[i+1] + (rho*para_n1+para_n2)*ad[i] + para_n3*wd[i]
+    end
+
+    for i in 1:N
+      # Generate the control variables
+      pf[i] = para_pa*ad[i] + para_pw*wd[i]
+      qd[i] = para_qa*ad[i] + para_qw*wd[i]
+      qa[i] = aa[i] + 0.5*para_pa*ad[i] + 0.5*para_pw*wd[i]
+      wa[i] = aa[i]
+      ka[i] = para_ka*ad[i] + para_kw*wd[i]
+
+      # Generate the price variables
+      p[i] = (1-alpha)*pf[i]
+      pstar[i] = alpha*pf[i]
+
+      # Generate the future expected portfolio returns
+      port[i] = ((para_H1h - para_H1f) * [ad[i] wd[i] aa[i]]')[1]/100
+
+    end
+
+    # Generate the return variables
+    for i in 1:N-1
+      rd[i+1] = para_m1 * ad[i+1] + para_m2 * ad[i] + para_m3 * wd[i+1] + para_m4 * wd[i]
+    end
+
+    # Compute the new k0
+    cost = tau/(gamma*var(rd)) # 0.67
+    rer = (gamma-1)*cov(p-pstar,rd)/(2*gamma*var(rd)) # -0.40
+    portfolio_hedge = (1-para_psi_prime)*cov(port,rd)/(2*gamma*var(rd)) # 0.03
+    k = 0.5 + portfolio_hedge + cost + rer
+
+    return (k,cost,rer,portfolio_hedge)
+
+  end
+
+  # Define the solver
+  function solver(parameters,k0 = 0.5, N = 100000, tol = 0.00000001)
+
+    # Generate the vector of innovations
+    u = Normal(0,parameters["sigma"])
+    epsh = rand(u,N)
+    epsf = rand(u,N)
+
+    # Storage will contain all the values taken by the variable of interest during convergence
+    storage1 = [k0]
+    storage2 = [0.0]
+    storage3 = [0.0]
+    storage4 = [0.0]
+
+    for i in 2:100
+      fix = fixedpoint(k0,N,epsh,epsf,parameters)
+      push!(storage1,fix[1])
+      push!(storage2,fix[2])
+      push!(storage3,fix[3])
+      push!(storage4,fix[4])
+      k0 = storage1[i]
+      if abs(storage1[i] - storage1[i-1]) < tol break end # Break if the result converged
+    end
+
+    return Dict("k0"=> k0,"k0_storage"=> storage1, "cost_storage"=> storage2, "rer_storage"=> storage3, "port"=> storage4)
+  end
+
+  function graph(par,var,lb,ub,N=10000,tol = 0.00001,l=100)
+
+    k0 = 0.5 # value to start with
+    res = Float64[]
+    l = linspace(lb,ub,l)
+
+    for i in collect(l)
+      par["$var"] = i
+      push!(res,Opt_portfolio_choices.solver(par,k0,N,tol)["k0"])
+    end
+
+    # Plot
+    fig,axes = subplots(1,1,figsize=(10,5))
+    axes[:plot](l,res, color = "blue")
+    axes[:set_title]("Response of portfolio holdings to changes in $var")
+
+  end
+
+end

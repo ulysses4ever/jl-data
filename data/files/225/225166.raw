@@ -1,0 +1,96 @@
+# Project Euler 2
+
+# Attempt 1
+
+# function Fib(n)
+	# if n == 0 || n == 1
+		# return 1
+	# end
+	# return Fib(n-1) + Fib(n-2)
+# end
+
+# function Run()
+	# tot = 0
+	# i = 0;
+	# currentFib = Fib(i)
+	# while currentFib < 4000000
+		# if mod(currentFib, 2) == 0
+			# tot += currentFib
+		# end
+		# i += 1
+		# currentFib = Fib(i)
+	# end 
+	# tot
+# end
+
+
+# Attempt 2, using Tasks
+
+# function producer() 
+	# n = 0
+	# currentFib = 0
+	# prev2 = 1
+	# prev1 = 1
+	# while currentFib < 4e6
+		# if (n == 0) 
+			# produce(prev2)
+		# elseif (n == 1)
+			# produce(prev1)
+		# else
+			# currentFib = prev2 + prev1
+			# produce(currentFib)
+			# prev2 = prev1
+			# prev1 = currentFib
+		# end
+		# n += 1
+	# end
+	# produce("stop")
+# end
+
+# function Run()
+	# p = Task(producer)
+	# cur = 0
+	# fibs = []
+	# while cur != "stop"
+		# cur = consume(p)
+		# if cur != "stop"
+			# fibs = [fibs, cur]
+		# end
+	# end
+	# tot = sum([mod(n, 2) == 0 ? n : 0 for n in fibs])
+# end
+
+# Attempt 3
+
+# function Run()
+	# fibs = [1, 1]
+	# tot = 0
+	# len = 2
+	# last = 1
+	# while last < 4e6
+		# fibs = [fibs, fibs[len] + fibs[len-1]]
+		# if mod(last, 2) == 0
+			# tot += last
+		# end
+		# len = length(fibs)
+		# last = fibs[len]
+	# end
+	# return tot
+# end
+
+# Final
+
+function Run()
+	i = 1
+	j = 1
+	tot = 0
+	while j < 4e6
+		next = i + j
+		i = j
+		j = next
+		if mod(j, 2) == 0
+			tot += j
+		end
+	end
+	return tot
+end

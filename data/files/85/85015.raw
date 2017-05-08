@@ -1,0 +1,26 @@
+#=
+@author titus 
+=#
+using   Base.Test
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_bs"] = function test_bs()
+	
+	include("../bs.jl")
+
+	lst = [1, 2, 2, 2, 3, 5, 9]
+	flt = [0.0, 0.1, 0.2, 0.3, 0.4]
+
+  @test isequal(bs(lst,3), 5);
+  @test isequal(bs(lst,2), 4);
+  @test isequal(bs(Int64[],42), 0);
+  @test isequal(bs(flt, 0.25), -5); # -idx -1 
+  @test isequal(bs(flt, 0.37), -6); # -idx -1 
+  @test isequal(bs(flt, 0.49), -7); # --7 -1 ->insert at idx 6
+  @test isequal(bs(flt, 0.58), -7); # --7 -1 
+  @test_throws Exception bs(flt, 0.58, -1, -7); # --7 -1 
+  @test_throws Exception bs(flt, 0.58, 1, -7); # --7 -1 
+end
+
+

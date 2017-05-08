@@ -1,0 +1,70 @@
+bempp = Package(
+  "bempp",
+  #= ModifySource( =#
+    GitSource("https://www.github.com/bempp/bempp.git", "development"),
+      #= `sed -i '' -e "s/VERSION *0.21/VERSION 0.20/" cmake/BemppFindDependencies.cmake` =#
+  #= ), =#
+  :CMake,
+  version=v"2.9.1+development",
+
+  email = "rc-softdev@ucl.ac.uk",
+  maintainer = "Research Software Development Team",
+  license = "mit",
+  build_depends = [
+    "cmake", "gcc (>= 4.0)", "make (>= 3.0)", "g++ (>= 4.0)", "cdbs",
+    "libdune-foamgrid", "doxygen", "libdune-common-dev", "libdune-geometry-dev", "libdune-grid-dev",
+    "libdune-localfunctions-dev", "great-cmake-cookoff (>= 2.0.6)", "intel-thread-building-blocks-dev",
+    "$python-dev", "c$(python[2:end])", "libboost-dev", "libboost-test-dev",
+    "libboost-filesystem1.55-dev", "libboost-program-options1.55-dev", "libboost-thread1.55-dev",
+    "libboost-iostreams1.55-dev", "$python-mako", "libeigen3-dev", "zlib1g-dev", "patchelf",
+    "$python-pytest", "$python-sphinx", "gfortran", "$python-pip"
+  ],
+  depends = [
+    "intel-thread-building-blocks",
+    "libdune-common-2.3.1", "libdune-geometry-2.3.1", "libdune-grid-2.3.1", "libblas3",
+    "liblapack3", "libgmp10", "$python", "$python-numpy", "libboost-filesystem1.55.0",
+    "libboost-program-options1.55.0", "libboost-thread1.55.0", "libboost-iostreams1.55.0", "zlib1g"
+  ],
+  distribution=distribution,
+  homepage = "http://www.bempp.org/",
+
+  description=[
+    "Galerkin boundary element library"
+    "  BEM++ is an open-source Galerkin boundary element library that handles Laplace, Helmholtz"
+    "  and Maxwell problems on bounded and unbounded domains."
+    "  BEM++ is developed at University College London. The current development team includes Simon"
+    "  Arridge, Timo Betcke, Nicolas Salles, Matthew Scroggs and Elwin Van ‘t Wout. Much of the"
+    "  original work on BEM++ was done by Wojciech Śmigaj, now at Simpleware Ltd. BEM++ is"
+    "  supported by EPSRC Grants EP/I030042/1 and EP/K03829X/1."
+    "  This package contains both c++ libraries and its python bindings."
+  ],
+  architecture="all"
+)
+# Add our PPA on top of normal packaging image
+bempp.image = image(
+  "bempp-$(bempp.image.name)", bempp.image, ppa="$(publisher.id)/$(publisher.ppa)")
+
+
+prepare(bempp)
+#= c =  DebbyPacker.container(bempp, workspace) =#
+#= machine |> activate |> c |> [ =#
+#=   `apt-get update` =#
+#=   `apt-cache policy intel-thread-building-blocks` =#
+#=   `apt-get remove -y intel-thread-building-blocks-dev intel-thread-building-blocks` =#
+#=   `add-apt-repository --remove $(publisher.id)/$(publisher.ppa)` =#
+#=   `apt-get update` =#
+#=   `apt-cache policy intel-thread-building-blocks` =#
+#= ] |> run =#
+#= machine |> activate |> DebbyPacker.container(bempp, workspace) |> `apt-cache search setuptools` |> run =#
+path = joinpath(DebbyPacker.packagedir(bempp, workspace), "VERSION")
+version = convert(VersionNumber, readchomp(path))
+if version.major != bempp.version.major || version.minor != bempp.version.minor ||
+    version.patch != bempp.version.patch
+  error("Versions do not agree $version != $(bempp.version)")
+end
+
+build(machine, bempp, workspace)
+
+# test(machine, bempp, workspace) do package
+#   "python -c \"import bempp\""
+# end

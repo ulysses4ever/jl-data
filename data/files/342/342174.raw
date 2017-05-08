@@ -1,0 +1,159 @@
+############# forward sweep and encoding ##############
+walk(f::Function,ex::Expr) = f(Expr(ex.head,map(x->walk(f,x),ex.args)...))
+walk(f::Function,ex)       = f(ex)
+
+#find active symbols in an expression.  return list of Symbols and list of Actives
+#used in encode.jl
+active_syms(ex) = active_syms!({},{},ex)
+function active_syms!(s_list, AS_list, ex::Expr)
+    map(x->active_syms!(s_list,AS_list,x), ex.args)
+    (s_list, AS_list)
+end
+function active_syms!(s_list, AS_list, s::Active)
+    push!(s_list, s.sym)
+    push!(AS_list,s)
+    (s_list, AS_list)
+end
+active_syms!(s_list, AS_list, a::Any) = (s_list,AS_list)
+
+function inactive!(s::Dict,x::Symbol)
+    @assert isa(s["inactive"],Dict)
+    merge!(s["inactive"],[x=>ASymbol(x)])
+end
+
+#activate! declare a symbol active if it isn't already, and return the appropriate Active type
+function activate!(s::Dict,x::Symbol)
+    if haskey(s["active"],x) || haskey(s["inactive"],x)
+        warn("$x already active: assuming $x overwrites")
+        if !haskey(s["overwriting"],x)
+            merge!(s["overwriting"],[x=>gensym("$(x)stack")])
+        end
+    end
+    asym = pop!(s["inactive"],x,ASymbol(x))
+    if !haskey(s["active"],x)
+        merge!(s["active"],[x=>asym])
+    end
+    var = s["active"][x]
+    haskey(s["overwriting"],x) ?  Overwriting(var,s["overwriting"][x]) : var
+end
+
+function activate!(s::Dict,x::Expr)
+    if Meta.isexpr(x,:ref)
+        activate_ref!(s,x)
+    elseif Meta.isexpr(x,:(::))
+        activate!(s,x.args[1])
+    else
+        error("can't activate $x with head $(x.head)")
+    end
+end
+function activate_ref!(s::Dict,xr::Expr)
+    x = activate!(s,xr.args[1])
+    r = xr.args[2]
+    isa(x,Overwriting) ? Overwriting(ARef(x.s,r),x.storage) : ARef(x,r)
+    # x = xr.args[1]
+    # r = xr.args[2]
+    # if haskey(s["active"],x) || haskey(s["inactive"],x)
+    #     warn("$x already active: assuming $x overwrites")
+    #     merge!(s["overwriting"],[x=>gensym("$(x)stack")])
+    # end
+    # asym = pop!(s["inactive"],x,ASymbol(x))
+    # if !haskey(s["active"],x)
+    #     merge!(s["active"],[x=>asym])
+    # end
+    # var = ARef(s["active"][x],r)
+    # haskey(s["overwriting"],x) ?  Overwriting(var,s["overwriting"][x]) : var
+end
+
+function activate!(s::Dict,x::Symbol,dx::Symbol)
+    merge!(s["active"],[x=>ASymbol(x,dx)])
+    s["active"][x]
+end
+
+#tag: find symbols that are active and replace with appropriate Active type
+function tag(x,s::Dict)
+    walk(y->_tag(y,s),x)
+end
+_tag(x::Symbol, s::Dict) = get(s["active"],x,x)
+@debug function _tag(x::Expr)
+    @bp
+    if Meta.isexpr(x,:ref) && isa(x.args[1],Active) #x.head == :ref && isa(x.args[1],Active)
+        ARef(x.args[1], x.args[2:end])
+    elseif meta.isexpr(x,symbol('\'')) && isa(x.args[1],Active)
+        ATrans(x.args[1])
+    elseif meta.isexpr(x,:(::)) && isa(x.args[1],Active)
+        ATypeassert(x.args[1],x.args[2])
+    else
+        x
+    end
+end
+_tag(x::Any, s::Dict) = x
+
+#encode_*:
+function encode_function!(f::Expr, s::Dict)
+    #expect s to contain all args w/r/t/ which we want to differentiate
+    fsig = tag(f.args[1],s)
+    block = encode!(f.args[2],s)
+    Expr(:function,fsig,block)
+end
+
+function encode_block!(b::Expr,s::Dict)
+    @assert b.head == :block
+    args = map(ex->encode!(ex,s),b.args)
+    Expr(:block,args...)
+end
+
+function encode_for!(b::Expr,s::Dict)
+    @assert b.head == :for
+    s_inner = deepcopy(s)  #s_inner may contain additional active vars local to loop body
+    block=encode!(b.args[2], s_inner)
+    loop_local_vars = setdiff(s_inner["active"],s["active"])
+    s_inner["loop_local_vars"] = loop_local_vars
+    AFor(b.args[1],block,s_inner)
+end
+
+function encode_assign!(ex::Expr,s::Dict)
+    @assert ex.head == :(=)
+    rhs = tag(ex.args[2],s)
+    n_active_rhs = active_syms(rhs)[1]
+    if length(n_active_rhs) > 0
+        lhs = activate!(s,ex.args[1])
+        rhs = tag(rhs,s)
+        Expr(:(=), lhs,rhs) #need to tag rhs again after activating lhs, e.g. if rhs was previously not flagged as active
+    else
+        #even if the LHS var is not active, we need to note that it was assigned
+        #e.g. if we write y = zeros(10) then we'll know y isn't local later
+        inactive!(s,ex.args[1])
+        Expr(:(=), ex.args[1], rhs)
+    end
+end
+
+function encode_incr!(ex::Expr,s::Dict)
+    @assert ex.head == :(+=)
+    Expr(:(+=),activate!(s,ex.args[1]),map(x->tag(x,s),ex.args[2:end])...)
+end
+
+encode_call!(ex::Expr,s::Dict) = tag(ex,s)
+
+function encode_if!(ex::Expr,s::Dict)
+    @assert ex.head == :if
+    sTrue = copy(s)
+    sFalse = copy(s)
+    ifTrue = encode!(ex.args[2],s)
+    if length(ex.args)==3
+        ifFalse = encode!(ex.args[3],s)
+    else
+        ifFalse = Expr(:block)
+    end
+    AIf(ex.args[1],ifTrue,ifFalse,sTrue,sFalse)
+end
+
+encode!(ex::Expr,s::Dict) = encode_lookup![ex.head](ex,s)
+encode!(x::Any,s::Dict) = tag(x,s)
+encode_lookup! = [:function=>encode_function!,
+                  :block=>encode_block!,
+                  :for=>encode_for!,
+                  :(=)=>encode_assign!,
+                  :(+=)=>encode_incr!,
+                  :line => ((x,s)->x),
+                  :call => encode_call!,
+                  :if => encode_if!,]

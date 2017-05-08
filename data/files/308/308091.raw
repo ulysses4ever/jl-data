@@ -1,0 +1,15 @@
+function complex(x::Float64,y::Float64)
+	return exp(2*pi*im*x) + exp(2*pi*im*(0.30901699437494745*x + 0.9510565162951535*y)) + exp(2*pi*im*(-0.8090169943749475*x + 0.5877852522924731*y)) + exp(2*pi*im*(-0.8090169943749475*x - 0.5877852522924731*y)) + exp(2*pi*im*(0.30901699437494745*x - 0.9510565162951535*y))
+end
+function generatearray(L, d)
+	arr = zeros(Int32, 1500, 1500)
+	temp = 0.0 + 0.0*im
+	for i in -L:d:L, j in -L:d:L
+		temp = complex(i, j)
+		a1 = 1+iround(720*(real(temp) + 5)/5);
+		a2 = 1+iround(720*(imag(temp) + 5)/5);
+		arr[a1, a2] += 1
+	end
+	return arr
+end
+

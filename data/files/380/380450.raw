@@ -1,0 +1,29 @@
+
+using Base.Test
+
+# test the "utilities" module
+## include("test_utils.jl")
+## using CompLingUtilsTest
+
+include("test_stemmer.jl")
+## using CompLingStemmerTest
+
+# run tests for Counter type
+include("test_counter.jl")
+
+# run tests for tokenization
+include("test_tokenizer.jl")
+
+# run tests for getting ngrams
+include("test_ngrams.jl")
+
+# test context window
+include("test_contextwindow.jl")
+
+# run tests for context free grammars
+include("test_grammar.jl")
+
+# run tests for trees
+include("test_tree.jl")
+
+include("test_naive_bayes.jl")

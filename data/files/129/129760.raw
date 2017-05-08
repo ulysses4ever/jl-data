@@ -1,0 +1,31 @@
+function preorder_traverse(exprn::Expr)
+  for arg in exprn.args
+    if arg.head == :(=)
+      println("Subexpression: ", arg)
+    
+      node = arg.args[2]
+      parentstack = Array(Union(Number, Symbol, Expr), 0)
+
+      while (length(parentstack)!=0 || isa(node, Expr))
+        if isa(node, Expr)   
+          push!(parentstack, node.args[3])
+          node = node.args[2]
+          
+          if isa(node, Symbol)
+            println(node)
+          end
+        else
+          if isa(parentstack[end], Symbol)
+            println(parentstack[end])
+          end
+          
+          node =pop!(parentstack)
+        end
+      end
+    elseif arg.head == :line
+      continue
+    else
+      error("The given exprn can not be handled")
+    end
+  end
+end

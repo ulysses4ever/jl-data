@@ -1,0 +1,8 @@
+
+decode(ex::Expr) = Expr(ex.head,map(decode,ex.args)...)
+decode(a::Active) = sym(a)
+decode(a::AFor) = Expr(:for,decode(a.loop),decode(a.block))
+decode(a::AIf) = Expr(:if,decode(a.ifcond),decode(a.iftrue),decode(a.iffalse))
+decode(ex_list::Array) = map(decode,ex_list)
+decode(s::Symbol) = s
+decode(a::Any) = a

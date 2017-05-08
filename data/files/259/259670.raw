@@ -1,0 +1,51 @@
+using JLD, HDF5
+
+jldopen(case_file, "w") do f
+  write(f, "calculation_mode", calculation_mode)
+  write(f, "number_of_ground_motion_fields", number_of_ground_motion_fields)
+
+  hm = g_create(f, "hazard")
+  for branch in branches
+    b = g_create(hm, branch)
+    b["gm_means"] = gm_means[branch]
+    if isdefined(:corr_matrix)
+      b["gm_stds_intra"] = gm_stds_intra[branch]
+      b["gm_stds_inter"] = gm_stds_inter[branch]
+      b["corr_matrix"] = corr_matrix
+    else
+      b["gm_stds"] = gm_stds[branch]
+    end
+  end
+
+  em = g_create(f, "exposure")
+  for asset in 1:num_assets
+    a = g_create(em, a_ref[asset])
+    a["a_loc"] = a_loc[asset]
+    a["a_tax"] = a_tax[asset]
+    a["a_num"] = a_num[asset]
+    a["a_occ"] = a_occ[asset]
+    a["a_val"] = a_val[asset]
+    a["a_ded"] = a_ded[asset]
+    a["a_lim"] = a_lim[asset]
+  end
+
+  vm = g_create(f, "vulnerability")
+  for vf_id in vf_ids
+    r = g_create(vm, vf_id)
+    r["vf_type"] = vf_type[vf_id]
+    r["vf_imls"] = vf_imls[vf_id]
+    if vf_type[vf_id] == "PM"
+      r["vf_lrs"] = vf_lrs[vf_id]
+      r["vf_probs"] = vf_probs[vf_id]
+    else
+      r["vf_mean_lrs"] = vf_mean_lrs[vf_id]
+      r["vf_cov_lrs"] = vf_cov_lrs[vf_id]
+    end
+  end
+
+  tm = g_create(f, "tax_vf_map")
+  for tax in taxonomies
+    tm[tax] = tax_vf_map[tax]
+  end
+
+end

@@ -1,0 +1,58 @@
+
+# Tests for MarketRisk module
+
+using Base.Test
+using BusinessDays
+using MarketRisk
+using InterestRates
+
+include("ScenarioFactory.jl")
+include("PricingModelFactory.jl")
+
+# Basic functions that should be overloaded
+import MarketRisk.getfunctionalcurrency
+import MarketRisk.FinancialContract
+getfunctionalcurrency() = SpotCurrency("BRL")
+FinancialContract(id::Int, portfolio::Vector{ASCIIString}, model_name::ASCIIString) = FinancialContract(id, portfolio, PricingModelFactory.getpricingmodel(model_name))
+
+# Pricing scenario
+scen = ScenarioFactory.getscenario(Date(2015,08,05))
+
+contract01 = FinancialContract(1, ["MyCompany", "Trading"], "Fixed_USD")
+contract01.attributes["NOTIONAL"] = 1000.0
+contract01.attributes["MATURITY"] = Date(2015,10,02)
+contract01.attributes["ASSET_LIABILITY"] = "a"
+
+println("Timing uncompiled price function")
+@time p = price(contract01, scen)
+
+println("Timing compiled price function")
+@time p = price(contract01, scen)
+
+println("And the price for contract01 is: $(p)")
+
+contract02 = FinancialContract(2, ["MyCompany", "Trading"], "Forward_USD")
+contract02.attributes["NOTIONAL"] = 1000.0
+contract02.attributes["MATURITY"] = Date(2015,10,02)
+contract02.attributes["ASSET_LIABILITY"] = "a"
+contract02.attributes["FORWARD_PRICE"] = 3.8
+
+println("Timing uncompiled price function")
+@time p = price(contract02, scen)
+
+println("Timing compiled price function")
+@time p = price(contract02, scen)
+
+println("And the price for contract02 is: $(p)")
+
+# If we specify a differenct contract using the same model, we should get different results
+contract03 = FinancialContract(3, ["MyCompany", "Trading"], "Forward_USD")
+contract03.attributes["NOTIONAL"] = 2000.0
+contract03.attributes["MATURITY"] = Date(2015,10,02)
+contract03.attributes["ASSET_LIABILITY"] = "a"
+contract03.attributes["FORWARD_PRICE"] = 3.8
+
+println("Timing compiled price function")
+@time p = price(contract03, scen)
+
+println("And the price for contract03 is: $(p)")

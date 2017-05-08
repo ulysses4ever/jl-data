@@ -1,0 +1,30 @@
+symb{S}(t::Term{S}) = S
+
+#Find the term matching a pattern.
+find_path(pattern::Term, s::Symbol) = begin
+    if length(pattern.args) == 0
+        if s==symb(pattern)
+            return Int[]
+        else
+            return nothing
+        end
+    else 
+        for i = 1:length(pattern.args)
+            res = find_path(pattern.args[i], s)
+            if isa(res, Vector{Int})
+                return [i, res]
+            end
+        end
+        nothing
+    end
+end
+
+#Should be a macro, producing target.args[1].args[2]...
+extract(target::Term, pattern::Term, s::Symbol) = begin
+    current_term = target
+    path = find_path(pattern, s)
+    for arg in path
+        current_term = current_term.args[arg]
+    end
+    current_term
+end

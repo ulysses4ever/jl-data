@@ -1,0 +1,11 @@
+
+using ZipFile
+
+r = ZipFile.Reader("/tmp/EQ210515_CSV.ZIP");
+for f in r.files
+	println("Filename: $(f.name)")
+	ostream = open("/tmp/$(f.name)","w+")
+	write (ostream,readall(f))
+	close (ostream)
+end
+close(r)

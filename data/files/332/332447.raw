@@ -1,0 +1,74 @@
+include("config.jl")
+include("preallocation.jl")
+include("genotype.jl")
+include("population.jl")
+
+
+import Preallocation
+import Genotype
+import Config
+import Population
+
+
+function walk()
+
+    NUM_FIRST_ORDER_SEARCH = 200000
+    NUM_SECOND_ORDER_SEARCH = 20000
+
+    SEARCH_DEPTH = 200
+    NUM_MUTANTS = 10000
+
+    config_vals::Config.Type_Config_Values = Config.Type_Config_Values()
+    population = Population.make_population(config_vals)
+    dummy_genotype = Genotype.make_random_genotype(config_vals)
+    dummy_genotype2 = Genotype.make_random_genotype(config_vals)
+    best_genotype = Genotype.make_random_genotype(config_vals)
+    previous_best_genotype = Genotype.make_random_genotype(config_vals)
+    target_number = 1
+
+    for i = 1:NUM_FIRST_ORDER_SEARCH
+        target_number = 1
+        dummy_genotype = Genotype.make_random_genotype(config_vals)
+        Genotype.evaluate(dummy_genotype, config_vals, target_number, 1, population.preallocation)
+        if dummy_genotype.fitness == 16.0
+            target_number = 2
+            for j = 1:NUM_SECOND_ORDER_SEARCH
+                Genotype.copy_into(dummy_genotype2, dummy_genotype)
+                Genotype.mutate_at_global_rate(dummy_genotype2, config_vals)
+                Genotype.evaluate(dummy_genotype2, config_vals, target_number, 1, population.preallocation)
+                if dummy_genotype2.fitness == 16.0
+                    for k = 1:SEARCH_DEPTH
+                        if target_number == 2
+                            target_number = 1
+                        else
+                            target_number = 2
+                        end
+                        Genotype.copy_into(dummy_genotype, dummy_genotype2)
+                        for l = 1:NUM_MUTANTS
+                            Genotype.copy_into(dummy_genotype2, dummy_genotype)
+                            Genotype.mutate_at_global_rate(dummy_genotype2, config_vals)
+                            Genotype.evaluate(dummy_genotype2, config_vals, target_number, 1, population.preallocation)
+                            if dummy_genotype2.fitness == 16.0
+                                break
+                            end
+                        end
+                        if l == NUM_MUTANTS
+                            println("failed mutants")
+                            break
+                        else
+                            println(l)
+                        end
+                    end
+                    break
+                end
+            end # for j = 1:NUM_SECOND_ORDER_SEARCH
+            if j == NUM_SECOND_ORDER_SEARCH
+                println("failed")
+            end
+        end # if dummy_genotype.fitness == 16.0
+    end # for i = 1:NUM_FIRST_ORDER_SEARCH
+
+
+end
+
+walk()

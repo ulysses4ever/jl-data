@@ -1,0 +1,35 @@
+module CUDA
+
+using Logging
+logger = Logger("CUDA.jl", haskey(ENV, "DEBUG") ? DEBUG : WARNING, STDERR)
+
+# Logging shadows info(), so let it work as intended again
+Logging.configure(output=STDOUT, level=Logging.INFO)
+
+include("errors.jl")
+
+include("util.jl")
+include("base.jl")
+include("types.jl")
+include("devices.jl")
+include("context.jl")
+include("module.jl")
+include("stream.jl")
+include("execution.jl")
+include("compilation.jl")
+
+include("memory.jl")
+include("arrays.jl")
+
+include("native/execution.jl")
+include("native/intrinsics.jl")
+include("native/arrays.jl")
+
+include("profile.jl")
+
+function initialize()
+	initialize_api()
+end
+initialize()
+
+end

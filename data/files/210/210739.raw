@@ -1,0 +1,78 @@
+module Symbolic
+
+import Base.show
+import Base.print
+
+export @t, @s, Term, simplify
+
+const ops = [:+, :-, :*, :/, :^]
+
+#Datatype and constructors
+immutable Term{S, Args<:Tuple}
+    args::Args
+end
+Term(S, args::(Term...)) = Term{S, typeof(args)}(args)
+Term(S, args...) = Term(S, map(Term, args))
+Term(n::Int) = Term(n, ())
+Term(n::Symbol) = Term(n, ())
+Term(t::Term) = t
+Term(ex::Expr) = begin
+    @assert ex.head == :call
+    term_args = map(Term, tuple(ex.args[2:]...))
+    Term(ex.args[1], term_args)
+end
+macro t(ex)
+    Term(ex)
+end
+
+#Infix printing
+show(io::IO, t::Term) = print(io, t)
+print{S}(io::IO, t::Term{S, ()}) = print(io, string(S))
+print{S}(io::IO, t::Term{S}) = 
+    if in(S, ops) && length(t.args) > 1
+        print(io, "(")
+        for i = 1:(length(t.args)-1)
+            print(io, t.args[i])
+            print(io, string(S))
+        end
+        print(io, t.args[end])
+        print(io, ")")
+    else
+        print(io, string(S))
+        print(io, "(")
+        for i = 1:(length(t.args)-1)
+            print(io, t.args[i])
+            print(io, ",")
+        end
+        print(io, t.args[end])
+        print(io, ")")
+    end
+
+
+#Simplification rules
+#Addition
+simplify{X}(t::Term{:+, (X, X)}) = Term(:*, 2, t.args[1])
+simplify{X}(t::Term{:+, (X, Term{0, ()})}) = t.args[1]
+simplify{X}(t::Term{:+, (Term{0, ()}, X)}) = t.args[2]
+
+#Multiplication
+simplify{X}(t::Term{:*, (X, X)}) = Term(:^, t.args[1], 2)
+
+simplify{X}(t::Term{:*, (X, Term{1, ()})}) = t.args[1]
+simplify{X}(t::Term{:*, (Term{1, ()}, X)}) = t.args[2]
+
+simplify{X}(t::Term{:*, (X, Term{0, ()})}) = Term(0)
+simplify{X}(t::Term{:*, (Term{0, ()}, X)}) = Term(0)
+
+#Subtraction
+simplify{X}(t::Term{:-, (X, X)}) = Term(0)
+simplify{X}(t::Term{:+, (X, Term{:-, (X,)})}) = Term(0)
+
+simplify{S}(t::Term{S, ()}) = t
+simplify{S, Args}(t::Term{S, Args}) = Term(S, map(simplify, t.args))
+
+macro s(ex)
+    simplify(Term(ex))
+end
+include("new_patterns")
+end

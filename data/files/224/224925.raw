@@ -1,0 +1,99 @@
+module Extract
+
+export @extract
+
+# # # #
+#
+# @extract obj exprs...
+#
+#   useful to extract fields from composite types.
+#   Given a type
+#
+#     type X
+#       a::Vector
+#       b::Int
+#     end
+#
+#   and given an object `x::X` of that type, you can use:
+#
+#     @extract X a b
+#
+#   and this will be equivalent to:
+#
+#     a = X.a
+#     b = X.b
+#
+#   Destination variable names can be changed:
+#
+#     @extract X a q=b
+#
+#   is equivalent to:
+#
+#     a = X.a
+#     q = X.b
+#
+#   Arbitrary functions (including indexing) can be applied:
+#
+#     @extract X a1=abs(a[1]) ai=abs(a[i]) y=max(a[1],b)
+#
+#   is equivalent to:
+#
+#     a1 = abs(X.a[1])
+#     ai = abs(X.a[i])
+#     y = max(X.a[1], X.b)
+#
+#   Notice that the `i` within the indexing expression is left
+#   untouched: indexing is special in this regard. In order to use
+#   another field to index, you can do:
+#
+#     @extract X i=a.b ai=a[i]
+#
+#   In order to explicitly avoid symbol manipulation n the right hand
+#   side, use `esc`:
+#
+#     @extract X y=abs(a[1] + esc(b)
+#
+#   is equivalent to:
+#
+#     y = abs(X.a[1] + b)
+#
+
+prepend_obj(x, obj::Symbol) = x
+prepend_obj(s::Symbol, obj::Symbol) = Expr(:(.), esc(obj), QuoteNode(s)) 
+function prepend_obj(body::Expr, obj::Symbol)
+    if Meta.isexpr(body, :call)
+        if body.args[1] != :esc
+            return Expr(body.head, body.args[1], map(x->prepend_obj(x, obj), body.args[2:end])...)
+        else
+            @assert length(body.args) == 2
+            return Expr(:escape, body.args[2])
+        end
+    elseif Meta.isexpr(body, :ref)
+        return Expr(body.head, prepend_obj(body.args[1], obj), map(esc, body.args[2:end])...)
+    else
+        return Expr(body.head, map(x->prepend_obj(x, obj), body.args)...)
+    end
+end
+
+macro extract(obj, vars...)
+    ex = quote end
+    for v in vars
+        if isa(v, Symbol)
+            ex = quote
+                $ex
+                $(esc(v)) = $(prepend_obj(v, obj))
+            end
+        elseif isa(v, Expr)
+            @assert v.head in [:(=), :(=>), :(:=)]
+            va = v.args
+            @assert length(va) == 2
+            ex = quote
+                $ex
+                $(esc(va[1])) = $(prepend_obj(va[2], obj))
+            end
+        end
+    end
+    ex
+end
+
+end

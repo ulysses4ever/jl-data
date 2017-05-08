@@ -1,0 +1,15 @@
+using Symbolic
+
+testexprn01 = quote
+  z = (x+y-2)*k^2-q  
+  w = y^2+z
+end
+
+println("Example of expression wih local variables:\n")
+println(testexprn01)
+
+println("\nPrinting symbols via breadth-first traversal:\n")
+breadth_first(testexprn01)
+
+println("\nPrinting symbols via depth-first pre-order traversal:\n")
+depth_first_pre_order(testexprn01)

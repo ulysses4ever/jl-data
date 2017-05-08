@@ -1,0 +1,27 @@
+__precompile__()
+
+
+module GeographicLibPy
+
+import PyCall
+
+
+const geographiclib = PyCall.PyNULL()
+const geographiclib_geodesic = PyCall.PyNULL()
+# const Geodesic = PyCall.PyNULL()
+const WGS84 = PyCall.PyNULL()
+
+
+function __init__()
+    copy!(geographiclib, PyCall.pyimport("geographiclib"))
+
+    copy!(geographiclib_geodesic, PyCall.pyimport("geographiclib.geodesic"))
+    copy!(WGS84, geographiclib_geodesic[:Geodesic][:WGS84])
+end
+
+
+function inverse(lat1, lon1, lat2, lon2, model=WGS84)
+    model[:Inverse](lat1, lon1, lat2, lon2)
+end
+
+end

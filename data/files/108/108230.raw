@@ -1,0 +1,16 @@
+using Romeo
+
+export App
+
+# exported
+
+type App
+    server::HttpServer
+
+    App(port::Integer) = new(HttpServer(handle_app, port))
+end
+
+# not exported
+function handle_app(req::Request, res::Response)
+    log(DEBUG, "handling: " * req.path)
+end

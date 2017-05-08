@@ -1,0 +1,189 @@
+type Model
+    env::Env # Cplex environment
+    lp::Ptr{Void} # Cplex problem (lp)
+    has_int::Bool # problem has integer variables?
+    has_qc::Bool # problem has quadratic constraints?
+    callback::Any
+    terminator::Vector{Cint}
+end
+
+function Model(env::Env, lp::Ptr{Void})
+    model = Model(env, lp, false, false, nothing, Cint[0])
+    finalizer(model, free_problem)
+    set_terminate(model)
+    model
+end
+
+function Model(env::Env, name::String)
+    @assert is_valid(env)
+    stat = Array(Cint, 1)
+    tmp = @cpx_ccall(createprob, Ptr{Void}, (Ptr{Void}, Ptr{Cint}, Ptr{Cchar}), env.ptr, stat, name)
+    if tmp == C_NULL
+        throw(CplexError(env, stat))
+    end
+    return Model(env, tmp)
+end
+
+# internal function that wraps finalizer for model and environment together
+function _Model(env::Env)
+    @assert is_valid(env)
+    stat = Array(Cint, 1)
+    tmp = @cpx_ccall(createprob, Ptr{Void}, (Ptr{Void}, Ptr{Cint}, Ptr{Cchar}), env.ptr, stat, "CPLEX.jl")
+    if tmp == C_NULL
+        throw(CplexError(model.env, stat))
+    end
+    model = Model(env, tmp, false, false, nothing, Cint[0])
+    finalizer(model, model::Model -> begin
+            tmp = model.env
+            free_problem(model)
+            close_CPLEX(tmp)
+        end)
+    set_terminate(model)
+    return model
+end
+
+function read_model(model::Model, filename::String)
+    stat = @cpx_ccall(readcopyprob, Cint, (Ptr{Void}, Ptr{Void}, Ptr{Cchar}, Ptr{Cchar}), model.env.ptr, model.lp, filename, C_NULL)
+    if stat != 0
+        throw(CplexError(model.env, stat))
+    end
+end
+
+function write_model(model::Model, filename::String)
+    if endswith(filename,".mps")
+        filetype = "MPS"
+    elseif endswith(filename,".lp")
+        filetype = "LP"
+    else
+        error("Unrecognized file extension: $filename (Only .mps and .lp are supported)")
+    end
+    stat = @cpx_ccall(writeprob, Cint, (Ptr{Void}, Ptr{Void}, Ptr{Cchar}, Ptr{Cchar}), model.env.ptr, model.lp, filename, filetype)
+    if stat != 0
+        throw(CplexError(model.env, stat))
+    end
+end
+
+## TODO: deep copy model, reset model
+
+function get_sense(model::Model)
+    sense_int = @cpx_ccall(getobjsen, Cint, (
+                           Ptr{Void},
+                           Ptr{Void},
+                           ),
+                           model.env.ptr, model.lp)
+    if sense_int == 1
+        sense = :Min
+    elseif sense_int == -1
+        sense = :Max
+    else
+        error("CPLEX: problem object or environment does not exist")
+    end
+    return sense
+end
+
+function set_sense!(model::Model, sense)
+    if sense == :Min
+        @cpx_ccall(chgobjsen, Void, (Ptr{Void}, Ptr{Void}, Cint), model.env.ptr, model.lp, 1)
+    elseif sense == :Max
+        @cpx_ccall(chgobjsen, Void, (Ptr{Void}, Ptr{Void}, Cint), model.env.ptr, model.lp, -1)
+    else
+        error("Unrecognized objective sense $sense")
+    end
+end
+
+function get_obj(model::Model)
+    nvars = num_var(model)
+    obj = Array(Cdouble, nvars)
+    stat = @cpx_ccall(getobj, Cint, (
+                      Ptr{Void},
+                      Ptr{Void},
+                      Ptr{Cdouble},
+                      Cint,
+                      Cint
+                      ),
+                      model.env.ptr, model.lp, obj, 0, nvars-1)
+    if stat != 0
+        throw(CplexError(model.env, stat))
+    end
+    return obj
+end
+
+const type_map = Dict(
+     0 => :LP,
+     1 => :MILP,
+     3 => :MILP,
+     5 => :QP,
+     7 => :MIQP,
+     8 => :MIQP,
+    10 => :QCP,
+    11 => :MIQCP
+)
+
+function get_prob_type(model::Model)
+  ret = @cpx_ccall(getprobtype, Cint, (
+                   Ptr{Void},
+                   Ptr{Void}),
+                   model.env.ptr, model.lp)
+  ret == -1 && error("No problem of environment")
+  return type_map[Int(ret)]
+end
+
+function set_obj!(model::Model, c::Vector)
+    nvars = num_var(model)
+    stat = @cpx_ccall(chgobj, Cint, (
+                        Ptr{Void},
+                        Ptr{Void},
+                        Cint,
+                        Ptr{Cint},
+                        Ptr{Cdouble}
+                        ),
+                        model.env.ptr, model.lp, nvars, Cint[0:nvars-1;], float(c))
+    if stat != 0
+        throw(CplexError(model.env, stat))
+    end
+end
+
+set_warm_start!(model::Model, x::Vector{Float64}) = set_warm_start!(model, Cint[1:length(x);], x)
+
+function set_warm_start!(model::Model, indx::IVec, val::FVec)
+    stat = @cpx_ccall(addmipstarts, Cint, (
+                      Ptr{Void},
+                      Ptr{Void},
+                      Cint,
+                      Cint,
+                      Ptr{Cint},
+                      Ptr{Cint},
+                      Ptr{Cdouble},
+                      Ptr{Cint},
+                      Ptr{Ptr{Cchar}}
+                      ),
+                      model.env.ptr, model.lp, 1, length(indx), Cint[0], indx.-1, val, Cint[CPX_MIPSTART_AUTO], C_NULL)
+    if stat != 0
+        throw(CplexError(model.env, stat))
+    end
+end
+
+function free_problem(model::Model)
+    tmp = Ptr{Void}[model.lp]
+    stat = @cpx_ccall(freeprob, Cint, (Ptr{Void}, Ptr{Void}), model.env.ptr, tmp)
+    if stat != 0
+        throw(CplexError(model.env, stat))
+    end
+end
+
+function close_CPLEX(env::Env)
+    tmp = Ptr{Void}[env.ptr]
+    stat = @cpx_ccall(closeCPLEX, Cint, (Ptr{Void},), tmp)
+    if stat != 0
+        throw(CplexError(env, stat))
+    end
+end
+
+function set_terminate(model::Model)
+    stat = @cpx_ccall(setterminate, Cint, (Ptr{Void},Ptr{Cint}), model.env.ptr, model.terminator)
+    if stat != 0
+        throw(CplexError(env, stat))
+    end
+end
+
+terminate(model::Model) = (model.terminator[1] = 1)

@@ -1,0 +1,24 @@
+function load_allc(filename, strand, context_map)
+    k,o,c = (Int)[],(Int)[],(Int)[]
+
+    f = open(filename)
+    
+    line = readline(f)
+    while length(line) > 0
+        row = split(strip(line),'\t')
+        if strand == row[3]
+            context = row[4][1:2] # only match first two nucleotides
+            ci = findfirst(context .== context_map)
+            if ci != 0
+                push!(c,ci)
+                push!(k,int(row[6]))
+                push!(o,int(row[7]))
+            end
+        end
+        line = readline(f)
+    end
+
+    close(f)
+
+    return k, o, c
+end

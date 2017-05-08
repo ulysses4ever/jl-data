@@ -1,0 +1,13 @@
+module MyQuickSortTests
+
+using FactCheck
+using MyQuickSort
+
+facts("quicksort should be correct") do
+  @fact myquicksort([1,2,3,4]) => [1,2,3,4]
+end
+
+
+
+
+end

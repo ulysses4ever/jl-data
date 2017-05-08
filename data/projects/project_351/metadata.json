@@ -1,16 +1,16 @@
 HTTP/1.1 200 OK
 Server: GitHub.com
-Date: Thu, 27 Apr 2017 17:59:56 GMT
+Date: Wed, 03 May 2017 20:59:58 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 6206
+Content-Length: 5135
 Status: 200 OK
 X-RateLimit-Limit: 5000
-X-RateLimit-Remaining: 3207
-X-RateLimit-Reset: 1493318926
+X-RateLimit-Remaining: 4133
+X-RateLimit-Reset: 1493847972
 Cache-Control: private, max-age=60, s-maxage=60
 Vary: Accept, Authorization, Cookie, X-GitHub-OTP
-ETag: "6154bcda14666b0e2cf6e2bb526d2416"
-Last-Modified: Tue, 24 Jan 2017 10:05:13 GMT
+ETag: "45408f5c1b109a148797228e0c928a04"
+Last-Modified: Tue, 15 Nov 2016 17:28:36 GMT
 X-OAuth-Scopes: admin:gpg_key, admin:org_hook, repo, user
 X-Accepted-OAuth-Scopes: repo
 X-GitHub-Media-Type: github.v3; format=json
@@ -22,85 +22,85 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: deny
 X-XSS-Protection: 1; mode=block
 Vary: Accept-Encoding
-X-Served-By: a474937f3b2fa272558fa6dc951018ad
-X-GitHub-Request-Id: 49E0:6637:13317BD:18C6472:5902319C
+X-Served-By: 13d09b732ebe76f892093130dc088652
+X-GitHub-Request-Id: 2194:5CA3:FF6080:1485D9B:590A44CE
 
 {
-  "id": 62058073,
-  "name": "SynapseUploadUtils.jl",
-  "full_name": "rasmushenningsson/SynapseUploadUtils.jl",
+  "id": 26722658,
+  "name": "swproj",
+  "full_name": "kwilsonpdx/swproj",
   "owner": {
-    "login": "rasmushenningsson",
-    "id": 16546530,
-    "avatar_url": "https://avatars1.githubusercontent.com/u/16546530?v=3",
+    "login": "kwilsonpdx",
+    "id": 1156698,
+    "avatar_url": "https://avatars1.githubusercontent.com/u/1156698?v=3",
     "gravatar_id": "",
-    "url": "https://api.github.com/users/rasmushenningsson",
-    "html_url": "https://github.com/rasmushenningsson",
-    "followers_url": "https://api.github.com/users/rasmushenningsson/followers",
-    "following_url": "https://api.github.com/users/rasmushenningsson/following{/other_user}",
-    "gists_url": "https://api.github.com/users/rasmushenningsson/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/rasmushenningsson/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/rasmushenningsson/subscriptions",
-    "organizations_url": "https://api.github.com/users/rasmushenningsson/orgs",
-    "repos_url": "https://api.github.com/users/rasmushenningsson/repos",
-    "events_url": "https://api.github.com/users/rasmushenningsson/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/rasmushenningsson/received_events",
+    "url": "https://api.github.com/users/kwilsonpdx",
+    "html_url": "https://github.com/kwilsonpdx",
+    "followers_url": "https://api.github.com/users/kwilsonpdx/followers",
+    "following_url": "https://api.github.com/users/kwilsonpdx/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kwilsonpdx/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kwilsonpdx/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kwilsonpdx/subscriptions",
+    "organizations_url": "https://api.github.com/users/kwilsonpdx/orgs",
+    "repos_url": "https://api.github.com/users/kwilsonpdx/repos",
+    "events_url": "https://api.github.com/users/kwilsonpdx/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kwilsonpdx/received_events",
     "type": "User",
     "site_admin": false
   },
   "private": false,
-  "html_url": "https://github.com/rasmushenningsson/SynapseUploadUtils.jl",
-  "description": "Simple uploading script for adding raw data to Synapse",
+  "html_url": "https://github.com/kwilsonpdx/swproj",
+  "description": "Software projects ",
   "fork": false,
-  "url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl",
-  "forks_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/forks",
-  "keys_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/keys{/key_id}",
-  "collaborators_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/collaborators{/collaborator}",
-  "teams_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/teams",
-  "hooks_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/hooks",
-  "issue_events_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/issues/events{/number}",
-  "events_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/events",
-  "assignees_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/assignees{/user}",
-  "branches_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/branches{/branch}",
-  "tags_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/tags",
-  "blobs_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/git/blobs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/git/tags{/sha}",
-  "git_refs_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/git/refs{/sha}",
-  "trees_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/git/trees{/sha}",
-  "statuses_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/statuses/{sha}",
-  "languages_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/languages",
-  "stargazers_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/stargazers",
-  "contributors_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/contributors",
-  "subscribers_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/subscribers",
-  "subscription_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/subscription",
-  "commits_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/commits{/sha}",
-  "git_commits_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/git/commits{/sha}",
-  "comments_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/comments{/number}",
-  "issue_comment_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/issues/comments{/number}",
-  "contents_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/contents/{+path}",
-  "compare_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/compare/{base}...{head}",
-  "merges_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/merges",
-  "archive_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/{archive_format}{/ref}",
-  "downloads_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/downloads",
-  "issues_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/issues{/number}",
-  "pulls_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/pulls{/number}",
-  "milestones_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/milestones{/number}",
-  "notifications_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/notifications{?since,all,participating}",
-  "labels_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/labels{/name}",
-  "releases_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/releases{/id}",
-  "deployments_url": "https://api.github.com/repos/rasmushenningsson/SynapseUploadUtils.jl/deployments",
-  "created_at": "2016-06-27T13:26:51Z",
-  "updated_at": "2017-01-24T10:05:13Z",
-  "pushed_at": "2017-01-24T10:05:11Z",
-  "git_url": "git://github.com/rasmushenningsson/SynapseUploadUtils.jl.git",
-  "ssh_url": "git@github.com:rasmushenningsson/SynapseUploadUtils.jl.git",
-  "clone_url": "https://github.com/rasmushenningsson/SynapseUploadUtils.jl.git",
-  "svn_url": "https://github.com/rasmushenningsson/SynapseUploadUtils.jl",
+  "url": "https://api.github.com/repos/kwilsonpdx/swproj",
+  "forks_url": "https://api.github.com/repos/kwilsonpdx/swproj/forks",
+  "keys_url": "https://api.github.com/repos/kwilsonpdx/swproj/keys{/key_id}",
+  "collaborators_url": "https://api.github.com/repos/kwilsonpdx/swproj/collaborators{/collaborator}",
+  "teams_url": "https://api.github.com/repos/kwilsonpdx/swproj/teams",
+  "hooks_url": "https://api.github.com/repos/kwilsonpdx/swproj/hooks",
+  "issue_events_url": "https://api.github.com/repos/kwilsonpdx/swproj/issues/events{/number}",
+  "events_url": "https://api.github.com/repos/kwilsonpdx/swproj/events",
+  "assignees_url": "https://api.github.com/repos/kwilsonpdx/swproj/assignees{/user}",
+  "branches_url": "https://api.github.com/repos/kwilsonpdx/swproj/branches{/branch}",
+  "tags_url": "https://api.github.com/repos/kwilsonpdx/swproj/tags",
+  "blobs_url": "https://api.github.com/repos/kwilsonpdx/swproj/git/blobs{/sha}",
+  "git_tags_url": "https://api.github.com/repos/kwilsonpdx/swproj/git/tags{/sha}",
+  "git_refs_url": "https://api.github.com/repos/kwilsonpdx/swproj/git/refs{/sha}",
+  "trees_url": "https://api.github.com/repos/kwilsonpdx/swproj/git/trees{/sha}",
+  "statuses_url": "https://api.github.com/repos/kwilsonpdx/swproj/statuses/{sha}",
+  "languages_url": "https://api.github.com/repos/kwilsonpdx/swproj/languages",
+  "stargazers_url": "https://api.github.com/repos/kwilsonpdx/swproj/stargazers",
+  "contributors_url": "https://api.github.com/repos/kwilsonpdx/swproj/contributors",
+  "subscribers_url": "https://api.github.com/repos/kwilsonpdx/swproj/subscribers",
+  "subscription_url": "https://api.github.com/repos/kwilsonpdx/swproj/subscription",
+  "commits_url": "https://api.github.com/repos/kwilsonpdx/swproj/commits{/sha}",
+  "git_commits_url": "https://api.github.com/repos/kwilsonpdx/swproj/git/commits{/sha}",
+  "comments_url": "https://api.github.com/repos/kwilsonpdx/swproj/comments{/number}",
+  "issue_comment_url": "https://api.github.com/repos/kwilsonpdx/swproj/issues/comments{/number}",
+  "contents_url": "https://api.github.com/repos/kwilsonpdx/swproj/contents/{+path}",
+  "compare_url": "https://api.github.com/repos/kwilsonpdx/swproj/compare/{base}...{head}",
+  "merges_url": "https://api.github.com/repos/kwilsonpdx/swproj/merges",
+  "archive_url": "https://api.github.com/repos/kwilsonpdx/swproj/{archive_format}{/ref}",
+  "downloads_url": "https://api.github.com/repos/kwilsonpdx/swproj/downloads",
+  "issues_url": "https://api.github.com/repos/kwilsonpdx/swproj/issues{/number}",
+  "pulls_url": "https://api.github.com/repos/kwilsonpdx/swproj/pulls{/number}",
+  "milestones_url": "https://api.github.com/repos/kwilsonpdx/swproj/milestones{/number}",
+  "notifications_url": "https://api.github.com/repos/kwilsonpdx/swproj/notifications{?since,all,participating}",
+  "labels_url": "https://api.github.com/repos/kwilsonpdx/swproj/labels{/name}",
+  "releases_url": "https://api.github.com/repos/kwilsonpdx/swproj/releases{/id}",
+  "deployments_url": "https://api.github.com/repos/kwilsonpdx/swproj/deployments",
+  "created_at": "2014-11-16T18:00:06Z",
+  "updated_at": "2016-11-15T17:28:36Z",
+  "pushed_at": "2016-12-14T23:18:24Z",
+  "git_url": "git://github.com/kwilsonpdx/swproj.git",
+  "ssh_url": "git@github.com:kwilsonpdx/swproj.git",
+  "clone_url": "https://github.com/kwilsonpdx/swproj.git",
+  "svn_url": "https://github.com/kwilsonpdx/swproj",
   "homepage": null,
-  "size": 14,
-  "stargazers_count": 0,
-  "watchers_count": 0,
-  "language": "Julia",
+  "size": 286,
+  "stargazers_count": 2,
+  "watchers_count": 2,
+  "language": "Jupyter Notebook",
   "has_issues": true,
   "has_projects": true,
   "has_downloads": true,
@@ -111,7 +111,7 @@ X-GitHub-Request-Id: 49E0:6637:13317BD:18C6472:5902319C
   "open_issues_count": 0,
   "forks": 0,
   "open_issues": 0,
-  "watchers": 0,
+  "watchers": 2,
   "default_branch": "master",
   "permissions": {
     "admin": false,
@@ -119,5 +119,5 @@ X-GitHub-Request-Id: 49E0:6637:13317BD:18C6472:5902319C
     "pull": true
   },
   "network_count": 0,
-  "subscribers_count": 1
+  "subscribers_count": 3
 }

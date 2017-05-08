@@ -1,0 +1,32 @@
+export gram_schmidt
+
+function gram_schmidt(a :: Matrix)
+  (n,m) = size(a)
+  q = similar(a)
+  for j in 1:m
+    q[:,j] = a[:,j]/norm(a[:,j])
+    for k in j+1:m
+      a[:,k] = a[:,k] - dot(q[:,j],a[:,k])*q[:,j]
+    end
+  end
+  return q
+end
+
+gram_schmidt(vecs :: Vector...) = gram_schmidt(hcat(vecs...))
+
+function test_gram_schmidt(dim::Integer, tol::FloatingPoint)
+  mat = rand(dim,dim)
+  while dim != rank(mat)
+    mat = rand(dim,dim)
+  end
+  mat = gram_schmidt(mat)
+  for i in 1:dim
+    Test.@test_approx_eq_eps dot(mat[:,i], mat[:,i]) 1.0 tol
+    for j in (i+1):dim
+      Test.@test_approx_eq_eps dot(mat[:,i], mat[:,j]) 0.0 tol
+    end
+  end
+end
+
+test_gram_schmidt(dim::Integer) = test_gram_schmidt(dim, 1.0e-10)
+

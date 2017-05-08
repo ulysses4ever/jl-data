@@ -1,0 +1,199 @@
+#!/usr/bin/env julia4
+using Mesos
+using ProtoBuf
+using Logging
+
+Logging.configure(level=DEBUG)
+Logging.configure(output=open("framework.log", "a"))
+
+const TOTAL_TASKS = 5
+const TASK_CPUS = 1
+const TASK_MEM = 128
+
+# Framework parameters
+global tasksLaunched = 0
+global tasksFinished = 0
+global messagesSent = 0
+global messagesReceived = 0
+global implicitAcknowledgements = true
+
+global taskData = Dict{String, (Proto.SlaveID, Proto.ExecutorID)}()
+global executor = @proto Proto.ExecutorInfo (
+    :name => "Test Executor (Julia)",
+    :source => "julia_test",
+    :executor_id => ( @proto Proto.ExecutorID (:value => "default") ),
+    :command => ( @proto Proto.CommandInfo (:value => joinpath(pwd(), "executor.jl")) )
+)
+
+function scheduler_registered(driver::SchedulerDriver, frameworkId::Proto.FrameworkID, masterInfo::Proto.MasterInfo)
+    debug("Registered with framework ID $(frameworkId.value)")
+end
+
+function scheduler_reregistered(driver::SchedulerDriver, masterInfo::Proto.MasterInfo)
+    debug("Re-registered with master: $(masterInfo.hostname)")
+end
+
+function scheduler_disconnected(driver::SchedulerDriver)
+    debug("Disconnected")
+end
+
+function scheduler_resourceOffers(driver::SchedulerDriver, offers::Vector{Proto.Offer})
+    for offer in offers
+        tasks = Proto.TaskInfo[]
+        offerCpus = 0
+        offerMem = 0
+        for resource in offer.resources
+            if resource.name == "cpus"
+                offerCpus += resource.scalar.value
+            elseif resource.name == "mem"
+                offerMem += resource.scalar.value
+            end
+        end
+
+        debug("Received offer $(offer.id.value) with cpus: $offerCpus and mem: $offerMem")
+
+        remainingCpus = offerCpus
+        remainingMem = offerMem
+
+        while tasksLaunched < TOTAL_TASKS &&
+              remainingCpus >= TASK_CPUS  &&
+              remainingMem >= TASK_MEM
+
+            tid = tasksLaunched
+            tasksLaunched += 1
+
+            debug("Launching task $tid using offer $offer.id.value")
+
+            task = @proto Proto.TaskInfo (
+                :task_id => (@proto Proto.TaskID (:value => string(tid))),
+                :slave_id => (@proto Proto.SlaveID (:value => offer.slave_id.value)),
+                :name => "task $tid",
+                :executor => executor,
+                :resources => Proto.Resource[]
+            )
+
+            push!(task.resources, @proto Proto.Resource (
+                :name => "cpus",
+                :_type => Proto.Value_Type.SCALAR,
+                :scalar => ( @proto Proto.Value_Scalar (:value => TASK_CPUS) )
+            ))
+
+            push!(task.resources, @proto Proto.Resource (
+                :name => "mem",
+                :_type => Proto.Value_Type.SCALAR,
+                :scalar => ( @proto Proto.Value_Scalar (:value => TASK_MEM) )
+            ))
+
+            push!(tasks, task)
+            taskData[task.task_id.value] = (offer.slave_id, task.executor.executor_id)
+
+            remainingCpus -= TASK_CPUS
+            remainingMem -= TASK_MEM
+        end
+
+        operation = @proto Proto.Offer_Operation (
+            :_type =>Proto.Offer_Operation_Type.LAUNCH,
+            :launch => ( @proto Proto.Offer_Operation_Launch (:task_infos => tasks) )
+        )
+
+        acceptOffers(driver, [offer.id], [operation])
+    end
+
+    setindex!(taskData, (Proto.SlaveID(),Proto.ExecutorID()), "131")
+end
+
+function scheduler_statusUpdate(driver::SchedulerDriver, status::Proto.TaskStatus)
+    debug("Task $(status.task_id.value) is in state $(status.state)")
+
+    # Ensure the binary data came through.
+    if status.data != "data with a \0 byte"
+        warn("""
+            The returned message data did not match!
+                Expected: 'data with a \0 byte'
+                  Actual: '$(status.data)'
+            """)
+        exit(1)
+    end
+
+    if status.state == Proto.TaskState.TASK_FINISHED
+        tasksFinished += 1
+        if tasksFinished == TOTAL_TASKS
+            info("All tasks done, waiting for final framework message")
+        end
+        slave_id, executor_id = taskData[status.task_id.value]
+        messagesSent += 1
+        sendFrameworkMessage(driver, executor_id, slave_id, "data with a \0 byte")
+    end
+
+    if status.state == Proto.TaskState.TASK_LOST ||
+       status.state == Proto.TaskState.TASK_KILLED ||
+       status.state == Proto.TaskState.TASK_FAILED
+        warn("Aborting because task $(status.task_id.value) is in unexpected state $(status.state) with message '$(status.message)'")
+        abort(driver)
+    end
+
+    # Explicitly acknowledge the update if implicit acknowledgements
+    # are not being used.
+    if implicitAcknowledgements
+        acknowledgeStatusUpdate(driver, update)
+    end
+end
+
+function scheduler_frameworkMessage(driver::SchedulerDriver, executorId::Proto.ExecutorID, slaveId::Proto.SlaveID, message::String)
+    messagesReceived += 1
+    if message != "data with a \0 byte"
+        warn("""
+            The returned message data did not match!
+                Expected: 'data with a \0 byte'
+                  Actual: '$message'
+            """)
+        exit(1)
+    end
+    info("Received message: '$message'")
+
+    if messagesReceived == TOTAL_TASKS
+        if messagesReceived != messagesSent
+            warn("Sent $messagesSent but received $messagesReceived")
+            exit(1)
+        end
+        info("All tasks done, and all messages received, exiting")
+        stop(driver)
+    end
+end
+
+if length(ARGS) == 0
+    println("Usage: $(ENV["_"]) master")
+    exit(1)
+end
+
+scheduler = Scheduler(registered = scheduler_registered,
+                      reregistered = scheduler_reregistered,
+                      disconnected = scheduler_disconnected,
+                      resourceOffers = scheduler_resourceOffers,
+                      statusUpdate = scheduler_statusUpdate,
+                      frameworkMessage = scheduler_frameworkMessage)
+
+framework = @proto Proto.FrameworkInfo (
+    :name =>  "Test Framework (Julia)",
+    :user => "" # Have Mesos fill in the current user.
+)
+
+if haskey(ENV, "MESOS_CHECKPOINT")
+    println("Enabling checkpoint for the framework")
+    set_field!(framework, :checkpoint, true)
+end
+
+if haskey(ENV, "MESOS_AUTHENTICATE")
+    println("Enabling authentication for the framework")
+    set_field!(framework, :principal, ENV["DEFAULT_PRINCIPAL"])
+else
+    set_field!(framework, :principal, "test-framework-julia")
+end
+
+if haskey(ENV, "MESOS_EXPLICIT_ACKNOWLEDGEMENTS")
+    println("Enabling explicit acknowledgements for status updates")
+    implicitAcknowledgements = false
+end
+
+info("Starting Scheduler Driver")
+run(scheduler, framework, ARGS[1])

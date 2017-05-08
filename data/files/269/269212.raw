@@ -1,0 +1,30 @@
+using NLP
+
+nlp = NLPModelMeta(2, ncon=1)
+
+f(x) = x[1]^2 + 4*x[2]^2;
+W(x,y) = H(x);
+
+x0 = [0.0;0.0];
+
+function g! (x::Vector, g::Vector)
+  g[1] = 2*x[1];
+  g[2] = 8*x[2];
+end
+
+function W! (x::Vector, y::Vector, W::Matrix)
+  W[1,1] = 2.0;
+  W[2,2] = 8.0;
+end
+
+function c! (x::Vector, c::Vector)
+  c[1] = x[1]+x[2]-1;
+end
+
+function J! (x::Vector, J::Matrix)
+  J[1,1] = 1.0;
+  J[1,2] = 1.0;
+end
+
+x = DCI.solve(nlp, f, g!, W!, c!, J!, x0)
+println("x = ", x)

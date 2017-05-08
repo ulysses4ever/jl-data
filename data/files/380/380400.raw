@@ -1,0 +1,8 @@
+###
+### stopwords.jl
+###
+
+function stopwords()
+    stopwds = [chomp(s) for s in readlines(open("/Users/david/nltk_data/corpora/stopwords/english"))]
+    return Set(stopwds)
+end

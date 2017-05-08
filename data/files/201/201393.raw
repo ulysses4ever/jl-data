@@ -1,0 +1,91 @@
+module Fracjack
+
+using Images, ImageView, Color, FixedPointNumbers
+
+export Constraints, gen_data, gen_img, gen_palette
+
+function fn_color(i, size)
+    if i <= size / 3
+        (i / (size / 3) *.75 + .25, 0, 0)
+    elseif i <= size * 2 / 3
+        (0, (i - size/3) / (size / 3) *.75 + .25, 0)
+    else
+        (0, 0, (i - size*2/3) / (size / 3) *.75 + .25)
+    end
+end
+
+fn_user(i, size) = 0
+
+function gen_palette(size = 256, fn = fn_color, fn_user=fn_user)
+    [fn(i, size) for i=1:size]
+end
+
+type Constraints
+    rn :: Float64
+    rx :: Float64
+    in :: Float64
+    ix :: Float64
+end
+
+function gen_data(imageSize, iterations;  palette = gen_palette(), nx::Constraints = Constraints(-2.0, 2.0, -2.0, 2.0), fn = fn_mandel, chk = chk_mandel)
+    x, y = imageSize
+    xs = (nx.rx - nx.rn) / x
+    ys = (nx.ix - nx.in) / y
+    imgData = Array(Float64, imageSize[1], imageSize[2], 3)
+
+    cx, cy = nx.rn, nx.in
+
+    for yi = 1:y
+        cx = nx.rn
+        cy += ys
+
+        for xi = 1:x
+            imgData[yi, xi, 1:3] = [0, 0, 0]
+            cx += xs
+            c = complex(cx, cy)
+
+            z = 0 + 0im
+            for i = 1:iterations
+                z = fn(z, c)
+                if chk(z)
+                    fact = i / iterations
+                    sz = size(palette, 1)
+                    idx = floor(Int64, fact * sz)
+                    imgData[yi, xi, 1:3] = [palette[idx]...]
+                    break
+                end
+            end
+        end
+    end
+
+    imgData
+end
+
+fn_mandel(z, c) = z*2 + c
+chk_mandel(z) =  z |> real |> abs2 > 4.0 || z |> imag |> abs2 > 4.0
+
+function gen_img(imageData)
+    colorim(imageData, "RGB")
+end
+
+function gen(imageSize, iterations; palette = gen_palette(), nx::Constraints = Constraints(-2.0, 2.0, -2.0, 2.0), fn = fn_mandel, chk = chk_mandel)
+    gen_img(gen_data(imageSize, iterations, nx=nx, fn=fn, chk=chk))
+end
+
+function gen_show(imageSize, iterations; palette = gen_palette(), nx::Constraints = Constraints(-2.0, 2.0, -2.0, 2.0), fn = fn_mandel, chk = chk_mandel)
+    view(gen_img(gen_data(imageSize, iterations, nx=nx, fn=fn, chk=chk)))
+end
+
+function gen_save(fileNameBase, fileIndex, imageSize, iterations; palette = gen_palette(), nx::Constraints = Constraints(-2.0, 2.0, -2.0, 2.0), fn = fn_mandel, chk = chk_mandel)
+    strIdx = "$fileIndex"
+    strIdxPre = "0"^(5 - length(strIdx))
+    filename = "$fileNameBase$strIdxPre$strIdx.png"
+    print ("$filename... ")
+
+    img = gen_img(gen_data(imageSize, iterations, nx=nx, fn=fn, chk=chk))
+
+    imwrite(img, filename)
+    println ("done.")
+end
+
+end

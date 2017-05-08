@@ -1,0 +1,67 @@
+using BinDeps,Compat
+
+@BinDeps.setup
+
+libblis = library_dependency("libblis")
+version = "0.1.5"
+provides(Sources, URI("https://github.com/flame/blis/archive/$version.tar.gz"),
+    libblis, unpacked_dir="blis-$version")
+
+# Determine which processor configuration to use
+# Take advantage of new OpenBLAS functionality
+processor = ""
+openblas = @compat(Libdl.dlopen_e)("libopenblas", @compat(Libdl.RTLD_GLOBAL))
+if openblas != C_NULL
+    if dlsym_e(openblas, :openblas_get_corename) != C_NULL
+        @unix_only processor = lowercase(bytestring(ccall(:openblas_get_corename, Ptr{Cchar}, () )))
+        @windows_only processor = lowercase(bytestring(ccall((:openblas_get_corename, "libopenblas"), Ptr{Cchar}, () )))
+        info("OpenBLAS indicates your processor is a $processor")
+    else
+        info("OpenBLAS version is older than v0.2.10.rc2, could not determine processor family")
+    end
+else
+    info("Not using OpenBLAS, could not determine processor family") # TODO: check from LLVM on 0.4
+end
+# Map processor names from OpenBLAS to available BLIS configurations
+# I'm largely guessing here, open an issue if something doesn't work for your processor!
+name_mapping = ["dunnington"  => "dunnington",
+                "nehalem"     => "dunnington",
+                "sandybridge" => "sandybridge",
+                "haswell"     => "sandybridge",
+                "piledriver"  => "piledriver"]
+
+# CHANGE NEXT LINE if you want to force a specific BLIS configuration
+blisconfig = ""
+# See https://github.com/flame/blis/tree/master/config for available options
+if blisconfig == ""
+    if haskey(name_mapping, processor)
+        blisconfig = name_mapping[processor]
+        info("Using closest BLIS configuration $blisconfig")
+    else
+        blisconfig = "reference"
+        info("Could not find matching BLIS configuration, using $blisconfig")
+    end
+else
+    info("Using specified BLIS configuration $blisconfig")
+end
+
+prefix = joinpath(BinDeps.depsdir(libblis),"usr")
+srcdir = joinpath(BinDeps.depsdir(libblis),"src","blis-$version")
+
+provides(SimpleBuild,
+    (@build_steps begin
+        GetSources(libblis)
+        @build_steps begin
+            ChangeDirectory(srcdir)
+            `sed -ibackup 's/BLIS_ENABLE_DYNAMIC_BUILD       := no/BLIS_ENABLE_DYNAMIC_BUILD       := yes/'
+                $srcdir/config/$blisconfig/make_defs.mk` # build shared library
+            `./configure -p $prefix $blisconfig`
+            `make -j$(Sys.CPU_CORES)`
+            `make install`
+            @osx_only `mv $prefix/lib/libblis.so $prefix/lib/libblis.dylib`
+        end
+    end), libblis, os = :Unix)
+
+@windows_only warn("Windows BinDeps not set up yet")
+
+@BinDeps.install [:libblis => :libblis]

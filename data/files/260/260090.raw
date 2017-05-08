@@ -1,0 +1,7 @@
+function scenario_risk_preprocess(job_file)
+  inputs = Dict{ASCIIString, ScenarioRiskInput}()
+  include(job_file)
+  input = ScenarioRiskInput(assets, gmfs, tax_vf_map)
+  inputs["b1"] = input
+  return inputs
+end

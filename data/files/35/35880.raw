@@ -1,0 +1,112 @@
+# this standalone script can be put anywhere
+#
+# run from shell/command-line:
+# julia FastqSplitter.jl -i <index>  -l <READ1> -r <READ2>
+#
+# required arguments:
+#   -i, --index INDEX  the index file
+#                      http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
+#   -l, --read1 READ1  read1 input fastq file, can be gzipped
+#   -r, --read2 READ2  read2 input fastq file, can be gzipped
+
+using OpenGene
+using ArgParse
+
+function split_pair(index, read1, read2)
+    indexes = load_index(index)
+    out_streams = Dict()
+    sample = 0
+
+    # create out streams
+    for (barcode, name) in indexes
+        sample += 1
+        r1name = name * "_S$sample\_R1_001.fastq.gz"
+        r2name = name * "_S$sample\_R2_001.fastq.gz"
+        out_streams[barcode] = fastq_open_pair(r1name, r2name, "w")
+    end
+
+    # handle Undetermined
+    indexes["unknown"] = "Undetermined"
+    r1name = "Undetermined_S$sample\_R1_001.fastq.gz"
+    r2name = "Undetermined_S$sample\_R2_001.fastq.gz"
+    out_streams["unknown"] = fastq_open_pair(r1name, r2name, "w")
+
+    # get input
+    input = fastq_open_pair(read1, read2)
+
+    # read and output
+    while (pair = fastq_read_pair(input)) != false
+        fastq_name = pair.read1.name
+        barcode = get_barcode(fastq_name)
+        if barcode == false
+            continue
+        end
+        if haskey(indexes, barcode)
+            fastq_write_pair(out_streams[barcode], pair)
+        else
+            fastq_write_pair(out_streams["unknown"], pair)
+        end
+    end
+
+    # close all output streams
+    for (barcode, stream) in out_streams
+        close(stream)
+    end
+end
+
+function get_barcode(fastq_name::ASCIIString)
+    len = length(fastq_name)
+    for i = len:-1:1
+        if fastq_name[i] == ':'
+            return ASCIIString(fastq_name[i+1:len])
+        end
+    end
+    return false
+end
+
+function load_index(index)
+    table = Dict()
+    io = open(index)
+    while true
+        if eof(io)
+            break
+        end
+        line = rstrip(readline(io), '\n')
+        if length(line) == 0
+            break
+        end
+        items = split(line)
+        if length(items) < 2
+            continue
+        end
+        name = items[1]
+        barcode = items[2]
+        table[barcode] = name
+    end
+    return table
+end
+
+function main(args)
+
+    s = ArgParseSettings(description = "FastqSplitter: split fastq files by indexes")
+
+    @add_arg_table s begin
+        "--index",  "-i"
+            help = "the index file"
+            required = true
+        "--read1",   "-l"
+            help = "read1 input fastq file, can be gzipped"
+            required = true
+        "--read2",   "-r"
+            help = "read2 input fastq file, can be gzipped"
+            required = true
+    end
+
+    options = parse_args(s) # the result is a Dict{String,Any}
+    split_pair(options["index"], options["read1"],options["read2"])
+end
+
+# REPL is not supported
+if !isinteractive()
+    main(ARGS)
+end

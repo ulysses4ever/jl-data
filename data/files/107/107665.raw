@@ -1,0 +1,285 @@
+#Caterpillar Tube Pricing Benchmark
+#Julia Ver. 0.0.6 # data merged with all the data
+
+#Install Needed Libraries
+#Pkg.add("BinDeps")
+#Pkg.add("JSON")
+#Pkg.add("DataFrames")
+#Pkg.add("TextAnalysis")
+#Pkg.add("Gadfly")
+#Pkg.add("XGBoost")
+
+#Libraries, directories, options and extra functions----------------------
+Pkg.update()
+
+using JSON
+using DataFrames
+using TextAnalysis
+using Dates
+#using Gadfly
+using XGBoost
+
+#Read Settings file & external modules
+cd(dirname(@__FILE__()))
+
+#Import External Modules
+include(pwd() * "/dateAdjusters.jl")
+include(pwd() * "/helperFunctions.jl")
+
+#Set Directory Variables
+directories = JSON.parsefile("SETTINGS.json")
+
+dataDirectory = directories["dataDirectory"]
+edaDirectory = directories["EDALoc"]
+
+#Load data
+train = readtable(dataDirectory * "train_set.csv")
+test = readtable(dataDirectory * "test_set.csv")
+test = test[:, 2:size(test, 2)]
+test[:cost] = 0
+train[:idx] = -[1:size(train, 1)]
+test[:idx] = [1:size(test, 1)]
+dataFull = vcat(train, test)
+
+#Data Transformations
+#Quote Dates to numeric columns
+dataFull[:quote_date] = Date(dataFull[:quote_date], "y-m-d")
+
+#New Columns with date information
+dataFull[:year] = year(dataFull[:quote_date])
+dataFull[:month] = month(dataFull[:quote_date])
+dataFull[:day] = day(dataFull[:quote_date])
+dataFull[:dayWeek] = dayofweek(dataFull[:quote_date])
+dataFull[:quarter] = quarterofyear(dataFull[:quote_date])
+dataFull[:dayQuarter] = dayofquarter(dataFull[:quote_date])
+dataFull[:dayYear] = dayofyear(dataFull[:quote_date])
+dataFull[:weekInMonth] = dayofweekofmonth(dataFull[:quote_date])
+#New Columns with holiday information
+dataFull[:newYearsBool] = convert(Array{Int64}, map(isnewyears, dataFull[:quote_date]))
+dataFull[:easterBool] = convert(Array{Int64}, map(iseaster, dataFull[:quote_date]))
+dataFull[:veteransBool] = convert(Array{Int64}, map(isveteransday, dataFull[:quote_date]))
+dataFull[:mlkBool] = convert(Array{Int64}, map(ismartinlutherking, dataFull[:quote_date]))
+dataFull[:memorialBool] = convert(Array{Int64}, map(ismemorialday, dataFull[:quote_date]))
+dataFull[:laborBool] = convert(Array{Int64}, map(islaborday, dataFull[:quote_date]))
+dataFull[:columbusBool] = convert(Array{Int64}, map(iscolumbusday, dataFull[:quote_date]))
+dataFull[:winHolidaysBool] = convert(Array{Int64}, map(isWinterHolidays, dataFull[:quote_date]))
+
+#Merge all dataframes
+dataFull = join(dataFull, readtable(dataDirectory * "bill_of_materials.csv"),
+                on = :tube_assembly_id, kind = :inner)
+dataFull = join(dataFull, readtable(dataDirectory * "specs.csv"),
+                on = :tube_assembly_id, kind = :inner)
+dataFull = join(dataFull, readtable(dataDirectory * "tube.csv"),
+                on = :tube_assembly_id, kind = :inner)
+
+print("Current index order. First 6 elements: " * string(head(test[:idx])))
+print("The size of the merged dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+files2Merge = readdir(dataDirectory)[[2:8, 10:14]]
+
+#Take the component data files and merge them together
+for csv2read in files2Merge
+  tempFile = readtable(dataDirectory * csv2read)
+  originalNamesTempFile = names(tempFile)
+  for i in [1:8]
+    newColNames = [symbol(string(nameCol) * "_" * string(i)) for nameCol in originalNamesTempFile]
+    names!(tempFile, newColNames)
+    column2JoinOn = symbol("component_id_" * string(i))
+    dataFull = join(dataFull, tempFile, on = column2JoinOn, kind = :left)
+  end
+end
+
+print("The size of the merged dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+#Reduce Data Size; NA Removal from data frames
+accumulatedNAInfo = colwise(isna, dataFull)
+numberOfNAsPerColumn = map((x) -> sum(x) / length(x), accumulatedNAInfo)
+namesAndTypes = hcat(names(dataFull), eltypes(dataFull), numberOfNAsPerColumn)
+
+naThreshold = 0.99
+validColumnsIdxs = bool(map(x -> x < naThreshold, numberOfNAsPerColumn))
+dataFull = dataFull[:, [validColumnsIdxs]]
+
+print("The size of the reduced dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+namesAndTypesReduced = hcat(names(dataFull),
+                            eltypes(dataFull),
+                            numberOfNAsPerColumnReduced)
+
+#Name of columns to merge with type_end_form.csv & tube_end_form.csv
+nestedFiles = [("end_form_id", ["type_end_form.csv", "tube_end_form.csv"]),
+               ("component_type_id", ["type_component.csv"]),
+               ("connection_type_id", ["type_connection.csv"])]
+
+for listOfFiles in nestedFiles
+  for file2merge in listOfFiles[2]
+    file2MergeWith = readtable(dataDirectory * file2merge)
+    originalColNames = names(file2MergeWith)
+    stringNameColData = [string(nameColData) for nameColData in names(dataFull)]
+    endFormCols = stringNameColData[bool([contains(colString, listOfFiles[1]) for colString in stringNameColData])]
+    for endFormCol in endFormCols
+      colSuffix = endFormCol[length(listOfFiles[1]) + 1:length(endFormCol)]
+      newColNames = [symbol(string(newNames) * colSuffix) for newNames in originalColNames]
+      newColNames = convert(Array{Symbol}, newColNames)
+      names!(file2MergeWith, newColNames)
+      column2JoinOn = symbol(listOfFiles[1] * string(colSuffix))
+      dataFull = join(dataFull, file2MergeWith, on = column2JoinOn, kind = :left)
+    end
+  end
+end
+
+print("The size of the 2nd merge dataset is " * string(size(dataFull, 1)) * " rows and " *
+      string(size(dataFull, 2)) * " columns.")
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+
+validColumnsIdxs = bool(map(x -> x < naThreshold, numberOfNAsPerColumnReduced))
+dataFull = dataFull[:, [validColumnsIdxs]]
+
+accumulatedNAInfoReduced = colwise(isna, dataFull)
+numberOfNAsPerColumnReduced = map((x) -> sum(x) / length(x), accumulatedNAInfoReduced)
+namesAndTypesReduced = hcat(names(dataFull),
+                            eltypes(dataFull),
+                            numberOfNAsPerColumnReduced)
+
+#EDA
+#EDA 1; Cost Histograms
+#Cost histogram
+plot(x = dataFull[dataFull[:idx].< 0, :cost], Geom.histogram,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost"))
+#Log Cost histogram; useful for linear models and posible outlier detection
+plot(x = dataFull[dataFull[:idx].< 0, :cost], Geom.histogram, Scale.x_log,
+     Guide.ylabel("Amount"), Guide.xlabel("Cost in Log Scale"))
+
+#EDA #2; tube cost vs. volume order
+#This plot was based on the script found on:
+#https://www.kaggle.com/timabram/caterpillar-tube-pricing/tube-pricing-data-exploration-v2
+plot(x = dataFull[dataFull[:idx].< 0, :quantity], y = dataFull[dataFull[:idx].< 0, :cost],
+     Geom.histogram, Geom.point, Scale.x_log, Scale.y_log,
+     Geom.smooth(method = :loess, smoothing = 0.9),
+     Guide.xlabel("Quantity Bought in Log Scale"), Guide.ylabel("Cost in Log Scale"))
+
+#EDA #3: Number of NAs per column in merged dataframes
+plot(x = 1:size(namesAndTypes, 1), y = namesAndTypes[:, 3], Geom.bar,
+     Guide.xlabel("Column Names"), Guide.ylabel("Percentage of NAs in data"))
+
+plot(x = 1:size(namesAndTypesReduced, 1), y = namesAndTypesReduced[:, 3], Geom.bar,
+     Guide.xlabel("Column Names"), Guide.ylabel("Percentage of NAs in data"))
+
+
+#Define Categorical and Numeric Rows
+namesAndTypesReduced[:, 2] = map(x -> string(x), namesAndTypesReduced[:, 2])
+categoricalColumns = names(dataFull)[namesAndTypesReduced[:, 2] .== "UTF8String"]
+numericalColumns = names(dataFull)[namesAndTypesReduced[:, 2] .≠ "UTF8String"]
+
+#Clean Idx, cost and idx values from training features
+cleanNumeric = !bool([bool(string(colSymbol) == "cost") | bool(string(colSymbol) == "quote_date") | bool(string(colSymbol) == "idx")
+                      for colSymbol in numericalColumns])
+
+numericalColumns = numericalColumns[cleanNumeric]
+
+#Categorical Columns to Sparse Matrices
+categoricalSparse = sparse(rep(0, size(dataFull, 1)))
+
+for singleCol in categoricalColumns
+  colSparse = categorical2SparseMatrix(dataFull[singleCol])
+  categoricalSparse = hcat(categoricalSparse, colSparse)
+  #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+#Categorical Columns to Frequency (Counts)
+for singleCol in categoricalColumns
+  dataFull[singleCol] = categorical2frequency(dataFull[singleCol])
+  #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+#Categorical Columns to Function+Response
+#Get Training Indices
+trainingDataIdxs = find(dataFull[:idx] .< 0)
+costFullDataset = dataFull[:cost]
+
+for singleCol in categoricalColumns
+  dataFull[symbol(string(singleCol) * "Response")] = categorical2response(dataFull[singleCol],
+                                                                          costFullDataset,
+                                                                          trainingDataIdxs,
+                                                                          false, false)
+  #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+#Remove NAs from numerical data
+for singleCol in numericalColumns
+  dataFull[isna(dataFull[singleCol]) .== true, singleCol] = -999
+    #Print progress
+  print(string(singleCol) * " Column Processed")
+end
+
+typeof(dataFull)
+trainArray = convert(Array{Float32}, dataFull[:, vcat(categoricalColumns, numericalColumns)])
+derpArray = sparse(trainArray)
+
+#Remap the data to the original partitions
+train = dataFull[dataFull[:idx].< 0, :]
+test = dataFull[dataFull[:idx].> 0, :]
+testIds = test[:idx]
+print("Current index order. First 6 elements of train: " * string(head(train[:idx])))
+print("Current index order. First 6 elements of test:" * string(head(test[:idx])))
+
+#Shuffle train DataFrame
+shuffledIdxs = shuffle([1:size(train, 1)])
+train = train[shuffledIdxs, :]
+
+#Transform DataFrame into Array{float32} (which is currently supported by xgboost in julia)
+costTraining = convert(Array{Float32}, train[:, :cost])
+costTrainingLog = log1p(convert(Array{Float32}, train[:, :cost]))
+trainArray = convert(Array{Float32}, train[:, vcat(categoricalColumns, numericalColumns)])
+testArray = convert(Array{Float32}, test[:, vcat(categoricalColumns, numericalColumns)])
+
+#XGBOOST
+#Create Binary Matrices
+dtrain = DMatrix(trainArray, label = costTrainingLog)
+dtest = DMatrix(testArray)
+
+#Define the evaluation function (xgboost currently doesn't support RMSLE)
+function evalRMSLE(preds::Array{Float32, 1}, dtrain::DMatrix)
+  labels = get_info(dtrain, "label")
+  # return a pair metric_name, result
+  differenceLogs = log(1 + preds) - log(1 + labels)
+  RMSLEError = sqrt(1/length(differenceLogs) * sum([x ^ 2 for x in differenceLogs]))
+  return ("RMSLE", RMSLEError)
+end
+
+#5fold Cross-Validation
+nfold = 5
+num_round = 1500
+param = ["eta" => 0.03, "max_depth" => 20, "objective" => "reg:linear", "silent" => 1]
+
+#nfold_cv(dtrain, num_round, nfold, param = param, seed = 0)  #This takes too long, the evaluation function has to be further optimized
+
+#Model Training
+#with RMSLE Evaluation
+#XGBoostModel = xgboost(dtrain, num_round, param = param, feval = evalRMSLE)
+#without RMSLE Evaluation
+XGBoostModel = xgboost(dtrain, num_round, param = param)
+
+#Model Evaluation
+dump_model(XGBoostModel, "dump.nice.txt")
+
+#Predictions using test data
+preds = exp(predict(XGBoostModel, dtest)) - 1
+
+#Write Results
+sampleSubmission = readtable(dataDirectory * "sample_submission.csv")
+sampleSubmission[:id] = testIds
+sampleSubmission[:cost] = preds
+
+writetable("juliaXGBoostX.csv", sampleSubmission)
+

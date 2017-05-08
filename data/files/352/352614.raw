@@ -1,0 +1,14 @@
+function nanmean(x::Array,dim::Integer=1)
+	nans=isnan(x);
+	x[isnan(x)]=0;
+	# denominator
+	count = size(x,dim) - sum(nans,dim);
+
+	# Protect against a  all NaNs in one dimension
+	i = find(count==0);
+	count[i] = ones(size(i));
+
+	y = sum(x,dim)./count;
+	y[i] = i + NaN;
+	return y
+end

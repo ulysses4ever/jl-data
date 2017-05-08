@@ -1,0 +1,14 @@
+function trapz(y::Union(Array{Float64}, DataArray{Float64}), x::Union(Array{Float64}, DataArray{Float64}))
+    """
+    Integrate tabular data
+    """
+    n = length(y)
+    if n != length(x)
+        error("Input x,y must be of same length")
+    end
+    r = 0.0
+    for i in 2:n
+        r += (x[i] - x[i-1]) * (y[i] + y[i-1])
+    end
+    return r / 2.0
+end

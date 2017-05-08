@@ -1,0 +1,28 @@
+branches = ["b1"]
+num_assets = 1
+num_sims = 100000
+gmvs = readcsv("/Users/anirudh/GEM/OpenQuake/Tests/test/event_based_risk/data/case1g_gmfs.csv")
+num_gmfs = size(gmvs, 1)
+gmfs = Dict{ASCIIString, Vector{GroundMotionField}}()
+gmfs["b1"] = [GroundMotionField([loc => gmvs[i,loc]
+                                 for loc=1:num_assets]) for i=1:num_gmfs]
+
+vf_imls = [0.05, 0.20, 0.40, 0.60, 1.00, 1.40, 1.60, 2.00]
+
+vf_lrs = [0.000, 0.005, 0.050, 0.200, 0.450, 0.800, 1.000]
+vf_probs = [0.995 0.950 0.490 0.300 0.140 0.030 0.010 0.004;
+            0.004 0.030 0.380 0.400 0.300 0.100 0.030 0.006;
+            0.001 0.015 0.080 0.160 0.240 0.300 0.100 0.010;
+            0.000 0.004 0.020 0.080 0.160 0.260 0.300 0.030;
+            0.000 0.001 0.015 0.030 0.100 0.180 0.300 0.180;
+            0.000 0.000 0.010 0.020 0.040 0.100 0.180 0.390;
+            0.000 0.000 0.005 0.010 0.020 0.030 0.080 0.380]
+
+vf = DiscreteVulnerabilityFunction("PM", vf_imls, vf_lrs, vf_probs)
+
+assets = [Asset("a1", 1, "wood", 1, 10000, 1)]
+
+tax_vf_map = ["wood" => vf]
+
+risk_investigation_time = 1.0
+loss_curve_res = 50

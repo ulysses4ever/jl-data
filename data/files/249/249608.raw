@@ -1,0 +1,20 @@
+module Mesos
+
+import Base: start, join, run, error
+
+depsfile = Pkg.dir("Mesos","deps","deps.jl")
+if isfile(depsfile)
+    include(depsfile)
+else
+    error("Mesos not properly installed. Please run Pkg.build(\"Mesos\")")
+end
+
+include("Proto.jl")
+include("utils.jl")
+include("upid.jl")
+include("executor.jl")
+#include("scheduler.jl")
+
+export Executor, UPID
+
+end # module

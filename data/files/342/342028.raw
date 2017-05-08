@@ -1,0 +1,36 @@
+using Spike
+using ModernGL
+
+# create window instance: width 400, height 400, "title", xpos, ypos 
+window = WindowInstance("FPS Limit with Spike", [400, 400], [0, 0], [1.0,0.0,0.0,1.0])
+
+frames = 0.0
+starttime = time()
+fps = 30.0
+frametime = 1.0 / fps
+
+# bool of whether or not window is open, requires type WindowInstance
+while open(window)
+	# clear window
+	clear(window)
+
+	frames += 1.0
+	currenttime = time()
+	timedelta = currenttime - starttime
+	
+	if timedelta >= frametime
+		println("MS PER FRAME = ", frametime / frames * 1000.0, "  ---   ", "FPS = ", frames / timedelta)
+
+		frames = 0.0
+		starttime = currenttime
+		
+	end
+
+	# requires type WindowInstance, swaps buffer and polls events
+	update(window)
+	
+end
+
+# end OpenGL
+terminate()
+

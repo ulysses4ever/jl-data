@@ -1,0 +1,369 @@
+function testAcc(x::Float64)
+	return -x
+end
+
+function A(x)
+	return testAcc(x)
+end
+
+function twoMagnetX(x, y)
+	return -x/5 - (2*(-1 + x))/(1 + (-1 + x)^2 + y^2)^2 - (2*(1 + x))/(1 + (1 + x)^2 + y^2)^2
+end
+
+function twoMagnetY(x, y)
+	return  -y/5 - (2*y)/(1 + (-1 + x)^2 + y^2)^2 - (2*y)/(1 + (1 + x)^2 + y^2)^2
+end
+
+function twoMagnet(x, y)
+	t1 = (1 + (-1 + x)^2 + y^2)^2
+	t2 = (1 + (1 + x)^2 + y^2)^2
+	return (-x/5 - 2*(-1 + x)/t1 - 2*(1 + x)/t2, -y/5 - 2*y/t1 - 2*y/t2)
+end
+
+function threeMagnetX(x, y)
+	return -x/5 - (2*(-1 + x))/(1/2 + (-1 + x)^2 + y^2)^2 - (4 + 8*x)/(3 + 2*x + 2*x^2 - 2*sqrt(3)*y + 2*y^2)^2 - (4 + 8*x)/(3 + 2*x + 2*x^2 + 2*sqrt(3)*y + 2*y^2)^2
+end
+
+function threeMagnetY(x, y)
+	return  -y/5 - (2*y)/(1/2 + (-1 + x)^2 + y^2)^2 - (-4*sqrt(3) + 8*y)/(3 + 2*x + 2*x^2 - 2*sqrt(3)*y + 2*y^2)^2 - (4*(sqrt(3) + 2*y))/(3 + 2*x + 2*x^2 + 2*sqrt(3)*y + 2*y^2)^2
+end
+
+function fourMagnetX(x, y)
+	return -x/20 - x/(1/3 + x^2 + (-1 + y)^2)^2 + (1 - x)/(1/3 + (-1 + x)^2 + y^2)^2 - (1 + x)/(1/3 + (1 + x)^2 + y^2)^2 - x/(1/3 + x^2 + (1 + y)^2)^2
+end
+
+function fourMagnetY(x, y)
+	return (1 - y)/(1/3 + x^2 + (-1 + y)^2)^2 - y/20 - y/(1/3 + (-1 + x)^2 + y^2)^2 - y/(1/3 + (1 + x)^2 + y^2)^2 - (1 + y)/(1/3 + x^2 + (1 + y)^2)^2
+end
+
+function eightAlternatingMagnetX(x, y)
+	return -(0.05*x - x/(0.5 + x^2 + (-1 + y)^2)^2 + (-0.7071067811865475 + x)/(0.5 + (-0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 + (0.7071067811865475 + x)/(0.5 + (0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 - (-1 + x)/(0.5 + (-1 + x)^2 + y^2)^2 - (1 + x)/(0.5 + (1 + x)^2 + y^2)^2 + (-0.7071067811865475 + x)/(0.5 + (-0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 + (0.7071067811865475 + x)/(0.5 + (0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 - x/(0.5 + x^2 + (1 + y)^2)^2)
+end
+
+function eightAlternatingMagnetY(x, y)
+	return -((1 - y)/(0.5 + x^2 + (-1 + y)^2)^2 + (-0.7071067811865475 + y)/(0.5 + (-0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 + (-0.7071067811865475 + y)/(0.5 + (0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 + 0.05*y - y/(0.5 + (-1 + x)^2 + y^2)^2 - y/(0.5 + (1 + x)^2 + y^2)^2 + (0.7071067811865475 + y)/(0.5 + (-0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 + (0.7071067811865475 + y)/(0.5 + (0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 - (1 + y)/(0.5 + x^2 + (1 + y)^2)^2)
+end
+
+function eightAlternatingMagnetRotX(x, y)
+	return -0.05*x - (1*x)/(0.5 + x^2 + (-1 + y)^2)^2 + (-0.7071067811865475 + x)/(0.5 + (-0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 + (0.7071067811865475 + x)/(0.5 + (0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 - (1*(-1 + x))/(0.5 + (-1 + x)^2 + y^2)^2 - (1*(1 + x))/(0.5 + (1 + x)^2 + y^2)^2 + (-0.7071067811865475 + x)/(0.5 + (-0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 + (0.7071067811865475 + x)/(0.5 + (0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 - (1*x)/(0.5 + x^2 + (1 + y)^2)^2
+end
+
+function eightAlternatingMagnetRotY(x, y)
+	return (-1*(-1 + y))/(0.5 + x^2 + (-1 + y)^2)^2 + (-0.7071067811865475 + y)/(0.5 + (-0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 + (-0.7071067811865475 + y)/(0.5 + (0.7071067811865475 + x)^2 + (-0.7071067811865475 + y)^2)^2 - 0.05*y - (1*y)/(0.5 + (-1 + x)^2 + y^2)^2 - (1*y)/(0.5 + (1 + x)^2 + y^2)^2 + (0.7071067811865475 + y)/(0.5 + (-0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 + (0.7071067811865475 + y)/(0.5 + (0.7071067811865475 + x)^2 + (0.7071067811865475 + y)^2)^2 - (1*(1 + y))/(0.5 + x^2 + (1 + y)^2)^2
+end
+
+function fourMagnetWellX(x, y)
+	return (-0.2*x)/(0.1 + x^2 + (-1 + y)^2)^2 - (0.2*(-1 + x))/(0.1 + (-1 + x)^2 + y^2)^2 - (0.2*(1 + x))/(0.1 + (1 + x)^2 + y^2)^2 - (0.2*x)/(0.1 + x^2 + (1 + y)^2)^2 + (20*x*(-2 + sqrt(x^2 + y^2)))/(exp(5*(-2 + sqrt(x^2 + y^2))^2)*sqrt(x^2 + y^2) + 0.000000000000001)
+end
+
+function fourMagnetWellY(x, y)
+	return (-0.2*(-1 + y))/(0.1 + x^2 + (-1 + y)^2)^2 - (0.2*y)/(0.1 + (-1 + x)^2 + y^2)^2 - (0.2*y)/(0.1 + (1 + x)^2 + y^2)^2 - (0.2*(1 + y))/(0.1 + x^2 + (1 + y)^2)^2 + (20*y*(-2 + sqrt(x^2 + y^2)))/(exp(5*(-2 + sqrt(x^2 + y^2))^2)*sqrt(x^2 + y^2) + 0.000000000000001)
+end
+
+function CosxCosyX(x, y)
+	return -cos(y)*sin(x)
+end
+
+function CosxCosyY(x, y)
+	return -cos(x)*sin(y)
+end
+
+function Ax(x, y)
+	return fourMagnetWellX(x, y)
+end
+
+function Ay(x, y)
+	return fourMagnetWellY(x, y)
+end
+
+function A2(x, y)
+	return twoMagnet(x, y)
+end
+
+
+function EulerIntegrator(x0::Float64, v0::Float64, mu::Float64, deltaT, T)
+	x = x0
+	v = v0
+	a = 0.0
+	for i in 1:iround(T/deltaT)
+		a = A(x) - mu*v		#Calculate a_k from x_k and v_k
+		x += deltaT*v		#Calculate x_{k+1} from v_k
+		v += deltaT*a		#Calculate v_{k+1} from a_k
+	end
+	return x
+end
+
+function NaiveVelocityVerletIntegrator(x0::Float64, v0::Float64, mu::Float64, deltaT, T)
+	x = x0
+	v = v0
+	a = A(x) - mu*v
+	aPrev = 0.0
+	for i in 1:iround(T/deltaT)
+		x += deltaT*v + deltaT^2*a/2	#Calculate x_{k+1} from v_k and a_k
+		aPrev = a
+		a = A(x) - mu*v					#Calculate a_{k+1} from x_{k+1} and v_k
+		v += deltaT*(a + aPrev)/2		#Calculate v_{k+1} from a_{k+1} and a_k
+	end
+	return x
+end
+
+function ModifiedVelocityVerletIntegrator(x0::Float64, v0::Float64, mu::Float64, deltaT, T)
+	x = x0
+	v = v0
+	vApp = 0.0
+	a = A(x) - mu*v
+	aPrev = 0.0
+	deltaTso2 = deltaT^2/2
+	deltaTo2 = deltaT/2
+	for i in 1:iround(T/deltaT)
+		x += deltaT*v + deltaTso2*a	#Calculate x_{k+1} from v_k and a_k
+		vApp = v + deltaT*a				#Calculate vApp_{k+1} from v_k and a_k
+		aPrev = a
+		a = A(x) - mu*vApp				#Calculate a_{k+1} from x_{k+1} and vApp_{k+1}
+		v += deltaTo2*(a + aPrev)		#Calculate v_{k+1} from a_{k+1} and a_k
+	end
+	return x
+end
+
+function ModifiedVelocityVerletIntegrator2D(x0::Float64, y0::Float64, vx0::Float64, vy0::Float64, mu::Float64, deltaT, T)
+	x = x0
+	y = y0
+	vx = vx0
+	vy = vy0
+	vxApp = 0.0
+	vyApp = 0.0
+	ax = Ax(x, y) - mu*vx
+	ay = Ay(x, y) - mu*vy
+	axPrev = 0.0
+	ayPrev = 0.0
+	deltaTso2 = deltaT^2/2
+	deltaTo2 = deltaT/2
+	for i in 1:iround(T/deltaT)
+		x += deltaT*vx + deltaTso2*ax	
+		y += deltaT*vy + deltaTso2*ay	
+		vxApp = vx + deltaT*ax				
+		vyApp = vy + deltaT*ay				
+		axPrev = ax
+		ayPrev = ay
+		ax = Ax(x, y) - mu*vxApp
+		ay = Ay(x, y) - mu*vyApp				
+		vx += deltaTo2*(ax + axPrev)		
+		vy += deltaTo2*(ay + ayPrev)		
+	end
+	return Complex{Float32}(x, y)
+end
+
+function ModifiedVelocityVerletIntegrator2DAntialiased(x0::Float64, y0::Float64, vx0::Float64, vy0::Float64, deltaL::Float64, mu::Float64, deltaT, T)
+	return (ModifiedVelocityVerletIntegrator2D(x0, y0, vx0 + 0.25*deltaL, vy0 + 0.25*deltaL, mu, deltaT, T) + ModifiedVelocityVerletIntegrator2D(x0, y0, vx0 + 0.25*deltaL, vy0 - 0.25*deltaL, mu, deltaT, T) + ModifiedVelocityVerletIntegrator2D(x0, y0, vx0 - 0.25*deltaL, vy0 + 0.25*deltaL, mu, deltaT, T) + ModifiedVelocityVerletIntegrator2D(x0, y0, vx0 - 0.25*deltaL, vy0 - 0.25*deltaL, mu, deltaT, T))/4
+end
+
+
+function FullCalculation(L, deltaL, mu, deltaT, T)
+	ra = -L:deltaL:L
+	return [ModifiedVelocityVerletIntegrator2D(0.0, 0.0, x, y, mu, deltaT, T) for x in ra, y in ra]
+end
+
+function FullCalculationParallel(L, deltaL, mu, deltaT, T)
+	ra = -L:deltaL:L
+	len = length(ra)
+	np1 = iround((len-1)/2) + 1
+	arr = SharedArray(Complex{Float32}, (len, len))
+	for j in 1:len
+		@parallel for i in 1:len
+			arr[i, j] = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i - np1)*deltaL, (j - np1)*deltaL, mu, deltaT, T)
+		end
+	end
+	return sdata(arr)
+end
+
+function SymmetryD8Calculation(L, deltaL, mu, deltaT, T)
+	ra = -L:deltaL:L
+	len = length(ra)
+	temp = 0.0f0 + 0.0f0*im;
+	t1 = 0.0f0
+	t2 = 0.0f0
+	n = iround((len-1)/2)
+	arr = ones(Complex{Float32}, len, len)
+	for j in 1:(n+1)
+		for i in 1:j
+			temp = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i-1)*deltaL, (j-1)*deltaL, mu, deltaT, T)
+			t1 = real(temp)
+			t2 = imag(temp)
+			arr[n + i, n + j] = temp
+			arr[n - i + 2, n + j] = -t1 + im*t2
+			arr[n + j, n + i] = (0.0f0 - 1.0f0*im)*(-t1 + im*t2)
+			arr[n - j + 2, n + i] = (0.0f0 + 1.0f0*im)*temp
+			arr[n - i + 2, n - j + 2] = -temp
+			arr[n + i, n - j + 2] = (t1 - im*t2)
+			arr[n - j + 2, n - i + 2] = (0.0f0 + 1.0f0*im)*(-t1 + im*t2)
+			arr[n + j, n - i + 2] = (0.0f0 - 1.0f0*im)*temp
+		end
+	end
+	return arr
+end
+
+function SymmetryD8CalculationParallel(L, deltaL, mu, deltaT, T)
+	ra = -L:deltaL:L
+	len = length(ra)
+	temp = 0.0f0 + 0.0f0*im;
+	t1 = 0.0f0
+	t2 = 0.0f0
+	n = iround((len-1)/2)
+	arr = SharedArray(Complex{Float32}, (len, len))
+	for j in 1:(n+1)
+		@parallel for i in 1:j
+			temp = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i-1)*deltaL, (j-1)*deltaL, mu, deltaT, T)
+			t1 = real(temp)
+			t2 = imag(temp)
+			arr[n + i, n + j] = temp
+			arr[n - i + 2, n + j] = -t1 + im*t2
+			arr[n + j, n + i] = (0.0f0 - 1.0f0*im)*(-t1 + im*t2)
+			arr[n - j + 2, n + i] = (0.0f0 + 1.0f0*im)*temp
+			arr[n - i + 2, n - j + 2] = -temp
+			arr[n + i, n - j + 2] = (t1 - im*t2)
+			arr[n - j + 2, n - i + 2] = (0.0f0 + 1.0f0*im)*(-t1 + im*t2)
+			arr[n + j, n - i + 2] = (0.0f0 - 1.0f0*im)*temp
+		end
+	end
+	return sdata(arr)
+end
+
+function SymmetryD4Calculation(L, deltaL, mu, deltaT, T)
+	ra = -L:deltaL:L
+	len = length(ra)
+	temp = 0.0f0 + 0.0f0*im;
+	t1 = 0.0f0
+	t2 = 0.0f0
+	n = iround((len-1)/2)
+	arr = SharedArray(Complex{Float32}, (len, len))
+	for j in 1:(n+1)
+		for i in 1:(n+1)
+			temp = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i-1)*deltaL, (j-1)*deltaL, mu, deltaT, T)
+			t1 = real(temp)
+			t2 = imag(temp)
+			arr[n + i, n + j] = temp
+			arr[n - i + 2, n - j + 2] = -temp
+			arr[n + i, n - j + 2] = (t1 - im*t2)
+			arr[n - i + 2, n + j] = -t1 + im*t2
+		end
+	end
+	return sdata(arr)
+end
+
+function SymmetryS2Calculation(L, deltaL, mu, deltaT, T) # Symmetry axis along x
+	ra = -L:deltaL:L
+	len = length(ra)
+	temp = 0.0f0 + 0.0f0*im;
+	t1 = 0.0f0
+	t2 = 0.0f0
+	n = iround((len-1)/2)
+	arr = SharedArray(Complex{Float32}, (len, len))
+	for j in 1:(n+1)
+		for i in 1:(n+1)
+			temp = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i-1)*deltaL, (j-1)*deltaL, mu, deltaT, T)
+			t1 = real(temp)
+			t2 = imag(temp)
+			arr[n + i, n + j] = temp
+			arr[n - i + 2, n + j] = conj(temp)
+		end
+	end
+	return sdata(arr)
+end
+
+function SymmetryS2CalculationParallel(L, deltaL, mu, deltaT, T) # Symmetry axis along x
+	ra = -L:deltaL:L
+	len = length(ra)
+	temp = 0.0f0 + 0.0f0*im;
+	t1 = 0.0f0
+	t2 = 0.0f0
+	n = iround((len-1)/2)
+	arr = SharedArray(Complex{Float32}, (len, len))
+	for j in (-n+1):(n+1)
+		@parallel for i in 1:(n+1)
+			temp = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i-1)*deltaL, (j-1)*deltaL, mu, deltaT, T)
+			t1 = real(temp)
+			t2 = imag(temp)
+			arr[n + i, n + j] = temp
+			arr[n - i + 2, n + j] = conj(temp)
+		end
+	end
+	return sdata(arr)
+end
+
+function SymmetryD4CalculationParallel(L, deltaL, mu, deltaT, T)
+	ra = -L:deltaL:L
+	len = length(ra)
+	temp = 0.0f0 + 0.0f0*im;
+	t1 = 0.0f0
+	t2 = 0.0f0
+	n = iround((len-1)/2)
+	arr = SharedArray(Complex{Float32}, (len, len))
+	for j in 1:(n+1)
+		@parallel for i in 1:(n+1)
+			temp = ModifiedVelocityVerletIntegrator2D(0.0, 0.0, (i-1)*deltaL, (j-1)*deltaL, mu, deltaT, T)
+			t1 = real(temp)
+			t2 = imag(temp)
+			arr[n + i, n + j] = temp
+			arr[n - i + 2, n - j + 2] = -temp
+			arr[n + i, n - j + 2] = (t1 - im*t2)
+			arr[n - i + 2, n + j] = -t1 + im*t2
+		end
+	end
+	return sdata(arr)
+end
+
+#Performance timings
+# With 2 cores on work desktop
+
+
+# Computation-heavy runs (5000 timesteps)
+
+
+# @time SymmetryD8Calculation(1.0, 0.01, 0.1, 0.01, 50.0);
+# elapsed time: 2.028850677 seconds (323472 bytes allocated)
+
+# @time SymmetryD8CalculationParallel(1.0, 0.01, 0.1, 0.01, 50.0);
+# elapsed time: 0.940629403 seconds (8428996 bytes allocated, 3.51% gc time)
+# Probably due to master reporting calculation done while workers still working on edge of triangle.
+
+# @time FullCalculation(1.0, 0.01, 0.1, 0.01, 50.0);
+# elapsed time: 15.974085252 seconds (323472 bytes allocated)
+
+# @time FullCalculationParallel(1.0, 0.01, 0.1, 0.01, 50.0);
+# elapsed time: 7.875223872 seconds (9314496 bytes allocated, 0.78% gc time)
+
+
+# Mid-level runs (500 timesteps)
+
+
+# @time SymmetryD8Calculation(1.0, 0.003, 0.1, 0.1, 50.0);
+# elapsed time: 2.261372662 seconds (3559248 bytes allocated)
+
+# @time SymmetryD8CalculationParallel(1.0, 0.003, 0.1, 0.1, 50.0);
+# elapsed time: 1.210092263 seconds (27895820 bytes allocated, 3.73% gc time)
+
+# @time FullCalculation(1.0, 0.005, 0.1, 0.1, 50.0);
+# elapsed time: 6.321314879 seconds (1871612 bytes allocated)
+
+# @time FullCalculationParallel(1.0, 0.005, 0.1, 0.1, 50.0);
+# elapsed time: 3.170442112 seconds (18511256 bytes allocated, 2.10% gc time)
+
+
+# Array-write-heavy runs (50 timesteps)
+
+
+# @time SymmetryD8Calculation(1.0, 0.001, 0.1, 1.0, 50.0);
+# elapsed time: 2.058073406 seconds (32032288 bytes allocated)
+
+# @time SymmetryD8CalculationParallel(1.0, 0.001, 0.1, 1.0, 50.0);
+# elapsed time: 2.119996191 seconds (83800020 bytes allocated, 16.10% gc time)
+# OMFG
+
+# @time FullCalculation(1.0, 0.001, 0.1, 1.0, 50.0);
+# elapsed time: 15.703606591 seconds (32032288 bytes allocated)
+
+# @time FullCalculationParallel(1.0, 0.001, 0.1, 1.0, 50.0);
+# elapsed time: 9.440211736 seconds (92623664 bytes allocated, 6.76% gc time)
+
+
+# Parallel doesn't work well on lightweight computations.

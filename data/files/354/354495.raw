@@ -1,0 +1,387 @@
+
+type CurrentPlot
+  nullableplot::Nullable{PlottingObject}
+end
+const CURRENT_PLOT = CurrentPlot(Nullable{PlottingObject}())
+
+isplotnull() = isnull(CURRENT_PLOT.nullableplot)
+
+function current()
+  if isplotnull()
+    error("No current plot/subplot")
+  end
+  get(CURRENT_PLOT.nullableplot)
+end
+current(plot::PlottingObject) = (CURRENT_PLOT.nullableplot = Nullable(plot))
+
+# ---------------------------------------------------------
+
+
+Base.string(plt::Plot) = "Plot{$(plt.backend) n=$(plt.n)}"
+Base.print(io::IO, plt::Plot) = print(io, string(plt))
+Base.show(io::IO, plt::Plot) = print(io, string(plt))
+
+getplot(plt::Plot) = plt
+getinitargs(plt::Plot, idx::Int = 1) = plt.initargs
+convertSeriesIndex(plt::Plot, n::Int) = n
+
+# ---------------------------------------------------------
+
+
+doc"""
+The main plot command.  Use `plot` to create a new plot object, and `plot!` to add to an existing one:
+
+```
+  plot(args...; kw...)                  # creates a new plot window, and sets it to be the current
+  plot!(args...; kw...)                 # adds to the `current`
+  plot!(plotobj, args...; kw...)        # adds to the plot `plotobj`
+```
+
+There are lots of ways to pass in data, and lots of keyword arguments... just try it and it will likely work as expected.
+When you pass in matrices, it splits by columns.  See the documentation for more info.
+"""
+
+# this creates a new plot with args/kw and sets it to be the current plot
+function plot(args...; kw...)
+  pkg = backend()
+  d = Dict(kw)
+  preprocessArgs!(d)
+  for k in sort(collect(keys(d))); println(); @printf("%14s: ", k); println(d[k], "\n"); end
+
+  # # ensure we're passing in an RGB
+  # if haskey(d, :background_color)
+  #   d[:background_color] = convertColor(d[:background_color])
+  # end
+
+  plt = plot(pkg; getPlotArgs(pkg, d, 1)...)  # create a new, blank plot
+
+  delete!(d, :background_color)
+  plot!(plt, args...; d...)  # add to it
+end
+
+
+
+# this adds to the current plot, or creates a new plot if none are current
+function  plot!(args...; kw...)
+  local plt
+  try
+    plt = current()
+  catch
+    return plot(args...; kw...)
+  end
+  plot!(current(), args...; kw...)
+end
+
+# not allowed:
+function plot!(subplt::Subplot, args...; kw...)
+  error("Can't call plot! on a Subplot!")
+end
+
+# this adds to a specific plot... most plot commands will flow through here
+function plot!(plt::Plot, args...; kw...)
+
+  d = Dict(kw)
+  preprocessArgs!(d)
+
+  warnOnUnsupportedArgs(plt.backend, d)
+
+  # handle a "group by" mechanism.
+  groupargs = get(d, :group, nothing) == nothing ? [] : [extractGroupArgs(d[:group], args...)]
+
+  # just in case the backend needs to set up the plot (make it current or something)
+  preparePlotUpdate(plt)
+
+  # get the list of dictionaries, one per series
+  kwList, xmeta, ymeta = createKWargsList(plt, groupargs..., args...; d...)
+  
+  # if we were able to extract guide information from the series inputs, then update the plot
+  updateDictWithMeta(d, plt.initargs, xmeta, true)
+  updateDictWithMeta(d, plt.initargs, ymeta, false)
+
+  # now we can plot the series
+  for (i,di) in enumerate(kwList)
+    plt.n += 1
+
+    setTicksFromStringVector(d, di, :x, :xticks)
+    setTicksFromStringVector(d, di, :y, :yticks)
+
+    plot!(plt.backend, plt; di...)
+  end
+
+  addAnnotations(plt, d)
+
+  warnOnUnsupportedScales(plt.backend, d)
+
+  # add title, axis labels, ticks, etc
+  updatePlotItems(plt, d)
+  current(plt)
+
+  # NOTE: lets ignore the show param and effectively use the semicolon at the end of the REPL statement
+  # # do we want to show it?
+  if haskey(d, :show) && d[:show]
+    gui()
+  end
+
+  plt
+end
+
+# --------------------------------------------------------------------
+
+# if x or y are a vector of strings, we should create a list of unique strings,
+# and map x/y to be the index of the string... then set the x/y tick labels
+function setTicksFromStringVector(d::Dict, di::Dict, sym::Symbol, ticksym::Symbol)
+  # if the x or y values are strings, set ticks to the unique values, and x/y to the indices of the ticks
+
+  # @show sym di
+  v = di[sym]
+  # @show v
+  isa(v, AbstractArray) || return
+
+  T = eltype(v)
+  # @show T
+  if T <: AbstractString || (!isempty(T.types) && all(x -> x <: AbstractString, T.types))
+    # @show sym ticksym di[sym]
+
+    ticks = unique(di[sym])
+    # @show ticks
+    di[sym] = Int[findnext(ticks, v, 1) for v in di[sym]]
+
+    if !haskey(d, ticksym) || d[ticksym] == :auto
+      d[ticksym] = (collect(1:length(ticks)), UTF8String[t for t in ticks])
+    end
+  end
+  # @show sym ticksym di[sym] d[ticksym]
+end
+
+# --------------------------------------------------------------------
+
+preparePlotUpdate(plt::Plot) = nothing
+
+# --------------------------------------------------------------------
+
+# should we update the x/y label given the meta info during input slicing?
+function updateDictWithMeta(d::Dict, initargs::Dict, meta::Symbol, isx::Bool)
+  lsym = isx ? :xlabel : :ylabel
+  if initargs[lsym] == default(lsym)
+    d[lsym] = string(meta)
+  end
+end
+updateDictWithMeta(d::Dict, initargs::Dict, meta, isx::Bool) = nothing
+
+# --------------------------------------------------------------------
+
+annotations(::Void) = []
+annotations{X<:Real, Y<:Real, V}(v::AVec{Tuple{X,Y,V}}) = v
+annotations{X<:Real, Y<:Real, V}(t::Tuple{X,Y,V}) = [t]
+annotations(anns) = error("Expecting a tuple (or vector of tuples) for annotations: ",
+                       "(x, y, annotation)\n    got: $(typeof(anns))")
+
+function addAnnotations(plt::Plot, d::Dict)
+  anns = annotations(get(d, :annotation, nothing))
+  if !isempty(anns)
+    addAnnotations(plt, anns)
+  end
+end
+
+
+# --------------------------------------------------------------------
+
+
+# create a new "createKWargsList" which converts all inputs into xs = Any[xitems], ys = Any[yitems].
+# Special handling for: no args, xmin/xmax, parametric, dataframes
+# Then once inputs have been converted, build the series args, map functions, etc.
+# This should cut down on boilerplate code and allow more focused dispatch on type
+# note: returns meta information... mainly for use with automatic labeling from DataFrames for now
+
+typealias FuncOrFuncs Union{Function, AVec{Function}}
+
+# missing
+convertToAnyVector(v::Void; kw...) = Any[nothing], nothing
+
+# fixed number of blank series
+convertToAnyVector(n::Integer; kw...) = Any[zero(0) for i in 1:n], nothing
+
+# numeric vector
+convertToAnyVector{T<:Real}(v::AVec{T}; kw...) = Any[v], nothing
+
+# string vector
+convertToAnyVector{T<:AbstractString}(v::AVec{T}; kw...) = Any[v], nothing
+
+# numeric matrix
+convertToAnyVector{T<:Real}(v::AMat{T}; kw...) = Any[v[:,i] for i in 1:size(v,2)], nothing
+
+# function
+convertToAnyVector(f::Function; kw...) = Any[f], nothing
+
+# vector of OHLC
+convertToAnyVector(v::AVec{OHLC}; kw...) = Any[v], nothing
+
+# list of things (maybe other vectors, functions, or something else)
+convertToAnyVector(v::AVec; kw...) = Any[vi for vi in v], nothing
+
+
+# --------------------------------------------------------------------
+
+# in computeXandY, we take in any of the possible items, convert into proper x/y vectors, then return.
+# this is also where all the "set x to 1:length(y)" happens, and also where we assert on lengths.
+computeX(x::Void, y) = 1:length(y)
+computeX(x, y) = copy(x)
+computeY(x, y::Function) = map(y, x)
+computeY(x, y) = copy(y)
+function computeXandY(x, y)
+  if x == nothing && isa(y, Function)
+    error("If you want to plot the function `$y`, you need to define the x values somehow!")
+  end
+  x, y = computeX(x,y), computeY(x,y)
+  @assert length(x) == length(y)
+  x, y
+end
+
+
+# --------------------------------------------------------------------
+
+# create n=max(mx,my) series arguments. the shorter list is cycled through
+# note: everything should flow through this
+function createKWargsList(plt::PlottingObject, x, y; kw...)
+  xs, xmeta = convertToAnyVector(x; kw...)
+  ys, ymeta = convertToAnyVector(y; kw...)
+  mx = length(xs)
+  my = length(ys)
+  ret = []
+  for i in 1:max(mx, my)
+
+    # try to set labels using ymeta
+    d = Dict(kw)
+    if !haskey(d, :label) && ymeta != nothing
+      if isa(ymeta, Symbol)
+        d[:label] = string(ymeta)
+      elseif isa(ymeta, AVec{Symbol})
+        d[:label] = string(ymeta[mod1(i,length(ymeta))])
+      end
+    end
+
+    # build the series arg dict
+    numUncounted = get(d, :numUncounted, 0)
+    n = plt.n + i + numUncounted
+    d = getSeriesArgs(plt.backend, getinitargs(plt, n), d, i + numUncounted, convertSeriesIndex(plt, n), n)
+    d[:x], d[:y] = computeXandY(xs[mod1(i,mx)], ys[mod1(i,my)])
+
+    if haskey(d, :idxfilter)
+      # @show d[:idxfilter] d[:x] d[:y]
+      d[:x] = d[:x][d[:idxfilter]]
+      d[:y] = d[:y][d[:idxfilter]]
+    end
+
+    # for linetype `line`, need to sort by x values
+    if d[:linetype] == :line
+      # order by x
+      indices = sortperm(d[:x])
+      d[:x] = d[:x][indices]
+      d[:y] = d[:y][indices]
+      d[:linetype] = :path
+    end
+
+    # add it to our series list
+    push!(ret, d)
+  end
+
+  ret, xmeta, ymeta
+end
+
+# handle grouping
+function createKWargsList(plt::PlottingObject, groupby::GroupBy, args...; kw...)
+  ret = []
+  for (i,glab) in enumerate(groupby.groupLabels)
+    # TODO: don't automatically overwrite labels
+    kwlist, xmeta, ymeta = createKWargsList(plt, args...; kw...,
+                                            idxfilter = groupby.groupIds[i],
+                                            label = string(glab),
+                                            numUncounted = length(ret))  # we count the idx from plt.n + numUncounted + i
+    append!(ret, kwlist)
+  end
+  ret, nothing, nothing # TODO: handle passing meta through
+end
+
+# pass it off to the x/y version
+function createKWargsList(plt::PlottingObject, y; kw...)
+  createKWargsList(plt, nothing, y; kw...)
+end
+
+function createKWargsList(plt::PlottingObject, f::FuncOrFuncs; kw...)
+  error("Can't pass a Function or Vector{Function} for y without also passing x")
+end
+
+function createKWargsList(plt::PlottingObject, f::FuncOrFuncs, x; kw...)
+  @assert !(typeof(x) <: FuncOrFuncs)  # otherwise we'd hit infinite recursion here
+  createKWargsList(plt, x, f; kw...)
+end
+
+# special handling... xmin/xmax with function(s)
+function createKWargsList(plt::PlottingObject, f::FuncOrFuncs, xmin::Real, xmax::Real; kw...)
+  width = plt.initargs[:size][1]
+  x = collect(linspace(xmin, xmax, width))  # we don't need more than the width
+  createKWargsList(plt, x, f; kw...)
+end
+
+mapFuncOrFuncs(f::Function, u::AVec) = map(f, u)
+mapFuncOrFuncs(fs::AVec{Function}, u::AVec) = [map(f, u) for f in fs]
+
+# special handling... xmin/xmax with parametric function(s)
+function createKWargsList(plt::PlottingObject, fx::FuncOrFuncs, fy::FuncOrFuncs, umin::Real, umax::Real, numPoints::Int = 1000; kw...)
+  u = collect(linspace(umin, umax, numPoints))
+  createKWargsList(plt, mapFuncOrFuncs(fx, u), mapFuncOrFuncs(fy, u); kw...)
+end
+
+
+# special handling... no args... 1 series
+function createKWargsList(plt::PlottingObject; kw...)
+  d = Dict(kw)
+  if !haskey(d, :y)
+    # assume we just want to create an empty plot object which can be added to later
+    return [], nothing, nothing
+    # error("Called plot/subplot without args... must set y in the keyword args.  Example: plot(; y=rand(10))")
+  end
+  
+  if haskey(d, :x)
+    return createKWargsList(plt, d[:x], d[:y]; kw...)
+  else
+    return createKWargsList(plt, d[:y]; kw...)
+  end
+end
+
+# --------------------------------------------------------------------
+
+"For DataFrame support.  Imports DataFrames and defines the necessary methods which support them."
+function dataframes()
+  @eval import DataFrames
+
+  @eval function createKWargsList(plt::PlottingObject, df::DataFrames.DataFrame, args...; kw...)
+    createKWargsList(plt, args...; kw..., dataframe = df)
+  end
+
+  # expecting the column name of a dataframe that was passed in... anything else should error
+  @eval function extractGroupArgs(s::Symbol, df::DataFrames.DataFrame, args...)
+    if haskey(df, s)
+      return extractGroupArgs(df[s])
+    else
+      error("Got a symbol, and expected that to be a key in d[:dataframe]. s=$s d=$d")
+    end
+  end
+
+  @eval function getDataFrameFromKW(; kw...)
+    for (k,v) in kw
+      if k == :dataframe
+        return v
+      end
+    end
+    error("Missing dataframe argument in arguments!")
+  end
+
+  # the conversion functions for when we pass symbols or vectors of symbols to reference dataframes
+  @eval convertToAnyVector(s::Symbol; kw...) = Any[getDataFrameFromKW(;kw...)[s]], s
+  @eval convertToAnyVector(v::AVec{Symbol}; kw...) = (df = getDataFrameFromKW(;kw...); Any[df[s] for s in v]), v
+end
+
+
+# --------------------------------------------------------------------
+

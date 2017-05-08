@@ -1,0 +1,40 @@
+type GPUArray{T, ND}
+    buffer  ::GPUArray{T, ND}
+    size    ::NTuple{ND, Int}
+end
+function optimal_shape{T}(array::Vector{T})
+    len         = length(array)
+    estimate    = sqrt(len)
+    pstride     = 2
+    while pstride < estimate && (len / pstride) > 1.0
+        pstride *= 2
+    end
+    pstride
+    if len % pstride != 0
+        append!(array, fill(Point3f(typemax(Float32)), pstride-(len%pstride))) # append if can't be reshaped with 1024
+    end
+    reshape(array, (pstride, div(length(array), pstride)))
+end
+
+
+function Base.push!(a::GPUArray{T, 2}, array::Vector{T})
+    @assert size(a, 1) == length(array) "can just push vectors with the same stride as the GPUArray"
+    size(a, 2)+1 >= size(a.buffer, 2) && grow!(a)
+    a.buffer[size(a,2)+1, 1:end] = array
+    a.size = (a.size[1], a.size[2]+1)
+    a
+end 
+function Base.push!(a::GPUArray{T, 1}, value::T)
+    length(a)+1 >= lenth(a.buffer) && grow!(a)
+    a.buffer[length(a)+1] = value
+    a.size = (a.size[1]+1,)
+    a
+end 
+function Base.append!(a::GPUArray{T, 1}, array::Vector{T})
+    len = length(array)
+    length(a)+len >= lenth(a.buffer) && grow!(a)
+    a.buffer[length(a)+1: length(a)+len] = array
+    a.size = (length(a)+length(array),)
+    a
+end
+

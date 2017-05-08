@@ -1,0 +1,251 @@
+#############################################################################
+# InteriorPoint.jl
+# Pure-Julia interior point solver for linear programs
+# By Iain Dunning
+# http://github.com/IainNZ/InteriorPoint.jl
+#############################################################################
+
+function solveIP(data::InteriorPointModel)
+    # This implementation is based on the description in 
+    # "Numerical Optimization" by Nocedal and Wright
+    
+    println("== InteriorPoint.jl")
+    m, n = size(data.A)
+    println("=== Initial problem size: $m rows, $n columns")
+
+    # Presolve
+    println("=== Applying presolve...")
+    presolved = presolve(data)
+    m, n = size(presolved.A)
+    println("=== Size after presolve : $m rows, $n columns")
+
+
+    # Convert data to standard form
+    println("Converting to standard form...")
+    A, b, c = convert_scf(presolved)
+    m, n = size(A)
+
+    # Determine an initial solution
+    tic()
+    println("Finding initial solution...")
+    x, λ, s = find_initial_solution(A,b,c)
+
+    for iteration = 1:100
+        println("Iteration $iteration")
+        println("At start of iteration: ")
+        println(" - Primal obj: ", dot(x,c))
+        println(" - Dual   obj: ", dot(b,λ))
+
+        # Form left-hand-side
+        # TODO: Don't form this left-hand-side :)
+        lhs = [zeros(n,n)          A'    eye(n,n);
+                        A  zeros(m,m)  zeros(m,n);
+                 diagm(s)  zeros(n,m)    diagm(x)]
+
+        # Factor left-hand-side
+        # TODO: Write my own Cholesky code?? D:
+        lhs_fact = lufact!(lhs)
+
+        # Solve for affine-scaling directions
+        r_b = A*x - b
+        r_c = A'*λ + s - c
+        ans = lhs_fact \ vcat(-r_c, -r_b, -x.*s)
+        Δ_x_aff = ans[1:n]
+        Δ_λ_aff = ans[n+1:n+m]
+        Δ_s_aff = ans[n+m+1:n+m+n]
+
+        # Calculate affine-scaling step length
+        α_pri_aff = 1.0
+        for i = 1:n
+            if Δ_x_aff[i] < 0.0
+                α_pri_aff  = min(α_pri_aff,  -x[i] / Δ_x_aff[i])
+            end
+        end
+        α_dual_aff = 1.0
+        for i = 1:m
+            if Δ_s_aff[i] < 0.0
+                α_dual_aff = min(α_dual_aff, -s[i] / Δ_s_aff[i])
+            end
+        end
+        μ = 1/n * dot(x, s)
+        μ_aff = 1/n * dot(x .+ α_pri_aff * Δ_x_aff, s .+ α_dual_aff * Δ_s_aff)
+
+        # Calculate centering parameter
+        σ = (μ_aff / μ) ^ 3
+
+        # Re-solve for actual directions
+        ans = lhs_fact \ vcat(-r_c, -r_b, -x.*s .- Δ_x_aff.*Δ_s_aff .+ σ*μ)
+        Δ_x = ans[1:n]
+        Δ_λ = ans[n+1:n+m]
+        Δ_s = ans[n+m+1:n+m+n]
+
+        # Calculate step lengths
+        eta = 0.9
+        α_pri_max = Inf
+        for i = 1:n
+            if Δ_x[i] < 0.0
+                α_pri_max  = min(α_pri_max,  -x[i] / Δ_x[i])
+            end
+        end
+        α_dual_max = Inf
+        for i = 1:m
+            if Δ_s[i] < 0.0
+                α_dual_max  = min(α_dual_max,  -s[i] / Δ_s[i])
+            end
+        end
+        α_pri  = min(1.0, eta*α_pri_max)
+        α_dual = min(1.0, eta*α_dual_max)
+
+        # Update current solution
+        x .+= α_pri  * Δ_x
+        λ .+= α_dual * Δ_λ
+        s .+= α_dual * Δ_s
+
+        if abs(dot(c,x) - dot(b,λ)) < 1e-4
+            println("UNDER TOL, YAY")
+            break
+        end
+    end
+    toc()
+
+    data.x      = x
+    data.objval = dot(c,x)
+    data.dual   = λ
+end
+
+
+
+# find_initial_solution
+# Finds a "good" starting point that approximately satisfies the primal and
+# dual constraints, has positive x and s, and doesn't have components that
+# are "too large".
+# TODO: Reorganize so not using inverse
+function find_initial_solution(A,b,c)
+    # Solve min 0.5dot(x,x) s.t. A x = b
+    # => Ax=b, x= A'μ
+    # => AA'μ=b
+    # => x_tilde = A' * inv( A * A' ) * b
+    AAT = A*A'
+    μ = AAT \ b
+    x_tilde = A' * μ
+
+    # Solve min 0.5dot(s,s) s.t. A'λ + s = c
+    # => s+A'λ=c, s=μ, 0=Aμ
+    # => s=c-A'λ
+    # => AA'λ=Ac
+    λ_tilde = AAT \ (A * c)
+    s_tilde = c - A' * λ_tilde
+
+    # Some components of x,s maybe be negative. Add constant offset to all
+    # elements to ensure non-negativity
+    δ_x = max(-3/2 * minimum(x_tilde), 0)
+    δ_s = max(-3/2 * minimum(s_tilde), 0)
+    x_hat = x_tilde .+ δ_x
+    s_hat = s_tilde .+ δ_s
+
+    # Now ensure that the components are not too close to zero and not too
+    # dissimilar, add two more scalars and return our starting point
+    δ_hat_x = 1/2 * dot(x_hat, s_hat) / sum(s_hat)
+    δ_hat_s = 1/2 * dot(x_hat, s_hat) / sum(x_hat)
+    return x_hat .+ δ_hat_x,  λ_tilde,  s_hat .+ δ_hat_s
+end
+
+
+
+# convert_scf
+# Take raw general model and convert it to 
+# min cx
+#  st Ax=b
+#      x>=0
+function convert_scf(data)
+    
+    # Assume x >= 0
+    # TODO: Handle this
+    for j = 1:length(data.collb)
+        if data.collb[j] != 0.0 || data.colub[j] != Inf
+            println("Col $j  lb  $(data.collb[j])")
+            println("Col $j  ub  $(data.colub[j])")
+            #readline()
+        end
+    end
+
+    # Non-equality constraints need to become equality constraints
+    # To do we, we add slacks to the matrix
+    new_slacks = Int[]
+    for i = 1:length(data.rowlb)
+        if data.rowlb[i] == data.rowub[i]
+            # Equality constraint - do nothing
+        elseif data.rowlb[i] == -Inf && data.rowub[i] != +Inf
+            # LEQ constraint - add a slack
+            push!(new_slacks, +i)
+        elseif data.rowlb[i] != -Inf && data.rowub[i] == +Inf
+            # GEQ constraint - substract a surplus
+            push!(new_slacks, -i)
+        else
+            # Range - give up for now
+            error("Range constraints are not supported")
+        end
+    end
+    # We'll assume initially that its all <=, and copy over row lower
+    # bounds as they are needed
+    b = copy(data.rowub)
+    # All slacks have 0 objective
+    c = vcat(data.obj, zeros(length(new_slacks)))
+    # We'll stick a new (should be sparse) matrix on the right of our
+    # existing one for the slacks
+    new_slack_matrix = zeros(length(data.rowlb),length(new_slacks))
+    for offset = 1:length(new_slacks)
+        s   = new_slacks[offset]
+        row = abs(s)
+        new_slack_matrix[row, offset] = sign(s)
+        if s < 0  # this is a GEQ >= constraint, so we actually need...
+            b[row] = data.rowlb[row]  # ... the lower bound
+        end
+    end
+    A = hcat(data.A, new_slack_matrix)
+
+    # Check for dependent rows, remove if necessary?
+    # TODO: How do you do this efficiently?
+    m, n = size(A)
+    rows_to_take = Int[]
+    sizehint(rows_to_take, m)
+    for row_a = 1:m
+        if sum(abs(A[row_a,:])) <= 1e-10
+            println("Row $row_a is all zeros")
+            continue
+        end
+        for row_b = row_a+1:m
+            factor = NaN
+            diff = false
+            for j = 1:n
+                (A[row_a,j] == 0.0 && A[row_b,j] == 0.0) && continue
+                if (A[row_a,j] == 0.0 && A[row_b,j] != 0.0) ||
+                   (A[row_a,j] != 0.0 && A[row_b,j] == 0.0)
+                   diff = true
+                   break
+                end
+                if isnan(factor)
+                    factor = A[row_a,j] / A[row_b,j]
+                else
+                    if abs((A[row_a,j] / A[row_b,j]) - factor) >= 1e-6
+                        # Different
+                        diff = true
+                        break
+                    end
+                end
+            end
+            if !diff
+                println("row $row_a $row_b")
+                for j = 1:n
+                    println("$j  $(A[row_a,j])  $(A[row_b,j])")
+                end
+                readline()
+            end
+        end
+        push!(rows_to_take, row_a)
+    end
+    A = A[rows_to_take,:]
+    b = b[rows_to_take]
+    
+    return A,b,c
+end

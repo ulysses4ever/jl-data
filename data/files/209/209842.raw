@@ -1,0 +1,48 @@
+using JuMP, JuMPTools
+import JuMPTools.normL1
+if VERSION >= v"0.5-"
+    using Base.Test
+else
+    using BaseTestNext
+end
+
+# Define our own, loose equality test, suitable for approximate solvers
+roughly(x, y) = isapprox(x, y, atol=1e-4)
+
+@testset "JuMPTools tests" begin
+
+@testset "normL1" begin
+    @testset "Single value" begin
+        m = Model()
+        @defVar(m, -5 <= single_var <= -2)
+        @setObjective(m, Min, normL1(m, single_var))
+        solve(m)
+        @test roughly(getObjectiveValue(m), 2)
+    end
+    @testset "Array of various" begin
+        m = Model()
+        @defVar(m, -5 <= single_var <= -2)
+        @defVar(m, -4 <= another_var <= 1)
+        x = [single_var, another_var - 1]
+        @setObjective(m, Min, normL1(m, x))
+        solve(m)
+        @test roughly(getObjectiveValue(m),   2)
+        @test roughly(getValue(single_var),  -2)
+        @test roughly(getValue(another_var),  1)
+    end
+    @testset "JuMPArray and JuMPDict" begin
+        m = Model()
+        things = [:some, :things]
+        @defVar(m, -10 <= jumparray[i=1:5] <= -i)
+        @defVar(m, -10 <= jumpdict[things] <= -1)
+        @setObjective(m, Min, normL1(m, jumparray) + normL1(m, jumpdict))
+        solve(m)
+        true_obj =
+        @test roughly(getObjectiveValue(m), sum(1:5) + length(things))
+        @test roughly(getValue(jumparray[1]), -1)
+        @test roughly(getValue(jumparray[5]), -5)
+        @test roughly(getValue(jumpdict[:some]), -1)
+    end
+end
+
+end

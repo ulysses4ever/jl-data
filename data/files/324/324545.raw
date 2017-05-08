@@ -1,0 +1,134 @@
+# This file is part of Kpax3. License is MIT.
+
+function split!(ij::Vector{Int},
+                neighbours::Vector{Int},
+                S::Int,
+                data::Matrix{UInt8},
+                priorR::PriorRowPartition,
+                priorC::PriorColPartition,
+                settings::KSettings,
+                support::KSupport,
+                state::AminoAcidState)
+  # number of clusters after the split
+  k = state.k + 1
+
+  initsupportsplitmerge!(ij, S, k, data, priorC, settings, support)
+
+  # sample a new proportion for cluster 'hi'
+  w = rand(settings.distws)
+
+  # logarithm of the product of sequential probabilities
+  lq = 0.0
+
+  # temporary / support variables
+  u = 0
+  lcp = zeros(Float64, 2)
+  z = 0.0
+  p = 0.0
+
+  # allocate the neighbours of i and j
+  for l in 1:S
+    u = neighbours[l]
+    lcp[1] = lcp[2] = 0.0
+
+    # compute p(x_{u} | x_{hi,1:(u-1)}) and p(x_{u} | x_{hj,1:(u-1)})
+    for b in 1:support.m
+      lcp[1] += computeclusteriseqprobs!(data[b, u], b, priorC, support)
+      lcp[2] += computeclusterjseqprobs!(data[b, u], b, priorC, support)
+    end
+
+    # (w * p1) / (w * p1 + (1 - w) * p2) = 1 / (1 + ((1 - w) / w) * (p2 / p1))
+    # => e^(-log(1 + e^(log(1 - w) - log(w) + log(p2) - log(p1))))
+    z = -log1p(exp(log(1 - w) - log(w) + lcp[2] - lcp[1]))
+    p = exp(z)
+
+    if rand() <= p
+      updateclusteri!(u, data, support)
+      lq += z
+    else
+      updateclusterj!(u, data, support)
+      lq += log1p(-p)
+    end
+  end
+
+  hi = state.R[ij[1]]
+
+  simcsplit!(k, hi, priorC, support, state)
+
+  support.lograR = logratiopriorrowsplit(k, support.vi, support.vj, priorR)
+
+  logliksplit!(hi, priorC, support, state)
+
+  distwm = Beta(settings.parawm + support.vi, settings.parawm + support.vj)
+
+  ratio = exp(support.lograR +
+              support.logpC[1] - state.logpC[1] +
+              support.loglik - state.loglik +
+              state.logpC[2] - support.logpC[2] +
+              logpdf(distwm, w) -
+              logpdf(settings.distws, w) -
+              lq)
+
+  if ratio >= 1 || ((ratio > 0) && (rand() <= ratio))
+    performsplit!(hi, k, priorC, settings, support, state)
+  end
+
+  nothing
+end
+
+function performsplit!(hi::Int,
+                       k::Int,
+                       priorC::PriorColPartition,
+                       settings::KSettings,
+                       support::KSupport,
+                       state::AminoAcidState)
+  resizestate!(state, k, settings)
+
+  hj = findfirst(state.emptycluster)
+
+  for b in 1:support.m
+    for l in 1:(support.k - 2)
+      state.C[support.cl[l], b] = support.C[l, b]
+    end
+    state.C[hi, b] = support.C[support.k - 1, b]
+    state.C[hj, b] = support.C[support.k, b]
+
+    state.n1s[hi, b] = support.ni[b]
+    state.n1s[hj, b] = support.nj[b]
+  end
+
+  state.emptycluster[hj] = false
+
+  h = 0
+  for a in 1:length(state.emptycluster)
+    if !state.emptycluster[a]
+      h += 1
+      state.cl[h] = a
+    end
+  end
+
+  state.k = h
+
+  state.v[hi] = support.vi
+  state.unit[hi] = copy!(state.unit[hi], 1, support.ui, 1, support.vi)
+
+  state.v[hj] = support.vj
+
+  if length(state.unit[hj]) < state.v[hj]
+    resize!(state.unit[hj], state.v[hj])
+  end
+
+  state.unit[hj] = copy!(state.unit[hj], 1, support.uj, 1, support.vj)
+
+  # move units to their new cluster
+  for j in 1:support.vj
+    state.R[support.uj[j]] = hj
+  end
+
+  state.logpR += support.lograR
+  copy!(state.logpC, support.logpC)
+  state.loglik = support.loglik
+  state.logpp = state.logpR + state.logpC[1] + state.loglik
+
+  nothing
+end

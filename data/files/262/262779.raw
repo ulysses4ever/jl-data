@@ -1,0 +1,38 @@
+triangle = Array{Int, 1}[]
+f = open("67/triangle.txt")
+for line in eachline(f)
+    push!(triangle, int(split(line, " ")))
+end
+close(f)
+
+function findmaxsumroute(triangle)
+    n = size(triangle, 1)
+
+    maxsum = deepcopy(triangle)
+    for i in 1:n
+        for j in 1:i
+            maxsum[i][j] = 0
+        end
+    end
+    maxsum[1][1] = triangle[1][1]
+
+    for i in 2:n
+        for j in 1:i
+            if j == 1
+                maxsum[i][1] = maxsum[i - 1][1] + triangle[i][1]
+            elseif j == i
+                maxsum[i][i] = maxsum[i - 1][i - 1] + triangle[i][i]
+            else
+                maxsum[i][j] = max(maxsum[i - 1][j - 1], maxsum[i - 1][j]) +
+                        triangle[i][j]
+            end
+        end
+    end
+    return maximum(maxsum[n])
+end
+
+@time res = findmaxsumroute(triangle)
+print("answer: ")
+println(res)
+print("md5sum: ")
+run(`echo -n $res` |> `md5sum`)

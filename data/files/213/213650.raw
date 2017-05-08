@@ -1,0 +1,26 @@
+## =============================================================================
+## 04_histogram.jl - Julia histogram sample
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using StatsBase, Distributions
+using DataFrames
+using Gadfly
+
+x = rand(Normal(10, 1/5), 1000)
+df = DataFrame(A = x)
+p = plot(x = df[:A], Geom.histogram)
+
+##
+# plot(dataset("Zelig", "macro"), x="Year", y="Unem", color="Country", Geom.point, Geom.smooth)
+
+dat = dataset("ggplot2", "diamonds")
+
+##
+plot(dat, x="Price", Geom.histogram)
+##
+plot(dat, x="Price", color="Cut", Geom.histogram)
+##
+plot(dat, x="Price", color="Cut", Geom.histogram(bincount=30))
+
+
+

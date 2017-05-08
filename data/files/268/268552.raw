@@ -1,0 +1,23 @@
+###################################################
+## Imports the system data
+###################################################
+
+function import_compatibility_matrix()
+  compatibility_matrix = readdlm("../data_NKR/compatibility_matrix.txt")
+  n = size(compatibility_matrix)[1]
+  return compatibility_matrix, n
+end
+
+"First column is the name of the type, second the departure rates"
+function import_node_types()
+  type_data = readdlm("../data_NKR/node_types.txt")
+  node_types::Array{AbstractString,1} = type_data[:,1]
+  dep_rates::Array{Float64,1} = type_data[:,2]
+  return node_types, dep_rates
+end
+
+function import_data()
+  matrix, n = import_compatibility_matrix()
+  node_types, dep_rates = import_node_types()
+  return TypeGraph(matrix, node_types, dep_rates)
+end

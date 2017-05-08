@@ -1,0 +1,49 @@
+type MonetDBConnection
+	MAX_PACKAGE_LENGTH::Int
+	MSG_PROMPT::AbstractString
+	MSG_MORE::AbstractString
+	MSG_INFO::AbstractString
+	MSG_ERROR::AbstractString
+	MSG_Q::AbstractString
+	MSG_QTABLE::AbstractString
+	MSG_QUPDATE::AbstractString
+	MSG_QSCHEMA::AbstractString
+	MSG_QTRANS::AbstractString
+	MSG_QPREPARE::AbstractString
+	MSG_QBLOCK::AbstractString
+	MSG_HEADER::AbstractString
+	MSG_TUPLE::AbstractString
+	MSG_TUPLE_NOSLICE::AbstractString
+	MSG_REDIRECT::AbstractString
+	MSG_OK::AbstractString
+	STATE_INIT::Int
+	STATE_READY::Int
+    STATE::Int
+	hostname::AbstractString
+	port::Int
+	username::AbstractString
+	password::AbstractString
+	database::AbstractString
+	language::AbstractString
+	unix_socket::Any
+	monetdb_socket::TCPSocket
+	autocommit::Bool
+	arraysize::Int
+	replysize::Int
+	sizeheader::Bool
+end
+
+type MonetDBCursor
+	connection::Union{MonetDBConnection, Void}
+	operation::AbstractString
+	arraysize::Int
+	rowcount::Int
+	description::Any
+	rownumber::Int
+	__executed::Any
+	__offset::Int
+	__rows::AbstractArray
+	__query_id::Int
+	messages::AbstractArray
+	lastrowid::Union{Int, Void}
+end

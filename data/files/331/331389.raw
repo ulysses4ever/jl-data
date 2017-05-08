@@ -1,0 +1,55 @@
+###################################################
+## Defines the 'InstanceGraph' type
+###################################################
+
+type InstanceNode
+  node_type::TypeNode
+  arrival::Int64
+  departed::Bool
+  matched::Bool
+
+  "Constructor: reference to the node type"
+  function InstanceNode(type_node::TypeNode, arr::Int64)
+    obj = new()
+    obj.node_type = type_node
+    obj.departed = false
+    obj.matched = false
+    obj.arrival = arr
+    return obj
+  end
+end
+
+type InstanceGraph
+  type_graph::TypeGraph
+  all_nodes::Array{InstanceNode,1}
+  present_nodes::Array{InstanceNode,1}
+  all::Int64
+
+  "Constructor: reference to the underlying type graph.
+  returns an empty InstanceGraph"
+  function InstanceGraph(tg::TypeGraph)
+    obj = new()
+    obj.type_graph = tg
+    obj.all_nodes = Array(InstanceNode,0)
+    obj.present_nodes = Array(InstanceNode,0)
+    obj.all = 0
+    return obj
+  end
+end
+
+function arrival!(pool::InstanceGraph, node::TypeNode, arr_time::Int64)
+  new_node = InstanceNode(node, arr_time)
+  push!(pool.all_nodes, new_node)
+  push!(pool.present_nodes, new_node)
+  pool.all = length(pool.all_nodes)
+end
+
+function departures!(pool::InstanceGraph)
+  copy = pool.present_nodes[:]
+  for n in copy
+    if rand() < n.node_type.dep_rate
+      n.departed = true
+      deleteat!(pool.present_nodes, findin(pool.present_nodes, [n]))
+    end
+  end
+end

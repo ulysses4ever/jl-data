@@ -1,0 +1,62 @@
+module ApproxSets
+    
+    export ApproxSet, issetapprox
+
+    # ApproxSet
+    # Like a Base.Set, but membership is approximate. Isn't
+    # implemented very smartly, but is functional.
+    type ApproxSet{T}
+        _data::Vector{T}
+        _tol::Any
+    end
+    ApproxSet(;tol=nothing) = ApproxSet{Any}(Any[],tol)
+    ApproxSet{T}(item::T;tol=nothing) = ApproxSet{T}(T[item],tol)
+    function ApproxSet(items...;tol=nothing)
+        # Get tightest type for items
+        set_type = Union()
+        for item in items
+            set_type = typejoin(typeof(item),set_type)
+        end
+        # Build set
+        set = ApproxSet{set_type}(set_type[],tol)
+        for item in items
+            push!(set, item; tol=tol)
+        end
+        set
+    end
+
+    ############################################################
+    # GENERIC BASE FUNCTIONS
+    Base.eltype(a::ApproxSet) = eltype(a._data)
+    Base.length(a::ApproxSet) = length(a._data)
+    Base.collect(a::ApproxSet) = a._data
+
+    ############################################################
+    # SET MEMBERHSIP
+    # Base defines an `isapprox` function, but only for 
+    # comparing single Number types. Rather than mout new
+    # functionality to that, we require users to define a new
+    # function, `issetapprox`, that should have one of the
+    # signatures:
+    #   ApproxSets.issetapprox(i, j)
+    #   ApproxSets.issetapprox(i, j, tol)
+    # where the tolerance will be passed through when available.
+
+    issetapprox(i,j)     = isequal(i,j)
+    issetapprox(i,j,tol) = isequal(i,j)
+
+    function Base.push!(a::ApproxSet, i; tol=nothing)
+        # kwarg tol trumpts _tol
+        tol_to_use = (tol != nothing) ? tol : a._tol
+        if tol_to_use == nothing
+            for j in a._data
+                issetapprox(i,j) && return a
+            end
+        else
+            for j in a._data
+                issetapprox(i,j,tol_to_use) && return a
+            end
+        end
+        push!(a._data, i)
+    end
+end

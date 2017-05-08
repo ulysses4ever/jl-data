@@ -1,0 +1,12 @@
+using LoraMPI
+using MPI
+
+function main()
+    MPI.Init()
+
+    FrielMC(100:1:1100)
+
+    MPI.Finalize()
+end
+
+main()

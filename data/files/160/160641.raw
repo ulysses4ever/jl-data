@@ -1,0 +1,89 @@
+function fit!(hmm; method=:baum_welch, max_iter=20, tol=1e-6, scaling=true)
+    # Setting tol to NaN will prevent early stopping, resulting in 'max_iter' iterations
+    if method == :baum_welch
+        return baum_welch!(hmm, max_iter, tol, scaling)
+    else
+        error("method not recognized/implemented")
+    end
+end
+
+function baum_welch!(hmm::HMM, max_iter, tol, scaling)
+    # convergence history of the fit, log-liklihood
+    ch = (Float64)[]
+
+    for k = 1:max_iter
+        # E step
+        log_p_obs, x, g = calc_stats(hmm,o,scaling)
+        push!(ch, log_p_obs)
+        
+        # Test for convergence
+        if length(ch)>1 && (ch[end]-ch[end-1] < tol)
+            println("Baum-Welch converged, stopping early")
+            break
+        end
+
+        # M step (re-estimation)
+        re_estimate!(hmm, o, x, g)
+    end
+
+    return ch
+end
+
+function re_estimate!(hmm,x,g)
+    # Update hmm.A 
+    for i = 1:hmm.n_states
+        denom = sum(g[1:end-1,i]) # Expected number of transitions from state 'i'
+        for j = 1:hmm.n_states
+            # Numerator is the expected number of transitions from state 'i' to 'j' 
+            A[i,j] = sum(x[:,i,j]) / denom
+        end
+    end
+
+    # Update hmm.B
+    for i = 1:hmm.n_states
+        for z = 1:hmm.n_ctxt
+            ## Weighted MLE for binomial distribution
+            ind = hmm.c .== z # only consider observations in nucleotide context z
+            wt = g[ind,i]     # weight observations by probability of being in state 'i'
+
+            # weighted MLE calculation: number of methylation sites / total number of sites
+            hmm.B[i,z] = sum(wt .* hmm.o[ind]) ./ sum(wt .* hmm.k[ind])
+
+            ## For beta-binomial distribution, MLE cannot be analytically calculated...
+            ## But it is an easy convex optimization problem:
+            ## http://research.microsoft.com/en-us/um/people/minka/papers/dirichlet/minka-dirichlet.pdf
+        end
+    end
+
+    # Update hmm.p (initial state variables)
+    hmm.p = vec(g[1,:])
+end
+
+function calc_stats(hmm,scaling)
+    # Calculate forward/backward probabilities
+    if scaling
+        alpha, log_p_obs, coeff = forward(hmm,o; scaling=true)
+        beta = backward(hmm,o; scale_coeff=coeff)
+    else
+        alpha, p_obs = forward(hmm,o; scaling=false)
+        log_p_obs = log(p_obs)
+        beta = backward(hmm,o)
+    end
+
+    # x[t,i,j] = probability of being in state 'i' at 't' and then in state 'j' at 't+1'
+    x = zeros(hmm.n_sites-1, hmm.n_states, hmm.n_states)
+    for t = 1:(hmm.n_sites-1)
+        for i = 1:hmm.n_states
+            for j = 1:hmm.n_states
+                x[t,i,j] = alpha[t,i] * hmm.A[i,j] * hmm.B[j,o[t+1]] * beta[t+1,j]
+            end
+        end
+        x[t,:,:] ./= sum(x[t,:,:]) # normalize to achieve probabilities
+    end
+
+    # g[t,i] = probability of being in state 'i' at step 't' given all observations
+    g = alpha .* beta
+    g ./= sum(g,2)   # normalize across states
+
+    return log_p_obs, x, g
+end

@@ -1,0 +1,48 @@
+###################################################
+## Defines the 'Log' type
+###################################################
+
+type Log
+  record::Bool
+  summary::DataFrame
+  time_tot::Array{Float64}
+  time_lp::Array{Float64}
+  time_jump::Array{Float64}
+  v::Int64 # Indicates how much data to store.
+
+  function Log(n_types::Int64, v::Int64, r::Bool)
+    obj = new()
+    obj.summary = DataFrame(n_arr = zeros(Int64, n_types),
+                        n_match = zeros(Int64, n_types),
+                        n_dep = zeros(Int64, n_types),
+                        wait_match = zeros(Float64, n_types),
+                        wait_dep = zeros(Float64, n_types),
+                        )
+    obj.v = v
+    obj.record = r
+    obj.time_tot = []
+    obj.time_lp = []
+    obj.time_jump = []
+    return obj
+  end
+end
+
+function dep_log!(n::Node, l::Log)
+  if l.record
+    l.summary[n.type_id,:n_dep] += 1
+    l.summary[n.type_id,:wait_dep] += n.dep_time - n.arr_time
+  end
+end
+
+function match_log!(n::Node, l::Log)
+  if l.record
+    l.summary[n.type_id,:n_match] += 1
+    l.summary[n.type_id,:wait_match] += n.dep_time - n.arr_time
+  end
+end
+
+function arr_log!(n::Node, l::Log)
+  if l.record
+    l.summary[n.type_id,:n_arr] += 1
+  end
+end

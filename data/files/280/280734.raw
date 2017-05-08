@@ -1,0 +1,174 @@
+############# backward sweep and final codegen for derivative code ############
+uninitialized(a::Active, state::Dict) = sym(a) in state["uninitialized"]
+function initIfNeeded!(a::Active, state::Dict)
+    extra_args = {}
+    if isa(a,ARef) && uninitialized(a,state)
+        pop!(state["uninitialized"],sym(a))
+        push!(extra_args,:($(a.dsym) = zero($(a.sym))) )
+        return :(+=), extra_args
+    elseif uninitialized(a,state)
+        pop!(state["uninitialized"],sym(a))
+        return :(=), extra_args
+    else
+        return :(+=), extra_args
+    end
+end
+initIfNeeded!(a::Any,state::Dict) = (:(+=), {})
+
+##### d_$Mytype(arglist, ex, state): take an encoded expression of type Mytype
+# and push a statement computing its derivatives to $arglist.
+function d_assign(ex::Expr,state::Dict)
+    #for a line y = h(x1,x2), where e.g. x1 and x2 are active,
+    # push Expr's to new_args that compute dx1 += h_1(x1,x_2).*dy, dx2 += h_2(x1,x2).*dy
+    @assert ex.head in [:(=), :(+=)]
+    if isa(ex.args[1],Active)
+        rhs = ex.args[2]
+        if isa(rhs,Active)
+            d_assign_sym(ex,state)
+        elseif isa(rhs,AIf)
+            d_assign_ternary(ex.head,ex.args[1],rhs,state)
+        elseif rhs.head == :call
+            ops = {}; inits = {};
+            for arg in rhs.args[2:end]
+                (op, g) = initIfNeeded!(arg,state)
+                push!(ops,op)
+                push!(inits,g...)
+            end
+            return [inits, d_assign_call(ops,ex,state,CallExpr(rhs))]
+        elseif ex.args[2].head == :ref
+            return d_assign_ref(ex,state)
+        else
+            error("can't d_assign expression with RHS expr $(rhs) having head $(rhs.head)")
+        end
+    else
+        return {}
+    end
+end
+
+function d_assign_sym(ex,state)
+    @assert isa(ex.args[2],Active)
+    @assert isa(ex.args[1],Active)
+    (op,extra) = initIfNeeded!(ex.args[2], state )
+    [extra..., Expr(op,dsym(ex.args[2]),dsym(ex.args[1]))]
+end
+
+function d_assign_ref(ex,state)
+    error("d_assign_ref not yet implemented")
+end
+
+function d_block(ex::Expr,state)
+    #we expect "state" to be a dict with fields
+    # (1) "uninitialized" : list of syms where dsym isn't yet defined in generated code
+    @assert ex.head == :block
+    inner_args = {}
+    for s in reverse(ex.args)
+        push!(inner_args, grad(s,state)...)
+    end
+    [Expr(:block,inner_args...)]
+end
+
+function d_for(ex::AFor,state)
+    #first, determine which not-yet-initialized vars are local and need to be initialized within the loop.
+    #initialize the remaining uninitialized vars before the loop.
+    #expect that "state" is a Dict with field "uninitialized": Set(Symbol)
+    nonlocals = intersect(keys(state["active"]), keys(ex.s) )
+    locals = setdiff(keys(ex.s),nonlocals)
+    newargs = {}
+    for xsym in intersect(nonlocals,state["uninitialized"])
+        x = ex.s[xsym]::Active
+        pop!(state["uninitialized"],xsym)
+        push!( newargs,:( $(dsym(x)) = zero($(sym(x))) ) )
+    end
+    #loop backwards
+    ix = Expr( ex.loop.head, ex.loop.args[1], :(reverse($(ex.loop.args[2]))) )
+    #generate loop body:
+    initializeInLoop = Set(union(locals,state["uninitialized"])...)
+    inner_state = ["active"=>merge(ex.s,state["active"]),
+                   "uninitialized"=>initializeInLoop,
+                   "ifstack"=>state["ifstack"], ]
+    inner_block = grad(ex.block,inner_state)
+    push!(newargs, Expr(:for,ix,inner_block...))
+    newargs
+end
+
+function d_function(f,state)
+    seed=gensym("seed")
+    tagged_args = {Expr(:(::),seed,:Seed)} #list of arguments of function; label active args with type "WRT"
+    fname = f.args[1].args[1]
+    returns = Expr(:tuple) #function value and derivatives
+    block = f.args[2]
+    fval=ASymbol(gensym("val"))
+    from_seed = Expr(:(=),dsym(fval),:($seed.dval))
+    merge!(state["active"],[sym(fval)=>fval])
+    block.args[end] = Expr(:(=),fval,block.args[end])
+    push!(returns.args,sym(fval))
+    block_args = decode(block.args,state)
+    dblock_args = {}
+    for arg in reverse(block.args)
+        #println("in d_function: taking gradient of $(arg)")
+        push!(dblock_args,grad(arg,state)...)
+    end
+    unpack = {}
+    push!(unpack,:($(state["ifstack"])=BitArray(0)))
+    for x in f.args[1].args[2:end]
+        if isa(x,Active)
+            s2 = gensym("$(sym(x))")
+            push!(tagged_args, :($s2 :: WRT) )
+            push!(unpack, :($(sym(x))=$(s2).val))
+            push!(returns.args, :($(dsym(x))))
+        else
+            push!(tagged_args,x)
+        end
+    end
+    fcall = Expr(:call,fname,tagged_args...)
+    [Expr(:function,fcall,Expr(:block,[unpack,block_args,from_seed,dblock_args,returns]...))]
+end
+
+function d_assign_ternary(op::Symbol,lhs,rhs::AIf,state)
+    newargs = init_before_branch(rhs,state)
+    for branch in [:ifTrue, :ifFalse]
+        if isa(rhs.(branch).args[end],Active) || isexpr(rhs.(branch).args[end],:call)
+            rhs.(branch).args[end] = Expr(:(=),lhs,rhs.(branch).args[end])
+        end
+    end
+    finish_d_branch!(newargs,rhs,state)
+end
+
+function d_if(ex::AIf,state)
+    newargs = init_before_branch(ex,state)
+    finish_d_branch!(newargs,ex,state)
+end
+
+function init_before_branch(ex::AIf,state)
+    #initialize all variables that are not yet init'd and appear in *either* the true or false branckes
+    toInitialize = intersect(union(keys(ex.sTrue),keys(ex.sFalse)),state["uninitialized"])
+    newargs = {}
+    for s in map(x->state["active"][x], toInitialize)
+        pop!(state["uninitialized"],sym(s))
+        push!(newargs, :($(dsym(s))=zero($(sym(s)))))
+    end
+    newargs
+end
+
+finish_d_branch!(newargs::Array, ex::AIf, state) = 
+    push!(newargs,:(if(pop!($(state["ifstack"]))); $(grad(ex.ifTrue,state)...); else; $(grad(ex.ifFalse,state)...); end))
+
+
+function gradient(ex,s::SymDict)
+    state = initialState(s)
+    grad(ex,state)
+end
+initialState(s::SymDict) = {"active"=>copy(s), "uninitialized"=>Set(keys(s)...), "ifstack"=>gensym("bools")}
+
+grad(ex::LineNumberNode,state::Dict) = {}
+grad(ex::ASymbol,state::Dict) = {}
+grad(ex::AFor,state::Dict) = d_for(ex,state)
+grad(ex::ARef,state::Dict) = (ex,state) -> [dsym(ex)]
+grad(ex::AIf,state::Dict)  = d_if(ex,state)
+grad(ex::Expr,state::Dict) = d_lookup[ex.head](ex,state)
+grad(ex::Number,state::Dict) = {}
+d_lookup = [:function => d_function,
+            :block => d_block,
+            :(=) => d_assign,
+            :(+=)=>d_assign,
+            :line => ((l,state)->{}),]

@@ -1,0 +1,36 @@
+#pnt2seg.jl
+#=
+ * Returns the distance of p3 to the segment defined by p1,p2
+ *
+ * @param p1{Array|Tuple} - first vertex of seg
+ * @param p2{Array|Tuple} - second vertex of seg
+ * @param p3{Array|Tuple} - pt to segment
+ *                defined by p1,p2
+ * @return {number} The distance of p3 to the segment defined by p1,p2
+ =#
+function pt2seg(p1, p2, p3)
+  x,y = 1, 2
+  dx  = p2[x] - p1[x]
+  dy  = p2[y] - p1[y]
+
+   #line with zero length - coincident end points on segment
+  if (dx == 0.0) && (dy == 0.0)
+    return hypot(p3[x] - p1[x], p3[y] - p1[y])
+  end
+  
+  numer = (p3[x] - p1[x]) * dx + (p3[y] - p1[y]) * dy
+  denom = (dx * dx + dy * dy)
+  u = numer / denom
+
+  if u < 0
+    cx = p1[x]
+    cy = p1[y]
+  elseif u > 1
+    cx = p2[x]
+    cy = p2[y]
+  else 
+    cx = p1[x] + u * dx
+    cy = p1[y] + u * dy
+  end
+  return hypot(cx - p3[x], cy - p3[y])
+end

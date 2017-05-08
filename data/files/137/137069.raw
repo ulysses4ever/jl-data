@@ -1,0 +1,76 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+# This is to create the independant start sequences from which everything else will be mutated
+#  This should put the two or however many results in startSequences
+
+sequencesToGenerate = [("startSequences/adamson_of_eden.dat",ARGS[1]),("startSequences/eve_of_venus.dat",ARGS[2])]
+
+if length(ARGS) < 2
+    error("Incorrect Usage: Must be of form, julia genStartSequences.jl [len_of_sequence_1] [length_of_sequence_2]")
+end
+
+for (sequenceFilename,lengthOfSequence) in sequencesToGenerate
+    print("Generating sequence for file '")
+    print(sequenceFilename)
+    print("' with length ")
+    println(lengthOfSequence)
+
+    charactersLeft = int(lengthOfSequence)
+
+    # off limit intervals are intervals where presumably events have already happened, and its not the point
+    # to interrupt or mutate inside of (or close to) these events during CONSTRUCTION. Mutation is a different
+    # story.
+    # we'll have to cafefully update this when we're actually going through
+    offLimitIntervals = [(0,3)]
+
+    #idea here is to spit the whole thing into parts of 500 and choose an index to place a long repitition
+    #of length random between 
+    intervalOfLongRepitition = 500
+
+    scheduledEvents = [0=>("GAT",3)]
+    #just before we start writing array in memory () and then priting that to file
+    # we use the generate random scheduled events like
+
+
+    file = open(sequenceFilename,"w")
+        ## while (charactersLeft > 0)
+            # create random number, if random number is 1 then we do the interval of LongRepitition
+            # remembering that depending on the remaining size of charactersLeft, we can only pick certain
+            #types (re: long repitition) and the number of actual repititions of it are also limited
+
+            println(file, lengthOfSequence)
+
+            if get(scheduledEvents, int(lengthOfSequence)-charactersLeft,-1) != -1
+                (pattern,patternRepititionCount) = get(scheduledEvents, int(lengthOfSequence)-charactersLeft,-1)
+
+                for count=1:patternRepititionCount
+                    write(file,pattern)
+
+                    charactersLeft = charactersLeft - length(pattern)
+                end
+            end
+        #end
+
+    close(file)
+end

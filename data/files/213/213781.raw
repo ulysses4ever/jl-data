@@ -1,0 +1,11 @@
+## =============================================================================
+## 04_histogram.jl - Julia histogram sample
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using StatsBase
+using Distributions
+using DataFrames
+
+x = rand(Normal(), 1000)
+df = DataFrame(A = x)
+p = plot(x = df[:A], Geom.histogram)

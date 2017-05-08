@@ -1,0 +1,177 @@
+module Spike
+
+import GLFW
+using ModernGL
+using Compat
+
+include("constants.jl")
+
+GLFW.Init()
+
+######
+# Windowing
+######
+
+export WindowInstance, update, clear, close, open, terminate
+
+type WindowInstance
+	title::String
+	size::Array{Int64,1}
+	position::Array{Int64,1}
+	bgcolor::Array{Float64,1}
+	windowObject
+	# framerate::Int - coming soon
+
+	function WindowInstance(title::String, size::Array{Int64,1}, position::Array{Int64,1}, bgcolor::Array{Float64,1})
+		# Create window
+		windowObject = GLFW.CreateWindow(size[X], size[Y],title)
+		
+		# Set window position
+		GLFW.SetWindowPos(windowObject, position[X], position[Y])
+
+		# Set clear color
+		glClearColor(bgcolor[R], bgcolor[G], bgcolor[B], bgcolor[A])
+		glClear(GL_COLOR_BUFFER_BIT)
+
+		# Return new WindowInstance
+		new(title::String, size::Array{Int64,1}, position::Array{Int64,1}, bgcolor::Array{Float64,1}, windowObject)
+	end
+end
+
+function update(window::WindowInstance)
+	# Swap front and back buffers
+	GLFW.SwapBuffers(window.windowObject)
+	
+	# Poll for and process events
+	GLFW.PollEvents()
+end
+
+function clear(window::WindowInstance)
+	# Clear buffer
+	glClear(GL_COLOR_BUFFER_BIT)
+end
+
+function close(window::WindowInstance)
+	# Close window
+	GLFW.SetWindowShouldClose(window.windowObject, 1)
+end
+
+function open(window::WindowInstance)
+	# Check to see if window is closed
+	!GLFW.WindowShouldClose(window.windowObject)
+end
+
+function terminate()
+	# Terminate OpenGL
+	GLFW.Terminate()
+end
+
+
+######
+# Inputs
+######
+
+export Mouse, Keyboard, hide, show
+
+type Mouse
+	position::Array{Float64,1}
+	normposition::Array{Float64,1}
+	buttonspressed::Int64
+	action::Int64
+	mods::Int64
+	entered::Int64
+	scroll::Array{Float64,1}
+	window::WindowInstance
+
+	function Mouse(window::WindowInstance)
+		position = [0.0,0.0]
+		normposition = [0.0, 0.0]
+		buttonspressed = 0
+		action = 0 
+		mods = 0 
+		entered = 0
+		scroll = [0.0, 0.0]
+
+		self = new(position::Array{Float64,1}, normposition::Array{Float64,1}, buttonspressed::Int64, action::Int64, 
+				mods::Int64, entered::Int64, scroll::Array{Float64,1}, window::WindowInstance)
+		
+		GLFW.SetCursorPosCallback(window.windowObject, (xPos,yPos) -> (self.position = [xPos, yPos]; nothing)) 
+		GLFW.SetMouseButtonCallback(window.windowObject, (button, action, mods) -> (self.buttonspressed = button; 
+																		self.action = action; self.mods = mods; nothing))
+		GLFW.SetCursorEnterCallback(window.windowObject, (entered) -> (self.entered = entered; nothing))
+		GLFW.SetScrollCallback(window.windowObject, (xoffset, yoffset) -> (self.scroll = [xoffset, yoffset]; nothing))
+
+		return self
+	end
+end
+
+function hide(mouse::Mouse)
+	GLFW.SetInputMode(mouse.window.windowObject, CURSOR, CURSOR_HIDDEN)
+end
+
+function show(mouse::Mouse)
+	GLFW.SetInputMode(mouse.window.windowObject, CURSOR, CURSOR_NORMAL)
+end
+
+type Keyboard
+	key::Int64
+	scancode::Int64
+	action::Int64
+	mods::Int64
+	char::Int64
+	window::WindowInstance
+	
+	function Keyboard(window::WindowInstance)
+		key = 0
+		scancode = 0
+		action = 0
+		mods = 0
+		char = 0
+
+		self = new(key::Int64, scancode::Int64, action::Int64, mods::Int64, char::Int64, window::WindowInstance)
+
+		GLFW.SetKeyCallback(window.windowObject, (key, scancode, action, mods) -> (self.key = key; self.scancode = scancode; 
+																			self.action = action; self.mods = mods; nothing))
+		GLFW.SetCharCallback(window.windowObject, (char) -> (self.char = char; nothing))
+
+		return self
+	end
+end
+
+
+######
+# Draw
+######
+
+type Rectangle
+	size::Array{Int64,1}
+	position::Array{Int64,1}
+	color::Array{Float64,1}
+
+	function Rectangle(size::Array{Int64,1}, position::Array{Int64,1}, color::Array{Float64,1})
+
+	end
+end
+
+function draw()
+
+end
+
+######
+# Info
+######
+
+function info(mouse::Mouse)
+
+end
+
+function info(keyboard::Keyboard)
+
+end 
+
+function info(window::WindowInstance)
+
+end
+
+end # module
+

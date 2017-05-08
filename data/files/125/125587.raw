@@ -1,0 +1,156 @@
+#= 
+ helper functions of EvolutionaryAction.jl
+  not intended to be called by user
+=# 
+
+# get node-to-leave distance for an internal node
+function dist2leaves ( phy, node )
+	# get the two childs
+	children = phy.edge[ 1:size(phy.edge,1), 2 ]
+	parents  = phy.edge[ 1:size(phy.edge,1), 1 ]
+	idx      = findin(parents,node)
+	# terminate recursion if leaf reached
+	if length(idx) == 0
+		return 0.0
+	end
+	# add distances to both childs
+	dL  = phy.edgeLength[idx][1]
+	dR  = phy.edgeLength[idx][2]
+	# add distances of both childs
+	dL += dist2leaves( phy,children[ idx[1] ] )
+	dR += dist2leaves( phy,children[ idx[2] ] )
+	# return largest of the two distances
+	return max(dL,dR)
+end
+
+
+# get all leaves for an internal node
+function getleaves ( phy, node )
+	# get the two childs
+	children = phy.edge[ 1:size(phy.edge,1), 2 ]
+	parents  = phy.edge[ 1:size(phy.edge,1), 1 ]
+	idx      = findin(parents,node)
+	# terminate recursion if leaf reached
+	if length(idx) == 0
+		return phy.tipLabel[node]
+	# or make rekursive call for subtrees
+	else
+		tipL = getleaves( phy,children[ idx[1] ] )
+		tipR = getleaves( phy,children[ idx[2] ] )
+		return vcat( tipL,tipR )
+	end
+end
+
+
+# check whether node is in subtree of another node
+function nodeinsubtree( phy, node1, node2 )
+	if node1 == node2
+		return true
+	end
+	# get the two childs
+	children = phy.edge[ 1:size(phy.edge,1), 2 ]
+	parents  = phy.edge[ 1:size(phy.edge,1), 1 ]
+	idx      = findin(parents,node1)
+	# terminate recursion if leaf reached
+	if length(idx) == 0
+		return false
+	# return success if one of the children is node2
+	elseif children[ idx[1] ]==node2 | children[ idx[2] ]==node2
+		return true
+	# or make rekursive call for subtrees
+	else
+		retL = nodeinsubtree( phy,children[ idx[1] ],node2 )
+		retR = nodeinsubtree( phy,children[ idx[2] ],node2 )
+		return retL || retR
+	end
+end
+
+
+# hierarchically divide tree into groups based on node-to-leave distance of internal nodes
+function divideintogroups ( phy )
+	# get root node of ingroup
+	children = phy.edge[ 1:size(phy.edge,1), 2 ]
+	parents  = phy.edge[ 1:size(phy.edge,1), 1 ]
+	root     = getroot(children,parents)
+	rootchs  = children[ findin(parents,root) ]
+	inroot   = rootchs[1]
+	if rootchs[2] > rootchs[1]
+		inroot = rootchs[2]
+	end
+	# get node-to-leave distance for each internal node of ingroup
+	nodes = Int32[]
+	dists = Float32[]
+	for node in inroot:maximum(parents)
+		nodes = vcat( nodes, node )
+		dists = vcat( dists, dist2leaves(phy,node) )
+	end
+	# sort nodes by their distance to leaves
+	#  and build groups for each associated hierarchical split
+	order = sortperm(dists,rev=true)
+	hiera = {}
+	for ix in 1:length(order)
+		i = order[ix]
+		# add all leaves in the substree of this split
+		groups = {}
+		push!( groups, getleaves(phy,nodes[i]) )		
+		# add all groups with more than one sequence
+		#  that are  (i) outside the subtree of this split
+		#       and (ii) are closer to their leaves than the this split
+		if ix != length(order)
+			for j in order[(ix+1):end]
+				if ! nodeinsubtree(phy,nodes[i],nodes[j])
+					push!( groups, getleaves(phy,nodes[j]) )
+				end
+			end
+		end
+		# add groups to the hierarchy
+		push!( hiera,groups )
+	end
+	# return result
+	return hiera
+end
+
+
+# count number of occurrences of amino acids in alignment column
+function countresinums ( aln, pos, alphabet )
+	# get residue for each seq
+	resis = Char[]
+	for si in 2:length(aln)
+		resis = vcat( resis,uppercase(aln[si][2][pos]) )		
+	end
+	# count number for each residue
+	resisuni = unique(resis)
+	resisuni = resisuni[ findin(resisuni,alphabet) ]
+	resisnum = Int32[]
+	for resi in resisuni
+		resisnum = vcat( resisnum,length(findin(resis,resi)) )
+	end
+	resisord = sortperm( resisnum,rev=true )	
+	# return counts
+	return resisuni[resisord],resisnum[resisord]
+end
+
+
+# rank elements of an array according to its order
+#  elements with equal value will get equal ranks
+function sortrank ( x; rev=false )
+	# get sorted unique values
+	unq = sort( unique(x), rev=rev )
+	# get number of occurrences for each unique element
+	num = zeros(Int32,length(unq))
+	num[1] = 1
+	for i in 2:length(unq)
+		ni = length( findin(x,unq[i-1]) )
+		num[i] = num[i-1] + ni
+	end
+	# get rank of each element
+	rank = zeros(Int32,length(x))
+	for i in 1:length(unq)
+		ix = findin( x, unq[i] )
+		rank[ix] = num[i]
+	end
+	# return ranks
+	return rank
+end
+
+

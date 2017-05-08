@@ -1,0 +1,95 @@
+
+# types for MarketRisk module
+
+# Any data used as input for pricing
+abstract PricingData
+
+###################
+# HISTORICAL DATA
+###################
+abstract HistoricalData <: PricingData
+
+type HDIndex <: HistoricalData
+	name::ASCIIString
+end
+
+# Not bound to maturity. Is bound to entire term structure.
+type HDSpreadCurve <: HistoricalData
+	name::ASCIIString
+end
+
+####################
+# RISK FACTORS
+####################
+abstract RiskFactor <: PricingData
+
+type RFStock <: RiskFactor
+	name::ASCIIString
+end
+
+type RFSpotCurrency <: RiskFactor
+	name::ASCIIString
+end
+
+# Not bound to maturity. Is bound to entire term structure.
+type RFIRCurve <: RiskFactor
+	name::ASCIIString
+end
+
+# Bound to specific maturity on a term structure.
+type RFIRCurveVertex <: RiskFactor
+	name::ASCIIString
+	maturity::Date
+end
+
+RFIRCurveVertex(factor::RFIRCurve, maturity::Date) = RFIRCurveVertex(factor.name, maturity)
+
+##################
+# PRICING MODELS
+##################
+abstract PricingModel
+abstract PMFixedIncome <: PricingModel
+abstract PMDerivative <: PricingModel
+
+type PMCash <: PricingModel
+	currency::RFSpotCurrency
+end
+
+type PMStock <: PricingModel
+	stock::RFStock
+	currency::RFSpotCurrency
+end
+
+type PMBullet <: PMFixedIncome
+	currency::RFSpotCurrency
+	basecurve::RFIRCurve
+	spreadcurve::HDSpreadCurve
+end
+
+type PMForwardCurrency <: PMDerivative
+	currency::RFSpotCurrency
+	currencycurve::RFIRCurve
+	basecurve::RFIRCurve
+end
+
+type PMFutureCurrency <: PMDerivative
+	currency::RFSpotCurrency
+	currencycurve::RFIRCurve
+	basecurve::RFIRCurve
+end
+
+##################
+
+type Scenario
+	date :: Date
+	data :: Dict{PricingData, Union{Float64, AbstractIRCurve}}
+end
+
+# AbstractFinancialContract, FinancialContract
+include("financialcontract.jl")
+
+type PricingResult
+	price::Float64
+	riskfactors::Vector{RiskFactor}
+	exposures::Vector{Float64}
+end

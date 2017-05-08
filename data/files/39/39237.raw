@@ -1,0 +1,13 @@
+import Base.Test
+
+"""
+The Julia port of Rentian scaling was "eyeball" tested against its Matlab counterpart, since exact testing of the two pseudorandom procedures would have been difficult. The following just ensures that the current Julia function gets the same answer as the original, manually tested version.
+"""
+function test_rentian_scaling()
+    g = groupaverage();
+    srand(1234);
+    rs = rentian_scaling(g,1000,"coordinates");
+    Base.Test.@test hash(rs) ==  0xea65e7387522f121;
+end
+
+test_rentian_scaling()

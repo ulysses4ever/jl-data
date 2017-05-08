@@ -1,0 +1,19 @@
+## get the process identifier 
+
+id = myid()
+
+# create variable, store random order
+
+rand_num = rand(Int64)
+@printf("process: %d  int: %d", id, rand_num)
+
+for i = 10:
+  # spawn the process
+  r = @spawn rand(Int64)
+
+  #print the results
+
+  @printf("process: %d  int: %d\n", r.where, fetch(r))
+end
+
+

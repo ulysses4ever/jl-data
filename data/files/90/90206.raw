@@ -1,0 +1,11 @@
+g = evolving_graph(Int, AbstractString)
+add_edge!(g, 1, 2, "t1")
+add_edge!(g, 2, 3, "t2")
+add_edge!(g, 4, 2, "t2")
+add_edge!(g, 4, 2, "t1")
+add_edge!(g, 2, 1, "t3")
+
+r, k = random_walk(g)
+ave, k = average_random_walk(g)
+n = num_timestamps(g)
+@test length(r) == length(ave)*n

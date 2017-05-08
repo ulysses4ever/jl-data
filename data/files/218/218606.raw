@@ -1,0 +1,8 @@
+include("../twiddle.jl")
+println(mort2d(uint(5),uint(4)))
+
+println(nextpow2(uint(2^32)))
+
+println([i for i in -2:10])
+println([nextpow2(uint(i)) for i in -2:10])
+println(nextpow2(uint(-32)))

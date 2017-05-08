@@ -1,0 +1,36 @@
+function daemonizeTheProcess()
+	# write an infinite loop to make the child behave like a daemon
+	i = 10
+	while ( i < 10)
+		println (cpid,": counter = " , i)
+		sleep(2)
+		i = i -1
+	end
+end
+
+function daemon()
+	cpid = ccall(:fork, Cint, ())
+	if cpid < 0
+	# fork failed, there is no child.
+		println(cpid,": fork failed" )
+	elseif cpid > 0
+	# upon a successful fork, further commmand can't be executed on parent as it misbehaves
+	# we are exiting the parent to avoid this behaviour
+		println(cpid,": fork success parent process" )
+		exit()
+	elseif cpid == 0
+	# Child process, this will not display results on TTY/console,
+	# output has to be redirected to a file of other destination
+		sid = ccall(:setsid, Cint, ())
+		if sid < 0
+			println(cpid,": new session id failed for child process" )
+		else
+		# child process is here
+			daemonizeTheProcess()
+		end
+	else
+	# this is an unreachable code section
+		println(cpid,": unreachable code section" )
+	end
+end
+

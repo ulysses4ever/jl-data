@@ -1,0 +1,20 @@
+#=
+Created on Mon Oct 26 26 20:25:12 2015
+@author: William Herrera
+
+IMPORTANT: run as administrator
+
+Test Julia 0.40 LightACPI hyperventilate.jl light breathing
+Should breathe lights
+
+=#
+
+module TestHyperventilate
+
+include("hyperventilate.jl")
+
+colors = [0x001111ee, 0x00ee1111, 0x0011ee11]
+all_cycle(colors)
+
+
+end

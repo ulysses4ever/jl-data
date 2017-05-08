@@ -1,0 +1,911 @@
+module SortedVectors
+
+#To test
+
+#-----------------------------------------------------------
+#PURPOSE
+#	Colin T. Bowers module for the SortedVector and SortedUniqueVector type
+#NOTES
+#	Module currently assumes vectors are sorted on "isless". Could potentially extend entire module to general orderings (see type Ordering)
+#	intersect on two sorted vectors returns all elements common from BOTH vectors. Note that intersect on two regular vectors only returns common elements from the first vector. In this module, intersect and union are both symmetric functions (unlike Base version)
+#	Indexing into a SortedVectorType does not create a new SortedVectorType but rather just results in a regular vector. This is deliberate as it means we don't need to check for monotinicity when indexing with any arbitrary vector of integers.
+#	If you have a SortedVector{Int} or SortedUniqueVector{Int} then you can only deleteat! on index, NOT on element-value. For all other types, you can deleteat! on element value as well as index.
+#LICENSE
+#	MIT License (see github repository for more detail: https://github.com/colintbowers/SortedVectors.jl.git)
+#-----------------------------------------------------------
+
+#Load any entire modules that are needed (use using ModuleName1, ModuleName2, etc)
+#(none currently needed)
+
+#Load any specific functions that are needed (use import ModuleName1.FunctionName1, ModuleName2.FunctionName2, etc)
+import 	Base.string,
+		Base.show,
+		Base.getindex,
+		Base.length,
+		Base.size,
+		Base.sizeof,
+		Base.eltype,
+		Base.first,
+		Base.last,
+		Base.endof,
+		Base.copy,
+		Base.deepcopy,
+		Base.issorted,
+		Base.search,
+		Base.searchsorted,
+		Base.searchsortedfirst,
+		Base.searchsortedlast,
+		Base.in,
+		Base.==,
+		Base.!=,
+		Base.pop!,
+		Base.shift!,
+		Base.push!,
+		Base.unshift!,
+		Base.deleteat!,
+		Base.empty!,
+		Base.insert!,
+		Base.intersect,
+		Base.union,
+		Base.setdiff,
+		Base.setdiff!,
+		Base.unique
+
+
+#Specify the variables/functions to export (use export FunctionName1, FunctionName2, etc)
+export  SortedVectorType,
+		SortedVector,
+		SortedUniqueVector,
+		searchfirst,
+		searchlast,
+		deletenotat!,
+		insertIndex,
+		intersectIndex,
+		unionIndex,
+		isunique,
+		unique!,
+		trimRange,
+		trim,
+		trim!,
+		constructMesh,
+		meshIndex,
+		mesh
+
+
+
+
+
+#----------------------------------------------------------
+#TYPE
+#	SortedVector
+#	SortedUniqueVector
+#FIELDS
+#	x::Vector{T}: This field contains the sorted vector (and unique in case of SortedUniqueVector) of element type T<:Any
+#PURPOSE
+#	This type implements a vector whose elements are guaranteed to be sorted, and a vector whose elements are guaranteed to be sorted and unique. Methods defined on this type exploit this feature for performance gains.
+#INNER CONSTRUCTOR
+#	(x::Vector{T}; alreadySorted::Bool=false): Inner constructor checks whether the input vector is sorted, and sorts it if it is not. This check can be skipped via a keyword argument.
+#	(x::Vector{T}; alreadySorted::Bool=false, alreadyUnique::Bool=false): Inner constructor checks whether the input vector is sorted and unique, and sorts it if it is not, and then forces uniqueness if not. These checks can be skipped via keyword arguments.
+#OUTER CONSTRUCTOR
+#	There are two outer constructors that match the inner constructors that allow the user to skip specifying the type explicitly (instead it is inferred from eltype of the input vector)
+#	(T::DataType): Initiates an empty SortedVector or SortedUniqueVector of type T
+#METHODS
+#	There are many
+#NOTES
+#----------------------------------------------------------
+#-------- TYPE DEFINITION -----------
+#Abstract super-type
+abstract SortedVectorType{T}
+#SortedVector
+immutable SortedVector{T} <: SortedVectorType{T}
+	x::Vector{T}
+	function SortedVector{T}(x::Vector{T}; alreadySorted::Bool=false)
+		!(method_exists(isless, (T, T))) && error("isless is not defined for Type " * string(T) * ", so SortedVector is not feasible.")
+		if alreadySorted == false
+			if issorted(x) == false
+				sort!(x)
+			end
+		end
+		new(x)
+	end
+end
+#SortedUniqueVector
+immutable SortedUniqueVector{T} <: SortedVectorType{T}
+	x::Vector{T}
+	function SortedUniqueVector{T}(x::Vector{T}; alreadySorted::Bool=false, alreadyUnique::Bool=false)
+		!(method_exists(isless, (T, T))) && error("isless is not defined for Type " * string(T) * ", so SortedUniqueVector is not feasible.")
+		if alreadySorted == false
+			if issorted(x) == false
+				sort!(x)
+			end
+		end
+		if alreadyUnique == false
+			if isuniqueSort(x) == false
+				uniqueSort!(x)
+			end
+		end
+		new(x)
+	end
+end
+#SortedVector constructors
+SortedVector{T}(x::Vector{T}; alreadySorted::Bool=false) = SortedVector{eltype(x)}(x, alreadySorted=alreadySorted)
+SortedVector(T::DataType) = SortedVector(Array(T, 0), alreadySorted=true)
+SortedVector(s::SortedVector) = s
+SortedVector(s::SortedUniqueVector) = SortedVector(s, alreadySorted=true)
+#SortedUniqueVector constructors
+SortedUniqueVector{T}(x::Vector{T}; alreadySorted::Bool=false, alreadyUnique::Bool=false) = SortedUniqueVector{eltype(x)}(x, alreadySorted=alreadySorted, alreadyUnique=alreadyUnique)
+SortedUniqueVector(T::DataType) = SortedUniqueVector(Array(T, 0), alreadySorted=true, alreadyUnique=true)
+SortedUniqueVector(s::SortedUniqueVector) = s
+SortedUniqueVector(s::SortedVector) = SortedUniqueVector(s, alreadySorted=true)
+#-------------------------------------
+#-------- ONE-LINE METHODS ----
+Base.string(s::SortedVectorType) = string(s.x)
+Base.show(s::SortedVectorType) = show(s.x)
+Base.getindex(s::SortedVectorType, i::Int) = s.x[i]
+Base.getindex(s::SortedVectorType, r::UnitRange) = s.x[r]
+Base.getindex(s::SortedVectorType, iVec::Vector{Int}) = s.x[iVec]
+Base.getindex(s::SortedVectorType, inds::IntSet) = s.x[collect(inds)]
+#Base.getindex(s::SortedVectorType, iAny) = s.x[iAny] #Duck-typing for other cases
+Base.length(s::SortedVectorType) = length(s.x)
+Base.size(s::SortedVectorType) = length(s)
+Base.size(s::SortedVectorType, i::Int) = (i != 1) ? error("SortedVector is a vector") : length(s)
+Base.sizeof(s::SortedVectorType) = sizeof(s.x)
+Base.eltype(s::SortedVectorType) = eltype(s.x)
+Base.first(s::SortedVectorType) = first(s.x)
+Base.last(s::SortedVectorType) = last(s.x)
+Base.endof(s::SortedVectorType) = endof(s.x)
+Base.copy(s::SortedVector) = SortedVector(copy(s.x), alreadySorted=true)
+Base.copy(s::SortedUniqueVector) = SortedUniqueVector(copy(s.x), alreadySorted=true, alreadyUnique=true)
+Base.deepcopy(s::SortedVector) = SortedVector(deepcopy(s.x), alreadySorted=true)
+Base.deepcopy(s::SortedUniqueVector) = SortedUniqueVector(deepcopy(s.x), alreadySorted=true, alreadyUnique=true)
+Base.issorted(s::SortedVectorType) = issorted(s.x) #Useful in case there is potential for someone to have messed with the internals
+#searchsorted is multi-line as it incorporates an error trap for SortedUniqueVector type
+Base.searchsortedfirst{T}(s::SortedVectorType{T}, a::T) = searchsortedfirst(s.x, a)
+Base.searchsortedlast{T}(s::SortedVectorType{T}, a::T) = searchsortedlast(s.x, a)
+Base.search{T}(s::SortedVectorType{T}, a::T) = searchsorted(s, a)
+searchfirst{T}(s::SortedVectorType{T}, a::T) = searchsortedfirst(s, a)
+searchlast{T}(s::SortedVectorType{T}, a::T) = searchsortedlast(s, a)
+#Base.in{T<:OrderedSet}(s::SortedVectorType{T}, a::T) = error("To avoid method ambiguities the in function can not be called on SortedVector types containing OrderedSet types")
+Base.in{T}(a::T, s::SortedVectorType{T}) = !(isempty(search(s, a)))
+Base.pop!(s::SortedVectorType) = pop!(s.x)
+Base.shift!(s::SortedVectorType) = shift!(s.x)
+Base.deleteat!(s::SortedVectorType, i::Int) = deleteat!(s.x, i)
+Base.deleteat!(s::SortedVectorType, r::UnitRange) = deleteat!(s.x, r)
+Base.deleteat!(s::SortedVectorType, iVec::Vector{Int}) = deleteat!(s.x, iVec)
+Base.deleteat!(s::SortedVectorType, inds::IntSet) = deleteat!(s.x, collect(inds))
+Base.deleteat!{T}(s::SortedVectorType{T}, a::T) = deleteat!(s, search(s, a))
+Base.deleteat!{T}(s::SortedVectorType{T}, a::Vector{T}) = [ deleteat!(s, a[n]) for n = 1:length(a) ]
+Base.empty!(s::SortedVectorType) = deleteat!(s, UnitRange(1, length(s)))
+==(s1::SortedVectorType, s2::SortedVectorType) = (s1.x == s2.x)
+!=(s1::SortedVectorType, s2::SortedVectorType) = (s1.x != s2.x)
+#-------------------------------------
+#-------- MULTI-LINE METHODS -----------
+#searchsorted
+Base.searchsorted{T}(s::SortedVector{T}, a::T) = searchsorted(s.x, a)
+function Base.searchsorted{T}(s::SortedUniqueVector{T}, a::T)
+	r = searchsorted(s.x, a)
+	(r.stop > r.start) ? error("SortedUniqueVector is not unique") : return(r)
+end
+#push!
+function push!{T}(s::SortedVector{T}, a::T)
+	if s == 0
+		push!(s.x, a)
+	else
+		a < s[end] && error("push! operation would violate sort order")
+		push!(s.x, a)
+	end
+end
+function push!{T}(s::SortedUniqueVector{T}, a::T)
+	if s == 0
+		push!(s.x, a)
+	else
+		a <= s[end] && error("push! operation would violate sort order")
+		push!(s.x, a)
+	end
+end
+#unshift!
+function unshift!{T}(s::SortedVector{T}, a::T)
+	if s == 0
+		unshift!(s.x, a)
+	else
+		a > s[1] && error("unshift! operation would violate sort order")
+		unshift!(s.x, a)
+	end
+end
+function unshift!{T}(s::SortedUniqueVector{T}, a::T)
+	if s == 0
+		unshift!(s.x, a)
+	else
+		a >= s[1] && error("unshift! operation would violate sort order")
+		unshift!(s.x, a)
+	end
+end
+#insertIndex
+function insertIndex{T}(s::SortedVector{T}, a::T)
+	if length(s) == 0
+		return(1)
+	else
+		if a < s.x[1]
+			return(1)
+		elseif a >= s.x[end]
+			return(length(s)+1)
+		else
+			return(searchlast(s, a)+1) #In presence of duplicates, insert after the duplicates
+		end
+	end
+end
+function insertIndex{T}(s::SortedUniqueVector{T}, a::T)
+	if length(s) == 0
+		return(1)
+	else
+		if a < s.x[1]
+			return(1)
+		elseif a > s.x[end]
+			return(length(s)+1)
+		else
+			r = search(s, a)
+			!(isempty(r)) && error("Unable to insert into SortedUniqueVector as it would create duplicate")
+			return(r.start)
+		end
+	end
+end
+#insert!
+function Base.insert!{T}(s::SortedVectorType{T}, a::T)
+	i = insertIndex(s, a)
+	insert!(s.x, i, a)
+	return(i)
+end
+Base.insert!{T}(s::SortedVectorType{T}, a::Vector{T}) = [ insert!(s, a[n]) for n = 1:length(a) ]
+#intersectIndex, intersect
+function intersectIndex{T}(x::SortedVector{T}, y::SortedVector{T})
+	nx = 1
+	ny = 1
+	indsx = Array(Int, 0)
+	indsy = Array(Int, 0)
+	indsxRecover = Array(Int, 0)
+	indsyRecover = Array(Int, 0)
+	if length(x) == 0 || length(y) == 0
+		return(indsx, indsy, indsxRecover, indsyRecover)
+	end
+	if x[end] < y[1] || y[end] < x[1]
+		return(indsx, indsy, indsxRecover, indsyRecover)
+	end
+	c1 = 1
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			nx += 1
+		elseif x[nx] > y[ny]
+			ny += 1
+		else
+			push!(indsx, nx)
+			push!(indsxRecover, c1)
+			c1 += 1
+			nnx = nx + 1
+			while nnx <= length(x) #This is needed in-case of duplicates
+				if x[nnx] != y[ny]
+					break
+				else
+					push!(indsx, nnx)
+					push!(indsxRecover, c1)
+					nnx += 1
+					c1 += 1
+				end
+			end
+			push!(indsy, ny)
+			push!(indsyRecover, c1)
+			c1 += 1
+			nny = ny + 1
+			while nny <= length(y) #This is needed in-case of duplicates
+				if y[nny] != x[nx]
+					break
+				else
+					push!(indsy, nny)
+					push!(indsyRecover, c1)
+					nny += 1
+					c1 += 1
+				end
+			end
+			nx = nnx
+			ny = nny
+		end
+	end
+	return(indsx, indsy, indsxRecover, indsyRecover)
+end
+function intersectIndex{T}(x::SortedUniqueVector{T}, y::SortedUniqueVector{T})
+	nx = 1
+	ny = 1
+	indsx = Array(Int, 0)
+	indsy = Array(Int, 0)
+	if length(x) == 0 || length(y) == 0
+		return(indsx, indsy)
+	end
+	if x[end] < y[1] || y[end] < x[1]
+		return(indsx, indsy)
+	end
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			nx += 1
+		elseif x[nx] > y[ny]
+			ny += 1
+		else
+			push!(indsx, nx)
+			nx += 1
+			push!(indsy, ny)
+			ny += 1
+		end
+	end
+	return(indsx, indsy)
+end
+intersectIndex{T}(x::SortedVectorType{T}, y::SortedVectorType{T}) = intersectIndex(SortedVector(x, alreadySorted=true), SortedVector(y, alreadySorted=true))
+function intersect{T}(x::SortedVector{T}, y::SortedVector{T})
+	nx = 1
+	ny = 1
+	xy = SortedVector(T)
+	if length(x) == 0 || length(y) == 0
+		return(xy)
+	end
+	if x[end] < y[1] || y[end] < x[1]
+		return(xy)
+	end
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			nx += 1
+		elseif x[nx] > y[ny]
+			ny += 1
+		else
+			push!(xy.x, x[nx])
+			nnx = nx + 1
+			while nnx <= length(x) #This is needed in-case of duplicates
+				if x[nnx] != y[ny]
+					break
+				else
+					push!(xy.x, x[nnx])
+					nnx += 1
+				end
+			end
+			push!(xy.x, y[ny])
+			nny = ny + 1
+			while nny <= length(y) #This is needed in-case of duplicates
+				if y[nny] != x[nx]
+					break
+				else
+					push!(xy.x, y[nny])
+					nny += 1
+				end
+			end
+			nx = nnx
+			ny = nny
+		end
+	end
+	return(xy)
+end
+function intersect{T}(x::SortedUniqueVector{T}, y::SortedUniqueVector{T})
+	nx = 1
+	ny = 1
+	xy = SortedUniqueVector(T)
+	if length(x) == 0 || length(y) == 0
+		return(xy)
+	end
+	if x[end] < y[1] || y[end] < x[1]
+		return(xy)
+	end
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			nx += 1
+		elseif x[nx] > y[ny]
+			ny += 1
+		else
+			push!(xy.x, x[nx])
+			nx += 1
+			ny += 1
+		end
+	end
+	return(xy)
+end
+intersect{T}(x::SortedVectorType{T}, y::SortedVectorType{T}) = intersect(SortedVector(x, alreadySorted=true), SortedVector(y, alreadySorted=true))
+#unionIndex, union
+function unionIndex{T}(x::SortedVector{T}, y::SortedVector{T})
+	nx = 1
+	ny = 1
+	indsxRecover = Array(Int, 0)
+	indsyRecover = Array(Int, 0)
+	if x[end] < y[1]
+		return([1:length(x)], [length(x)+1:length(x)+length(y)])
+	elseif y[end] < x[1]
+		return([length(y)+1:length(y)+length(x)], [1:length(y)])
+	end
+	c1 = 1
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			push!(indsxRecover, c1)
+			nx += 1
+			c1 += 1
+		elseif x[nx] > y[ny]
+			push!(indsyRecover, c1)
+			ny += 1
+			c1 += 1
+		else
+			push!(indsxRecover, c1)
+			c1 += 1
+			nnx = nx + 1
+			while nnx <= length(x)
+				if x[nnx] != y[ny]
+					break
+				else
+					push!(indsxRecover, c1)
+					nnx += 1
+					c1 += 1
+				end
+			end
+			push!(indsyRecover, c1)
+			c1 += 1
+			nny = ny + 1
+			while nny <= length(y)
+				if y[nny] != x[nx]
+					break
+				else
+					push!(indsyRecover, c1)
+					c1 += 1
+					nny += 1
+				end
+			end
+			nx = nnx
+			ny = nny
+		end
+	end
+	if nx <= length(x)
+		for n = nx:length(x)
+			push!(indsxRecover, c1)
+			c1 += 1
+		end
+	elseif ny <= length(y)
+		for n = ny:length(y)
+			push!(indsyRecover, c1)
+			c1 += 1
+		end
+	end
+	return(indsxRecover, indsyRecover)
+end
+function unionIndex{T}(x::SortedUniqueVector{T}, y::SortedUniqueVector{T})
+	nx = 1
+	ny = 1
+	indsxRecover = Array(Int, 0)
+	indsyRecover = Array(Int, 0)
+	if x[end] < y[1]
+		return([1:length(x)], [length(x)+1:length(x)+length(y)])
+	elseif y[end] < x[1]
+		return([length(y)+1:length(y)+length(x)], [1:length(y)])
+	end
+	c1 = 1
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			push!(indsxRecover, c1)
+			nx += 1
+			c1 += 1
+		elseif x[nx] > y[ny]
+			push!(indsyRecover, c1)
+			ny += 1
+			c1 += 1
+		else
+			push!(indsxRecover, c1)
+			push!(indsyRecover, c1) #The goal of function is to return indices that can be used to index into union and return original vectors
+			c1 += 1
+			nx += 1
+			ny += 1
+		end
+	end
+	if nx <= length(x)
+		for n = nx:length(x)
+			push!(indsxRecover, c1)
+			c1 += 1
+		end
+	elseif ny <= length(y)
+		for n = ny:length(y)
+			push!(indsyRecover, c1)
+			c1 += 1
+		end
+	end
+
+	return(indsxRecover, indsyRecover)
+end
+unionIndex{T}(x::SortedVectorType{T}, y::SortedVectorType{T}) = unionIndex(SortedVector(x, alreadySorted=true), SortedVector(y, alreadySorted=true))
+function union{T}(x::SortedVector{T}, y::SortedVector{T})
+	nx = 1
+	ny = 1
+	xy = SortedVector(T)
+	if x[end] < y[1] #Special case shortcut
+		[ push!(xy.x, x[n]) for n = 1:length(x) ]
+		[ push!(xy.x, y[n]) for n = 1:length(y) ]
+		return(xy)
+	elseif y[end] < x[1]  #Special case shortcut
+		[ push!(xy.x, y[n]) for n = 1:length(y) ]
+		[ push!(xy.x, x[n]) for n = 1:length(x) ]
+		return(xy)
+	end
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			push!(xy.x, x[nx])
+			nx += 1
+		elseif x[nx] > y[ny]
+			push!(xy.x, y[ny])
+			ny += 1
+		else
+			push!(xy.x, x[nx])
+			nnx = nx + 1
+			while nnx <= length(x)
+				if x[nnx] != y[ny]
+					break
+				else
+					push!(xy.x, x[nnx])
+					nnx += 1
+				end
+			end
+			push!(xy.x, y[ny])
+			nny = ny + 1
+			while nny <= length(y)
+				if y[nny] != x[nx]
+					break
+				else
+					push!(xy.x, y[nny])
+					nny += 1
+				end
+			end
+			nx = nnx
+			ny = nny
+		end
+	end
+	if nx <= length(x)
+		[ push!(xy.x, x[n]) for n = nx:length(x) ]
+	elseif ny <= length(y)
+		[ push!(xy.x, y[n]) for n = ny:length(y) ]
+	end
+	return(xy)
+end
+function union{T}(x::SortedUniqueVector{T}, y::SortedUniqueVector{T})
+	nx = 1
+	ny = 1
+	xy = SortedUniqueVector(T)
+	if x[end] < y[1] #Special case shortcut
+		[ push!(xy.x, x[n]) for n = 1:length(x) ]
+		[ push!(xy.x, y[n]) for n = 1:length(y) ]
+		return(xy)
+	elseif y[end] < x[1]  #Special case shortcut
+		[ push!(xy.x, y[n]) for n = 1:length(y) ]
+		[ push!(xy.x, x[n]) for n = 1:length(x) ]
+		return(xy)
+	end
+	while nx <= length(x) && ny <= length(y)
+		if x[nx] < y[ny]
+			push!(xy.x, x[nx])
+			nx += 1
+		elseif x[nx] > y[ny]
+			push!(xy.x, y[ny])
+			ny += 1
+		else
+			push!(xy.x, x[nx]) #Only push x[nx] to avoid duplication
+			nx += 1
+			ny += 1
+		end
+	end
+	if nx <= length(x)
+		[ push!(xy.x, x[n]) for n = nx:length(x) ]
+	elseif ny <= length(y)
+		[ push!(xy.x, y[n]) for n = ny:length(y) ]
+	end
+	return(xy)
+end
+union{T}(x::SortedVectorType{T}, y::SortedVectorType{T}) = union(SortedVector(x, alreadySorted=true), SortedVector(y, alreadySorted=true))
+#setdiff!, setdiff (note, is essentially equivalent to complement, where x is the space, and we want the complement of y)
+function setdiff!{T}(x::SortedVector{T}, y::SortedVector{T})
+	nx = length(x)
+	ny = length(y)
+	if x[end] < y[1] || y[end] < x[1] #Special case shortcut
+		return(true)
+	end
+	while nx >= 1 && ny >= 1
+		if x[nx] > y[ny]
+			nx -= 1
+		elseif x[nx] < y[ny]
+			ny -= 1
+		else
+			deleteat!(x, nx)
+			nnx = nx - 1
+			while nnx >= 1
+				if x[nnx] != y[ny]
+					break
+				else
+					deleteat!(x, nnx)
+					nnx -= 1
+				end
+			end
+			nx = nnx
+			ny -= 1
+		end
+	end
+	return(true)
+end
+function setdiff!{T}(x::SortedUniqueVector{T}, y::SortedUniqueVector{T})
+	nx = length(x)
+	ny = length(y)
+	if x[end] < y[1] || y[end] < x[1] #Special case shortcut
+		return(true)
+	end
+	while nx >= 1 && ny >= 1
+		if x[nx] > y[ny]
+			nx -= 1
+		elseif x[nx] < y[ny]
+			ny -= 1
+		else
+			deleteat!(x, nx)
+			nx -= 1
+			ny -= 1
+		end
+	end
+	return(true)
+end
+setdiff!{T}(x::SortedVector{T}, y::SortedUniqueVector{T}) = setdiff!(x, SortedVector(y, alreadySorted=true))
+setdiff!{T}(x::SortedUniqueVector{T}, y::SortedVector{T}) = setdiff!(x, SortedUniqueVector(y, alreadySorted=true)) #
+function setdiff{T}(x::SortedVectorType{T}, y::SortedVectorType{T})
+	xOut = deepcopy(x)
+	setdiff!(xOut, y)
+	return(xOut)
+end
+#unique!, unique, isunique (note, I deliberately choose NOT to return a SortedUniqueVector here. If the user wants that, they can do it as an additional step)
+function isunique(x::SortedVector)
+	for n = 2:length(x)
+		if x[n] == x[n-1]
+			return(false)
+		end
+	end
+	return(true)
+end
+function unique!(x::SortedVector)
+	for n = length(x):-1:2
+		if x[n] == x[n-1]
+			deleteat!(x, n)
+		end
+	end
+	return(true)
+end
+function unique(x::SortedVector)
+	xOut = deepcopy(x)
+	unique!(xOut)
+	return(xOut)
+end
+#deletenotat!
+deletenotat!(s::SortedVectorType, r::UnitRange) = deleteat!(s, setdiffIndex(length(s), r))
+deletenotat!(s::SortedVectorType, inds::IntSet) = deleteat!(s, setdiffIndex(length(s), collect(inds)))
+deletenotat!(s::SortedVectorType, inds::Vector{Int}; alreadySorted::Bool=false) = deleteat!(s, setdiffIndex(length(s), inds, alreadySorted=alreadySorted))
+deletenotat!(s::SortedVectorType, i::Int) = deletenotat!(s, [i], alreadySorted=true)
+#trimRange, trim!, trim
+function trimRange{T}(x::SortedVectorType{T}, xLB::T, xUB::T)
+	length(x) == 0 && return(1:0)
+	xLB > xUB && error("xLB is greater than xUB")
+	xLB > x[end] && return(UnitRange(length(x)+1, length(x))) #Special-case shortcut
+	xUB < x[1] && return(UnitRange(1, 0)) #Special-case shortcut
+	r = UnitRange(searchfirst(x, xLB), searchlast(x, xUB))
+	r.start > length(x) && return(UnitRange(length(x)+1, length(x)))
+	r.stop < 1 && return(UnitRange(1, 0))
+	return(r)
+end
+function trim!{T}(x::SortedVectorType{T}, xLB::T, xUB::T)
+	r = trimRange(x, xLB, xUB)
+	deletenotat!(x, r)
+	return(r)
+end
+function trim{T}(x::SortedVectorType{T}, xLB::T, xUB::T)
+	xOut = deepcopy(x)
+	trim!(xOut, xLB, xUB)
+	return(xOut)
+end
+
+
+
+#----------------------------------------------------------
+#FUNCTION
+#	constructMesh
+#INPUT
+#	{T1, T2}(intervalStart::T1, intervalEnd::T1, intervalLength::T2): Any types. Note, intervalLength need not be the same type as intervalStart and intervalEnd.
+#OUTPUT
+#	Output is a SortedUniqueVector{T1} mesh
+#PURPOSE
+#	Build a mesh corresponding to a given start, end, and interval length.
+#NOTES
+#	Use trim functions if you want to reduce a mesh
+#----------------------------------------------------------
+function constructMesh{T1, T2}(intervalStart::T1, intervalEnd::T1, intervalLength::T2)
+	intervalStart > intervalEnd && error("intervalStart must be strictly less than intervalEnd")
+	intervalStart + intervalLength > intervalEnd && return(SortedUniqueVector([intervalStart, intervalEnd]))
+	m = [intervalStart:intervalLength:intervalEnd]
+	m[end] != intervalEnd && push!(m, intervalEnd)
+	return(SortedUniqueVector(m))
+end
+
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	meshIndex
+#INPUT
+#		(xLength::Int64, k::Int64=1, kStart::Int64=1): Return an index that can be used to retrieve every kth observation in some vector x of length xLength, starting at kStart (defaults to 1). Last index will always be xLength.
+#		(x::SortedVectorType{T1}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true): Return an index that, for each time in m, will retrieve the most recent observation in x before or equal to that time.
+#		(x::SortedVectorType{T1}, m::SortedVector{T1}; allowForwardLooking::Bool=true): Wrapper that converts m to SortedUniqueVector.
+#		(x::SortedVectorType{T1}, intervalLength::T2): Return an index corresponding to a mesh that starts at the first date-time in x, ends at the last date-time in x, and has interval length of intervalLength, where the final interval is truncated if need be. Note, duck typing used to ensure intervalLength is of a suitable type.
+#		(x::SortedVectorType{T1}, intervalStart::T1, intervalEnd::T1, intervalLength::T2; allowForwardLooking::Bool=true): Return an index corresponding to a mesh that starts at intervalStart and ends at intervalEnd, and has interval length of intervalLength, where the final interval is truncted if need be. Note, duck typing used to ensure intervalLength is of a suitable type.
+#	Note, some (but not all) of the methods have the following keyword arguments (see INPUT)
+#		allowForwardLooking::Bool tells the function whether it can employ forward-looking if the first time in the mesh occurs before the first time in x, eg if set to true and this situation occurs, the first indices will be set to 1, even though this observation occurs after the first times in the mesh. If set to false then this situation will result in the first indices being set to 0 (which will cause an error if used to index into data)
+#OUTPUT
+#	Output is Vector{Int64} of indices that can be used to index into x (or any data that corresponds to x)
+#PURPOSE
+#	Obtain a set of indices corresponding to the specified mesh of the input time-series.
+#NOTES
+#----------------------------------------------------------
+meshIndex(xLength::Int, k::Int=1, kStart::Int=1) = constructMesh(kStart, xLength, k).x #return just the vector of integers
+function meshIndex{T}(x::SortedVectorType{T}, m::SortedUniqueVector{T}; allowForwardLooking::Bool=true)
+	if length(x) == 0 || length(m) == 0; error("Empty input vector"); end
+	inds = Array(Int, length(m))
+	nx = 1
+	nm = 1
+	while nx <= length(x) && nm <= length(m)
+		if x[nx] > m[nm]
+			inds[nm] = nx - 1
+			nm += 1
+		else
+			nx += 1
+		end
+	end
+	for n = nm:length(m) #This loop will only initiate if the while loop breaks because of nx. If that occurs, then this loop fills out the remainder of index with the index of last observation in x
+		inds[n] = length(x)
+	end
+	if allowForwardLooking == true #If we want to allow forward looking for allocation of the first observation, we simply replace any 0's at the top of index with 1's
+		for n = 1:length(inds)
+			if inds[n] == 0
+				inds[n] = 1
+			else
+				break
+			end
+		end
+	end
+	return(inds)
+end
+meshIndex{T}(x::SortedVectorType{T}, m::SortedVector{T}; allowForwardLooking::Bool=true) = meshIndex(x, SortedUniqueVector(m, alreadySorted=true), allowForwardLooking=allowForwardLooking)
+meshIndex{T1<:Any, T2<:Any}(x::SortedVectorType{T1}, intervalLength::T2) = meshIndex(x, constructMesh(x[1], x[end], intervalLength))
+meshIndex{T1<:Any, T2<:Any}(x::SortedVectorType{T1}, intervalStart::T1, intervalEnd::T1, intervalLength::T2) = meshIndex(x, constructMesh(intervalStart, intervalEnd, intervalLength))
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	mesh
+#INPUT
+#	Let TN1<:Number and T2<:validTimeIntervalType. Then function accepts:
+#		(x::Vector{TN1}, k::Int64=1, kStart::Int64=1): Wrapper on corresponding method of meshIndex that applies the index to build a new x
+#		(d::FinTimeData, k::Int64=1, kStart::Int64=1): Wrapper on corresponding method of meshIndex that applies the index to build a new d
+#		(d::FinTimeData, m::Vector{DateTime}; allowForwardLooking::Bool=true, matchDate::Bool=false): Wrapper on corresponding method of meshIndex that applies the index to build a new d
+#		(d::FinTimeData, intervalLength::T2): Wrapper on corresponding method of meshIndex that applies the index to build a new d
+#		(d::FinTimeData, intervalStart::DateTime, intervalEnd::DateTime, intervalLength::T2; allowForwardLooking::Bool=true): Wrapper on corresponding method of meshIndex that applies the index to build a new d
+#	Note, some (but not all) of the methods have the following keyword arguments (see INPUT)
+#		allowForwardLooking::Bool tells the function whether it can employ forward-looking if the first time in the mesh occurs before the first time in x, eg if set to true and this situation occurs, the first indices will be set to 1, even though this observation occurs after the first times in the mesh. If set to false then this situation will result in a call to reduceMesh to reduce the mesh so that the first element occurs on or after the first element in the input time vector
+#		matchDate::Bool tells the function whether to check if the date in mesh matches the date in the input time vector. This keyword argument should generally be set to false (default value), except for the case where the user is working with FinTimeData objects drawn from a FinHFSeries, in which case we might want to re-use the times in a mesh, altering only the date portion at each iteration.
+#OUTPUT
+#	Output is a new x or d (depending on method called) that corresponds to the specified mesh.
+#PURPOSE
+#	Build new dataset according to a specified mesh.
+#NOTES
+#	All inputs x, d, or m are assumed to be sorted in ascending order.
+#	Some methods may be able to be improved by finding a way to update DateTime in-place.
+#----------------------------------------------------------
+mesh(x::SortedVectorType, k::Int64=1, kStart::Int64=1) = x[meshIndex(length(x), k, kStart)]
+mesh{T}(x::SortedVectorType{T}, m::SortedUniqueVector{T}; allowForwardLooking::Bool=true) = x[meshIndex(x, m, allowForwardLooking=allowForwardLooking)]
+mesh{T}(x::SortedVectorType{T}, m::SortedVector{T}; allowForwardLooking::Bool=true) = mesh(x, SortedUniqueVector(m, alreadySorted=true), allowForwardLooking=allowForwardLooking)
+mesh{T1<:Any, T2<:Any}(x::SortedVectorType{T1}, intervalLength::T2) = mesh(x, constructMesh(x[1], x[end], intervalLength))
+mesh{T1<:Any, T2<:Any}(x::SortedVectorType{T1}, intervalStart::T1, intervalEnd::T1, intervalLength::T2) = mesh(x, constructMesh(intervalStart, intervalEnd, intervalLength))
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	isuniqueSort
+#INPUT
+#	Function accepts:
+#		(x::Vector{T}): x is assumed to be sorted in ascending order.
+#OUTPUT
+#	A boolean indicating whether x is unique (ie return true if no duplicates, false if duplicates)
+#PURPOSE
+#	Efficiently check if the input vector is sorted given the knowledge that the input is sorted
+#NOTES
+#	Non-exported function used in the inner constructor of a SortedUniqueVector
+#----------------------------------------------------------
+function isuniqueSort{T}(x::Vector{T})
+	for n = 2:length(x)
+		if x[n] == x[n-1]
+			return(false)
+		end
+	end
+	return(true)
+end
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	uniqueSort!
+#	uniqueSort
+#INPUT
+#	Function accepts:
+#		(x::Vector{T}): x is assumed to be sorted in ascending order.
+#OUTPUT
+#	A unique version of x (still sorted)
+#PURPOSE
+#	Efficiently obtain a unique version of the input vector given the knowledge that the input is sorted
+#NOTES
+#	Non-exported function used in the inner constructor of SortedVector and SortedUniqueVector
+#----------------------------------------------------------
+function uniqueSort!{T}(x::Vector{T})
+	for n = length(x):-1:2
+		if x[n] == x[n-1]
+			deleteat!(x, n)
+		end
+	end
+	return(x)
+end
+uniqueSort{T}(x::Vector{T}) = uniqueSort!(deepcopy(x))
+
+
+
+
+#----------------------------------------------------------
+#FUNCTION(S)
+#	setdiffIndex
+#INPUT
+#	Function accepts:
+#		(N::Int, inds::IntSet): Provides the complement of x on 1:N
+#		(N::Int, inds::Vector{Int}; alreadySorted::Bool=false):
+#		(N::Int, r::UnitRange):
+#OUTPUT
+#	Vector{Int} of the complement of the input
+#PURPOSE
+#	Function to find the complement of a set of indices
+#NOTES
+#	Non-exported function used to find the complement of a set of indices
+#----------------------------------------------------------
+function setdiffIndex(N::Int, inds::IntSet)
+	indsOut = setdiff(IntSet(1:N), inds)
+	return(collect(indsOut))
+end
+function setdiffIndex(N::Int, inds::Vector{Int}; alreadySorted::Bool=false)
+	alreadySorted == false && sort!(inds)
+	return(setdiffIndex(N, IntSet(inds)))
+end
+function setdiffIndex(N::Int, r::UnitRange)
+	r.start < 1 && error("Bounds error on UnitRange")
+	r.stop > N && error("Bounds error on UnitRange")
+	return(setdiffIndex(N, IntSet([r.start:r.stop])))
+end
+
+
+
+
+
+
+
+
+
+
+
+end # module
+
+
+
+

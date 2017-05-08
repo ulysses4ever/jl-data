@@ -1,0 +1,21 @@
+#Helper Functions
+function categorical2frequency(dataVector)
+  #This functions counts the occurences of a category and maps it back to the data provided
+  #countmap is similar to the function "table()" in R, the only difference is that countmap() returns a dictionary
+  vectorDict = countmap(dataVector)
+  newVector = [vectorDict[dataPoint] for dataPoint in dataVector]
+  return newVector
+end
+
+function categorical2SparseMatrix(dataVector)
+  #Replace NAs with stings "NA"
+  dataVector[bool(isna(dataVector))] = "NA"
+  #Replace NAs with stings "" (empty document)
+  #dataVector[bool(isna(dataVector))] = ""
+  #Transform to StringDocument and merge them all into a Corpus
+  dataVectorCorpus = Corpus(convert(Vector, map(x -> StringDocument(x), dataVector)))
+  update_lexicon!(dataVectorCorpus)
+  #Transform corpus to document term matrix and then to a sparse matrix
+  dataVectorSparse = dtm(DocumentTermMatrix(dataVectorCorpus))
+  return dataVectorSparse
+end

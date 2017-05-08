@@ -1,0 +1,39 @@
+module synapses
+
+import neurons.Neurons
+
+abstract Synapses
+
+### Conductance-based synapses ###
+# change the constructor to avoid the redundance of A and W
+type CondSyn <: Synapses
+    # W is the matrix of base conductances
+    A::Array{Bool,2}
+    W::Array{Float64,2}
+    tausyn::Float64
+    Vsyn::Float64
+end
+
+function input_current(neurons::Neurons, synapses::CondSyn)
+    input = exp(-neurons.LastSpikes/synapses.tausyn)
+    input = synapses.W*input
+    input .*= -neurons.Vm + synapses.Vsyn
+    return input
+end
+
+
+### Current-based synapses ###
+# change the constructor to avoid the redundance of A and W
+type CurrSyn <: Synapses
+    A::Array{Bool,2}
+    W::Array{Float64,2}
+    tausyn::Float64
+end
+
+function input_current(neurons::Neurons, synapses::CurrSyn)
+    input = exp(-neurons.LastSpikes/synapses.tausyn)
+    input = synapses.W*input
+    return input
+end
+
+end

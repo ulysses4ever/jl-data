@@ -1,0 +1,29 @@
+using MethylHMM
+using HDF5,JLD
+
+# Create a betabinomial HMM
+
+fns = [ "AM_E1_2_chr2subset",
+        "AM_E1_2_chr2subset2",
+        "AM_E2_2_chr2subset",
+        "AM_E2_2_chr2subset2",
+        "AM_V8_2_chr2subset",
+        "AM_V8_2_chr2subset2",
+        "AM_V9_2_chr2subset",
+        "AM_V9_2_chr2subset2" ]
+
+for f in fns
+    allc_file = string("/Users/alex/Dropbox/code/MethylHMM/data/allc_",f,".tsv")
+    hmm = binomial_HMM(1,allc_file)
+    for n_states = 1:4  
+        hmm.n_states = n_states
+        randomize!(hmm)
+
+        # Fit the parameters to the data
+        ch = fit!(hmm; max_iter=200, tol=1e-2, repeats=10)
+
+        # Save best parameters
+        out_file = string("/Users/alex/Dropbox/code/MethylHMM/output/binom_hmm_fit_",f,"_n",n_states,".jld")
+        save(out_file, "A", hmm.A, "B", hmm.B, "p", hmm.p, "ch", ch)
+    end
+end

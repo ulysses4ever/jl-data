@@ -1,0 +1,10 @@
+include("./Point.jl")
+using Point
+p = Pt(4,5)
+println(Pt([3, 6.6]));
+println(Pt(0, 0));
+println(p)
+
+@time Pt([3, 6.6])
+@time Pt([3, 6.6])
+@time Pt(0, 0)

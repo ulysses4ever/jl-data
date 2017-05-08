@@ -1,0 +1,24 @@
+function findStoechio(formula::String)
+	doc"""return an array with each chemical element and its stoechiometry"""
+	regexpElem = r"([A-Z][a-z]?)([0-9]*)" #1st capture the chemical element, 2nd capture the stoechiometry (empty if 0)
+	dictStoechio = Dict{String, Int64}() #empty dict : String (element) => integer (stoechiometry)
+	offset = 1
+	while offset < endof(formula)
+		m = match(regexpElem, formula, offset)
+		element, stoechio = m.captures
+		stoechio = stoechio != "" ? int(stoechio) : 1 #If the stochio of an element is 1, there is no number in the formula
+		dictStoechio[element] = stoechio #stockage of the result
+		offset += endof(m.match) #add the length of : the element + stoechio
+	end
+	dictStoechio
+end
+
+function completeSoechio(stoechioFormula)
+	#add to the stochiometry calculated from the formula 0 for other elements used
+	base = ["C", "H", "Br", "Cl", "F", "N", "O", "P", "S", "Si"] #elements used for the 7GR, excludes exotics elements in the formula
+	complete = Dict{String, Int64}() #empty dictionary
+	for element in base
+		complete[element] = get(stoechioFormula, element, 0) #get the stoechio from the formula or default 0
+	end
+	complete
+end

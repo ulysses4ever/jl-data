@@ -1,0 +1,103 @@
+## =============================================================================
+## xxxxx.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+
+type Data
+    i::Int
+    v::ASCIIString
+    f::Float64
+
+    Data(i, v, f) = new(i, v, f)
+    Data() = new(0, "", 0.0)
+end
+
+type Node
+    data::Data
+    next::Node
+
+    Node(data::Data) = (n = new(); n.data = data; n.next = n)
+end
+# type Node{Data}
+#     data::Data
+#     next::Node{Data}
+
+#     Node(data::Data) = (n = new(); n.data = data; n.next = n)
+# end
+# function append{Data}(n::Node{Data}, data::Data)
+#     tmp = Node(data)
+#     if !islast(n)
+#         tmp.next = n.next
+#     end
+#     n.next = tmp
+# end
+
+islast(n::Node) = (n == n.next)
+
+function append{Data}(n::Node, data::Data)
+    tmp = Node(data)
+    if !islast(n)
+        tmp.next = n.next
+    end
+    n.next = tmp
+end
+
+
+
+type Samp
+    i::Int
+    v::ASCIIString
+    f::Float64
+    objA::Samp
+    objB::Samp
+
+    Samp() = (x = new(0, "", 0.0); x.objA = x; x.objB = x)
+end
+
+#     function Samp01()
+#         x = new()
+#         x.objA = x
+#         x.objB = x
+        
+#         obj_init(x)
+
+#         return x 
+#     end
+
+#     function obj_init(obj::Samp01)
+#         obj.i = 1
+#         obj.v = "init'ed"
+#         obj.f = 1.0
+
+#         return obj
+#     end
+
+#     function Samp01(i, v, f, objA, objB)
+#         x = new()
+#         x.objA = x
+#         x.objB = x
+
+#         x.i = i
+#         x.v = v
+#         x.f = f
+#         return x 
+#     end
+# end
+    
+# type Samp00
+#     i::Int
+#     v::ASCIIString
+#     f::Float64
+
+#     # function Samp01()
+#     #     i = 10
+#     #     v = "hoge"
+#     #     f = 20.0
+#     #     new(i, v, f)
+#     # end
+    
+#     function Samp00(i = 1000, v = "", f = 90.0)
+#         new(i, v, f)
+#     end
+# end
+

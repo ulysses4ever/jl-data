@@ -1,0 +1,28 @@
+#=
+@author titus 
+=#
+A = [1,2,3,4,5,6,7,8,9]
+function cmp(a, b) 
+  dx = a[1] - b[1]
+  dy = a[2] - b[2]
+  (dx == 0) && return dy
+  return dx
+end
+
+ss = SSet([(1,2),(3,4),(-1,3)], cmp)
+ss_set = [(-5, -1), (-1, 3), (1, -1), (1, 2), (3, 4)]
+
+exports["test_sset_items"] = function test_list()
+  @test strictequal(first(ss), (-1, 3));
+  @test strictequal(last(ss),  (3, 4));
+  @test strictequal(size(ss),  3);
+  push!(ss, (3,4))
+  push!(ss, (1,-1))
+  push!(ss, (3,4))
+  push!(ss, (-5,-1))
+  @test strictequal(first(ss), (-5, -1));
+  @test strictequal(last(ss),  (3, 4));
+  @test strictequal(ss.items, ss_set);
+end
+
+

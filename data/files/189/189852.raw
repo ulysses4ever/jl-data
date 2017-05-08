@@ -1,0 +1,36 @@
+module lexer
+include("tools.jl")
+include("numbers.jl")
+
+"""
+Contains the regexes to use in legacy mode
+"""
+legacy_regexes = Dict{AbstractString, Regex}(
+    "string" => r"'(^'|'')*'",
+    "item" => r".+[\.:]+|[^\w][\.:]+",
+    "name" => r"[A-Za-z][\w\d]*",
+    "number" => r"[\d_]([\w\d]*(\s*[\d_])?)+",
+    "paren" => r"[()]",
+)
+
+"""
+Contains the regexes to use in non-legacy mode
+"""
+regexes = Dict{AbstractString, Regex}(
+    "string" => r"'([^']|\.)*'",
+    "multistring" => r"'''.*?'''", # The ? is lazy matching
+    "item" => r"[^()']+[\.:]+|[^\w()'][\.:]*",
+    "name" => r"[^!-@\[-`{-~\s][^!-/:-@\[-`{-~]", #Supports unicode
+    "number" => r"[\d_]([\w\d]*(\s*[\d_])?)+",
+    "paren" => r"[()]",
+)
+
+"""
+A convenience dict to ease the selection of the regex dict to use (legacy vs
+non-legacy)
+"""
+regex_meta_dict = Dict{Bool, Dict{AbstractString, Regex}}(
+    true => legacy_regexes,
+    false => regexes
+)
+end

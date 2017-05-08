@@ -1,0 +1,72 @@
+require("JFinEALE.jl")
+using MeshExportModule
+using IntegRuleModule
+using MeshModificationModule
+using MeshSelectionModule
+using HeatDiffusionAlgorithmModule
+
+
+println("""
+Heat conduction example described by Amuthan A. Ramabathiran
+http://www.codeproject.com/Articles/579983/Finite-Element-programming-in-Julia:
+Unit square, with known temperature distribution along the boundary, 
+and uniform heat generation rate inside.  Mesh of regular TRIANGLES,
+in a grid of N x N edges. 
+This version uses the JFinEALE algorithm module.
+"""
+)
+t0 = time()
+
+
+A= 1.0
+thermal_conductivity=eye(2,2); # conductivity matrix
+magn = -6.0; #heat source
+boundaryf(x)=1.0 + x[:,1].^2 + 2.0*x[:,2].^2;
+N=10;
+fens,fes =MeshTriangleModule.T3block(A, A, N, N)
+
+modeldata= Dict{ASCIIString, Any}();
+
+# Finite element nodes
+modeldata["fens"]= fens;
+
+# Defined boundary conditions
+boundary_conditions=Dict{ASCIIString, Any}();
+
+#@time bfes  =MeshModificationModule.meshboundary(fes)
+l1 =MeshSelectionModule.fenodeselect(fens; box=[0. 0. 0. A], inflate = 1.0/N/100.0)
+l2 =MeshSelectionModule.fenodeselect(fens; box=[A A 0. A], inflate = 1.0/N/100.0)
+l3 =MeshSelectionModule.fenodeselect(fens; box=[0. A 0. 0.], inflate = 1.0/N/100.0)
+l4 =MeshSelectionModule.fenodeselect(fens; box=[0. A A A], inflate = 1.0/N/100.0)
+
+essential= Any[];
+Def=Dict{ASCIIString, Any}();
+#Def["node_list"]=MeshSelectionModule.connectednodes(bfes);
+Def["node_list"]=[l1 l2 l3 l4];
+Def["temperature"]=boundaryf
+push!(essential,Def);
+
+boundary_conditions["essential"]= essential;
+modeldata["boundary_conditions"]= boundary_conditions;
+
+# Define regions
+region= Any[];
+Def=Dict{ASCIIString, Any}();
+Def["conductivity"]=thermal_conductivity
+Def["Q"]=magn
+Def["fes"]=fes
+Def["integration_rule"]=IntegRuleModule.TriRule(npts=1)
+push!(region,Def);
+
+modeldata["region"]= region;
+
+# Call the solver
+modeldata=HeatDiffusionAlgorithmModule.steadystate(modeldata)
+
+println("Total time elapsed = ",time() - t0,"s")
+
+# Postprocessing
+# geom=modeldata["geom"]
+# Temp=modeldata["temp"]
+# MeshExportModule.vtkexportmesh ("a.vtk", fes.conn, [geom.values Temp.values], MeshExportModule.T3; scalars=Temp.values, scalars_name ="Temperature")
+

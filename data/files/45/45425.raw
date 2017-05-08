@@ -1,0 +1,24 @@
+abstract RDD
+
+type ListRDD <: RDD
+    splits:: Vector
+    dependencies:: Vector
+    preferred_locations:: Vector
+    partitioner:: Vector
+
+    function ListRDD(vec_data:: Vector, split_num:: UInt = 1)
+        new()
+    end
+end
+
+type TextFileRDD <: RDD
+end
+
+type MappedRDD <: RDD
+end
+
+type FilterRDD <: RDD
+end
+
+type FlatMappedRDD <: RDD
+end

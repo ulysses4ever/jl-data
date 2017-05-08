@@ -1,0 +1,10 @@
+## =============================================================================
+## 12_smooth.jl - plot a smooth function 
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+plot(dataset("Zelig", "macro"), x="Year", y="Trade", color="Country", Geom.point, Geom.smooth)
+plot(dataset("Zelig", "macro"), x="Year", y="Unem", color="Country", Geom.point, Geom.smooth)
+

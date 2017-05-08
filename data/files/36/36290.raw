@@ -1,0 +1,21 @@
+using  PropertyHeatDiffusionModule
+
+
+# Class for heat diffusion models of materials.
+p=PropertyHeatDiffusionModule.PropertyHeatDiffusion(
+  thermal_conductivity= 1.0,
+  specific_heat=0.0)
+p.thermal_conductivity
+p.specific_heat
+
+using MaterialHeatDiffusionModule
+
+
+# Class for heat diffusion models of materials.
+m =MaterialHeatDiffusionModule.MaterialHeatDiffusion(
+ property=p)
+ m.property.thermal_conductivity
+
+a=[2 3; 4 5; 7 8]
+length(a)
+reshape(a.',length(a),1)

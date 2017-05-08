@@ -1,0 +1,53 @@
+using Gadfly
+
+include("../src/saddle_point_solve.jl") 
+
+m = 10000 
+condm = 0
+n = 10000
+condn = 0
+
+pf = 0.0001 
+pg = 0.0001
+ph = (pf+pg)/2 
+
+# Solves
+# [F    H] [x] = [f]
+# [H'  -G] [y]   [g]
+
+FF = sprand(m,m,pf)
+CF = spdiagm(2.0.^(linspace(0,-condm,m)))
+F = FF*CF*FF' 
+F = (F+F')/2 # Make symmetric
+F = F + 1e-5*speye(F)
+
+GG = sprand(n,n,pg)
+CG = spdiagm(2.0.^(linspace(0,-condn,n)))
+G = GG*CG*GG' 
+G = (G+G')/2 # Make symmetric
+G = G + 1e-5*speye(G)
+
+H = sprand(m,n,ph)
+
+f = rand(m,1) 
+g = rand(n,1)
+
+#println("Condition number : ", cond(full([F H ; H' -G]),2))
+(x,y) = saddle_point_solve(F,G,H,f,g) 
+
+println("Done.") 
+
+# Compare to straightforward implementation
+
+tic() 
+A = [F   H ;
+     H' -G]
+b = [f ; g]
+x = A\b 
+
+println("Straighforward implementation residual : ", norm(A*x-b)/norm(b))
+println("and time ", toq(), " s.")
+
+# spy([F H;H' -G])
+
+

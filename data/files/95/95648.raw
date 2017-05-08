@@ -1,0 +1,46 @@
+@doc """
+### EulerEquationMod.absvalue
+
+  This function computes the absolute value in a way such that the complex 
+  step method works.
+
+  There is probably a bit-twiddling way of doing this faster
+
+"""
+function absvalue(x::Complex)
+
+  x2 = complex(real(x), imag(x))
+
+  if (real(x) < 0)
+    x2 *= -1
+  end
+
+#  println("after modification, x2 = ", x2)
+  return x2
+end
+
+function absvalue(x)   # general fallback method
+  return abs(x)
+end
+
+import Base.isless
+
+@doc """
+### EulerEquationMod.isless
+
+  This function defines the isless() function (ie. <  operator) in such a way
+  that algorithmic differentiation works
+
+"""->
+function isless(x::Complex, y::Complex)
+  return real(x) < real(y)
+end
+
+function isless(x::Real, y::Complex)
+  return x < real(y)
+end
+
+function isless(x::Complex, y::Real)
+  return real(x) < y
+end
+# there is no isgreater, just a reuse of isless

@@ -1,0 +1,239 @@
+module SharedBitArrays
+
+export SharedBitArray, SharedBitVector, SharedBitMatrix,
+       shtrues, shfalses, shrandbool
+
+import Base: @_div64, @_mod64, _msk64, num_bit_chunks, bitarray_rand_fill!, @_msk_end, @nsplat
+
+import Base: length, size, isassigned,
+             procs, sdata, indexpids,
+             start, next, done,
+             similar, fill!, copy!, reshape,
+             convert, bitpack, bitunpack,
+             rand!, randbool!,
+             unsafe_bitgetindex, getindex
+
+type SharedBitArray{N} <: DenseArray{Bool, N} 
+    chunks::SharedArray{Uint64, 1}
+    len::Int
+    dims::NTuple{N,Int}
+    function SharedBitArray(dims::Int...; pids=Int[])
+        if length(dims) != N
+            error("number of dimensions must be $N (got $(length(dims)))")
+        end
+        n = 1
+        for d in dims
+            if d < 0
+                error("dimension size must be nonnegative (got $d)")
+            end
+            n *= d
+        end
+        nc = num_bit_chunks(n)
+        chunks = SharedArray(Uint64, nc, init=false, pids=pids)
+        if nc > 0
+            chunks[end] = uint64(0)
+        end
+        B = new(chunks, n)
+        if N != 1
+            B.dims = dims
+        end
+        return B
+    end
+end
+
+SharedBitArray{N}(dims::NTuple{N,Int}; kwargs...) = SharedBitArray{N}(dims...; kwargs...)
+SharedBitArray(dims::Int...; kwargs...) = SharedBitArray(dims; kwargs...)
+
+typealias SharedBitVector SharedBitArray{1}
+typealias SharedBitMatrix SharedBitArray{2}
+
+length(B::SharedBitArray) = B.len
+size(B::SharedBitVector) = (B.len,)
+size(B::SharedBitArray) = B.dims
+
+size(B::SharedBitVector, d) = (d==1 ? B.len : d>1 ? 1 : error("dimensions should be positive (got $d)"))
+size{N}(B::SharedBitArray{N}, d) = (d>N ? 1 : B.dims[d])
+
+isassigned{N}(B::SharedBitArray{N}, i::Int) = 1 <= i <= length(B)
+
+procs(B::SharedBitArray) = procs(B.chunks)
+indexpids(B::SharedBitArray) = indexpids(B.chunks)
+
+function sdata{N}(B::SharedBitArray{N})
+    D = BitArray{N}(ntuple(N,i->0)...)
+    D.chunks = sdata(B.chunks)
+    D.len = B.len
+    N != 1 && (D.dims = B.dims)
+    return D
+end
+
+## custom iterator ##
+start(B::SharedBitArray) = 0
+next(B::SharedBitArray, i::Int) = (B.chunks[@_div64(i)+1] & (uint64(1)<<@_mod64(i)) != 0, i+1)
+done(B::SharedBitArray, i::Int) = i >= length(B)
+
+## similar, fill!, copy! etc ##
+similar(B::SharedBitArray) = SharedBitArray(size(B); pids=procs(B))
+similar(B::SharedBitArray, dims::Int...) = SharedBitArray(dims; pids=procs(B))
+similar(B::SharedBitArray, dims::Dims) = SharedBitArray(dims...; pids=procs(B))
+
+similar(B::SharedBitArray, T::Type{Bool}, dims::Dims) = SharedBitArray(dims; pids=procs(B))
+# changing type to a non-Bool returns a SharedArray
+# (this triggers conversions like float(bitvector) etc.)
+similar(B::SharedBitArray, T::Type, dims::Dims) = SharedArray(T, dims; pids=procs(B))
+
+function fill!(B::SharedBitArray, x)
+    y = convert(Bool, x)
+    length(B) == 0 && return B
+    Bc = B.chunks
+    if !y
+        fill!(Bc, 0)
+    else
+        fill!(Bc, _msk64)
+        Bc[end] &= @_msk_end length(B)
+    end
+    return B
+end
+
+shfalses(args...) = fill!(SharedBitArray(args...), false)
+shtrues(args...) = fill!(SharedBitArray(args...), true)
+
+function copy!(dest::SharedBitArray, src::Union(SharedBitArray,BitArray))
+    length(dest) == length(src) || throw(BoundsError())
+    copy!(dest.chunks, src.chunks)
+    return dest
+end
+
+function reshape{N}(B::SharedBitArray, dims::NTuple{N,Int})
+    if prod(dims) != length(B)
+        throw(DimensionMismatch("new dimensions $(dims) must be consistent with array size $(length(B))"))
+    end
+    dims == size(B) && return B
+    Br = SharedBitArray{N}(ntuple(N,i->0)...)
+    Br.chunks = B.chunks
+    Br.len = prod(dims)
+    N != 1 && (Br.dims = dims)
+    return Br
+end
+
+## Conversions ##
+convert{T,N}(::Type{SharedArray{T}}, B::SharedBitArray{N}) = convert(SharedArray{T,N},B)
+function convert{T,N}(::Type{SharedArray{T,N}}, B::SharedBitArray{N})
+    ps = procs(B)
+    A = SharedArray(T, size(B); pids=ps)
+    l = length(A)
+    l == 0 && return A
+    length(ps) > l && (ps = ps[1:l])
+    nw = length(ps)
+    partlen = div(l, nw)
+    Bc = B.chunks
+    @sync for w = 1:nw
+        p = ps[w]
+        idx = w < nw ?  ((w-1)*partlen+1:w*partlen) : ((w-1)*partlen+1:l)
+        @spawnat p begin
+            As = A.s
+            Bcs = Bc.s
+            @inbounds for i in idx
+                As[i] = unsafe_bitgetindex(Bcs, i)
+            end
+        end
+    end
+    return A
+end
+convert{T,N}(::Type{Array{T}}, B::SharedBitArray{N}) = sdata(convert(SharedArray{T,N},B))
+
+setchunks!(chunks::SharedVector{Uint64}, c0::Int, nc::Int, lB::Int, src::AbstractArray) = setchunks!(sdata(chunks), c0, nc, lB, src)
+function setchunks!(chunks::Vector{Uint64}, c0::Int, nc::Int, lB::Int, src::AbstractArray)
+    A = sdata(src)
+    l = length(chunks)
+    ind = ((c0-1) << 6) + 1
+    c1 = (c0 + nc - 1)
+    @inbounds for i in c0:min(c1,l-1)
+        u = uint64(1)
+        c = uint64(0)
+        for j = 0:63
+            bool(A[ind]) && (c |= u)
+            ind += 1
+            u <<= 1
+        end
+        chunks[i] = c
+    end
+    if c1 >= l
+        @assert ind == (l-1) << 6 + 1
+        u = uint64(1)
+        c = uint64(0)
+        for j = 0:@_mod64(lB-1)
+            bool(A[ind]) && (c |= u)
+            ind += 1
+            u <<= 1
+        end
+        chunks[l] = c
+    end
+end
+
+convert{T,N}(::Type{SharedBitArray}, A::AbstractArray{T,N}) = convert(BitArray{N}, A)
+function convert{T,N}(::Type{SharedBitArray{N}}, A::AbstractArray{T,N})
+    if isa(A, SharedArray)
+        ps = procs(A)
+    else
+        ps = Int[]
+    end
+    B = SharedBitArray(size(A); pids=ps)
+    lB = length(B)
+    lB == 0 && return B
+    Bc = B.chunks
+    l = length(Bc)
+    length(ps) > l && (ps = ps[1:l])
+    nw = length(ps)
+    partlen = div(l+nw-1, nw)
+
+    @sync for w = 1:nw
+        @spawnat ps[w] setchunks!(Bc, (w-1)*partlen+1, partlen, lB, A)
+    end
+    return B
+end
+
+convert{N}(::Type{SharedBitArray{N}}, B::SharedBitArray{N}) = B
+
+function convert{N}(::Type{SharedBitArray{N}}, B::BitArray{N})
+    S = SharedBitArray{N}(ntuple(N,i->0)...)
+    S.chunks = SharedArray(Uint64, length(B.chunks); pids=Int[])
+    copy!(S.chunks, B.chunks)
+    S.len = B.len
+    N != 1 && (S.dims = S.dims)
+    return S
+end
+
+convert{T,N}(::Type{BitArray{T}}, B::SharedBitArray{N}) = sdata(B)
+
+
+bitunpack{N}(B::SharedBitArray{N}) = convert(SharedArray{Bool,N}, B)
+bitpack{T,N}(A::SharedArray{T,N}) = convert(SharedBitArray{N}, A)
+bitpack{N}(B::SharedBitArray{N}) = B
+
+## Random ##
+
+function bitarray_rand_fill!(B::SharedBitArray)
+    length(B) == 0 && return B
+    Bc = B.chunks
+    rand!(Bc)
+    Bc[end] &= @_msk_end length(B)
+    return B
+end
+
+rand!(B::SharedBitArray) = bitarray_rand_fill!(B)
+randbool!(B::SharedBitArray) = bitarray_rand_fill!(B)
+
+shrandbool(dims::Dims) = rand!(SharedBitArray(dims))
+shrandbool(dims::Int...) = rand!(SharedBitArray(dims))
+
+## pass through getindex ##
+
+unsafe_bitgetindex(Bc::SharedVector{Uint64}, i::Int) = unsafe_bitgetindex(sdata(Bc), i)
+
+getindex(B::SharedBitArray) = getindex(sdata(B))
+getindex(B::SharedBitArray, I::Real) = getindex(sdata(B), I)
+getindex(B::SharedBitArray, I::AbstractArray) = getindex(sdata(B), I)
+@nsplat N 1:5 getindex(B::SharedBitArray, I::NTuple{N,Any}...) = getindex(sdata(B), I...)
+
+end # module

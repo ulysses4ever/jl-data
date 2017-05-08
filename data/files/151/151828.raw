@@ -1,0 +1,123 @@
+### Population MCMC using Friel's method based on power posteriors
+
+immutable FrielMCRunner <: Lora.ParrallelMCRunner
+  burnin::Int
+  thinning::Int
+  nsteps::Int
+  r::Range{Int}
+  storegradlogtarget::Bool # Indicates whether to save the gradient of the log-target in the cases it is available
+  t::Vector{Float64} # temperature ladder
+  swapproposal::Function
+
+  # Note that swapproposal has been temporarily set by default to identity until a temperature density is implemented
+  # swapproposal is a function f : {n}⊆N -> SxR. Some more info about f:
+  # 1) n is the length of the fixed temperature ladder vector
+  # 2) S and R denotes the sets of sender and receiver procs, both subsets of T(n) := {1, 2, ..., n}
+  # 3) f(n) = {s_l, r_l : l ∈ T(n)} ⊆ SxR
+  # 4) f can be either pure or stochastic, but in all cases must generate non-overlapping MPI-compatible pairs
+  function FrielMCRunner(
+    r::Range{Int},
+    storegradlogtarget::Bool=false,
+    t::Vector{Float64}=map(t->t^4, 0:1/10:1),
+    swapproposal::Function=identity)
+    burnin = first(r)-1
+    thinning = r.step
+    nsteps = last(r)
+    @assert burnin >= 0 "Number of burn-in iterations should be non-negative."
+    @assert thinning >= 1 "Thinning should be >= 1."
+    @assert nsteps > burnin "Total number of MCMC iterations should be greater than number of burn-in iterations."
+    @assert length(t) >= 2 "Temperature ladder must contain at least two temperatures."
+    @assert t[1] == 0.0 "Temperature ladder must start at 0."
+    @assert t[end] == 1.0 "Temperature ladder must end at 1."
+    new(burnin, thinning, nsteps, r, storegradlogtarget, t, swapproposal)
+  end
+end
+
+FrielMCRunner(
+  r::Range1{Int},
+  storegradlogtarget::Bool=false,
+  t::Vector{Float64}=map(t->t^4, 0:1/10:1),
+  swapproposal::Function=identity) =
+  FrielMCRunner(first(r):1:last(r), storegradlogtarget, t, swapproposal)
+
+FrielMCRunner(;
+  burnin::Int=0,
+  thinning::Int=1,
+  nsteps::Int=100,
+  storegradlogtarget::Bool=false,
+  t::Vector{Float64}=map(t->t^4, 0:1/10:1),
+  swapproposal::Function=identity) =
+  FrielMCRunner((burnin+1):thinning:nsteps, storegradlogtarget, t, swapproposal)
+
+typealias FrielMC FrielMCRunner
+
+function run(
+  mpistate::MPIState,
+  m::MCLikelihoodPatch,
+  s::Vector{Lora.MCSampler},
+  r::FrielMC,
+  t::Vector{Lora.MCTuner})
+
+  @assert mpistate.nprocs == length(t) "Number of MPI procs must be equal to temperature ladder vector length."
+
+  if mpistate.procid == mpistate.rootproc
+    tic()
+  end
+
+  # Initialize Monte Carlo model, runner and job for each power posterior in the corresponding proc
+  mcmodel = MCLikelihood(x->t[mpistate.procid]*m.lik(x), m.prior, init=m.init)
+  mcrunner = SerialMC(burnin=r.burnin, thinning=r.thinning, nsteps=r.nsteps, storegradlogtarget=r.storegradlogtarget)
+  mcjob = MCJob(mcmodel, s[mpistate.procid], mcrunner; tuner=t[mpistate.procid], job=:plain)
+
+  # Pre-allocation for storing results
+  mcchain = MCChain(mcmodel.size, length(mcrunner.r); storegradlogtarget=mcrunner.storegradlogtarget)
+  ds = Dict{Any, Any}("step" => collect(mcrunner.r))
+
+  ### Sampling loop
+
+  i::Int = 1
+  for j in 1:r.nsteps
+    ###  Step 1 of FrielMC runner: within-chain move ocurring in each proc independently
+
+    # Simulate chain for each power posterior in the corresponding proc
+    mcstate = mcjob.receive(1)
+
+    ## Save state of current iteration in mcchain
+    if in(j, r.r)
+      # Save Monte Carlo sample and value of log-target
+      mcchain.samples[i, :] = mcstate.successive.sample
+      mcchain.logtargets[i] = mcstate.successive.logtarget
+
+      # Save value of grad-log-target if needed 
+      if r.storegradlogtarget
+        mcchain.gradlogtargets[i, :] = mcstate.successive.gradlogtarget
+      end
+
+      # Save diagnostics
+      for (k,v) in mcstate.diagnostics
+        # If diagnostics name not seen before, create column
+        if !haskey(ds, k)
+          ds[k] = Array(typeof(v), length(ds["step"]))          
+        end
+        
+        ds[k][i] = v
+      end
+
+      ###  WIP: step 2 of FrielMC runner: between-chain move requiring send-receive communication between procs
+
+      # Generate vectors of senders and receivers in root proc
+      if mpistate.procid == mpistate.rootproc
+        senders, receivers = swapproposal(mpistate.nprocs)
+      else
+        senders = Nothing
+        receivers = Nothing
+      end
+
+      # Broadcast vectors of senders and receivers from root proc to rest of procs
+      senders = MPI.bcast(senders, mpistate.rootproc-1, mpistate.comm)
+      receivers = MPI.bcast(receivers, mpistate.rootproc-1, mpistate.comm)
+
+      i += 1
+    end
+  end
+end

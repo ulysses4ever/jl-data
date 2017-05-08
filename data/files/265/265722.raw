@@ -1,0 +1,46 @@
+using Calendar
+
+export log,
+       ERROR,
+       WARNING,
+       INFO,
+       DEBUG
+
+# exported
+
+const ERROR   = 2^0
+const WARNING = 2^1
+const INFO    = 2^2
+const DEBUG   = 2^4
+
+function log(level::Int, args...)
+    local buf = ""
+
+    if haskey(level_colors, level)
+        buf *= level_colors[level]
+    end
+
+    buf *= format("yyyy-MM-dd HH:mm:ss", now())
+    buf *= NORMAL * " "
+
+    for x in args
+        buf *= x * " "
+    end
+
+    println(buf)
+end
+
+# NOT exported
+
+const BLUE    = "\033[1m\033[34m"
+const NORMAL  = "\033[0m"
+const RED     = "\033[1m\033[31m"
+const WHITE   = "\033[1m\033[37m"
+const YELLOW  = "\033[1m\033[33m"
+
+const level_colors = (Int => String)[
+    ERROR   => RED,
+    WARNING => YELLOW,
+    INFO    => BLUE,
+    DEBUG   => WHITE
+]

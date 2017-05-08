@@ -1,0 +1,237 @@
+function legalMove(board, pos, color)
+    # returns the truth value of playing a move for a given color and given position
+
+    if board[pos[0], pos[1]] != NaN
+        return false
+    end
+    if getKo(board, pos, color)
+        return false
+    end
+    return true
+end
+
+
+function makeMove(board, pos, color)
+    # makes the move for the given color at the given position, only makes legal moves
+    
+    board[pos[0], pos[1]] = color
+    return board
+end
+
+
+function chooseRandomMove(board, color)
+    # makes a random move
+
+    s = size(board)
+    pos = (rand(1:s[0]),rand(1:s[1]))
+    if legalMove(board, pos, color)
+        return pos
+    end
+    else
+        return chooseRandomMove(board, color)
+    end
+end
+
+
+function getLiberties(group, board)
+    # gets the liberties for a group
+
+    lib = 0
+    for pos in group
+        for mov in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+            n = mov + pos
+            if !(n[0] < 1 | n[1] < 1)
+                if board[n[0], n[1]] == NaN
+                    lib += 1
+                end
+            end
+        end
+    end
+    return lib
+end
+
+
+function removeGroup(group, board)
+    # removes a group from the board
+
+    for pos in group
+        board[pos[0], pos[1]] = NaN
+    end
+    return board
+end
+
+
+function updateAll(board)
+    # does everything for each turn
+
+    groups = getGroups(board)
+    liberties = Int64[]
+    sizes = Int64[]
+    for g in groups
+        lib = getLiberties(g, board)
+        if lib == 0
+            removeGroup(g, board)
+        end
+        else
+            push!(liberties, lib)
+            push!(sizes, length(g))
+       end
+    end
+    return board
+end
+
+
+function decideWhenToPass(wait_time, i)
+    # decides when to pass, currently it is crap, I'm keeping it because I want to build it up later
+
+    if wait_time <= i
+        return false
+    end
+    return true
+end
+
+
+function getTerritory(board, color)
+    # determines the territory for the sepcified color
+
+
+function determineWinner(board)
+    # determines the winner at the end time
+
+    territory_c = getTerritory(board, color)
+    territory_n = getTerritory(board, !color)
+    if territory_c >= territory_n
+        return color
+    end
+    return !color
+end
+
+
+function playRandomGame(board, winner_array, color, wait_time)
+    # plays through a random game starting from the current state and returns a win or loss
+
+    i = 0
+    while passed
+        chosen = chooseRandomMove(board, !color)
+        board = makeMove(board, chosen, !color)
+        chosen = chooseRandomMove(board, color)
+        push!(winner_array, chosen)
+        board = makeMove(board, chosen, color)
+        passed = decideWhenToPass(wait_time, i)
+        i += 1
+    end
+    winner = determineWinner(board, color)
+    return winner_array, winner
+end
+    
+
+function updateProbArray(prob_board, winner_array, winner)
+    # updates the probability array with all the winners
+
+    s = size(prob_board)
+    for pos in winner_array
+        prob_board[pos[0], pos[1]][1] += winner
+        prob_board[pos[0], pos[1]][2] += 1
+    end
+    for i in range(1, s[0])
+        for j in rangE(1, s[1])
+            prob_board[i, j][3] += 1
+        end
+    end
+    return prob_board
+end
+
+
+function getScore(pos_tuple, mod)
+    # takes in a tuple of data for a locaiton and returns the score
+    
+    wins = prob_tuple[1]
+    n_j = prob_tuple[2]
+    n = prob_tuple[3]
+    
+    return wins/n_j + mod * sqrt(2*log(n)/n_j)
+end
+
+
+function chooseMAB(prob_board)
+    # choses a move based on the array, this is the multi armed bandit choice
+    # I should add a random choice aspect to this, it is possible (and actually likely, at least early on) that you could get multiple positions with the same score in which case you should chosen from those at random.
+    
+    m_score = 0
+    m_tup = (1, 1)
+    for i in range(1, s[0])
+        for j in range(1, s[1])
+            t_score = getScore(prob_board[i, j], 1)
+            if t_score >= m_score
+                m_score = t_Score
+                m_tup = (i, j)
+            end
+        end
+    end
+    return m_tup
+end
+
+
+function multiArmedBandit(board, iterations, prob_board, color)
+    winner_array = Array((Int,Int),0)
+    # does the multi armed bandit problem
+
+    s = size(board)
+    for i in range(iterations)
+        chosen = chooseMABMove(prob_board)
+        winner_array = Array((Int,Int),0)
+        push!(winner_array, chosen)
+        test_board = makeMove(board, chosen, color)
+        winner_array, winner = playRandomGame(test_board, winner_array, color)
+        prob_board = updateProbArray(prob_board, winner_array, winner)
+    emd
+    return makeMove(board, chosen, color), prob_board
+end 
+
+
+function decideWhenToPassMAB(board, color)
+    # decides when to pass for the multiarmed bandit
+    
+    cur_territory = getTerritory(board, color)
+    state = false
+    possible_moves = Array((Int, Int), 0)
+    s = size(board)
+    for i in range(1, s[0])
+        for j in range(1, s[1])
+            if legalMove(board, (i, j), color)
+                push!(possible_moves, (i, j))
+            end
+        end
+    end
+    for pos in possible_moves
+        test_board = makeMove(board, pos, color)
+        test_territory = getTerritory(test_board, color)
+        if test_territory >= cur_territory
+            state = true
+        end
+    end
+    if state
+        return true
+    end
+    return false
+end
+
+function playGame(board, iterations, init_prob_val, color)
+    # plays the game for the chosen color, init_prob_val is a tuple of the successes and attempts (N)
+
+    s = size(board)
+    prob_board_c = fill!(Array((Int, Int, Int), s[0], s[1]), init_prob_val)
+    prob_board_n = fill!(Array((Int, Int, Int), s[0], s[1]), init_prob_val)
+    while passed
+        passed_c = decideWhenToPassMAB(board, color)
+        if passed_c
+            board, prob_board_c = multiArmedBandit(board, iterations, prob_board_c, color)
+        end
+        passed_n = decideWhenToPassMAB(board, !color)
+        if passed_n
+            board, prob_board_n = multiArmedBandit(board, iterations, prob_board_n, !color)
+        end
+        passed = passed_c | passed_n
+    end
+return determineWinner(board, color)
+end

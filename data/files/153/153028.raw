@@ -1,0 +1,153 @@
+module BinHeap
+
+import Base: length, pop!, push!
+import Utility: lesser, greater
+
+export
+  BinaryHeap,
+  MinHeap,
+  MaxHeap,
+  pop!,
+  push!,
+  changekey!,
+  length,
+  peek,
+  value,
+  lesser,
+  greater,
+  leq,
+  geq
+
+#heap indexing
+parent(i) = div(i,2)
+left(i)   = i << 1
+right(i)  = (i << 1) | 1
+
+#heap operations that works directly on arrays
+
+#TODO: turn heapify into a loop
+#not sure if Julia has tailcall recursion (it doesn't)
+function heapify!(array,
+                  comp::Function,
+                  i::Int,
+                  size = length(array))
+  l = left(i)
+  r = right(i)
+
+  if (l <= size) && comp(array[l], array[i])
+    precedence = l
+  else
+    precedence = i
+  end
+
+  if r <= size && comp(array[r], array[precedence])
+    precedence = r
+  end
+
+  if precedence != i
+    (array[i], array[precedence]) =
+      (array[precedence], array[i])
+    heapify!(array, comp, precedence, size)
+  end
+end
+
+function buildheap!(array, comp::Function)
+  for i = fld(length(array), 2):-1:1
+    heapify!(array, comp, i)
+  end
+end
+
+################################################################
+################################################################
+################################################################
+
+#values are stored as tuples of (key,value)
+#the compare function must act on the key type
+type BinaryHeap{K <: Number,V}
+  array::AbstractArray{(K,V)}
+  comp::Function
+  defaultkey::K
+
+  #TODO: maybe a key argument letting the user
+  #choose between a shallow copy and a deepcopy
+  function BinaryHeap(array::AbstractArray{(K,V)},
+                      compare::Function = lesser,
+                      defaultkey::K = typemax(K))
+    carray = copy(array)
+    comparetuple(x,y) = compare(x[1], y[1])
+    buildheap!(carray, comparetuple)
+    new(carray, comparetuple, defaultkey)
+  end
+end
+
+#heap constructors
+function BinaryHeap{K <: Number}(k::K, v::Type,
+                    compare::Function = lesser,
+                    defaultkey::K = typemax(K))
+  BinaryHeap{t}(Array((k,v),0), compare, defaultkey)
+end
+
+function BinaryHeap{K,V}(array::AbstractArray{(K,V)},
+                         compare::Function = lesser,
+                         defaultkey::K = typemax(K))
+  BinaryHeap{K,V}(array, compare, defaultkey)
+end
+
+#TODO: maybe turn Max/MinHeap into subtypes of BinaryHeap
+function MaxHeap{K,V}(array::AbstractArray{(K,V)})
+  BinaryHeap{K,V}(array, greater, typemin(K))
+end
+
+function MinHeap{K,V}(array::AbstractArray{(K,V)})
+  BinaryHeap{K,V}(array, lesser, typemax(K))
+end
+
+################################################################
+################################################################
+################################################################
+
+#binary heap utility
+length(heap::BinaryHeap) = length(heap.array)
+peek(heap::BinaryHeap)   = heap.array[1]
+value(heap::BinaryHeap, i) = heap.array[i][2]
+
+#binary heap functions
+function pop!(heap::BinaryHeap)
+  len = length(heap.array)
+  if len < 1
+    error("Heap underflow.")
+  end
+
+  (heap.array[1], heap.array[len]) =
+    (heap.array[len], heap.array[1])
+  top = pop!(heap.array)
+  heapify!(heap.array, heap.comp, 1)
+
+  top
+end
+
+function push!{K,V}(heap::BinaryHeap{K,V}, key::K, value::V)
+  push!(heap.array, (heap.defaultkey, value))
+  changekey!(heap, length(heap.array), key)
+end
+
+#TODO: maybe keep track of indexes of each value
+#it would make changekey! easier to work with
+#in exchange of memory
+function changekey!(heap::BinaryHeap, idx, newkey)
+  pair = (newkey, value(heap, idx))
+
+  if !heap.comp(pair, heap.array[idx])
+    error("New key doest not precede current key.")
+  end
+
+  heap.array[idx] = (newkey, value(heap,idx))
+  while idx > 1 &&
+      heap.comp(heap.array[idx], heap.array[parent(idx)])
+
+    (heap.array[idx], heap.array[parent(idx)]) =
+      (heap.array[parent(idx)], heap.array[idx])
+    idx = parent(idx)
+  end
+end
+end

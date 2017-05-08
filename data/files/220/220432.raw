@@ -1,0 +1,1256 @@
+#Library related to Generation of Initial Solution
+#Copyright(c) 2015: Kally Chung
+
+#01...swapPickups( prob, sol )
+#02...swapPickups( prob, sol, indP )
+#03...repair( prob, sol )
+#04...repairOverflow( prob, sol, indC )
+#05...repairNegLevel( prob, sol, indC )
+#06...swapDelivs( prob, sol )
+#07...swapDelivs( prob, sol, indD )
+#08...resetPickups( prob, sol )
+#09...addDeliv( prob, sol )
+# addDeliv( prob, sol, indD )
+#10...addPickup( prob, sol )
+# addPickup( prob, sol, indP )
+#11...changeTimeDeliv( prob, sol )
+# changeTimeDeliv( prob, sol, indD )
+#13...changeTimePickup( prob, sol )
+# changeTimePickup( prob, sol, indP )
+#12...removeDelivs( prob, sol )
+#14...swapCdocks( prob, sol )
+# swapCdocks( prob, sol, indC )
+#15...rescheduleCdock( prob, sol )
+# rescheduleCdock( prob, sol, indC )
+
+include( "IO_MCITW-1P.jl" )
+include( "verification.jl" )
+include( "searching.jl" )
+include( "GIS.jl" )
+
+function checkUniqueness( auxArray )
+  
+  (nRow, nCol) = size( auxArray )
+  aux = zeros( Int, size( auxArray ) )
+  
+  for i in 1:nRow
+    if ( auxArray[i,1] == auxArray[i,2] )
+      return false, i
+    end
+    aux[i,1] = auxArray[i,1] * auxArray[i,2]
+    aux[i,2] = auxArray[i,1] + auxArray[i,2]
+  end
+  
+  if ( max ( length(unique(aux[:,1])), length(unique(aux[:,2])) ) < nRow )
+    for i1 in 1:(nRow-1)
+      for i2 = (i1+1):nRow
+        if ( aux[i1,1] == aux[i2,1] ) && ( aux[i1,2] == aux[i2,2] )
+          return false, i2
+        end
+      end
+    end
+  end
+
+  return true,0
+  
+end
+
+function swapPickups( prob, sol )
+
+  #choosing a pair of pickups
+  indP = rand( 1:prob.cardP, 2 )
+  while ( length(indP) != length( unique( indP ) ) ) 
+    indP[2] = rand( 1:prob.cardP )
+  end
+  
+  #swaping pickups, update solution and checking the new solution
+  return swapPickups( prob, sol, indP )
+end
+
+function swapPickupsAll( prob, sol, penPar )
+
+  solBest = copy(sol)
+#   println("N1 ... swapPickups")
+  for j1 in 1:(prob.cardP-1)
+    for j2 = (j1+1):prob.cardP
+      solNew = swapPickups( prob, solBest, [j1 j2] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+  
+  return solBest
+end
+
+function swapPickups( prob, sol, penPar, numNeigh )
+#   N = 10
+# cardP = 8
+# indPs = []
+# 
+# while length(indPs) < N
+#   indP = sort(rand(1:cardP), 2)
+#   if length(unique(indP)) < 2 || indP in indPs
+#     continue
+#   end
+#   push!(indPs, indP)
+# end
+
+  #choosing a pair of pickups
+  
+  aux = 1
+  indP = rand(1:prob.cardP, numNeigh, 2)
+  
+  while ( aux == 1 )
+    (flag, fixP) = checkUniqueness( indP )
+    
+    if ( flag )
+      aux = 0
+    else
+      indP[fixP,1] = rand(1:prob.cardP)
+      indP[fixP,2] = rand(1:prob.cardP)
+    end
+  end
+
+  solBest = copy(sol)
+  for j in 1:numNeigh
+    solNew = swapPickups( prob, solBest, [ indP[j,1] indP[j,2] ] )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+  
+  return solBest
+  
+end
+
+function swapPickups( prob, sol, indP )
+
+  aux1 = 0
+  aux2 = 0
+  
+  solNew = copy(sol)
+  
+#   println("indP = $indP")
+  
+  #swaping the crossdocks and the times of indP, updating varZ
+  aux1 = searchPickupSol( prob, solNew, indP[1] )
+  aux2 = searchPickupSol( prob, solNew, indP[2] )
+  
+  if ( aux1[1] == aux2[1] )
+#     println("P", indP[1], " and P", indP[2], " occurs in the same cdock")
+    return solNew
+  end
+  
+#   ==>these commands find a new pair of indP if indC_indP[1] == indC_indP[2]
+#   while ( aux1[1] == aux2[1] )
+#     indP = rand( 1:prob.cardP, 2 )
+#     while ( length(indP) != length( unique( indP ) ) ) 
+#       indP[2] = rand( 1:prob.cardP )
+#     end
+#     
+#     aux1 = searchPickupSol( prob, solNew, indP[1] )
+#     aux2 = searchPickupSol( prob, solNew, indP[2] )
+#   end
+  
+  if ( ( aux1[1] != 0 ) && ( aux2[1] != 0 ) )
+    solNew.solY[ indP[1], aux1[1], aux1[2] ] = 0;
+    solNew.solY[ indP[2], aux2[1], aux2[2] ] = 0;
+    
+    if ( aux2[2] < PS[ indP[1] ] )
+      aux2[2] = PS[ indP[1] ]
+    elseif ( aux2[2] > PE[ indP[1] ] )
+      aux2[2] = PE[ indP[1] ]
+    end
+    
+    if ( aux1[2] < PS[ indP[2] ] )
+      aux1[2] = PS[ indP[2] ]
+    elseif ( aux1[2] > PE[ indP[2] ] )
+      aux1[2] = PE[ indP[2] ]
+    end
+    
+    solNew.solY[ indP[1], aux2[1], aux2[2] ] = 1;
+    solNew.solY[ indP[2], aux1[1], aux1[2] ] = 1;
+  
+  elseif ( ( aux1[1] == 0 ) && ( aux2[1] != 0 ) )
+    solNew.solY[ indP[2], aux2[1], aux2[2] ] = 0;
+    
+    if ( aux2[2] < PS[ indP[1] ] )
+      aux2[2] = PS[ indP[1] ]
+    elseif ( aux2[2] > PE[ indP[1] ] )
+      aux2[2] = PE[ indP[1] ]
+    end
+    
+    solNew.solY[ indP[1], aux2[1], aux2[2] ] = 1;
+  
+  elseif ( ( aux1[1] != 0 ) && ( aux2[1] == 0 ) )
+    solNew.solY[ indP[1], aux1[1], aux1[2] ] = 0;
+  
+    if ( aux1[2] < PS[ indP[2] ] )
+      aux1[2] = PS[ indP[2] ]
+    elseif ( aux1[2] > PE[ indP[2] ] )
+      aux1[2] = PE[ indP[2] ]
+    end
+    
+    solNew.solY[ indP[2], aux1[1], aux1[2] ] = 1;
+    
+  end
+
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+  if ( solNew.feas < 0 )
+    solNew = repair( prob, solNew )
+  end
+  
+  return solNew  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+  
+  #if necessary, repairing sol
+  
+  #checking sol factibility
+end
+
+function repair( prob, sol )
+  
+  solNew = copy(sol)
+  
+  for k in 1:prob.cardC
+    if ( checkCapacExceed( prob, sol, k ) == true )
+      solNew = repairOverflow( prob, solNew, k)
+    end
+    
+    if ( checkNegLevel( prob, sol, k ) == true )
+      solNew = repairNegLevel( prob, solNew, k )
+    end
+  end
+  
+  return solNew
+end
+
+function repairOverflow( prob, sol, indC )
+
+  solNew = copy( sol )
+
+  #finding the time when the overflow starts
+  indT = 0;
+  for k in 1:prob.cardC
+    for t in 1:prob.cardT
+      if ( sol.solZ[k,t] > prob.CCap[k] )
+        indT = t
+      end
+    end
+  end
+  
+  #postponing deliveries
+  solDeliv = [0 0]
+  newTime = 0
+  for i in 1:prob.cardD
+    solDeliv = searchDelivSol( prob, sol, i )
+    if ( ( solDeliv[1] == indC ) && ( solDeliv[2] <= indT ) && ( indT < prob.DE[i] ) )
+      newTime = rand( (indT+1):prob.DE[i] )
+      solNew.solX[i,indC,solDeliv[2]] = 0
+      solNew.solX[i,indC,indT] = 1
+      
+      computeCosts!( prob, solNew )
+      solNew.feas = checkFeas( prob, solNew )
+      
+      if ( solNew.feas == 1 )
+        return solNew
+      else
+        solNew = copy(sol)
+      end
+    end
+  end
+  
+  #predating pickups
+  solPickup = [0 0]
+  for j in 1:prob.cardP
+    solPickup = searchPickupSol( prob, sol, j )
+    
+    if ( solPickup[1] == indC ) && ( prob.PS[j] < indT ) && ( indT <= solPickup[2] )
+      newTime = rand( prob.PS[j]:(indT-1) )
+      solNew.solY[j,indC,solPickup[2]] = 0
+      solNew.solY[j,indC,indT] = 1
+      
+      computeCosts!( prob, solNew )
+      solNew.feas = checkFeas( prob, solNew )
+      
+      if ( solNew.feas == 1 )
+        return solNew
+      else
+        solNew = copy(sol)
+      end
+    end
+  end
+  
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  return solNew
+
+end
+
+function repairNegLevel( prob, sol, indC )
+
+  solNew = copy( sol )
+
+  #finding the time when the negative level of inventory starts
+  indT = 0;
+  for k in 1:prob.cardC
+    for t in 1:prob.cardT
+      if ( sol.solZ[k,t] < 0 )
+        indT = t
+      end
+    end
+  end
+  
+  #predating deliveries
+  solDeliv = [0 0]
+  newTime = 0
+  for i in 1:prob.cardD
+    solDeliv = searchDelivSol( prob, sol, i )
+    if ( ( solDeliv[1] == indC ) && ( prob.DS[i] < indT ) && ( indT <= solDeliv[2] ) )
+      newTime = rand( prob.DS[i]:(indT-1) )
+      solNew.solX[i,indC,solDeliv[2]] = 0
+      solNew.solX[i,indC,indT] = 1
+      
+      computeCosts!( prob, solNew )
+      solNew.feas = checkFeas( prob, solNew )
+      
+      if ( solNew.feas == 1 )
+        return solNew
+      else
+        solNew = copy(sol)
+      end
+    end
+  end
+  
+  #postponing pickups
+  solPickup = [0 0]
+  for j in 1:prob.cardP
+    solPickup = searchPickupSol( prob, sol, j )
+    
+    if ( solPickup[1] == indC ) && ( solPickup[2] <= indT ) && ( indT < prob.PE[j] )
+      newTime = rand( (indT+1):prob.PE[j] )
+      solNew.solY[j,indC,solPickup[2]] = 0
+      solNew.solY[j,indC,indT] = 1
+      
+      computeCosts!( prob, solNew )
+      solNew.feas = checkFeas( prob, solNew )
+      
+      if ( solNew.feas == 1 )
+        return solNew
+      else
+        solNew = copy(sol)
+      end
+    end
+  end
+  
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  return solNew
+
+end
+
+function swapDelivs( prob, sol )
+
+  #choosing a pair of deliveries
+  indD = rand( 1:prob.cardD, 2 )
+  while ( length(indD) != length( unique( indD ) ) ) 
+    indD[2] = rand( 1:prob.cardD )
+  end
+  
+  return swapDelivs( prob, sol, indD )
+  
+end
+
+function swapDelivsAll( prob, sol, penPar )
+
+  solBest = copy(sol)
+#   println("N2 ... swapDelivs")
+  for i1 in 1:(prob.cardD-1)
+    for i2 in (i1+1):prob.cardD
+      solNew = swapDelivs( prob, solBest, [i1 i2] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+  
+  return solBest
+end
+
+function swapDelivs( prob, sol, penPar, numNeigh )
+
+  
+#   println("N2 ... swapDelivs")
+
+  indD = rand(1:prob.cardD, numNeigh, 2)
+  
+  aux = 1
+  while ( aux == 1 )
+    (flag, fixD) = checkUniqueness( indD )
+    
+    if ( flag )
+      aux = 0
+    else
+      indD[fixD,1] = rand(1:prob.cardD)
+      indD[fixD,2] = rand(1:prob.cardD)
+    end
+  end
+  
+  solBest = copy(sol)
+  for i in 1:numNeigh
+    solNew = swapDelivs( prob, solBest, [ indD[i,1] indD[i,2] ] )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+  
+  return solBest
+end
+
+function swapDelivs( prob, sol, indD )
+
+  aux1 = 0
+  aux2 = 0
+  
+  solNew = copy(sol)
+  
+#   println("indD = $indD")
+  
+  #swaping the crossdocks and the times of indD, updating sol
+  aux1 = searchDelivSol( prob, solNew, indD[1] )
+  aux2 = searchDelivSol( prob, solNew, indD[2] )
+#   println("aux1 = $aux1 ... aux2 = $aux2")
+  
+#   ==>these commands find a new pair of indD if indC_indD[1] == indC_indD[2]
+#   while ( aux1[1] == aux2[1] )
+#     indD = rand( 1:prob.cardD, 2 )
+#     while ( length(indD) != length( unique( indD ) ) ) 
+#       indD[2] = rand( 1:prob.cardD )
+#     end
+#     
+#     aux1 = searchDelivSol( prob, solNew, indD[1] )
+#     aux2 = searchDelivSol( prob, solNew, indD[2] )
+#   end
+  
+  if ( ( aux1[1] != 0 ) && ( aux2[1] != 0 ) )
+    solNew.solX[ indD[1], aux1[1], aux1[2] ] = 0;
+    solNew.solX[ indD[2], aux2[1], aux2[2] ] = 0;
+    
+    if ( aux2[2] < DS[ indD[1] ] )
+      aux2[2] = DS[ indD[1] ]
+    elseif ( aux2[2] > DE[ indD[1] ] )
+      aux2[2] = DE[ indD[1] ]
+    end
+    
+    if ( aux1[2] < DS[ indD[2] ] )
+      aux1[2] = DS[ indD[2] ]
+    elseif ( aux1[2] > DE[ indD[2] ] )
+      aux1[2] = DE[ indD[2] ]
+    end
+    
+    solNew.solX[ indD[1], aux2[1], aux2[2] ] = 1;
+    solNew.solX[ indD[2], aux1[1], aux1[2] ] = 1;
+  
+  elseif ( ( aux1[1] == 0 ) && ( aux2[1] != 0 ) )
+    solNew.solX[ indD[2], aux2[1], aux2[2] ] = 0;  
+    
+    if ( aux2[2] < DS[ indD[1] ] )
+      aux2[2] = DS[ indD[1] ]
+    elseif ( aux2[2] > DE[ indD[1] ] )
+      aux2[2] = DE[ indD[1] ]
+    end
+    
+    solNew.solX[ indD[1], aux2[1], aux2[2] ] = 1;
+  
+  elseif ( ( aux1[1] != 0 ) && ( aux2[1] == 0 ) )
+    solNew.solX[ indD[1], aux1[1], aux1[2] ] = 0;
+  
+    if ( aux1[2] < DS[ indD[2] ] )
+      aux1[2] = DS[ indD[2] ]
+    elseif ( aux1[2] > DE[ indD[2] ] )
+      aux1[2] = DE[ indD[2] ]
+    end
+    
+    solNew.solX[ indD[2], aux1[1], aux1[2] ] = 1;
+    
+  end
+
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+  if ( solNew.feas < 0 )
+    solNew = repair( prob, solNew )
+#     solNew = resetPickups( prob, solNew )
+  end
+
+  return solNew
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+  #if necessary, repairing sol
+  
+  #checking sol factibility
+  
+end
+
+function resetPickups( prob, sol )
+  
+  solNew = copy(sol)
+
+  #resetting all pickups
+  for j in 1:prob.cardP
+    for k in 1:prob.cardC
+      for t in 1:prob.cardT
+        solNew.solY[j,k,t] = 0
+      end
+    end
+  end
+#   println("all pickups reseted")
+  
+  #ordering deliveries
+  sortedD = zeros( Int, prob.cardD )
+  sortedD = orderD( cardD )
+#   println("sortedD = $sortedD")
+  
+  numDeliv = 1
+  numPickup = 0
+  indD = 0
+  indC = 0
+  indT = 0
+  availP = ones( Int, prob.cardP )
+  
+  #reassigning pickups
+  while ( ( numDeliv <= prob.cardD ) && ( numPickup < prob.cardP ) )
+    indD = sortedD[ numDeliv ]
+    ( indC, indT) = searchDelivSol( prob, sol, indD )
+    if ( indT == 0 )
+#       println( "indT == 0" )
+      numDeliv += 1
+      continue
+    end
+#     println(" resetPickups-> indD = $indD")
+    
+    #find set S of pickups
+    setSDem = findDemand( indD, prob.DA, indT, prob.cardP, prob.PA, prob.PE, availP )
+    
+    cardSetS = length(setSDem)
+#     println(" resetPickups-> setSDem = $setSDem")
+    
+    if ( cardSetS == 0 )
+      numDeliv += 1
+      continue
+    end
+    
+    for ind in 1:cardSetS
+      aux = setSDem[ ind ]
+      availP[ aux ] = 0
+    end
+    numPickup += cardSetS
+
+    #assign D_indD and set S
+    timeS = assignSetS( indD, setSDem, cardSetS, prob, sol )
+
+    #find a cdock for set S, update solution
+    for j in 1:cardSetS
+      solNew.solY[ setSDem[j], indC, timeS[j]] = 1
+    end
+  
+    #verify if current solution is feasible (if it is, break the while)
+    if ( numPickup == prob.cardP )
+      auxFeas = checkFeas( prob, sol )
+    end
+    
+    numDeliv += 1
+    auxFeas = checkInventoryLevel( prob, sol )
+  
+  end
+
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+  return solNew
+  #if necessary, repairing sol
+  
+  #checking sol factibility
+
+end
+
+function addDeliv( prob, sol )
+  
+  unfDeliv = searchUnfDelivSol( prob, sol )
+#   println("unfDeliv = $unfDeliv")
+  if ( length(unfDeliv) == 0 )
+#     println("No unfulfilled deliveries.")
+    return sol
+  end
+  
+  #choosing a unfulfilled delivery indD
+  aux = rand( 1:length(unfDeliv) )
+  indD = unfDeliv[aux]
+  
+  #adding delivery and update the solution
+  return addDeliv( prob, sol, indD )
+  
+end
+
+function addDelivAll( prob, sol, penPar )
+  
+#   println("N3 ... addDeliv")
+      
+  solBest = copy(sol)
+  #find unfulfilled deliveries
+  unfDeliv = searchUnfDelivSol( prob, solBest )
+#   println( "unfDeliv = $unfDeliv" )
+  if ( length(unfDeliv) > 0 )
+    for i in 1:length(unfDeliv)
+      solNew = addDeliv( prob, solBest, unfDeliv[i] )
+      solbest = compSol( penPar, solBest, solNew )[1]
+    end
+  else
+#     println("No fulfilled deliveries")
+    return solBest
+  end
+  
+  return solBest
+end
+
+function addDeliv( prob, sol, penPar, numNeigh )
+  
+#   println("N3 ... addDeliv")
+      
+  solBest = copy(sol)
+  #find unfulfilled deliveries
+  unfDeliv = searchUnfDelivSol( prob, solBest )
+#   println( "unfDeliv = $unfDeliv" )
+  if ( length(unfDeliv) > 0 ) && ( length(unfDeliv) <= numNeigh )
+    for i in 1:length(unfDeliv)
+      solNew = addDeliv( prob, solBest, unfDeliv[i] )
+      solbest = compSol( penPar, solBest, solNew )[1]
+    end
+  elseif ( length(unfDeliv) > 0 ) && ( length(unfDeliv) > numNeigh )
+    indD = rand(1:length(unfDeliv), numNeigh)
+    while ( length(unique(indD)) != numNeigh )
+      indD = rand(1:length(unfDeliv), numNeigh)
+    end
+    for i in 1:numNeigh
+      solNew = addDeliv( prob, solBest, indD[i] )
+      solbest = compSol( penPar, solBest, solNew )[1]
+    end
+  else
+#     println("No fulfilled deliveries")
+    return solBest
+  end
+  
+  return solBest
+end
+
+function addDeliv( prob, sol, indD )
+  
+  solNew = copy(sol)
+
+  #assigning indD
+  auxC = rand( 1:prob.cardC )
+  auxT = rand( prob.DS[indD]:prob.DE[indD] )
+#   println("indD = D$indD ... auxC = $auxC ... auxT = $auxT")
+  
+  solNew.solX[ indD, auxC, auxT ] = 1
+  
+  #update solution
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+  return solNew  
+  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+  
+end
+
+function addPickup( prob, sol )
+  
+  unasPickup = searchUnasPickupSol( prob, sol )
+#   println("unasPickup = $unasPickup")
+  if ( length(unasPickup) == 0 )
+#     println("No unassigned pickups")
+    return sol
+  end
+  
+  #choosing a unassigned pickup indP
+  aux = rand( 1:length(unasPickup) )
+  indP = unasPickup[ aux ]
+  
+  #adding delivery and update the solution
+  return addPickup( prob, sol, indP )
+  
+end
+
+function addPickupAll( prob, sol, penPar )
+  
+#   println("N5 ... addPickup")
+
+  solBest = copy(sol)
+  #find unassigned pickups
+  unasPickup = searchUnasPickupSol( prob, sol )
+  if ( length(unasPickup) == 0 )
+#     println("No unassigned pickups")
+    return solBest
+  end
+  for j in 1:length(unasPickup)
+    solNew = addPickup( prob, solBest, unasPickup[j] )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+  
+  return solBest
+end
+
+function addPickup( prob, sol, penPar, numNeigh )
+  
+#   println("N5 ... addPickup")
+
+  solBest = copy(sol)
+  #find unassigned pickups
+  unasPickup = searchUnasPickupSol( prob, sol )
+  if ( length(unasPickup) == 0 )
+#     println("No unassigned pickups")
+    return solBest
+  end
+  if ( length(unasPickup) < numNeigh )
+    for j in 1:length(unasPickup)
+      solNew = addPickup( prob, solBest, j )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  else
+    indP = rand(1:length(unasPickup), numNeigh)
+    while ( length(unique(indP)) != numNeigh )
+      indP = rand(1:length(unasPickup), numNeigh)
+    end
+    for j in 1:numNeigh
+      solNew = addPickup( prob, solBest, indP[j] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+  
+  return solBest
+end
+
+function addPickup( prob, sol, indP )
+  
+  solNew = copy(sol)
+  
+  #assigning indP
+  auxC = rand( 1:prob.cardC )
+  auxT = rand( prob.PS[indP]:prob.PE[indP] )
+#   println("indP = $indP ... auxC = $auxC ... auxT = $auxT")
+  
+  solNew.solY[ indP, auxC, auxT ] = 1
+  
+  #update solution
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+  return solNew
+  
+end
+
+function changeTimeDeliv( prob, sol )
+  
+  fulDeliv = searchDelivSol( prob, sol )[:,1]
+  fulDeliv = unique( fulDeliv )
+  if ( length(fulDeliv) == 0 )
+#     println("No fulfilled delivs")
+    return sol
+  end
+  
+  aux = rand(1:length(fulDeliv))
+  indD = fulDeliv[aux]
+  
+  #changing time of delivery and update the solution
+  return changeTimeDeliv( prob, sol, indD )
+  
+end
+
+function changeTimeDelivAll( prob, sol, penPar )
+  
+  solBest = copy(sol)
+#   println("N6 ... changeTimeDeliv")
+  fulDeliv = unique( searchDelivSol(prob, sol)[:,1] )
+  if ( length(fulDeliv) == 0 )
+#     println("No fulfilled delivs")
+    return solBest
+  end
+  for i in 1:length( fulDeliv )
+    solNew = changeTimeDeliv( prob, solBest, fulDeliv[i] )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+  
+  return solBest
+end
+
+function changeTimeDeliv( prob, sol, penPar, numNeigh)
+  
+  solBest = copy(sol)
+#   println("N6 ... changeTimeDeliv")
+  fulDeliv = unique( searchDelivSol(prob, sol)[:,1] )
+  if ( length(fulDeliv) == 0 )
+#     println("No fulfilled delivs")
+    return solBest
+  end
+  if ( length(fulDeliv) < numNeigh )
+    for i in 1:length( fulDeliv )
+      solNew = changeTimeDeliv( prob, solBest, fulDeliv[i] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  else
+    indD = rand(1:length(fulDeliv), numNeigh)
+    while ( length(unique(indD)) != numNeigh )
+      indD = rand(1:length(fulDeliv), numNeigh)
+    end
+    for i in 1:numNeigh
+      solNew = changeTimeDeliv( prob, solBest, indD[i] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+  
+  return solBest
+end
+
+function changeTimeDeliv( prob, sol, indD )
+  
+  solNew = copy(sol)
+  
+  currSolDeliv = searchDelivSol( prob, sol, indD )
+  if ( currSolDeliv[1] == 0 )
+#     println("No fulfilled delivs")
+    return sol
+  end
+  
+  #changing time of indD
+  newTime = 0
+  if ( currSolDeliv[2] < prob.DE[indD] )
+    newTime = rand( (currSolDeliv[2]+1):prob.DE[indD] )
+  else
+    newTime = rand( prob.DS[indD]:(prob.DE[indD]-1) )
+  end
+#   println("indD = $indD ... newTime = $newTime")
+  
+  #updating solNew
+  solNew.solX[ indD, currSolDeliv[1], currSolDeliv[2] ] = 0
+  solNew.solX[ indD, currSolDeliv[1], newTime ] = 1
+  
+  #update solution
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+  return solNew
+end
+
+function changeTimePickup( prob, sol )
+  
+  #choosing a assigned pickup indP
+  assignPickup = searchPickupSol( prob, sol )[:,1]
+  assignPickup = unique( assignPickup )
+  if ( length(assignPickup) == 0 )
+#     println("No assigned pickup")
+    return sol
+  end
+  
+  aux = rand(1:length(assignPickup))
+  indP = assignPickup[aux]
+  
+  #changing time of indP
+  return changeTimePickup( prob, sol, indP )
+  
+end
+
+function changeTimePickupAll( prob, sol, penPar )
+
+  solBest = copy(sol)
+#   println("N7 ... changeTimePickup")
+  assignPickup = unique( searchPickupSol( prob, sol )[:,1] )
+  if ( length(assignPickup) == 0 )
+#     println("No assigned pickup")
+    return solBest
+  end
+  for j in 1:length( assignPickup )
+    solNew = changeTimePickup( prob, solBest, assignPickup[j] )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+  
+  return solBest
+end
+
+function changeTimePickup( prob, sol, penPar, numNeigh )
+
+  solBest = copy(sol)
+#   println("N7 ... changeTimePickup")
+  assignPickup = unique( searchPickupSol( prob, sol )[:,1] )
+  if ( length(assignPickup) == 0 )
+#     println("No assigned pickup")
+    return solBest
+  end
+  if ( length( assignPickup ) < numNeigh )
+    for j in 1:length( assignPickup )
+      solNew = changeTimePickup( prob, solBest, assignPickup[j] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  else
+    indP = rand(1:length(assignPickup), numNeigh)
+    while ( length(unique(indP)) != numNeigh )
+      indP = rand(1:length(assignPickup), numNeigh)
+    end
+    for j in 1:numNeigh
+      solNew = changeTimePickup( prob, solBest, indP[j] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+  
+  return solBest
+end
+
+function changeTimePickup( prob, sol, indP )
+  
+  solNew = copy(sol)
+  
+  aux = 1
+  aux2 = 0
+  currSolPickup = [0 0]
+  
+  #choosing a assigned pickup indP
+  currSolPickup = searchPickupSol( prob, solNew, indP )
+  if ( currSolPickup[1] == 0 )
+#     println("No assigned pickup")
+    return solNew
+  end
+  
+  #changing time of indP
+  aux = 1
+  newTime = 0
+  while ( aux == 1 )
+    newTime = rand( prob.PS[indP]:prob.PE[indP] )
+      
+    if ( newTime != currSolPickup[2] )
+      aux = 0
+    end
+  end
+#   println("indP = $indP ... newTime = $newTime")
+  
+  #updating solNew
+  solNew.solY[ indP, currSolPickup[1], currSolPickup[2] ] = 0
+  solNew.solY[ indP, currSolPickup[1], newTime ] = 1
+  
+  #update solution
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+
+  return solNew
+end
+
+function removeDelivs( prob, sol )
+  
+  if ( sol.feas != 1 )
+#     println("current solution is not feasible")
+    return sol
+  end
+  
+  solBest = copy(sol)
+  solNew = copy(solBest)
+  
+  flag = 0
+  fulDeliv = Array{Int, 2}
+  for i in 1:prob.cardD
+    fulDeliv = searchDelivSol( prob, solNew, i )
+    
+    if ( fulDeliv[1] == 0 )
+      continue
+    else
+#       println("Trying to remove D", i)
+      solNew.solX[ i, fulDeliv[1], fulDeliv[2] ] == 0
+      
+      #update solution
+      computeCosts!( prob, solNew )
+      solNew.feas = checkFeas( prob, solNew )
+      
+      if ( solNew.feas == 1 ) && ( solNew.trspCost+solNew.invCost < solBest.trspCost+solBest.invCost )
+#         println("removing D$i")
+        solBest = copy( solNew )
+        flag = 1
+      end
+      
+    end
+  end
+  
+  if ( flag == 1 )
+    removeDelivs( prob, solBest )
+  else
+#     println("no improvements (removeDelivs)")
+#     if ( solNew.feas < 0 )
+#       return sol
+#     else
+#       return solNew
+#     end
+  return solNew
+  end
+  
+end
+
+function swapCdocks( prob, sol )
+  
+  aux1 = 0
+  aux2 = 0
+  
+  #choosing a pair of cdocks
+  indC = rand( 0:prob.cardC, 2 )
+  while ( length(indC) != length( unique( indC ) ) ) 
+    indC[2] = rand( 0:prob.cardC )
+  end
+  
+  #swaping the crossdocks
+  return swapCdocks( prob, sol, indC )
+  
+end
+
+function swapCdocksAll( prob, sol, penPar )
+  
+  solBest = copy(sol)
+#   println("N8 ... swapPickups")
+  for k1 = 0:(prob.cardC-1)
+    for k2 = (k1+1):prob.cardC
+      solNew = swapCdocks( prob, solBest, [k1 k2] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+
+  return solBest
+end
+
+function swapCdocks( prob, sol, penPar, numNeigh )
+  
+#   println("N8 ... swapPickups")
+  aux = 1
+  indC = rand(0:prob.cardC, numNeigh, 2)
+  
+  while ( aux == 1 )
+    (flag, fixC) = checkUniqueness( indC )
+    
+    if ( flag )
+      aux = 0
+    else
+      indC[fixC,1] = rand(0:prob.cardC)
+      indC[fixC,2] = rand(0:prob.cardC)
+    end
+  end
+  
+  solBest = copy(sol)
+  for k = 1:numNeigh
+    solNew = swapCdocks( prob, solBest, [ indC[k,1] indC[k,2] ] )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+
+  return solBest
+end
+
+function swapCdocks( prob, sol, indC )
+  
+  solNew = copy(sol)
+  
+  aux = 0
+#   println("indC = $indC")
+  
+  #swaping the crossdocks
+  fulDeliv = searchDelivSol( prob, solNew )
+  aUnusedIndC = setdiff( 1:prob.cardC, unique( fulDeliv ) )
+
+  if ( length(aUnusedIndC) != 0 )
+    aux = rand( 1:length(aUnusedIndC) )
+    unusedIndC = aUnusedIndC[aux]
+  else
+    if ( 0 in indC )
+    return solNew
+    end
+  end
+  for i in 1:size(fulDeliv,1)
+    if !( 0 in indC )
+      if ( fulDeliv[i,2] == indC[1] )
+        solNew.solX[ i, fulDeliv[i,2], fulDeliv[i,3] ] = 0
+        solNew.solX[ i, indC[2], fulDeliv[i,3] ] = 1
+      elseif ( fulDeliv[i,2] == indC[2] )
+        solNew.solX[ i, fulDeliv[i,2], fulDeliv[i,3] ] = 0
+        solNew.solX[ i, indC[1], fulDeliv[i,3] ] = 1
+      end
+    else
+      aux = findmax( indC )[2]
+      if ( fulDeliv[i,2] == indC[aux] )
+        solNew.solX[ i, fulDeliv[i,2], fulDeliv[i,3] ] = 0
+        solNew.solX[ i, unusedIndC, fulDeliv[i,3] ] = 1
+      end
+    end
+  end
+  
+  assignPickup = searchPickupSol( prob, solNew )
+  for j in 1:size(assignPickup,1)
+    if ( !( 0 in indC ) )
+      if ( assignPickup[j,2] == indC[1] )
+        solNew.solY[ j, assignPickup[j,2], assignPickup[j,3] ] = 0
+        solNew.solY[ j, indC[2], assignPickup[j,3] ] = 1
+      elseif ( assignPickup[j,2] == indC[2] )
+        solNew.solY[ j, assignPickup[j,2], assignPickup[j,3] ] = 0
+        solNew.solY[ j, indC[1], assignPickup[j,3] ] = 1
+      end
+    else
+      aux = findmax( indC )[2]
+      if ( assignPickup[j,2] == indC[aux] )
+        solNew.solY[ j, assignPickup[j,2], assignPickup[j,3] ] = 0
+        solNew.solY[ j, unusedIndC, assignPickup[j,3] ] = 1
+      end
+    end
+  end
+  
+  #update solution
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+    return solNew
+end
+
+function rescheduleCdock( prob, sol )
+  
+  aux = 0
+  auxD = 0
+  auxP = 0
+  newTime = 0
+  
+  #choosing a crossdock
+  indC = rand(1:prob.cardC)
+#   println("indC = $indC")
+  
+  #reschedule deliveries and pickups
+  return rescheduleCdock( prob, sol, indC )
+  
+end
+
+function rescheduleCdockAll( prob, sol, penPar )
+  
+  solBest = copy(sol)
+#   println("N9 ... rescheduleCdock")
+  for k = 1:prob.cardC
+    solNew = rescheduleCdock( prob, solBest, k )
+    solBest = compSol( penPar, solBest, solNew )[1]
+  end
+  
+  return solBest
+end
+
+function rescheduleCdock( prob, sol, penPar, numNeigh )
+  
+  solBest = copy(sol)
+#   println("N9 ... rescheduleCdock")
+  if ( prob.cardC < numNeigh )
+    return rescheduleCdockAll( prob, sol, penPar )
+  else
+    indC = rand(1:prob.cardC, numNeigh)
+    while ( length(unique(indC)) != numNeigh )
+      indC = rand(1:prob.cardC, numNeigh)
+    end
+    for k in 1:numNeigh
+      solNew = rescheduleCdock( prob, solBest, indC[k] )
+      solBest = compSol( penPar, solBest, solNew )[1]
+    end
+  end
+  
+  return solBest
+end
+
+function rescheduleCdock( prob, sol, indC )
+  
+  solNew = copy(sol)
+  
+  aux = 0
+  auxD = 0
+  auxP = 0
+  newTime = 0
+  
+  #choosing a crossdock
+#   println("indC = $indC")
+  
+  #reschedule deliveries
+  for i in 1:prob.cardD
+    
+    auxD = searchDelivSol( prob, sol, i )
+    
+    if ( auxD[1] == indC )
+      solNew.solX[ i, auxD[1], auxD[2] ] = 0
+      
+      aux = 1
+      while ( aux == 1 )
+        newTime = rand( prob.DS[i]:prob.DE[i] )
+        
+        if ( newTime != auxD[2] )
+          aux = 0
+        end
+      end
+#       println("D$i - C",auxD[1]," - T$newTime")
+      solNew.solX[ i, auxD[1], newTime ] = 1
+    else
+      continue
+    end
+  end
+  
+  #reschedule pickups
+  for j in 1:prob.cardP
+    
+    auxP = searchPickupSol( prob, sol, j )
+    
+    if ( auxP[1] == indC )
+      solNew.solY[ j, auxP[1], auxP[2] ] = 0
+      
+      aux = 1
+      while ( aux == 1 )
+        newTime = rand( prob.PS[j]:prob.PE[j] )
+        
+        if ( newTime != auxP[2] )
+          aux = 0
+        end
+      end
+#       println("P$j - C",auxP[1]," - T$newTime")
+      solNew.solY[ j, auxP[1], newTime ] = 1
+    else
+      continue
+    end
+  end
+  
+  #update solution
+  computeCosts!( prob, solNew )
+  solNew.feas = checkFeas( prob, solNew )
+  
+#   if ( solNew.feas < 0 )
+#     return sol
+#   else
+#     return solNew
+#   end
+    return solNew
+end

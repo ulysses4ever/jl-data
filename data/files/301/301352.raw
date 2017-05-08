@@ -1,0 +1,166 @@
+
+# Tests for MarketRisk module
+
+using Base.Test
+using BusinessDays
+using MarketRisk
+using InterestRates
+
+include("ScenarioFactory.jl")
+include("PricingModelFactory.jl")
+
+BusinessDays.initcache(BrazilBanking())
+
+# Basic functions that should be overloaded
+import MarketRisk.getfunctionalcurrency
+import MarketRisk.FinancialContract
+getfunctionalcurrency() = MarketRisk.RFSpotCurrency("BRL")
+FinancialContract(id::Int, portfolio::Vector{ASCIIString}, model_name::ASCIIString) = FinancialContract(id, portfolio, PricingModelFactory.getpricingmodel(model_name))
+
+@test MarketRisk.RFSpotCurrency("BRL") == getfunctionalcurrency()
+@test isequal(MarketRisk.RFSpotCurrency("BRL"), getfunctionalcurrency())
+
+# Pricing scenario
+scen = ScenarioFactory.getscenario(Date(2015,08,05))
+
+discount_di_dol = 1.0 / ( 1.1^(Int(bdays(BrazilBanking(), Date(2015,08,05), Date(2015,10,02)))/252) )
+discount_pre = 1.0 / ( 1.2^(Int(bdays(BrazilBanking(), Date(2015,08,05), Date(2015,10,02)))/252) )
+
+println("\n######### CONTRACT01 #############")
+contract01 = FinancialContract(1, ["MyCompany", "Trading"], "Fixed_USD")
+fc_set_notional!(contract01, 1000.0)
+fc_set_maturity!(contract01, Date(2015,10,02))
+fc_set_asset_liability!(contract01, "a")
+
+println("Timing uncompiled price function")
+@time p = price(contract01, scen)
+
+println("Timing compiled price function")
+@time p = price(contract01, scen)
+
+price_expected = 1000.0 * 3.5 * discount_di_dol
+@test_approx_eq p.price price_expected
+@test_approx_eq p.exposures [ price_expected, price_expected ]
+
+println("\n######### CONTRACT02 #############")
+contract02 = FinancialContract(2, ["MyCompany", "Trading"], "Forward_USD")
+fc_set_notional!(contract02, 1000.0)
+fc_set_maturity!(contract02, Date(2015,10,02))
+fc_set_asset_liability!(contract02, "a")
+fc_set_forward_price!(contract02, 3.8)
+
+println("Timing uncompiled price function")
+@time p = price(contract02, scen)
+
+println("Timing compiled price function")
+@time p = price(contract02, scen)
+
+println("Timing 2nd time compiled price function")
+@time p = price(contract02, scen)
+
+price_expected = 1000.0 * ( 3.5*discount_di_dol - 3.8*discount_pre  )
+
+@test_approx_eq p.price price_expected
+
+println("\n######### CONTRACT03 #############")
+# If we specify a differenct contract using the same model, we should get different results
+contract03 = FinancialContract(3, ["MyCompany", "Trading"], "Forward_USD")
+fc_set_notional!(contract03, 2000.0)
+fc_set_maturity!(contract03, Date(2015,10,02))
+fc_set_asset_liability!(contract03, "a")
+fc_set_forward_price!(contract03, 3.8)
+
+println("Timing compiled price function")
+@time p = price(contract03, scen)
+
+@test_approx_eq p.price price_expected*2.0
+
+println("\n######### CONTRACT04 #############")
+# If we specify a differenct contract using the same model, we should get different results
+contract04 = FinancialContract(4, ["MyCompany", "Trading"], "Fixed_USD")
+fc_set_notional!(contract04, 2000.0)
+fc_set_maturity!(contract04, Date(2017,10,02))
+fc_set_asset_liability!(contract04, "l")
+
+println("Timing compiled price function")
+@time p = price(contract04, scen)
+
+println("And the price for contract04 is: $(p)")
+println("Log: $(contract04.log)")
+
+println("\n######### CONTRACT05 #############")
+# If we specify a differenct contract using the same model, we should get different results
+contract05 = FinancialContract(5, ["MyCompany", "Trading"], "Future_USD")
+fc_set_notional!(contract05, 2000.0)
+fc_set_maturity!(contract05, Date(2017,10,02))
+fc_set_asset_liability!(contract05, "a")
+
+println("Timing uncompiled price function")
+@time p = price(contract05, scen)
+
+println("Timing compiled price function")
+@time p = price(contract05, scen)
+
+println("And the price for contract05 is: $(p)")
+println("Log: $(contract05.log)")
+
+println("\n######### CONTRACT06 #############")
+contract06 = FinancialContract(1, ["MyCompany", "Banking"], "Cash_USD")
+fc_set_notional!(contract06, 1000.0)
+
+println("Timing uncompiled price function")
+@time p = price(contract06, scen)
+
+println("Timing compiled price function")
+@time p = price(contract06, scen)
+
+println("And the price for contract06 is: $(p)")
+println("Log: $(contract06.log)")
+
+println("\n######### CONTRACT07 #############")
+contract07 = FinancialContract(1, ["MyCompany", "Banking"], "Cash_EUR")
+fc_set_notional!(contract07, 1000.0)
+
+println("Timing compiled price function")
+@time p = price(contract07, scen)
+
+println("And the price for contract07 is: $(p)")
+println("Log: $(contract07.log)")
+
+println("\n######### CONTRACT08 #############")
+contract08 = FinancialContract(1, ["MyCompany", "Trading"], "PETR4")
+fc_set_quantity!(contract08, 10.0)
+fc_set_asset_liability!(contract08, "a")
+
+println("Timing uncompiled price function")
+@time p = price(contract08, scen)
+
+println("Timing compiled price function")
+@time p = price(contract08, scen)
+
+println("And the price for contract08 is: $(p)")
+println("Log: $(contract08.log)")
+
+println("\n######### CONTRACT09 #############")
+contract09 = FinancialContract(1, ["MyCompany", "Trading"], "AAPL")
+fc_set_quantity!(contract09, 21.0)
+fc_set_asset_liability!(contract09, "a")
+
+println("Timing uncompiled price function")
+@time p = price(contract09, scen)
+
+println("Timing compiled price function")
+@time p = price(contract09, scen)
+
+println("And the price for contract09 is: $(p)")
+println("Log: $(contract09.log)")
+
+#@code_warntype price(contract09, scen)
+#@code_warntype MarketRisk._price(contract09.model, contract09, scen)
+#@code_warntype MarketRisk.fc_get_maturity(contract09)
+
+fc_vec = [contract01, contract02, contract03, contract04, contract05, contract06, contract07, contract08, contract09]
+println("Time pricing a portfolio")
+@time price(fc_vec, scen)
+@time pr_vec = price(fc_vec, scen)
+println("price vector: $(pr_vec)")

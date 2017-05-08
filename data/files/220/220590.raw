@@ -1,0 +1,53 @@
+using JuMP
+using Cbc
+using MathProgBase
+
+#include ( "00-0instanceMCITW-1P.dat" )
+include ( "test_data.jl" )
+
+# m = Model(solver=CbcSolver(seconds=7200, maxNodes=10000000, logLevel=2, ratioGap=0.0001))
+
+#variables
+@defVar( m, x[ 1:cardD, 1:cardC, 1:cardT ], Bin )
+@defVar( m, y[ 1:cardP, 1:cardC, 1:cardT ], Bin )
+@defVar( m, z[ 1:cardC, 1:cardT ] >= 0, Int ) #check this line
+@defVar( m, costTransp >= 0 )
+@defVar( m, costInv >= 0 )
+
+#objective function
+@setObjective( m, Min, costTransp + costInv )
+
+#constraints
+#each delivery, if it occurs, must occur within its specified time window
+for i in 1:cardD
+  @addConstraint( m, sum{ x[i,k,t], k = 1:cardC, t = DS[i]:DE[i] } <= 1 )
+  @addConstraint( m, sum{ x[i,k,t], k = 1:cardC, t = 1:(DS[i]-1) } + sum{ x[i,k,t], k = 1:cardC, t = (1+DE[i]):cardT } == 0 )
+end
+
+#each pickup is fullfilled within its specified time window
+for j in 1:cardP
+  @addConstraint( m, sum{ y[j,k,t], k = 1:cardC, t = PS[j]:PE[j] } == 1 )
+  @addConstraint( m, sum{ y[j,k,t], k = 1:cardC, t = 1:(PS[j]-1) } + sum{ y[j,k,t], k = 1:cardC, t = (PE[j]+1):cardT } == 0 )
+end
+
+#inventory level and upper bound of z[k,t]
+for k in 1:cardC
+  for t in 1:cardT
+    if ( t == 1 )
+      @addConstraint( m, z[ k, 1] - sum{ DA[i]*x[i,k,1], i = 1:cardD } + sum{ PA[j]*y[j,k,1], j = 1:cardP } == 0 )
+    else
+      @addConstraint( m, z[k,t] - z[k, t-1] - sum{DA[i]*x[i,k,t], i = 1:cardD} + sum{ PA[j]*y[j,k,t], j = 1:cardP } == 0 )
+    end
+    
+    @addConstraint( m, z[k,t] <= CCap[k] )
+  end
+end
+
+#transportation cost
+@addConstraint( m, sum{ DD[i]*x[i,k,t], i = 1:cardD, k = 1:cardC, t = 1:cardT } + sum{ PD[j]*y[j,k,t], j = 1:cardP, k = 1:cardC, t = 1:cardT } - costTransp == 0 )
+
+#inventory cost
+@addConstraint( m, sum{ CCost[k] * z[k,t], k = 1:cardC, t = 1:cardT } - costInv == 0 )
+
+# print(m)
+writeMPS( m, "mpsmodel.mps" )

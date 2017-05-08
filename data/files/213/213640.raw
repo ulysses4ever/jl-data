@@ -1,0 +1,17 @@
+## =============================================================================
+## 02_density.jl - density funcion
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+## simple density function
+plot(dataset("ggplot2", "diamonds"), x="Price", Geom.density)
+
+## separate lines with color
+plot(dataset("ggplot2", "diamonds"), x="Price", color="Cut", Geom.density)
+
+## using log scale for Price variable
+df = dataset("ggplot2", "diamonds")
+df[:logPrice] = log(df[:Price])
+plot(df, x="logPrice", color="Cut", Geom.density)

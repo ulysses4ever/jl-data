@@ -1,0 +1,82 @@
+module SpimRegXML
+
+using LightXML, AffineTransforms
+
+
+type NamedAffine
+  name::String
+  affine::AffineTransform
+end
+
+
+function affine(
+    xml::XMLElement
+    )
+  @assert name(xml) == "ViewTransform" && attribute(xml, "type") == "affine"
+
+  nam = ""
+  element = find_element(xml, "Name")
+  if typeof(element) == XMLElement
+    nam = strip( content(element) )
+  end
+
+  strings = split( strip( content( find_element(xml, "affine"))), r"\s+" )
+  values = Array(Real, 4, 3)
+  for (i, s) in enumerate(strings)
+    values[i] = float(s)
+  end
+  values = transpose(values)
+
+  return NamedAffine(nam, AffineTransform(values[:, 1:3], values[:, 4]))
+end
+
+
+function affine_list(
+    xml::XMLElement
+    )
+  @assert name(xml) == "ViewRegistration"
+  elements = get_elements_by_tagname(xml, "ViewTransform")
+  transforms = Array(NamedAffine, length(elements))
+  for (i, e) in enumerate(elements)
+    transforms[i] = affine(e)
+  end
+  return transforms
+end
+
+
+function xml(
+    affine::NamedAffine
+    )
+  element = new_element("ViewTransform")
+  set_attribute(element, "type", "affine")
+
+  if length(affine.name) > 0
+    e = new_child(element, "Name")
+    add_text(e, affine.name)
+  end
+
+  values = Array(Real, 12)
+  trafo = affine.affine
+  values[ 1: 3] = trafo.scalefwd[1, :]
+  values[ 5: 7] = trafo.scalefwd[2, :]
+  values[ 9:11] = trafo.scalefwd[3, :]
+  values[ 4] = trafo.offset[1]
+  values[ 8] = trafo.offset[2]
+  values[12] = trafo.offset[3]
+  e = new_child(element, "affine")
+  add_text(e, join(values, " "))
+  return element
+end
+
+
+function xml(
+    affines::Vector{NamedAffine}
+    )
+  element = new_element("ViewRegistration")
+  for a in affines
+    add_child(element, xml(a))
+  end
+  return element
+end
+
+end # module

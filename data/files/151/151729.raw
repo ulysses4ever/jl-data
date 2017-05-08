@@ -1,0 +1,13 @@
+using LoraMPI
+using MPI
+
+function main()
+  MPI.Init()
+
+  mpistate = MPIState(MPI, 1)
+  mcrunner = FrielMC(100:1:1000)
+
+  MPI.Finalize()
+end
+
+main()

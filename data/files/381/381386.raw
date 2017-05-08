@@ -1,0 +1,18 @@
+module TensorBase
+
+using Reexport
+import Iterators: product
+
+@reexport using Einsum
+
+include("decompositions.jl")
+export CPDecomp,
+       compose
+
+include("utils.jl")
+export unfold,
+       unfold_idx,
+       krprod,
+       tensordot
+
+end # module

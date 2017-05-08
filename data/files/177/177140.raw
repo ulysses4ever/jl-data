@@ -1,0 +1,48 @@
+module signalprocessing
+export filterwav, dumpspectrograms
+using DSP, Images
+
+#filter parameters
+fc = 1250
+npoles = 4
+
+# half widths of feature box
+boxwidth = 3
+boxheight = 10
+
+function filterwav(signal, fs)
+  #filter the wav recording using a high pass Butterworth filter
+  #with cutoff frequency 1250Hz
+  responsetype = Highpass(fc/(fs/2))
+  designmethod = Butterworth(npoles) # fourth order filter
+  signal = filt(digitalfilter(responsetype,designmethod),signal)
+  return  signal
+end
+
+function dumpspectrograms(signal,segments,path,nameprefix,specwidth)
+  left = segments[1:end-1]
+  right = segments[2:end]-1
+  for (i,l) in enumerate(left)
+    #compute a spectrogram with roughly equal time and freq information
+    spec = spectrogram(signal[l:right[i]],specwidth,window=hanning)
+    filename = string(path,nameprefix,"$i.png")
+    imwrite(flipud(spec.power/maximum(spec.power)),filename)
+  end
+end
+
+function imgfeature(img)
+
+  nrows = height(img)
+  ncols = width(img)
+  layers = separate(img)
+  pcount = 0;
+  for row in (boxheight+1):(nrows-1)
+    for col in (boxwidth+1):(ncols-1)
+      pcount += 1
+      data[pcount,:] = 1
+    end
+  end
+  return data
+end
+
+end

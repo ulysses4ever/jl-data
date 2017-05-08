@@ -1,0 +1,138 @@
+module CART
+using Jules, FPUtil, Streaming
+
+export
+Part,
+PartSide,
+findsplit,
+gaussianinit,
+gaussianadd,
+gaussianremove,
+updatepartside
+
+
+immutable PartSide
+  value
+  loss::FloatingPoint
+  pred::FloatingPoint
+end
+immutable Part
+  id::Integer
+  index::Integer
+  left::PartSide
+  right::PartSide
+  nleft::Integer
+  nright::Integer
+end
+
+setright(p::Part, idx::Integer, r::PartSide, rn::Integer) =
+  Part(p.id, idx, p.left, r, p.nleft, rn)
+
+loss(p::Part) = (p.left.loss + p.right.loss) / (p.left.n + p.right.n)
+
+function updatepartside(f::Function, ps::PartSide, y)
+  value, loss, pred = f(ps, y)
+  PartSide(value, loss, pred)
+end
+
+function findsplit(y::Vector,
+                   x::Vector, xperm::Vector,
+                   parts::Vector,
+                   conf)
+  nrows = length(y)
+  acc = Dict()
+
+  for i in 1:nrows
+    partid = parts[i]
+
+    part0, best = get!(acc,
+                       partid,
+                       (Part(partid, 0, init, init, 0, 0),
+                        nothing))
+
+    part1 = setright(part0,
+                     i,
+                     updatepartside(conf.addexample,
+                                    part0.right,
+                                    y[i],
+                                    part0.nright),
+                     part0.nright + 1)
+    acc[partid] = (part1, best)
+  end
+
+  for i in 1:nrows
+    partid = parts[i]
+    part0, best0 = acc[partid]
+
+    part1 = Part(partid,
+                 i,
+                 updatepartside(conf.addexample,
+                                part0.left,
+                                y[i],
+                                part0.nleft),
+                 updatepartside(conf.removeexample,
+                                part0.right,
+                                y[i],
+                                part0.nright))
+
+    best1 = if isnothing(best0) || loss(part1) < loss(best0)
+      part1
+    else
+      best0
+    end
+
+    acc[partid] = (part1, best1)
+  end
+
+  minby(p -> loss(p(2)(2)), acc)
+end
+
+findsplits(y::Vector,
+           xs, xperms,
+           parts::Vector,
+           conf) =
+  pmap(i -> findsplit(y, xs[i], xperms[i], parts, conf),
+       1:length(xs))
+
+
+
+gaussianinit = nothing
+function gaussianadd(value::Union(Nothing,(Number,Number,Number,Number)),
+                     y::Number,
+                     n0::Integer)
+  if isnothing(value)
+    ((y^2, y, 2 * y * y, y), 0, y)
+  else
+    y2sum0, ysum0, twoxysum0, x0 = value
+    y2sum1 = y2sum0 + y^2
+    ysum1 = ysum0 + y
+    n1 = n0 + 1
+    x1 = ysum1 / n1
+    twoxysum1 = (2 * y + twoxysum0 / x0) * x1
+
+    mse = (y2sum1 + n1 * x1^2 - twoxysum1) / n1
+
+    ((y2sum1, ysum1, twoxysum1, x1), mse, x1)
+  end
+end
+function gaussianremove(value::Union(Nothing,(Number,Number,Number,Number)),
+                        y::Number,
+                        n0::Integer)
+  if isnothing(value)
+    error("cannot do gaussianremove on nothing")
+  else
+    y2sum0, ysum0, twoxysum0, x0 = value
+
+    y2sum1 = y2sum0 - y^2
+    ysum1 = ysum0 - y
+    n1 = n0 - 1
+    x1 = ysum1 / n1
+    twoxysum1 = (twoxysum0 / x0 - 2 * y) * x1
+
+    mse = (y2sum1 + n1 * x1^2 - twoxysum1) / n1
+
+    ((y2sum1, ysum1, twoxysum1, x1), mse, x1)
+  end
+end
+
+end ## end module

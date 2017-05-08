@@ -1,0 +1,128 @@
+using Base.Test
+using MethylHMM
+
+##################
+## Simple Tests ##
+##################
+
+# Create a binomial HMM
+filename = "/Users/alex/Dropbox/code/MethylHMM/data/allc_AM_E1_2_chr2subset.tsv"
+n_states = 2
+hmm = binomial_HMM(n_states,filename)
+
+# Set hmm parameters to a simple case
+hmm.A = eye(2)
+hmm.B = [1 0 1 0; 0 1 0 1]
+
+# Generate some synthetic data:
+# state sequence s, observation sequence o, context sequence c
+n_obs = 100
+c = rand(1:4,n_obs)
+k = ones(Int,n_obs) # reduce the problem to Bernoulli outputs
+
+hmm.p = vec([1 0])  # start in state 1
+s,o = generate(hmm,k,c)
+
+# Test that the synthetic data was correctly generated
+@test(all(s .== 1)) # should never transition to state 2
+@test(all(o[c.==1] .== 1)) # state 1 should always be methylated in context 1
+@test(all(o[c.==2] .== 0)) # state 1 should never be methylated in context 2
+@test(all(o[c.==3] .== 1)) # state 1 should always be methylated in context 3
+@test(all(o[c.==4] .== 0)) # state 1 should never be methylated in context 4
+
+# New synthetic data, starting in state 2
+hmm.p = vec([0 1])
+s,o = generate(hmm,k,c)
+
+# Replace hmm data with synthetic data
+hmm.c = c
+hmm.k = k
+hmm.o = o
+hmm.n_sites = n_obs
+
+@test(all(s .== 2)) # should never transition to state 1
+@test(all(o[c.==1] .== 0)) # state 2 should never be methylated in context 1
+@test(all(o[c.==2] .== 1)) # state 2 should always be methylated in context 2
+@test(all(o[c.==3] .== 0)) # state 2 should never be methylated in context 3
+@test(all(o[c.==4] .== 1)) # state 2 should always be methylated in context 4
+
+# check forward algorithm on perfect sequence
+alpha,p_obs = forward(hmm; scaling=false)
+@test(p_obs == 1)
+@test(all(alpha[:,2] .== 1)) # should always be in state 2
+@test(all(alpha[:,1] .== 0)) # should never be in state 1
+
+# test forward with scaling
+alpha,log_p_obs,coeff = forward(hmm)
+@test(log_p_obs == 0.0)
+@test(all(alpha[:,2] .== 1))
+@test(all(alpha[:,1] .== 0))
+@test(all(coeff .== 1.0))
+
+# check backward algorithm on perfect sequence
+beta = backward(hmm)
+@test(all(beta[end,:] .== 1))
+@test(all(beta[:,2] .== 1))
+
+# test backward with scaling
+beta = backward(hmm; scale_coeff=coeff)
+@test(all(beta[end,:] .== 1))
+@test(all(beta[:,2] .== 1))
+
+# check viterbi algorithm on perfect sequence
+@test(all(viterbi(hmm) .== s))
+
+# check forward-backward algorithm on complement observation sequence
+hmm.o = (hmm.o+1)%2
+alpha,p_obs = forward(hmm; scaling=false)
+beta = backward(hmm)
+@test(p_obs == 0)
+@test(all(alpha .== 0)) # impossible given we start in state 2
+@test(all(beta[1:end-1,2] .== 0)) # impossible if we end in state 2
+@test(all(beta[1:end-1,1] .== 1)) # (o+1)%2 occurs with probability 1 if we end in state 1
+
+# results should be the same if we increase k (read coverage)
+hmm.o = (hmm.o+1)%2
+hmm.k = 10*hmm.k
+hmm.o = 10*hmm.o
+alpha,log_p_obs,coeff = forward(hmm)
+beta = backward(hmm; scale_coeff=coeff)
+@test(log_p_obs == 0.0)
+@test(all(alpha[:,2] .== 1))
+@test(all(alpha[:,1] .== 0))
+@test(all(coeff .== 1.0))
+@test(all(beta[end,:] .== 1))
+@test(all(beta[:,2] .== 1))
+
+#####################################
+## Test for reasonable performance ##
+#####################################
+
+# Set hmm parameters to an easily recoverable case
+hmm.A = [ 0.95 0.05 ;
+          0.03 0.97 ]
+hmm.B = [ 0.8 0.5 0.6 0.7 ; # high methylated state
+          0.3 0.1 0.3 0.2 ] # low methylation state
+hmm.p = [0.5, 0.5]
+
+# draw observations from this hmm
+n_obs = 10_000
+c = rand(1:4,n_obs)
+k = rand(5:15,n_obs)
+
+true_s,o = generate(hmm,k,c)
+
+hmm.c = c
+hmm.k = k
+hmm.o = o
+hmm.n_sites = n_obs
+
+# Randomize hmm parameters and re-fit
+hmm.A = rand(2,2)
+hmm.A ./= sum(hmm.A,2)
+hmm.B = rand(2,4)
+
+fit!(hmm; max_iter=200)
+
+
+

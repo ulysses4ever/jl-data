@@ -1,0 +1,8 @@
+## =============================================================================
+## 02_boxplot.jl - boxplot sample julia script with Gadfly
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using Gadfly, RDatasets, DataFrames
+
+plot(dataset("lattice", "singer"), x="VoicePart", y="Height", Geom.boxplot)
+

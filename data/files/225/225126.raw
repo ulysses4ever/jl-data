@@ -1,0 +1,37 @@
+function isLeapYear(yr)
+	if mod(yr, 100) == 0 && mod(yr, 400) == 0 || (mod(yr, 4) == 0 && mod(yr, 100) != 0)
+		return true
+	end
+	return false
+end
+
+function isFirstOfMonth(day, isLeapYear)
+	months = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30]
+	if day == 1
+		return true
+	end
+	for i in 1:11
+		if sum(months[1:i]) == day - 1
+			return true
+		end
+	end
+	return false
+end
+
+function Run()
+	day = 1
+	count = 0
+	for year in 1900:2000
+		isLeapYr = isLeapYear(year)
+		yearLength = isLeapYr ? 366: 365
+		for i in 1:yearLength
+			day += 1
+			if day > 7
+				day = 1
+			elseif year > 1900 && day == 7 && isFirstOfMonth(i, isLeapYr)
+				count += 1
+			end
+		end
+	end
+	return count
+end

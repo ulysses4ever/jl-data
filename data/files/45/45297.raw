@@ -1,0 +1,272 @@
+module NeuralNet
+abstract AbstractLayer
+
+@inline function sigmoid(i::Matrix{Float64})
+    @inbounds @fastmath begin
+        expmi = similar(i)
+        for j in eachindex(expmi)
+            expmi[j] = exp(-i[j])
+        end
+        @simd for j in eachindex(expmi)
+            expmi[j] = 1.0/(expmi[j]+1.0)
+        end
+    end
+    expmi
+end
+
+@inline function dsigmoid(o::Matrix{Float64})
+    @inbounds @fastmath begin
+        dodi=similar(o)
+        @simd for j in eachindex(dodi)
+            oj      = o[j]
+            dodi[j] = (1.0-oj)*oj
+        end
+    end
+    dodi
+end
+
+@inline function sigmoid!(o::Matrix{Float64}, i::Matrix{Float64})
+    @inbounds @fastmath begin
+        for j in eachindex(i)
+            o[j] = exp(-i[j])
+        end
+        @simd for j in eachindex(o)
+            o[j] = 1.0/(o[j]+1.0)
+        end
+    end
+    o
+end
+
+@inline function dsigmoid!(dodi::Matrix{Float64},o::Matrix{Float64})
+    @inbounds @fastmath begin
+        @simd for j in eachindex(dodi)
+            oj      = o[j]
+            dodi[j] = (1.0-oj)*oj
+        end
+    end
+    dodi
+end
+
+type HiddenLayer <: AbstractLayer
+    I::Matrix{Float64}
+    O::Matrix{Float64}
+    dIdO::Matrix{Float64}
+    function HiddenLayer(x::Matrix{Float64})
+        y=sigmoid(x)
+        z=dsigmoid(y)
+        new(x,y,z)
+    end
+end
+
+type TrainingSet
+    IS::Matrix{Float64}
+    OS::Matrix{Float64}
+    function TrainingSet(x::Matrix{Float64}, y::Matrix{Float64})
+        @assert size(x,2)==size(y,2)
+        new(x,y)
+    end
+end
+
+abstract AbstractNeuralNet
+
+type SupervisedNet <: AbstractNeuralNet
+    TS::TrainingSet
+    OS::Matrix{Float64}
+    HLS::Vector{HiddenLayer}
+    Weights::Vector{Matrix{Float64}}
+    dWLast::Vector{Matrix{Float64}}
+end
+
+function supervisednet(TS::TrainingSet,NNinHLs::Vector{Int})
+    @inbounds @fastmath begin
+        NHLs  = length(NNinHLs)
+        NI,NT = size(TS.IS)
+        NO    = size(TS.OS,1)
+
+        Weights = Array(Matrix{Float64},NHLs+1)
+        dWLast  = Array(Matrix{Float64},NHLs+1)
+
+        Wrange = -1.0:1.0e-2:1.0
+
+        Weights[1] = rand(Wrange,NNinHLs[1],NI)
+        dWLast[1]  = zeros(NNinHLs[1],NI)
+
+        Weights[NHLs+1] = rand(Wrange,NO,NNinHLs[NHLs])
+        dWLast[NHLs+1]  = zeros(NO,NNinHLs[NHLs])
+
+        HLS    = Array(HiddenLayer,NHLs)
+        HLS[1] = HiddenLayer(Weights[1]*TS.IS)
+
+        i=1
+        while i<NHLs
+            W  = rand(Wrange,NNinHLs[i+1],NNinHLs[i])
+            Weights[i+1] = W
+            dWLast[i+1]  = zeros(NNinHLs[i+1],NNinHLs[i])
+            HLS[i+1]     = HiddenLayer(W*HLS[i].O)
+            i += 1
+        end
+        OS = Weights[NHLs+1]*HLS[NHLs].O
+        sigmoid!(OS,OS)
+    end
+    SupervisedNet(TS,OS,HLS,Weights,dWLast)
+end
+
+function supervisednet(TS::TrainingSet,NNinHLs::Vector{Int},Weights::Vector{Matrix{Float64}})
+    @inbounds @fastmath begin
+        NHLs  = length(NNinHLs)
+        NI,NT = size(TS.IS)
+        NO    = size(TS.OS,1)
+        dWLast= Array(Matrix{Float64},NHLs+1)
+        dWLast[1]      = zeros(NNinHLs[1],NI)
+        dWLast[NHLs+1] = zeros(NO,NNinHLs[NHLs])
+        HLS=Array(HiddenLayer,NHLs)
+        HLS[1]=HiddenLayer(Weights[1]*TS.IS)
+        i=1
+        while i<NHLs
+            W  = Weights[i+1]
+            HLS[i+1]    = HiddenLayer(W*HLS[i].O)
+            dWLast[i+1] = zeros(NNinHLs[i+1],NNinHLs[i])
+            i += 1
+        end
+        OS = Weights[NHLs+1]*HLS[NHLs].O
+        sigmoid!(OS,OS)
+    end
+    SupervisedNet(TS,OS,HLS,Weights,dWLast)
+end
+
+function subsupervisedNet!(SN::SupervisedNet,IIndex::Integer)
+    @inbounds @fastmath begin
+        OS  = SN.OS[:,IIndex:IIndex]      #Output
+        DOS = SN.TS.OS[:,IIndex:IIndex]  #Desired Output
+        IS  = SN.TS.IS[:,IIndex:IIndex]  #Input
+        NO  = size(DOS,1)
+        NHLs  = length(NNinHLs)
+        NI,NT = size(IS)
+        dWLast= Array(Matrix{Float64},NHLs+1)
+        dWLast[1]      = zeros(NNinHLs[1],NI)
+        dWLast[NHLs+1] = zeros(NO,NNinHLs[NHLs])
+        HLS   = Array(HiddenLayer,NHLs)
+        HLS[1]= HiddenLayer(Weights[1]*IS)
+        i=1
+        while i<NHLs
+            W  = SN.Weights[i+1]
+            HLS[i+1]    = HiddenLayer(W*HLS[i].O)
+            dWLast[i+1] = zeros(NNinHLs[i+1],NNinHLs[i])
+            i += 1
+        end
+        OS = SN.Weights[NHLs+1]*HLS[NHLs].O
+        sigmoid!(OS,OS)
+    end
+    SupervisedNet(TrainingSet(IS,DOS),OS,HLS,SN.Weights,dWLast)
+end
+
+function subsupervisednet{T<:Integer}(SN::SupervisedNet,IIndicies::UnitRange{T})
+    @inbounds @fastmath begin
+        OS  = SN.OS[:,IIndicies]     #Output
+        DOS = SN.TS.OS[:,IIndicies]  #Desired Output
+        IS  = SN.TS.IS[:,IIndicies]  #Input
+        NO  = size(DOS,1)
+        NHLs  = length(NNinHLs)
+        NI,NT = size(IS)
+        dWLast= Array(Matrix{Float64},NHLs+1)
+        dWLast[1]      = zeros(NNinHLs[1],NI)
+        dWLast[NHLs+1] = zeros(NO,NNinHLs[NHLs])
+        HLS   = Array(HiddenLayer,NHLs)
+        HLS[1]= HiddenLayer(Weights[1]*IS)
+        i=1
+        while i<NHLs
+            W  = SN.Weights[i+1]
+            HLS[i+1]    = HiddenLayer(W*HLS[i].O)
+            dWLast[i+1] = zeros(NNinHLs[i+1],NNinHLs[i])
+            i += 1
+        end
+        OS = SN.Weights[NHLs+1]*HLS[NHLs].O
+        sigmoid!(OS,OS)
+    end
+    SupervisedNet(TrainingSet(IS,DOS),OS,HLS,SN.Weights,dWLast)
+end
+
+@inline function deltalast!(dlast,x,y)
+    @inbounds @fastmath begin
+        dsigmoid!(dlast,y)
+        @simd for i in eachindex(x)
+            dlast[i] = (x[i]-y[i])*dlast[i]
+        end
+    end
+    dlast
+end
+
+function Feedforward!(SN::SupervisedNet)
+    @inbounds @fastmath begin
+        IS = SN.TS.IS
+        OS = SN.OS
+        Weights = SN.Weights
+        HLayers = SN.HLS             #Hidden Layers
+        NHLs    = length(HLayers)    #Number of Hidden Layers
+        A_mul_B!(HLayers[1].I,Weights[1],IS)
+        sigmoid!(HLayers[1].O,HLayers[1].I)
+        dsigmoid!(HLayers[1].dIdO,HLayers[1].O)
+        for i=2:NHLs
+            A_mul_B!(HLayers[i].I,Weights[i],HLayers[i-1].O)
+            sigmoid!(HLayers[i].O,HLayers[i].I)
+            dsigmoid!(HLayers[i].dIdO,HLayers[i].O)
+        end
+        A_mul_B!(OS,Weights[NHLs+1],HLayers[NHLs].O)
+        sigmoid!(OS,OS)
+    end
+    SN
+end
+
+function BatchBackpropagate!(SN::SupervisedNet, α=0.5, epoch=100)
+    @inbounds @fastmath begin
+        OS = SN.OS                #Output
+        DOS= SN.TS.OS            #Desired Output
+        IS = SN.TS.IS            #Input
+        W  = SN.Weights            #Weights
+        dW = SN.dWLast            #Weights' Last Change
+        HLayers=SN.HLS          #Hidden Layers
+        NLs  = length(HLayers)
+        NLs += 1
+        m    = size(OS,2)
+        δ    = Array(Matrix{Float64},NLs)
+        for i in eachindex(δ)
+            δ[i] = Array(Float64,size(W[i],1),m)
+        end
+        while epoch>0
+            Feedforward!(SN)
+            scale!(deltalast!(δ[NLs],DOS,OS),α)
+            i=NLs
+            while i>1
+                Wₜ  =  W[i]
+                dWₜ = dW[i]
+                δₜ  =  δ[i]
+                i -=  1
+                inp = HLayers[i].O
+                δₚ  = δ[i]
+                At_mul_B!(δₚ,Wₜ,δₜ)
+                A_mul_Bt!(dWₜ,δₜ,inp)
+                @simd for j in eachindex(dWₜ)
+                    Wₜ[j] += dWₜ[j]
+                end
+                dIdO= HLayers[i].dIdO
+                @simd for k in eachindex(δₚ)
+                    δₚ[k] = δₚ[k]*dIdO[k]
+                end
+            end
+            W1  =  W[1]
+            δ1  =  δ[1]
+            dW1 = dW[1]
+            A_mul_Bt!(dW1,δ1,IS)
+            @simd for j in eachindex(dW1)
+                W1[j] += dW1[j]
+            end
+            epoch -= 1
+        end
+    end
+    SN
+end
+BatchBackpropagate!(SN::SupervisedNet, epoch::Int) = BatchBackpropagate!(SN,0.5,epoch)
+
+export TrainingSet, supervisednet, BatchBackpropagate!, Feedforward!, SupervisedNet
+
+end

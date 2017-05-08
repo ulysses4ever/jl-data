@@ -1,0 +1,58 @@
+### The main issue with model specification for FrielMC is that the likelihood and prior should be stored separetly
+### This issue brings to surface a deficiancy in the existing MCLikelihood model
+### The solution is to redefine MCLikelihood apparently
+### For now the issue is temporarily patched in the context of LoraMPI
+
+function MCLikelihood(
+  lik::Function,
+  prior::Function;
+  gradlik::FunctionOrNothing = nothing,
+  tensorlik::FunctionOrNothing = nothing,
+  dtensorlik::FunctionOrNothing = nothing,
+  gradprior::FunctionOrNothing = nothing,
+  tensorprior::FunctionOrNothing = nothing,
+  dtensorprior::FunctionOrNothing = nothing,
+  init::F64OrVectorF64 = [1.0],
+  scale::F64OrVectorF64 = 1.0,
+  pmap::Union(Nothing, Dict) = nothing)
+  gradtarget =
+    if gradlik == nothing
+      @assert gradprior == nothing "Grad of likelihood and of prior are both either functions or nothing."
+    nothing
+  else
+    x->gradlik(x)+gradprior(x)
+  end
+
+  tensortarget =
+    if tensorlik == nothing
+      @assert tensorprior == nothing "Tensor of likelihood and of prior are both either functions or nothing."
+    nothing
+  else
+    x->tensorlik(x)+tensorprior(x)
+  end
+
+  dtensortarget =
+    if dtensorlik == nothing
+      @assert dtensorprior == nothing "dTensor of likelihood and of prior are both either functions or nothing."
+    nothing
+  else
+    x->dtensorlik(x)+dtensorprior(x)
+  end
+
+  Lora.MCLikelihood(
+    x->lik(x)+prior(x),
+    grad = gradtarget,
+    tensor = tensortarget,
+    dtensor = dtensortarget,
+    init = init,
+    scale = scale,
+    pmap = pmap
+  )
+end
+
+### The purpose of MCLikelihoodPatch is to temporarily sort the issue of not having separate lik and prior fields
+immutable MCLikelihoodPatch
+  lik::Function
+  prior::Function
+  init::F64OrVectorF64
+end

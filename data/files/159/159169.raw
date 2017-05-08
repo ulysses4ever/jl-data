@@ -1,0 +1,17 @@
+module Multiclass
+
+using Classifiers
+
+importall Classifiers
+
+export MulticlassWithBinaryClassifier,fit,predict,loss
+export AllVersusAllClassifier, AllVersusAllClassifierConfig,OneVersusAllClassifier, OneVersusAllClassifierConfig
+
+abstract  MulticlassWithBinaryClassifier <: Classifier
+abstract  MulticlassWithBinaryClassifierConfig <: ClassifierConfig
+
+include("OneVersusAllClassifier.jl")
+include("AllVersusAllClassifier.jl")
+
+
+end

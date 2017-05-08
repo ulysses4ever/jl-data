@@ -1,0 +1,13 @@
+A = Float64[2 -1 0; -1 2 -1; 0 -1 2]
+F = FrontalMatrix(A, [1,2,3])
+@test size(A) == (3,3)
+
+
+L = [sqrt(2) 0 0; -sqrt(2)/2 1 0; 0 0 1]
+C = [1 0 0; 0 3/2 -1; 0 -1 2]
+@test_approx_eq A L*C*L'
+
+l, U = factor(F)
+@test_approx_eq l [sqrt(2) -sqrt(2)/2 0]
+@test_approx_eq U.data [3/2 -1; -1 2]
+@test F.rowval[2:end] == U.rowval

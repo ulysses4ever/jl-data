@@ -1,0 +1,28 @@
+module Chinese
+
+#############################
+module Pre
+include("Pre.jl")
+end
+# package code goes here
+importall .Pre
+
+include("Pre.export.jl")
+#############################
+
+
+#############################
+module Base简体
+include("Base.jl")
+end
+# package code goes here
+importall .Base简体
+
+include("Base.export.jl")
+#############################
+
+include("Chinese_parse.jl")
+
+include("Trans_parse.jl")
+
+end # module

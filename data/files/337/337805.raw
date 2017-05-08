@@ -1,0 +1,42 @@
+module Vec
+export Vec3,+,-,*,/
+
+immutable Vec3{T}
+  x::T
+  y::T
+  z::T
+end
+
+function +(a::Vec3, b::Vec3)
+  return Vec3(a.x + b.x,
+              a.y + b.y,
+              a.z + b.z)
+end
+
+function -(a::Vec3, b::Vec3)
+  return Vec3(a.x - b.x,
+              a.y - b.y,
+              a.z - b.z)
+end
+
+function *(a::Vec3, b::Vec3)
+  return Vec3(a.x * b.x,
+              a.y * b.y,
+              a.z * b.z)
+end
+
+function /(a::Vec3, b::Vec3)
+  return Vec3(a.x / b.x,
+              a.y / b.y,
+              a.z / b.z)
+end
+
+function ⋅(a::Vec3, b::Vec3)
+  return a.x*b.x +
+         a.y*b.y +
+         a.z*b.z
+end
+
+function x (a::Vec3, b::Vec3)
+  return
+end

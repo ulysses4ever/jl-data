@@ -1,0 +1,70 @@
+#= Julia implementions of algorithms featured in Feldman, Schmidt, and Soler, "Turning Big data into tiny data"
+=#
+
+
+function j_subspace()
+    #=
+    %% Coreset Computation
+    %% for j-Subspace Approximation %%%
+    
+    % Creating Random Input
+    n=10000;
+    d=2000;
+    A=rand(n,d);
+    j=2;
+    epsilon=0.1;
+    =#
+    #= A nxd matrix, A, is given. An nxm coreset, C, is to be found
+    such that the projection of any j-subspace on A is approximated
+    to within a factor of 1+epsilon by its projection on C.
+    =#
+    
+    n=1000
+    d=200
+    j=2
+    epsilon=0.1
+    A = reshape(randn(n*d),(n,d))
+    #=
+    % 2. The Actual Coreset Construction
+    m=j+ceil(j/epsilon)-1; % i.e., m=21.
+    [U, D, V]=svds(A,m);
+    C = D*V’; % C is an m-by-m matrix
+    c=norm(A,’fro’)^2-norm(D,’fro’)^2;
+    =#
+
+    # calculate the size of the coreset, m
+    m = j + ceil(Int, j/epsilon)-1
+
+    # calculate singular value decomposition of A
+    U,D,V = svd(A)
+    # U is the same size as A, dxn. Its columns or O.N., U'*U=I
+    # D (for diagonal) is an n long array of eigenvalues
+    # arranged in descending order.
+    # V is nxn. Its rows are O.N., V*V'=I
+
+    # C is the first m rows of the diagonal times V. 
+    C = diagm(D[1:m])*V[1:m,:]
+    c = vecnorm(A)^2 - vecnorm(D[1:m])^2
+    
+    #=
+    % 3. Compare sum of squared distances of j
+    % random orthogonal columns Q to A and C
+    % NOTE: orth is merely orthonomalizing the random dx(d-j)
+    % matrix. Q is thus dx(d-j) thus represents a subspace
+    % of dimension d-j, not dimension j.
+    Q=orth(rand(d,d-j));
+    costA= norm(A*Q,’fro’)^2;
+    costC= c+norm(C*Q,’fro’)^2;
+    errJsubspaceApprox = abs(costC/costA - 1)
+    =#
+
+    # nullspace generates an O.N. basis for the null
+    # space of its argument. To follow the Matlab code
+    # literally, we want the nullspace to have dimension
+    # d-j. (This seems inconsistent with their text, however.)
+    Q = nullspace(reshape(randn(d*j),(j,d)))
+    CostA = vecnorm(A*Q)^2
+    CostC = c+vecnorm(C*Q)^2
+    CostA, CostC, abs(CostA-CostC)/CostA
+    
+end

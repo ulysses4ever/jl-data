@@ -1,0 +1,47 @@
+include("../src/utils/CompLingUtils.jl")
+
+module CompLingUtilsTest
+using CompLingUtils
+
+function test_counter()
+    sentence = ["the", "man", "loves", "the", "cat"]
+    ctr = counter(sentence)
+    @assert(ctr.total == 5)
+    @assert(ctr["the"] == 2)
+    @assert(ctr["cat"] == 1)
+    @assert(ctr["dog"] == 0)
+    s2 = ["the", "the", "the", "the", "the"]
+    ctr2 = counter(s2)
+    @assert(ctr2.total == 5)
+    @assert(ctr2["the"] == 5)
+    @assert(ctr2["a"] == 0)
+end
+
+function test_tokens()
+    sentence = "the man loves the cat"
+    tokens = tokenize_ws(sentence)
+    @assert(tokens[1] == "the")
+    @assert(tokens[end] == "cat")
+    @assert(length(tokens) == 5)
+    messy_sentence = "   the man       loves	\nthe\ncat"
+    tokens = tokenize_ws(messy_sentence)
+    @assert(tokens[1] == "the")
+    @assert(tokens[end] == "cat")
+    @assert(length(tokens) == 5)
+    token = "Oscar/NNP"
+    @assert(word(token) == "Oscar")
+    @assert(tag(token) == "NNP")
+    @assert(word_tag(token) == ("Oscar", "NNP"))
+    token2 = "either/or/CONJ"
+    @assert(word(token2) == "either/or")
+    @assert(tag(token2) == "CONJ")
+    @assert(word_tag(token2) == ("either/or", "CONJ"))
+end
+
+# run the tests
+test_counter()
+test_tokens()
+
+println("Utils: all tests pass.")
+
+end # module

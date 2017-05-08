@@ -1,0 +1,112 @@
+module MaybeMacro
+
+export @maybe
+
+# # # #
+#
+# @maybe v = x
+#
+#   executes `v = x` only if `v` is `nothing`, or does not exist, or
+#   it is undefined. It returns `x` if the assignment was performed, or
+#   the current value of `v` otherwise.
+#
+#   It works with simple variables, indexing expressions and field access
+#   expressions.
+#
+#   Example with variables:
+#
+#     @maybe a = 1
+#
+#   If `a` was not present in the scope, this creates it and gives it the
+#   value `1`.
+#
+#     a = nothing
+#     @maybe a = 1
+#
+#   This assigns the value `1` to `a` and returns `1`.
+#
+#     a = 5
+#     @maybe a = 1
+#
+#   This does not assign the value, and returns `5`.
+#
+#
+#   Examples with Arrays and Dicts:
+#
+#     v = Array(Any, 3)
+#     @maybe v[1] = 5
+#     @maybe v[2] = nothing
+#     @maybe v[2] = 6
+#
+#   These perform the assignments; note that the last one still works
+#   because @maybe does not distinguish between an undefined value and
+#   `nothing`.
+#   
+#     v = Array(Any, 3)
+#     @maybe v[4] = 1 # error
+#
+#   This gives an out-of-bounds error. The same happens when indexing other
+#   types, e.g. for Dicts @maybe only works with keys already present:
+#
+#     d = {1=>nothing, 2=>"foo"}
+#     @maybe d[1] = "ok"  # works, assigns
+#     @maybe d[2] = "bar" # works, does not assign
+#     @maybe d[3] = "baz" # error
+#
+#
+#   Examples for composite type field access: say we define a type with a
+#   field which can be left uninitialized:
+#
+#     type Q
+#         x
+#         Q() = new()
+#         Q(x) = new(x)
+#     end
+#
+#   Then we can assign to the `x` field if it's uninitialized:
+#
+#     q0 = Q()
+#     @maybe q0.x = "this will be assigned"
+#
+#     q1 = Q("assigned")
+#     @maybe q1.x = "this will be ignored"
+#
+#   Again, undefined fields or fields which evaluate to `nothing` are the same
+#   for @maybe:
+#
+#     q2 = Q(nothing)
+#     @maybe q2.x = "this will be assigned"
+#
+
+macro maybe(ex)
+    Meta.isexpr(ex, [:(=), :(:=), :(=>)]) || error("@maybe requires an assignment")
+    v = ex.args[1]
+    x = ex.args[2]
+    if isa(v, Symbol)
+        hasval = quote
+            local hv::Bool
+            try
+                hv = $(esc(v)) != nothing
+            catch
+                hv = false
+            end
+        end
+    elseif Meta.isexpr(v, :ref)
+        isd = Expr(:call, :isdefined, v.args...)
+        hasval = :($(esc(isd)) && $(esc(v)) != nothing)
+    elseif Meta.isexpr(v, :(.)) && length(v.args) == 2
+        isd = Expr(:call, :isdefined, v.args[1], v.args[2])
+        hasval = :($(esc(isd)) && $(esc(v)) != nothing)
+    else
+        error("invalid or unsupported left-hand expression in @maybe")
+    end
+    quote
+        if !$hasval
+            ($(esc(v)) = $(esc(x)))
+        else
+            $(esc(v))
+        end
+    end
+end
+
+end

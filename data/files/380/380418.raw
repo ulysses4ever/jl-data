@@ -1,0 +1,43 @@
+include("../src/util/counter.jl")
+
+function test_counter()
+    sentence = ["the", "man", "loves", "the", "cat"]
+    ctr = counter(sentence)
+    @assert(ctr.total == 5)
+    @assert(ctr["the"] == 2)
+    @assert(ctr["cat"] == 1)
+    @assert(ctr["dog"] == 0)
+    s2 = ["the", "the", "the", "the", "the"]
+    ctr2 = counter(s2)
+    @assert(ctr2.total == 5)
+    @assert(ctr2["the"] == 5)
+    @assert(ctr2["a"] == 0)
+    ctr3 = counter({"one" => 1, "two" => 2, "three" => 3})
+    @assert(ctr3["one"] == 1)
+    @assert(ctr3["two"] == 2)
+    @assert(ctr3["three"] == 3)
+
+    ctr = counter()
+    ctr["one"] += 1
+    ctr["two"] += 2
+    ctr["three"] += 3
+
+    @assert( ctr["one"] == 1 )
+    @assert( ctr["two"] == 2 )
+    @assert( ctr["three"] == 3 )
+    @assert( ctr.total == 6 )
+
+    ctr = counter()
+    ctr["lol"] += 1
+    ctr["lol"] += 1
+    @assert( ctr["lol"] == 2 )
+    @assert( ctr.total == 2 )
+
+    @assert( get(ctr, "lol", 0) == 2)
+    @assert( get(ctr, "lol2", 0) == 0)
+    
+end
+
+# run the tests
+test_counter()
+info("Tests pass [counter]")

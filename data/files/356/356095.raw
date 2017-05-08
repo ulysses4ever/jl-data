@@ -1,0 +1,44 @@
+module Sudoku3
+
+export replaceCellErrors, initRowsColsBlks
+
+function sudokuSolver(newPuzzle)
+  puzzle = replaceCellErrors(newPuzzle)
+
+end
+
+function replaceCellErrors(originalPuzzle)
+  correctedPuzzle = deepcopy(originalPuzzle)
+
+  for i = 1:length(correctedPuzzle)
+    if 1 > correctedPuzzle[i] || correctedPuzzle[i]> 9
+      correctedPuzzle[i] = 0
+    end
+  end
+
+  return correctedPuzzle
+end
+
+function initRowsColsBlks(puzzle)
+  rows = Array[]
+  cols = Array[]
+  blks = Array[]
+
+  for i = 1:9
+    thisRow = Bool[]
+    for j = 1:9
+      cellIndex = (i-1) * 9 + j
+      if puzzle[cellIndex] == 0
+        push!(thisRow, false)
+      else
+        push!(thisRow, true)
+      end
+    end
+    reshapedRow = reshape(thisRow, 1, 9)
+    push!(rows, reshapedRow)
+  end
+
+  return rows, cols, blks
+end
+
+end

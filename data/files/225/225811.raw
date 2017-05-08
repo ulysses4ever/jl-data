@@ -1,0 +1,14 @@
+#=
+@author titus 
+=#
+using   Base.Test
+include("../floatequal.jl")
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test mbr"] = function test_mbr()
+  a = 0.1 
+  b = 0.2
+  c = 0.3
+  @test (floatequal(a + b, c)) #true
+end

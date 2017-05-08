@@ -1,0 +1,17 @@
+## =============================================================================
+## 00_simple.jl - boxplot sample julia script with Gadfly
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+plot(x=rand(100), y=rand(100))
+# display(p)
+
+iris = dataset("datasets", "iris")
+data = dataset("car", "SLID")
+
+println(head(iris))
+println(tail(data))
+
+

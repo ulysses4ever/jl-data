@@ -1,0 +1,45 @@
+using JLD, HDF5
+
+jldopen(case_file, "w") do f
+  write(f, "calculation_mode", calculation_mode)
+  write(f, "number_of_ground_motion_fields", number_of_ground_motion_fields)
+
+  hm = g_create(f, "hazard")
+  for branch in branches
+    b = g_create(hm, branch)
+    b["gm_means"] = gm_means[branch]
+    b["gm_stds"] = gm_stds[branch]
+  end
+
+  em = g_create(f, "exposure")
+  for asset in 1:num_assets
+    a = g_create(em, a_ref[asset])
+    a["a_loc"] = a_loc[asset]
+    a["a_tax"] = a_tax[asset]
+    a["a_num"] = a_num[asset]
+    a["a_occ"] = a_occ[asset]
+    a["a_val"] = a_val[asset]
+    a["a_ded"] = a_ded[asset]
+    a["a_lim"] = a_lim[asset]
+  end
+
+  fm = g_create(f, "fragility")
+  for ff_id in ff_ids
+    r = g_create(fm, ff_id)
+    r["ff_states"] = ff_states
+    r["ff_type"] = ff_type[ff_id]
+    if ff_type[ff_id] == "discrete"
+      r["ff_imls"] = ff_imls[ff_id]
+      r["ff_poes"] = ff_poes[ff_id]
+    else
+      r["ff_mean_imls"] = ff_mean_imls[ff_id]
+      r["ff_std_imls"] = ff_std_imls[ff_id]
+    end
+  end
+
+  tm = g_create(f, "tax_ff_map")
+  for tax in taxonomies
+    tm[tax] = tax_ff_map[tax]
+  end
+
+end

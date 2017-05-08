@@ -1,0 +1,20 @@
+###
+### CompLing utils
+###
+
+### collections of some utilities for computational linguistics
+### and natural language processing.
+
+
+module CompLingUtils
+
+import Base: haskey, start, next, done
+
+export Counter, counter
+
+export tokenize_ws, word, word_tag, tag
+
+include("counter.jl")
+include("tokenize.jl")
+
+end # module

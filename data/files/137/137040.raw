@@ -1,0 +1,183 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+include("recognitionPDA.jl")
+
+type NWMatrixRow
+    row::Array{Float64}
+end
+
+type NWMatrix
+    _rows::Array{NWMatrixRow}
+    _pos_i::Int64
+    _pos_j::Int64
+
+    _numRows::Int64
+    _numCols::Int64
+end
+
+type SubstMatrix
+  _score_map::Dict{Any,Any}
+end
+
+function createMatrix(numRows, numColumns)
+    matrix = NWMatrix([NWMatrixRow(zeros(numColumns))], 1, 1, numRows, numColumns)
+
+    # we need to add numRows - 1 more rows
+    for n=1:numRows-1
+        push(matrix._rows, NWMatrixRow(zeros(numColumns)))
+    end
+
+    return matrix
+end
+
+# look at notes for important information on this  (blue book)
+function createDefaultSubstitutionMatrix()
+  defaultScoring = { ('A', 'A')=>1.0, ('A','C')=>-5.0, ('A','G')=>-5.0, ('A','T')=>-5.0,
+                      ('C', 'C')=>1.0, ('C','A')=>-5.0, ('C','G')=>-5.0, ('C','T')=>-5.0,
+                      ('G', 'G')=>1.0, ('G','A')=>-5.0, ('G','C')=>-5.0, ('G','T')=>-5.0,
+                      ('T', 'T')=>1.0, ('T','A')=>-5.0, ('T','G')=>-5.0, ('T','C')=>-5.0 } 
+
+  return SubstMatrix(defaultScoring)
+end
+
+## todo: long off, be able to read this in from file
+## Note: The below subst. matrix seems more biologically sound than the Default
+##  specifically: e.g. G,C have tendency to form stronger bonds less likely to be
+##                         to be broken. (I think it's like an extra hyrdrogen bond
+##                         or something).  This is why in extreeme high temperatures,
+##                         "where the bonds that hold together the very thing that
+##                         that defines us (for which this mortal coil is but an encasing...)
+##                         start to break down", we see bacteria with much higher G+C content
+##                         (Also the particular arrangement of bases may affect the coiled
+##                         structure of the dna strands, which may in turn affect the
+##                         physical properties of the region etc
+##                         => see G-Quadruplex for an explanation that actually makes sense)
+function createCustomSubstitutionMatrix1()
+  customScoring1 = { ('A', 'A')=>10.0, ('A','C')=>-3.0, ('A','G')=>-1.0, ('A','T')=>-4.0,
+                     ('C', 'C')=>9.0, ('C','A')=>-3.0, ('C','G')=>-5.0, ('C','T')=>0.0,
+                     ('G', 'G')=>7.0, ('G','A')=>-1.0, ('G','C')=>-5.0, ('G','T')=>-3.0,
+                     ('T', 'T')=>8.0, ('T','A')=>-4.0, ('T','G')=>-3.0, ('T','C')=>0.0 }
+
+  return SubstMatrix(customScoring1)
+end
+
+function getScore(substitutionMatrix::SubstMatrix, nucl_a, nucl_b)
+  get(substitutionMatrix._score_map, (nucl_a, nucl_b), 'X')
+end
+
+## Works!
+function testDefaultScoring()
+  aSubstMatrix = createDefaultSubstitutionMatrix()
+  bases = ['A','C','G','T']
+
+  for i=1:4
+    for j=1:4
+      score = getScore(aSubstMatrix, bases[i], bases[j])
+      if i == j && score != 1.0
+        print("i= ")
+        println(i)
+        print("j= ")
+        println(j)
+
+        error("Woops, did something wrong...identity in subst matrix should be 1.0. fix this")
+      elseif i != j && score != -5.0
+        print("i= ")
+        println(i)
+        print("j= ")
+        println(j)
+
+        error("Woops, did something wrong...mismatch in subst matrix should be -5.0. fix this")
+      end
+    end
+  end
+
+  println("\nDefault Scoring Test Successful")
+end
+
+function getCurrentPosI(matrix::NWMatrix)
+    return matrix._pos_i
+end
+
+function getCurrentPosJ(matrix::NWMatrix)
+    return matrix._pos_j
+end
+
+function getNumOfRows(matrix::NWMatrix)
+    return matrix._numRows
+end
+
+function getNumOfCols(matrix::NWMatrix)
+    return matrix._numCols
+end
+
+function setMatrixValue(matrix::NWMatrix, i::Int64, j::Int64, val::Float64)
+    if i <1 || j < 1 || i > matrix._numRows || j > matrix._numCols
+        error("Invalid values to index matrix cell. Must be >= 1\n")
+    end
+
+    matrix._rows[i].row[j] = val
+end
+
+function getMatrixValue(matrix::NWMatrix, i::Int64, j::Int64)
+    if i <1 || j < 1 || i > matrix._numRows || j > matrix._numCols
+        error("Invalid values to index matrix cell. Must be >= 1\n")
+    end
+
+    return matrix._rows[i].row[j]
+end
+
+function drawMatrix(matrix::NWMatrix)
+    for i=1:getNumOfRows(matrix)
+        for j=1:getNumOfCols(matrix)
+            val::Float64 = getMatrixValue(matrix, i, j)
+            
+            if val == 0
+                print("Z")
+            elseif val < 0
+                print("N")
+            elseif val < 10
+                print("D")
+            else
+                print("G")
+            end
+        end
+        print("\n")
+    end 
+end
+
+function drawMatrixWithNumbers(matrix::NWMatrix)
+    for i=1:getNumOfRows(matrix)
+        for j=1:getNumOfCols(matrix)
+            val::Float64 = getMatrixValue(matrix, i, j)
+
+            print(round(val))
+            print("\t")
+
+        end
+        print("\n")
+    end
+end
+
+#mat = createMatrix(7,8)
+#println(mat)

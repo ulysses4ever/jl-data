@@ -1,0 +1,66 @@
+module MonetDB
+
+using PyCall
+@pyimport monetdb.mapi as mapi
+
+# mapi
+function __init__()
+    mapi.Server()
+end
+
+function connect(;database::AbstractString = "",
+                  username::AbstractString = "",
+                  password::AbstractString = "monetdb",
+                  language::AbstractString = "sql",
+                  hostname::AbstractString = "localhost",
+                  port::Int = 50000,
+                  unix_socket::Any = nothing,
+                  connection::Any = "")
+    connection["connect"](hostname=hostname, port=port, username=username, password=password, database=database, language=language, unix_socket = unix_socket)
+end
+
+function _login(; iteration::Int = 0, connection::Any = "")
+    connection["_login"](iteration)
+end
+
+function disconnect(; connection::Any = "")
+    connection["disconnect"]()
+end
+
+function cmd(;operation::AbstractString = "", connection::Any = "")
+    connection["cmd"](operation)
+end
+
+function _challenge_response(; challenge::AbstractString, connection::Any = "")
+    connection["_challenge_response"](challenge)
+end
+
+function _getblock(;connection::Any = "")
+    connection["_getblock"]()
+end
+
+function _getblock_inet(;connection::Any = "")
+    connection["_getblock_inet"]()
+end
+
+function _getblock_socket(;connection::Any = "")
+    connection["getblock_socket"]()
+end
+
+function _getbytes(; bytes::Int=0, connection::Any = "")
+    connection["_getbytes"](bytes)
+end
+
+function _putblock(; block::AbstractString="", connection::Any = "")
+    connection["_putblock"](block)
+end
+
+function _putblock_inet(; block::AbstractString = "", connection::Any = "")
+    connection["_putblock_inet"](block)
+end
+
+function __del__(; connection::Any = "")
+    connection["__del__"]()
+end
+
+end # module

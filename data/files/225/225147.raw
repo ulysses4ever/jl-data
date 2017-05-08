@@ -1,0 +1,31 @@
+function chainLength(i)
+	count = 0
+	seq = i
+	while seq != 1
+		seq = nextN(seq)
+		count += 1
+	end
+	return count
+end
+
+function nextN(n)
+	if mod(n, 2) == 0
+		return div(n, 2)
+	else
+		return 3 * n + 1
+	end
+end
+
+function Run()
+	longestLength = 0
+	longestStartNumber = 1
+	maxStartNumberTry = 999999
+	for i in 1:maxStartNumberTry
+		count = chainLength(i)
+		if count > longestLength
+			longestLength = count
+			longestStartNumber = i
+		end
+	end
+	return longestStartNumber
+end

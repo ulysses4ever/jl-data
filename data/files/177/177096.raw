@@ -1,0 +1,25 @@
+#extract_spectrograms.jl
+#This script takes audio recordings and dumps the corresponding spectrograms
+#into specpath, defined in the config file.
+#author: Timothy Evans
+#date: 30/07/15
+
+importall signalprocessing, config
+using DSP, WAV, Winston, Images
+
+#=wavfile = "0.wav";
+path = string(wavpath,wavfile);
+rec, fs = wavread(path);
+frec = hpfilter(rec,fs);
+spec = spectrogram(frec[14000:18000],442);
+A = spec.power;
+imagesc(1000*A)
+=#
+
+if path_rel
+  curr_dir = pwd()[1:end-3]; #remove src directory
+  wav_dir = string(curr_dir,wavpath)
+  spec_dir = string(curr_dir,specpath)
+else
+
+end

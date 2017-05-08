@@ -1,0 +1,16 @@
+module SimulationModels
+
+# package code goes here
+using Sundials
+using StrPack
+using Dierckx
+
+import Base.getindex, Base.setindex!, Base.size
+
+export InputVector, InputMatrix, Forcing, simulate, OdeModel
+
+include("Types.jl")
+include("cvode.jl")
+
+
+end # module

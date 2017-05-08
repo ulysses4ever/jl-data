@@ -1,0 +1,112 @@
+module Spike
+
+using GLFW
+using ModernGL
+using GLWindow
+
+
+######
+# Windowing
+######
+
+export WindowInstance, update, clear, close, open, terminate
+
+type WindowInstance
+	width::Int
+	height::Int
+	title::String
+	xposition::Int
+	yposition::Int
+	bgcolor
+	# framerate::Int - coming soon
+	screenObject
+
+	function WindowInstance(width::Int, height::Int, title::String, xposition::Int, yposition::Int, bgcolor)
+		# Create window
+		screenObject = createwindow(title, width, height)
+		
+		# Set window position
+		GLFW.SetWindowPos(screenObject.nativewindow, xposition, yposition)
+
+		# Set clear color
+		glClearColor(bgcolor[1], bgcolor[2], bgcolor[3], bgcolor[4])
+		glClear(GL_COLOR_BUFFER_BIT)
+
+		# Return new WindowInstace
+		new(width::Int, height::Int, title::String, xposition::Int, yposition::Int, bgcolor, screenObject)
+	end
+end
+
+function update(window::WindowInstance)
+	# Swap front and back buffers
+	GLFW.SwapBuffers(window.screenObject.nativewindow)
+
+	yield()
+	
+	# Poll for and process events
+	GLFW.PollEvents()
+end
+
+function clear(window::WindowInstance)
+	# Clear buffer
+	glClear(GL_COLOR_BUFFER_BIT)
+end
+
+function close(window::WindowInstance)
+	# Close window
+	GLFW.SetWindowShouldClose(window.screenObject.nativewindow, 1)
+end
+
+function open(window::WindowInstance)
+	# Check to see if window is closed
+	window.screenObject.inputs[:open].value
+end
+
+function terminate()
+	# Terminate OpenGL
+	GLFW.Terminate()
+end
+
+
+# ######
+# # Inputs
+# ######
+
+export Mouse #, Keyboard # update is already exported in windowing area
+
+type Mouse
+	position
+	window::WindowInstance
+	
+
+	function Mouse(window::WindowInstance)
+		position = window.screenObject.inputs[:mouseposition]
+		new(position, window)
+	end
+end
+
+# type Keyboard
+# 	window::WindowInstance
+# 	key::Int
+
+# 	function Keyboard(window, key=0)
+# 		window = window
+# 		key = GLFW.GetKey(window.screenObject, key)
+
+# 		new(window, key)
+# 	end
+# end
+
+# function update(mouse::Mouse)
+# 	mouse.x = GLFW.GetCursorPos(mouse.window.screenObject)[1]
+# 	mouse.y = GLFW.GetCursorPos(mouse.window.screenObject)[2]
+# 	return (mouse.x,mouse.y)
+# end
+
+# function update(keyboard::Keyboard)
+# 	keyboard.key = GLFW.GetKey(keyboard.window.screenObject, keyboard.key)
+# 	return keyboard.key
+# end
+
+end # module
+

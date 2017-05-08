@@ -1,0 +1,176 @@
+### Population MCMC using Friel's method based on power posteriors
+
+immutable FrielMCRunner <: Lora.ParrallelMCRunner
+  burnin::Int
+  thinning::Int
+  nsteps::Int
+  r::Range{Int}
+  storegradlogtarget::Bool # Indicates whether to save the gradient of the log-target in the cases it is available
+  t::Vector{Float64} # temperature ladder
+  swapproposal::Function
+  rootname::AbstractString
+
+  # Note that swapproposal has been temporarily set by default to identity until a temperature density is implemented
+  # swapproposal is a function f : {n}⊆N -> LxR. Some more info about f:
+  # 1) n is the length of the fixed temperature ladder vector
+  # 2) L and R denote the pairs of left-right swapping procs, both subsets of T(n) := {1, 2, ..., n}
+  # It is noted that L and R within each pair are sorted according to the corresponding tempeature (and procid)
+  # This sorting is however a convention rather than a requirement
+  # 3) f(n) = {l_k, r_k : k ∈ T(n)} ⊆ LxR
+  # 4) f can be either pure or stochastic, but in all cases must generate non-overlapping MPI-compatible pairs
+  function FrielMCRunner(
+    r::Range{Int},
+    storegradlogtarget::Bool=false,
+    t::Vector{Float64}=map(t->t^4, 0:1/10:1),
+    swapproposal::Function=identity,
+    rootname::AbstractString="mcchain")
+    burnin = first(r)-1
+    thinning = r.step
+    nsteps = last(r)
+    @assert burnin >= 0 "Number of burn-in iterations should be non-negative."
+    @assert thinning >= 1 "Thinning should be >= 1."
+    @assert nsteps > burnin "Total number of MCMC iterations should be greater than number of burn-in iterations."
+    @assert length(t) >= 2 "Temperature ladder must contain at least two temperatures."
+    @assert t[1] == 0.0 "Temperature ladder must start at 0."
+    @assert t[end] == 1.0 "Temperature ladder must end at 1."
+    new(burnin, thinning, nsteps, r, storegradlogtarget, t, swapproposal, rootname)
+  end
+end
+
+FrielMCRunner(
+  r::Range1{Int},
+  storegradlogtarget::Bool=false,
+  t::Vector{Float64}=map(t->t^4, 0:1/10:1),
+  swapproposal::Function=identity,
+  rootname::AbstractString="mcchain") =
+  FrielMCRunner(first(r):1:last(r), storegradlogtarget, t, swapproposal, rootname)
+
+FrielMCRunner(;
+  burnin::Int=0,
+  thinning::Int=1,
+  nsteps::Int=100,
+  storegradlogtarget::Bool=false,
+  t::Vector{Float64}=map(t->t^4, 0:1/10:1),
+  swapproposal::Function=identity,
+  rootname::AbstractString="mcchain") =
+  FrielMCRunner((burnin+1):thinning:nsteps, storegradlogtarget, t, swapproposal, rootname)
+
+typealias FrielMC FrielMCRunner
+
+function run(
+  mpistate::MPIState,
+  m::MCLikelihoodPatch,
+  s::Vector{Lora.MCSampler},
+  r::FrielMC,
+  t::Vector{Lora.MCTuner})
+
+  @assert mpistate.nprocs == length(t) "Number of MPI procs must be equal to temperature ladder vector length."
+
+  if mpistate.procid == mpistate.rootproc
+    tic()
+  end
+
+  # Initialize Monte Carlo model, runner and job for each power posterior in the corresponding proc
+  mcmodel = MCLikelihood(x->t[mpistate.procid+1]*m.lik(x), m.prior, init=m.init)
+  mcrunner = SerialMC(burnin=r.burnin, thinning=r.thinning, nsteps=r.nsteps, storegradlogtarget=r.storegradlogtarget)
+  mcjob = MCJob(mcmodel, s[mpistate.procid+1], mcrunner; tuner=t[mpistate.procid+1], job=:plain)
+
+  # Pre-allocation for storing results
+  mcchain = MCChain(mcmodel.size, length(mcrunner.r); storegradlogtarget=mcrunner.storegradlogtarget)
+  ds = Dict{Any, Any}("step" => collect(mcrunner.r))
+
+  # Pre-allocation of buffer for MPI communication
+  buffer = Dict{Symbol, Any}(:samples=>Array(Float64, mcmodel.size), :logtargets=>Array(Float64, 2))
+
+  # Declaration of variables used in the function body
+  ratio::Float64
+  swap::Int
+  status::MPI.Status
+
+  ### Sampling loop
+
+  i::Int = 1
+  for j in 1:r.nsteps
+    ###  Step 1 of FrielMC runner: within-chain move ocurring in each proc independently
+
+    # Simulate chain for each power posterior in the corresponding proc
+    mcstate = mcjob.receive(1)
+
+    ### Step 2 of FrielMC runner: between-chain move requiring send-receive communication between procs
+
+    # Use root proc to generate vectors of left and right swappers of each swapping pair
+    if mpistate.procid == mpistate.rootproc
+      # swaps is a matrix holding proc pairs that are candidates for swapping their states
+      # Each pair is represented by a row of the swaps matrix
+      # swaps has two columns
+      # The first column conventionally s the proc of the two in that pair with the smaller procid
+      # The second column conventionally s the proc of the two in that pair with the larger procid
+      swaps = swapproposal(mpistate.nprocs)
+    else
+      swaps = Nothing
+    end
+
+    # Broadcast dictionary of swaps from root proc to rest of procs
+    swaps = MPI.bcast(swaps, mpistate.rootproc, mpistate.comm)
+
+    # Hash pairs, i.e. create dictionaries used for state swapping
+    nswaps = size(swaps, 1)
+    lswaps = Dict{Int, Int}([swaps[k, 1]=>swaps[k, 2] for k in 1:nswaps])
+    rswaps = Dict{Int, Int}([swaps[k, 2]=>swaps[k, 1] for k in 1:nswaps])
+
+    ## Perform MPI send-receive to exchange states
+    if mpistate.procid in keys(rswaps)
+      MPI.Send(mcstate.successive.sample, rswaps[mpistate.procid], mpistate.procid, mpistate.comm)
+      MPI.Recv!(buffer[:samples], rswaps[mpistate.procid], rswaps[mpistate.procid], mpistate.comm)
+
+      buffer[:logtargets] = [mcstate.successive.logtarget, mcmodel.eval(buffer[:samples])]
+      MPI.Send(buffer[:logtargets], rswaps[mpistate.procid], mpistate.nprocs+mpistate.procid, mpistate.comm)
+
+      swap, status = MPI.Recv(Int, rswaps[mpistate.procid], 2*mpistate.nprocs+rswaps[mpistate.procid], mpistate.comm)
+      if swap == 1
+        resetall!(mcjob.heap, buffer[:samples])
+      end
+    elseif mpistate.procid in keys(lswaps)
+      MPI.Recv!(buffer[:samples], lswaps[mpistate.procid], lswaps[mpistate.procid], mpistate.comm)
+      MPI.Send(mcstate.successive.sample, lswaps[mpistate.procid], mpistate.procid, mpistate.comm)
+
+      MPI.Recv!(buffer[:logtargets], lswaps[mpistate.procid], mpistate.nprocs+lswaps[mpistate.procid], mpistate.comm)
+
+      ratio = buffer[:logtargets][2]+mcmodel.eval(buffer[:samples])-buffer[:logtargets][1]-mcstate.successive.logtarget
+
+      if (ratio > 0) || (ratio > log(rand()))
+        MPI.Send(1, lswaps[mpistate.procid], 2*mpistate.nprocs+mpistate.procid, mpistate.comm)
+        resetall!(mcjob.heap, buffer[:samples])
+      else
+        MPI.Send(0, lswaps[mpistate.procid], 2*mpistate.nprocs+mpistate.procid, mpistate.comm)
+      end
+    end
+
+    ## Save state of current iteration in mcchain
+    if in(j, r.r)
+      # Save Monte Carlo sample and value of log-target
+      mcchain.samples[i, :] = mcjob.heap.instate.current.sample
+      mcchain.logtargets[i] = mcjob.heap.instate.current.logtarget
+
+      # Save value of grad-log-target if needed
+      if r.storegradlogtarget
+        mcchain.gradlogtargets[i, :] = mcjob.heap.instate.current.gradlogtarget
+      end
+
+      # Save diagnostics
+      for (k, v) in mcstate.diagnostics
+        # If diagnostics name not seen before, create column
+        if !haskey(ds, k)
+          ds[k] = Array(typeof(v), length(ds["step"]))
+        end
+
+        ds[k][i] = v
+      end
+
+      i += 1
+    end
+  end
+
+
+  write(mcchain, storegradlogtarget=r.storegradlogtarget, rootname=r.rootname)
+end

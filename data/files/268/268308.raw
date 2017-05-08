@@ -1,0 +1,16 @@
+#code doesn't work yet. My imagemagick lib needs to be fixed...
+#can't read all the training images, as indexed color is not supported (how can that be?)
+
+cd("/Users/scherf/dev/DataScience/eleusinian_mysteries/julia_tutorial/")
+#Pkg.build("DataFrames")
+#Pkg.build("Images")
+
+using Images
+using DataFrames
+include("tutorial_functions.jl")
+
+imageSize = 400
+path = "./data"
+labelsInfoTrain = readtable("$(path)/trainLabels.csv")
+xTrain = read_data("train", labelsInfoTrain, imageSize, path)
+

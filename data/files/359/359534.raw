@@ -1,0 +1,64 @@
+
+# Framework for Market Risk calculation
+
+module MarketRisk
+
+using Base.Dates
+using InterestRates
+using ForwardDiff
+
+export
+	PricingData,
+	HistoricalData,
+		HDIndex, HDSpreadCurve,
+	RiskFactor,
+		RFStock, RFSpotCurrency, RFIRCurve, RFIRCurveVertex,
+	PricingModel,
+		PMFixedIncome, PMDerivative, PMCash, PMStock, PMBullet, PMForwardCurrency, PMFutureCurrency,
+	Scenario,
+	getname, price, PricingResult
+
+export
+	FinancialContract,
+	fc_set_maturity!, fc_get_maturity,
+	fc_set_notional!, fc_get_notional,
+	fc_set_asset_liability!, fc_get_asset_liability, fc_get_asset_liability_multiplier,
+	fc_set_forward_price!, fc_get_forward_price,
+	fc_set_quantity!, fc_get_quantity
+
+import Base: hash, isequal, ==
+
+include("types.jl")
+
+# TODO: generate code for getname function
+getname(rf::RFSpotCurrency) = rf.name
+getname(rf::RFIRCurve) = rf.name
+getname(rf::RFStock) = rf.name
+getname(hd::HDIndex) = hd.name
+getname(hd::HDSpreadCurve) = hd.name
+
+hash(pd::PricingData) = hash(getname(pd))
+isequal(x::PricingData, y::PricingData) = getname(x) == getname(y)
+==(x::PricingData, y::PricingData) = isequal(x,y)
+
+getfunctionalcurrency() = error("Function getfunctionalcurrency should be overloaded.")
+projectCashFlows(c::FinancialContract, s::Scenario) = error("projectCashFlows not defined for $(p) and $(s)")
+
+_currencyvalue(c::RFSpotCurrency, s::Scenario) = getfunctionalcurrency() == c ? 1.0 : s.data[c]
+
+# Let's multiple-dispatch on pricing models
+price(c::FinancialContract, s::Scenario) = _price(c.model, c, s)
+
+# Price a portfolio of FinancialContracts
+function price(fc_vec::Vector{FinancialContract}, s::Scenario)
+	l = length(fc_vec)
+	result = Array(PricingResult, l)
+	for i in 1:l
+		result[i] = price(fc_vec[i], s)
+	end
+	return result
+end
+
+include("pricing.jl")
+
+end # module MarketRisk

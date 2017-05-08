@@ -1,0 +1,55 @@
+function MP2(DvF0,HvF0,S,y0,x0)
+  
+    # 1. Dimensiones de las variables relevantes
+        ny = size(y0,1); 
+        nx = size(x0,1); 
+        n0 = nx + ny;   
+    
+    # 2. Cálculos Preliminares
+        
+        # 2.1. Cálculo de Dxg0, Dxh0:
+            (Dxg0,Dxh0) = MP1(DvF0,y0,x0);
+        
+        # 2.2. Partición de DvF0
+            DxpF0 = DvF0[ : ,           1 : nx                ];   # "p" reemplaza  a "t+1".   
+            DypF0 = DvF0[ : ,      nx + 1 : nx + ny           ];   # "p" reemplaza  a "t+1".
+            DxtF0 = DvF0[ : , n0      + 1 : nx + ny + nx      ];
+            DytF0 = DvF0[ : , n0 + nx + 1 : nx + ny + nx + ny ];
+    
+    # 3. Cálculo Principal:
+    
+        # 3.1. Cálculo de X:
+            B01  = [ Dxh0   ;   Dxg0*Dxh0   ;   eye(nx)   ;   Dxg0 ];
+            A07  = HvF0*kron(B01,B01);
+            A08  = [ DxpF0 + DypF0*Dxg0      DytF0 ];
+            A09  = [ zeros(n0,nx)            DypF0 ];     
+            A10  = kron(Dxh0, Dxh0);
+
+            vecX = - ( kron( eye(nx^2) , A08 ) + kron( A10' , A09 ) ) \ vec(A07);
+            X    = reshape( vecX , n0 , nx*nx );
+            Hxh0 = X[      1 : nx     , : ];
+            Hxg0 = X[ nx + 1 : nx + ny, : ];
+      
+        # 3.2. Cálculo de Y:
+            B02  = [ eye(nx)   ;   Dxg0   ;   zeros(nx,nx)   ;   zeros(ny,nx) ] ;
+            A11  = HvF0*vec(B02*S*B02') + DypF0*Hxg0*vec(S) ;
+            A12  = [ DxpF0 + DypF0*Dxg0    DypF0 + DytF0 ] ;
+
+            Y    = - A12\A11;
+            Hsh0 = Y[      1 : nx      ];
+            Hsg0 = Y[ nx + 1 : nx + ny ];        
+
+    # 4. Resultados:
+        return Dxg0, Dxh0, Hxg0, Hxh0, Hsg0, Hsh0;
+        
+end
+    
+#================================================================================================================================
+
+# Observaciones
+    
+    [1] Vea el capítulo 2 de la tesis para más detalles.
+    [2] A diferencia de MATLAB, actualmente Julia no puede ordenar los valores propios con un solo comando,
+        pero de seguro eso se corregirá en un futuro próximo. Mejoraré estas líneas cuando eso pase.
+    
+================================================================================================================================#

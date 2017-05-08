@@ -1,0 +1,48 @@
+using MAT
+using LightGraphs
+
+""" c_elegans_mat2lg(path_to_matfile::AbstractString,  path_to_lgfile::AbstractString)
+
+Convert C elagans adjacency matrix as given in matfile to LightGraphs format stored in lgfile. NOTE: LightGraphs format is text, hence git-friendly.
+
+Data sources:
+1. [HomogeneousSetsFinder](https://github.com/AzulEye/HomogeneousSetsFinder)
+2. [C elegans mat file](https://github.com/AzulEye/HomogeneousSetsFinder/raw/master/HomogeneousSetsFinder/C_elegans_AdjMat.mat)
+3. Azulay et. al., [The C. elegans Connectome Consists of Homogenous Circuits with Defined Functional Roles](http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005021)
+"""
+function c_elegans_mat2lg(path_to_matfile::AbstractString,
+                   path_to_lgfile::AbstractString)
+    # 280x280 boolean adjacency matrix
+    bam = MAT.matread(path_to_matfile)["J2"]
+    g = LightGraphs.DiGraph(280)
+    for i in 1:280, j in 1:280
+        if bam[i,j] LightGraphs.add_edge!(g,i,j) end
+    end
+    lgfile = open(path_to_lgfile,"w+")
+    save(lgfile, g, "C elegans")
+    close(lgfile)
+    nothing
+end
+
+""" fve32()
+The larger of two versions of anatomical connectivity in the macaque visual cortex. BCT references Felleman and van Essen [Distributed Hierarchical Processing in the Primate Cerebral Cortex](http://cercor.oxfordjournals.org/content/1/1/1.1.short)(1991).
+
+Converts graph and vertex names to files in lg and tab-delimited text respectively.
+"""
+function fve32_2lg(bctdir::AbstractString, datadir::AbstractString)
+    Names = readdlm(joinpath(bctdir,"fve32Names.txt"),
+                    ' ', AbstractString)[:,1]
+
+    Names = map(strip, Names) # remove useless whitespace
+    writedlm(joinpath(datadir,"fve32Names.txt"), Names)
+    CIJ = readdlm(joinpath(bctdir,"fve32CIJ.txt"), ' ', Int)
+    n = size(Names,1)
+    g = LightGraphs.DiGraph(n)
+    for i in 1:n, j in 1:n
+        if CIJ[i,j] > 0 LightGraphs.add_edge!(g,i,j) end
+    end
+    lgfile = open(joinpath(datadir,"fve32.txt"),"w+")
+    LightGraphs.save(lgfile, g, "fve 32")
+    close(lgfile)
+    nothing
+end

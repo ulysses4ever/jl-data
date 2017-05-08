@@ -1,0 +1,65 @@
+import LowRankModels: Loss, evaluate, grad, observations
+
+# a CompositeLoss is a sum of concrete loss functions, Σ lᵢ(u,a)
+type CompositeLoss<:Loss
+    losses::Array{Loss}
+end
+
+function evaluate(l::CompositeLoss, u::Float64, a)
+    obj = 0.0
+    for loss in losses
+        obj += evaluate(loss,u,a)
+    end
+    return obj
+end
+
+function grad(l::CompositeLoss, u::Float64, a)
+    g = 0.0
+    for loss in losses
+        g += grad(loss,u,a)
+    end
+    return g
+end
+
+# an NALoss evaluates observed data and missing data with distinct loss
+# functions. The loss for missing data is evaluated with respect to
+# na_val
+type NALoss<:Loss
+    obs_loss::Loss # loss for observed data
+    na_loss::Loss  # loss for missing data
+    na_val::Number # estimated value for missing data
+end
+NALoss(obs_loss=QuadLoss()::Loss, na_loss=QuadLoss()::Loss, na_val=0.0::Number) = NALoss(obs_loss, na_loss, na_val)
+
+function evaluate(l::NALoss, u::Float64, a)
+    if isna(a)
+        return evaluate(l.na_loss, u, l.na_val)
+    else
+        return evaluate(l.obs_loss, u, a)
+    end
+end
+
+function grad(l::NALoss, u::Float64, a)
+    if isna(a)
+        return grad(l.na_loss, u, l.na_val)
+    else
+        return grad(l.obs_loss, u, a)
+    end
+end
+
+
+# new observations function to operate on DataArrays
+function observations(da::DataArray)
+    obs = (Int, Int)[]
+    m,n = size(da)
+    for j=1:n # follow column-major order. First element of index in innermost loop
+        for i=1:m
+            if !isna(da[i,j])
+                push!(obs,(i,j))
+            end
+        end
+    end
+    return obs
+end
+
+

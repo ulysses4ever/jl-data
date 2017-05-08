@@ -1,0 +1,229 @@
+using Iterators
+using PyCall
+using Images
+@pyimport gzip
+@pyimport cPickle
+
+function preprocess_data(data)
+    N = size(data[1])[1]
+    X = convert(Array{Float64, 2}, data[1])
+    y = zeros(N, 10)
+    for i in 1:N
+        y[i, data[2][i] + 1] = 1.0
+    end
+    return X, y
+end
+
+function get_data()
+    f = gzip.open("../../data/mnist.pkl.gz", "rb")
+    (train_set, valid_set, test_set) = cPickle.load(f)
+    (train_X, train_y) = preprocess_data(train_set)
+    (valid_X, valid_y) = preprocess_data(valid_set)
+    (test_X, test_y) = preprocess_data(test_set)
+
+    return train_X, train_y, valid_X, valid_y, test_X, test_y
+end
+
+# TODO type
+function sigmoid(z::Array{Float64, 2})
+    return 1.0 ./ (1.0 + exp(-z))
+end
+
+function sigmoid(z::Array{Float64, 3})
+    return 1.0 ./ (1.0 + exp(-z))
+end
+
+function test(X::Array{Float64, 2}, y::Array{Float64, 2}, theta1::Array{Float64, 3}, bias1::Array{Float64, 1}, theta2::Array{Float64, 2}, num_feature_maps::Int64)
+    N = size(X)[1]
+    correct = 0
+    for n_i in 1:N
+        a0 = reshape(X[n_i,:], 28, 28)
+        z1 = zeros(num_feature_maps, 24, 24)
+        for n in 1:num_feature_maps
+            z1[n, :, :] = Images.imfilter(a0, squeeze(theta1[n,:,:], 1), "inner") + bias1[n]
+        end
+        a1 = sigmoid(z1)
+        a2 = zeros(num_feature_maps, 12, 12)
+
+        # TODO more efficient
+        for n in 1:num_feature_maps
+        for i=0:11, j=0:11
+            (max_value, max_index) = findmax(a1[n, 2i+1:2i+2, 2j+1:2j+2])
+            a2[n, i+1, j+1] = max_value
+        end
+        end
+
+        # a2 is the pooling layer, 12x12
+        a3 = [reshape(a2, 1, num_feature_maps * 144) 1.0] # reshaped to 1x144
+        z4  = a3 * theta2
+        a4 = sigmoid(z4) # the final activation layer, 1x10
+        correct += findmax(a4)[2] == findmax(y[n_i, :])[2]
+    end
+
+    return 1 - correct / N
+end
+
+function train(train_X::Array{Float64, 2}, train_y::Array{Float64, 2}, valid_X::Array{Float64, 2}, valid_y::Array{Float64, 2}, learning_rate::Float64, num_feature_maps::Int64, regularization_term::Float64, minibatch_size::Int64, epochs::Int64)
+
+    theta1 = 1/sqrt(25) * randn(num_feature_maps, 5, 5)
+    bias1   = randn(num_feature_maps)
+    theta2 = 1/sqrt(num_feature_maps * 144) * randn(num_feature_maps * 144, 10)
+    biases = randn(1, 10)
+    theta2 = [theta2; biases]
+
+    validation_error = 1.0
+
+    stopped_early = false
+
+    N = size(train_X)[1]
+    Delta2 = zeros(theta2)
+    Delta1 = zeros(theta1)
+    Delta1b = zeros(bias1)
+
+    n_i = 1
+    epoch = 0
+    while epoch < epochs
+        #println(n_i)
+
+        a0 = reshape(train_X[n_i,:], 28, 28)
+        z1 = zeros(num_feature_maps, 24, 24)
+        for n in 1:num_feature_maps
+            z1[n, :, :] = Images.imfilter(a0, squeeze(theta1[n,:,:], 1), "inner") + bias1[n]
+        end
+        a1 = sigmoid(z1) # fx24x24
+
+        a2 = zeros(num_feature_maps, 12, 12)
+        conv_undo = Array(Tuple{Int64, Int64}, num_feature_maps, 12, 12)
+
+        # TODO more efficient
+        for n in 1:num_feature_maps
+        for i=0:11, j=0:11
+            (max_value, max_index) = findmax(a1[n, 2i+1:2i+2, 2j+1:2j+2])
+            a2[n, i+1, j+1] = max_value
+            r = mod(max_index - 1, 2) + 1
+            c = div(max_index - 1, 2) + 1
+            conv_undo[n, i+1, j+1] = (r, c)
+        end
+        end
+
+        # a2 is the pooling layer, 12x12
+        a3 = [reshape(a2, 1, num_feature_maps * 144) 1.0] # reshaped to 1x144
+        z4  = a3 * theta2
+        a4 = sigmoid(z4) # the final activation layer, 1x10
+
+        delta2 = a4 - train_y[n_i, :]
+        Delta2 += a3' * delta2 # How to change theta2
+        delta_star = reshape((delta2 * theta2' .* a3 .* (1-a3))[1, 1:end-1], num_feature_maps, 12, 12)
+        delta1 = zeros(num_feature_maps, 24, 24)
+
+        # TODO more efficient
+        for n in 1:num_feature_maps
+        for i in 0:11, j in 0:11
+            (r, c) = conv_undo[n, i+1, j+1]
+            delta1[n, 2i+r, 2j+c] = delta_star[n, i+1, j+1]
+        end
+        end
+        # Now I have a delta for each node in the convolutional layer, 24x24
+        # From that, accumulate Delta1 and Delta1b
+
+        Delta1b += squeeze(sum(delta1, [2,3]), (2,3))
+        for n in 1:num_feature_maps
+        for i in 1:24, j in 1:24
+            Delta1[n, :, :] += reshape(a0[i:i+4,j:j+4] * delta1[n, i, j], 1, 5, 5)
+        end
+        end
+
+        n_i += 1
+
+        if mod(n_i, minibatch_size) == 0 # minibatch
+            #println(n_i)
+            D1 = (1/minibatch_size) * Delta1
+            Delta2 = (1/minibatch_size) * Delta2
+
+            # Regularization
+            #Delta[1:end-1, :] += regularization_term * minibatch_size/N * theta[l][1:end-1, :] # No reg. on thresholds. TODO slow
+            theta1 -= learning_rate * D1
+            bias1   -= learning_rate * Delta1b
+            theta2 -= learning_rate * Delta2
+
+            Delta2 = zeros(theta2)
+            Delta1 = zeros(theta1)
+            Delta1b = 0.0
+        end
+
+        if n_i > N
+            n_i = mod(n_i, N) + 1
+            epoch += 1
+
+            if mod(epoch, 1) == 0
+                new_validation_error = test(valid_X, valid_y, theta1, bias1, theta2, num_feature_maps)
+                println("Epoch: ", epoch, ". Validation error: ", new_validation_error)
+                if new_validation_error > validation_error # early stopping
+                    println("Validation error increased. Early stopping.")
+                    stopped_early = true
+                    break
+                end
+                #prev_theta = copy_theta(theta)
+                validation_error = new_validation_error
+            end
+        end
+
+    end
+
+    if !stopped_early
+        #prev_theta = copy_theta(theta)
+    end
+
+    return (theta1, bias1, theta2, validation_error)
+end
+
+function run()
+
+    (train_X, train_y, valid_X, valid_y, test_X, test_y) = get_data()
+
+    train_X = train_X[1:4000, :]
+    train_y = train_y[1:4000, :]
+
+    # Parameters to tune
+    learning_rate_list = [0.1, 1.0]
+    num_feature_maps_list = [5]
+    regularization_term_list = [0.0]
+
+    # Other parameters
+    minibatch_size = 50
+    epochs = 50
+
+    best_validation_error = 1.0
+    #best_theta = []
+    best_learning_rate = 1.0
+    best_num_feature_maps = 10
+    best_regularization_term = 1.0
+
+    parameters = product(learning_rate_list, num_feature_maps_list, regularization_term_list)
+    for (param_i, (learning_rate, num_feature_maps, regularization_term)) in enumerate(parameters)
+        percent_complete = div((100 * (param_i-1)), length(parameters))
+        print("\n", percent_complete, "%\tLearning rate: ", learning_rate, ", feature maps: ", num_feature_maps)
+        println(", regularization: ", regularization_term)
+
+        (theta1, bias1, theta2, validation_error) = train(train_X, train_y, valid_X, valid_y, learning_rate, num_feature_maps, regularization_term, minibatch_size, epochs)
+        if validation_error < best_validation_error
+            best_validation_error = validation_error
+            #best_theta = [copy(th) for th in theta]::Array{Array{Float64, 2}}
+            best_learning_rate = learning_rate
+            best_num_feature_maps = num_feature_maps
+            best_regularization_term = regularization_term
+        end
+    end
+
+    #=
+    println("\n\nCOMPLETE\n\nBest validation error: ", best_validation_error)
+    test_error = test(test_X, test_y, best_theta)
+    println("Test error: ", test_error)
+    println("\nBest parameters:")
+    print("learning_rate: ", best_learning_rate, ", feature maps: ", best_num_feature_maps)
+    println(", regularization: ", best_regularization_term)
+    =#
+end
+
+run()
+

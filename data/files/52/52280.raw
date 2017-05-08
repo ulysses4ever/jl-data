@@ -1,0 +1,59 @@
+using SimpleGraphs
+using SimpleGraphDrawings
+
+
+"""
+`geogebra(X,file_name="geogebra.txt")` creates a script to
+produce a drawing of this graph in GeoGebra.
+
+Here is the secret sauce to make this work.
+
+* Run `geogebra(X,file_name)` to save the script to `file_name`.
+* Copy the contents of `file_name` to the clipboard.
+* Create a new GeoGebra document.
+* In the **Input** zone at the bottom, enter `Button[]` to create a new
+  button.
+* Right click the button and select **Object Properties**.
+* Go to the **Scripting** tab and paste in the copied commands.
+* Save and close the properties window.
+* **Close the Algebra window**.
+* Press the newly created button.
+* Right click on the button and select **Delete** (you don't need this
+  button any more).
+* **Save your work!**
+
+If you neglected to close the **Algebra** window the graph will be
+drawn, but with lot of labels.
+
+* In the **Algebra** panel on the left, select all the points, right
+  click, and uncheck **ShowLabel**.
+* Next select all the segments, right click, and uncheck
+  **ShowLabel**.
+
+The vertices can be dragged around the drawing and the incident edges
+will follow.
+"""
+function geogebra(X::SimpleGraphDrawing, file_name::ASCIIString="geogebra.txt")
+    VV = vlist(X.G)
+    n = NV(X.G)
+    F = open(file_name,"w")
+
+    for i=1:n
+        v = VV[i]
+        (x,y) = X.xy[v]
+        println(F,"v_{$i} = CopyFreeObject[Point[{$x,$y}]]")
+    end
+
+    for i=1:n-1
+        u = VV[i]
+        for j=i+1:n
+            v = VV[j]
+            if has(X.G,u,v)
+                println(F,"e_{$i,$j} = Segment[v_{$i},v_{$j}]")
+            end
+        end
+    end
+    println(F, "ShowAxes[false]")
+    println(F, "ShowGrid[false]")
+    close(F)
+end

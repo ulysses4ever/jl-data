@@ -1,0 +1,39 @@
+## =============================================================================
+## treepredict.jl - a re-written version of a decsition tree python
+##                  by Toby Segaran's Collective inttelligence
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+## import Base.import
+
+my_data = readdlm("./data/decision_tree_example.txt", '\t')
+
+## class definition
+type DecisionNode
+    col::Int
+    value::ASCIIString
+    tb::DecisionNode
+    fb::DecisionNode
+    results::ASCIIString
+    
+    function DecisionNode(col, value, tb, fb, results)
+        new(col, value, tb, fb, results)
+    end
+end
+
+## Divides a set on a specific column.
+## Can handle numeric or nomnal values.
+function divide_set(rows, column, value)
+
+    idx_y = Array{Int}[]
+    idx_n = Array{Int}[]
+
+    if isa(value, Int) || isa(value, Float32)
+        idx_y = find(x -> x >= value, rows[:, column])
+        idx_n = find(x -> x <  value, rows[:, column])
+    else
+        idx_y = find(x -> x == value, rows[:, column])
+        idx_n = find(x -> x != value, rows[:, column])
+    end
+    
+    return (rows[idx_y, :], rows[idx_n, :])
+end

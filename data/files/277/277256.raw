@@ -1,0 +1,13 @@
+module MonetDB
+
+using PyCall, Nettle
+@pyimport struct
+
+export monetdbconn #global connection object, kinda hacky?
+
+
+include("types.jl") # define types before functions call them
+include("mapi.jl") # mapi low-level interface
+include("cursor.jl") # higher-level interface
+
+end # module

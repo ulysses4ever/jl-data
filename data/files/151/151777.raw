@@ -1,0 +1,12 @@
+import MPI
+include("mpi_chain_swap_impl.jl")
+
+function main()
+    MPI.Init()
+
+    swap_chains()
+
+    MPI.Finalize()
+end
+
+main()

@@ -1,0 +1,11 @@
+const STATE_STOP = 0
+const STATE_PLAY = 1
+
+global state = STATE_PLAY      # 1 fighting; 0 exit
+global server
+global sock
+
+# getBonus. Example: getB(11) -> 0      getB(12) -> +1
+function getB(n)
+    return round((n-10)/2)
+end

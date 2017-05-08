@@ -1,0 +1,494 @@
+module SortedDataColumns
+#-----------------------------------------------------------
+#PURPOSE
+#	Colin T. Bowers module for sorted data columns
+#NOTES
+#LICENSE
+#	MIT License (see github repository for more detail: https://github.com/colintbowers/SortedDataColumns.jl.git)
+#-----------------------------------------------------------
+
+#Load any entire modules that are needed (use using ModuleName1, ModuleName2, etc)
+using SortedVectors
+
+#Load any specific functions that are needed (use import ModuleName1.FunctionName1, ModuleName2.FunctionName2, etc)
+import 	Base.string,
+		Base.show,
+		Base.getindex,
+		Base.ndims,
+		Base.length,
+		Base.size,
+		Base.sizeof,
+		Base.eltype,
+		Base.first,
+		Base.last,
+		Base.endof,
+		Base.copy,
+		Base.deepcopy,
+		Base.issorted,
+		Base.search,
+		Base.searchsorted,
+		Base.searchsortedfirst,
+		Base.searchsortedlast,
+		SortedVectors.searchfirst,
+		SortedVectors.searchlast,
+		Base.in,
+		Base.==,
+		Base.!=,
+		Base.push!,
+		Base.unshift!,
+		Base.pop!,
+		Base.shift!,
+		Base.deleteat!,
+		SortedVectors.deletenotat!,
+		Base.empty!,
+		Base.insert!,
+		Base.intersect!,
+		Base.intersect,
+		Base.union!,
+		Base.union,
+		SortedVectors.trim!,
+		SortedVectors.trim,
+		SortedVectors.meshIndex,
+		SortedVectors.mesh
+
+
+
+#Specify the variables/functions to export (use export FunctionName1, FunctionName2, etc)
+export 	SortedDataVector,
+		SortedUniqueDataVector,
+		SortedVectorStructure,
+		SortedDataColumn,
+		SortedUniqueDataColumn,
+		SortedColumnStructure,
+		SortedStructure,
+		getlist,
+		numcol,
+		getx,
+		getdata,
+		getheader,
+		searchlist,
+		searchfirst,
+		searchlast,
+		replace!,
+		deletenotat!,
+		deleteatlist!,
+		deleteat,
+		deleteatlist,
+		deletenotat,
+		trim!,
+		trim,
+ 		meshIndex,
+		mesh
+
+
+#Abstract super type to nest all types in this module
+abstract SortedStructure{T1, T2, T3}
+
+
+
+
+
+
+
+
+#----------------------------------------------------------
+#TYPE
+#	SortedDataColumn{T1, T2, T3}
+#	SortedUniqueDataColumn{T1, T2, T3}
+#FIELDS
+#	list::SortedVector{T1} or SortedUniqueVector{T1}: A SortedVector or SortedUniqueVector that indexes the data in x
+#	x::Vector{Vector{T2}}: An outer vector (can be conceptually thought of as a row) containing a set of inner vectors (can be conceptually thought of as columns). Elements of inner vectors are indexed by list.
+#	header::Vector{T3}: A vector that indexes the outer vector of x (conceptually can be thought of as column names)
+#PURPOSE
+#	This type allows the user to store multivariate sorted columns of data (of equal length) indexed by a sorted list, and to dynamically grow or shrink them in assorted ways at run-time without trigerring memory allocation.
+#CONSTRUCTORS
+#	The constructors allow all types to be initialised without a header (default is vector of empty ASCIIString), with x expressed as a matrix, or with list expressed as a regular vector (or any combination of these).
+#	There are also constructors that input datatypes in order to build an empty SortedDataColumn or an empty SortedUniqueDataColumn
+#METHODS
+#	Many
+#----------------------------------------------------------
+#-------- TYPE DEFINITION -----------
+#Unique and NotUnique types used to leverage type hierarchy
+#Abstract super-type
+abstract SortedColumnStructure{T1, T2, T3} <: SortedStructure{T1, T2, T3}
+#SortedDataColumn
+immutable SortedDataColumn{T1, T2, T3} <: SortedColumnStructure{T1, T2, T3}
+	list::SortedVector{T1}
+	x::Vector{Vector{T2}}
+	header::Vector{T3}
+	function SortedDataColumn{T1, T2, T3}(list::SortedVector{T1}, x::Vector{Vector{T2}}, header::Vector{T3})
+		length(x) < 1 && error("Type must be initialised with at least one data column")
+		length(header) != length(x) && error("Number of columns must equal number of headers")
+		for n = 1:length(x)
+			length(list) != length(x[n]) && error("Input list and columns must all have matching length")
+		end
+		new(list, x, header)
+	end
+end
+#SortedUniqueDataColumn
+immutable SortedUniqueDataColumn{T1, T2, T3} <: SortedColumnStructure{T1, T2, T3}
+	list::SortedUniqueVector{T1}
+	x::Vector{Vector{T2}}
+	header::Vector{T3}
+	function SortedUniqueDataColumn{T1, T2, T3}(list::SortedUniqueVector{T1}, x::Vector{Vector{T2}}, header::Vector{T3})
+		length(x) < 1 && error("Type must be initialised with at least one data column")
+		length(header) != length(x) && error("Number of columns must equal number of headers")
+		for n = 1:length(x)
+			length(list) != length(x[n]) && error("Input list and columns must all have matching length")
+		end
+		new(list, x, header)
+	end
+end
+#SortedDataColumn Constructors
+function SortedDataColumn{T1, T2, T3}(list::SortedVector{T1}, x::Vector{Vector{T2}}, header::Vector{T3})
+	length(x) < 1 && error("Type must be initialised with at least one data column")
+	return(SortedDataColumn{eltype(list), eltype(x[1]), eltype(header)}(list, x, header))
+end
+SortedDataColumn{T1, T2}(list::SortedVector{T1}, x::Vector{Vector{T2}}) = SortedDataColumn(list, x, buildAsciiVector(length(x)))
+SortedDataColumn(T1::DataType, T2::DataType, T3::DataType, nCol::Int) = SortedDataColumn(SortedVector(T1, 0), [ Array(T2, 0) for n = 1:nCol ], Array(T3, nCol))
+SortedDataColumn(T1::DataType, T2::DataType, nCol::Int) = SortedDataColumn(T1, T2, ASCIIString, nCol)
+SortedDataColumn{T1, T2, T3}(list::SortedVector{T1}, x::Matrix{T2}, header::Vector{T3}) = SortedDataColumn(list, [ x[:, n] for n = 1:size(x, 2) ], header)
+SortedDataColumn{T1, T2}(list::SortedVector{T1}, x::Matrix{T2}) = SortedDataColumn(list, x, buildAsciiVector(size(x, 2)))
+function SortedDataColumn{T1, T2, T3}(list::Vector{T1}, x::Vector{Vector{T2}}, header::Vector{T3}; alreadySorted::Bool=false)
+	length(x) < 1 && error("Type must be initialised with at least one data column")
+	return(SortedDataColumn{eltype(list), eltype(x[1]), eltype(header)}(SortedVector(list, alreadySorted=alreadySorted), x, header))
+end
+SortedDataColumn{T1, T2}(list::Vector{T1}, x::Vector{Vector{T2}}; alreadySorted::Bool=false) = SortedDataColumn(SortedVector(list, alreadySorted=alreadySorted), x, buildAsciiVector(length(x)))
+SortedDataColumn{T1, T2, T3}(list::Vector{T1}, x::Matrix{T2}, header::Vector{T3}; alreadySorted::Bool=false) = SortedDataColumn(SortedVector(list, alreadySorted=alreadySorted), [ x[:, n] for n = 1:size(x, 2) ], header)
+SortedDataColumn{T1, T2}(list::Vector{T1}, x::Matrix{T2}; alreadySorted::Bool=false) = SortedDataColumn(SortedVector(list, alreadySorted=alreadySorted), x, buildAsciiVector(size(x, 2)))
+#SortedUniqueDataColumn Constructors
+function SortedUniqueDataColumn{T1, T2, T3}(list::SortedUniqueVector{T1}, x::Vector{Vector{T2}}, header::Vector{T3})
+	length(x) < 1 && error("Type must be initialised with at least one data column")
+	return(SortedUniqueDataColumn{eltype(list), eltype(x[1]), eltype(header)}(list, x, header))
+end
+SortedUniqueDataColumn{T1, T2}(list::SortedUniqueVector{T1}, x::Vector{Vector{T2}}) = SortedUniqueDataColumn(list, x, buildAsciiVector(length(x)))
+SortedUniqueDataColumn(T1::DataType, T2::DataType, T3::DataType, nCol::Int) = SortedUniqueDataColumn(SortedUniqueVector(T1, 0), [ Array(T2, 0) for n = 1:nCol ], Array(T3, nCol))
+SortedUniqueDataColumn(T1::DataType, T2::DataType, nCol::Int) = SortedUniqueDataColumn(T1, T2, ASCIIString, nCol)
+SortedUniqueDataColumn{T1, T2, T3}(list::SortedUniqueVector{T1}, x::Matrix{T2}, header::Vector{T3}) = SortedUniqueDataColumn(list, [ x[:, n] for n = 1:size(x, 2) ], header)
+SortedUniqueDataColumn{T1, T2}(list::SortedUniqueVector{T1}, x::Matrix{T2}) = SortedUniqueDataColumn(list, x, buildAsciiVector(size(x, 2)))
+function SortedUniqueDataColumn{T1, T2, T3}(list::Vector{T1}, x::Vector{Vector{T2}}, header::Vector{T3}; alreadySorted::Bool=false, alreadyUnique::Bool=false)
+	length(x) < 1 && error("Type must be initialised with at least one data column")
+	return(SortedUniqueDataColumn{eltype(list), eltype(x[1]), eltype(header)}(SortedUniqueVector(list, alreadySorted=alreadySorted, alreadyUnique=alreadyUnique), x, header))
+end
+SortedUniqueDataColumn{T1, T2}(list::Vector{T1}, x::Vector{Vector{T2}}; alreadySorted::Bool=false, alreadyUnique::Bool=false) = SortedUniqueDataColumn(SortedUniqueVector(list, alreadySorted=alreadySorted, alreadyUnique=alreadyUnique), x, buildAsciiVector(length(x)))
+SortedUniqueDataColumn{T1, T2, T3}(list::Vector{T1}, x::Matrix{T2}, header::Vector{T3}; alreadySorted::Bool=false, alreadyUnique::Bool=false) = SortedUniqueDataColumn(SortedUniqueVector(list, alreadySorted=alreadySorted, alreadyUnique=alreadyUnique), [ x[:, n] for n = 1:size(x, 2) ], header)
+SortedUniqueDataColumn{T1, T2}(list::Vector{T1}, x::Matrix{T2}; alreadySorted::Bool=false, alreadyUnique::Bool=false) = SortedUniqueDataColumn(SortedUniqueVector(list, alreadySorted=alreadySorted, alreadyUnique=alreadyUnique), x, buildAsciiVector(size(x, 2)))
+#-------------------------------------
+#-------- SIMPLE METHODS ----
+Base.string(d::SortedColumnStructure) = "list = " * string(d.list) * ". header = " * string(d.header)
+Base.show(d::SortedColumnStructure) = begin show(d.list); show(d.x); show(d.header); end
+Base.length(d::SortedColumnStructure) = length(d.list)
+function Base.size(d::SortedColumnStructure, i::Int)
+	i == 1 && return(length(d.list))
+	i == 2 && return(length(d.header))
+	error("Invalid dimension")
+end
+numcol(d::SortedColumnStructure) = length(d.header)
+Base.sizeof(d::SortedColumnStructure) = sizeof(d.list) + sizeof(d.x)
+Base.sizeof(d::SortedColumnStructure) = sizeof(d.list) + sizeof(d.x) + sizeof(d.header)
+Base.ndims(d::SortedColumnStructure) = 2
+getlist(d::SortedColumnStructure) = d.list
+getlist(d::SortedColumnStructure, i::Int) = d.list[i]
+getlist(d::SortedColumnStructure, r::UnitRange) = d.list[r]
+getlist(d::SortedColumnStructure, i::Vector{Int}) = d.list[i]
+getlist(d::SortedColumnStructure, inds::IntSet) = d.list[IntSetToIntVec(inds)]
+getx(d::SortedColumnStructure) = [ d.x[j][n] for n in 1:length(d), j in 1:numcol(d) ] #returns matrix
+getx(d::SortedColumnStructure, iCol::Int, jRow::Int) = d.x[jRow][iCol] #Returns scalar
+getx(d::SortedColumnStructure, rCol::UnitRange, jRow::Int) = d.x[jRow][rCol] #Returns vector
+getx(d::SortedColumnStructure, indsCol::Vector{Int}, jRow::Int) = d.x[jRow][indsCol] #returns vector
+getx(d::SortedColumnStructure, indsCol::IntSet, jRow::Int) = d.x[jRow][IntSetToIntVec(indsCol)] #returns vector
+getx(d::SortedColumnStructure, iCol::Int, jRow::UnitRange) = [ d.x[n][iCol] for n in jRow ]' #returns row matrix
+getx(d::SortedColumnStructure, iCol::Int, jRow::Vector{Int}) = [ d.x[n][iCol] for n in jRow ]' #returns row matrix
+getx(d::SortedColumnStructure, iCol::Int, jRow::IntSet) = [ d.x[n][iCol] for n in IntSetToIntVec(jRow) ]' #returns row matrix
+getx{T1<:Union(Vector{Int}, UnitRange), T2<:Union(Vector{Int}, UnitRange)}(d::SortedColumnStructure, indsCol::T1, indsRow::T2) = [ d.x[j][n] for n in indsCol, j in indsRow ] #returns matrix
+getx{T<:Union(Vector{Int}, UnitRange)}(d::SortedColumnStructure, indsCol::T, indsRow::IntSet) = [ d.x[j][n] for n in indsCol, j in IntSetToIntVec(indsRow) ] #returns matrix
+getx{T<:Union(Vector{Int}, UnitRange)}(d::SortedColumnStructure, indsCol::IntSet, indsRow::T) = [ d.x[j][n] for n in IntSetToIntVec(indsCol), j in indsRow ] #returns matrix
+Base.getindex(d::SortedColumnStructure, i::Int, j::Int) = getx(d, i, j) #returns scalar
+Base.getindex{T<:Union(Vector{Int}, UnitRange, IntSet)}(d::SortedColumnStructure, i::Int, j::T) = getx(d, i, j) #returns row matrix
+Base.getindex{T<:Union(Vector{Int}, UnitRange, IntSet)}(d::SortedColumnStructure, i::T, j::Int) = getx(d, i, j) #returns vector
+Base.getindex{T1<:Union(Vector{Int}, UnitRange, IntSet), T2<:Union(Vector{Int}, UnitRange, IntSet)}(d::SortedColumnStructure, i::T1, j::T2) = getx(d, i, j) #returns matrix
+getheader(d::SortedColumnStructure) = d.header
+getheader(d::SortedColumnStructure, i::Int) = d.header[i]
+getheader(d::SortedColumnStructure, r::UnitRange) = d.header[r]
+getheader(d::SortedColumnStructure, inds::Vector{Int}) = d.header[inds]
+getheader(d::SortedColumnStructure, inds::IntSet) = d.header[IntSetToIntVec(inds)]
+getdata{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = d[searchlist(d, a), :] #returns matrix
+Base.searchsorted{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = searchsorted(d.list, a)
+Base.searchsortedfirst{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = searchsortedfirst(d.list, a)
+Base.searchsortedlast{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = searchsortedlast(d.list, a)
+Base.search{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = searchsorted(d.list, a)
+searchfirst{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = searchsortedfirst(d.list, a)
+searchlast{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = searchsortedlast(d.list, a)
+function searchlist{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1)
+	r = search(d, a)
+	r.start > r.stop && error("Unable to find matching element in SortedColumnStructure list")
+	return(r)
+end
+Base.first(d::SortedColumnStructure) = first(d.x)
+Base.last(d::SortedColumnStructure) = last(d.x)
+Base.endof(d::SortedColumnStructure) = endof(d.x)
+Base.copy(d::SortedDataColumn) = SortedDataColumn(copy(d.list), copy(d.x), copy(d.header))
+Base.copy(d::SortedUniqueDataColumn) = SortedUniqueDataColumn(copy(d.list), copy(d.x), copy(d.header))
+Base.deepcopy(d::SortedDataColumn) = SortedDataColumn(deepcopy(d.list), deepcopy(d.x), deepcopy(d.header))
+Base.deepcopy(d::SortedUniqueDataColumn) = SortedUniqueDataColumn(deepcopy(d.list), deepcopy(d.x), deepcopy(d.header))
+Base.issorted(d::SortedColumnStructure) = issorted(d.list)
+Base.in{T1, T2, T3}(a::T1, d::SortedColumnStructure{T1, T2, T3}) = in(a, d.list)
+#-------------------------------------
+#-------- LONGER METHODS -----------
+#eltype
+function Base.eltype(d::SortedColumnStructure, i::Int)
+	size(d, 2) < 1 && error("SortedColumnStructure must contain at least one column")
+	if i == 1
+		return(eltype(d.list))
+	elseif i == 2
+		return(eltype(d.x[1]))
+	elseif i == 3
+		return(eltype(d.header))
+	else
+		error("Invalid dimension")
+	end
+end
+#equal to / not equal to
+function =={T1, T2, T3}(d1::SortedColumnStructure{T1, T2, T3}, d2::SortedColumnStructure{T1, T2, T3})
+	if d1.list != d2.list
+		return(false)
+	elseif d1.x != d2.x
+		return(false)
+	elseif d1.header != d2.header
+		return(false)
+	end
+	return(true)
+end
+!={T1, T2, T3}(d1::SortedColumnStructure{T1, T2, T3}, d2::SortedColumnStructure{T1, T2, T3}) = !(d1 == d2)
+#pop!
+function Base.pop!(d::SortedColumnStructure)
+	pop!(d.list)
+	[ pop!(d.x[n]) for n = 1:numcol(d) ]
+end
+#shift!
+function Base.shift!(d::SortedColumnStructure)
+	shift!(d.list)
+	[ shift!(d.x[n]) for n = 1:numcol(d) ]
+end
+#push!
+function Base.push!{T1, T2, T3}(d::SortedDataColumn{T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != numcol(d) && error("Column number mismatch")
+	listItem < d.list[end] && error("push! operation will violate sort order")
+	push!(d.list, listItem)
+	[ push!(d.x[n], xItem[n]) for n = 1:numcol(d) ]
+end
+function Base.push!{T1, T2, T3}(d::SortedUniqueDataColumn{T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != numcol(d) && error("Column number mismatch")
+	listItem <= d.list[end] && error("push! operation will violate sort order")
+	push!(d.list, listItem)
+	[ push!(d.x[n], xItem[n]) for n = 1:numcol(d) ]
+end
+#unshift!
+function Base.unshift!{T1, T2, T3}(d::SortedDataColumn{T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != numcol(d) && error("Column number mismatch")
+	listItem > d.list[1] && error("unshift! operation will violate sort order")
+	unshift!(d.list, listItem)
+	[ unshift!(d.x[n], xItem[n]) for n = 1:numcol(d) ]
+end
+function Base.unshift!{T1, T2, T3}(d::SortedUniqueDataColumn{T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != numcol(d) && error("Column number mismatch")
+	listItem >= d.list[1] && error("unshift! operation will violate sort order")
+	unshift!(d.list, listItem)
+	[ unshift!(d.x[n], xItem[n]) for n = 1:numcol(d) ]
+end
+#insert!
+function Base.insert!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != numcol(d) && error("Column number mismatch")
+	i = insert!(d.list, listItem)
+	[ insert!(d.x[n], i, xItem[n]) for n = 1:numcol(d) ]
+	return(i)
+end
+function Base.insert!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, listItem::Vector{T1}, xItem::Matrix{T2})
+	length(listItem) != size(xItem, 1) && error("Row number mismatch")
+	return([ insert!(d, listItem[n], xItem[n, :]) for n = 1:length(listItem) ])
+end
+function Base.insert!{T1, T2, T3}(d1::SortedColumnStructure{T1, T2, T3}, d2::SortedColumnStructure{T1, T2, T3})
+	numcol(d1) != numcol(d2) && error("Column number mismatch")
+	for n = 1:length(d2)
+		i = insert!(d1.list, d2.list[n])
+		for j = 1:numcol(d2)
+			insert!(d1.x[j], i, d2.x[j][n])
+		end
+	end
+end
+#deleteat!
+function Base.deleteat!{T<:Union(Int, UnitRange, Vector{Int})}(d::SortedColumnStructure, inds::T)
+	deleteat!(d.list, inds)
+	[ deleteat!(d.x[n], inds) for n = 1:numcol(d) ]
+end
+Base.deleteat!(d::SortedColumnStructure, inds::IntSet) = deleteat!(d, IntSetToIntVec(inds))
+#deleteatlist! (deleteat! for a given element of list)
+deleteatlist!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::T1) = deleteat!(d, search(d, a))
+deleteatlist!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::Vector{T1}) = [ deleteatlist!(d, a[n]) for n = 1:length(a) ]
+#empty!
+Base.empty!(d::SortedColumnStructure) = deleteat!(d, 1:length(d))
+#replace!
+function replace!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, listItem::T1, xItem::Vector{T2})
+	length(xItem) != numcol(d) && error("Column number mismatch")
+	r = searchlist(d, listItem)
+	for n = 1:length(xItem)
+		for i = r.start:r.stop
+			d.x[n][i] = xItem[n]
+		end
+	end
+	return(r)
+end
+function replace!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, listItem::T1, xItem::Matrix{T2})
+	size(xItem, 1) != 1 && error("xItem must be a row matrix")
+	replace!(d, listItem, vec(xItem))
+end
+function replace!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, listItem::Vector{T1}, xItem::Matrix{T2})
+	length(listItem) != size(xItem, 1) && error("listItem length must match number of rows in xItem")
+	return([ replace!(d, listItem[n], xItem[n, :]) for n = 1:length(listItem) ])
+end
+#deletenotat!
+SortedVectors.deletenotat!(d::SortedColumnStructure, r::UnitRange) = deleteat!(d, setdiffIndex(length(d), r))
+SortedVectors.deletenotat!(d::SortedColumnStructure, inds::IntSet) = deleteat!(d, setdiffIndex(length(d), inds))
+SortedVectors.deletenotat!(d::SortedColumnStructure, inds::Vector{Int}; alreadySorted::Bool=false) = deleteat!(d, setdiffIndex(length(d), inds, alreadySorted=alreadySorted))
+#insert
+function insert{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, listItem::Vector{T1}, xItem::Matrix{T2})
+	dCopy = deepcopy(d)
+	insert!(dCopy, listItem, xItem)
+	return(dCopy)
+end
+insert{T1, T2, T3}(d1::SortedColumnStructure{T1, T2, T3}, d2::SortedColumnStructure{T1, T2, T3}) = insert(d1, d2.list, getmat(d2.x))
+#deleteat
+function deleteat{T<:Union(UnitRange, Vector{Int}, IntSet)}(d::SortedColumnStructure, inds::T)
+	dCopy = deepcopy(d)
+	deleteat!(dCopy, inds)
+	return(dCopy)
+end
+#deletenotat
+function deletenotat{T<:Union(UnitRange, Vector{Int}, IntSet)}(d::SortedColumnStructure, inds::T)
+	dCopy = deepcopy(d)
+	deletenotat!(dCopy, inds)
+	return(dCopy)
+end
+#deleteatlist
+function deleteatlist{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, a::Vector{T1})
+	dCopy = deepcopy(d)
+	deleteatlist!(dCopy, a)
+	return(dCopy)
+end
+#intersect!
+function intersect!{T1, T2, T3}(d1::SortedDataColumn{T1, T2, T3}, s::SortedVector{T1})
+	(inds, indsTemp1, indsTemp2, indsTemp3) = intersectIndex(d1.list, s)
+	deletenotat!(d1, inds, alreadySorted=true)
+end
+function intersect!{T1, T2, T3}(d1::SortedDataColumn{T1, T2, T3}, d2::SortedDataColumn{T1, T2, T3})
+	#Need to think about how this works with respect to intersect
+	error("This method is currently not available. For SortedDataColumn, try intersect instead")
+end
+function intersect!{T1, T2, T3}(d1::SortedUniqueDataColumn{T1, T2, T3}, s::SortedUniqueVector{T1})
+	(inds, indsTemp1) = intersectIndex(d1.list, s)
+	deletenotat!(d1, inds, alreadySorted=true)
+end
+intersect!{T1, T2, T3}(d1::SortedUniqueDataColumn{T1, T2, T3}, d2::SortedUniqueDataColumn{T1, T2, T3}) = intersect!(d1, d2.list)
+#intersect
+function intersect{T1, T2, T3}(d1::SortedDataColumn{T1, T2, T3}, d2::SortedDataColumn{T1, T2, T3})
+	numcol(d1) != numcol(d2) && error("Column number mismatch")
+	(inds1, inds2, inds1Rec, inds2Rec) = intersectIndex(d1.list, d2.list)
+	N = length(inds1) + length(inds2)
+	listNew = Array(T1, N)
+	listNew[inds1Rec] = d1.list[inds1]
+	listNew[inds2Rec] = d2.list[inds2]
+	xNew = Array(T2, N, numcol(d1))
+	xNew[inds1Rec, :] = d1[inds1, :]
+	xNew[inds2Rec, :] = d2[inds2, :]
+	return(SortedDataColumn(SortedVector(listNew, alreadySorted=true), xNew, deepcopy(d1.header)))
+end
+function intersect{T1, T2, T3}(d1::SortedUniqueDataColumn{T1, T2, T3}, s::SortedUniqueVector{T1})
+	dCopy = deepcopy(d1)
+	intersect!(dCopy, s)
+	return(dCopy)
+end
+intersect{T1, T2, T3}(d1::SortedUniqueDataColumn{T1, T2, T3}, d2::SortedUniqueDataColumn{T1, T2, T3}) = intersect(d1, d2.list)
+#union! (efficiency could be improved by explicit while loop over d1 and d2)
+union!{T1, T2, T3}(d1::SortedDataColumn{T1, T2, T3}, d2::SortedDataColumn{T1, T2, T3}) = insert!(d1, d2)
+function union!{T1, T2, T3}(d1::SortedUniqueDataColumn{T1, T2, T3}, d2::SortedUniqueDataColumn{T1, T2, T3})
+	numcol(d1) != numcol(d2) && error("Column number mismatch")
+	for n = 1:size(d2, 1)
+		if d2.list[n] < d1.list[1]
+			unshift!(d1, d2.list[n], vec(d2[n, :]))
+		elseif d2.list[n] > d1.list[end]
+			push!(d1, d2.list[n], vec(d2[n, :]))
+		else
+			r = search(d1.list, d2.list[n])
+			if isempty(r)
+				insert!(d1.list.x, r.start, d2.list[n])
+				[ insert!(d1.x[j], r.start, d2.x[j][n]) for j = 1:numcol(d2) ]
+			end
+		end
+	end
+	return(true)
+end
+#union
+function union{T1, T2, T3}(d1::SortedColumnStructure{T1, T2, T3}, d2::SortedColumnStructure{T1, T2, T3})
+	dCopy = deepcopy(d1)
+	union!(dCopy, d2)
+	return(dCopy)
+end
+#trim!, trim
+SortedVectors.trim!{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, LB::T1, UB::T1) = deletenotat!(d, trimRange(d.list, LB, UB))
+function SortedVectors.trim{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, LB::T1, UB::T1)
+	dCopy = deepcopy(d)
+	trim!(dCopy, LB, UB)
+	return(dCopy)
+end
+#meshIndex, mesh (note, output of mesh always SortedUnique since mesh always unique)
+SortedVectors.meshIndex{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true) = meshIndex(d.list, m, allowForwardLooking=allowForwardLooking)
+SortedVectors.mesh{T1, T2, T3}(d::SortedColumnStructure{T1, T2, T3}, m::SortedUniqueVector{T1}; allowForwardLooking::Bool=true) = SortedUniqueDataColumn(m, d[meshIndex(d, m, allowForwardLooking=allowForwardLooking), :])
+
+
+
+
+
+
+
+
+
+
+#Non-exported function for getting the complement of a set of indices over some range 1:N
+function setdiffIndex(N::Int, inds::IntSet)
+	indsOut = setdiff(IntSet(1:N), inds)
+	return(IntSetToIntVec(indsOut))
+end
+function setdiffIndex(N::Int, inds::Vector{Int}; alreadySorted::Bool=false)
+	alreadySorted == false && sort!(inds)
+	return(setdiffIndex(N, IntSet(inds)))
+end
+function setdiffIndex(N::Int, r::UnitRange)
+	r.start < 1 && error("Bounds error on UnitRange")
+	r.stop > N && error("Bounds error on UnitRange")
+	return(setdiffIndex(N, IntSet([r.start:r.stop])))
+end
+
+
+
+#Non-exported function for building a vector of ASCIIString with each element set to ""
+function buildAsciiVector(N::Int)
+	x = Array(ASCIIString, N)
+	fill!(x, "")
+	return(x)
+end
+
+
+
+
+
+#Non-exported function for converting an IntSet to a vector of integers
+function IntSetToIntVec(x::IntSet)
+	if length(x) == 0
+		return(Array(Int, 0))
+	else
+		return([ i for i in x ])
+	end
+end
+
+
+end # module

@@ -1,0 +1,37 @@
+#!/usr/bin/julia
+
+include ("input.jl")
+
+die1=rand(1:100)
+
+while true
+  choice = input("Guess a number 1-100: " )
+
+
+
+  if Base.isdigit(choice)
+    choice = parseint(choice)
+  else
+    println("$choice, is not a positive number")
+    continue
+  end
+
+  if choice < 101
+
+    if choice == die1
+      println("You win!")
+      return false
+
+    elseif choice > die1
+      println("Too high!")
+
+    elseif choice < die1
+      println("Too low!")
+
+
+    end
+  else
+    println(choice, " is greater than 100!")
+  end
+
+end

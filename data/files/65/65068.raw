@@ -1,0 +1,15 @@
+A = example2()
+parent, post = etree(A, true)
+A = A[post,post]
+colptr, rowval = struct_L(A)
+for i in 1:A.n
+    println(rowval[colptr[i]:colptr[i+1]-1])
+end
+
+# test etree
+A = example5()
+L = example5(true)
+@test Multifrontal._etree(L) == etree(A)
+B = example4()
+@test elimination_tree(A) == etree(A)
+@test elimination_tree(B) == etree(B) 

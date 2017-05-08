@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+# Julia 0.4 code to interface with ASUS G20 desktop PC lighting
+
+#=
+Created on Mon Oct 26 26 20:25:12 2015
+@author: William Herrera
+
+IMPORTANT: run as administrator
+
+Module for calls to the ASUS G20aj ACPIWMI.dll library to manipulate
+the G20aj LED lighting displays.
+
+The ASUS ACPI and dll's were analyzed by William Hererra, 2015
+
+
+   OEM-UNDOCUMENTED ASUS DLL API NOTES:
+
+   The byte code for each light on the ASUS G20 desktop's LED lighting:
+   left vertical light:   0xc00e0000
+   right vertical light:  0xc00d0000
+   base horizontal light: 0xc00c0000
+
+   The position of color in second argument 4 byte integer:
+   red   0x00ff0000
+   green 0x0000ff00
+   blue  0x000000ff
+   Note that other colors use a mix of this type of RGB color coding.
+   The DLL calls from ACPIWMI.dll used by my ASUSLighting class:
+   AsWMI_Open() opens the ACPI for calls
+   AsWMI_GetDeviceStatus(?dhand, ?bufref) -- No idea why this seems broken
+   AsWMI_DeviceControl(device, rgb_color) -- Does call to change lighting
+
+=#
+
+module LightACPI
+
+export LIGHTS, RLIGHT, LLIGHT, BLIGHT, 
+       initialize!, getcolor, setcolor, setrgb
+
+type ASUSLighting
+    #=
+    type for ASUS G20 lighting color setting
+    =#
+    RightVertical::UInt32
+    LeftVertical::UInt32
+    BaseHorizontal::UInt32
+    DLLPath::ASCIIString
+    dhandle::UInt32
+    initialized::Bool
+end
+
+
+LIGHTS = ASUSLighting(0xc00d0000, 0xc00e0000, 0xc00c0000,
+                      "C:\\Program Files (x86)\\ASUS\\ASUS Manager\\Lighting\\",
+                      0x00000000, false)
+RLIGHT = LIGHTS.RightVertical
+LLIGHT = LIGHTS.LeftVertical
+BLIGHT = LIGHTS.BaseHorizontal
+ENV["PATH"] = string(LIGHTS.DLLPath, ";", ENV["PATH"])
+
+function initialize!(li=LIGHTS)
+    #=
+    set up dll
+    =#
+    ENV["PATH"] = string(LIGHTS.DLLPath, ";", ENV["PATH"])
+    li.dhandle = ccall((:AsWMI_Open, "ACPIWMI"), stdcall, UInt32, ())
+    li.initialized = true
+end
+
+
+function getcolor(li=LIGHTS, pos=LIGHTS.LeftVertical)
+    #=
+    Get current color of the LED light at pos
+    FIXME-- not working atm
+    =#
+    if li.initialized == false
+        initialize!(li)
+    end
+    ccall((:AsWMI_GetDeviceStatus, "ACPIWMI"), stdcall, UInt32, 
+           (UInt32, UInt32), li.dhandle, pos)
+end
+
+
+function setcolor(pos, color, li=LIGHTS)
+    #=
+    Set color of the LED light as a 8-byte integer
+    The color is of form hex 0x00rrggbb, where rr id red, gg green,
+    and bb the blue values of an RGB coded color
+    Black is 0, white is 0x00ffffff
+    =#
+    if li.initialized == false
+        initialize!(li)
+    end
+    ccall((:AsWMI_DeviceControl, "ACPIWMI"), stdcall, UInt32, 
+           (UInt32, UInt32), UInt32(pos), UInt32(color))
+end   
+
+
+function setrgb(pos, red, green, blue, li=LIGHTS)
+    #=
+    Set RGB color as separate red, green, and blue values
+    =#
+    rgb_color = (UInt32(blue) & 255) +
+                ((UInt32(green) & 255) * 0x100) +
+                ((UInt32(red) & 255) * 0x10000)
+    setcolor(pos, rgb_color, li)
+end
+
+
+end # of module

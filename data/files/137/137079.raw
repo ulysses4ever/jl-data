@@ -1,0 +1,94 @@
+#
+# Naive-Needleman-Wunsch
+# Copyright (C) 2012  Khalique Williams
+#
+# This file is part of Naive-Needlemann-Wunch.
+#
+# Naive-Needleman-Wunsch is free software: you can redistribute it and/or modify
+# it under the terms of the   GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Naive-Needleman-Wunsch is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Naive-Needleman-Wunsch.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you wish to contact the author of Naive-Needleman-Wunsch, you may do so at
+# kwillia.pub@gmail.com
+#
+
+# Purpose: This file has the  special functions needed to evaluate some probability #
+#          distributions and parts of scoring model.                                #
+
+# -- common --
+type SubstCost
+    _val::Float64
+
+    _costMatrix::Array{Float64,2}
+end
+
+type OpeningGapCost
+    _val::Float64
+end
+
+# -- standard --
+type AffineGapCost
+    _val::Float64
+end
+
+# -- specific to context dependant penalties --
+type AffineGapCostModel
+    _probabilityParams::Dict{Any,Any}
+    _fixedCostFuncParams::Dict{Any,Any}
+end
+
+abstract IComputationBundle
+
+# -- N.W. functions --
+
+type StandardBundle <: IComputationBundle
+    _subst::SubstCost
+    _o::OpeningGapCost
+
+    _D1::AffineGapCost
+    _D2::AffineGapCost
+end
+
+type ContextDependantBundle <: IComputationBundle
+    _subst::SubstCost
+    _o::OpeningGapCost
+
+    _D1::AffineGapCostModel
+    _D2::AffineGapCostModel
+end
+
+function createStandardBundle(d_1::AffineGapCost, d_2::AffineGapCost)
+    return StandardBundle(d_1,d_2)
+end
+
+function createContextDependantBundle(aSubst::SubstCost,anO::OpeningGapCost,probabilityParamsDict::Dict{Any,Any},fixedCostFuncParamsDict::Dict{Any,Any})
+    return ContextDependantBundle(aSubst,anO,AffineGapCostModel(probabilityParamsDict,fixedCostFuncParamsDict),AffineGapCostModel(probabilityParamsDict,fixedCostFuncParamsDict))
+end
+
+# === Modelling Functions Testing ==== #
+
+const subst = SubstCost(-6.0,zeros(4,4))
+const o = OpeningGapCost(1.0)
+
+const D1 = AffineGapCost(-2.0)
+const D2 = AffineGapCost(-2.0)
+
+# The below is like saying, if we make the result of fixedFunc calculation 2/3's it values
+#  the lowest output it can produce should still beat be higher than AVERAGE substition cost
+const thisTimesFixedFuncResultBeatsAvgSubstMinusOpeningGapCost= 1/3
+const alphaMultiplier = 1/thisTimesFixedFuncResultBeatsAvgSubstMinusOpeningGapCost
+
+ctxdepBundle = createContextDependantBundle(subst,o,{"b_1"=>pi/4, "(b/c)_1"=>0,"b_2"=>pi/10, "(b/c)_2"=>10},{"alpha_1"=>alphaMultiplier*(subst._val-o._val)/2.0, "alpha_2"=>(alphaMultiplier/2)*(subst._val-o._val)/2.0, "alpha_3"=>(subst._val-o._val)})
+
+
+
+

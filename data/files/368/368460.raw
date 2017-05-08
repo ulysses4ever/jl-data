@@ -1,0 +1,57 @@
+"""
+    Swept approximate message-passing (SwAMP) for sparse estimation. See
+        Manoel et. al (2014).
+"""
+function iterate_swamp(y, F, opts)
+    # Parameters
+    x = get(opts, "x", nothing)
+    prior_prmts = get(opts, "prior_prmts", nothing)
+    t_max = get(opts, "t_max", 100)
+    disp = get(opts, "disp", 1)
+
+    if prior_prmts == nothing
+        error()
+    end
+
+    # Init vars, arrays and other structures
+    m, n = size(F)
+    sqrF = F.^2
+
+    a, c = zeros(n), ones(n)
+    r, s = zeros(n), ones(n)
+    w, v = zeros(m), ones(m)
+    d = 1.
+
+    mses = zeros(t_max)
+
+    # Run algorithm
+    tic()
+    for t = 1:t_max
+        g = w ./ v
+        w = (y - F * a) + g .* (sqrF * c)
+        v = d + (sqrF * c)
+
+        for i = randperm(n)
+            s[i] = 1 ./ dot(sqrF[:, i], 1 ./ v)
+            r[i] = a[i] + s[i] .* dot(F[:, i], w ./ v)
+
+            a_i, c_i = prior_gb(r[i], s[i], prior_prmts)
+            da, dv = a_i - a[i], sqrF[:, i] * (c_i - c[i])
+            w += -F[:, i] .* da + g .* dv
+            v += dv
+
+            a[i], c[i] = a_i, c_i
+        end
+
+        d *= sum((w ./ v).^2) / sum(1 ./ v)
+
+        if x != nothing; mses[t] = norm(x - a)^2 / norm(x)^2; end
+        if disp == 1
+            @printf("t = %d, delta = %.4e, mse = %.4e, rss = %.4e\n", 
+                t, d, mses[t], norm(y - F * a)^2 / m)
+        end
+    end
+    elapsed = toq()
+
+    return a, mses, elapsed
+end

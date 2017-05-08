@@ -1,0 +1,51 @@
+#!/usr/bin/env julia
+
+type Datastuff
+	filename::String
+	samplerate_hz::Uint32
+end
+
+function read_n_ms_from_file(ms, expdata::Datastuff)
+	#=
+	file is expected to be pairs of ishort in complex IQ format
+	=#
+
+	read_samples      = expdata.samplerate_hz /1000  * ms
+	fid               = open(expdata.filename,"r")
+	wid               = open("test.dat","w")
+
+	println("filename: $(expdata.filename)\tsamplerate: $(expdata.samplerate_hz)")
+	println("Read milliseconds = $ms")
+	println("Read samples      = $read_samples")
+
+	i_data            = zeros(Uint16, int(read_samples))
+	q_data            = zeros(Uint16, int(read_samples))
+
+	println("$(read_samples)")
+	iq = zeros(Uint16, 2)
+	for i in 1:int(read_samples)
+		iq_sample = read!(fid, iq)
+		write(wid, iq)
+		i_data[i] = iq_sample[1]
+		q_data[i] = iq_sample[2]
+	end
+	close(fid)
+	close(wid)
+	return(i_data, q_data)
+end
+
+expdata          = Datastuff("2013_04_04_GNSS_SIGNAL_at_CTTC_SPAIN.dat", 4000000)
+#expdata          = Datastuff("test2.dat", 4000)
+
+(i_data, q_data) = read_n_ms_from_file(10, expdata)
+
+@assert length(i_data) == length(q_data)
+println("i_data\tq_data")
+println("$(length(i_data))")
+for i in 1:length(i_data)
+		@printf("%d\t0x%x\t0x%x\n",i, i_data[i], q_data[i])
+end
+
+
+
+

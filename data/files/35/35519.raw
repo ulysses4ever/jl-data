@@ -1,0 +1,13 @@
+using Debug
+include("bin2dec.jl");
+@debug function polyDiv(A::AbstractArray{Bool,2},B::AbstractArray{Bool,2})
+    # do A/B
+    C = bin2dec(A);
+    D = bin2dec(B);
+    if(C < D)
+        return(A,B);
+    end
+    
+    return(C);
+end
+

@@ -1,0 +1,42 @@
+const unary_function_list = [:+,:-,:cos,:sin,:tan,:acos,:asin,:atan,:cosh,:sinh,:tanh,:acosh,:asinh,:atanh,:sqrt,:exp,:log,:expm1,:erf,:erfc]
+const binary_function_list = [:+,:-,:*,:/,:^,:hypot,:atan2]
+const unary_diff = Dict(
+    (+) => x -> 1,
+    (-) => x -> -1,
+    (cos) => x -> -sin(x),
+    (sin) => x -> cos(x),
+    (tan) => x -> tan(x)^2 + 1,
+    (acos) => x -> -1/sqrt(-x^2 + 1),
+    (asin) => x -> 1/sqrt(-x^2 + 1),
+    (atan) => x -> 1/(x^2 + 1),
+    (cosh) => x -> sinh(x),
+    (sinh) => x -> cosh(x),
+    (tanh) => x -> -tanh(x)^2 + 1,
+    (acosh) => x -> 1/sqrt(x^2 - 1),
+    (asinh) => x -> 1/sqrt(x^2 + 1),
+    (atanh) => x -> 1/(-x^2 + 1),
+    (sqrt) => x -> 1/(2*sqrt(x)),
+    (exp) => x -> exp(x),
+    (log) => x -> 1/x,
+    (expm1) => x -> exp(x),
+    (erf) => x -> 2*exp(-x^2)/sqrt(pi),
+    (erfc) => x -> -2*exp(-x^2)/sqrt(pi))
+
+const binary1_diff = Dict(
+    (+) => ( x, y ) -> 1,
+    (-) => ( x, y ) -> 1,
+    (*) => ( x, y ) -> y,
+    (/) => ( x, y ) -> 1/y,
+    (^) => ( x, y ) -> x^y*y/x,
+    (hypot) => ( x, y ) -> x/sqrt(x^2 + y^2),
+    (atan2) => ( x, y ) -> 1/(y*(x^2/y^2 + 1)))
+
+const binary2_diff = Dict(
+    (+) => ( x, y ) -> 1,
+    (-) => ( x, y ) -> -1,
+    (*) => ( x, y ) -> x,
+    (/) => ( x, y ) -> -x/y^2,
+    (^) => ( x, y ) -> x^y*log(x),
+    (hypot) => ( x, y ) -> y/sqrt(x^2 + y^2),
+    (atan2) => ( x, y ) -> -x/(y^2*(x^2/y^2 + 1)))
+

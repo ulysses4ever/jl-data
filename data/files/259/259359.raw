@@ -1,0 +1,41 @@
+  using Gadfly
+  calc_mode = "event_based_risk"
+  test_cases = ["5a"]
+  for tc in test_cases
+    jl_file = "test/$(calc_mode)/outputs/case_$(tc)/results_assets.out"
+    oq_file = "test/$(calc_mode)/outputs/case_$(tc)/rlz-000-structural-loss_curves.csv"
+    png_file = "test/$(calc_mode)/outputs/figures/fig-lc-ebr-$(tc).png"
+    pdf_file = "test/$(calc_mode)/outputs/figures/fig-lc-ebr-$(tc).pdf"
+
+    f = open(jl_file, "r")
+    poes_str = split(readline(f)[1:end-2], "[")[2]
+    poes_jl = float(split(poes_str, ","))
+    losses_str = split(readline(f)[1:end-2], "[")[2]
+    losses_jl = float(split(losses_str, ","))
+    avg_jl = float(split(readline(f)[1:end-2], ", ")[3])
+    close(f)
+
+    f = readcsv(oq_file, skipstart=1)
+    poes_oq = float(split(f[5]))
+    losses_oq = float(split(f[4]))/100.0
+    avg_oq = float(f[6])
+
+    p = plot(layer(x=losses_oq, y=poes_oq,
+               Geom.point, Geom.line,
+               Theme(default_color=color("royalblue"))),
+             layer(x=losses_jl, y=poes_jl,
+                   Geom.point, Geom.line,
+                   Theme(default_color=color("indianred"))),
+             Scale.x_continuous(format=:plain, minvalue=0, maxvalue=10000),
+             Guide.xlabel("Asset loss"),
+             Guide.ylabel("Annual probability of exceedance"),
+             Guide.xticks(ticks=linspace(0,10000,5)),
+             Guide.yticks(ticks=linspace(0,0.044,5)),
+             Guide.manual_color_key("", ["OpenQuake", "Julia"], ["royalblue", "indianred"]),
+             Theme(minor_label_font="Charter", minor_label_font_size=10pt,
+                   major_label_font="Charter", major_label_font_size=12pt,
+                   key_label_font="Charter", key_label_font_size=10pt,
+                   colorkey_swatch_shape=:circle))
+    draw(PDF(pdf_file, 16.0cm, 10.0cm), p)
+    draw(PNG(png_file, 16.0cm, 10.0cm, dpi=300), p)
+  end

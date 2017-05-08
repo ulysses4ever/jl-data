@@ -1,0 +1,112 @@
+using DataFrames
+
+type Dataset
+
+  num_electrodes::Integer
+  num_time_points::Integer
+  num_neurons::Integer
+  num_positions::Integer
+  frame::DataFrame
+
+  function Dataset(num_electrodes::Integer, num_time_points::Integer, num_neurons::Integer, num_positions::Integer, frame::DataFrame)
+    new(num_electrodes, num_time_points, num_neurons, num_positions, frame)
+  end
+
+end
+
+Dataset(data::Dict) = Dataset(values_at(data, names(Dataset)...)...)
+
+function Dataset(df::DataFrame)
+  expr = :( !((p1 .== -1) | (p2 .== -1) | (p3 .== -1) | (p4 .== -1)) )
+  # TODO temp hack to deal with bad positions at beginning
+  df = DataFrame(select(expr, df))  # drop bad position rows
+  df["p"] = get_position(df)
+  df["pb"] = get_position_bin(df["p"])
+  df["d"] = get_directions(df["p"])
+  df["da"] = get_average_direction(df["d"])
+  df = drop_intertrial_periods(df, TRACK_BOUNDS)
+  df["t"] = get_trials(df, TRACK_BOUNDS)
+  number_fields = graph(FIELDS) do f
+    field_name = symbol("num_" * f.meaning)
+    num_cols = count(DataFrames.colnames(df)) do n n[1:1] == f.abbreviation end
+    [field_name, num_cols]
+  end
+  number_fields = merge(number_fields, {:num_time_points => size(df,1)})
+  Dataset(merge(number_fields, {:frame => df}))
+end
+
+# return a dataframe containing the data, keyed by e$i for electrodes and n$i
+# for neurons, where i is an index
+
+function Dataset(path::String)
+  data = matread(path)
+  num_time_points = size(data["X"],2)
+  data["pos"] = data["pos"][1:num_time_points,:]'
+  data_dict = mapreduce(merge, FIELDS) do f
+    graph(1:size(data[f.code],1)) do i
+      (f.abbreviation*"$i", reshape(data[f.code][i,:], num_time_points))
+    end
+  end
+  Dataset( DataFrame(data_dict) )
+end
+
+### HELPERS
+
+function DataFrames.colnames(ds::Dataset)
+  DataFrames.colnames(ds.frame)
+end
+
+function drop_intertrial_periods(df, track_bounds::(Int,Int))
+  df = df[640:size(df,1),:]  # temp hack to get rid of bad initial period
+  expr = :( (pb .>= $(track_bounds[1])) & (pb .<= $(track_bounds[2])) )
+  df = DataFrame(select( expr, df ))
+end
+
+function get_position(df)
+  pca(matrix(df[["p1","p2","p3","p4"]])).scores[:,1]
+end
+
+function get_position_bin(positions; num_bins=100)
+  bin_size = range(convert(Array{Float64,1}, positions)) / num_bins
+  floor((positions - min(positions)) / bin_size)
+end
+
+function get_directions(positions)
+  dirs = map(2:length(positions)) do i
+    (positions[i] - positions[i-1]) > 0 ? 1 : -1 end
+  unshift!(dirs, dirs[1])
+end
+
+function get_average_direction(direction)
+  window_size = 20  # must be even
+  buffer = convert(Int, window_size / 2)
+  avg = map(buffer:length(direction)-buffer) do i
+    mean(direction[i-buffer+1:i+buffer]) > 0 ? 1 : -1
+  end
+  append!( fill(0,buffer-1), append!(avg, fill(0,buffer)) )
+end
+
+function get_trials(df, track_bounds::(Int,Int))
+  dir = df[1,"da"]
+  starts = Int[1]
+  breakpoints = { 1 => [ track_bounds[2] 1 ; track_bounds[2] -1 ], -1 => [ track_bounds[1] -1 ; track_bounds[1] 1 ] }
+  for i in 1:size(df,1)-1
+    if matrix( df[i:i+1, ["pb", "d"]] ) == breakpoints[dir]
+      push!(starts, i+1); dir *= -1
+    end
+  end
+  mapreduce(vcat, 1:length(starts)) do i
+    len = (i == length(starts) ? size(df,1)+1 : starts[i+1]) - starts[i]
+    fill( i, len )
+  end
+end
+
+#function get_trials(directions)
+#  chunks = chunk(directions) do x x end
+#  lengths = map(1:length(chunks)) do i
+#    (i, length(chunks[i][2]))
+#  end
+#  mapreduce(vcat, lengths) do pair
+#    fill(pair...)
+#  end
+#end

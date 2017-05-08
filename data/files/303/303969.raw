@@ -1,0 +1,52 @@
+# Basic routines for exact decimal arithmetic (ref. IEEE 754-2008)
+# @author jack@tinybike.net (Jack Peterson), 7/3/2014
+
+# numerical value = (-1)^s * c * b^q
+type Decimal
+    s::Int  # sign can be 0 (+) or 1 (-)
+    c::Int  # coefficient (or significand)
+    q::Int  # exponent
+end
+
+# Addition
+function decimal_add(x::Decimal, y::Decimal)
+    # To add, convert both decimals to the same exponent.
+    # (If the exponents are different, use the smaller exponent
+    # to make sure we're adding integers.)
+    cx = x.c * 10^max(x.q - y.q, 0)
+    cy = y.c * 10^max(y.q - x.q, 0)
+    s = (cx > cy) ? x.s : y.s
+    Decimal(s, cx + cy, min(x.q, y.q))
+end
+
+# Negation
+decimal_negative(x::Decimal) = Decimal((x.s == 1) ? 0 : 1, x.c, x.q)
+
+# Overload the + and - operators
++(x::Decimal, y::Decimal) = decimal_add(x, y)::Decimal
+-(x::Decimal) = decimal_negative(x)::Decimal
+-(x::Decimal, y::Decimal) = decimal_add(x, -y)::Decimal
+
+function to_string(d::Decimal)
+    s = (d.s == 1) ? "-" : ""
+    c = string(d.c)
+    if d.q > 0
+        for i in 1:d.q
+            c *= "0"
+        end
+    elseif d.q < 0
+        for i in 1:(-d.q)
+            if i == 1
+                c = "." * c
+            else
+                c = "0" * c
+            end
+        end
+    end
+    if c[1] == '.'
+        c = "0" * c
+    end
+    s * c
+end
+
+to_float(d::Decimal) = float(to_string(d)::ASCIIString)

@@ -1,0 +1,20 @@
+;(define-special-variable default-frame-style 'Toyberg
+;  "Default frame style")
+
+(setq theme-load-path 
+     (append (list 
+              "~/.sawfish/extensions/themes") 
+              theme-load-path))
+
+;;(define-special-variable default-frame-style 'get-S-tabbed
+;;  "Default frame style")
+
+(define-special-variable default-frame-style 'Elberg-tabbed
+  "Default frame style")
+
+(system "fbsetbg ~/.sawfish/images/late_summer_landscape-wallpaper-1366x768.jpg")
+;;  (define-special-variable default-font nil
+;;    "Default font.")
+
+;;(custom-set-typed-variable 
+;; (quote default-font) (quote ("Pango" . "Sans 10")) (quote font))

@@ -1,0 +1,23 @@
+function subfolders(path::AbstractString)
+  path=abspath(path)
+  files=filter(x->!startswith(x,"."),readdir(path))
+  files=map(x->joinpath(path,x), files)
+  folders=filter(isdir,files)
+  subsubfolders=map(subfolders,folders)
+  result=[path]
+  for f=subsubfolders
+    append!(result,f)
+  end
+  return result
+end
+
+append!(LOAD_PATH,subfolders("../"))
+
+
+tests = ["RandomHyperplaneClassifier.jl","SequentialPatterns/SequentialPattern.jl","SequentialPatterns/SequentialPatternFit.jl", "AdaBoosts.jl" ,"ClassificationUtilsTest.jl"]
+
+for path in tests
+  println("Running tests in $path...")
+  include(path)
+
+end

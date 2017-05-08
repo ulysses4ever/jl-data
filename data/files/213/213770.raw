@@ -1,0 +1,12 @@
+## ====================================================================
+## xxxxx.jl - xxxxxxxxxx
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## ====================================================================
+
+function mysum(xs)
+    s = zero(eltype(xs))
+    for x in xs
+        s += x
+    end
+    return s
+end

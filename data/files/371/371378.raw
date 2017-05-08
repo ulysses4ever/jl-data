@@ -1,0 +1,191 @@
+# Elio liquido dentro un confinamento armonico, con VMC. Il resto del modulo sono funioni generali che poi si applicano a quella cosa
+module mc
+import Roots
+# un iteratore è un qualsiasi tipo che abbia definiti i metodi start, next e done
+
+# Un iteratore che campiona usando metropolis. Lo si inizializza con la distribuzione da campionare e lui produce uno alla volta i campioni
+# si potrebbe aggiungere un campo per la lunghezza di correlazione così dico a next di tirare fuori solo punti scorrelati
+type MarkovChain{T}
+    value::T
+    delta::Float64
+    p::Function
+    accepted::Int # ci mettiamo anche un campo che conta quelli proposti?
+    steps::Int
+    prop::T
+end
+
+function Base.display(chain::MarkovChain)
+    println("Datatype:\t$(typeof(chain.value))")
+    println("Delta:   \t$(chain.delta)")
+    println("Distrib: \t$(chain.p)")
+    println("Accepted:\t$(chain.accepted)")
+    println("Length:  \t$(chain.steps)")
+    println("Ratio:   \t$(chain.accepted/chain.steps)")
+end
+
+# Un costruttore comodo con dei valori di default sensati
+MarkovChain(;init=0.0, delta=1.0, p=gauss, steps=100000) = MarkovChain{typeof(init)}(init, delta, p, 0, steps, init)
+
+# state inizia da 1 ed è un intero, conta quanta roba ho prodotto
+Base.start(chain::MarkovChain) = 1
+
+# next deve restituire il valore dell'iteratore ed il prossimo stato (che è un intero)
+function Base.next(chain::MarkovChain{Float64}, state::Int)
+    proposal = chain.value + chain.delta*(rand() - 0.5)
+    w        = chain.p(proposal)/chain.p(chain.value)
+    if w >= 1 || w > rand() # se è più probabile starci lo accetto, altrimenti uniforme
+        chain.accepted += 1
+        chain.value = proposal
+    else # se ho rifutato rimango dove sono
+        chain.value = chain.value
+    end
+    return chain.value, state+1
+end
+
+# metodo per gestire configurazioni a molte particelle
+function Base.next{T<:Array}(chain::MarkovChain{T}, state::Int)
+    # la configurazione va generata tutta insieme, non una particella alla volta
+    for i in 1:length(chain.value)
+        chain.prop[i] = chain.value[i] + chain.delta*(rand(length(chain.value[i])) - 0.5) 
+    end
+    w = chain.p(chain.prop)/chain.p(chain.value)
+    if w >= 1 || w > rand() # se è più probabile starci lo accetto, altrimenti uniforme
+        chain.accepted += 1
+        chain.value = deepcopy(chain.prop) # è lento FIXME
+    else # se ho rifutato rimango dove sono
+        chain.value = chain.value
+    end
+    return chain.value, state+1
+end
+
+# definendo questo metodo posso fare le comprehensions
+Base.length(chain::MarkovChain) = chain.steps
+
+# in questo modo i cicli sono 'for val in catena' e sanno quando fermarsi  
+Base.done(chain::MarkovChain, state) = state > chain.steps
+
+function gauss(x)
+    # variabile gaussiana standard
+    return exp(-dot(x,x)/2)
+end
+
+function gauss{T<:Array}(x::T)
+    return exp(-sum(map(y->dot(y,y), x)))
+end
+
+function regola_acc_rate!(target_rate::Float64, catena::MarkovChain)
+    # aggiusta delta in place finché accepted/steps non fa target_rate
+    old_steps = catena.steps
+    function acceptance_rate(delta::Float64)
+        catena.accepted = 0
+        catena.steps = 1000
+        catena.delta = delta
+        for val in catena # è vuoto perchè deve solo produrre i valori e non farci niente
+        end
+        return catena.accepted/catena.steps - target_rate
+    end
+    catena.delta    = Roots.fzero(acceptance_rate, 0.0, 50.0) # lentissimo FIXME
+    catena.accepted = 0
+    catena.steps    = old_steps
+    return catena.delta
+end
+
+function monte_carlo(stimatori, catena::MarkovChain)
+    # gli passo un dizionario di funzioni da integrare con la catena e lui restituisce
+    # un dizionario di risultati numerici con le stesse chiavi
+    integrali = [nome => 0.0 for nome in keys(stimatori)]
+    for val in catena
+        for (nome,funzione) in stimatori
+            integrali[nome] += funzione(val)
+        end
+    end
+    for (nome,somma) in integrali
+        integrali[nome] = somma/catena.steps
+    end
+    return integrali 
+end
+
+function gradiente(f, p, a, da, catena)
+    # fa il gradiente con il ripesamento del funzionale ∫f⋅p valutato in a±da
+    #= return (E(a+da) - E(a-da))/2da =#
+    fd(x)    = f(x,a+da)*p(x,a+da)/p(x,a)
+    wd(x)    = p(x,a+da)/p(x,a)
+    fs(x)    = f(x, a+da)*p(x,a-da)/p(x,a)
+    ws(x)    = p(x,a-da)/p(x,a)
+    stimatori = ["Peso a-da"=>ws, "Peso a+da"=>wd, "Integr. a+da"=>fd, "Integr. a-da"=>fs]
+    res =  monte_carlo(stimatori, catena)
+    return (res["Integr. a+da"]/res["Peso a+da"] - res["Integr. a-da"]/res["Peso a-da"])/2da  
+end
+
+
+function sq(x)
+    # gli dai un array di 3vettori e lui fa ∑rᵢ²
+    return sum([dot(y,y) for y in x])
+end
+
+
+# Oscillatore armonico 3D, il risultato deve essere (1.5,1.5,1.0,3.0)
+# le unità sono ɛ =ħ ω / 2, σ = sqrt(ħ / m ω )   
+a = 1.0
+p(x) = exp(-sq(x)/a)
+
+en_kin(x) = (-sq(x)+3a*particles)/a^2 # en. cinetica locale
+en_pot(x) = sq(x)                     # en. potenziale
+en_loc(x) = en_kin(x)+en_pot(x)       # en. locale, in queste unità deve fare 3*particles
+test(x)   = 1.0                       # controllo che l'integrale faccia 1
+stimatori = ["En. cinetica"=>en_kin, "En. potenziale"=>en_pot, "En. locale"=>en_loc, "Test"=> test]
+
+particles = 10
+# La configurazione è una tupla di array lunghi 3
+catena = MarkovChain(init = [zeros(3) for i in 1:particles], steps=500000, p=p)
+regola_acc_rate!(0.5, catena)
+
+risultati = monte_carlo(stimatori, catena)
+
+function E(a)
+    # calcola l'energia di ho 3D in unita hw/2 col parametro variazionale a
+    p(x) = exp(-sq(x)/a)
+    en_loc(x) = (-sq(x)+3a*particles)/a^2 + sq(x)
+    stimatori = ["En. locale"=>en_loc]
+    catena = MarkovChain(init = [zeros(3) for i in 1:particles], steps=100000, p=p)
+    regola_acc_rate!(0.5, catena)
+    println("a = $(round(a,3))\tdelta = $(round(catena.delta, 2))")
+    return  monte_carlo(stimatori, catena)["En. locale"]
+end
+# calcolo le energie per alcuni valori del parametro, per farmi un'idea di dove sta il minimo
+#= as      = linspace(0.5, 1.5, 10) =#
+#= energie = map(E, as) =#
+#= using PyPlot =#
+#= plot(as, energie, linestyle="-", marker=".") =#
+
+function minimizza_energia_braveness(a_iniz, braveness, da, tolerance)
+    a = a_iniz
+    while true
+        en_loc(x,a) = (-sq(x)+3a*particles)/a^2 + sq(x)
+        p(x,a)      = exp(-sq(x)/a)
+        distr(x)    = p(x,a)
+        catena = MarkovChain(init=[zeros(3) for i in 1:particles], steps=300000, p=distr)
+        regola_acc_rate!(0.5, catena)
+        grad        = gradiente(en_loc, p, a, da, catena)
+        print("\r a = $(round(a, 5)) \t grad = $(round(grad, 5))")
+        if norm(grad)<tolerance
+            break
+        else
+            a = a - grad*braveness
+            println(" --> \ta_new = $(round(a, 5))")
+        end
+    end
+    println("")
+    return a
+end
+#= minimizza_energia_braveness(0.8, 0.03, 1e-4, 1e-3) =#
+
+end # fine modulo
+
+
+
+
+
+
+
+

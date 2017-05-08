@@ -1,0 +1,35 @@
+using CommLib
+using Debug
+#using PyPlot
+@debug function runUncQAMSISO(SNR::Array{Float64,2},Ncpc,nRuns)
+
+srand(1);
+bits = BitArray{2};
+numSNR = length(SNR);
+perSNRBER = 0.0*zeros(numSNR,1);
+ebno = 0.0*zeros(numSNR,1);
+for j = 1:numSNR
+    errors = 0;
+    thisSNR = SNR[j];
+    llrSNR  = 10^(thisSNR/10)*ones(nRuns,1);
+
+    bits = randn(Ncpc*nRuns,1).>zeros(Ncpc*nRuns,1);
+    qam  = mapper(bits,Ncpc);
+    rx   = addNoise(qam,thisSNR);
+    
+    measNoiseVar =  ((qam-rx)'*(qam-rx))/(nRuns);
+    
+    llr  = sliceLLR(rx,llrSNR,Ncpc);
+   
+    decBits  = llr.>0;
+
+    errors   = errors + measBER(bits,decBits);
+
+    perSNRBER[j] = errors/(nRuns*Ncpc);
+    ebno[j] = SNR[j] - 10*log10(Ncpc);
+end
+    #semilogy(ebno,perSNRBER);
+    return(ebno,perSNRBER);
+end
+
+

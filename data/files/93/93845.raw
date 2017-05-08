@@ -1,0 +1,74 @@
+abstract Node 
+
+# Players properties structure
+type Player{N,UF}
+  name::String 
+  nodes::Array{N,1} 
+  utilityfunctions::Array{UF,1}
+end
+
+# Extensive Node properties structure
+type ExtensiveNode{M} <: Node
+  name::String
+  timeposistion::Int
+  moves::Array{M,1}
+end
+
+# Strategic Node properties structure
+type StrategicNode{P} <: Node
+	name::String
+	timeposistion::Int
+	playerstrategies::Dict{P,Array{S,1}}
+end
+
+# Moves properties structure
+type Move{R,V}
+  name::String
+  length::Int
+  childnodeindex::Nullable{Int}
+  childnodeplayerindex::Nullable{Int}
+  payoffset::Dict{R,V}
+end
+
+# Payoff Set properties structure
+type PayoffSet
+	globalindependentoutcomes::Union{Int, V}
+	individualindependentoutcomes::Union{Int, V}
+	environmentconstrainedoutcomes
+end
+
+# Game properties structure
+type Game
+	name::String
+end
+
+# Infoset properties structure
+type InfoSet{N}
+  name::String
+  span::Int
+  nodes::Array{N,1}
+end
+
+# Variable properties structure
+type Variable{P,R}
+  name::String
+  linkedresource::R
+  examined::Dict{P,Bool}
+end
+
+type Resource{R}
+  name::String
+  shared::Bool
+  examined::Bool
+  independentpercentage::Float
+  dependentpercentage::Nullable{Dict{R,Float}}
+  initalamount::Float
+  finalamount::Nullable{Float} 
+  minimumamount::Float
+  maximumamount::Float
+end
+
+type UtilityFunction 
+  resourcepercentage::Dict{R,Float}
+  resourcecondition::Dict{R,C}
+end

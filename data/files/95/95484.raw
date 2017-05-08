@@ -1,0 +1,47 @@
+function compute_ber(s, r, sprlens::Ranges, out; s_has_header=false, r_has_header=false)
+  nspoints = s_has_header ? countlines(s)-1 : countlines(s)
+  nrpoints = r_has_header ? countlines(r)-1 : countlines(r)
+
+  if !(nspoints == nrpoints)
+    error("Driver and received signal do not have equal lengths.")
+  end
+
+  nsprlens = length(sprlens)
+  bers = Array(Float64, nsprlens)
+
+  for i = 1:nsprlens
+    sprrange = 0:sprlens[i]:npoints
+    nsprseqs = length(sprrange)-1
+
+    sseq = Array(Float64, sprlens[i])
+    rseq = Array(Float64, sprlens[i])
+
+    nbiterrors = 0
+
+    sstream = open(s, "r")
+    rstream = open(r, "r")
+
+    if s_has_header; datatitle01 = readline(sstream); end
+    if r_has_header; datatitle02 = readline(rstream); end
+
+    for j = 1:nsprseqs
+      for k = 1:sprlens[i]
+        sseq[k] = float64(readline(sstream))
+        rseq[k] = float64(readline(rstream))
+      end
+
+      if cov(sseq, rseq) < 0
+        nbiterrors += 1
+      end
+    end
+
+    close(sstream)
+    close(rstream)
+
+    bers[i] = nbiterrors/nsprseqs
+
+    println("Completed simulation $i of $nsprlens")
+  end
+
+  writedlm(out, hcat(sprlens, bers), ' ')
+end

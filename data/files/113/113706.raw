@@ -1,0 +1,121 @@
+module CoinFlips
+
+export Coin, flip, length, show, collect, heads, tails, loglik
+using Distributions
+
+# A coin is flipped, and returns heads (1) with probability p.
+immutable Coin
+    p::Float64
+
+    function Coin(p::Float64)
+        if p > 1.0 || p < 0.0
+            error("p must be between 0 and 1, inclusive.")
+        else
+            new(p)
+        end
+    end
+end
+
+# A Flip is 1 or 0 and is the result of flipping a coin.
+immutable Flip
+    side::Int
+
+    function Flip(side::Int)
+        side in [0, 1] ? new(side) : error("side must be 0 or 1.")
+    end
+end
+
+abstract AbstractFlips
+
+# A sequence of individual flips.
+immutable Flips <: AbstractFlips
+    n::Int
+    flips::Vector{Flip}
+
+    function Flips(n::Int, flips::Vector{Flip})
+        if length(flips) != n
+            error("n must equal the number of flips.")
+        else
+            new(n, flips)
+        end
+    end
+end
+
+
+# Mixed flips are the result of flipping two Coins, one after
+# the other.
+immutable MixedFlips <: AbstractFlips
+    n1::Int
+    n2::Int
+    n::Int
+    flips::Vector{Flip}
+end
+
+
+# Constructors for a flip and series of flips.
+flip(c::Coin) = Flip(rand(Bernoulli(c.p)))
+flip(c::Coin, n::Int) = Flips(n, [flip(c) for i = 1:n])
+function flip(c1::Coin, c2::Coin, n1::Int, n2::Int)
+    fs = [[flip(c1) for i = 1:n1], [flip(c2) for i= 1:n2]]
+    MixedFlips(n1, n2, n1+n2, fs)
+end
+
+# Helper functions.
+Base.length(fs::AbstractFlips) = fs.n
+function Base.show(io::IO, fs::AbstractFlips)
+    println(reduce(*, map(f -> f.side == 1 ? "H": "T", fs.flips)))
+    println("Heads: ", heads(fs), " Tails: ", tails(fs))
+end
+
+# Outcomes into a 1-D array/vector.
+Base.collect(fs::AbstractFlips) = [flip.side for flip in fs.flips]
+
+Base.getindex(fs::AbstractFlips, index) =
+    Flips(length(index), getindex(fs.flips, index))
+
+Base.endof(fs::AbstractFlips) = endof(fs.flips)
+
+# Count heads (1s) and tails (0s)
+heads(fs::AbstractFlips) = sum(collect(fs))
+tails(fs::AbstractFlips) = length(fs) - heads(fs)
+
+
+# Likelihood functions calculate the probability
+# of observing a sequence of flips given underlying parameters.
+# We take the log for convenience and numerical stability.
+# (Log likelihoods are additive, raw likelihoods are multiplicative;
+# this can cause underflow problems.)
+
+# For a single coin, the only parameter is p (the probability of heads).
+# The observerd flips are binomial RVs with probability p.
+#
+# Likelihood of some draws from a binomial variable is:
+#     p^(# of 1s) * (1-p)^(# of 0s)
+# So the log likelihood is:
+#     (# of 1s) * log(p) + (# of 0s) * log(1-p)
+loglik(fs::Flips, p::Float64) = heads(fs) * log(p) + tails(fs) * log(1-p)
+
+
+# For mixed flips, there are two binomial probability
+#
+# Likelihood of observing a sequence of flips given there are
+# two different coins being flipped, one after another, with the
+# second coin starting after some unknown time n1.
+function loglik(fs::MixedFlips, p1::Float64, p2::Float64, n1::Int)
+    fs1 = fs[1:n1]
+    fs2 = fs[(n1+1):end]
+    h1 = heads(fs1)
+    h2 = heads(fs2)
+    loglik(fs1, p1) + loglik(fs2, p2)
+end
+
+loglik(fs::MixedFlips, params::Vector) = loglik(fs, params...)
+
+
+end # module
+
+
+
+
+
+

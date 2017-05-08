@@ -1,0 +1,80 @@
+function registered_schd(eiBuf::Ptr{Uint8}, eiBufSize::Cint,
+                        fiBuf::Ptr{Uint8}, fiBufSize::Cint,
+                        siBuf::Ptr{Uint8}, siBufSize::Cint,
+                        callback::Ptr{Void}, driver::Ptr{Void})
+    f = unsafe_pointer_to_objref(callback)::Function
+    frameworkId = makeproto(fiBuf, fiBufSize, Proto.FrameworkID)
+    masterInfo = makeproto(masterBuf, masterBufSize, Proto.MasterInfo)
+    f(SchedulerDriver(driver), frameworkId, masterInfo)
+    return
+end
+
+function reregistered_schd(masterBuf::Ptr{Uint8}, masterBufSize::Cint, callback::Ptr{Void}, driver::Ptr{Void})
+    f = unsafe_pointer_to_objref(callback)::Function
+    masterInfo = makeproto(masterBuf, masterBufSize, Proto.MasterInfo)
+    f(SchedulerDriver(driver), masterInfo)
+    return
+end
+
+
+# Callback C handles
+const registered_schd_c = cfunction(registered_schd, Void, (Ptr{Uint8}, Cint, Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}))
+const reregistered_schd_c = cfunction(reregistered_schd, Void, (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}))
+# const disconnected_exec_c = cfunction(disconnected_wrap, Void, (Ptr{Void}, Ptr{Void}))
+# const launchTask_exec_c = cfunction(launchTask_wrap, Void, (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}))
+# const killTask_exec_c = cfunction(killTask_wrap, Void, (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}))
+# const frameworkMessage_exec_c = cfunction(frameworkMessage_wrap, Void, (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}))
+# const shutdown_exec_c = cfunction(shutdown_wrap, Void, (Ptr{Void}, Ptr{Void}))
+# const error_exec_c = cfunction(error_wrap, Void, (Ptr{Uint8}, Cint, Ptr{Void}, Ptr{Void}))
+
+
+# Scheduler (callback container)
+type Scheduler
+    registered_cf::Ptr{Void}
+    registered_callback::Any
+    reregistered_cf::Ptr{Void}
+    reregistered_callback::Any
+    disconnected_cf::Ptr{Void}
+    disconnected_callback::Any
+    resourceOffers_cf::Ptr{Void}
+    resourceOffers_callback::Any
+    offerRescinded_cf::Ptr{Void}
+    offerRescinded_callback::Any
+    statusUpdate_cf::Ptr{Void}
+    statusUpdate_callback::Any
+    frameworkMessage_cf::Ptr{Void}
+    frameworkMessage_callback::Any
+    slaveLost_cf::Ptr{Void}
+    slaveLost_callback::Any
+    executorLost_cf::Ptr{Void}
+    executorLost_callback::Any
+    error_cf::Ptr{Void}
+    error_callback::Any
+
+    function Scheduler(;callbacks...)
+        callbacks = Dict(callbacks)
+        registered = get(:registered, callbacks, nothing)
+        reregistered = get(:reregistered, callbacks, nothing)
+        disconnected = get(:disconnected, callbacks, nothing)
+        resourceOffers = get(:resourceOffers, callbacks, nothing)
+        offerRescinded = get(:offerRescinded, callbacks, nothing)
+        statusUpdate = get(:statusUpdate, callbacks, nothing)
+        frameworkMessage = get(:frameworkMessage, callbacks, nothing)
+        slaveLost = get(:slaveLost, callbacks, nothing)
+        executorLost = get(:executorLost, callbacks, nothing)
+        error = get(:error, callbacks, nothing)
+
+        return new(
+            registered_schd_c, registered,
+            reregistered_schd_c, reregistered,
+            disconnected_wrap_c, disconnected,
+            resourceOffers_wrap_c, resourceOffers,
+            offerRescinded_wrap_c, offerRescinded,
+            statusUpdate_wrap_c, statusUpdate,
+            frameworkMessage_wrap_c, frameworkMessage,
+            slaveLost_wrap_c, slaveLost,
+            executorLost_wrap_c, executorLost
+            error_wrap_c, error
+        )
+    end
+end

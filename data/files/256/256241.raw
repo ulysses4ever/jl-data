@@ -1,0 +1,90 @@
+# !/usr/bin/julia
+
+######################################################################
+### Usamos este modulo para encontrar las raices de una funcion f  ###
+### en el intervalo X, si es que las hay.                          ###
+######################################################################
+
+module Raices
+
+## Importa el modulo de Intervalos
+
+using Intervalos
+
+export roots
+export possibleroots
+
+## Funcion que calcula la longitud de un intervalo
+
+long(I::Intervalo) = I.b - I.a
+
+## Funcion que verifica si hay un cero en un intervalo X
+
+verify(X) = 0 in X
+
+## Funcion que divide en n partes iguales el intervalo
+
+function divide(I::Intervalo, n::Int)
+	subint = Intervalo[]
+	for i = 0:n-1
+		push!(subint, Intervalo(I.a + i*long(I)/n, I.a + (i+1)*long(I)/n))
+	end
+	return subint
+end
+
+
+## Modifica el vector r y lo llena con intervalos donde posiblemente hay una raiz
+
+
+function roots(f::Function, X::Intervalo, err::Real, r::Array{Intervalo,1})
+	N = 2  # Numero de subintervalos
+	if verify(f(X))
+		if long(f(X)) <= err
+			push!(r, X)
+		else
+			BX = divide(X,N)
+			for i = 1:N
+				roots(f, BX[i], err, r)
+			end
+		end
+	end
+end
+
+
+## Calcula los intervalos donde posiblemente hay raices
+
+function possibleroots(f::Function, X::Intervalo, err::Real)
+    r = Intervalo[]
+    roots(f, X, err, r)
+    return r
+end
+
+
+###########################################################
+### Especificando derivada a mano para unicidad de raiz ###
+###########################################################
+
+function evalder(df::Function, X::Intervalo)
+	if 0 in df(X)
+		return false
+	else
+		return true
+	end
+end
+
+
+## Evalua los intervalos con posibles raices en la derivada de la funcion
+
+function uniqueroots(f::Function, X::Intervalo, err::Real)
+	roots = possibleroots(f, X, err)
+	nomon = Intervalo[]
+	for i = 1:length(roots)
+		if ~evalder(f, roots[i])
+			push!(nomon, roots[i])
+		end
+	end
+	return setdiff(roots, nomon)
+end
+			
+
+end    

@@ -1,0 +1,47 @@
+###################################################
+## Main file
+###################################################
+
+techno = ARGS[1]
+# can be "2_cycles" or "23_cycles"
+
+prio = ARGS[2]
+# can be "greedy"
+
+steps = parse(Int, ARGS[3])
+# solve time is about steps/10 seconds
+
+batch = parse(Int, ARGS[4])
+# can be any Int64
+
+solver = ARGS[5]
+# Can be "gurobi" or "mosek"
+
+data_folder = ARGS[6]
+# name of the folder under 'data' where the types and matrix should be retrieved
+# also the folder under  'results' where results will be stored
+
+job_id = ARGS[7]
+# identifier to save the results
+
+using JuMP
+using DataFrames
+using LightGraphs
+if solver == "gurobi"
+  using Gurobi
+else
+  using Mosek
+end
+
+include("typegraph.jl")
+include("instancegraph.jl")
+include("params.jl")
+include("edges.jl")
+include("import_data.jl")
+include("runsim.jl")
+include("match.jl")
+
+g = import_data(data_folder)
+p = Params(batch = batch, techno = techno, prio = prio, solver = solver)
+summary = run_dynamic(g, steps, p);
+writetable("../results/$data_folder/$techno/$prio/batch=$batch/$job_id.csv", summary)

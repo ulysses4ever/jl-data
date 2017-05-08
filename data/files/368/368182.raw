@@ -1,0 +1,164 @@
+export
+	single_threshold_classifier
+
+#constructs the q (q = number of classes) univariate depth axis with the corresponding thresholds
+function single_threshold_classifier_train{T<:Number}(data_set::AbstractArray{T,2},classlabels::AbstractVector,depth_function::Function)
+    sortedClasslabels = sort(unique(classlabels))
+    sortedData = sortData(data_set,classlabels)
+    
+    res = cell(length(data_set[:,1]),length(sortedData))
+    
+    for j in 1:length(sortedData)
+        for i in 1:length(data_set[:,1])
+            #Save the resulting trainingData with the corresponding index i => for sorting
+            res[i,j] = (depth_function(vec(data_set[i,:]),sortedData[j]),i)
+        end
+    end
+    
+    #Index of the class which minimizes the classification error (=> maximal AUC)
+    thresholds = findOptimalThreshold(res,classlabels,depth_function)
+    
+    #Only return the training matrix without the indices
+    res = map((x) -> x[1], res)
+    return (res,thresholds)
+end
+
+#finds the thresholds for every of the univeriate axis 
+function findOptimalThreshold(trainedData::Array{Any,2},classlabels::AbstractVector,depth_function::Function)
+    uniqueClasslabels = sort(unique(classlabels))
+    #res = single_threshold_classifier_train(data_set,classlabels,depth_function)
+    curves = cell(length(trainedData[1,:]))
+    thresholds = zeros(length(trainedData[1,:]))
+    
+    for i in 1:length(trainedData[1,:])
+        amr = (typemax(Float64),-1)
+        
+        sortedTrainingData = sort(trainedData[:,i])
+        
+        for j in 1:length(trainedData[:,i])-1
+            truelabel = uniqueClasslabels[i]
+            falselabel = setdiff(uniqueClasslabels,[uniqueClasslabels[i]])[1]
+
+            #Depth values left and right of the threshold
+            left_arr = sortedTrainingData[1:j]
+            right_arr = sortedTrainingData[j+1:end]
+            #Corresponding classlabels => left = truelabel (since we are working with the misclassification rate) 
+            #right = falselabel
+            left_labels_tmp = fill!(similar(classlabels[1:j]),truelabel)
+            right_labels_tmp = fill!(similar(classlabels[j+1:end]),falselabel)
+            
+            #Count misclassifications on both sides, so count he instances where the classlabels are == false labels
+            mis_left = sum(classlabels[map((x) -> x[2], left_arr)] .== left_labels_tmp)
+            mis_right = sum(classlabels[map((x) -> x[2], right_arr)] .== right_labels_tmp)
+            amr_tmp = (mis_left + mis_right)/(length(left_arr) + length(right_arr))
+            
+            if(amr_tmp <= amr[1])
+                amr = (amr_tmp,j)
+            end
+        end
+        
+        #Thresholds are in the middle of two points
+        thresholds[i] = (sortedTrainingData[amr[2]][1]+sortedTrainingData[amr[2]+1][1])/2
+    end    
+
+    return thresholds
+end
+
+#Tests one single point w. r. t. two classlabels
+function single_threshold_classifier_test{T<:Number}(x::AbstractArray{T,1},data_set::AbstractArray{T,2},classlabels::AbstractVector,thresholds::AbstractArray{Float64,1},depth_function::Function)
+    uniqueClasslabels = sort(unique(classlabels))
+    sortedData = sortData(data_set,classlabels)
+    res = similar(uniqueClasslabels)
+    for i in 1:length(thresholds)
+        truelabel = uniqueClasslabels[i]
+        falselabel = setdiff(uniqueClasslabels,[uniqueClasslabels[i]])[1]
+        if(depth_function(x,sortedData[i]) >= thresholds[i])
+            res[i] = truelabel
+        else
+            res[i] = falselabel
+        end
+    end
+    return res
+end
+
+#Test of multiple points w. r. t. q >= 2 classes.
+#For 2 classes a classlabel_ind (index) must be set to test the points w. r. t. a certain class out of two classes 
+function single_threshold_classifier{T<:Number}(test_data::AbstractArray{T,2},training_data::AbstractArray{T,2},training_classlabels::AbstractVector,depth_function::Function,classlabel_ind::Int64=-1)
+    q = length(unique(training_classlabels))
+    uniqueClasses = sort(unique(training_classlabels))
+    class_combinations = collect(combinations(1:q,2))
+    
+    testResult = cell(length(test_data[:,1]),length(class_combinations)*2)
+    #This collects all indices of every 2-class-combination 
+    
+    tmpfct_binary = 0
+    tmpfct_moreclass = cell(length(class_combinations))
+    
+    #Training phase
+    if(length(uniqueClasses) == 2)
+        tmpfct_binary = single_threshold_classifier_train(training_data,training_classlabels,depth_function)
+    else
+        cnt = 1
+        for i in class_combinations
+                indices_class1 = find(z-> z == uniqueClasses[i[1]],training_classlabels)
+                indices_class2 = find(z-> z == uniqueClasses[i[2]],training_classlabels)
+                indices = [indices_class1;indices_class2]
+                indices = sort(indices)
+                tmp_trainingData = training_data[indices,:]
+                tmp_trainingClasslabels = training_classlabels[indices]
+                
+                tmpfct_moreclass[cnt] = single_threshold_classifier_train(tmp_trainingData,tmp_trainingClasslabels,depth_function)
+                cnt = cnt + 1
+        end
+    end
+    
+    #Test phase
+    for k in 1:length(test_data[:,1])
+        cnt = 1
+        if(length(uniqueClasses) == 2)
+            res = tmpfct_binary[1]
+            thresholds = tmpfct_binary[2]
+            testResult[k,1] = single_threshold_classifier_test(vec(test_data[k,:]),training_data,training_classlabels,thresholds,depth_function)[classlabel_ind]
+        else
+            cnt2 = 1
+            for i in class_combinations
+                indices_class1 = find(z-> z == uniqueClasses[i[1]],training_classlabels)
+                indices_class2 = find(z-> z == uniqueClasses[i[2]],training_classlabels)
+                indices = [indices_class1;indices_class2]
+                indices = sort(indices)
+                tmp_trainingData = training_data[indices,:]
+                tmp_trainingClasslabels = training_classlabels[indices]
+
+                res = tmpfct_moreclass[cnt2][1]
+                thresholds = tmpfct_moreclass[cnt2][2]
+
+                two_predictions = single_threshold_classifier_test(vec(test_data[k,:]),tmp_trainingData,tmp_trainingClasslabels,thresholds,depth_function)
+
+                testResult[k,cnt] = two_predictions[1]
+                testResult[k,cnt+1] = two_predictions[2]
+                cnt = cnt + 2
+                cnt2 = cnt2 + 1
+            end
+        end
+    end
+    
+	#If there are two classes, two threshold classifiers are constructed, each one with an own solution
+    if(length(uniqueClasses) == 2)
+        return testResult[:,1] 
+	#If there are more than two classes, majority vote for the q threshold classifiers is applied
+    else
+        return majorityVote(testResult)
+    end
+end
+
+function majorityVote(result::Array{Any,2})
+    maj_res = cell(length(result[:,1]))
+    for i in 1:length(result[:,1])
+        dict_tmp = Dict{Any,Int}()
+        for j in result[i,:]
+            dict_tmp[j] = get(dict_tmp,j,0)+1
+        end
+        maj_res[i] = collect(keys(dict_tmp))[indmax(collect(values(dict_tmp)))]
+    end
+    return maj_res
+end

@@ -1,0 +1,107 @@
+using Wavelets
+
+function ComputeTime_X(npix::Int64)
+#Calcul du temps pour executer l'operation : 
+#requiert le calcul d'une FFT + une FFT inverse sur
+	Q_fft = randn(npix,npix) ; 
+	B = randn(npix,npix) ; 
+	X = zeros(npix,npix) ;
+	tic();
+	ifft(fft(B)./Q_fft)
+	t=toc();
+
+end
+
+
+
+function ComputeTime_B(npix::Int64)
+	#on  doit sommer 6 matrices de tailles npix*npix
+
+	X = randn(npix,npix,6) ; 
+	tic();
+	sum(X,3)
+	t=toc();
+
+end
+
+
+function ComputeTime_P(npix::Int64)
+	#on  doit sommer 6 matrices de tailles npix*npix
+
+	X = randn(npix,npix) ;
+	gamma = randn(npix,npix) ; 
+	tic();
+	P = max(0,X - 0.5.*gamma)
+	t=toc();
+
+end
+
+
+function ComputeTime_T(npix::Int64)
+	#on  doit sommer 6 matrices de tailles npix*npix
+
+	T = randn(npix,npix) ;
+	Gamma =  randn(npix,npix) ;
+	tic();
+	T  = max(0,1- 0.5.*0.6./abs(T))
+	t=toc();
+
+end
+
+
+
+function update_multiplier(npix::Int64)
+	#on  doit sommer 6 matrices de tailles npix*npix
+	gamma = randn(npix,npix)
+	A = randn(npix,npix) ; 
+	B = randn(npix,npix) ;
+	
+
+	tic();
+	gamma += gamma + 0.05*(A-B) ;
+	t=toc();
+
+end
+
+
+
+
+function Wavelet_sum(npix::Int64,nwavelet)
+#Calcul du temps pour executer l'operation : 
+#requiert le calcul d'une FFT + une FFT inverse sur
+	X = randn(npix,npix,nwavelet)
+	tic();
+	sum(X,3)
+	t=toc();
+
+end
+
+
+function Wavelet_sum(npix::Int64,nwavelet)
+#Calcul du temps pour executer l'operation : 
+#requiert le calcul d'une FFT + une FFT inverse sur
+	X = randn(npix,npix,nwavelet)
+	tic();
+	sum(X,3)
+	t=toc();
+
+end
+
+
+function Wavelet_compute(npix::Int64,wt)
+	X = randn(npix,npix) ;
+	tic() ; 
+	dwt(X,wavelet(wt)) ; 
+	toc() ;
+end
+
+
+function dct_compute(npix::Int64,nfreq::Int64)
+	X = randn(128,128,nfreq) ;
+	tic() ; 
+	dct(X,3) ; 
+	temp=toc() ;
+	temp = npix*npix*temp/(128*128) ; 
+end
+
+

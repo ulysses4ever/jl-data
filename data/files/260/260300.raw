@@ -1,0 +1,42 @@
+function run_test(test_case)
+  include("../data/$(test_case)_data.jl")
+  if fragility_format == "discrete"
+    interpolated_imls = finegrain_list(fragility_imls,
+                                       steps_per_interval,
+                                       no_damage_limit)
+    interpolated_fragility_poes = interpolate_matrix(fragility_imls,
+                                                     fragility_poes,
+                                                     interpolated_imls)
+    stripped_fragility_poes = strip_matrix(interpolated_imls,
+                                           interpolated_fragility_poes,
+                                           no_damage_limit)
+    computed_hazard_imls = finegrain_list(fragility_imls, 1,
+                                          no_damage_limit)
+    interpolated_hazard_poes = interpolate_vector(computed_hazard_imls,
+                                                  computed_hazard_poes,
+                                                  interpolated_imls)
+    damage_poos = classical_damage(interpolated_hazard_poes,
+                                   stripped_fragility_poes,
+                                   hazard_investigation_time,
+                                   risk_investigation_time)
+  else
+    discrete_imls = finegrain_list([minIML maxIML],
+                                   continuous_fragility_discretization - 1,
+                                   minIML)
+    discrete_fragility_poes = discretize_lognormal(discrete_imls,
+                                                   fragility_means,
+                                                   fragility_stds)
+    damage_poos = classical_damage(computed_hazard_poes,
+                                   discrete_fragility_poes,
+                                   hazard_investigation_time,
+                                   risk_investigation_time)
+  end
+
+  damage_fracs = damage_poos * number_per_asset
+  pd = pwd()
+  cd("results")
+  f = open("$(test_case).out", "w")
+  writecsv(f, transpose([@sprintf("%11.5E", n) for n in damage_fracs]))
+  close(f)
+  cd(pd)
+end

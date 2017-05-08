@@ -1,0 +1,9 @@
+using Gadfly
+
+function plot_clusters(K::Int)
+  plot_clusters(Clusters{K}())
+end
+
+function plot_clusters(cluster::Clusters{2})
+  plot(cluster.points, { :x => "x", :y => "y", :color => "k" }, Geom.point)
+end

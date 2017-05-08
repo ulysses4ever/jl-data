@@ -1,0 +1,47 @@
+
+module CRlibm
+
+# following check from Ipopt.jl:
+if isfile(joinpath(dirname(@__FILE__),"..","deps","deps.jl"))
+    include("../deps/deps.jl")
+else
+    error("CRlibm not properly installed. Please run Pkg.build(\"CRlibm\")")
+end
+
+
+import Base:
+    sin, cos, tan, exp, log
+
+export sin, cos, tan, exp, log
+
+
+## Generate wrappers of CRlibm shared library:
+
+for f in (:sin, :cos, :tan, :exp, :log)
+    for (mode, symb) in [(:Nearest, "n"), (:Up, "u"), (:Down, "d")  ]
+
+        fname = symbol(f, "_r", symb)
+        fname = Expr(:quote, fname)
+
+        mode = Expr(:quote, mode)
+        mode = :(::RoundingMode{$mode})
+
+        @eval ($f)(x::Float64, $mode) = ccall(($fname, libcrlibm), Float64, (Float64,), x)
+    end
+end
+
+
+end # module
+
+
+
+## OUTPUT:
+
+# julia> cos(0.5, RoundDown)
+# 0.8775825618903726
+
+# julia> cos(0.5, RoundUp)
+# 0.8775825618903728
+
+# julia> cos(0.5, RoundNearest)
+# 0.8775825618903728

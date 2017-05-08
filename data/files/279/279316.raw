@@ -1,0 +1,31 @@
+include("../List.jl")
+using .List 
+
+lst = LinkList{Integer}()
+push!(lst, 8)
+unshift!(lst, 7)
+push!(lst, 4)
+push!(lst, 9)
+
+println(items(lst))
+
+# [7, 8, 4, 9]
+sq(x) = x*x
+
+k = map(sq, lst)
+println("map square: ",items(k))
+
+k = filter(iseven, k)
+println("filter even : ",items(k))
+
+println("reduce:   ", reduce(k))
+println("slice:   ", slice(lst, 1,2))
+println("collect: ", items(lst,5))
+println("at: ",   at(lst, 4))
+println("length: ", lst.length)
+println("pop : ",   pop!(lst))
+println("shift : ", shift!(lst))
+println("shift : ", shift!(lst))
+println("length: ", lst.length)
+println(first(lst))
+println(repr(lst))

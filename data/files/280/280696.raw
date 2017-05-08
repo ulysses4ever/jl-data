@@ -1,0 +1,23 @@
+
+decode(ex::Expr,state) = Expr(ex.head,map(x->decode(x,state),ex.args)...)
+
+function decode(a::Overwriting,state)
+	error("can't yet decode overwriting")
+	:(storeIntermediate!($(state["tape1"]),$(state["tape2"]),$(sym(a))); $(sym(a)))
+end
+
+decode(a::Active,state) = sym(a)
+
+decode(a::AFor,state) = Expr(:for,decode(a.loop,state),decode(a.block,state))
+
+function decode(a::AIf,state)
+	ifcond = gensym("ifcond")
+	arg1 = :($ifcond = $(a.ifcond))
+	arg2 = :(push!($(state["ifstack"]),$ifcond))
+	arg3 = Expr(:if,ifcond,decode(a.ifTrue,state), decode(a.ifFalse,state))
+	Expr(:block, arg1, arg2, arg3)
+end
+
+decode(ex_list::Array,state) = map(x->decode(x,state),ex_list)
+decode(s::Symbol,state) = s
+decode(a::Any,state) = a

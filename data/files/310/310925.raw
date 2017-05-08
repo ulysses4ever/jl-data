@@ -1,0 +1,31 @@
+export feature_selection_fcc
+
+#Calculates the feature-class-correlation for a given feature vector and a classlabel vector
+function feature_class_correlation{T<:Number, U<:Number}(feature::AbstractArray{T,1},classlabels::AbstractArray{U,1})
+    tmp1 = 0.0
+    tmp2 = 0.0
+    tmp3 = 0.0
+    mean_feature = mean(feature)
+    mean_class = mean(classlabels)
+    for i in 1:length(classlabels)
+        tmp1 = tmp1 + (classlabels[i] - mean_class[1]) * (feature[i] - mean_feature[1])
+        tmp2 = tmp2 + (classlabels[i] - mean_class[1])^2
+        tmp3 = tmp3 + (feature[i] - mean_feature[1])^2
+    end
+    return tmp1/sqrt(tmp2*tmp3)
+end
+
+#This selects the k features with the highest absolute feature-class-correlation, returns the indices of the features
+#Classlabels have to be numerous
+function feature_selection_fcc{T<:Number, U<:Number}(data_set::AbstractArray{T,2},classlabels::AbstractArray{U,1},k::Int64=50)
+    results = zeros(k)
+    correlations = cell(length(data_set[1,:]))
+    for i in 1:length(data_set[1,:])
+        correlations[i] = (abs(feature_class_correlation(data_set[:,i],classlabels)),i)
+    end
+    correlations = sort(correlations,rev=true)
+    for i in 1:k
+        results[i] = correlations[i][2]
+    end
+    return convert(Array{Int},sort(results))
+end

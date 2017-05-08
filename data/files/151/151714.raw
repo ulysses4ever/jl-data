@@ -1,0 +1,32 @@
+function swap_chains()
+
+  comm = MPI.COMM_WORLD
+
+  MPI.Barrier(comm)
+
+  rank = MPI.Comm_rank(comm)
+  size = MPI.Comm_size(comm)
+
+  N = 4
+  msg = Array(Float64, N)
+  fill!(msg, float64(rank))
+
+  i = 2
+  j = 4
+
+  if rank == j
+    msg_buffer = Array(Float64, N)
+    MPI.Recv!(msg_buffer, i, 5, comm)
+    MPI.Send(msg, i, 6, comm)
+    msg = msg_buffer
+  elseif rank == i
+    msg_buffer = Array(Float64, N)
+    MPI.Send(msg, j, 5, comm)
+    MPI.Recv!(msg_buffer, j, 6, comm)
+    msg = msg_buffer
+  end
+
+  println("Proc $rank of $size: $msg\n")
+
+  MPI.Barrier(comm)
+end

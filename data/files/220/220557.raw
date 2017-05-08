@@ -1,0 +1,7 @@
+if (length(ARGS) == 0 )
+  println("length(ARGS) == 0")
+  exit(1)
+end
+
+include (ARGS[1])
+include ("optProblem.jl")

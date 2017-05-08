@@ -1,0 +1,5 @@
+mix = Mixture{2}(3)
+actual = kmeans(3, mix)
+expected = centroids(mix)
+
+@assert sum(sum(actual - expected)) < 0.1

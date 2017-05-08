@@ -1,0 +1,24 @@
+abstract Dispatcher
+
+function partition(data_iter, d::Dispatcher)
+    dim = get_dimension(data_iter)
+    cluster_Xs_unshaped = [k => Array(Float64, 0) for k in cluster_keys(d)]
+    cluster_ys = [k => Array(Int, 0) for k in cluster_keys(d)]
+    for (x,y) in data_iter
+        for key in dispatch(d, x)
+            append!(cluster_Xs_unshaped[key], x)
+            push!(cluster_ys[key], y)
+        end
+    end
+    cluster_Xs = [k => reshape(X, dim, div(length(X), dim))
+                  for (k,X) in cluster_Xs_unshaped]
+    return cluster_Xs, cluster_ys
+end
+
+function dispatch_to_learners(data_iter, d::Dispatcher, learners)
+    for (x,y) in data_iter
+        for key in dispatch(d, x)
+            add_example!(learners[key], x, y)
+        end
+    end
+end

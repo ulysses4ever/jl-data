@@ -1,0 +1,71 @@
+
+#= According to Brad DeLong in lectures 1 & 2, Econ 207 UCB, the six most important macroeconomic variables are
+
+1. Real GDP, GDPC1 (Q), the broadest measure of economic activity
+2. The unemployment rate, UNRATE (M),a measure of slack and waste.
+3. Inflation rate and price level, CPIAUCSL (M), a measure of how well the economy enables rational economic decisions
+4. Stock market indices, business and investor confidence. Shiller will be the best source for this.
+5. Interest rates on short term gov't bonds, TB3MS (M), a measure of liquidity in the economy
+6. Interest rates on long term corporate bonds, a measure of business access to capital. Shiller is also the best source for this.
+=#
+
+#= A far more convenient macro dataset is available from Michael McCracken at the St. Louis Fed's research department https://research.stlouisfed.org/econ/mccracken/fred-databases/.
+
+It does appear that manual download is easiest.
+
+Δ = x[t] - x[t-1]
+Transformation codes are as follows
+
+1. No transform
+2. Δx
+3. Δ^2 x
+4. log(x)
+5. Δlog(x)
+6. Δ^2 log(x)
+
+=#
+
+function mccracken{T<:AbstractString}(datadir::T)
+    fname = joinpath(datadir,"mccracken.csv")
+    tmp = readlines(fname)
+    # reject comments
+    tmp = tmp[![startswith(line,"#") for line in tmp]]
+    # header
+    header = split(strip(tmp[1]),",")
+    # transforms
+    transform = split(strip(tmp[2]),",")
+    transform[1] = "0" # no transform for date
+    transform = [parse(Int,x) for x in transform]
+    # dates and data
+    nrow = length(tmp)-2 # first two rows are header & transforms
+    ncol = length(header)-1 # first column is date
+    date = fill(Date("1/1/1959","m/d/y"),nrow)
+    mc = fill(0.0,(nrow,ncol))
+    for i in 1:nrow
+        row = split(strip(tmp[i+2]),",")
+        date[i] = Date(row[1],"m/d/y")
+        for j in 1:ncol
+            mc[i,j] = row[j+1]==""? NaN : parse(Float64,row[j+1])
+        end
+    end
+    header, transform, date, mc
+end
+
+function group_index(group::Symbol)
+    if group==:income || group==:output
+        return 1:17
+    elseif group==:labor || group==:labour
+        return 17+(1:32)
+    elseif group==:housing
+        return 17+32+(1:10)
+    elseif group==:consumpution || group==:orders ||
+        group==:inventories
+        return 17+32+10+(1:14)
+    elseif group==:money || group==:credit
+        return 17+32+10+14+(1:14)
+    elseif group==:interest || group==:exchange_rate
+        return 17+32+10+14+14+(1:22)
+    else
+        error("unrecognized group ",group)
+    end
+end

@@ -1,0 +1,20 @@
+###################################################
+## Tests
+###################################################
+
+include("../src/KidneyMatching.jl")
+using KidneyMatching
+using Base.Test
+
+testdir = dirname(@__FILE__)
+
+tests = [
+    "sim"
+    "match"
+]
+
+for t in tests
+    tp = joinpath(testdir, t, "run_tests.jl")
+    println("running $(tp) ...")
+    include(tp)
+end

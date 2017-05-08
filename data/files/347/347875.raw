@@ -1,0 +1,9 @@
+function ols(y::Array,x::Array)
+  β = (x'x)\x'y
+  return β::Array
+end
+
+#Example
+y = rand(100,1)
+x = rand(100,1)
+ols(y,x)

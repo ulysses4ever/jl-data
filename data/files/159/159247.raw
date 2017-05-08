@@ -1,0 +1,33 @@
+using RDatasets
+
+abstract Classifier
+abstract ClassifierConfig
+
+type BoostedModelConfig <: ClassifierConfig
+  weak_model_config::ClassifierConfig
+  weak_classifiers::Int
+end
+
+type BoostedModel <:Classifier
+    models::Classifier
+    config::BoostedModelConfig
+end
+
+
+function fit(c::BoostedModelConfig,x,y)
+  
+end
+
+function iris_dataset()
+  iris = dataset("datasets", "iris")
+  x = convert(Array,iris[:, 1:end-1])
+  labels_string=convert(Array,iris[:, end])
+  label_to_index = Dict("setosa"=> 1, "versicolor"=> 2, "virginica"=> 3)
+  y = map( (label -> label_to_index[label]),labels_string)
+  x,y,label_strings
+  # println(x)
+  # println(labels_string)
+  # println(y)
+end
+
+x,y,labels=iris_dataset()

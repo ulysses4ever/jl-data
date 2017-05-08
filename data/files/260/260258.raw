@@ -1,0 +1,21 @@
+gm_means = [0.50, 0.20, 0.05, 0.50, 0.20, 0.50, 0.20]
+num_assets = 7
+num_sims = 1000000
+gmfs = [GroundMotionField([loc => gm_means[loc]
+                           for loc=1:num_assets]) for i=1:num_sims]
+
+vf_imls = [0.05, 0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40, 1.60, 1.80, 2.00]
+vf1_mean_lrs = [0.01, 0.04, 0.10, 0.20, 0.33, 0.50, 0.67, 0.80, 0.90, 0.96, 0.99]
+vf1_cov_lrs = [0.03, 0.12, 0.24, 0.32, 0.38, 0.40, 0.38, 0.32, 0.24, 0.12, 0.03]
+
+vf = ContinuousVulnerabilityFunction("LN", vf_imls, vf1_mean_lrs, vf1_cov_lrs)
+
+assets = [Asset("a1", 1, "wood", 1, 10000, 1),
+          Asset("a2", 2, "wood", 1, 10000, 1),
+          Asset("a3", 3, "wood", 1, 10000, 1),
+          Asset("a4", 4, "wood", 1, 10000, 1),
+          Asset("a5", 5, "wood", 1, 10000, 1),
+          Asset("a6", 6, "wood", 1, 10000, 1),
+          Asset("a7", 7, "wood", 1, 10000, 1)]
+
+tax_vf_map = ["wood" => vf]

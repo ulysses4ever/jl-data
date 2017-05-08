@@ -1,0 +1,23 @@
+#=
+@author titus 
+=#
+using   Base.Test
+include("../seg2seg.jl")
+exports = isdefined(:exports)?
+    exports : Dict{ASCIIString,Function}()
+
+exports["test_distance_2_segment"] = function test_pt2seg()
+  
+  a = [-0.8, -2.6]
+  b = [-1, 1] # [6, 2]; [5, 2]
+  c = [-2, 3]
+  d = [7, -3]
+
+  expects= 1.1094003924504583
+  @test_approx_eq_eps seg2seg(a, b, c, d) expects 1e-12
+  @test_approx_eq_eps seg2seg(a, b, d, c) expects 1e-12
+  @test_approx_eq_eps seg2seg(b, a, c, d) expects 1e-12
+  @test_approx_eq_eps seg2seg(c, d, a, b) expects 1e-12
+end
+
+

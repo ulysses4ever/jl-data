@@ -1,0 +1,14 @@
+
+module PricingModelFactory
+
+using MarketRisk
+
+const MODEL_DICT = Dict{ASCIIString, PricingModel}()
+
+MODEL_DICT["Fixed_USD"] = Bullet(RFSpotCurrency("USD"), RFIRCurve("DIxDOL"), HDSpreadCurve("Riskless"))
+MODEL_DICT["Forward_USD"] = ForwardCurrency(RFSpotCurrency("USD"), RFIRCurve("DIxDOL"), RFIRCurve("PRE"))
+MODEL_DICT["Future_USD"] = FutureCurrency(RFSpotCurrency("USD"), RFIRCurve("DIxDOL"), RFIRCurve("PRE"))
+
+getpricingmodel(name::ASCIIString) = MODEL_DICT[name]
+
+end # module PricingModelFactory

@@ -1,0 +1,154 @@
+#=this file contains code for use with "Think Stats",
+by Allen B. Downey, available from greenteapress.com
+
+Copyright 2010 Allen B. Downey
+License: GNU GPLv3 http://www.gnu.org/licenses/gpl.html
+
+The data is stored in fixed width file format in
+compressed (.gz) files.  This routine reads 1 value
+from one file and 10 values from another, performing
+conversions along the way.
+
+It outputs the number of records from each file.
+=#
+
+using DataFrames
+using GZip
+
+type FixedWidthColumn
+    name::String
+    start::Integer
+    finish::Integer
+    datatype::DataType
+    func::Function
+end
+FixedWidthColumn(name,start,finish,datatype) = FixedWidthColumn(name,start,finish,datatype,x->x)
+
+#=
+    converts string into an array of characters to enable
+    easy extraction of characters between positions
+=#
+
+function string2chars(string)
+    chars = Char[]
+    
+    for i = 1:endof(string)
+        try
+            s = string[i]
+            push!(chars, s)
+        catch
+            # nothing here, move along please
+        end
+    end
+    return chars
+end
+
+#=
+    extracts a field value from a string and converts it to
+    the required datatype.  A date format can be supplied
+    that describes the position of each component.
+=#
+
+function extractasstring(row::Array{Char,1},col::FixedWidthColumn)
+    value = match(r"^\s*(.*)\s*$",bytestring(wstring(row[col.start:col.finish]))).captures[1]
+    "NA" == value ? NA : value
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn,::Type{String},callfunc=true)
+    value = extractasstring(row,col)
+    callfunc ? col.func(value) : value
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn,::Type{Integer})
+    value = extractasstring(row,col)
+    value = "" == value ? NA : int(value)
+    isna(value) ? NA : col.func(value)
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn,::Type{Float64})
+    value = extractasstring(row,col)
+    value = "" == value ? NA : parse(Float64,value)
+    isna(value) ? value : col.func(value)
+end
+
+function extractfield(row::Array{Char,1},col::FixedWidthColumn)
+   (col.start==0 || col.finish == 0) ? NA :  extractfield(row,col,col.datatype)
+end
+
+function newdataframe(columns::Array{FixedWidthColumn,1})
+    datatypes=DataType[]
+    colnames=Symbol[]
+    
+    for column in columns
+        push!(datatypes,column.datatype)
+        push!(colnames,symbol(column.name))
+    end
+
+    DataFrame(datatypes, colnames,0)
+    
+end
+
+function readintable(filename::String,columns::Array{FixedWidthColumn,1})
+
+    df = newdataframe(columns)
+    
+    iter=eachline(GZip.gzopen(filename))
+    state=start(iter)
+    
+    while true
+        (row,state) = next(iter,state)
+        done(iter,state) && break
+
+        rowchars = string2chars(row) 
+        data=Any[]
+        for column in columns
+            push!(data,extractfield(rowchars,column))
+        end
+        push!(df,data)
+        
+    end
+    return df
+end
+
+
+#=
+    Script to read data in from the two tables and print the number of records
+=#
+function respondents()
+    respondentcolumns = FixedWidthColumn[FixedWidthColumn("caseid",1,12,Integer)]
+    df=readintable("2002FemResp.dat.gz",respondentcolumns)
+    println("Number of respondents $(size(df)[1])")
+    respondents
+end
+
+function pregnancies()
+    pregnancycolumns = FixedWidthColumn[FixedWidthColumn("caseid",1,12,Integer),
+                                        FixedWidthColumn("nbrnaliv", 22, 22, Integer),
+                                        FixedWidthColumn("babysex", 56, 56, Integer),
+                                        FixedWidthColumn("birthwgt_lb", 57, 58, Integer),
+                                        FixedWidthColumn("birthwgt_oz", 59, 60, Integer),
+                                        FixedWidthColumn("prglength", 275, 276, Integer),
+                                        FixedWidthColumn("outcome", 277, 277, Integer),
+                                        FixedWidthColumn("birthord", 278, 279, Integer),
+                                        FixedWidthColumn("agepreg", 284, 287, Integer,x-> iround(x / 100)),
+                                        FixedWidthColumn("finalwgt", 423, 440, Float64),
+                                        FixedWidthColumn("totalwgt_oz", 0, 0, Integer)
+                                       ]
+
+    df=readintable("2002FemPreg.dat.gz",pregnancycolumns)
+
+    for rec in eachrow(df)
+            if ~isna(rec[:birthwgt_lb]) & (rec[:birthwgt_lb] < 20 ) &
+               ~isna(rec[:birthwgt_oz]) & (rec[:birthwgt_oz] <=16 )
+                rec[:totalwgt_oz] = rec[:birthwgt_lb] * 16 + rec[:birthwgt_oz]
+            end
+    end
+
+    println("Number of pregnancies $(size(df)[1])")
+end
+
+function survey_main()
+    respondents()
+    pregnancies()
+end
+

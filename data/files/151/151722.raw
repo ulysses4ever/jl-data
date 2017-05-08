@@ -1,0 +1,46 @@
+function MCLikelihood(
+  lik::Function,
+  prior::Function;
+  gradlik::FunctionOrNothing = nothing,
+  tensorlik::FunctionOrNothing = nothing,
+  dtensorlik::FunctionOrNothing = nothing,
+  gradprior::FunctionOrNothing = nothing,
+  tensorprior::FunctionOrNothing = nothing,
+  dtensorprior::FunctionOrNothing = nothing,
+  init::F64OrVectorF64 = [1.0],
+  scale::F64OrVectorF64 = 1.0,
+  pmap::Union(Nothing, Dict) = nothing)
+  gradtarget =
+    if gradlik == nothing
+      @assert gradprior == nothing "Grad of likelihood and of prior are both either functions or nothing."
+    nothing
+  else
+    x->gradlik(x)+gradprior(x)
+  end
+
+  tensortarget =
+    if tensorlik == nothing
+      @assert tensorprior == nothing "Tensor of likelihood and of prior are both either functions or nothing."
+    nothing
+  else
+    x->tensorlik(x)+tensorprior(x)
+  end
+
+  dtensortarget =
+    if dtensorlik == nothing
+      @assert dtensorprior == nothing "dTensor of likelihood and of prior are both either functions or nothing."
+    nothing
+  else
+    x->dtensorlik(x)+dtensorprior(x)
+  end
+
+  MCLikelihood(
+    x->lik(x)+prior(x),
+    gradlik=gradtarget,
+    tensorlik=tensortarget,
+    dtensorlik=dtensortarget,
+    init = init,
+    scale = scale,
+    pmap = pmap
+  )
+end

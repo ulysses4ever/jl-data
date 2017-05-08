@@ -1,0 +1,15 @@
+## =============================================================================
+## 07_hline.jl - horizontal line sample
+## Copyright(C). masaru.charlie 2015. All rights reserved.
+## =============================================================================
+using DataFrames, RDatasets
+using Gadfly
+
+##n
+dat = dataset("datasets", "iris") 
+plot(dat, x="SepalLength", y="SepalWidth", yintercept=[2.5, 4.0],
+     Geom.point, Geom.hline)
+
+##
+plot(dat, x="SepalLength", y="SepalWidth", yintercept=[2.5, 4.0],
+     Geom.point, Geom.hline(color="orange", size=2mm))

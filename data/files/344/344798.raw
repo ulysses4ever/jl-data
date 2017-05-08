@@ -1,0 +1,28 @@
+using Gadfly
+
+include("../src/saddle_point_solve.jl") 
+include("laplacian2d.jl")
+
+(nx,ny) = (50,50)
+F = laplacian2d(nx,ny)
+H = spzeros(nx*ny,0)
+G = spzeros(0,0)
+f = randn(nx*ny,1)
+g = zeros(0,1) 
+
+(x,y) = saddle_point_solve(F,G,H,f,g) 
+
+println("Done.") 
+
+# Compare to straightforward implementation
+
+A = [F   H ;
+     H' -G]
+b = [f ; g]
+x = A\b 
+
+tic()
+println("Straighforward implementation residual : ", norm(A*x-b)/norm(b))
+toc()
+
+

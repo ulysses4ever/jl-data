@@ -1,0 +1,40 @@
+module Ccall
+
+export @C
+
+# # # # (INCOMPLETE)
+#
+# @C cfunc(arg1::T, arg2::S)::R
+#
+#   provides a quasi-Julia syntax for `ccall`, with argument
+#   types appended as type assertions, and return type appended
+#   as a type assertion at the end.
+#
+#   For example, instead of writing:
+#
+#     t = ccall(:time, Cint, (Ptr{Void},), C_NULL)
+#
+#   you can write:
+#
+#     t = @C time(C_NULL::Ptr{Void,})::Cint
+#
+#   Currently it does not support specifying the shared library
+#   where to look for symbols.
+#
+
+macro C(ex)
+    synt_err = "@C macro syntax error. Usage example: @C time(C_NULL::Ptr{Void})::Cint"
+    Meta.isexpr(ex, :(::)) || error(synt_err)
+    outtype = ex.args[2]
+    ex = ex.args[1]
+    Meta.isexpr(ex, :call) || error(synt_err)
+    isa(ex.args[1], Symbol) || error(synt_err)
+    all(a->Meta.isexpr(a, :(::)), ex.args[2:end]) || error(synt_err)
+    fname = ex.args[1]
+    types = [a.args[2] for a in ex.args[2:end]]
+    args = [a.args[1] for a in ex.args[2:end]]
+
+    Expr(:ccall, QuoteNode(fname), outtype, Expr(:tuple, types...), args...)
+end
+
+end

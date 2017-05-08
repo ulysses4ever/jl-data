@@ -1,0 +1,17 @@
+module Multifrontal
+
+using DataStructures: Stack, pop!, push!
+using ParallelSparseMatMul: SharedSparseMatrixCSC
+export cholesky, pcholesky, SparseCholesky
+
+  include("analyse.jl")    # analyse phase
+  include("factor.jl")        # factor phase 
+  include("solve.jl")         # solve phase
+
+  include("kernel.jl")       # computational kernel
+
+  include("cholesky.jl")  # sparse Choleksy factorization
+
+  include("examples.jl")  # some SPD sparse matrices 
+
+end # module
