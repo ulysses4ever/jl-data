@@ -655,7 +655,7 @@ next_br:    while (true) {
                 currentApiToken_ = 0;
         }
         // construct the url and the request
-        std::string req = STR("curl -i -s " << p.apiUrl() << " -H \"Authorization: token " << apiTokens_[tokenIndex] << "\"");
+        std::string req = STR("curl -s " << p.apiUrl() << " -H \"Authorization: token " << apiTokens_[tokenIndex] << "\"");
         req = execAndCapture(req, localPath_);
         // TODO analyze the results somehow to be a bit more robust
 
